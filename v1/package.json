@@ -1,0 +1,26 @@
+{
+  "name": "v1",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "axios": "^0.16.2",
+    "jquery": "^3.2.1",
+    "jquery.kinetic": "^2.1.1",
+    "lodash": "^4.17.4",
+    "prop-types": "^15.5.10",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "script-loader": "^0.7.0",
+    "underscore": "^1.8.3"
+  },
+  "main": "igv-beta.js",
+  "devDependencies": {
+    "react-scripts": "1.0.10"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
