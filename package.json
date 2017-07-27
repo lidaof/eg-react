@@ -1,0 +1,22 @@
+{
+  "name": "eg-server",
+  "version": "0.1.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lidaof/eg-react.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lidaof/eg-react/issues"
+  },
+  "homepage": "https://github.com/lidaof/eg-react#readme",
+  "dependencies": {
+    "hapi": "^16.5.0"
+  }
+}
