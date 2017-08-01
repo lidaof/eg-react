@@ -17,6 +17,7 @@ class App extends Component {
   render() {
     let tkobj = {
       type:'bigWig',
+      label:'example bigwig track',
       url:'http://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig'
     };
     return (
