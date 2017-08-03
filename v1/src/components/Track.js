@@ -9,11 +9,7 @@ class Track extends React.Component {
   c.height=c.width=1;
   c.style.display='block';
   c.tkname=obj.name;
-  c.onmousemove=track_Mmove;
-  c.onmouseout=track_Mout;
-  c.oncontextmenu=menu_track_browser;
   obj.canvas=c;
-  c.onclick=track_click;
   if(obj.cotton) c.cotton=obj.cotton;
 
   // mcm canvas (hidden in splinter)
@@ -21,11 +17,7 @@ class Track extends React.Component {
   c.style.display = "block";
   c.tkname=obj.name;
   c.width=c.height=1;
-  c.onmousedown=mcm_Mdown;
-  c.onmouseover=mcm_Mover;
-  c.onmousemove=mcm_tooltipmove;
-  c.onmouseout=mcm_Mout;
-  c.oncontextmenu=menu_track_mcm;
+
   obj.atC = c;
   if(obj.cotton) c.cotton=obj.cotton;
 
@@ -34,14 +26,10 @@ class Track extends React.Component {
   c.style.display = 'block';
   c.width=c.height=1;
   c.tkname=obj.name;
-  c.oncontextmenu=menu_track_browser;
-  c.onmouseover=trackheader_Mover;
-  c.onmouseout=trackheader_Mout;
-  c.onmousedown=trackheader_MD;
   obj.header=c;
   if(obj.cotton) c.cotton=obj.cotton;
 
-  obj.qtc[anglescale]=1;
+  obj.qtc['anglescale']=1;
 
   return obj;
   }
