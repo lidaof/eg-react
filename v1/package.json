@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "axios": "^0.16.2",
+    "d3": "^4.10.0",
     "jquery": "^3.2.1",
     "jquery.kinetic": "^2.1.1",
     "lodash": "^4.17.4",
@@ -11,8 +12,8 @@
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "script-loader": "^0.7.0",
-    "zlib": "^1.0.5",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "react-scripts": "^1.0.10"
