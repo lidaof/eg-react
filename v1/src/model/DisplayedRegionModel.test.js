@@ -55,31 +55,34 @@ describe("setRegion()", () => {
     })
 });
 
-describe("baseToChromosomeIndex()", () => {
-    it("returns the right index", () => {
-        let results = [
-            instance.baseToChromosomeIndex(19), // In genome
-            instance.baseToChromosomeIndex(100), // Outside of genome, high number
-            instance.baseToChromosomeIndex(-1), // Outside of genome, low number
-        ];
-        expect(results).toEqual([1,2,0]);
+describe("baseToChromosomeCoordinate() and baseToChromosomeIndex()", () => {
+    it("returns the right info", () => {
+        expect(instance.baseToChromosomeCoordinate(10)).toEqual({
+            name: "chr2",
+            base: 1
+        });
+    });
+
+    it("errors when given a base outside the genome", () => {
+        expect(() => instance.baseToChromosomeCoordinate(-1)).toThrow(RangeError);
+        expect(() => instance.baseToChromosomeCoordinate(100)).toThrow(RangeError);
     });
 });
 
 describe("getRegionList()", () => {
     it("gets the region properly when zoomed into one chromosome", () => {
-        instance.setRegion(10, 19);
-        expect(instance.getRegionList()).toEqual([
-            {chromosomeName: "chr2", start: 1, end: 10}
-        ]);
+        instance.setRegion(10, 20);
+        let result = instance.getRegionList().map(chr => chr.toString());
+        expect(result).toEqual(["chr2:1-10"]);
     });
 
     it("gets the list of regions properly when zoomed across multiple chromosomes", () => {
-        instance.setRegion(4, 24);
-        expect(instance.getRegionList()).toEqual([
-            {chromosomeName: "chr1", start: 5, end: 10},
-            {chromosomeName: "chr2", start: 1, end: 10},
-            {chromosomeName: "chr3", start: 1, end: 5},
+        instance.setRegion(4, 21);
+        let result = instance.getRegionList().map(chr => chr.toString());
+        expect(result).toEqual([
+            "chr1:5-10",
+            "chr2:1-10",
+            "chr3:1-1",
         ]);
     });
 });

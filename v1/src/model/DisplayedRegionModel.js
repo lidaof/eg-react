@@ -30,6 +30,13 @@ class DisplayedRegionModel {
     }
 
     /**
+     * @return {number} length of the genome in base pairs
+     */
+    getGenomeLength() {
+        return this._genomeLength;
+    }
+
+    /**
      * @return {Object[]} copy of the internal list of chromosomes
      */
     getChromosomeList() {
@@ -41,8 +48,12 @@ class DisplayedRegionModel {
      *
      * @param {number} base - the absolute base number to look up
      * @return {number} index of chromosome
+     * @throws {RangeError} if the base is not in the genome
      */
     baseToChromosomeIndex(base) {
+        if (base < 0 || base > this._genomeLength) {
+            throw new RangeError("Base number not in genome");
+        }
         // Last chromosome (highest base #) to first (lowest base #)
         for (let i = this._chromosomes.length - 1; i > 0; i--) {
             if (base >= this._chromosomes[i].startBase) {
@@ -50,6 +61,22 @@ class DisplayedRegionModel {
             }
         }
         return 0;
+    }
+
+    /**
+     * Given an absolute base number, gets the chromosome's name and base number.
+     *
+     * @param {number} base - the absolute base number to look up
+     * @return {Object} object with keys `name` and `base`
+     * @throws {RangeError} if the base is not in the genome
+     */
+    baseToChromosomeCoordinate(base) {
+        let index = this.baseToChromosomeIndex(base); // Can throw RangeError
+        let chr = this._chromosomes[index];
+        return {
+            name: chr.name,
+            base: base - chr.startBase + 1,
+        }
     }
 
     /**
@@ -77,26 +104,27 @@ class DisplayedRegionModel {
      * @return {SingleChromosomeInterval[]} a list of SingleChromosomeInterval
      */
     getRegionList() {
-        let leftChrIndex = this.baseToChromosomeIndex(this._startBase);
-        let rightChrIndex = this.baseToChromosomeIndex(this._endBase);
-        let leftChr = this._chromosomes[leftChrIndex];
-        let rightChr = this._chromosomes[rightChrIndex];
+        let inRegion = this._chromosomes.filter((chr) => {
+            return (chr.startBase + chr.lengthInBases > this._startBase) && (chr.startBase < this._endBase);
+        });
+
+        let leftChr = inRegion[0];
+        let rightChr = inRegion[inRegion.length - 1];
         // SingleChromosomeIntervals are 1-indexed so we add 1
         let leftChrStart = this._startBase - leftChr.startBase + 1;
-        let rightChrEnd = this._endBase - rightChr.startBase + 1;
+        let rightChrEnd = this._endBase - rightChr.startBase;
 
-        if (leftChrIndex === rightChrIndex) {
-            return [new SingleChromosomeInterval(leftChr.name, leftChrStart, rightChrEnd)];
+        if (inRegion.length === 1) {
+            return [new SingleChromosomeInterval(leftChr.name, leftChrStart, rightChrEnd, leftChr)];
         }
 
         let result = [];
-
-        result.push(new SingleChromosomeInterval(leftChr.name, leftChrStart, leftChr.lengthInBases));
-        for (let i = leftChrIndex + 1; i < rightChrIndex; i++) {
-            let chr = this._chromosomes[i];
-            result.push(new SingleChromosomeInterval(chr.name, 1, chr.lengthInBases));
+        result.push(new SingleChromosomeInterval(leftChr.name, leftChrStart, leftChr.lengthInBases, leftChr));
+        for (let i = 1; i < inRegion.length - 1; i++) {
+            let chr = inRegion[i];
+            result.push(new SingleChromosomeInterval(chr.name, 1, chr.lengthInBases, chr));
         }
-        result.push(new SingleChromosomeInterval(rightChr.name, 1, rightChrEnd));
+        result.push(new SingleChromosomeInterval(rightChr.name, 1, rightChrEnd, rightChr));
 
         return result;
     }
@@ -177,16 +205,18 @@ class DisplayedRegionModel {
 class SingleChromosomeInterval {
 
     /**
-     * Makes a new SingleChromosomeInterval.
+     * Makes a new SingleChromosomeInterval.  Makes a *shallow* copy of all the parameters.
      *
-     * @param {string} chromosomeName - the name of the chromosome
+     * @param {string} name - the name of the chromosome
      * @param {number} start - the (inclusive) start of the interval as a base pair number
      * @param {number} end - the (inclusive) end of the interval as a base pair number
+     * @param {Object} metadata - additional info about this chromosome
      */
-    constructor(chromosomeName, start, end) {
-        this.chromosomeName = chromosomeName;
+    constructor(name, start, end, metadata) {
+        this.name = name;
         this.start = start;
         this.end = end;
+        this.metadata = metadata;
     }
 
     /**
@@ -196,7 +226,7 @@ class SingleChromosomeInterval {
      * @return {string} this interval represented in UCSC notation
      */
     toString() {
-        return `${this.chromosomeName}:${this.start}:${this.end}`;
+        return `${this.name}:${this.start}-${this.end}`;
     }
 }
 
