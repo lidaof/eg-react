@@ -1,4 +1,4 @@
-class GenomeNavigatorComponent {
+class SvgComponent {
 
     constructor(parentSvg, displayedRegionModel) {
         this.svg = parentSvg;
@@ -30,6 +30,10 @@ class GenomeNavigatorComponent {
         return pixel * basesPerPixel + this.model.getAbsoluteRegion().start;
     }
 
+    domXToSvgX(domX) {
+        return domX - this.svg.node.getBoundingClientRect().left;
+    }
+
     offsetBy(x, y) {
         this.group.transform({x: x, y: y});
         return this;
@@ -44,4 +48,4 @@ class GenomeNavigatorComponent {
     }
 }
 
-export default GenomeNavigatorComponent;
+export default SvgComponent;

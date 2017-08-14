@@ -1,8 +1,8 @@
-import GenomeNavigatorComponent from './GenomeNavigatorComponent';
+import SvgComponent from './SvgComponent';
 
 const SELECT_BOX_HEIGHT = 60;
 
-class SelectionBox extends GenomeNavigatorComponent {
+class SelectionBox extends SvgComponent {
     constructor(parentSvg, displayedRegionModel, anchorX, regionSelectedCallback) {
         super(parentSvg, displayedRegionModel);
         this.anchorX = anchorX;
@@ -42,7 +42,7 @@ class SelectionBox extends GenomeNavigatorComponent {
     }
 
     mousemove(event) {
-        this.mouseX = event.clientX;
+        this.mouseX = this.domXToSvgX(event.clientX);
         this.redraw();
     }
 

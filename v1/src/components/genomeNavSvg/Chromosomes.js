@@ -1,10 +1,10 @@
-import GenomeNavigatorComponent from './GenomeNavigatorComponent';
+import SvgComponent from './SvgComponent';
 
 const HEIGHT = 20;
 const BOUNDARY_LINE_EXTENT = 5;
 const LABEL_OFFSET = 80;
 
-class Chromosomes extends GenomeNavigatorComponent {
+class Chromosomes extends SvgComponent {
     redraw() {
         this.group.clear();
 

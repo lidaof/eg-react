@@ -1,4 +1,4 @@
-import GenomeNavigatorComponent from './GenomeNavigatorComponent';
+import SvgComponent from './SvgComponent';
 
 const BOX_HEIGHT = 40;
 const GOTO_BUTTON_WIDTH = 50;
@@ -7,7 +7,7 @@ const GOTO_LABEL_HEIGHT = 11;
 
 const GOTO_BUTTON_Y = BOX_HEIGHT/2 - GOTO_BUTTON_HEIGHT/2;
 
-class SelectedRegionBox extends GenomeNavigatorComponent {
+class SelectedRegionBox extends SvgComponent {
     constructor(parentSvg, displayedRegionModel, selectedRegionModel, gotoButtonCallback) {
         super(parentSvg, displayedRegionModel);
         this.selectedRegionModel = selectedRegionModel;
@@ -44,13 +44,16 @@ class SelectedRegionBox extends GenomeNavigatorComponent {
     }
 
     redraw() {
-        let x = this.baseToX(this.selectedRegionModel.getAbsoluteRegion().start);
-        let width = this.basesToXWidth(this.selectedRegionModel.getWidth());
-        this.box.x(x);
+        let svgWidth = this.getSvgWidth();
+        let absRegion = this.selectedRegionModel.getAbsoluteRegion()
+        let xStart = Math.max(-10, this.baseToX(absRegion.start));
+        let xEnd = Math.min(svgWidth + 10, this.baseToX(absRegion.end));
+        let width = Math.max(0, xEnd - xStart);
+
+        this.box.x(xStart);
         this.box.width(width);
 
-        let svgWidth = this.getSvgWidth();
-        if (x + width <= 0) {
+        if (xEnd <= 0) {
             this.gotoButton.plot([
                 [0, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT/2],
                 [GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y],
@@ -60,7 +63,7 @@ class SelectedRegionBox extends GenomeNavigatorComponent {
             this.gotoLabel.font({
                 anchor: 'start',
             });
-        } else if (x >= svgWidth) {
+        } else if (xStart >= svgWidth) {
             this.gotoButton.plot([
                 [svgWidth, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT/2],
                 [svgWidth - GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y],

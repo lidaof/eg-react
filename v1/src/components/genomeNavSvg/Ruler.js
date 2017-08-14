@@ -1,11 +1,11 @@
-import GenomeNavigatorComponent from './GenomeNavigatorComponent';
+import SvgComponent from './SvgComponent';
 
 const MAX_MAJOR_TICKS = 15;
 const MINOR_TICKS = 5;
 const MAJOR_TICK_HEIGHT = 10;
 const MINOR_TICK_HEIGHT = 5;
 
-class Ruler extends GenomeNavigatorComponent {
+class Ruler extends SvgComponent {
     _getMajorUnit(log10BasesPerMajorTick) {
         if (log10BasesPerMajorTick >= 5) { // 10K
             return {
