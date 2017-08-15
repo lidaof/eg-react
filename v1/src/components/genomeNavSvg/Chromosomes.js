@@ -5,10 +5,10 @@ const BOUNDARY_LINE_EXTENT = 5;
 const LABEL_OFFSET = 80;
 
 class Chromosomes extends SvgComponent {
-    redraw() {
+    draw() {
         this.group.clear();
 
-        let regionList = this.model.getRegionList();
+        let regionList = this.props.model.getRegionList();
         let x = 0;
         for (let region of regionList) {
             let width = this.basesToXWidth(region.end - region.start + 1);
@@ -28,11 +28,11 @@ class Chromosomes extends SvgComponent {
                 regionBoundaryLine.stroke({width: 4, color: '#000'});
             }
 
-            let label = this.group.text(region.name); // Chromosome labels
-            label.move(x + width/2, LABEL_OFFSET);
-            label.font({
-                anchor: 'middle',
-                weight: 'bold',
+            this.group.text(region.name).attr({ // Chromosome labels
+                x: x + width/2,
+                y: LABEL_OFFSET,
+                "text-anchor": "middle",
+                "font-weight": "bold"
             });
 
             x += width;

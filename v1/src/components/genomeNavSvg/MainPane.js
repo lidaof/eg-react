@@ -3,6 +3,7 @@ import Chromosomes from './Chromosomes';
 import SelectedRegionBox from './SelectedRegionBox';
 import SelectionBox from './SelectionBox';
 import Ruler from './Ruler';
+import React from 'react';
 
 const WHEEL_ZOOM_SPEED = 0.15;
 
@@ -15,94 +16,43 @@ const SELECTED_BOX_Y = 30;
 const RULER_Y = CHROMOSOME_Y + 40;
 
 class MainPane extends SvgComponent {
-
-    constructor(parentSvg, displayedRegionModel, props) {
-        super(parentSvg, displayedRegionModel);
-        this.props = props;
-        this.selectBox = null;
-        this.dragOriginData = null;
-
-         // Order matters here; it dictates what is drawn on top of what -- bottommost to topmost
-        this.childComponents = [
-            new Chromosomes(this.svg, this.model).offsetBy(0, CHROMOSOME_Y),
-            new Ruler(this.svg, this.model).offsetBy(0, RULER_Y),
-            new SelectedRegionBox(this.svg, this.model, this.props.selectedRegionModel,
-                this.props.gotoSelectedRegionCallback)
-                .offsetBy(0, SELECTED_BOX_Y),
-        ];
-
-        this.svg.on('contextmenu', event => event.preventDefault());
-        this.svg.on('mousedown', this.mousedown, this);
-        this.svg.on('mousemove', this.mousemove, this);
-        this.svg.on('mouseup', this.mouseupOrMouseleave, this);
-        this.svg.on('mouseleave', this.mouseupOrMouseleave, this);
-        this.svg.on('wheel', this.mousewheel, this);
-        this.redraw();
-    }
-
-    gotoSelectedRegion() {
-        let selectedAbsRegion = this.props.selectedRegionModel.getAbsoluteRegion();
-        let halfWidth = this.props.selectedRegionModel.getWidth() * 3;
-        this.model.setRegion(selectedAbsRegion.start - halfWidth, selectedAbsRegion.end + halfWidth, true);
-        this.redraw();
-    }
-
-    offsetBy(x, y) {
-        this.svg.transform({x: x, y: y});
-        return this;
-    }
-
-    redraw() {
-        for (let component of this.childComponents) {
-            component.redraw();
+    constructor(props) {
+        super(props);
+        this.state = {
+            selectBoxAnchorX: null,
         }
-    }
 
-    selectRegion(startBase, endBase) {
-        this.props.selectedRegionModel.setRegion(startBase, endBase); // TODO Call parent stuff in future version
-        //this.props.newRegionSelectedCallback(startBase, endBase);
-        this.redraw(); // This call may be done by the parent in future versions
+        this.dragOrigin = null;
+        this.props.svg.on('contextmenu', event => event.preventDefault());
+        this.props.svg.on('mousedown', this.mousedown, this);
+        this.props.svg.on('mousemove', this.mousemove, this);
+        this.props.svg.on('mouseup', this.mouseupOrMouseleave, this);
+        this.props.svg.on('mouseleave', this.mouseupOrMouseleave, this);
+        this.props.svg.on('wheel', this.mousewheel, this);
     }
 
     mousedown(event) {
         event.preventDefault();
         if (event.button === LEFT_BUTTON) { // Select a region
-            this.selectBox = new SelectionBox(this.svg, this.model, this.domXToSvgX(event.clientX),
-                this.selectBoxCallback.bind(this)
-            );
-            this.selectBox.offsetBy(0, SELECT_BOX_Y);
-        } else if (event.button === RIGHT_BUTTON) { // Drag the display
-            this.dragOriginData = {
-                region: this.model.getAbsoluteRegion(),
-                x: event.clientX,
-                y: event.clientY,
-            }
+            this.setState({selectBoxAnchorX: this.domXToSvgX(event.clientX)});
+        } else if (event.button === RIGHT_BUTTON) { // Drag view
+            this.dragOrigin = {x: event.clientX, model: this.props.model};
         }
     }
 
     mousemove(event) {
-        event.preventDefault();
-        if (this.dragOriginData !== null) { // Dragging the view around
-            let baseDiff = this.xWidthToBases(this.dragOriginData.x - event.clientX);
-            this.model.setRegion(
-                this.dragOriginData.region.start + baseDiff,
-                this.dragOriginData.region.end + baseDiff,
-                true
+        if (this.dragOrigin) { // Dragging the view around
+            let baseDiff = this.xWidthToBases(this.dragOrigin.x - event.clientX);
+            let origRegion = this.dragOrigin.model.getAbsoluteRegion();
+            this.props.dragCallback(
+                origRegion.start + baseDiff,
+                origRegion.end + baseDiff
             );
-            this.redraw();
         }
     }
 
     mouseupOrMouseleave(event) {
-        this.dragOriginData = null; // Stopped dragging the view
-    }
-
-    selectBoxCallback(startBase, endBase) {
-        this.selectBox.remove();
-        this.selectBox = null;
-        if (endBase - startBase > 80) { // TODO let the parent take care of this
-            this.selectRegion(startBase, endBase);
-        }
+        this.dragOrigin = null;
     }
 
     mousewheel(event) {
@@ -116,7 +66,38 @@ class MainPane extends SvgComponent {
         } else if (event.deltaY < 0) { // Zoom in
             this.props.zoomCallback(1 - WHEEL_ZOOM_SPEED, focusPoint);
         }
-        this.redraw();
+    }
+
+    regionSelected(startBase, endBase) {
+        this.setState({selectBoxAnchorX: null});
+        this.props.regionSelectedCallback(startBase, endBase);
+    }
+
+    render() {
+        // Order of components matters here; components listed later will be drawn IN FRONT of ones listed before
+        return (
+        <div>
+            <Chromosomes svg={this.props.svg} model={this.props.model} yOffset={CHROMOSOME_Y} />
+            <Ruler svg={this.props.svg} model={this.props.model} yOffset={RULER_Y} />
+            <SelectedRegionBox
+                svg={this.props.svg}
+                model={this.props.model}
+                selectedRegionModel={this.props.selectedRegionModel}
+                gotoButtonCallback={this.props.gotoButtonCallback}
+                yOffset={SELECTED_BOX_Y}
+            />
+            {
+                this.state.selectBoxAnchorX &&
+                <SelectionBox
+                    svg={this.props.svg}
+                    model={this.props.model}
+                    anchorX={this.state.selectBoxAnchorX}
+                    regionSelectedCallback={this.regionSelected.bind(this)}
+                    yOffset={SELECT_BOX_Y}
+                />
+            }
+        </div>
+        );
     }
 }
 

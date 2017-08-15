@@ -25,10 +25,10 @@ class Ruler extends SvgComponent {
         };
     }
 
-    redraw() {
+    draw() {
         this.group.clear();
 
-        let regionWidth = this.model.getWidth();
+        let regionWidth = this.props.model.getWidth();
 
         // If one wanted MAX_MAJOR_TICKS to represent the min number of ticks, use Math.floor() instead.
         let log10BasesPerMajorTick = Math.ceil(Math.log10(regionWidth / MAX_MAJOR_TICKS));
@@ -41,7 +41,7 @@ class Ruler extends SvgComponent {
         let rulerLine = this.group.line(0, 0, this.getSvgWidth(), 0);
         rulerLine.stroke({width: 1, color: '#bbb'});
 
-        let regionList = this.model.getRegionList();
+        let regionList = this.props.model.getRegionList();
         for (let region of regionList) {
             // Round down to the nearest major tick base for this region, to find where to start drawing
             let relativeBase = Math.floor(region.start / basesPerMajorTick) * basesPerMajorTick;
@@ -57,9 +57,11 @@ class Ruler extends SvgComponent {
 
                 // Label for the major tick
                 if (relativeBase > 0) {
-                    let label = this.group.text(relativeBase / unit.size + unit.suffix);
-                    label.move(majorX, 0 + 10);
-                    label.font('anchor', 'middle');
+                    this.group.text(relativeBase / unit.size + unit.suffix).attr({
+                        x: majorX,
+                        y: 0 + 10,
+                        "text-anchor": "middle",
+                    });
                 }
 
                 // Minor ticks

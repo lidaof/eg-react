@@ -1,50 +1,66 @@
-class SvgComponent {
+import React from 'react';
 
-    constructor(parentSvg, displayedRegionModel) {
-        this.svg = parentSvg;
-        this.group = parentSvg.group();
-        this.model = displayedRegionModel;
+class SvgComponent extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.group = this.props.svg.group();
+    }
+
+    readOffset() {
+        let x = this.props.xOffset || 0;
+        let y = this.props.yOffset || 0;
+        this.group.transform({x: x, y: y});
+    }
+
+    componentDidMount() {
+        this.readOffset();
+        this.draw();
+    }
+
+    componentDidUpdate() {
+        this.readOffset();
+        this.draw();
+    }
+
+    componentWillUnmount() {
+        this.group.remove();
     }
 
     getSvgWidth() {
-        return this.svg.viewbox().width;
+        return this.props.svg.viewbox().width;
     }
 
     basesToXWidth(bases) {
-        let pixelsPerBase = this.getSvgWidth() / this.model.getWidth();
+        let pixelsPerBase = this.getSvgWidth() / this.props.model.getWidth();
         return bases * pixelsPerBase;
     }
 
     xWidthToBases(pixels) {
-        let basesPerPixel = this.model.getWidth() / this.getSvgWidth();
+        let basesPerPixel = this.props.model.getWidth() / this.getSvgWidth();
         return pixels * basesPerPixel;
     }
 
     baseToX(base) {
-        let pixelsPerBase = this.getSvgWidth() / this.model.getWidth();
-        return (base - this.model.getAbsoluteRegion().start) * pixelsPerBase;
+        let pixelsPerBase = this.getSvgWidth() / this.props.model.getWidth();
+        return (base - this.props.model.getAbsoluteRegion().start) * pixelsPerBase;
     }
 
     xToBase(pixel) {
-        let basesPerPixel = this.model.getWidth() / this.getSvgWidth();
-        return pixel * basesPerPixel + this.model.getAbsoluteRegion().start;
+        let basesPerPixel = this.props.model.getWidth() / this.getSvgWidth();
+        return pixel * basesPerPixel + this.props.model.getAbsoluteRegion().start;
     }
 
     domXToSvgX(domX) {
-        return domX - this.svg.node.getBoundingClientRect().left;
+        return domX - this.props.svg.node.getBoundingClientRect().left;
     }
 
-    offsetBy(x, y) {
-        this.group.transform({x: x, y: y});
-        return this;
-    }
-
-    redraw() {
+    draw() {
 
     }
 
-    remove() {
-        this.group.remove();
+    render() {
+        return null;
     }
 }
 
