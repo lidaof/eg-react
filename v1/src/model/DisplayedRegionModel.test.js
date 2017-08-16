@@ -69,6 +69,29 @@ describe("baseToChromosomeCoordinate() and baseToChromosomeIndex()", () => {
     });
 });
 
+describe("parseRegionString() and chromosomeCoordinatesToBase()", () => {
+    it("parses correctly", () => {
+        expect(instance.parseRegionString("chr1:1-10")).toEqual({start: 0, end: 10});
+        expect(instance.parseRegionString("chr2:1-chr3:10")).toEqual({start: 10, end: 30});
+    });
+
+    it("errors if given a nonsensical string", () => {
+        expect(() => instance.parseRegionString("chr1:234s-130")).toThrow(RangeError);
+    });
+
+    it("errors if end base is before start base", () => {
+        expect(() => instance.parseRegionString("chr1:10-1")).toThrow(RangeError);
+    });
+
+    it("errors if the chromosome doesn't exist", () => {
+        expect(() => instance.parseRegionString("chr3:1-chr4:10")).toThrow(RangeError);
+    });
+
+    it("errors if the base pair is out of range", () => {
+        expect(() => instance.parseRegionString("chr1:1-11")).toThrow(RangeError);
+    });
+});
+
 describe("getRegionList()", () => {
     it("gets the region properly when zoomed into one chromosome", () => {
         instance.setRegion(10, 20);

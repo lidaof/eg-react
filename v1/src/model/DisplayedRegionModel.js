@@ -30,20 +30,6 @@ class DisplayedRegionModel {
     }
 
     /**
-     * @return {number} length of the genome in base pairs
-     */
-    getGenomeLength() {
-        return this._genomeLength;
-    }
-
-    /**
-     * @return {Object[]} copy of the internal list of chromosomes
-     */
-    getChromosomeList() {
-        return this._chromosomes.slice();
-    }
-
-    /**
      * Given an absolute base number, gets the index of the chromosome in which the base is located.
      *
      * @param {number} base - the absolute base number to look up
@@ -77,6 +63,71 @@ class DisplayedRegionModel {
             name: chr.name,
             base: base - chr.startBase + 1,
         }
+    }
+
+    /**
+     * Given a chromosome name and base number in that chromosome, gets the absolute base number in this genome.
+     *
+     * @param {string} chrName - name of the chromosome to look up
+     * @param {number} baseNum - base number in the chromosome
+     * @return {number} the absolute base in this genome
+     * @throws {RangeError} if the chromosome or its base number is not in the genome
+     */
+    chromosomeCoordinatesToBase(chrName, baseNum) {
+        let chr = this._chromosomes.find(chr => chr.name === chrName);
+        if (!chr) {
+            throw new RangeError("Could not find chromosome with that name");
+        }
+
+        // Take care: `!baseNum` is only appropriate because the `baseNum < 1` check
+        if (!baseNum || baseNum < 1 || baseNum > chr.lengthInBases) {
+            throw new RangeError("Base number not in that chromosome");
+        }
+        return chr.startBase + baseNum - 1;
+    }
+
+    /**
+     * Parses a UCSC-style chromosomal range, like "chr1:1000-chr2:1000", and returns a object that contains the range's
+     * absolute start and end base.
+     *
+     * @param {string} string - the string to parse
+     * @return {Object} object with props `start` and `end`
+     * @throws {RangeError} if parsing fails or if something nonsensical was parsed (like end before start)
+     */
+    parseRegionString(string) {
+        let startChr, endChr, startBase, endBase;
+        let singleChrMatch, multiChrMatch;
+        // eslint-disable-next-line no-cond-assign
+        if ((singleChrMatch = string.match(/([\w:]+):(\d+)-(\d+)/)) !== null) {
+            startChr = singleChrMatch[1];
+            endChr = startChr;
+            startBase = Number.parseInt(singleChrMatch[2], 10);
+            endBase = Number.parseInt(singleChrMatch[3], 10);
+        // eslint-disable-next-line no-cond-assign
+        } else if ((multiChrMatch = string.match(/([\w:]+):(\d+)-([\w:]+):(\d+)/)) !== null) {
+            startChr = multiChrMatch[1];
+            endChr = multiChrMatch[3];
+            startBase = Number.parseInt(multiChrMatch[2], 10);
+            endBase = Number.parseInt(multiChrMatch[4], 10);
+        } else {
+            throw new RangeError("Could not parse coordinates");
+        }
+
+        if (endBase < startBase) {
+            throw new RangeError("Start base must be before end base");
+        }
+
+        return {
+            start: this.chromosomeCoordinatesToBase(startChr, startBase),
+            end: this.chromosomeCoordinatesToBase(endChr, endBase) + 1,
+        }
+    }
+
+    /**
+     * @return {number} length of the genome in base pairs
+     */
+    getGenomeLength() {
+        return this._genomeLength;
     }
 
     /**

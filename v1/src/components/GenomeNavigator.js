@@ -3,6 +3,7 @@ import SVG from 'svg.js';
 import _ from 'lodash';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import MainPane from './genomeNavSvg/MainPane';
+import TrackRegionController from './TrackRegionController';
 
 const MIN_REGION_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
 
@@ -28,7 +29,7 @@ class GenomeNavigator extends React.Component {
         }
         // TODO the info required to make this model should be passed from the parent
         this.state.model.setRegion(15000000, 25000000); // This setting should depend on this.props.trackRegionModel
-        this.state.selectedRegionModel.setRegion(15500000, 16000000);
+        this.state.selectedRegionModel.setRegion(15599999, 16000000);
 
         // TODO TrackRegionModel should be passed from parent (this.props.trackRegionModel); we will make one here for
         // test purposes.
@@ -92,6 +93,7 @@ class GenomeNavigator extends React.Component {
                         onChange={this.zoomSliderDragged.bind(this)}
                     />
                 </label>
+                <TrackRegionController model={this.state.selectedRegionModel} newRegionCallback={this.regionSelected}/>
 
                 {/* This div will hold the actual svg element; SVG.js adds it in componentDidMount() */}
                 <div id={this.id} style={{border: "1px solid black"}}></div>
