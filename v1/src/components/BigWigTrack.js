@@ -1,6 +1,6 @@
+import BarChart from './BarChart';
 import React from 'react';
 import Track from './Track';
-import BarChart from './BarChart';
 import _ from 'lodash';
 
 const bigwig = require('../vendor/bbi-js/main/bigwig');

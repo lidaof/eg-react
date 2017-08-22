@@ -1,84 +1,98 @@
-import React from 'react';
-import SVG from 'svg.js';
-import _ from 'lodash';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import MainPane from './genomeNavSvg/MainPane';
+import PropTypes from 'prop-types';
+import React from 'react';
+import SVG from 'svg.js';
 import TrackRegionController from './TrackRegionController';
+import _ from 'lodash';
 
 const MIN_REGION_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
+const DEFAULT_VIEW_REGION = [15000000, 25000000]; // TODO calculate this dynamically, or get it from this.props
 
+/**
+ * A navigator that allows users to scroll around the genome and select what region for tracks to display.  Relies on
+ * SVG.js to render much of the UI.
+ * 
+ * @extends {React.Component}
+ * @author Silas Hsu
+ */
 class GenomeNavigator extends React.Component {
-
+    /**
+     * @inheritdoc 
+     */
     constructor(props) {
         super(props);
         this.id = _.uniqueId();
-        let chromosomes = [
-            {name: "chr1", lengthInBases: 224999719},
-            {name: "chr2", lengthInBases: 237712649},
-            {name: "chr3", lengthInBases: 194704827},
-            {name: "chr4", lengthInBases: 187297063},
-            {name: "chr5", lengthInBases: 177702766},
-            {name: "chr6", lengthInBases: 167273993},
-            {name: "chr7", lengthInBases: 154952424},
-            {name: "chrY", lengthInBases: 25121652},
-        ];
         this.state = {
-            model: new DisplayedRegionModel("meow", chromosomes),
-            selectedRegionModel: new DisplayedRegionModel("meow", chromosomes),
+            model: new DisplayedRegionModel("meow", this.props.chromosomes),
             svg: null,
         }
-        // TODO the info required to make this model should be passed from the parent
-        this.state.model.setRegion(15000000, 25000000); // This setting should depend on this.props.trackRegionModel
-        this.state.selectedRegionModel.setRegion(15599999, 16000000);
+        this.state.model.setRegion(...DEFAULT_VIEW_REGION);
 
-        // TODO TrackRegionModel should be passed from parent (this.props.trackRegionModel); we will make one here for
-        // test purposes.
-        this.regionSelected = this.regionSelected.bind(this);
         this.zoom = this.zoom.bind(this);
         this.setNewView = this.setNewView.bind(this);
         this.zoomSliderDragged = this.zoomSliderDragged.bind(this);
     }
 
-    cloneAndMutate(modelObj, methodName, args) {
-        let copy = _.cloneDeep(modelObj);
-        copy[methodName].apply(copy, args);
-        return copy;
+    /**
+     * Deep copies this.state.model, mutates it by calling `methodName` with `args`, and then calls this.setState().
+     * 
+     * @param {string} methodName - the method to call on the model
+     * @param {any[]} args - arguments to provide to the method
+     */
+    _setModelState(methodName, args) {
+        let modelCopy = _.cloneDeep(this.state.model);
+        modelCopy[methodName].apply(modelCopy, args);
+        this.setState({model: modelCopy});
     }
 
-    regionSelected(newStart, newEnd) {
-        let modelCopy = _.cloneDeep(this.state.selectedRegionModel);
-        modelCopy.setRegion(newStart, newEnd, true);
-        this.setState({selectedRegionModel: modelCopy});
-    }
-
+    /**
+     * Wrapper for calling zoom() on the view model.
+     * 
+     * @param {number} amount - amount to zoom
+     * @param {number} focusPoint - focal point of the zoom
+     * @see DisplayedRegionModel#zoom
+     */
     zoom(amount, focusPoint) {
         if (amount < 1 && this.state.model.getWidth() <= MIN_REGION_LENGTH) {
             return;
         }
-        let modelCopy = _.cloneDeep(this.state.model);
-        modelCopy.zoom(amount, focusPoint);
-        this.setState({model: modelCopy});
+        this._setModelState("zoom", [amount, focusPoint]);
     }
 
+    /**
+     * Wrapper for calling setRegion() on the view model
+     * 
+     * @param {number} newStart - start absolute base number
+     * @param {number} newEnd - end absolute base number
+     * @see DisplayedRegionModel#setRegion
+     */
     setNewView(newStart, newEnd) {
-        let modelCopy = _.cloneDeep(this.state.model);
-        modelCopy.setRegion(newStart, newEnd, true);
-        this.setState({model: modelCopy});
+        this._setModelState("setRegion", [newStart, newEnd]);
     }
 
+    /**
+     * Zooms the view to the right level when the zoom slider is dragged.
+     * 
+     * @param {React.SyntheticEvent} event - the event that react fired when the zoom slider was changed
+     */
     zoomSliderDragged(event) {
         let targetRegionSize = Math.exp(event.target.value);
         let proportion = targetRegionSize / this.state.model.getWidth();
-
-        let modelCopy = _.cloneDeep(this.state.model);
-        modelCopy.zoom(proportion);
-        this.setState({model: modelCopy});
+        this._setModelState("zoom", [proportion]);
     }
 
+    /**
+     * Calls SVG.js, constructing a new SVG DOM element, and sets state accordingly.
+     * @override
+     */
     componentDidMount() {
         this.setState({svg: SVG(this.id)})
     }
 
+    /**
+     * @inheritdoc
+     */
     render() {
         return (
             <div style={{padding: "20px"}}>
@@ -90,20 +104,24 @@ class GenomeNavigator extends React.Component {
                         max={Math.log(this.state.model.getGenomeLength())}
                         step="any"
                         value={Math.log(this.state.model.getWidth())}
-                        onChange={this.zoomSliderDragged.bind(this)}
+                        onChange={this.zoomSliderDragged}
                     />
                 </label>
-                <TrackRegionController model={this.state.selectedRegionModel} newRegionCallback={this.regionSelected}/>
+                <TrackRegionController
+                    model={this.props.selectedRegionModel}
+                    newRegionCallback={this.props.regionSelectedCallback}
+                />
 
                 {/* This div will hold the actual svg element; SVG.js adds it in componentDidMount() */}
                 <div id={this.id} style={{border: "1px solid black"}}></div>
                 {
-                    this.state.svg &&
+                    // We need a svg already mounted in the DOM for MainPane to work.
+                    this.state.svg && 
                     <MainPane
                         svg={this.state.svg}
                         model={this.state.model}
-                        selectedRegionModel={this.state.selectedRegionModel} // TODO Or rather, this.props.
-                        regionSelectedCallback={this.regionSelected}
+                        selectedRegionModel={this.props.selectedRegionModel}
+                        regionSelectedCallback={this.props.regionSelectedCallback}
                         dragCallback={this.setNewView}
                         gotoButtonCallback={this.setNewView}
                         zoomCallback={this.zoom}
@@ -112,6 +130,12 @@ class GenomeNavigator extends React.Component {
             </div>
         );
     }
+}
+
+GenomeNavigator.propTypes = {
+    chromosomes: PropTypes.arrayOf(PropTypes.object).isRequired,
+    selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+    regionSelectedCallback: PropTypes.func.isRequired, // Function that takes arguments [number, number]
 }
 
 export default GenomeNavigator;

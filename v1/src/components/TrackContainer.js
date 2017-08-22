@@ -1,5 +1,5 @@
-import React from 'react';
 import BigWigTrack from './BigWigTrack.js';
+import React from 'react';
 
 class TrackContainer extends React.Component {
     constructor(props) {

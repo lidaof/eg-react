@@ -5,27 +5,51 @@ const MINOR_TICKS = 5;
 const MAJOR_TICK_HEIGHT = 10;
 const MINOR_TICK_HEIGHT = 5;
 
+/**
+ * Draws a ruler that displays genomic coordinates
+ * 
+ * @author Silas Hsu
+ * @extends SvgComponent
+ */
 class Ruler extends SvgComponent {
-    _getMajorUnit(log10BasesPerMajorTick) {
-        if (log10BasesPerMajorTick >= 5) { // 10K
+    /**
+     * @typedef {Object} Ruler~Unit
+     * @property {number} size - the number of base pairs in this unit
+     * @property {string} name - a string that represents this unit
+     */
+
+    /**
+     * Gets the unit for the major tick labels, depending on the number of bases between ticks.  Chooses between unit
+     * base, kilobase, and megabase.
+     * 
+     * @param {number} log10BasesPerTick - log10() of the number of bases between ticks
+     * @return {Ruler~Unit} the unit for tick labels
+     */
+    _getMajorUnit(log10BasesPerTick) {
+        if (log10BasesPerTick >= 5) { // 10K
             return {
                 size: 1000000,
-                suffix: "M",
+                name: "M",
             };
-        } else if (log10BasesPerMajorTick > 2) { // 100
+        } else if (log10BasesPerTick > 2) { // 100
             return {
                 size: 1000,
-                suffix: "K",
+                name: "K",
             };
         }
 
         return {
             size: 1,
-            suffix: "",
+            name: "",
         };
     }
 
-    draw() {
+    /**
+     * Clears this group and redraws the ruler.
+     * 
+     * @override
+     */
+    render() {
         this.group.clear();
 
         let regionWidth = this.props.model.getWidth();
@@ -43,7 +67,7 @@ class Ruler extends SvgComponent {
 
         let regionList = this.props.model.getRegionList();
         for (let region of regionList) {
-            // Round down to the nearest major tick base for this region, to find where to start drawing
+            // relativeBase = round down to the nearest major tick base for this region, to find where to start drawing
             let relativeBase = Math.floor(region.start / basesPerMajorTick) * basesPerMajorTick;
             let majorX = this.baseToX(region.metadata.startBase + relativeBase);
             let majorTickEndX = this.baseToX(region.metadata.startBase + region.end);
@@ -57,7 +81,7 @@ class Ruler extends SvgComponent {
 
                 // Label for the major tick
                 if (relativeBase > 0) {
-                    this.group.text(relativeBase / unit.size + unit.suffix).attr({
+                    this.group.text(relativeBase / unit.size + unit.name).attr({
                         x: majorX,
                         y: 0 + 10,
                         "text-anchor": "middle",
@@ -78,6 +102,8 @@ class Ruler extends SvgComponent {
                 majorX += pixelsPerMajorTick;
             } // End while (majorX < majorTickEndX) { ... }
         } // End for (let region of regionList) { ... }
+
+        return null;
     }
 }
 

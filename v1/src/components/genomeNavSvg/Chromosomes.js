@@ -4,8 +4,19 @@ const HEIGHT = 20;
 const BOUNDARY_LINE_EXTENT = 5;
 const LABEL_OFFSET = 80;
 
+/**
+ * Draws rectangles that represent chromosomes and their labels.
+ * 
+ * @author Silas Hsu
+ * @extends SvgComponent
+ */
 class Chromosomes extends SvgComponent {
-    draw() {
+    /**
+     * Clears this group and redraws all the chromosomes.
+     * 
+     * @override
+     */
+    render() {
         this.group.clear();
 
         let regionList = this.props.model.getRegionList();
@@ -37,6 +48,7 @@ class Chromosomes extends SvgComponent {
 
             x += width;
         }
+        return null;
     }
 }
 

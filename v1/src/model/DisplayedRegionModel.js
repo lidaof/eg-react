@@ -1,9 +1,11 @@
+import _ from 'lodash';
+
 const MIN_ABS_BASE = 0; // Index absolute bases starting from this number.  Take caution in modifying this!
 
 /**
  * Model that stores the currently displayed genomic region.  Internally, expresses the current region as a single open
- * interval [startBaseNumber, endBaseNumber).  For APIs that require 1-indexing and chromosomal ranges (such as
- * "chr1:1-1000", the first 1000 bases of chromosome 1), this class also provides such funtionality.
+ * interval [startBaseNumber, endBaseNumber).  Also provides helpers to convert to and from UCSC notation, e.g. 
+ * "chr1:1-1000", the first 1000 bases of chromosome 1.
  *
  * @author Silas Hsu
  */
@@ -19,7 +21,7 @@ class DisplayedRegionModel {
         this.name = name;
 
         let totalBases = 0;
-        this._chromosomes = chromosomes.slice();
+        this._chromosomes = _.cloneDeep(chromosomes);
         for (let chromosome of this._chromosomes) {
             chromosome.startBase = totalBases;
             totalBases += chromosome.lengthInBases;
@@ -138,9 +140,15 @@ class DisplayedRegionModel {
     }
 
     /**
+     * @typedef {Object} DisplayedRegionModel~Region
+     * @property {number} start - the start of the region, inclusive
+     * @property {number} end - the start of the region, exclusive
+     */
+
+    /**
      * Gets a copy of the internally stored 0-indexed open interval that represents this displayed region.
      *
-     * @return {Object} object with props `start` and `end`
+     * @return {DisplayedRegionModel~Region} copy of the internally stored region
      */
     getAbsoluteRegion() {
         return {
