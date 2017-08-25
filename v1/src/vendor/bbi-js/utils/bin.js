@@ -261,7 +261,7 @@ var convertBuffer = new ArrayBuffer(8);
 var ba = new Uint8Array(convertBuffer);
 var fa = new Float32Array(convertBuffer);
 
-global.readFloat = function(buf, offset) {
+function readFloat(buf, offset) {
   ba[0] = buf[offset];
   ba[1] = buf[offset + 1];
   ba[2] = buf[offset + 2];
@@ -298,5 +298,5 @@ module.exports = {
   readInt64: readInt64,
   readShort: readShort,
   readByte: readByte,
-  readFloat: this.readFloat
+  readFloat: readFloat
 }
