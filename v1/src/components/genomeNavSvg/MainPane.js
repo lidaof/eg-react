@@ -8,8 +8,6 @@ import SelectionBox from './SelectionBox';
 import SvgComponent from './SvgComponent';
 
 const WHEEL_ZOOM_SPEED = 0.2;
-
-const SELECT_REGION_BUTTON = 0; // Left mouse
 const DRAG_VIEW_BUTTON = 2; // Right mouse
 // FYI, {0: left mouse, 1: middle mouse, 2: right mouse}
 
@@ -32,10 +30,6 @@ class MainPane extends SvgComponent {
      */
     constructor(props) {
         super(props);
-        this.state = {
-            selectBoxAnchorX: null,
-        }
-
         this.dragOrigin = null;
         this.props.svg.on('contextmenu', event => event.preventDefault());
         this.props.svg.on('mousedown', this.mousedown, this);
@@ -64,9 +58,7 @@ class MainPane extends SvgComponent {
      */
     mousedown(event) {
         event.preventDefault();
-        if (event.button === SELECT_REGION_BUTTON) {
-            this.setState({selectBoxAnchorX: this.domXToSvgX(event.clientX)});
-        } else if (event.button === DRAG_VIEW_BUTTON) {
+        if (event.button === DRAG_VIEW_BUTTON) {
             this.dragOrigin = {x: event.clientX, model: this.props.model};
         }
     }
@@ -115,18 +107,6 @@ class MainPane extends SvgComponent {
     }
 
     /**
-     * Callback for when a user finishes selecting a region.  Uninitializes the region selection box and propagates the
-     * selected region to this component's parent.
-     * 
-     * @param {number} startBase - start base of the newly selected region
-     * @param {number} endBase - end base of the newly selected region
-     */
-    regionSelected(startBase, endBase) {
-        this.setState({selectBoxAnchorX: null});
-        this.props.regionSelectedCallback(startBase, endBase);
-    }
-
-    /**
      * Doesn't draw anything by itself, but places child SvgComponents that *do* draw things.
      * 
      * @override
@@ -144,16 +124,12 @@ class MainPane extends SvgComponent {
                 gotoButtonCallback={this.props.gotoButtonCallback}
                 yOffset={SELECTED_BOX_Y}
             />
-            {
-                this.state.selectBoxAnchorX &&
-                <SelectionBox
-                    svg={this.props.svg}
-                    model={this.props.model}
-                    anchorX={this.state.selectBoxAnchorX}
-                    regionSelectedCallback={this.regionSelected.bind(this)}
-                    yOffset={SELECT_BOX_Y}
-                />
-            }
+            <SelectionBox
+                svg={this.props.svg}
+                model={this.props.model}
+                regionSelectedCallback={this.props.regionSelectedCallback}
+                yOffset={SELECT_BOX_Y}
+            />
         </div>
         );
     }

@@ -21,4 +21,4 @@ yarn-debug.log*
 yarn-error.log*
 
 storybook-static
-
+src/components/genomeNavSvg/__image_snapshots__/__diff_output__/

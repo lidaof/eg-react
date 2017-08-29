@@ -2,7 +2,7 @@ import { configure } from '@storybook/react';
 
 function loadStories() {
   require('../src/stories');
-  require('../src/stories/genomeNavStories');
+  require('../src/stories/genomeNavStories.js');
 }
 
 configure(loadStories, module);

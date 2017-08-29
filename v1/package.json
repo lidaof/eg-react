@@ -22,7 +22,8 @@
     "@storybook/react": "^3.2.8",
     "jest-image-snapshot": "^1.0.0",
     "nightmare": "^2.10.0",
-    "react-scripts": "^1.0.10"
+    "react-scripts": "^1.0.10",
+    "tcp-port-used": "^0.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
