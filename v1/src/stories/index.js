@@ -32,6 +32,9 @@ storiesOf('Welcome', module).add('to Storybook', () => {
             On macOS, if you get an EMFILE error when you <code>npm test</code>, 
             try <code>brew install watchman</code> first.
         </p>
+        <p>
+            If you need to update a snapshot, simply press the "u" key inside the test runner app.
+        </p>
     </div>
     );
 });
