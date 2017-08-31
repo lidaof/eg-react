@@ -31,12 +31,12 @@ class MainPane extends SvgComponent {
     constructor(props) {
         super(props);
         this.dragOrigin = null;
-        this.props.svg.on('contextmenu', event => event.preventDefault());
-        this.props.svg.on('mousedown', this.mousedown, this);
-        this.props.svg.on('mousemove', this.mousemove, this);
-        this.props.svg.on('mouseup', this.mouseupOrMouseleave, this);
-        this.props.svg.on('mouseleave', this.mouseupOrMouseleave, this);
-        this.props.svg.on('wheel', this.mousewheel, this);
+        this.svg.on('contextmenu', event => event.preventDefault());
+        this.svg.on('mousedown', this.mousedown, this);
+        this.svg.on('mousemove', this.mousemove, this);
+        this.svg.on('mouseup', this.mouseupOrMouseleave, this);
+        this.svg.on('mouseleave', this.mouseupOrMouseleave, this);
+        this.svg.on('wheel', this.mousewheel, this);
     }
 
     /**
@@ -47,7 +47,7 @@ class MainPane extends SvgComponent {
     applyOffset() {
         let x = this.props.xOffset || 0;
         let y = this.props.yOffset || 0;
-        this.props.svg.transform({x: x, y: y});
+        this.svg.transform({x: x, y: y});
     }
 
     /**
@@ -115,17 +115,17 @@ class MainPane extends SvgComponent {
         // Order of components matters here; components listed later will be drawn IN FRONT of ones listed before
         return (
         <div>
-            <Chromosomes svg={this.props.svg} model={this.props.model} yOffset={CHROMOSOME_Y} />
-            <Ruler svg={this.props.svg} model={this.props.model} yOffset={RULER_Y} />
+            <Chromosomes svgNode={this.props.svgNode} model={this.props.model} yOffset={CHROMOSOME_Y} />
+            <Ruler svgNode={this.props.svgNode} model={this.props.model} yOffset={RULER_Y} />
             <SelectedRegionBox
-                svg={this.props.svg}
+                svgNode={this.props.svgNode}
                 model={this.props.model}
                 selectedRegionModel={this.props.selectedRegionModel}
                 gotoButtonCallback={this.props.gotoButtonCallback}
                 yOffset={SELECTED_BOX_Y}
             />
             <SelectionBox
-                svg={this.props.svg}
+                svgNode={this.props.svgNode}
                 model={this.props.model}
                 regionSelectedCallback={this.props.regionSelectedCallback}
                 yOffset={SELECT_BOX_Y}

@@ -22,10 +22,10 @@ class SelectionBox extends SvgComponent {
         this.box = null;
         this.anchorX = 0;
 
-        this.props.svg.on('mousedown', this.mousedown, this);
-        this.props.svg.on('mousemove', this.mousemove, this);
-        this.props.svg.on('mouseup', this.mouseupOrMouseleave, this);
-        this.props.svg.on('mouseleave', this.mouseupOrMouseleave, this);
+        this.svg.on('mousedown', this.mousedown, this);
+        this.svg.on('mousemove', this.mousemove, this);
+        this.svg.on('mouseup', this.mouseupOrMouseleave, this);
+        this.svg.on('mouseleave', this.mouseupOrMouseleave, this);
     }
 
     /**
@@ -109,10 +109,10 @@ class SelectionBox extends SvgComponent {
      */
     componentWillUnmount() {
         this.group.remove();
-        this.props.svg.off('mousedown', this.mousedown);
-        this.props.svg.off('mousemove', this.mousemove);
-        this.props.svg.off('mouseup', this.mouseupOrMouseleave);
-        this.props.svg.off('mouseleave', this.mouseupOrMouseleave);
+        this.svg.off('mousedown', this.mousedown);
+        this.svg.off('mousemove', this.mousemove);
+        this.svg.off('mouseup', this.mouseupOrMouseleave);
+        this.svg.off('mouseleave', this.mouseupOrMouseleave);
     }
 }
 

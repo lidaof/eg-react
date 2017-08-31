@@ -9,7 +9,7 @@ import SVG from 'svg.js';
  * 
  * In order to support responsive SVG drawing, this component requires a <svg> already in the DOM that SVG.js created.
  * The constructor automatically creates a <group> element in the SVG.  It is recommended to manipulate `this.group`
- * rather than `this.props.svg`, to take advantage of the `applyOffset()` and `componentWillUnmount()` methods and to
+ * rather than `this.svg`, to take advantage of the `applyOffset()` and `componentWillUnmount()` methods and to
  * make element management easier.
  * 
  * @extends React.Component
@@ -21,7 +21,8 @@ class SvgComponent extends React.Component {
      */
     constructor(props) {
         super(props);
-        this.group = this.props.svg.group();
+        this.svg = SVG.adopt(this.props.svgNode);
+        this.group = this.svg.group();
         this.applyOffset();
     }
 
@@ -54,7 +55,7 @@ class SvgComponent extends React.Component {
      * @return {number} the width, in pixels, of this SVG's viewbox
      */
     getSvgWidth() {
-        return this.props.svg.viewbox().width;
+        return this.svg.viewbox().width;
     }
 
     /**
@@ -64,7 +65,7 @@ class SvgComponent extends React.Component {
      * @return {number} the X coordinate in the SVG
      */
     domXToSvgX(domX) {
-        return domX - this.props.svg.node.getBoundingClientRect().left;
+        return domX - this.props.svgNode.getBoundingClientRect().left;
     }
 
     /*//////////
@@ -130,7 +131,7 @@ class SvgComponent extends React.Component {
 }
 
 SvgComponent.propTypes = {
-    svg: PropTypes.instanceOf(SVG.Container).isRequired,
+    svgNode: PropTypes.instanceOf(SVGElement).isRequired,
     model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
     xOffset: PropTypes.number,
     yOffset: PropTypes.number,

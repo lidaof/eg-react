@@ -2,7 +2,7 @@ import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import MainPane from './genomeNavSvg/MainPane';
 import PropTypes from 'prop-types';
 import React from 'react';
-import SVG from 'svg.js';
+import SvgContainer from './SvgContainer';
 import TrackRegionController from './TrackRegionController';
 import _ from 'lodash';
 
@@ -25,7 +25,6 @@ class GenomeNavigator extends React.Component {
         this.id = _.uniqueId();
         this.state = {
             model: new DisplayedRegionModel("meow", this.props.chromosomes),
-            svg: null,
         }
         this.state.model.setRegion(...DEFAULT_VIEW_REGION);
 
@@ -68,7 +67,7 @@ class GenomeNavigator extends React.Component {
      * @see DisplayedRegionModel#setRegion
      */
     setNewView(newStart, newEnd) {
-        this._setModelState("setRegion", [newStart, newEnd]);
+        this._setModelState("setRegion", [newStart, newEnd, true]);
     }
 
     /**
@@ -80,14 +79,6 @@ class GenomeNavigator extends React.Component {
         let targetRegionSize = Math.exp(event.target.value);
         let proportion = targetRegionSize / this.state.model.getWidth();
         this._setModelState("zoom", [proportion]);
-    }
-
-    /**
-     * Calls SVG.js, constructing a new SVG DOM element, and sets state accordingly.
-     * @override
-     */
-    componentDidMount() {
-        this.setState({svg: SVG(this.id)})
     }
 
     /**
@@ -113,12 +104,8 @@ class GenomeNavigator extends React.Component {
                 />
 
                 {/* This div will hold the actual svg element; SVG.js adds it in componentDidMount() */}
-                <div id={this.id} style={{border: "1px solid black"}}></div>
-                {
-                    // We need a svg already mounted in the DOM for MainPane to work.
-                    this.state.svg && 
+                <SvgContainer>
                     <MainPane
-                        svg={this.state.svg}
                         model={this.state.model}
                         selectedRegionModel={this.props.selectedRegionModel}
                         regionSelectedCallback={this.props.regionSelectedCallback}
@@ -126,7 +113,7 @@ class GenomeNavigator extends React.Component {
                         gotoButtonCallback={this.setNewView}
                         zoomCallback={this.zoom}
                     />
-                }
+                </SvgContainer>
             </div>
         );
     }
