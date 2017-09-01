@@ -1,6 +1,6 @@
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import PropTypes from 'prop-types';
-import SvgComponent from './SvgComponent';
+import SvgComponent from '../SvgComponent';
 
 const BOX_HEIGHT = 40;
 const GOTO_BUTTON_WIDTH = 50;
@@ -76,8 +76,8 @@ class SelectedRegionBox extends SvgComponent {
         let absRegion = this.props.selectedRegionModel.getAbsoluteRegion();
 
         // We limit the box's start and end X because SVGs don't like to be billions of pixels wide.
-        let xStart = Math.max(-10, this.baseToX(absRegion.start));
-        let xEnd = Math.min(svgWidth + 10, this.baseToX(absRegion.end));
+        let xStart = Math.max(-10, this.scale.baseToX(absRegion.start));
+        let xEnd = Math.min(svgWidth + 10, this.scale.baseToX(absRegion.end));
         let width = Math.max(0, xEnd - xStart);
         this.box.x(xStart);
         this.box.width(width);

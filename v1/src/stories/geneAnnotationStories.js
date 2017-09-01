@@ -1,7 +1,7 @@
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import GeneAnnotationSvg from '../components/GeneAnnotationSvg';
 import React from 'react';
-import SingleSvgRender from './SingleSvgRender';
+import SvgContainer from '../components/SvgContainer';
 import { storiesOf } from '@storybook/react';
 
 export const STORY_KIND = "Gene annotation"
@@ -65,15 +65,14 @@ const data = [
 
 export const geneAnnotationTest = {
     storyName: "SVG only",
-    component: <SingleSvgRender
-        childClass={GeneAnnotationSvg}
-        childProps={{
-            data: data,
-            model: model,
-            maxRows: 2,
-            yOffset: 20
-        }}
-    />,
+    component: <SvgContainer>
+        <GeneAnnotationSvg 
+            data={data}
+            model={model}
+            maxRows={2}
+            yOffset={20}
+        />
+    </SvgContainer>
 }
 storiesOf(STORY_KIND, module)
     .add(geneAnnotationTest.storyName, () => geneAnnotationTest.component);

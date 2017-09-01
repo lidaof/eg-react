@@ -1,4 +1,4 @@
-import SvgComponent from './SvgComponent';
+import SvgComponent from '../SvgComponent';
 
 const HEIGHT = 20;
 const BOUNDARY_LINE_EXTENT = 5;
@@ -22,7 +22,7 @@ class Chromosomes extends SvgComponent {
         let regionList = this.props.model.getRegionList();
         let x = 0;
         for (let region of regionList) {
-            let width = this.basesToXWidth(region.end - region.start + 1);
+            let width = this.scale.basesToXWidth(region.end - region.start + 1);
 
             this.group.rect().attr({ // Rectangle for each chromosome
                 width: width,

@@ -1,9 +1,10 @@
-import Chromosomes from '../components/genomeNavSvg/Chromosomes';
+import Chromosomes from '../components/genomeNavigator/Chromosomes';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import { LEFT_MOUSE } from '../components/DomDragListener';
 import React from 'react';
-import Ruler from '../components/genomeNavSvg/Ruler';
-import SelectionBox from '../components/genomeNavSvg/SelectionBox';
-import SingleSvgRender from './SingleSvgRender';
+import Ruler from '../components/genomeNavigator/Ruler';
+import SelectionBox from '../components/genomeNavigator/SelectionBox';
+import SvgContainer from '../components/SvgContainer';
 import { storiesOf } from '@storybook/react';
 
 const STORIES = [];
@@ -18,26 +19,26 @@ model.setRegion(0, model.getGenomeLength());
 
 export const chromosomeTest = {
     storyName: "Chromosomes",
-    component: <SingleSvgRender childClass={Chromosomes} childProps={{model: model}} />,
+    component: <SvgContainer><Chromosomes model={model}/></SvgContainer>
 };
 STORIES.push(chromosomeTest);
 
 export const rulerTest = {
     storyName: "Ruler",
-    component: <SingleSvgRender childClass={Ruler} childProps={{model: model, yOffset: 40}} />,
+    component: <SvgContainer><Ruler model={model} yOffset={40}/></SvgContainer>
 }
 STORIES.push(rulerTest);
 
 export const selectBoxTest = {
     storyName: "Selection box",
-    component: <SingleSvgRender
-        childClass={SelectionBox}
-        childProps={{
-            model: model,
-            regionSelectedCallback: (start, end) => {window.newRegion = {start: start, end: end}},
-            yOffset: 20,
-        }}
-    />,
+    component: <SvgContainer>
+        <SelectionBox
+            button={LEFT_MOUSE}
+            model={model}
+            regionSelectedCallback={(start, end) => window.newRegion = {start: start, end: end}}
+            yOffset={20}
+        />
+    </SvgContainer>,
 };
 STORIES.push(selectBoxTest);
 

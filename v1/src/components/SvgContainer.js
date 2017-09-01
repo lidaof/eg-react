@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
 
@@ -9,14 +10,22 @@ class SvgContainer extends React.Component {
         }
         this.svgNode = null;
         this.svgId = _.uniqueId();
+
+        this.handleSvgRef = this.handleSvgRef.bind(this);
     }
 
     /**
-     * Calls SVG.js, constructing a new SVG DOM element, and sets state accordingly.
-     * @override
+     * @inheritdoc
      */
     componentDidMount() {
-        this.setState({svgDidMount: true})
+        this.setState({svgDidMount: true});
+    }
+
+    handleSvgRef(node) {
+        this.svgNode = node;
+        if (this.props.svgRef) {
+            this.props.svgRef(this.svgNode);
+        }
     }
 
     render() {
@@ -33,11 +42,13 @@ class SvgContainer extends React.Component {
         return (
         <div>
             <svg
+                style={this.props.svgStyle}
                 width="100%"
                 height="100%"
                 id={this.svgId}
-                ref={(node) => this.svgNode = node}
-                style={{border: "1px solid black"}}
+                ref={this.handleSvgRef}
+                onWheel={this.props.onWheel}
+                onContextMenu={this.props.onContextMenu}
             ></svg>
             {children}
         </div>
@@ -47,4 +58,9 @@ class SvgContainer extends React.Component {
 
 export default SvgContainer;
 
-// Props: add onDragStart, onDrag, onDragEnd
+SvgContainer.propTypes = {
+    svgRef: PropTypes.func,
+    svgStyle: PropTypes.object,
+    onContextMenu: PropTypes.func,
+    onWheel: PropTypes.func,
+}

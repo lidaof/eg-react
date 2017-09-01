@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import SvgComponent from './genomeNavSvg/SvgComponent'
+import SvgComponent from './SvgComponent';
 
 const ANNOTATION_HEIGHT = 8;
 const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;
@@ -31,8 +31,8 @@ class GeneAnnotationSvg extends SvgComponent {
     }
 
     _drawGene(gene, topY) {
-        let startX = this.baseToX(gene.start);
-        let endX = this.baseToX(gene.end);
+        let startX = this.scale.baseToX(gene.start);
+        let endX = this.scale.baseToX(gene.end);
         let centerY = topY + ANNOTATION_HEIGHT / 2;
         let bottomY = topY + ANNOTATION_HEIGHT;
 
@@ -58,9 +58,9 @@ class GeneAnnotationSvg extends SvgComponent {
         let exonClip = this.group.clip();
         for (let exon of gene.exons) {
             let exonBox = this.group.rect().attr({
-                x: this.baseToX(exon.start),
+                x: this.scale.baseToX(exon.start),
                 y: topY,
-                width: this.basesToXWidth(exon.end - exon.start),
+                width: this.scale.basesToXWidth(exon.end - exon.start),
                 height: ANNOTATION_HEIGHT,
                 fill: COLOR
             });
@@ -102,8 +102,8 @@ class GeneAnnotationSvg extends SvgComponent {
         for (let gene of genes) {
             // Label width is approximate; I don't feel like adding one to the DOM and checking its width.
             let labelWidth = gene.name.length * LABEL_SIZE;
-            let startX = this.baseToX(gene.start) - labelWidth;
-            let endX = this.baseToX(gene.end);
+            let startX = this.scale.baseToX(gene.start) - labelWidth;
+            let endX = this.scale.baseToX(gene.end);
             let row = rowXExtents.findIndex(rightmostX => startX > rightmostX);
             if (row === -1) {
                 let y = maxRows * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING);
@@ -116,7 +116,7 @@ class GeneAnnotationSvg extends SvgComponent {
                 });
                 numHiddenGenes++;
             } else {
-                rowXExtents[row] = this.baseToX(gene.end);
+                rowXExtents[row] = this.scale.baseToX(gene.end);
                 let y = row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING);
                 this._drawGene(gene, y);
             }

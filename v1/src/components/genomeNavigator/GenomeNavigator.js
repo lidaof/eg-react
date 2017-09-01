@@ -1,8 +1,7 @@
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import MainPane from './genomeNavSvg/MainPane';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import MainPane from './MainPane';
 import PropTypes from 'prop-types';
 import React from 'react';
-import SvgContainer from './SvgContainer';
 import TrackRegionController from './TrackRegionController';
 import _ from 'lodash';
 
@@ -103,17 +102,14 @@ class GenomeNavigator extends React.Component {
                     newRegionCallback={this.props.regionSelectedCallback}
                 />
 
-                {/* This div will hold the actual svg element; SVG.js adds it in componentDidMount() */}
-                <SvgContainer>
-                    <MainPane
-                        model={this.state.model}
-                        selectedRegionModel={this.props.selectedRegionModel}
-                        regionSelectedCallback={this.props.regionSelectedCallback}
-                        dragCallback={this.setNewView}
-                        gotoButtonCallback={this.setNewView}
-                        zoomCallback={this.zoom}
-                    />
-                </SvgContainer>
+                <MainPane
+                    model={this.state.model}
+                    selectedRegionModel={this.props.selectedRegionModel}
+                    regionSelectedCallback={this.props.regionSelectedCallback}
+                    dragCallback={this.setNewView}
+                    gotoButtonCallback={this.setNewView}
+                    zoomCallback={this.zoom}
+                />
             </div>
         );
     }

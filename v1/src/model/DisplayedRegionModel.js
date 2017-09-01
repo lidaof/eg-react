@@ -198,6 +198,9 @@ class DisplayedRegionModel {
      * @throws {RangeError} if end is less than start
      */
     setRegion(start, end, preserveLength) {
+        if (!Number.isFinite(start) || !Number.isFinite(end)) {
+            throw new RangeError("Start and end must be well-defined");
+        }
         if (end < start) {
             throw new RangeError("Start must be less than or equal to end");
         }

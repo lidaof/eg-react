@@ -1,6 +1,6 @@
 import './App.css';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
-import GenomeNavigator from './components/GenomeNavigator';
+import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import React from 'react';
 import TrackContainer from './components/TrackContainer';
 import _ from 'lodash';
