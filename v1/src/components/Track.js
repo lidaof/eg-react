@@ -1,4 +1,5 @@
-//import PropTypes from 'prop-types';
+import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 class Track extends React.Component {
@@ -43,3 +44,7 @@ class Track extends React.Component {
 }
 
 export default Track;
+
+Track.PropTypes = {
+    viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+}

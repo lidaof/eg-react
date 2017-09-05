@@ -43,7 +43,7 @@ class App extends React.Component {
                 selectedRegionModel={this.state.selectedRegionModel}
                 regionSelectedCallback={this.regionSelected}
             />
-            <TrackContainer></TrackContainer>
+            <TrackContainer viewRegion={this.state.selectedRegionModel}></TrackContainer>
         </div>
         );
     }

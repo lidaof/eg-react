@@ -4,6 +4,8 @@ import { max } from 'd3-array'
 import { select } from 'd3-selection'
 //import { transition } from 'd3-transition'
 
+const DEBUG = false;
+
 class BarChart extends Component {
   constructor(props){
     super(props)
@@ -23,7 +25,7 @@ class BarChart extends Component {
     const node = this.node;
     const dataMax = max(this.props.data);
     const barWidth = w / this.props.data.length;
-    console.log([w,h,dataMax,barWidth]);
+    if (DEBUG) console.log([w,h,dataMax,barWidth]);
     select(node)
     //.attr("height","100%")
     //      .attr("width","100%")
