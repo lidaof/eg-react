@@ -32,6 +32,9 @@ class SvgContainer extends React.Component {
         let children = null;
         if (this.state.svgDidMount) {
             children = React.Children.map(this.props.children, (child) => {
+                if (!child) {
+                    return null;
+                }
                 return React.cloneElement(child, {
                     // Props to merge
                     svgNode: this.svgNode

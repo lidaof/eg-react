@@ -5,7 +5,7 @@ class LinearDrawingModel {
     }
 
     getSvgWidth() {
-        return this.svgNode.scrollWidth
+        return this.svgNode.clientWidth;
     }
 
     /**
