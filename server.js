@@ -1,33 +1,33 @@
 'use strict';
 
 const Hapi = require('hapi');
-const server = new Hapi.Server();
+const configRefGeneRoute = require('./routes/refGeneRoute.js');
 
-server.connection({
-    host: 'localhost',
-    port: 3001
-});
+var server = null;
 
-server.route({
-    method: 'GET',
-    path:'/hello',
-    handler: function (request, reply) {
-        return reply('hello world');
+function startServer(dataSources, logger) {
+    server = new Hapi.Server();
+
+    server.connection({
+        host: 'localhost',
+        port: 3001
+    });
+
+    configRefGeneRoute(server, dataSources.refGeneSource);
+
+    return server.start().then(() => {
+        console.log('Server running at:', server.info.uri);
+    });
+}
+
+function stopServer() {
+    if (server === null) {
+        return Promise.reject(new Error("No server running"));
     }
-});
+    return server.stop().then(() => server = null);
+}
 
-server.route({
-    method: 'POST',
-    path:'/getTrackData',
-    handler: function (request, reply) {
-        return reply('wow very data');
-    }
-});
-
-
-server.start((err) => {
-    if (err) {
-        throw err;
-    }
-    console.log('Server running at:', server.info.uri);
-});
+module.exports = {
+    start: startServer,
+    stop: stopServer,
+};
