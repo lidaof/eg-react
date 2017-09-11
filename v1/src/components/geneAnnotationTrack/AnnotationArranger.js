@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import SvgComponent from '../SvgComponent';
 
-const DEFAULT_MAX_ROWS = 4;
+const DEFAULT_MAX_ROWS = 6;
 const ROW_BOTTOM_PADDING = 5;
+const ANNOTATION_RIGHT_PADDING = 10;
 
 /*
 class GeneAnnotation {
@@ -29,10 +30,9 @@ class AnnotationArranger extends SvgComponent {
     }
 
     _filterAndSortGenes(genes) {
-        let displayRegion = this.props.model.getAbsoluteRegion();
-        let visibleGenes = genes.filter(gene => gene.start < displayRegion.end && gene.end > displayRegion.start);
-        return visibleGenes.sort((gene1, gene2) => gene1.start - gene2.start);
-    } // End _drawGene
+        let visibleGenes = genes.filter(gene => gene.isInView);
+        return visibleGenes.sort((gene1, gene2) => gene1.absStart - gene2.absEnd);
+    }
 
     _addHiddenGenesReminder(numHiddenGenes) {
         if (numHiddenGenes > 0) {
@@ -56,17 +56,21 @@ class AnnotationArranger extends SvgComponent {
         let numHiddenGenes = 0;
         let id = 0;
         for (let gene of genes) {
-            // Label width is approximate; I don't feel like adding one to the DOM and checking its width.
-            let labelWidth = gene.name.length * LABEL_SIZE;
-            let startX = this.scale.baseToX(gene.start) - labelWidth;
+            // Label width is approx because I don't feel like adding one to the DOM and checking its width.
+            let estimatedLabelWidth = gene.name.length * LABEL_SIZE;
+            let startX = this.scale.baseToX(gene.absStart) - estimatedLabelWidth;
+            let endX = this.scale.baseToX(gene.absEnd);
+            if (startX < estimatedLabelWidth) {
+                endX += estimatedLabelWidth + 5;
+            }
             let row = rowXExtents.findIndex(rightmostX => startX > rightmostX);
             let isLabeled = true;
-            if (startX < 0 || row === -1) {
+            if (row === -1) {
                 isLabeled = false;
                 numHiddenGenes++;
                 row = this.props.maxRows;
             } else {
-                rowXExtents[row] = this.scale.baseToX(gene.end);
+                rowXExtents[row] = endX + ANNOTATION_RIGHT_PADDING;
             }
             children.push(<GeneAnnotation
                 svgNode={this.props.svgNode}

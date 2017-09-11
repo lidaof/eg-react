@@ -11,7 +11,7 @@ class TrackContainer extends React.Component {
     render() {
         return (
             <div>
-                <BigWigTrack viewRegion={this.props.viewRegion} dataSource={bwSource} />
+                {/* <BigWigTrack viewRegion={this.props.viewRegion} dataSource={bwSource} /> */}
                 <GeneAnnotationTrack viewRegion={this.props.viewRegion} dataSource={geneSource} />
             </div>
         );

@@ -1,60 +1,32 @@
+import $ from 'jquery';
 import DataSource from './DataSource';
-
-const data = [
-    {
-        name: "GENE1",
-        strand: "+",
-        start: 5,
-        end: 100,
-        exons: []
-    },
-    {
-        name: "GENE2",
-        strand: "-",
-        start: 200,
-        end: 400,
-        exons: [
-            {
-                start: 200,
-                end: 250
-            },
-            {
-                start: 330,
-                end: 400
-            }
-        ]
-    },
-    {
-        name: "GENE3",
-        strand: "+",
-        start: 250,
-        end: 300,
-        exons: []
-    },
-    {
-        name: "GENE4",
-        strand: "-",
-        start: 350,
-        end: 500,
-        exons: []
-    },
-    {
-        name: "GENE5",
-        strand: "+",
-        start: 800,
-        end: 1200,
-        exons: [
-            {
-                start: 900,
-                end: 1100
-            }
-        ]
-    },
-];
+import Gene from '../model/Gene';
 
 class GeneDataSource extends DataSource {
     getData(regionModel) {
-        return Promise.resolve(data);
+        let requests = []
+        for (let region of regionModel.getRegionList()) {
+            requests.push(this._getDataForOneRegion(region));
+        }
+
+        return Promise.all(requests).then((results) => {
+            let combined = [].concat.apply([], results); // Concatenate all the data into one array
+            return combined.map(record => new Gene(record, regionModel));
+        });
+    }
+
+    _getDataForOneRegion(region) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "refGene/hg19",
+                data: { // Query parameters
+                    chromosome: region.name,
+                    start: region.start,
+                    end: region.end
+                },
+                dataType: "json", // Expected type of data from server
+            }).done(resolve).fail(reject);
+        });
     }
 }
 

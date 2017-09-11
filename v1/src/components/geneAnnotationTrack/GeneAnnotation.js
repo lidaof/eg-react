@@ -9,6 +9,8 @@ const ARROW_SEPARATION = 10;
 const COLOR = "blue";
 const IN_EXON_ARROW_COLOR = "white";
 
+const LABEL_BACKGROUND_PADDING = 2;
+
 export class GeneAnnotation extends SvgComponent {
     onClick(event) {
         if (this.props.onClick) {
@@ -23,11 +25,16 @@ export class GeneAnnotation extends SvgComponent {
 
     render() {
         this.group.clear();
+        let gene = this.props.gene;
 
-        const startX = this.scale.baseToX(this.props.gene.start);
-        const endX = this.scale.baseToX(this.props.gene.end);
+        const startX = this.scale.baseToX(gene.absStart);
+        const endX = this.scale.baseToX(gene.absEnd);
         const centerY = this.props.topY + ANNOTATION_HEIGHT / 2;
         const bottomY = this.props.topY + ANNOTATION_HEIGHT;
+
+        if (endX - startX < 1 && !this.props.isLabeled) { // No use rendering if less than one pixel wide
+            return null;
+        }
 
         // Box that covers the whole annotation to increase the click area
         let coveringBox = this.group.rect().attr({
@@ -43,17 +50,6 @@ export class GeneAnnotation extends SvgComponent {
             coveringBox.opacity(0);
         }
 
-        // Label
-        // Add a little more right padding depending on the arrow direction
-        let labelX = this.props.gene.strand === "+" ? startX - ARROW_WIDTH : startX;
-        labelX -= 5;
-        this.group.text(this.props.gene.name).attr({
-            x: labelX,
-            y: this.props.topY - ANNOTATION_HEIGHT,
-            "text-anchor": "end",
-            "font-size": LABEL_SIZE,
-        });
-
         // Center line
         this.group.line(startX, centerY, endX, centerY).stroke({
             color: COLOR,
@@ -63,11 +59,13 @@ export class GeneAnnotation extends SvgComponent {
         // Exons
         // someComponent.clipWith(exonClip) will make it show up only where the exons are.
         let exonClip = this.group.clip();
-        for (let exon of this.props.gene.exons) {
+        for (let exon of gene.absExons) {
+            let exonStart = exon[0];
+            let exonEnd = exon[1];
             let exonBox = this.group.rect().attr({
-                x: this.scale.baseToX(exon.start),
+                x: this.scale.baseToX(exonStart),
                 y: this.props.topY,
-                width: this.scale.basesToXWidth(exon.end - exon.start),
+                width: this.scale.basesToXWidth(exonEnd - exonStart),
                 height: ANNOTATION_HEIGHT,
                 fill: COLOR
             });
@@ -76,7 +74,7 @@ export class GeneAnnotation extends SvgComponent {
 
         // Arrows
         for (let x = startX; x <= endX; x += ARROW_SEPARATION) {
-            let arrowTipX = this.props.gene.strand === "+" ?
+            let arrowTipX = gene.strand === "+" ?
                 x - ARROW_WIDTH : // Point to the right
                 x + ARROW_WIDTH; // Point to the left
             let arrowPoints = [
@@ -97,6 +95,30 @@ export class GeneAnnotation extends SvgComponent {
                 "stroke-width": 1
             }).clipWith(exonClip); // <-- Note the .clipWith()
         }
+
+        // Label
+        // Move the label a little more to the left if the arrow is pointing that way
+        let labelX = (gene.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
+        let label = this.group.text(gene.name).attr({
+            x: labelX,
+            y: this.props.topY - ANNOTATION_HEIGHT,
+            "text-anchor": "end",
+            "font-size": LABEL_SIZE,
+        });
+        let labelBox = label.bbox();
+        if (labelBox.x < 0) { // Move the label into view
+            label.x(labelBox.width + 5);
+            labelBox = label.bbox(); // Since we moved the label, we need to get the box again
+        }
+        let labelBackground = this.group.rect().attr({
+            x: labelBox.x - LABEL_BACKGROUND_PADDING,
+            y: labelBox.y,
+            width: labelBox.width + 2 * LABEL_BACKGROUND_PADDING,
+            height: labelBox.height,
+            fill: "white",
+            opacity: 0.75,
+        });
+        labelBackground.backward();
 
         return null;
     }

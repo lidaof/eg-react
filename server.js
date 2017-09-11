@@ -24,6 +24,7 @@ function stopServer() {
     if (server === null) {
         return Promise.reject(new Error("No server running"));
     }
+    console.log('Stopping server...');
     return server.stop().then(() => server = null);
 }
 

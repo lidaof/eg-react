@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node main.js",
+    "start": "concurrently --kill-others \"npm run server\" \"cd v1 && npm start\"",
+    "server": "node main.js",
     "test": "mocha",
     "setup": "node setup/ingestRefGene.js refGene"
   },
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "concurrently": "^3.5.0",
     "mocha": "^3.5.0"
   }
 }

@@ -28,10 +28,9 @@ class GeneAnnotationTrack extends Track {
             return <p>Loading...</p>;
         }
         return (
-        <div ref={node => this.divNode = node} onClick={(event) => this.setState({geneDetail: null})}>
-            <SvgContainer svgStyle={{border: "1px solid black"}}>
+        <div style={{padding: "20px"}} ref={node => this.divNode = node} onClick={(event) => this.setState({geneDetail: null})}>
+            <SvgContainer svgStyle={{border: "1px solid black", padding: "10px"}}>
                 <AnnotationArranger
-                    yOffset={10}
                     data={this.state.data}
                     model={this.props.viewRegion}
                     onGeneClick={this.geneClicked}

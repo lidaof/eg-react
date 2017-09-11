@@ -18,8 +18,8 @@ class RefGeneSource {
                 let collection = this.database.collection(collectionName);
                 return collection.find({
                     chromosome: chromosome,
-                    start: { $gt: startBase },
-                    end: { $lt: endBase },
+                    start: { $lt: endBase },
+                    end: { $gt: startBase },
                 }).toArray();
             });
         return promise;

@@ -18,4 +18,9 @@ mongoUtils.getRefGeneDatabase()
         if (database !== null) {
             database.close();
         }
+        process.exit(1);
     });
+
+process.on('SIGINT', function() {
+    return server.stop().then(() => process.exit(0));
+});
