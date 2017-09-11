@@ -39,12 +39,10 @@ class SelectionBox extends SvgComponent {
         }
         this.anchorX = anchorX;
 
-        this.box = this.group.rect();
+        this.box = this.group.rect(1, SELECT_BOX_HEIGHT);
         this.box.attr({
             x: this.anchorX,
             y: 0,
-            width: 1,
-            height: SELECT_BOX_HEIGHT,
             stroke: "#009",
             fill: "#00f",
             "fill-opacity": 0.1,
@@ -58,7 +56,7 @@ class SelectionBox extends SvgComponent {
      */
     dragStart(event) {
         event.preventDefault();
-        this._addBox(this.scale.domXToSvgX(event.clientX));
+        this._addBox(this.props.drawModel.domXToSvgX(event.clientX));
     }
 
     /**
@@ -87,8 +85,8 @@ class SelectionBox extends SvgComponent {
         if (!this.box) {
             return;
         }
-        let startBase = this.scale.xToBase(this.box.x());
-        let endBase = startBase + this.scale.xWidthToBases(this.box.width());
+        let startBase = this.props.drawModel.xToBase(this.box.x());
+        let endBase = startBase + this.props.drawModel.xWidthToBases(this.box.width());
 
         this.box.remove();
         this.box = null;

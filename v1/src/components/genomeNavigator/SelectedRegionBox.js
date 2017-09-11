@@ -25,8 +25,7 @@ class SelectedRegionBox extends SvgComponent {
     constructor(props) {
         super(props);
 
-        this.box = this.group.rect().attr({
-            height: BOX_HEIGHT,
+        this.box = this.group.rect(1, BOX_HEIGHT).attr({
             stroke: "#090",
             fill: "#0f0",
             "fill-opacity": 0.1,
@@ -72,12 +71,12 @@ class SelectedRegionBox extends SvgComponent {
      * @override
      */
     render() {
-        let svgWidth = this.getSvgWidth();
+        let svgWidth = this.props.drawModel.svgWidth;
         let absRegion = this.props.selectedRegionModel.getAbsoluteRegion();
 
         // We limit the box's start and end X because SVGs don't like to be billions of pixels wide.
-        let xStart = Math.max(-10, this.scale.baseToX(absRegion.start));
-        let xEnd = Math.min(svgWidth + 10, this.scale.baseToX(absRegion.end));
+        let xStart = Math.max(-10, this.props.drawModel.baseToX(absRegion.start));
+        let xEnd = Math.min(svgWidth + 10, this.props.drawModel.baseToX(absRegion.end));
         let width = Math.max(0, xEnd - xStart);
         this.box.x(xStart);
         this.box.width(width);

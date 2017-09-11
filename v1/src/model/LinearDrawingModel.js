@@ -2,10 +2,7 @@ class LinearDrawingModel {
     constructor(model, svgNode) {
         this.model = model;
         this.svgNode = svgNode;
-    }
-
-    getSvgWidth() {
-        return this.svgNode.clientWidth;
+        this.svgWidth = svgNode.clientWidth;
     }
 
     /**
@@ -15,7 +12,7 @@ class LinearDrawingModel {
      * @return {number} width in pixels
      */
     basesToXWidth(bases) {
-        let pixelsPerBase = this.getSvgWidth() / this.model.getWidth();
+        let pixelsPerBase = this.svgWidth / this.model.getWidth();
         return bases * pixelsPerBase;
     }
 
@@ -26,7 +23,7 @@ class LinearDrawingModel {
      * @return {number} width in number of bases
      */
     xWidthToBases(pixels) {
-        let basesPerPixel = this.model.getWidth() / this.getSvgWidth();
+        let basesPerPixel = this.model.getWidth() / this.svgWidth;
         return pixels * basesPerPixel;
     }
 
@@ -37,7 +34,7 @@ class LinearDrawingModel {
      * @return {number} X coordinate that represents the input base
      */
     baseToX(base) {
-        let pixelsPerBase = this.getSvgWidth() / this.model.getWidth();
+        let pixelsPerBase = this.svgWidth / this.model.getWidth();
         return (base - this.model.getAbsoluteRegion().start) * pixelsPerBase;
     }
 
@@ -48,7 +45,7 @@ class LinearDrawingModel {
      * @return {number} absolute base coordinate
      */
     xToBase(pixel) {
-        let basesPerPixel = this.model.getWidth() / this.getSvgWidth();
+        let basesPerPixel = this.model.getWidth() / this.svgWidth;
         return pixel * basesPerPixel + this.model.getAbsoluteRegion().start;
     }
 

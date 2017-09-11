@@ -24,8 +24,9 @@ class SvgComponent extends React.Component {
         super(props);
         this.svg = SVG.adopt(this.props.svgNode);
         this.group = this.svg.group();
-        this.scale = new LinearDrawingModel(this.props.model, this.props.svgNode);
-        this.applyOffset(props);
+        if (props.xOffset !== 0 || props.yOffset !== 0) {
+            this.applyOffset(props);
+        }
     }
 
     /**
@@ -33,9 +34,7 @@ class SvgComponent extends React.Component {
      * @param {Object} props 
      */
     applyOffset(props) {
-        let x = props.xOffset || 0;
-        let y = props.yOffset || 0;
-        this.group.transform({x: x, y: y});
+        this.group.transform({x: this.props.xOffset, y: this.props.yOffset});
     }
 
     /**
@@ -44,9 +43,6 @@ class SvgComponent extends React.Component {
     componentWillUpdate(nextProps) {
         if (this.props.xOffset !== nextProps.xOffset || this.props.yOffset !== nextProps.yOffset) {
             this.applyOffset(nextProps);
-        }
-        if (this.props.model !== nextProps.model) {
-            this.scale = new LinearDrawingModel(nextProps.model, nextProps.svgNode);
         }
     }
 
@@ -57,13 +53,6 @@ class SvgComponent extends React.Component {
      */
     componentWillUnmount() {
         this.group.remove();
-    }
-
-    /**
-     * @return {number} the width, in pixels, of this SVG.
-     */
-    getSvgWidth() {
-        return this.svg.viewbox().width;
     }
 
     /**
@@ -81,10 +70,16 @@ class SvgComponent extends React.Component {
 SvgComponent.propTypes = {
     // Since jsdom doesn't know what SVG is, we comment this out.  Don't worry, it because apparent VERY quickly if
     // this.props.svgNode is ever undefined.
-    //svgNode: PropTypes.instanceOf(SVGElement).isRequired, 
-    model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+    //svgNode: PropTypes.instanceOf(SVGElement).isRequired,
+    model: PropTypes.instanceOf(DisplayedRegionModel),
+    drawModel: PropTypes.instanceOf(LinearDrawingModel),
     xOffset: PropTypes.number,
     yOffset: PropTypes.number,
+}
+
+SvgComponent.defaultProps = {
+    xOffset: 0,
+    yOffset: 0,
 }
 
 export default SvgComponent;

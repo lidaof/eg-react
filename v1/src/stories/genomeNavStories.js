@@ -19,22 +19,21 @@ model.setRegion(0, model.getGenomeLength());
 
 export const chromosomeTest = {
     storyName: "Chromosomes",
-    component: <SvgContainer><Chromosomes model={model}/></SvgContainer>
+    component: <SvgContainer model={model}><Chromosomes/></SvgContainer>
 };
 STORIES.push(chromosomeTest);
 
 export const rulerTest = {
     storyName: "Ruler",
-    component: <SvgContainer><Ruler model={model} yOffset={40}/></SvgContainer>
+    component: <SvgContainer model={model}><Ruler yOffset={40}/></SvgContainer>
 }
 STORIES.push(rulerTest);
 
 export const selectBoxTest = {
     storyName: "Selection box",
-    component: <SvgContainer>
+    component: <SvgContainer model={model}>
         <SelectionBox
             button={LEFT_MOUSE}
-            model={model}
             regionSelectedCallback={(start, end) => window.newRegion = {start: start, end: end}}
             yOffset={20}
         />

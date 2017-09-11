@@ -1,3 +1,5 @@
+import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import LinearDrawingModel from '../model/LinearDrawingModel';
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
@@ -28,18 +30,25 @@ class SvgContainer extends React.Component {
         }
     }
 
+    giveChildrenProps(children) {
+        let propsToGive = {
+            svgNode: this.svgNode,
+            model: this.props.model,
+            drawModel: new LinearDrawingModel(this.props.model, this.svgNode),
+        };
+        
+        return React.Children.map(children, (child) => {
+            if (!child) {
+                return null;
+            }
+            return React.cloneElement(child, propsToGive);
+        });
+    }
+
     render() {
         let children = null;
         if (this.state.svgDidMount) {
-            children = React.Children.map(this.props.children, (child) => {
-                if (!child) {
-                    return null;
-                }
-                return React.cloneElement(child, {
-                    // Props to merge
-                    svgNode: this.svgNode
-                });
-            });
+            children = this.giveChildrenProps(this.props.children);
         }
     
         return (
@@ -62,6 +71,7 @@ class SvgContainer extends React.Component {
 export default SvgContainer;
 
 SvgContainer.propTypes = {
+    model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
     svgRef: PropTypes.func,
     svgStyle: PropTypes.object,
     onContextMenu: PropTypes.func,

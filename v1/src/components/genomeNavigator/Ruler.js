@@ -57,20 +57,20 @@ class Ruler extends SvgComponent {
         // If one wanted MAX_MAJOR_TICKS to represent the min number of ticks, use Math.floor() instead.
         let log10BasesPerMajorTick = Math.ceil(Math.log10(regionWidth / MAX_MAJOR_TICKS));
         let basesPerMajorTick = Math.pow(10, log10BasesPerMajorTick); // Thus ensuring each major tick is a power of 10.
-        let pixelsPerMajorTick = this.scale.basesToXWidth(basesPerMajorTick);
+        let pixelsPerMajorTick = this.props.drawModel.basesToXWidth(basesPerMajorTick);
         let pixelsPerMinorTick = pixelsPerMajorTick / MINOR_TICKS;
         let unit = this._getMajorUnit(log10BasesPerMajorTick);
 
         // The horizontal line spanning the width of the ruler
-        let rulerLine = this.group.line(0, 0, this.getSvgWidth(), 0);
+        let rulerLine = this.group.line(0, 0, this.props.drawModel.svgWidth, 0);
         rulerLine.stroke({width: 1, color: '#bbb'});
 
         let regionList = this.props.model.getRegionList();
         for (let region of regionList) {
             // relativeBase = round down to the nearest major tick base for this region, to find where to start drawing
             let relativeBase = Math.floor(region.start / basesPerMajorTick) * basesPerMajorTick;
-            let majorX = this.scale.baseToX(region.metadata.startBase + relativeBase);
-            let majorTickEndX = this.scale.baseToX(region.metadata.startBase + region.end);
+            let majorX = this.props.drawModel.baseToX(region.metadata.startBase + relativeBase);
+            let majorTickEndX = this.props.drawModel.baseToX(region.metadata.startBase + region.end);
 
             // This loop updates relativeBase and majorX every iteration
             // Draw major and minor ticks for this region (chromosome)

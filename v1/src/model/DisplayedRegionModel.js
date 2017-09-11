@@ -78,12 +78,12 @@ class DisplayedRegionModel {
     chromosomeCoordinatesToBase(chrName, baseNum) {
         let chr = this._chromosomes.find(chr => chr.name === chrName);
         if (!chr) {
-            throw new RangeError("Could not find chromosome with that name");
+            throw new RangeError(`Cannot find chromosome with name '${chrName}'`);
         }
 
         // Take care: `!baseNum` is only appropriate because the `baseNum < 1` check
         if (!baseNum || baseNum < 1 || baseNum > chr.lengthInBases) {
-            throw new RangeError("Base number not in that chromosome");
+            throw new RangeError(`Base number '${baseNum}' not in chromosome '${chrName}'`);
         }
         return chr.startBase + baseNum - 1;
     }

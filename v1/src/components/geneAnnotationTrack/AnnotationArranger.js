@@ -5,19 +5,7 @@ import SvgComponent from '../SvgComponent';
 
 const DEFAULT_MAX_ROWS = 6;
 const ROW_BOTTOM_PADDING = 5;
-const ANNOTATION_RIGHT_PADDING = 10;
-
-/*
-class GeneAnnotation {
-    
-    name: string;
-    strand: string;
-    start: number;
-    end: number;
-    exons: []
-    
-}
-*/
+const ANNOTATION_RIGHT_PADDING = 30;
 
 class AnnotationArranger extends SvgComponent {
     shouldComponentUpdate(nextProps) {
@@ -56,25 +44,32 @@ class AnnotationArranger extends SvgComponent {
         let numHiddenGenes = 0;
         let id = 0;
         for (let gene of genes) {
-            // Label width is approx because I don't feel like adding one to the DOM and checking its width.
-            let estimatedLabelWidth = gene.name.length * LABEL_SIZE;
-            let startX = this.scale.baseToX(gene.absStart) - estimatedLabelWidth;
-            let endX = this.scale.baseToX(gene.absEnd);
+            let geneWidth = this.props.drawModel.basesToXWidth(gene.absEnd - gene.absStart);
+            if (geneWidth < 1) { // No use rendering something less than one pixel wide.
+                numHiddenGenes++;
+                continue;
+            }
+
+            // Label width is approx. because calculating bounding boxes is expensive.
+            let estimatedLabelWidth = gene.name.length * ANNOTATION_HEIGHT;
+            let startX = this.props.drawModel.baseToX(gene.absStart) - estimatedLabelWidth;
+            let endX = this.props.drawModel.baseToX(gene.absEnd);
             if (startX < estimatedLabelWidth) {
-                endX += estimatedLabelWidth + 5;
+                endX = Math.max(endX, endX + estimatedLabelWidth);
             }
             let row = rowXExtents.findIndex(rightmostX => startX > rightmostX);
-            let isLabeled = true;
+            let isLabeled;
             if (row === -1) {
                 isLabeled = false;
-                numHiddenGenes++;
                 row = this.props.maxRows;
+                numHiddenGenes++;
             } else {
+                isLabeled = true;
                 rowXExtents[row] = endX + ANNOTATION_RIGHT_PADDING;
             }
             children.push(<GeneAnnotation
+                drawModel={this.props.drawModel}
                 svgNode={this.props.svgNode}
-                model={this.props.model}
                 xOffset={this.props.xOffset}
                 yOffset={this.props.yOffset}
                 gene={gene}

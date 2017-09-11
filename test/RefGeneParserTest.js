@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const RefGeneParser = require('../RefGeneParser.js');
+const parser = require('../setup/RefGeneParser.js');
 
 describe('RefGeneParser', function() {
     const data = 
@@ -9,7 +9,7 @@ describe('RefGeneParser', function() {
         'chr2\t34610\t36081\tname:"NM_1",id:40166,strand:"-",struct:{thick:[[367658,368597],],},name2:"OR4F29"';
 
     it('should parse correctly', function() {
-        let parsed = new RefGeneParser.RefGeneParser(data).parse();
+        let parsed = new parser.RefGeneParser().parse(data);
         expect(parsed).to.deep.equal([
             {
                 chromosome: 'chr1',

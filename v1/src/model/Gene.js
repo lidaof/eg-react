@@ -47,4 +47,4 @@ class Gene {
     }
 }
 
-module.exports = Gene;
+export default Gene;

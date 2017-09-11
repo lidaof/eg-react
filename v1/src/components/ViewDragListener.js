@@ -43,7 +43,7 @@ class ViewDragListener extends SvgComponent {
     }
 
     _getRegionOffsetByX(model, xDiff) {
-        let baseDiff = this.scale.xWidthToBases(xDiff);
+        let baseDiff = this.props.drawModel.xWidthToBases(xDiff);
         let startRegion = model.getAbsoluteRegion();
         return {
             start: startRegion.start + baseDiff,
@@ -69,7 +69,7 @@ export default ViewDragListener;
 
 ViewDragListener.propTypes = {
     button: PropTypes.number.isRequired,
-    model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+    model: PropTypes.instanceOf(DisplayedRegionModel),
     onDragStart: PropTypes.func,
     onViewDrag: PropTypes.func,
     onViewDragEnd: PropTypes.func,

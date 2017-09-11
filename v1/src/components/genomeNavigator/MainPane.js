@@ -59,22 +59,21 @@ class MainPane extends React.Component {
         // Order of components matters here; components listed later will be drawn IN FRONT of ones listed before
         return (
         <SvgContainer
+            model={this.props.model}
             onContextMenu={event => event.preventDefault()}
             onWheel={this.mousewheel}
             svgRef={(node) => this.svgNode = node}
             svgStyle={{border: "1px solid black"}}
         >
-            <ViewDragListener model={this.props.model} button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} />
-            <Chromosomes model={this.props.model} yOffset={CHROMOSOME_Y} />
-            <Ruler model={this.props.model} yOffset={RULER_Y} />
+            <ViewDragListener button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} />
+            <Chromosomes yOffset={CHROMOSOME_Y} />
+            <Ruler yOffset={RULER_Y} />
             <SelectedRegionBox
-                model={this.props.model}
                 selectedRegionModel={this.props.selectedRegionModel}
                 gotoButtonCallback={this.props.gotoButtonCallback}
                 yOffset={SELECTED_BOX_Y}
             />
             <SelectionBox
-                model={this.props.model}
                 button={LEFT_MOUSE}
                 regionSelectedCallback={this.props.regionSelectedCallback}
                 yOffset={SELECT_BOX_Y}

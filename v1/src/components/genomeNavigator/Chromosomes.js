@@ -22,11 +22,9 @@ class Chromosomes extends SvgComponent {
         let regionList = this.props.model.getRegionList();
         let x = 0;
         for (let region of regionList) {
-            let width = this.scale.basesToXWidth(region.end - region.start + 1);
+            let width = this.props.drawModel.basesToXWidth(region.end - region.start + 1);
 
-            this.group.rect().attr({ // Rectangle for each chromosome
-                width: width,
-                height: HEIGHT,
+            this.group.rect(width, HEIGHT).attr({ // Rectangle for each chromosome
                 x: x,
                 y: BOUNDARY_LINE_EXTENT,
                 stroke: "#000",
