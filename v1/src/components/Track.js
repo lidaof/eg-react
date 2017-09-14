@@ -44,4 +44,5 @@ export default Track;
 Track.propTypes = {
     dataSource: PropTypes.instanceOf(DataSource).isRequired,
     viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+    newRegionCallback: PropTypes.func.isRequired,
 }

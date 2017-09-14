@@ -6,14 +6,14 @@ import TrackContainer from './components/TrackContainer';
 import _ from 'lodash';
 
 const CHROMOSOMES = [
-    {name: "chr1", lengthInBases: 224999719},
-    {name: "chr2", lengthInBases: 237712649},
-    {name: "chr3", lengthInBases: 194704827},
-    {name: "chr4", lengthInBases: 187297063},
-    {name: "chr5", lengthInBases: 177702766},
-    {name: "chr6", lengthInBases: 167273993},
-    {name: "chr7", lengthInBases: 154952424},
-    {name: "chrY", lengthInBases: 25121652},
+    {name: "chr1", lengthInBases: 249250621},
+    {name: "chr2", lengthInBases: 243199373},
+    {name: "chr3", lengthInBases: 198022430},
+    {name: "chr4", lengthInBases: 191154276},
+    {name: "chr5", lengthInBases: 180915260},
+    {name: "chr6", lengthInBases: 171115067},
+    {name: "chr7", lengthInBases: 159138663},
+    {name: "chrY", lengthInBases: 59373566},
 ];
 const DEFAULT_SELECTED_REGION = [15599999, 16000000];
 
@@ -43,7 +43,10 @@ class App extends React.Component {
                 selectedRegionModel={this.state.selectedRegionModel}
                 regionSelectedCallback={this.regionSelected}
             />
-            <TrackContainer viewRegion={this.state.selectedRegionModel}></TrackContainer>
+            <TrackContainer
+                viewRegion={this.state.selectedRegionModel}
+                newRegionCallback={this.regionSelected}
+            />
         </div>
         );
     }

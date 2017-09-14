@@ -42,7 +42,6 @@ class AnnotationArranger extends SvgComponent {
         let rowXExtents = new Array(this.props.maxRows).fill(-Number.MAX_VALUE);
         let genes = this._filterAndSortGenes(this.props.data);
         let numHiddenGenes = 0;
-        let id = 0;
         for (let gene of genes) {
             let geneWidth = this.props.drawModel.basesToXWidth(gene.absEnd - gene.absStart);
             if (geneWidth < 1) { // No use rendering something less than one pixel wide.
@@ -76,7 +75,7 @@ class AnnotationArranger extends SvgComponent {
                 isLabeled={isLabeled}
                 topY={row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING)}
                 onClick={this.props.onGeneClick}
-                key={id++ /* TODO use a more robust id */}
+                key={gene.id}
             />);
         }
         this._addHiddenGenesReminder(numHiddenGenes);

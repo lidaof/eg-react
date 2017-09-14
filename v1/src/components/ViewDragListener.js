@@ -17,8 +17,8 @@ class ViewDragListener extends SvgComponent {
 
     dragStart(event) {
         this.dragOriginModel = this.props.model;
-        if (this.props.onDragStart) {
-            this.props.onDragStart(event);
+        if (this.props.onViewDragStart) {
+            this.props.onViewDragStart(event);
         }
     }
 
@@ -30,14 +30,14 @@ class ViewDragListener extends SvgComponent {
     drag(event, coordinateDiff) {
         if (this.props.onViewDrag && this.dragOriginModel) {
             let newRegion = this._getRegionOffsetByX(this.dragOriginModel, -coordinateDiff.dx);
-            this.props.onViewDrag(newRegion.start, newRegion.end);
+            this.props.onViewDrag(newRegion.start, newRegion.end, event, coordinateDiff);
         }
     }
 
     dragEnd(event, coordinateDiff) {
         if (this.props.onViewDragEnd && this.dragOriginModel) {
             let newRegion = this._getRegionOffsetByX(this.dragOriginModel, -coordinateDiff.dx);
-            this.props.onViewDragEnd(newRegion.start, newRegion.end);
+            this.props.onViewDragEnd(newRegion.start, newRegion.end, event, coordinateDiff);
         }
         this.dragOriginModel = null;
     }
@@ -70,7 +70,7 @@ export default ViewDragListener;
 ViewDragListener.propTypes = {
     button: PropTypes.number.isRequired,
     model: PropTypes.instanceOf(DisplayedRegionModel),
-    onDragStart: PropTypes.func,
+    onViewDragStart: PropTypes.func,
     onViewDrag: PropTypes.func,
     onViewDragEnd: PropTypes.func,
 }

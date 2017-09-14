@@ -21,6 +21,7 @@ export class GeneAnnotation extends SvgComponent {
 
     componentDidMount() {
         this.group.on("click", this.onClick.bind(this));
+        this.group.on("mousedown", event => event.stopPropagation());
     }
 
     render() {
