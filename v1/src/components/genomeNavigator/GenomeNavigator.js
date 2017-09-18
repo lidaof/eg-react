@@ -9,8 +9,7 @@ const MIN_REGION_LENGTH = 80; // Minimum region length, where zooming is not all
 const DEFAULT_VIEW_REGION = [15000000, 25000000]; // TODO calculate this dynamically, or get it from this.props
 
 /**
- * A navigator that allows users to scroll around the genome and select what region for tracks to display.  Relies on
- * SVG.js to render much of the UI.
+ * A navigator that allows users to scroll around the genome and select what region for tracks to display.
  * 
  * @extends {React.Component}
  * @author Silas Hsu

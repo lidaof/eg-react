@@ -3,6 +3,11 @@ import React from 'react';
 
 const WIDTH = 300; // In pixels
 
+/**
+ * Box that contains gene details when a gene annotation is clicked.
+ * 
+ * @author Silas Hsu
+ */
 class GeneDetail extends React.Component {
     render() {
         return (
@@ -28,9 +33,9 @@ export default GeneDetail;
 
 GeneDetail.propTypes = {
     gene: PropTypes.object.isRequired,
-    top: PropTypes.number,
-    left: PropTypes.number,
-    rightBoundary: PropTypes.number
+    top: PropTypes.number, // CSS property
+    left: PropTypes.number, // CSS property
+    rightBoundary: PropTypes.number // Limit of the box's right edge
 };
 
 GeneDetail.defaultProps = {

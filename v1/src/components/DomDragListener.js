@@ -5,6 +5,12 @@ export const LEFT_MOUSE = 0;
 export const MIDDLE_MOUSE = 1;
 export const RIGHT_MOUSE = 2;
 
+/**
+ * A React component that listens for drag-across events as specified by DragAcrossDispatcher.  To use, pass a DOM ref
+ * through the `node` property, and the component will automatically listen for events on that node.
+ * 
+ * @author Silas Hsu
+ */
 class DomDragListener extends React.Component {
     constructor(props) {
         super(props);
@@ -12,6 +18,9 @@ class DomDragListener extends React.Component {
         this.dragDispatcher = null;
     }
 
+    /**
+     * Makes a new DragAcrossDispatcher that listens to `this.props.node`.
+     */
     _initDragDispatcher() {
         this.dragDispatcher = new DragAcrossDispatcher(this.props.button, {
             dragStart: this.props.onDragStart,
@@ -20,15 +29,39 @@ class DomDragListener extends React.Component {
         }).listenTo(this.props.node);
     }
 
+    /**
+     * Starts listening to drag events.
+     * 
+     * @override
+     */
     componentDidMount() {
         this._initDragDispatcher();
     }
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.button !== this.props.button) {
-            this.dragDispatcher.stopListeningTo(this.props.node);
-            this._initDragDispatcher();
+    /**
+     * Shallowly compares `this.props` and `nextProps`.  Returns true if there is any difference, otherwise false.
+     * 
+     * @param {any} nextProps - next props that the component will receive
+     * @return {boolean} whether the component should update
+     * @override
+     */
+    shouldComponentUpdate(nextProps) {
+        for (let key in this.props) {
+            if (this.props[key] !== nextProps[key]) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    /**
+     * Rebinds event listeners on any changes.
+     * 
+     * @override
+     */
+    componentDidUpdate(prevProps) {
+        this.dragDispatcher.stopListeningTo(prevProps.node);
+        this._initDragDispatcher();
     }
 
     /**
@@ -69,9 +102,27 @@ class ListenerStateError extends Error {}
  * holding a button down.  Not to be confused with the native DragEvents, which happen when a DOM element gets moved
  * across the screen.
  * 
+ * To use this class, pass the appropriate mouse button and an object of callbacks to the constructor.  The callbacks
+ * will be executed upon detection of drag-across events.
+ * 
  * @author Silas Hsu
  */
 class DragAcrossDispatcher {
+    /**
+     * An object containing callbacks for DragAcrossDispatcher.
+     * 
+     * @typedef {Object} DragAcrossDispatcher~Callbacks
+     * @property {function} [dragStart] - called upon a mousedown of the appropriate button
+     * @property {function} [drag] - called upon dragging anywhere after drag start
+     * @property {function} [dragEnd] - called upon mouse release after drag start
+     */
+
+    /**
+     * Makes a new DragAcrossDispatcher specialized for a certain mouse button.
+     * 
+     * @param {number} mouseButton - the mouse button for which to listen
+     * @param {DragAcrossDispatcher~Callbacks} callbacks - callbacks to be executed upon detection of drag-across events
+     */
     constructor(mouseButton, callbacks) {
         if (!this._isValidButton(mouseButton)) {
             throw new ListenerStateError("Invalid mouse button");
@@ -86,13 +137,19 @@ class DragAcrossDispatcher {
         this.mouseupOrMouseleave = this.mouseupOrMouseleave.bind(this);
     }
 
+    /**
+     * @param {number} button - a button number
+     * @return {boolean} whether the input button number is a valid mouse button.
+     */
     _isValidButton(button) {
         return (button === LEFT_MOUSE || button === MIDDLE_MOUSE || button === RIGHT_MOUSE)
     }
 
     /**
+     * Start listening for drag-across events on a DOM element.
      * 
-     * @param {HTMLElement} domElement 
+     * @param {HTMLElement} domElement - element on which to add event listeners
+     * @return {DragAcrossDispatcher} this
      */
     listenTo(domElement) {
         if (this._isSubscribed) {
@@ -107,8 +164,10 @@ class DragAcrossDispatcher {
     }
 
     /**
+     * Stop listening for drag-across events on a DOM element.
      * 
-     * @param {HTMLElement} domElement 
+     * @param {HTMLElement} domElement - element from which to remove event listeners
+     * @return {DragAcrossDispatcher} this
      */
     stopListeningTo(domElement) {
         if (!this._isSubscribed) {
@@ -122,6 +181,12 @@ class DragAcrossDispatcher {
         return this;
     }
 
+    /**
+     * If a drag-across event is currently happening, gets the mouse event that started the drag.  Otherwise, returns
+     * null.
+     * 
+     * @return {MouseEvent} the event that started the current drag-across event, or null
+     */
     getOriginEvent() {
         return this._originEvent;
     }

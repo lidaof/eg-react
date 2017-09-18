@@ -11,7 +11,17 @@ const IN_EXON_ARROW_COLOR = "white";
 
 const LABEL_BACKGROUND_PADDING = 2;
 
+/**
+ * A single annotation for the gene annotation track.
+ * 
+ * @author Silas Hsu
+ */
 export class GeneAnnotation extends SvgComponent {
+    /**
+     * Called when the annotation is clicked; executes the onClick callback provided via props.
+     * 
+     * @param {MouseEvent} event - MouseEvent from clicking this annotation
+     */
     onClick(event) {
         if (this.props.onClick) {
             this.props.onClick(event, this.props.gene);
@@ -19,11 +29,21 @@ export class GeneAnnotation extends SvgComponent {
         }
     }
 
+    /**
+     * Binds event listeners.
+     * 
+     * @override
+     */
     componentDidMount() {
         this.group.on("click", this.onClick.bind(this));
         this.group.on("mousedown", event => event.stopPropagation());
     }
 
+    /**
+     * Draws the annotation.
+     * 
+     * @override
+     */
     render() {
         this.group.clear();
         let gene = this.props.gene;

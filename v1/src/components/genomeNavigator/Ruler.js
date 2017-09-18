@@ -62,7 +62,7 @@ class Ruler extends SvgComponent {
         let unit = this._getMajorUnit(log10BasesPerMajorTick);
 
         // The horizontal line spanning the width of the ruler
-        let rulerLine = this.group.line(0, 0, this.props.drawModel.svgWidth, 0);
+        let rulerLine = this.group.line(0, 0, this.props.drawModel.getDrawWidth(), 0);
         rulerLine.stroke({width: 1, color: '#bbb'});
 
         let regionList = this.props.model.getRegionList();

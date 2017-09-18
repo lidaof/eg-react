@@ -1,3 +1,8 @@
+/**
+ * An abstract class that represents a source of data for Tracks
+ * 
+ * @author Silas Hsu
+ */
 class DataSource {
     /**
      * Gets data lying within the region.

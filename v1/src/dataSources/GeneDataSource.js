@@ -2,7 +2,19 @@ import $ from 'jquery';
 import DataSource from './DataSource';
 import Gene from '../model/Gene';
 
+/**
+ * Data source for gene annotations.  Gets data through a REST API.
+ * 
+ * @author Silas Hsu
+ */
 class GeneDataSource extends DataSource {
+    /**
+     * Gets gene data lying within the region.
+     * 
+     * @param {DisplayedRegionModel} regionModel - the model containing the displayed region
+     * @return {Promise<any>} a Promise for the data
+     * @override
+     */
     getData(regionModel) {
         let requests = []
         for (let region of regionModel.getRegionList()) {
@@ -15,6 +27,12 @@ class GeneDataSource extends DataSource {
         });
     }
 
+    /**
+     * Gets gene data for a single chromosome, as DisplayedRegionModel can cover multiple chromosomes.
+     * 
+     * @param {SingleChromosomeInterval} region - a region within a single chromosome for which to get data
+     * @return {Promise<any>} a Promise for the data
+     */
     _getDataForOneRegion(region) {
         return new Promise((resolve, reject) => {
             $.ajax({

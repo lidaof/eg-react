@@ -1,8 +1,27 @@
+/**
+ * Utility class for converting between pixels and base numbers.
+ * 
+ * @author Silas Hsu
+ */
 class LinearDrawingModel {
-    constructor(model, svgNode) {
-        this.model = model;
-        this.svgNode = svgNode;
-        this.svgWidth = svgNode.clientWidth;
+    /**
+     * Makes a new drawing model.
+     * 
+     * @param {DisplayedRegionModel} model - the displayed region
+     * @param {number} drawWidth - the width of the canvas/svg/etc on which to draw
+     * @param {HTMLElement} domElement - the DOM element on which to draw
+     */
+    constructor(model, drawWidth, domElement) {
+        this._model = model;
+        this._drawWidth = drawWidth;
+        this._svgNode = domElement;
+    }
+
+    /**
+     * @return {number} the drawing width with which this model was created
+     */
+    getDrawWidth() {
+        return this._drawWidth;
     }
 
     /**
@@ -12,7 +31,7 @@ class LinearDrawingModel {
      * @return {number} width in pixels
      */
     basesToXWidth(bases) {
-        let pixelsPerBase = this.svgWidth / this.model.getWidth();
+        let pixelsPerBase = this._drawWidth / this._model.getWidth();
         return bases * pixelsPerBase;
     }
 
@@ -23,7 +42,7 @@ class LinearDrawingModel {
      * @return {number} width in number of bases
      */
     xWidthToBases(pixels) {
-        let basesPerPixel = this.model.getWidth() / this.svgWidth;
+        let basesPerPixel = this._model.getWidth() / this._drawWidth;
         return pixels * basesPerPixel;
     }
 
@@ -34,8 +53,8 @@ class LinearDrawingModel {
      * @return {number} X coordinate that represents the input base
      */
     baseToX(base) {
-        let pixelsPerBase = this.svgWidth / this.model.getWidth();
-        return (base - this.model.getAbsoluteRegion().start) * pixelsPerBase;
+        let pixelsPerBase = this._drawWidth / this._model.getWidth();
+        return (base - this._model.getAbsoluteRegion().start) * pixelsPerBase;
     }
 
     /**
@@ -45,8 +64,8 @@ class LinearDrawingModel {
      * @return {number} absolute base coordinate
      */
     xToBase(pixel) {
-        let basesPerPixel = this.model.getWidth() / this.svgWidth;
-        return pixel * basesPerPixel + this.model.getAbsoluteRegion().start;
+        let basesPerPixel = this._model.getWidth() / this._drawWidth;
+        return pixel * basesPerPixel + this._model.getAbsoluteRegion().start;
     }
 
     /**
@@ -56,7 +75,7 @@ class LinearDrawingModel {
      * @return {number} the X coordinate in the SVG
      */
     domXToSvgX(domX) {
-        return domX - this.svgNode.getBoundingClientRect().left;
+        return domX - this._svgNode.getBoundingClientRect().left;
     }
 }
 

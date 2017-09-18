@@ -1,5 +1,11 @@
 import React from 'react';
 
+/**
+ * The display that is above the main pane of the genome navigator, which shows the current track region and a text
+ * input to modify it.
+ * 
+ * @author Silas Hsu
+ */
 class TrackRegionController extends React.Component {
     constructor(props) {
         super(props);
@@ -9,6 +15,9 @@ class TrackRegionController extends React.Component {
         };
     }
 
+    /**
+     * @return {string} the currently displayed region in human-readable form
+     */
     _currentRegionAsString() {
         let regionList = this.props.model.getRegionList();
         if (regionList.length === 1) {
@@ -20,6 +29,9 @@ class TrackRegionController extends React.Component {
         }
     }
 
+    /**
+     * Parses user input that expresses a desired region for tracks to display.
+     */
     parseRegion() {
         let parsedRegion = null;
         try {
@@ -40,6 +52,9 @@ class TrackRegionController extends React.Component {
         this.props.newRegionCallback(parsedRegion.start, parsedRegion.end);
     }
 
+    /**
+     * @inheritdoc
+     */
     render() {
         let region = this._currentRegionAsString();
         return (

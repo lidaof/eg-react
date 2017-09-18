@@ -30,7 +30,20 @@ const GENE_SCHEMA = { // Only used in validateGene, but it happens to serve as g
     }
 }
 
+/**
+ * A simple data container for gene annotations.  Code that uses this class have certain expectations of the properties
+ * of Gene, but they are not enforced since it is computationally expensive to do so.
+ * 
+ * @author Silas Hsu
+ */
 class Gene {
+    /**
+     * Simply makes a copy of the input object, and optionally merges additional properties related to absolute base
+     * coordinates if given a {@link DisplayedRegionModel}.
+     * 
+     * @param {object} plainObject - object to make a copy of
+     * @param {DisplayedRegionModel} [model] - model used to compute absolute base numbers
+     */
     constructor(plainObject, model) {
         Object.assign(this, plainObject); // Use validateGene() here for debugging if needed.
 

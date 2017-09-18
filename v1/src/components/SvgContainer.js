@@ -4,6 +4,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
 
+/**
+ * A React component that contains a <svg> element.  This component's children will automatically recieve a ref to the
+ * SVG node, a DisplayedRegionModel, and a LinearDrawingModel once the component mounts.  Note that the children will
+ * be mounted as siblings to the SVG node, and not children to the SVG node.  For specifying direct children of the SVG,
+ * a different component would be more appropriate.
+ * 
+ * @see SvgComponent
+ * @author Silas Hsu
+ */
 class SvgContainer extends React.Component {
     constructor(props) {
         super(props);
@@ -20,21 +29,34 @@ class SvgContainer extends React.Component {
     }
 
     /**
-     * @inheritdoc
+     * Sets state so we can mount our children, and creates a new LinearDrawingModel for them to receive.
+     * 
+     * @override
      */
     componentDidMount() {
         this.setState({svgDidMount: true});
         this.svgWidth = this.svgNode.clientWidth;
         this.svgHeight = this.svgNode.clientHeight;
-        this.drawModel = new LinearDrawingModel(this.props.model, this.svgNode);
+        this.drawModel = new LinearDrawingModel(this.props.model, this.svgWidth, this.svgNode);
     }
 
-    componentWillUpdate(nextProps, nextState) {
+    /**
+     * Updates the LinearDrawingModel to pass to the children if necessary.
+     * 
+     * @param {any} nextProps - next props that the component will receive
+     * @override
+     */
+    componentWillUpdate(nextProps) {
         if (this.props.model !== nextProps.model) {
-            this.drawModel = new LinearDrawingModel(nextProps.model, this.svgNode);
+            this.drawModel = new LinearDrawingModel(nextProps.model, this.svgWidth, this.svgNode);
         }
     }
 
+    /**
+     * Saves the ref to the SVG node and passes it to any interested parents
+     * 
+     * @param {SVGAnimatedString} node - a SVG DOM node
+     */
     handleSvgRef(node) {
         this.svgNode = node;
         if (this.props.svgRef) {
@@ -42,6 +64,11 @@ class SvgContainer extends React.Component {
         }
     }
 
+    /**
+     * Gives each component in the input array `svgNode`, `model`, and `drawModel` props.
+     * 
+     * @param {React.Component[]} children 
+     */
     giveChildrenProps(children) {
         let propsToGive = {
             svgNode: this.svgNode,
@@ -57,6 +84,11 @@ class SvgContainer extends React.Component {
         });
     }
 
+    /**
+     * Outputs a SVG node, and then this component's children as siblings to the SVG once the SVG mounts.
+     * 
+     * @override
+     */
     render() {
         let children = null;
         if (this.state.svgDidMount) {

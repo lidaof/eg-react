@@ -71,7 +71,7 @@ class SelectedRegionBox extends SvgComponent {
      * @override
      */
     render() {
-        let svgWidth = this.props.drawModel.svgWidth;
+        let svgWidth = this.props.drawModel.getDrawWidth();
         let absRegion = this.props.selectedRegionModel.getAbsoluteRegion();
 
         // We limit the box's start and end X because SVGs don't like to be billions of pixels wide.

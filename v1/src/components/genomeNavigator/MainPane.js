@@ -41,7 +41,7 @@ class MainPane extends React.Component {
      */
     mousewheel(event) {
         event.preventDefault();
-        let svgWidth = this.svgNode.scrollWidth;
+        let svgWidth = this.svgNode.clientWidth;
         let focusPoint = event.clientX / svgWidth; // Proportion-based, not base-based.
         if (event.deltaY > 0) { // Mouse wheel turned towards user, or spun downwards -- zoom out
             this.props.zoomCallback(1 + WHEEL_ZOOM_SPEED, focusPoint);

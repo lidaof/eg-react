@@ -6,11 +6,15 @@ import SvgContainer from '../SvgContainer';
 import Track from '../Track';
 import ViewDragListener from '../ViewDragListener';
 
+/**
+ * A gene annotation track.
+ * 
+ * @author Silas Hsu
+ */
 class GeneAnnotationTrack extends Track {
     constructor(props) {
         super(props);
         this.state.geneDetail = null;
-        this.state.xOffset = 0;
 
         this.divNode = null;
         this.geneClicked = this.geneClicked.bind(this);
@@ -18,12 +22,12 @@ class GeneAnnotationTrack extends Track {
         this.viewDragEnd = this.viewDragEnd.bind(this);
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (prevState.data !== this.state.data) {
-            this.setState({xOffset: 0});
-        }
-    }
-
+    /**
+     * Called when a gene annotation is clicked.  Sets state so a detail box is displayed.
+     * 
+     * @param {MouseEvent} event 
+     * @param {Gene} gene 
+     */
     geneClicked(event, gene) {
         event.stopPropagation();
         let detail = <GeneDetail
@@ -33,16 +37,6 @@ class GeneAnnotationTrack extends Track {
             gene={gene}
         />;
         this.setState({geneDetail: detail});
-    }
-
-    viewDrag(unused, unused2, unusedEvent, coordinateDiff) {
-        this.setState({xOffset: -coordinateDiff.dx});
-    }
-
-    viewDragEnd(newStart, newEnd, event, coordinateDiff) {
-        if (Math.abs(coordinateDiff.dx) > 5) {
-            this.props.newRegionCallback(newStart, newEnd);
-        }
     }
 
     render() {

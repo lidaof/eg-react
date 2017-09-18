@@ -7,21 +7,45 @@ const DEFAULT_MAX_ROWS = 6;
 const ROW_BOTTOM_PADDING = 5;
 const ANNOTATION_RIGHT_PADDING = 30;
 
+/**
+ * Arranges gene annotations on a SVG.
+ * 
+ * @author Silas Hsu
+ */
 class AnnotationArranger extends SvgComponent {
+    /**
+     * Shallowly compares `this.props` and `nextProps`.  Returns true if there is any difference, otherwise false.
+     * 
+     * @param {any} nextProps - next props that the component will receive
+     * @return {boolean} whether the component should update
+     * @override
+     */
     shouldComponentUpdate(nextProps) {
-        for (let propName in nextProps) {
-            if (this.props[propName] !== nextProps[propName]) {
+        for (let key in nextProps) {
+            if (this.props[key] !== nextProps[key]) {
                 return true;
             }
         }
         return false;
     }
 
+    /**
+     * Filters an array of Gene such that only genes visible in the current view are present, and then sorts them by
+     * start position in the genome.
+     * 
+     * @param {Gene[]} genes - array of Gene to sort and filter
+     * @return {Gene[]} subset of the input array
+     */
     _filterAndSortGenes(genes) {
         let visibleGenes = genes.filter(gene => gene.isInView);
-        return visibleGenes.sort((gene1, gene2) => gene1.absStart - gene2.absEnd);
+        return visibleGenes.sort((gene1, gene2) => gene1.absStart - gene2.absStart);
     }
 
+    /**
+     * Adds a label to the SVG expressing how many genes are unlabeled
+     * 
+     * @param {number} numHiddenGenes - number of unlabeled/hidden genes
+     */
     _addHiddenGenesReminder(numHiddenGenes) {
         if (numHiddenGenes > 0) {
             let maxRows = this.props.maxRows || DEFAULT_MAX_ROWS;
@@ -35,6 +59,11 @@ class AnnotationArranger extends SvgComponent {
         }
     }
 
+    /**
+     * Arranges GeneAnnotation components so they don't overlap.
+     * 
+     * @override
+     */
     render() {
         this.group.clear();
 
