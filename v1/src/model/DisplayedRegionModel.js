@@ -190,28 +190,28 @@ class DisplayedRegionModel {
 
     /**
      * Safely sets the internal display interval, ensuring that it stays within the genome and makes sense. `start` and
-     * `end` should express a 0-indexed open interval of base numbers, [startBaseNumber, endBaseNumber).
+     * `end` should express a 0-indexed open interval of base numbers, [startBaseNumber, endBaseNumber).  This
+     * function will attempt to preserve the input length as much as possible.
      *
      * @param {number} start - the (inclusive) start of the region interval as a base pair number
      * @param {number} end - the (exclusive) end of the region interval as a base pair number
-     * @param {boolean} [preserveLength] - option to preserve the input length as much as possible.  Default: false
-     * @throws {RangeError} if end is less than start
+     * @throws {RangeError} if end is less than start, or the inputs are undefined/infinite
      */
-    setRegion(start, end, preserveLength) {
+    setRegion(start, end) {
         if (!Number.isFinite(start) || !Number.isFinite(end)) {
             throw new RangeError("Start and end must be well-defined");
         }
         if (end < start) {
             throw new RangeError("Start must be less than or equal to end");
         }
-        if (preserveLength) {
-            let newLength = end - start;
-            if (start < MIN_ABS_BASE) { // Left cut off; we need to extend right side
-                end = MIN_ABS_BASE + newLength;
-            } else if (end > this._genomeLength) { // Ditto for right
-                start = this._genomeLength - newLength;
-            }
+
+        let newLength = end - start;
+        if (start < MIN_ABS_BASE) { // Left cut off; we need to extend right side
+            end = MIN_ABS_BASE + newLength;
+        } else if (end > this._genomeLength) { // Ditto for right
+            start = this._genomeLength - newLength;
         }
+
         this._startBase = Math.round(Math.max(MIN_ABS_BASE, start));
         this._endBase = Math.round(Math.min(end, this._genomeLength));
     }
@@ -224,7 +224,7 @@ class DisplayedRegionModel {
      * @param {number} numBases - number of base pairs to pan
      */
     pan(numBases) {
-        this.setRegion(this._startBase + numBases, this._endBase + numBases, true);
+        this.setRegion(this._startBase + numBases, this._endBase + numBases);
     }
 
     /**
@@ -256,7 +256,7 @@ class DisplayedRegionModel {
         let rawStart = this._startBase + panAmount;
         let rawEnd = this._startBase + newWidth + panAmount;
 
-        this.setRegion(rawStart, rawEnd, true);
+        this.setRegion(rawStart, rawEnd);
     }
 }
 

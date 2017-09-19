@@ -1,21 +1,4 @@
-"use strict"
-
-import DisplayedRegionModel from './DisplayedRegionModel.js';
-
-const CHROMOSOMES = [
-    {
-        name: "chr1",
-        lengthInBases: 10,
-    },
-    {
-        name: "chr2",
-        lengthInBases: 10,
-    },
-    {
-        name: "chr3",
-        lengthInBases: 10,
-    },
-];
+import makeToyRegion from './toyRegion';
 
 function expectRegion(instance, start, end) {
     // For a less flaky test, I would want to manually compare just the `start` and `end` props, but done this way,
@@ -25,7 +8,7 @@ function expectRegion(instance, start, end) {
 
 var instance;
 beforeEach(() => {
-    instance = new DisplayedRegionModel("My little genome", CHROMOSOMES);
+    instance = makeToyRegion();
 });
 
 /*
@@ -39,6 +22,12 @@ describe("setRegion()", () => {
     it("makes sure the region stays within bounds of the genome", () => {
         instance.setRegion(-1, 100);
         expectRegion(instance, 0, 30);
+
+        instance.setRegion(100, 150);
+        expectRegion(instance, 0, 30);
+
+        instance.setRegion(-150, -100);
+        expectRegion(instance, 0, 30);
     });
 
     it("rounds the arguments", () => {
@@ -46,12 +35,15 @@ describe("setRegion()", () => {
         expectRegion(instance, 1, 2);
     });
 
-    it("honors the option to preserve input width", () => {
-        instance.setRegion(-5, 10, true);
+    it("preserves input width", () => {
+        instance.setRegion(-5, 10);
         expectRegion(instance, 0, 15);
 
-        instance.setRegion(25, 35, true);
+        instance.setRegion(25, 35);
         expectRegion(instance, 20, 30);
+
+        instance.setRegion(40, 45);
+        expectRegion(instance, 25, 30);
     })
 });
 

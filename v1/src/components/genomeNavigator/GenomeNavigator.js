@@ -65,7 +65,7 @@ class GenomeNavigator extends React.Component {
      * @see DisplayedRegionModel#setRegion
      */
     setNewView(newStart, newEnd) {
-        this._setModelState("setRegion", [newStart, newEnd, true]);
+        this._setModelState("setRegion", [newStart, newEnd]);
     }
 
     /**

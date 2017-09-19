@@ -31,7 +31,7 @@ class App extends React.Component {
 
     regionSelected(start, end) {
         let modelCopy = _.cloneDeep(this.state.selectedRegionModel);
-        modelCopy.setRegion(start, end, true);
+        modelCopy.setRegion(start, end);
         this.setState({selectedRegionModel: modelCopy});
     }
 
