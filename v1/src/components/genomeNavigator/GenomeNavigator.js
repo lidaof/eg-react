@@ -5,8 +5,7 @@ import React from 'react';
 import TrackRegionController from './TrackRegionController';
 import _ from 'lodash';
 
-const MIN_REGION_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
-const DEFAULT_VIEW_REGION = [15000000, 25000000]; // TODO calculate this dynamically, or get it from this.props
+const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
 
 /**
  * A navigator that allows users to scroll around the genome and select what region for tracks to display.
@@ -16,15 +15,14 @@ const DEFAULT_VIEW_REGION = [15000000, 25000000]; // TODO calculate this dynamic
  */
 class GenomeNavigator extends React.Component {
     /**
-     * @inheritdoc 
+     * Binds functions, and also forks that view region that was passed via props.
      */
     constructor(props) {
         super(props);
         this.id = _.uniqueId();
         this.state = {
-            model: new DisplayedRegionModel("meow", this.props.chromosomes),
+            viewModel: this.props.viewModel,
         }
-        this.state.model.setRegion(...DEFAULT_VIEW_REGION);
 
         this.zoom = this.zoom.bind(this);
         this.setNewView = this.setNewView.bind(this);
@@ -32,15 +30,27 @@ class GenomeNavigator extends React.Component {
     }
 
     /**
-     * Deep copies this.state.model, mutates it by calling `methodName` with `args`, and then calls this.setState().
+     * Resets the view region if a new one is received.
+     * 
+     * @param {any} nextProps - new props that this component will receive
+     * @override
+     */
+    componentWillReceiveProps(nextProps) {
+        if (this.props.viewModel !== nextProps.viewModel) {
+            this.setState({viewModel: nextProps.viewModel});
+        }
+    }
+
+    /**
+     * Deep copies this.state.viewModel, mutates it by calling `methodName` with `args`, and then calls this.setState().
      * 
      * @param {string} methodName - the method to call on the model
      * @param {any[]} args - arguments to provide to the method
      */
     _setModelState(methodName, args) {
-        let modelCopy = _.cloneDeep(this.state.model);
+        let modelCopy = _.cloneDeep(this.state.viewModel);
         modelCopy[methodName].apply(modelCopy, args);
-        this.setState({model: modelCopy});
+        this.setState({viewModel: modelCopy});
     }
 
     /**
@@ -51,7 +61,7 @@ class GenomeNavigator extends React.Component {
      * @see DisplayedRegionModel#zoom
      */
     zoom(amount, focusPoint) {
-        if (amount < 1 && this.state.model.getWidth() <= MIN_REGION_LENGTH) {
+        if (amount < 1 && this.state.viewModel.getWidth() * amount <= MIN_VIEW_LENGTH) {
             return;
         }
         this._setModelState("zoom", [amount, focusPoint]);
@@ -75,7 +85,7 @@ class GenomeNavigator extends React.Component {
      */
     zoomSliderDragged(event) {
         let targetRegionSize = Math.exp(event.target.value);
-        let proportion = targetRegionSize / this.state.model.getWidth();
+        let proportion = targetRegionSize / this.state.viewModel.getWidth();
         this._setModelState("zoom", [proportion]);
     }
 
@@ -89,10 +99,10 @@ class GenomeNavigator extends React.Component {
                     Zoom:
                     <input
                         type="range"
-                        min={Math.log(MIN_REGION_LENGTH)}
-                        max={Math.log(this.state.model.getGenomeLength())}
+                        min={Math.log(MIN_VIEW_LENGTH)}
+                        max={Math.log(this.state.viewModel.getGenomeLength())}
                         step="any"
-                        value={Math.log(this.state.model.getWidth())}
+                        value={Math.log(this.state.viewModel.getWidth())}
                         onChange={this.zoomSliderDragged}
                     />
                 </label>
@@ -102,7 +112,7 @@ class GenomeNavigator extends React.Component {
                 />
 
                 <MainPane
-                    model={this.state.model}
+                    model={this.state.viewModel}
                     selectedRegionModel={this.props.selectedRegionModel}
                     regionSelectedCallback={this.props.regionSelectedCallback}
                     dragCallback={this.setNewView}
@@ -115,7 +125,7 @@ class GenomeNavigator extends React.Component {
 }
 
 GenomeNavigator.propTypes = {
-    chromosomes: PropTypes.arrayOf(PropTypes.object).isRequired,
+    viewModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
     selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
     regionSelectedCallback: PropTypes.func.isRequired, // Function that takes arguments [number, number]
 }

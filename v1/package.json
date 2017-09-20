@@ -20,11 +20,13 @@
     "@storybook/addon-actions": "^3.2.6",
     "@storybook/addon-links": "^3.2.6",
     "@storybook/react": "^3.2.8",
+    "enzyme": "^2.9.1",
     "jest-image-snapshot": "^1.0.0",
     "jsonschema": "^1.2.0",
     "nightmare": "^2.10.0",
     "react-addons-perf": "^15.4.2",
     "react-scripts": "^1.0.10",
+    "react-test-renderer": "^15.6.1",
     "tcp-port-used": "^0.1.2"
   },
   "scripts": {

@@ -16,6 +16,7 @@ const CHROMOSOMES = [
     {name: "chrY", lengthInBases: 59373566},
 ];
 const DEFAULT_SELECTED_REGION = [15599999, 16000000];
+const DEFAULT_NAV_VIEW = [0, 20000000];
 
 class App extends React.Component {
     constructor(props) {
@@ -25,6 +26,10 @@ class App extends React.Component {
         };
         // TODO set the selected region dynamically.  Don't want it outside the genome.
         this.state.selectedRegionModel.setRegion(...DEFAULT_SELECTED_REGION);
+
+        // TODO this can be set dynamically too.
+        this.initNavModel = new DisplayedRegionModel("Wow very genome", CHROMOSOMES);
+        this.initNavModel.setRegion(...DEFAULT_NAV_VIEW);
 
         this.regionSelected = this.regionSelected.bind(this);
     }
@@ -39,7 +44,7 @@ class App extends React.Component {
         return (
         <div>
             <GenomeNavigator
-                chromosomes={CHROMOSOMES}
+                viewModel={this.initNavModel}
                 selectedRegionModel={this.state.selectedRegionModel}
                 regionSelectedCallback={this.regionSelected}
             />

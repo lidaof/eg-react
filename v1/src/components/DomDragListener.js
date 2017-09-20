@@ -11,7 +11,7 @@ export const RIGHT_MOUSE = 2;
  * 
  * @author Silas Hsu
  */
-class DomDragListener extends React.Component {
+export class DomDragListener extends React.Component {
     constructor(props) {
         super(props);
 
@@ -90,12 +90,11 @@ DomDragListener.propTypes = {
 
 
 /**
- * Fired when the event listener has been asked to perform an action while in an inappropriate state.  Not exported
- * because no one catches it specifically; the throwing of this error indicates a bug.
+ * Fired when the event listener has been asked to perform an action while in an inappropriate state.
  * 
  * @author Silas Hsu
  */
-class ListenerStateError extends Error {}
+export class ListenerStateError extends Error {} // Currently, only tests import this.
 
 /**
  * A class that facilitates listening to the type of mouse event where the user moves the mouse across the screen while
