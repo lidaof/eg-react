@@ -12,6 +12,8 @@ import ViewDragListener from '../ViewDragListener';
  * @author Silas Hsu
  */
 class GeneAnnotationTrack extends Track {
+    static TYPE_NAME = "gene annotation";
+
     constructor(props) {
         super(props);
         this.state.geneDetail = null;

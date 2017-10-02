@@ -1,9 +1,9 @@
 # Server
 ## Installation
-First, make sure that MongoDB is installed.  Then run `npm run setup` and follow the prompts.
+First, make sure that MongoDB is installed and started.  Then run `npm run setup` and follow the prompts.
 
 ## Running
-`npm start` starts up both the backend and the React development server.
+`npm start` starts up both the backend and the React development server.  Again, make sure MongoDB is up and running.
 
 # Client
 ## Quick tour
@@ -24,6 +24,12 @@ Drawing on SVGs is facilitated by `SvgContainer`.  This component requires a `Di
 * `drawModel`: a `LinearDrawingModel`
 
 A child component can then use these props in any way it sees fit.  For example, one can pass the svg DOM node to D3, or SVG.js.  `SvgComponent` is a base class that uses SVG.js.
+
+## Making a new track
+In general, one has to make two new classes to make a new Track:
+
+1. Extend the Track class
+
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.  Such queries take on the order of 2 to 20 ms.  While it is fine to do it once or twice, avoid doing it in a loop.  Suppose you aim to plot 500 data points on a SVG, and for each point you query the SVG's width.  That is already a second or more of computation -- very noticable to the user!

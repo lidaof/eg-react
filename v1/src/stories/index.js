@@ -13,16 +13,17 @@ storiesOf('Welcome', module).add('to Storybook', () => {
 
         <h2>Adding new story files</h2>
         <p>
-            Simply specify stories in a .js file anywhere, and <code> require()</code> it in <code>./.storybook/config.js</code>.
+            Simply specify stories in a .js file anywhere, and <code> require()</code> it in <code>
+            .storybook/config.js</code>.
         </p>
 
         <h2>Testing a story</h2>
         <p>
             Since Storybook doesn't understand Jest's global functions like <code>describe</code>, the stories and tests
             for the stories are in separate files.  While there exist addons that rectify this 
-            (like <a href="https://www.npmjs.com/package/storybook-addon-specifications">storybook-addon-specifications</a>),
-            they require ejecting from create-react-app first.  In the meantime, I hope your text editor supports screen
-            splitting!  ^_^
+            (like <a href="https://www.npmjs.com/package/storybook-addon-specifications">storybook-addon-specifications
+            </a>), they require ejecting from create-react-app first.  In the meantime, I hope your text editor supports
+            screen splitting!  ^_^
         </p>
         <p>
             Following the paradigm of Don't Repeat Yourself, export whatever consts that your story uses (like the

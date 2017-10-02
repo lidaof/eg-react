@@ -6,6 +6,7 @@ import _ from 'lodash';
 const DEBUG = false;
 
 class BigWigTrack extends Track {
+    static TYPE_NAME = "bigwig";
 
     constructor(props) {
         super(props);
