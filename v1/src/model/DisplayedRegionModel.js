@@ -115,13 +115,15 @@ class DisplayedRegionModel {
             throw new RangeError("Could not parse coordinates");
         }
 
-        if (endBase < startBase) {
-            throw new RangeError("Start base must be before end base");
+        let startAbsBase = this.chromosomeCoordinatesToBase(startChr, startBase);
+        let endAbsBase = this.chromosomeCoordinatesToBase(endChr, endBase) + 1;
+        if (endAbsBase < startAbsBase) {
+            throw new RangeError("Start of range must be before end of range");
         }
 
         return {
-            start: this.chromosomeCoordinatesToBase(startChr, startBase),
-            end: this.chromosomeCoordinatesToBase(endChr, endBase) + 1,
+            start: startAbsBase,
+            end: endAbsBase,
         }
     }
 

@@ -20,8 +20,6 @@ class GeneAnnotationTrack extends Track {
 
         this.divNode = null;
         this.geneClicked = this.geneClicked.bind(this);
-        this.viewDrag = this.viewDrag.bind(this);
-        this.viewDragEnd = this.viewDragEnd.bind(this);
     }
 
     /**

@@ -64,7 +64,7 @@ describe("baseToChromosomeCoordinate() and baseToChromosomeIndex()", () => {
 describe("parseRegionString() and chromosomeCoordinatesToBase()", () => {
     it("parses correctly", () => {
         expect(instance.parseRegionString("chr1:1-10")).toEqual({start: 0, end: 10});
-        expect(instance.parseRegionString("chr2:1-chr3:10")).toEqual({start: 10, end: 30});
+        expect(instance.parseRegionString("chr1:10-chr3:1")).toEqual({start: 9, end: 21});
     });
 
     it("errors if given a nonsensical string", () => {
@@ -73,6 +73,7 @@ describe("parseRegionString() and chromosomeCoordinatesToBase()", () => {
 
     it("errors if end base is before start base", () => {
         expect(() => instance.parseRegionString("chr1:10-1")).toThrow(RangeError);
+        expect(() => instance.parseRegionString("chr2:1-chr1:5")).toThrow(RangeError);
     });
 
     it("errors if the chromosome doesn't exist", () => {

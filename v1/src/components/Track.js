@@ -10,6 +10,8 @@ import React from 'react';
  * @author Silas Hsu
  */
 class Track extends React.Component {
+    static TYPE_NAME = "please override me";
+
     /**
      * Initializes state and immediately sends a request for data.
      * 
@@ -23,12 +25,15 @@ class Track extends React.Component {
             xOffset: 0
         };
 
+        this.viewDrag = this.viewDrag.bind(this);
+        this.viewDragEnd = this.viewDragEnd.bind(this);
+
         this.props.dataSource.getData(this.props.viewRegion).then(data => {
             this.setState({
                 isLoading: false,
                 data: data
             });
-        })
+        });
     }
 
     /**

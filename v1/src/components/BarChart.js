@@ -1,48 +1,57 @@
-import React, { Component } from 'react'
+import React from 'react'
 //import { scaleLinear } from 'd3-scale'
-import { max } from 'd3-array'
 import { select } from 'd3-selection'
 //import { transition } from 'd3-transition'
+import PropTypes from 'prop-types';
+import _ from 'lodash';
 
-const DEBUG = false;
+/**
+ * Component takes a SVG and renders a bar chart on it.
+ * 
+ * @author Daofeng Li and Silas Hsu
+ */
+class BarChart extends React.Component {
+    static propTypes = {
+        data: PropTypes.arrayOf(PropTypes.object)
+    }
 
-class BarChart extends Component {
-  constructor(props){
-    super(props)
-    this.createBarChart = this.createBarChart.bind(this)
-  }
+    /**
+     * Only updates the component if the data changes.
+     * 
+     * @param {object} nextProps - next props the component will receive
+     */
+    shouldComponentUpdate(nextProps) {
+        return this.props.data !== nextProps.data;
+    }
 
-  componentDidMount() {
-    this.createBarChart()
-  }
+    /**
+     * Renders a bar chart with d3.js.
+     */
+    render() {
+        let non0Data = this.props.data.filter(record => record.value !== 0);
+        if (non0Data.length === 0) {
+            return null;
+        }
+        const dataMax = _.maxBy(this.props.data, record => record.value).value;
+        const svgHeight = this.props.svgNode.clientHeight;
+        let rectSelection = select(this.props.svgNode)
+            .selectAll("rect")
+            .data(non0Data);
 
-  componentDidUpdate() {
-    this.createBarChart()
-  }
+        const shapeBars = function(selection) {
+            selection.attr("class", "bar")
+                .attr("height", record => record.value/dataMax * svgHeight)
+                .attr("width", 1)
+                .attr("x", record => this.props.drawModel.baseToX(record.start))
+                .attr("y", record => svgHeight - (record.value/dataMax * svgHeight) + 10)
+        }.bind(this);
 
-  createBarChart() {
-    let [w,h] = this.props.size;
-    const node = this.node;
-    const dataMax = max(this.props.data);
-    const barWidth = w / this.props.data.length;
-    if (DEBUG) console.log([w,h,dataMax,barWidth]);
-    select(node)
-    //.attr("height","100%")
-    //      .attr("width","100%")
-      .selectAll("rect")
-      .data(this.props.data)
-      .enter().append("rect")
-            .attr("class", "bar")
-            .attr("height", function(d, i) {return (d/dataMax * h)})
-            .attr("width",barWidth)
-            .attr("x", function(d, i) {return (i * barWidth)})
-            .attr("y", function(d, i) {return h - (d/dataMax * h)});
-  }
+        shapeBars(rectSelection);
+        shapeBars(rectSelection.enter().append("rect"));
+        rectSelection.exit().remove();
 
-  render() {
-    return <svg ref={node => this.node = node} width={this.props.size[0]} height={this.props.size[1]}>
-    </svg>
-  }
+        return null;
+    }
 }
 
 export default BarChart;

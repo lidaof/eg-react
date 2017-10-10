@@ -10,6 +10,8 @@
 //
 
 // "use strict";
+const DEBUG = false;
+
 var spans = require('../utils/spans');
 var Range = spans.Range;
 var union = spans.union;
@@ -172,7 +174,7 @@ BigWigView.prototype.readWigDataById = function(chr, min, max, callback) {
   }
 
   var cirFobRecur = function(offset, level) {
-    if (thisB.bwg.instrument)
+    if (thisB.bwg.instrument && DEBUG)
       console.log('level=' + level + '; offset=' + offset + '; time=' + (Date.now() | 0));
 
     outstanding += offset.length;
@@ -326,7 +328,7 @@ BigWigView.prototype.fetchFeatures = function(filter, blocksToFetch, callback) {
 
               var data;
               if (thisB.bwg.uncompressBufSize > 0) {
-                console.log(thisB.bwg);
+                if (DEBUG) console.log(thisB.bwg);
                 data = jszlib_inflate_buffer(result, offset + 2, fb.size - 2);
 
                 // var resultBuffer = String.fromCharCode.apply(null, new Uint8Array(result));
