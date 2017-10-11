@@ -16,6 +16,27 @@ import SVG from 'svg.js';
  * @author Silas Hsu
  */
 class SvgComponent extends React.Component {
+    static propTypes = {
+        /**
+         * Since jsdom doesn't know what SVG is, we comment this out so the unit tests pass.  Don't worry; it becomes
+         * apparent VERY quickly if this component does not get a SVG node.
+         */
+        // svgNode: PropTypes.instanceOf(SVGElement).isRequired,
+        model: PropTypes.instanceOf(DisplayedRegionModel), // The current region in which we are drawing
+
+        /**
+         * Used to convert pixels to bases and vice-versa while drawing.
+         */
+        drawModel: PropTypes.instanceOf(LinearDrawingModel),
+        xOffset: PropTypes.number, // X amount to translate everything that is drawn
+        yOffset: PropTypes.number, // Y amount to translate everything that is drawn
+    }
+
+    static defaultProps = {
+        xOffset: 0,
+        yOffset: 0,
+    }
+
     /**
      * Creates a new SVG group to draw in.
      */
@@ -67,21 +88,6 @@ class SvgComponent extends React.Component {
     render() {
         return null;
     }
-}
-
-SvgComponent.propTypes = {
-    // Since jsdom doesn't know what SVG is, we comment this out.  Don't worry, it because apparent VERY quickly if
-    // this.props.svgNode is ever undefined.
-    //svgNode: PropTypes.instanceOf(SVGElement).isRequired,
-    model: PropTypes.instanceOf(DisplayedRegionModel),
-    drawModel: PropTypes.instanceOf(LinearDrawingModel),
-    xOffset: PropTypes.number,
-    yOffset: PropTypes.number,
-}
-
-SvgComponent.defaultProps = {
-    xOffset: 0,
-    yOffset: 0,
 }
 
 export default SvgComponent;

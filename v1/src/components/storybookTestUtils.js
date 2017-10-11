@@ -1,3 +1,9 @@
+/**
+ * Utilities for unit tests that use Storybook.
+ * 
+ * @author Silas Hsu
+ */
+
 import $ from 'jquery';
 import Nightmare from 'nightmare';
 import tcpPortUsed from 'tcp-port-used';

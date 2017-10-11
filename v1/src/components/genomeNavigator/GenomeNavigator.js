@@ -14,6 +14,27 @@ const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allow
  * @author Silas Hsu
  */
 class GenomeNavigator extends React.Component {
+    static propTypes = {
+        /**
+         * The initial view of the genome.  This prop will be forked into this component's state, after which mouse
+         * events can control the view.  Setting this prop again will force a different view.
+         */
+        viewModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+
+        /**
+         * The region that the tracks are displaying.
+         */
+        selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+
+        /**
+         * Called when the user selects a new region to display.  Has the signature
+         *     (newStart: number, newEnd: number): void
+         *         `newStart`: the absolute base number of the start of the selected interval
+         *         `newEnd`: the absolute base number of the end of the selected interval
+         */
+        regionSelectedCallback: PropTypes.func.isRequired,
+    };
+
     /**
      * Binds functions, and also forks that view region that was passed via props.
      */
@@ -122,12 +143,6 @@ class GenomeNavigator extends React.Component {
             </div>
         );
     }
-}
-
-GenomeNavigator.propTypes = {
-    viewModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-    selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-    regionSelectedCallback: PropTypes.func.isRequired, // Function that takes arguments [number, number]
 }
 
 export default GenomeNavigator;

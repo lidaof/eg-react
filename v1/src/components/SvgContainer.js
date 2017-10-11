@@ -14,6 +14,31 @@ import _ from 'lodash';
  * @author Silas Hsu
  */
 class SvgContainer extends React.Component {
+    static propTypes = {
+        /**
+         * The current region in which to draw; will be passed to child elements.
+         */
+        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+
+        /**
+         * Function for getting a reference to the native SVG element.  Has the signature
+         *     (svgNode: SVGAnimatedString): void
+         *         `svgNode` - the native SVG node mounted in the DOM
+         */
+        svgRef: PropTypes.func,
+
+        svgStyle: PropTypes.object, // Inline CSS to pass to the SVG node
+        onContextMenu: PropTypes.func, // Called when a right click happens in the SVG to open the context menu
+        onWheel: PropTypes.func, // Called when the mouse wheel is scrolled over the SVG
+        viewBoxX: PropTypes.number, // X pixels to translate the SVG's viewBox
+        viewBoxY: PropTypes.number, // Y pixels to translate the SVG's viewBox
+    }
+
+    static defaultProps = {
+        viewBoxX: 0,
+        viewBoxY: 0
+    }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -43,7 +68,7 @@ class SvgContainer extends React.Component {
     /**
      * Updates the LinearDrawingModel to pass to the children if necessary.
      * 
-     * @param {any} nextProps - next props that the component will receive
+     * @param {object} nextProps - next props that the component will receive
      * @override
      */
     componentWillUpdate(nextProps) {
@@ -117,18 +142,3 @@ class SvgContainer extends React.Component {
 }
 
 export default SvgContainer;
-
-SvgContainer.defaultProps = {
-    viewBoxX: 0,
-    viewBoxY: 0
-}
-
-SvgContainer.propTypes = {
-    model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-    svgRef: PropTypes.func,
-    svgStyle: PropTypes.object,
-    onContextMenu: PropTypes.func,
-    onWheel: PropTypes.func,
-    viewBoxX: PropTypes.number,
-    viewBoxY: PropTypes.number,
-}

@@ -17,6 +17,21 @@ const LABEL_X_PADDING = 15;
  * @author Silas Hsu
  */
 class SelectedRegionBox extends SvgComponent {
+    static propTypes = {
+        /**
+         * The region that the tracks are displaying
+         */
+        selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+
+        /**
+         * Called when the user presses the "GOTO" button to quicky scroll the view to the selected track region.
+         *     (newStart: number, newEnd: number): void
+         *         `newStart`: the absolute base number of the start of the interval to scroll to
+         *         `newEnd`: the absolute base number of the end of the interval to scroll to
+         */
+        gotoButtonCallback: PropTypes.func.isRequired, // Function that takes arguments [number, number]
+    }
+
     /**
      * Creates the box and GOTO button, and attaches event listeners
      * 
@@ -114,11 +129,6 @@ class SelectedRegionBox extends SvgComponent {
 
         return null;
     }
-}
-
-SelectedRegionBox.propTypes = {
-    selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-    gotoButtonCallback: PropTypes.func.isRequired, // Function that takes arguments [number, number]
 }
 
 export default SelectedRegionBox;

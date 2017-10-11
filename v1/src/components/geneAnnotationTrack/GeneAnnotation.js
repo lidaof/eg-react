@@ -17,6 +17,20 @@ const LABEL_BACKGROUND_PADDING = 2;
  * @author Silas Hsu
  */
 export class GeneAnnotation extends SvgComponent {
+    static propTypes = {
+        gene: PropTypes.object.isRequired, // Gene to display
+        isLabeled: PropTypes.bool.isRequired, // Whether to display the gene's name
+        topY: PropTypes.number.isRequired, // The y coordinate of the top edge of the annotation
+
+        /**
+         * Called when this annotation is clicked.  Has the signature
+         *     (event: React.SyntheticEvent, gene: Gene): void
+         *         `event`: the mouse event from the click
+         *         `gene`: the Gene object that was clicked, same as this.props.gene
+         */
+        onClick: PropTypes.func,
+    };
+
     /**
      * Called when the annotation is clicked; executes the onClick callback provided via props.
      * 
@@ -140,10 +154,3 @@ export class GeneAnnotation extends SvgComponent {
 }
 
 export default GeneAnnotation;
-
-GeneAnnotation.propTypes = {
-    gene: PropTypes.object.isRequired,
-    isLabeled: PropTypes.bool.isRequired,
-    topY: PropTypes.number.isRequired,
-    onClick: PropTypes.func,
-}

@@ -9,6 +9,19 @@ const WIDTH = 300; // In pixels
  * @author Silas Hsu
  */
 class GeneDetail extends React.Component {
+    static propTypes = {
+        gene: PropTypes.object.isRequired, // The Gene object for which to display info
+        top: PropTypes.number, // CSS property for positioning, as this component follows absolute positioning
+        left: PropTypes.number, // CSS property, as this component follows absolute positioning
+        rightBoundary: PropTypes.number // Limit of the box's right edge, as an X pixel coordinate
+    };
+
+    static defaultProps = {
+        top: 0,
+        left: 0,
+        rightBoundary: Number.MAX_VALUE, // In effect, no right boundary.
+    };
+
     render() {
         return (
         <div
@@ -30,16 +43,3 @@ class GeneDetail extends React.Component {
 }
 
 export default GeneDetail;
-
-GeneDetail.propTypes = {
-    gene: PropTypes.object.isRequired,
-    top: PropTypes.number, // CSS property
-    left: PropTypes.number, // CSS property
-    rightBoundary: PropTypes.number // Limit of the box's right edge
-};
-
-GeneDetail.defaultProps = {
-    top: 0,
-    left: 0,
-    rightBoundary: Number.MAX_VALUE,
-};

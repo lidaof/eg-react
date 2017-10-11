@@ -7,7 +7,23 @@ import React from 'react';
 
 const GENE_SOURCE = new GeneDataSource();
 
+/**
+ * Contains all tracks and makes tracks from TrackMetadata objects.
+ * 
+ * @author Silas Hsu
+ */
 class TrackContainer extends React.Component {
+    static propTypes = {
+        /**
+         * Called whenever a track requests that the view be changed, such as when a track is dragged.  Signature:
+         *     (newStart: number, newEnd: number): void
+         *         `newStart`: the absolute base number of the start of the new view interval
+         *         `newEnd`: the absolute base number of the end of the new view interval
+         */
+        newRegionCallback: PropTypes.func.isRequired,
+        tracks: PropTypes.arrayOf(PropTypes.object).isRequired, // The tracks to display.  Array of TrackMetadata.
+    }
+
     constructor(props) {
         super(props);
         this.makeTrackFromMetadataObj = this.makeTrackFromMetadataObj.bind(this);
@@ -17,7 +33,7 @@ class TrackContainer extends React.Component {
         let genericTrackProps = {
             viewRegion: this.props.viewRegion,
             newRegionCallback: this.props.newRegionCallback,
-            key: key
+            key: key // TODO make keys NOT index-based
         };
         let lowercaseType = obj.type.toLowerCase();
         switch (lowercaseType) {
@@ -40,15 +56,10 @@ class TrackContainer extends React.Component {
     render() {
         return (
             <div>
-                {this.props.tracks.map(this.makeTrackFromMetadataObj) /* TODO make keys NOT index-based */}
+                {this.props.tracks.map(this.makeTrackFromMetadataObj)}
             </div>
         );
     }
-}
-
-TrackContainer.propTypes = {
-    newRegionCallback: PropTypes.func.isRequired,
-    tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default TrackContainer;

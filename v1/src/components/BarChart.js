@@ -12,7 +12,7 @@ import _ from 'lodash';
  */
 class BarChart extends React.Component {
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.object)
+        data: PropTypes.arrayOf(PropTypes.object) // The data to display.  Array of BarChartRecord.
     }
 
     /**

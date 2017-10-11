@@ -11,6 +11,40 @@ import SvgComponent from './SvgComponent';
  * @author Silas Hsu
  */
 class ViewDragListener extends SvgComponent {
+    static propTypes = {
+        button: PropTypes.number.isRequired, // The mouse button to listen to.  See DomDragListener for possible values.
+
+        /**
+         * The current view of the SVG; used to calculate how many base pairs the user has dragged.
+         */
+        model: PropTypes.instanceOf(DisplayedRegionModel),
+
+        /**
+         * Called when dragging has started.  Note that a click will also fire this event.  Has the signature
+         *     (event: MouseEvent): void
+         */
+        onViewDragStart: PropTypes.func,
+
+        /**
+         * Called during dragging, when the user has not let go of the mouse and is moving it around.  Has the signature
+         *     (newStart: number,
+         *      newEnd: number,
+         *      event: MouseEvent,
+         *      coordinateDiff: {dx: number, dy: number}
+         *     ): void
+         *         `newStart`: the absolute base number of the start of the view region if it were centered on the mouse
+         *         `newEnd`: the absolute base number of the end of the view region if it were centered on the mouse
+         *         `event`: the MouseEvent that triggered this event
+         *         `coordinateDiff`: the location of the mouse relative to where the drag started
+         */
+        onViewDrag: PropTypes.func,
+
+        /**
+         * Called when dragging has ended; i.e. the user let go of the mouse button.  Same signature as onViewDrag.
+         */
+        onViewDragEnd: PropTypes.func,
+    }
+
     constructor(props) {
         super(props);
 
@@ -95,11 +129,3 @@ class ViewDragListener extends SvgComponent {
 }
 
 export default ViewDragListener;
-
-ViewDragListener.propTypes = {
-    button: PropTypes.number.isRequired,
-    model: PropTypes.instanceOf(DisplayedRegionModel),
-    onViewDragStart: PropTypes.func, // function(MouseEvent)
-    onViewDrag: PropTypes.func, // function({number} view region start, {number} view region end, MouseEvent, Object)
-    onViewDragEnd: PropTypes.func, // function({number} view region start, {number} view region end, MouseEvent, Object)
-}

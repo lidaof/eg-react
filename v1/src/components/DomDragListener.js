@@ -12,6 +12,18 @@ export const RIGHT_MOUSE = 2;
  * @author Silas Hsu
  */
 export class DomDragListener extends React.Component {
+    static propTypes = {
+        button: PropTypes.number.isRequired, // The mouse button to listen to.  See the consts defined above this class.
+        node: PropTypes.object.isRequired, // The native DOM node to listen to
+
+        /**
+         * For the onDrag callbacks, see the doc on DragAcrossDispatcher, below this class.
+         */
+        onDragStart: PropTypes.func,
+        onDrag: PropTypes.func,
+        onDragEnd: PropTypes.func,
+    }
+
     constructor(props) {
         super(props);
 
@@ -79,15 +91,6 @@ export class DomDragListener extends React.Component {
 }
 
 export default DomDragListener;
-
-DomDragListener.propTypes = {
-    button: PropTypes.number.isRequired,
-    node: PropTypes.object.isRequired,
-    onDragStart: PropTypes.func,
-    onDrag: PropTypes.func,
-    onDragEnd: PropTypes.func,
-}
-
 
 /**
  * Fired when the event listener has been asked to perform an action while in an inappropriate state.

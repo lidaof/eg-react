@@ -5,6 +5,11 @@ import Track from './Track';
 import { LEFT_MOUSE } from './DomDragListener';
 import ViewDragListener from './ViewDragListener';
 
+/**
+ * Track that displays BigWig data.
+ * 
+ * @author Silas Hsu
+ */
 class BigWigTrack extends Track {
     static TYPE_NAME = "bigwig";
 

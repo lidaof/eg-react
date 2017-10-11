@@ -1,4 +1,6 @@
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * The display that is above the main pane of the genome navigator, which shows the current track region and a text
@@ -7,6 +9,18 @@ import React from 'react';
  * @author Silas Hsu
  */
 class TrackRegionController extends React.Component {
+    static propTypes = {
+        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view of the genome navigator
+    
+        /**
+         * Called when the user types a region to go to and it is successfully parsed.  Has the signature
+         *     (newStart: number, newEnd: number): void
+         *         `newStart`: the absolute base number of the start of the interval
+         *         `newEnd`: the absolute base number of the end of the interval
+         */
+        newRegionCallback: PropTypes.func.isRequired,
+    }
+
     constructor(props) {
         super(props);
         this.input = null;

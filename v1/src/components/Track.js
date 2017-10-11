@@ -10,12 +10,28 @@ import React from 'react';
  * @author Silas Hsu
  */
 class Track extends React.Component {
+    /**
+     * Determines what kind of Track a TrackMetadata object is describing
+     */
     static TYPE_NAME = "please override me";
+
+    static propTypes = {
+        dataSource: PropTypes.instanceOf(DataSource).isRequired, // Source of data for this Track
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
+
+        /**
+         * Called whenever the track requests that the view be changed, such as when the track is dragged.  Signature:
+         *     (newStart: number, newEnd: number): void
+         *         `newStart`: the absolute base number of the start of the new view interval
+         *         `newEnd`: the absolute base number of the end of the new view interval
+         */
+        newRegionCallback: PropTypes.func.isRequired,
+    }
 
     /**
      * Initializes state and immediately sends a request for data.
      * 
-     * @param {any} props 
+     * @param {object} props 
      */
     constructor(props) {
         super(props);
@@ -39,7 +55,7 @@ class Track extends React.Component {
     /**
      * If the view region has changed, sends a request for data
      * 
-     * @param {any} nextProps - new props that the component will receive
+     * @param {object} nextProps - new props that the component will receive
      * @override
      */
     componentWillReceiveProps(nextProps) {
@@ -96,9 +112,3 @@ class Track extends React.Component {
 }
 
 export default Track;
-
-Track.propTypes = {
-    dataSource: PropTypes.instanceOf(DataSource).isRequired,
-    viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-    newRegionCallback: PropTypes.func.isRequired,
-}

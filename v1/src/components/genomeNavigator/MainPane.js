@@ -23,6 +23,53 @@ const RULER_Y = CHROMOSOME_Y + 40;
  * @extends React.Component
  */
 class MainPane extends React.Component {
+    static propTypes = {
+        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view
+
+        /**
+         * The region that the tracks are displaying
+         */
+        selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+
+        /**
+         * Called when the user selects a new region to display.  Has the signature
+         *     (newStart: number, newEnd: number): void
+         *         `newStart`: the absolute base number of the start of the selected interval
+         *         `newEnd`: the absolute base number of the end of the selected interval
+         */
+        regionSelectedCallback: PropTypes.func.isRequired,
+
+        /**
+         * Called during dragging.  Has the signature
+         *     (newStart: number,
+         *      newEnd: number,
+         *      event: MouseEvent,
+         *      coordinateDiff: {dx: number, dy: number}
+         *     ): void
+         *         `newStart`: the absolute base number of the start of the view region if it were centered on the mouse
+         *         `newEnd`: the absolute base number of the end of the view region if it were centered on the mouse
+         *         `event`: the MouseEvent that triggered this event
+         *         `coordinateDiff`: the location of the mouse relative to where the drag started
+         */
+        dragCallback: PropTypes.func.isRequired,
+        
+        /**
+         * Called when the user presses the "GOTO" button to quicky scroll the view to the selected track region.
+         *     (newStart: number, newEnd: number): void
+         *         `newStart`: the absolute base number of the start of the interval to scroll to
+         *         `newEnd`: the absolute base number of the end of the interval to scroll to
+         */
+        gotoButtonCallback: PropTypes.func.isRequired,
+
+        /**
+         * Called when the view should be zoomed.  Has the signature
+         *     (amount: number, focusPoint: number)
+         *         `amount`: amount to zoom
+        *          `focusPoint`: focal point of the zoom, which is where the mouse was as % of the width of the SVG.
+         */
+        zoomCallback: PropTypes.func.isRequired,
+    }
+
     /**
      * Does setup and binds event listeners.
      * 
@@ -81,15 +128,6 @@ class MainPane extends React.Component {
         </SvgContainer>
         );
     }
-}
-
-MainPane.propTypes = {
-    model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-    selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-    regionSelectedCallback: PropTypes.func.isRequired, // All callbacks take arguments [number, number]
-    dragCallback: PropTypes.func.isRequired,
-    gotoButtonCallback: PropTypes.func.isRequired,
-    zoomCallback: PropTypes.func.isRequired,
 }
 
 export default MainPane;

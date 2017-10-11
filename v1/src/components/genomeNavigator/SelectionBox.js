@@ -13,6 +13,21 @@ const SELECT_BOX_HEIGHT = 60;
  * @author Silas Hsu
  */
 class SelectionBox extends SvgComponent {
+    static propTypes = {
+        /**
+         * The mouse button for which the box should activate; see DomDragListener for valid values.
+         */
+        button: PropTypes.number.isRequired, 
+
+        /**
+         * Called when the user lets go of the mouse, selecting a region.  Has the signature
+         *     (newStart: number, newEnd: number): void
+         *         `newStart`: the absolute base number of the start of the selected interval
+         *         `newEnd`: the absolute base number of the end of the selected interval
+         */
+        regionSelectedCallback: PropTypes.func.isRequired,
+    }
+
     /**
      * Attaches event listeners.
      * 
@@ -105,11 +120,6 @@ class SelectionBox extends SvgComponent {
         />
         );
     }
-}
-
-SelectionBox.propTypes = {
-    button: PropTypes.number.isRequired,
-    regionSelectedCallback: PropTypes.func.isRequired, // Function that takes arguments [number, number]
 }
 
 export default SelectionBox;

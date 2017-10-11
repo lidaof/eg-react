@@ -13,6 +13,23 @@ const ANNOTATION_RIGHT_PADDING = 30;
  * @author Silas Hsu
  */
 class AnnotationArranger extends SvgComponent {
+    static propTypes = {
+        data: PropTypes.arrayOf(PropTypes.object).isRequired, // Array of Gene objects
+        maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
+
+        /**
+         * Called when a gene is clicked.  Has the signature
+         *     (event: React.SyntheticEvent, gene: Gene): void
+         *         `event`: the mouse event from the click
+         *         `gene`: the Gene object that was clicked
+         */
+        onGeneClick: PropTypes.func 
+    };
+
+    static defaultProps = {
+        maxRows: DEFAULT_MAX_ROWS,
+    };
+
     /**
      * Shallowly compares `this.props` and `nextProps`.  Returns true if there is any difference, otherwise false.
      * 
@@ -112,15 +129,5 @@ class AnnotationArranger extends SvgComponent {
         return <div>{children}</div>;
     }
 }
-
-AnnotationArranger.propTypes = {
-    data: PropTypes.arrayOf(PropTypes.object).isRequired,
-    maxRows: PropTypes.number,
-    onGeneClick: PropTypes.func
-};
-
-AnnotationArranger.defaultProps = {
-    maxRows: DEFAULT_MAX_ROWS,
-};
 
 export default AnnotationArranger;
