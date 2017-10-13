@@ -12,7 +12,13 @@ import _ from 'lodash';
  */
 class BarChart extends React.Component {
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.object) // The data to display.  Array of BarChartRecord.
+        data: PropTypes.arrayOf(PropTypes.object), // The data to display.  Array of BarChartRecord.
+        height: PropTypes.number // The height of the svg
+    }
+
+    static defaultProps = {
+        data: [],
+        height: 50,
     }
 
     /**
@@ -33,7 +39,7 @@ class BarChart extends React.Component {
             return null;
         }
         const dataMax = _.maxBy(this.props.data, record => record.value).value;
-        const svgHeight = this.props.svgNode.clientHeight;
+        const svgHeight = this.props.height;
         let rectSelection = select(this.props.svgNode)
             .selectAll("rect")
             .data(non0Data);

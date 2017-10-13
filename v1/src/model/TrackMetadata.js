@@ -16,12 +16,14 @@ const SCHEMA = { // Schema for the plain object argument to the constructor.
 class TrackMetadata {
     constructor(plainObject) {
         Object.assign(this, plainObject);
-        if (!this.name || !this.type) {
-            throw new TypeError("Properties `name` and `type` are required");
-        }
-        if (!this.metadata) {
-            this.metadata = {};
-        }
+        this.name = this.name || "";
+        this.type = this.type || "";
+        this.metadata = this.metadata || {};
+        this.options = this.options || {};
+    }
+
+    getType() {
+        return this.type.toLowerCase();
     }
 }
 

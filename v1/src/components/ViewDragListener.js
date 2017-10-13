@@ -1,18 +1,25 @@
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import LinearDrawingModel from '../model/LinearDrawingModel';
 import DomDragListener from './DomDragListener';
 import PropTypes from 'prop-types';
 import React from 'react';
-import SvgComponent from './SvgComponent';
 
 /**
- * Listens for drag-across events as specified by {@link DomDragListener}, but as a SvgComponent, this component also 
- * calculates changes in view region as the result of the drag.
+ * Listens for drag-across events as specified by {@link DomDragListener}, and also  calculates changes in view region
+ * as the result of the drag.
  * 
  * @author Silas Hsu
  */
-class ViewDragListener extends SvgComponent {
+class ViewDragListener extends React.Component {
     static propTypes = {
         button: PropTypes.number.isRequired, // The mouse button to listen to.  See DomDragListener for possible values.
+        node: PropTypes.object, // The node to listen to.
+        svgNode: PropTypes.object, // Fallback if node is not defined; gives compatibility when inside a SvgContainer.
+
+        /**
+         * Used to convert number of pixels dragged to number of bases dragged.
+         */
+        drawModel: PropTypes.instanceOf(LinearDrawingModel),
 
         /**
          * The current view of the SVG; used to calculate how many base pairs the user has dragged.
@@ -27,11 +34,7 @@ class ViewDragListener extends SvgComponent {
 
         /**
          * Called during dragging, when the user has not let go of the mouse and is moving it around.  Has the signature
-         *     (newStart: number,
-         *      newEnd: number,
-         *      event: MouseEvent,
-         *      coordinateDiff: {dx: number, dy: number}
-         *     ): void
+         *     (newStart: number, newEnd: number, event: MouseEvent, coordinateDiff: {dx: number, dy: number}): void
          *         `newStart`: the absolute base number of the start of the view region if it were centered on the mouse
          *         `newEnd`: the absolute base number of the end of the view region if it were centered on the mouse
          *         `event`: the MouseEvent that triggered this event
@@ -122,7 +125,7 @@ class ViewDragListener extends SvgComponent {
                 onDragStart={this.dragStart}
                 onDrag={this.drag}
                 onDragEnd={this.dragEnd}
-                node={this.props.svgNode}
+                node={this.props.node || this.props.svgNode}
             />
         );
     }

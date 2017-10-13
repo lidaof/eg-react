@@ -2,6 +2,7 @@ import DataSource from '../dataSources/DataSource';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import PropTypes from 'prop-types';
 import React from 'react';
+import TrackMetadata from '../model/TrackMetadata';
 
 /**
  * A track for the genome browser.  This extendable class provides functionality common to all tracks, such as data
@@ -16,16 +17,10 @@ class Track extends React.Component {
     static TYPE_NAME = "please override me";
 
     static propTypes = {
-        dataSource: PropTypes.instanceOf(DataSource).isRequired, // Source of data for this Track
+        dataSourceOverride: PropTypes.instanceOf(DataSource), // Source of data for this Track; overrides the default
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
-
-        /**
-         * Called whenever the track requests that the view be changed, such as when the track is dragged.  Signature:
-         *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the new view interval
-         *         `newEnd`: the absolute base number of the end of the new view interval
-         */
-        newRegionCallback: PropTypes.func.isRequired,
+        metadata: PropTypes.instanceOf(TrackMetadata).isRequired, // Metadata for this track
+        xOffset: PropTypes.number, // The horizontal amount to translate visualizations
     }
 
     /**
@@ -38,17 +33,41 @@ class Track extends React.Component {
         this.state = {
             isLoading: true,
             data: null,
-            xOffset: 0
+            error: null,
+            xOffset: this.props.xOffset || 0,
         };
+        // We fork the xOffset prop because we want to set it to 0 when data finishes loading, regardless of the value
+        // of the prop.
 
-        this.viewDrag = this.viewDrag.bind(this);
-        this.viewDragEnd = this.viewDragEnd.bind(this);
+        this.dataSource = this.props.dataSourceOverride || this.makeDefaultDataSource();
 
-        this.props.dataSource.getData(this.props.viewRegion).then(data => {
-            this.setState({
-                isLoading: false,
-                data: data
-            });
+        this.fetchData = this.fetchData.bind(this);
+        this.fetchData(this.props.viewRegion);
+    }
+
+    makeDefaultDataSource() {
+        throw new Error("No default data source defined");
+    }
+
+    fetchData(viewRegion) {
+        return this.dataSource.getData(viewRegion).then(data => {
+            // When the data finally comes in, be sure it is still what the user wants
+            if (this.props.viewRegion === viewRegion) {
+                this.setState({
+                    isLoading: false,
+                    data: data,
+                    error: null,
+                    xOffset: 0,
+                });
+            }
+        })
+        .catch(error => {
+            if (this.props.viewRegion === viewRegion) {
+                this.setState({
+                    error: error,
+                    xOffset: 0
+                });
+            }
         });
     }
 
@@ -59,45 +78,21 @@ class Track extends React.Component {
      * @override
      */
     componentWillReceiveProps(nextProps) {
+        let nextStateObj = {};
         if (this.props.viewRegion !== nextProps.viewRegion) {
-            this.props.dataSource.getData(nextProps.viewRegion).then((data) => {
-                // When the data finally comes in, be sure it is still what the user wants
-                if (this.props.viewRegion === nextProps.viewRegion) {
-                    this.setState({
-                        isLoading: false,
-                        data: data,
-                        xOffset: 0
-                    });
-                }
-            });
-            this.setState({isLoading: true});
+            nextStateObj.isLoading = true;
+            this.fetchData(nextProps.viewRegion);
         }
-    }
 
-    /**
-     * Called when the user drags the track around.
-     * 
-     * @param {any} [unused] - unused
-     * @param {any} [unused2] - unused
-     * @param {MouseEvent} [unusedEvent] - unused
-     * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
-     */
-    viewDrag(unused, unused2, unusedEvent, coordinateDiff) {
-        this.setState({xOffset: -coordinateDiff.dx});
-    }
-
-    /**
-     * Called when the user finishes dragging the track, signaling a new track display region.
-     * 
-     * @param {number} newStart - absolute start base pair of the new display region
-     * @param {number} newEnd - absolute end base number of the new display region
-     * @param {MouseEvent} [event] - unused
-     * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
-     */
-    viewDragEnd(newStart, newEnd, event, coordinateDiff) {
-        if (Math.abs(coordinateDiff.dx) > 5) {
-            this.props.newRegionCallback(newStart, newEnd);
+        if (this.props.xOffset !== nextProps.xOffset) {
+            nextStateObj.xOffset = nextProps.xOffset;
         }
+
+        if (this.props.dataSourceOverride !== nextProps.dataSourceOverride) {
+            this.dataSource = nextProps.dataSourceOverride || this.makeDefaultDataSource();
+        }
+
+        this.setState(nextStateObj);
     }
 
     /**

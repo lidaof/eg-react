@@ -1,6 +1,7 @@
 import './App.css';
 import BigWigTrack from './components/BigWigTrack';
 import GeneAnnotationTrack from './components/geneAnnotationTrack/GeneAnnotationTrack';
+import TrackMetadata from './model/TrackMetadata';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import React from 'react';
@@ -23,16 +24,16 @@ const DEFAULT_SELECTED_REGION = [15599999, 16000000];
 const DEFAULT_NAV_VIEW = [0, 20000000];
 
 const DEFAULT_TRACKS = [
-    {
+    new TrackMetadata({
         type: BigWigTrack.TYPE_NAME,
         name: "GSM429321.bigWig",
         url: 'http://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig',
-    },
-    {
+    }),
+    new TrackMetadata({
         type: GeneAnnotationTrack.TYPE_NAME,
         name: "refGene",
-    },
-]
+    }),
+];
 
 class App extends React.Component {
     constructor(props) {

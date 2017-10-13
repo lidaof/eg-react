@@ -1,10 +1,9 @@
 import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
-import { LEFT_MOUSE } from '../DomDragListener';
+import GeneDataSource from '../../dataSources/GeneDataSource';
 import React from 'react';
 import SvgContainer from '../SvgContainer';
 import Track from '../Track';
-import ViewDragListener from '../ViewDragListener';
 
 /**
  * A gene annotation track.
@@ -20,6 +19,10 @@ class GeneAnnotationTrack extends Track {
 
         this.divNode = null;
         this.geneClicked = this.geneClicked.bind(this);
+    }
+
+    makeDefaultDataSource() {
+        return new GeneDataSource();
     }
 
     /**
@@ -40,10 +43,22 @@ class GeneAnnotationTrack extends Track {
     }
 
     render() {
+        let svgStyle = {border: "1px solid black", padding: "10px", height: "120px"};
+        if (this.state.isLoading) {
+            svgStyle.opacity = 0.5;
+        }
+        if (this.state.error) {
+            svgStyle.backgroundColor = "red";
+        }
+
         return (
-        <div style={{padding: "20px"}} ref={node => this.divNode = node} onClick={(event) => this.setState({geneDetail: null})}>
+        <div
+            style={{paddingLeft: "20px", paddingRight: "20px"}}
+            ref={node => this.divNode = node}
+            onClick={(event) => this.setState({geneDetail: null})}
+        >
             <SvgContainer
-                svgStyle={{border: "1px solid black", padding: "10px"}}
+                svgStyle={svgStyle}
                 model={this.props.viewRegion}
                 viewBoxX={this.state.xOffset}
             >
@@ -55,14 +70,8 @@ class GeneAnnotationTrack extends Track {
                     />
                     : null
                 }
-                <ViewDragListener
-                    button={LEFT_MOUSE}
-                    onViewDrag={this.viewDrag}
-                    onViewDragEnd={this.viewDragEnd}
-                />
             </SvgContainer>
             {this.state.geneDetail}
-            {this.state.isLoading ? <p>Loading...</p> : null}
         </div>
         );
     }

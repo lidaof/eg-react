@@ -111,7 +111,8 @@ export class ListenerStateError extends Error {} // Currently, only tests import
  */
 class DragAcrossDispatcher {
     /**
-     * An object containing callbacks for DragAcrossDispatcher.
+     * An object containing callbacks for DragAcrossDispatcher.  `dragStart` is called with the MouseEvent as its only
+     * argument; `drag` and `dragEnd` are called with (event: MouseEvent, coordinateDiff: {dx: number, dy: number})
      * 
      * @typedef {Object} DragAcrossDispatcher~Callbacks
      * @property {function} [dragStart] - called upon a mousedown of the appropriate button
