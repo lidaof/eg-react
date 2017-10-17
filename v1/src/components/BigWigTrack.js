@@ -1,8 +1,8 @@
-import BarChart from './BarChart';
+import LinearDrawingModel from '../model/LinearDrawingModel';
 import BigWigDataSource from '../dataSources/BigWigDataSource';
 import React from 'react';
-import SvgContainer from './SvgContainer';
 import Track from './Track';
+import _ from 'lodash';
 
 const DEFAULT_HEIGHT = 50;
 
@@ -14,32 +14,88 @@ const DEFAULT_HEIGHT = 50;
 class BigWigTrack extends Track {
     static TYPE_NAME = "bigwig";
 
+    constructor(props) {
+        super(props);
+        this.canvasNode = null;
+    }
+
     makeDefaultDataSource() {
-        return new BigWigDataSource(this.props.metadata.url);
+        return new BigWigDataSource(this.props.trackModel.url);
+    }
+
+    componentDidMount() {
+        this.draw();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.data !== this.state.data) {
+            this.draw();
+        }
+    }
+
+    draw() {
+        if (!this.canvasNode) {
+            return;
+        }
+        const data = this.state.data || [];
+        const non0Data = data.filter(record => record.value !== 0);
+        if (non0Data.length === 0) {
+            return;
+        }
+        const dataMax = _.maxBy(data, record => record.value).value;
+
+        const canvas = this.canvasNode;
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width, canvas);
+        const canvasHeight = canvas.height;
+        const context = canvas.getContext("2d");
+        context.fillStyle = "blue";
+        context.clearRect(0, 0, canvas.width, canvasHeight);
+        
+        non0Data.forEach(record => {
+            const x = Math.round(drawModel.baseToX(record.start));
+            const y = Math.round(canvasHeight - (record.value/dataMax * canvasHeight) + 10);
+            const width = 1;
+            const height = Math.round(record.value/dataMax * canvasHeight);
+            context.fillRect(x, y, width, height);
+        });
     }
 
     render() {
-        const height = this.props.metadata.options.height || DEFAULT_HEIGHT;
-        let data = this.state.data || [];
-        let svgStyle = {
+        const height = this.props.trackModel.options.height || DEFAULT_HEIGHT;
+        const divStyle = {
+            overflow: "hidden",
+        };
+        const loadingDivStyle = {
+            position: "absolute",
+            width: "100%",
+            height: `${height}px`,
+            backgroundColor: "white",
+            textAlign: "center",
+            opacity: 0.6,
+            zIndex: 1,
+        };
+        let canvasStyle = {
             borderTop: "1px solid black",
             borderBottom: "1px solid black",
-            overflow: "hidden",
-            height: `${height}px`,
-        }
-        if (this.state.isLoading) {
-            //svgStyle.opacity = 0.5;
-        }
+            display: "block",
+
+            position: "relative",
+            left: this.props.xOffset
+        };
         if (this.state.error) {
-            svgStyle.backgroundColor = "red";
+            canvasStyle.backgroundColor = "red";
         }
+
         return (
-        <div style={{paddingLeft: "20px", paddingRight: "20px"}}>
-            {this.state.isLoading ? <div style={{opacity: 0.75, position: "absolute", textAlign: "center", width: "100%", height: `${height}px`, backgroundColor: "white"}}><h2>Loading...</h2></div> : null}
-            <SvgContainer model={this.props.viewRegion} svgStyle={svgStyle} viewBoxX={this.state.xOffset} >
-                <BarChart data={data} height={height} />
-            </SvgContainer>
-        </div>
+            <div style={divStyle}>
+                {this.state.isLoading ? <div style={loadingDivStyle}><h3>Loading...</h3></div> : null}
+                <canvas
+                    width={this.props.width}
+                    height={height}
+                    style={canvasStyle}
+                    ref={node => this.canvasNode = node}
+                />
+            </div>
         );
     }
 }

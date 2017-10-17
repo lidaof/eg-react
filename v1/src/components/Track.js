@@ -12,15 +12,18 @@ import TrackModel from '../model/TrackModel';
  */
 class Track extends React.Component {
     /**
-     * Determines what kind of Track a TrackModel object is describing
+     * Name to compare to a TrackModel's type when creating new Tracks
      */
     static TYPE_NAME = "please override me";
 
     static propTypes = {
-        dataSourceOverride: PropTypes.instanceOf(DataSource), // Source of data for this Track; overrides the default
+        trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Metadata for this track
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
-        metadata: PropTypes.instanceOf(TrackModel).isRequired, // Metadata for this track
+
+        width: PropTypes.number, // The width of the track
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
+        onNewData: PropTypes.func, // Callback when the track loads new data.  Called with no arguments.
+        dataSourceOverride: PropTypes.instanceOf(DataSource), // Source of data for this Track; overrides the default
     }
 
     /**
@@ -34,7 +37,6 @@ class Track extends React.Component {
             isLoading: true,
             data: null,
             error: null,
-            xOffset: this.props.xOffset || 0,
         };
         // We fork the xOffset prop because we want to set it to 0 when data finishes loading, regardless of the value
         // of the prop.
@@ -57,15 +59,16 @@ class Track extends React.Component {
                     isLoading: false,
                     data: data,
                     error: null,
-                    xOffset: 0,
                 });
+                if (this.props.onNewData) {
+                    this.props.onNewData();
+                }
             }
         })
         .catch(error => {
             if (this.props.viewRegion === viewRegion) {
                 this.setState({
                     error: error,
-                    xOffset: 0
                 });
             }
         });
@@ -82,10 +85,6 @@ class Track extends React.Component {
         if (this.props.viewRegion !== nextProps.viewRegion) {
             nextStateObj.isLoading = true;
             this.fetchData(nextProps.viewRegion);
-        }
-
-        if (this.props.xOffset !== nextProps.xOffset) {
-            nextStateObj.xOffset = nextProps.xOffset;
         }
 
         if (this.props.dataSourceOverride !== nextProps.dataSourceOverride) {

@@ -7,8 +7,10 @@ import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import React from 'react';
 import TrackContainer from './components/TrackContainer';
 import _ from 'lodash';
-
 import TrackManager from './components/trackManagers/TrackManager';
+
+import Perf from 'react-addons-perf'; // ES6
+window.Perf = Perf;
 
 const CHROMOSOMES = [
     {name: "chr1", lengthInBases: 249250621},

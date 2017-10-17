@@ -28,23 +28,34 @@ class TrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isMounted: false,
+            width: 0,
             xOffsets: Array(props.tracks.length).fill(0)
         };
+        this.offsetsOnDragStart = this.state.xOffsets;
         this.node = null;
 
+        this.viewDragStart = this.viewDragStart.bind(this);
         this.viewDrag = this.viewDrag.bind(this);
         this.viewDragEnd = this.viewDragEnd.bind(this);
+        this.newTrackDataCallback = this.newTrackDataCallback.bind(this);
         this.renderTrack = this.renderTrack.bind(this);
     }
 
     componentDidMount() {
-        this.drawModel = new LinearDrawingModel(this.props.viewRegion, this.node.clientWidth, this.node);
-        this.setState({isMounted: true});
+        this.setState({width: this.node.clientWidth});
     }
 
     /**
-     * Called when the user drags the track around.
+     * Saves the current track draw offsets.
+     * 
+     * @param {MouseEvent} unusedEvent - unused
+     */
+    viewDragStart(unusedEvent) {
+        this.offsetsOnDragStart = this.state.xOffsets.slice();
+    }
+
+    /**
+     * Called when the user drags the track around.  Sets track draw offsets.
      * 
      * @param {any} [unused] - unused
      * @param {any} [unused2] - unused
@@ -52,7 +63,8 @@ class TrackContainer extends React.Component {
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
     viewDrag(unused, unused2, unusedEvent, coordinateDiff) {
-        this.setState({xOffset: -coordinateDiff.dx});
+        let newOffsets = this.offsetsOnDragStart.map(initOffset => initOffset + coordinateDiff.dx);
+        this.setState({xOffsets: newOffsets});
     }
 
     /**
@@ -70,31 +82,45 @@ class TrackContainer extends React.Component {
     }
 
     /**
+     * Resets the draw offset for a track when it has loaded new data.
+     * 
+     * @param {number} index - the index of the track that got new data
+     */
+    newTrackDataCallback(index) {
+        let newOffsets = this.state.xOffsets.slice();
+        newOffsets[index] = 0;
+        this.setState({xOffsets: newOffsets});
+    }
+
+    /**
      * Make a single track component with the input TrackModel.
      * 
      * @param {TrackModel} trackModel - model to use to create the track
-     * @param {number} key - key unique among all tracks to be mounted, as specified by React
+     * @param {number} index - index of the track in this.props.tracks
      * @return {Track} track component to render
      */
-    renderTrack(trackModel, key) {
-        if (!trackModel) {
+    renderTrack(trackModel, index) {
+        if (!trackModel || !this.node) {
             return null;
         }
 
-        let genericTrackProps = {
+        let trackProps = {
+            trackModel: trackModel,
             viewRegion: this.props.viewRegion,
-            xOffset: this.state.xOffset,
-            metadata: trackModel,
-            key: key // TODO make keys NOT index-based
+
+            width: this.state.width,
+            xOffset: this.state.xOffsets[index],
+            onNewData: () => this.newTrackDataCallback(index),
+            key: index // TODO make keys NOT index-based
         };
         switch (trackModel.getType()) {
             case BigWigTrack.TYPE_NAME.toLowerCase():
                 return <BigWigTrack
-                    {...genericTrackProps}
+                    {...trackProps}
                 />;
             case GeneAnnotationTrack.TYPE_NAME.toLowerCase():
                 return <GeneAnnotationTrack
-                    {...genericTrackProps}
+                    {...trackProps}
                 />;
             default:
                 console.warn("Unknown track type " + trackModel.type);
@@ -103,16 +129,19 @@ class TrackContainer extends React.Component {
     }
 
     render() {
+        const drawModel = this.node ?
+            new LinearDrawingModel(this.props.viewRegion, this.node.clientWidth, this.node) : undefined;
         return (
-            <div ref={node => this.node = node}>
+            <div ref={node => this.node = node} style={{margin: "10px"}}>
                 {this.props.tracks.map(this.renderTrack)}
                 {
                 this.node ?
                     <ViewDragListener
                         button={LEFT_MOUSE}
                         node={this.node}
-                        drawModel={this.drawModel}
+                        drawModel={drawModel}
                         model={this.props.viewRegion}
+                        onViewDragStart={this.viewDragStart}
                         onViewDrag={this.viewDrag}
                         onViewDragEnd={this.viewDragEnd}
                     />
