@@ -13,7 +13,7 @@ const SCHEMA = { // Schema for the plain object argument to the constructor.
 }
 */
 
-class TrackMetadata {
+class TrackModel {
     constructor(plainObject) {
         Object.assign(this, plainObject);
         this.name = this.name || "";
@@ -27,4 +27,4 @@ class TrackMetadata {
     }
 }
 
-export default TrackMetadata;
+export default TrackModel;

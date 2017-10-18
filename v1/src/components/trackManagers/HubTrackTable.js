@@ -31,7 +31,7 @@ class HubTrackTable extends React.PureComponent {
      * added, meaning there should be an add button.
      * 
      * @param {Object} reactTableRow - a Row object that ReactTable provides
-     * @param {Set<TrackMetadata>} addedTrackSet - set of tracks, to help determine if the track has been added already
+     * @param {Set<TrackModel>} addedTrackSet - set of tracks, to help determine if the track has been added already
      * @return {React.Component} the cell to render
      */
     getAddTrackCell(reactTableRow, addedTrackSet) {

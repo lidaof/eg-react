@@ -2,7 +2,7 @@ import DataSource from '../dataSources/DataSource';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import PropTypes from 'prop-types';
 import React from 'react';
-import TrackMetadata from '../model/TrackMetadata';
+import TrackModel from '../model/TrackModel';
 
 /**
  * A track for the genome browser.  This extendable class provides functionality common to all tracks, such as data
@@ -12,14 +12,14 @@ import TrackMetadata from '../model/TrackMetadata';
  */
 class Track extends React.Component {
     /**
-     * Determines what kind of Track a TrackMetadata object is describing
+     * Determines what kind of Track a TrackModel object is describing
      */
     static TYPE_NAME = "please override me";
 
     static propTypes = {
         dataSourceOverride: PropTypes.instanceOf(DataSource), // Source of data for this Track; overrides the default
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
-        metadata: PropTypes.instanceOf(TrackMetadata).isRequired, // Metadata for this track
+        metadata: PropTypes.instanceOf(TrackModel).isRequired, // Metadata for this track
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
     }
 

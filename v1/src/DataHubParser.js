@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import JSON5 from 'json5';
-import TrackMetadata from './model/TrackMetadata';
+import TrackModel from './model/TrackModel';
 
 // const VOCAB_INDEX = 0;
 const TRACKS_START_INDEX = 1;
@@ -32,8 +32,8 @@ class HubParser {
         for (let plainObject of hub.slice(TRACKS_START_INDEX)) {
             let newTrack = null;
             try {
-                newTrack = new TrackMetadata(plainObject);
-            } catch(error) { // Can't be converted to a TrackMetadata object
+                newTrack = new TrackModel(plainObject);
+            } catch(error) { // Can't be converted to a TrackModel object
                 if (error instanceof TypeError) {
                     console.warn(`Encounted a badly-formatted track in hub ${hubMetadata.name}:`);
                     console.warn(plainObject);

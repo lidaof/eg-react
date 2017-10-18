@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 /**
- * Contains all tracks and makes tracks from TrackMetadata objects.
+ * Contains all tracks and makes tracks from TrackModel objects.
  * 
  * @author Silas Hsu
  */
@@ -22,14 +22,14 @@ class TrackContainer extends React.Component {
          *         `newEnd`: the absolute base number of the end of the new view interval
          */
         newRegionCallback: PropTypes.func.isRequired,
-        tracks: PropTypes.arrayOf(PropTypes.object).isRequired, // The tracks to display.  Array of TrackMetadata.
+        tracks: PropTypes.arrayOf(PropTypes.object).isRequired, // The tracks to display.  Array of TrackModel.
     }
 
     constructor(props) {
         super(props);
         this.state = {
             isMounted: false,
-            xOffset: 0,
+            xOffsets: Array(props.tracks.length).fill(0)
         };
         this.node = null;
 
@@ -69,18 +69,25 @@ class TrackContainer extends React.Component {
         }
     }
 
-    renderTrack(trackMetadata, key) {
-        if (!trackMetadata) {
+    /**
+     * Make a single track component with the input TrackModel.
+     * 
+     * @param {TrackModel} trackModel - model to use to create the track
+     * @param {number} key - key unique among all tracks to be mounted, as specified by React
+     * @return {Track} track component to render
+     */
+    renderTrack(trackModel, key) {
+        if (!trackModel) {
             return null;
         }
 
         let genericTrackProps = {
             viewRegion: this.props.viewRegion,
             xOffset: this.state.xOffset,
-            metadata: trackMetadata,
+            metadata: trackModel,
             key: key // TODO make keys NOT index-based
         };
-        switch (trackMetadata.getType()) {
+        switch (trackModel.getType()) {
             case BigWigTrack.TYPE_NAME.toLowerCase():
                 return <BigWigTrack
                     {...genericTrackProps}
@@ -90,7 +97,7 @@ class TrackContainer extends React.Component {
                     {...genericTrackProps}
                 />;
             default:
-                console.warn("Unknown track type " + trackMetadata.type);
+                console.warn("Unknown track type " + trackModel.type);
                 return null;
         }
     }

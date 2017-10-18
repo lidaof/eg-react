@@ -31,7 +31,7 @@ class HubPane extends React.PureComponent {
     /**
      * Adds a list of tracks to the list of all tracks available from a hub.
      * 
-     * @param {TrackMetadata[]} newTracks - additions to the list of all tracks available from a hub
+     * @param {TrackModel[]} newTracks - additions to the list of all tracks available from a hub
      */
     addToAvailableTracks(newTracks) {
         this.setState({availableTracks: this.state.availableTracks.concat(newTracks)});
