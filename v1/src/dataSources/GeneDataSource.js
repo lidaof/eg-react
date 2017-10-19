@@ -16,7 +16,7 @@ class GeneDataSource extends DataSource {
      * @override
      */
     getData(regionModel) {
-        let requests = []
+        let requests = [];
         for (let region of regionModel.getRegionList()) {
             requests.push(this._getDataForOneRegion(region));
         }

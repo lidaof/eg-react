@@ -1,5 +1,6 @@
 import BarChartRecord from '../model/BarChartRecord';
 import DataSource from './DataSource';
+import _ from 'lodash';
 
 const bigwig = require('../vendor/bbi-js/main/bigwig');
 const bin = require('../vendor/bbi-js/utils/bin');
@@ -14,10 +15,12 @@ class BigWigDataSource extends DataSource {
      * Prepares to fetch BigWig data from a URL.
      * 
      * @param {string} url - the URL from which to fetch data
+     * @param {number} surroundingsToFetch - multiple of input region length to fetch, on each side.  Default: 1
      */
-    constructor(url) {
+    constructor(url, surroundingsToFetch = 1) {
         super();
         this.url = url;
+        this.zoomRatio = 2 * surroundingsToFetch + 1;
         this.bigWigPromise = new Promise((resolve, reject) => {
             bigwig.makeBwg(new bin.URLFetchable(url), (bigWigObj, error) => {
                 if (error) {
@@ -37,10 +40,13 @@ class BigWigDataSource extends DataSource {
      */
     async getData(viewRegion) {
         let bigWigObj = await this.bigWigPromise;
+        let expandedModel = _.clone(viewRegion);
+        expandedModel.zoom(this.zoomRatio);
+
         // FIXME window.innerWidth is not a good way to get pixelsPerBase, but it's quick and dirty.
         let basesPerPixel = viewRegion.getWidth() / window.innerWidth;
         let zoomLevel = this._getMatchingZoomLevel(bigWigObj, basesPerPixel);
-        let promises = viewRegion.getRegionList().map(region =>
+        let promises = expandedModel.getRegionList().map(region =>
             this._getDataForOneRegion(region, bigWigObj, zoomLevel)
         );
         let dataForEachRegion = await Promise.all(promises);

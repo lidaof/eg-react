@@ -4,7 +4,8 @@ import React from 'react';
 import Track from './Track';
 import _ from 'lodash';
 
-const DEFAULT_HEIGHT = 50;
+const EXTRA_RENDER_WIDTH = 1; // Multiple of current region length, on each side
+const DEFAULT_HEIGHT = 30; // In pixels
 
 /**
  * Track that displays BigWig data.
@@ -20,7 +21,7 @@ class BigWigTrack extends Track {
     }
 
     makeDefaultDataSource() {
-        return new BigWigDataSource(this.props.trackModel.url);
+        return new BigWigDataSource(this.props.trackModel.url, 2 * EXTRA_RENDER_WIDTH + 1);
     }
 
     componentDidMount() {
@@ -37,22 +38,23 @@ class BigWigTrack extends Track {
         if (!this.canvasNode) {
             return;
         }
+        const canvas = this.canvasNode;
+        const canvasHeight = canvas.height;
+        const context = canvas.getContext("2d");
+        context.fillStyle = "blue";
+        context.clearRect(0, 0, canvas.width, canvasHeight);
+
         const data = this.state.data || [];
         const non0Data = data.filter(record => record.value !== 0);
         if (non0Data.length === 0) {
             return;
         }
         const dataMax = _.maxBy(data, record => record.value).value;
-
-        const canvas = this.canvasNode;
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width, canvas);
-        const canvasHeight = canvas.height;
-        const context = canvas.getContext("2d");
-        context.fillStyle = "blue";
-        context.clearRect(0, 0, canvas.width, canvasHeight);
         
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width, canvas);
+        const translate = this.props.width * EXTRA_RENDER_WIDTH;
         non0Data.forEach(record => {
-            const x = Math.round(drawModel.baseToX(record.start));
+            const x = Math.round(drawModel.baseToX(record.start)) + translate;
             const y = Math.round(canvasHeight - (record.value/dataMax * canvasHeight) + 10);
             const width = 1;
             const height = Math.round(record.value/dataMax * canvasHeight);
@@ -64,6 +66,7 @@ class BigWigTrack extends Track {
         const height = this.props.trackModel.options.height || DEFAULT_HEIGHT;
         const divStyle = {
             overflow: "hidden",
+            textAlign: "center",
         };
         const loadingDivStyle = {
             position: "absolute",
@@ -80,7 +83,8 @@ class BigWigTrack extends Track {
             display: "block",
 
             position: "relative",
-            left: this.props.xOffset
+            marginLeft: `-${this.props.width * EXTRA_RENDER_WIDTH}px`,
+            left: this.props.xOffset,
         };
         if (this.state.error) {
             canvasStyle.backgroundColor = "red";
@@ -90,7 +94,7 @@ class BigWigTrack extends Track {
             <div style={divStyle}>
                 {this.state.isLoading ? <div style={loadingDivStyle}><h3>Loading...</h3></div> : null}
                 <canvas
-                    width={this.props.width}
+                    width={this.props.width * (2 * EXTRA_RENDER_WIDTH + 1)}
                     height={height}
                     style={canvasStyle}
                     ref={node => this.canvasNode = node}
