@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import AnnotationTrackSelector from './AnnotationTrackSelector';
 import HubPane from './HubPane'
 
 import './TrackManager.css';
@@ -27,7 +28,7 @@ class TrackManager extends React.Component {
         this.submenus = [ // See doc below constructor for what each submenu object is
             {
                 buttonText: "Annotation tracks...",
-                getComponent: () => null,
+                getComponent: () => <AnnotationTrackSelector />,
             },
             {
                 buttonText: "Data hubs...",
