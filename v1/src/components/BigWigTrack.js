@@ -2,10 +2,14 @@ import LinearDrawingModel from '../model/LinearDrawingModel';
 import BigWigDataSource from '../dataSources/BigWigDataSource';
 import React from 'react';
 import Track from './Track';
+import TrackLegend from './TrackLegend';
+import TrackLoadingNotice from './TrackLoadingNotice';
 import _ from 'lodash';
+import { scaleLinear } from 'd3-scale'
 
 const EXTRA_RENDER_WIDTH = 1; // Multiple of current region length, on each side
 const DEFAULT_HEIGHT = 30; // In pixels
+const TOP_PADDING = 5;
 
 /**
  * Track that displays BigWig data.
@@ -55,7 +59,7 @@ class BigWigTrack extends Track {
         const translate = this.props.width * EXTRA_RENDER_WIDTH;
         non0Data.forEach(record => {
             const x = Math.round(drawModel.baseToX(record.start)) + translate;
-            const y = Math.round(canvasHeight - (record.value/dataMax * canvasHeight) + 10);
+            const y = Math.round(canvasHeight - (record.value/dataMax * canvasHeight) + TOP_PADDING);
             const width = 1;
             const height = Math.round(record.value/dataMax * canvasHeight);
             context.fillRect(x, y, width, height);
@@ -63,19 +67,11 @@ class BigWigTrack extends Track {
     }
 
     render() {
-        const height = this.props.trackModel.options.height || DEFAULT_HEIGHT;
+        let height = this.props.trackModel.options.height || DEFAULT_HEIGHT;
+        console.log(height);
         const divStyle = {
             overflow: "hidden",
             textAlign: "center",
-        };
-        const loadingDivStyle = {
-            position: "absolute",
-            width: "100%",
-            height: `${height}px`,
-            backgroundColor: "white",
-            textAlign: "center",
-            opacity: 0.6,
-            zIndex: 1,
         };
         let canvasStyle = {
             borderTop: "1px solid black",
@@ -90,11 +86,18 @@ class BigWigTrack extends Track {
             canvasStyle.backgroundColor = "red";
         }
 
+        let scale = null;
+        if (this.state.data && this.state.data.length > 0) {
+            const dataMax = _.maxBy(this.state.data, record => record.value).value;
+            scale = scaleLinear().domain([dataMax, 0]).range([TOP_PADDING, height]);
+        }
+
         return (
             <div style={divStyle}>
-                {this.state.isLoading ? <div style={loadingDivStyle}><h3>Loading...</h3></div> : null}
+                <TrackLegend height={height + 2} trackModel={this.props.trackModel} scaleForAxis={scale} />
+                {this.state.isLoading ? <TrackLoadingNotice height={height} /> : null}
                 <canvas
-                    width={this.props.width * (2 * EXTRA_RENDER_WIDTH + 1)}
+                    width={(this.props.width - TrackLegend.WIDTH) * (2 * EXTRA_RENDER_WIDTH + 1)}
                     height={height}
                     style={canvasStyle}
                     ref={node => this.canvasNode = node}

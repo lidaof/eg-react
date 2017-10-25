@@ -1,9 +1,14 @@
 import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
 import GeneDataSource from '../../dataSources/GeneDataSource';
+
 import React from 'react';
 import SvgContainer from '../SvgContainer';
 import Track from '../Track';
+import TrackLegend from '../TrackLegend';
+import TrackLoadingNotice from '../TrackLoadingNotice';
+
+const HEIGHT = 120;
 
 /**
  * A gene annotation track.
@@ -43,24 +48,30 @@ class GeneAnnotationTrack extends Track {
     }
 
     render() {
-        let svgStyle = {border: "1px solid black", padding: "10px", height: "120px"};
-        if (this.state.isLoading) {
-            svgStyle.opacity = 0.5;
-        }
+        let svgStyle = {
+            borderTop: "1px solid black",
+            borderBottom: "1px solid black",
+            padding: "10px",
+            height: HEIGHT,
+
+            position: "relative",
+            left: this.props.xOffset,
+        };
         if (this.state.error) {
             svgStyle.backgroundColor = "red";
         }
 
         return (
         <div
-            style={{paddingLeft: "20px", paddingRight: "20px"}}
             ref={node => this.divNode = node}
             onClick={(event) => this.setState({geneDetail: null})}
+            style={{overflow: "hidden"}}
         >
+            <TrackLegend height={HEIGHT} trackModel={this.props.trackModel} />
+            {this.state.isLoading ? <TrackLoadingNotice height={HEIGHT} /> : null}
             <SvgContainer
                 svgStyle={svgStyle}
                 model={this.props.viewRegion}
-                viewBoxX={this.state.xOffset}
             >
                 {this.state.data ? 
                     <AnnotationArranger

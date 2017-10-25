@@ -30,13 +30,6 @@ class SvgContainer extends React.Component {
         svgStyle: PropTypes.object, // Inline CSS to pass to the SVG node
         onContextMenu: PropTypes.func, // Called when a right click happens in the SVG to open the context menu
         onWheel: PropTypes.func, // Called when the mouse wheel is scrolled over the SVG
-        viewBoxX: PropTypes.number, // X pixels to translate the SVG's viewBox
-        viewBoxY: PropTypes.number, // Y pixels to translate the SVG's viewBox
-    }
-
-    static defaultProps = {
-        viewBoxX: 0,
-        viewBoxY: 0
     }
 
     constructor(props) {
@@ -119,15 +112,11 @@ class SvgContainer extends React.Component {
         if (this.state.svgDidMount) {
             children = this.giveChildrenProps(this.props.children);
         }
-
-        let isTranslate = this.props.viewBoxX !== 0 || this.props.viewBoxY !== 0;
-        let viewBoxString = isTranslate ?
-            `${this.props.viewBoxX} ${this.props.viewBoxY} ${this.svgWidth} ${this.svgHeight}` : null;
+        
         return (
         <div>
             <svg
                 style={this.props.svgStyle}
-                viewBox={viewBoxString}
                 width="100%"
                 height="100%"
                 id={this.svgId}
