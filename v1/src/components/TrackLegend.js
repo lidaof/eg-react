@@ -1,11 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TrackModel from '../model/TrackModel';
 import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
 
-const NUM_TICKS_SUGGESTION = 2;
+import TrackModel from '../model/TrackModel';
 
+const NUM_TICKS_SUGGESTION = 2;
+const LABEL_RIGHT_MARGIN = 30;
+
+/**
+ * A box displaying labels, axes, and other important track info.
+ * 
+ * @author Silas Hsu
+ */
 class TrackLegend extends React.PureComponent {
     static WIDTH = 120;
 
@@ -43,21 +50,17 @@ class TrackLegend extends React.PureComponent {
 
     render() {
         const divStyle = {
-            opacity: 0.95,
-            zIndex: 2,
-            backgroundColor: "white",
-            borderRight: "1px solid black",
+            display: "inline-block",
             width: TrackLegend.WIDTH,
             height: this.props.height,
-            position: "absolute",
             fontSize: 10,
         };
 
         return (
-        <div style={divStyle} >
+        <div style={divStyle}>
             <svg width={TrackLegend.WIDTH} height={this.props.height} ref={node => this.svgNode = node}>
                 <foreignObject
-                    width={TrackLegend.WIDTH - 20}
+                    width={TrackLegend.WIDTH - LABEL_RIGHT_MARGIN}
                     style={{fontSize: 9, textAlign: "left"}}
                 >
                     {this.props.trackModel.name}

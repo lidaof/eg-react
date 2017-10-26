@@ -107,16 +107,19 @@ class MainPane extends React.Component {
         return (
         <SvgContainer
             model={this.props.model}
-            onContextMenu={event => event.preventDefault()}
-            onWheel={this.mousewheel}
-            svgRef={(node) => this.svgNode = node}
-            svgStyle={{border: "1px solid black"}}
+            svgProps={{
+                onContextMenu: event => event.preventDefault(),
+                onWheel: this.mousewheel,
+                style: {border: "1px solid black"},
+                ref: node => this.svgNode = node
+            }}
         >
-            <ViewDragListener button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} />
-            <Chromosomes yOffset={CHROMOSOME_Y} />
-            <Ruler yOffset={RULER_Y} />
+            <ViewDragListener button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} model={this.props.model} />
+            <Chromosomes yOffset={CHROMOSOME_Y} model={this.props.model} />
+            <Ruler yOffset={RULER_Y} model={this.props.model} />
             <SelectedRegionBox
                 selectedRegionModel={this.props.selectedRegionModel}
+                model={this.props.model}
                 gotoButtonCallback={this.props.gotoButtonCallback}
                 yOffset={SELECTED_BOX_Y}
             />

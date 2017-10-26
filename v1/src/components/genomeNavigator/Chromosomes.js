@@ -1,4 +1,6 @@
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import SvgComponent from '../SvgComponent';
+import PropTypes from 'prop-types';
 
 const HEIGHT = 20;
 const BOUNDARY_LINE_EXTENT = 5;
@@ -11,6 +13,10 @@ const LABEL_OFFSET = 80;
  * @extends SvgComponent
  */
 class Chromosomes extends SvgComponent {
+    static propTypes = {
+        model: PropTypes.instanceOf(DisplayedRegionModel)
+    }
+
     /**
      * Clears this group and redraws all the chromosomes.
      * 

@@ -21,6 +21,11 @@ function nodeHasChildren(dataObj) {
     return dataObj.children && dataObj.children.length > 0;
 }
 
+/**
+ * A tree view (outline view) of data.  Nodes are collapsible, and customizable via props.
+ * 
+ * @author Silas Hsu
+ */
 class TreeView extends React.Component {
     static propTypes = {
         data: PropTypes.arrayOf(PropTypes.object.isRequired),
@@ -50,35 +55,35 @@ class TreeView extends React.Component {
     }
 
     renderNonLeaf(dataObj) {
+        const nextIndent = this.props.indent + this.props.childIndent;
         const onClick = this.props.onNodeToggled ? () => this.props.onNodeToggled(dataObj) : undefined;
         return (
             <div onClick={onClick} style={{marginLeft: this.props.indent || 0}} >
                 <DefaultExpandButton isExpanded={dataObj.isExpanded} />
                 {dataObj.label}
+                {
+                dataObj.isExpanded ?
+                    <TreeView
+                        data={dataObj.children}
+                        onNodeToggled={this.props.onNodeToggled}
+                        indent={nextIndent}
+                        childIndent={this.props.childIndent}
+                        leafRenderer={this.props.leafRenderer}
+                    />
+                    :
+                    null
+                }
             </div>
         );
     }
 
     render() {
-        const nextIndent = this.props.indent + this.props.childIndent;
         return (
         <div style={{marginLeft: this.props.indent}}>
         {
             this.props.data.map((obj, index) => (
                 <div key={index}>
-                    { !nodeHasChildren(obj) ? this.renderLeaf(obj) : this.renderNonLeaf(obj) }
-                    {
-                    obj.isExpanded && nodeHasChildren(obj) ? 
-                        <TreeView
-                            data={obj.children}
-                            onNodeToggled={this.props.onNodeToggled}
-                            indent={nextIndent}
-                            childIndent={this.props.childIndent}
-                            leafRenderer={this.props.leafRenderer}
-                        />
-                        :
-                        null
-                    }
+                    { nodeHasChildren(obj) ? this.renderNonLeaf(obj) : this.renderLeaf(obj) }
                 </div>
             ))
         }

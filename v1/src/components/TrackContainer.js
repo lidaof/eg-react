@@ -1,14 +1,19 @@
-import { LEFT_MOUSE } from './DomDragListener';
-import ViewDragListener from './ViewDragListener';
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import BigWigTrack from './BigWigTrack.js';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
+import TrackLegend from './TrackLegend';
+
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
-import PropTypes from 'prop-types';
-import React from 'react';
+import RegionExpander from '../model/RegionExpander';
+
+import { LEFT_MOUSE } from './DomDragListener';
+import ViewDragListener from './ViewDragListener';
 
 /**
- * Contains all tracks and makes tracks from TrackModel objects.
+ * Contains all tracks and makes tracks from TrackModel objects.  Also handles track dragging.
  * 
  * @author Silas Hsu
  */
@@ -33,6 +38,7 @@ class TrackContainer extends React.Component {
         };
         this.offsetsOnDragStart = this.state.xOffsets;
         this.node = null;
+        this.regionExpander = new RegionExpander(0.75);
 
         this.viewDragStart = this.viewDragStart.bind(this);
         this.viewDrag = this.viewDrag.bind(this);
@@ -107,8 +113,9 @@ class TrackContainer extends React.Component {
         let trackProps = {
             trackModel: trackModel,
             viewRegion: this.props.viewRegion,
+            regionExpander: this.regionExpander,
 
-            width: this.state.width,
+            width: this.state.width - TrackLegend.WIDTH,
             xOffset: this.state.xOffsets[index],
             onNewData: () => this.newTrackDataCallback(index),
             key: index // TODO make keys NOT index-based
@@ -130,9 +137,9 @@ class TrackContainer extends React.Component {
 
     render() {
         const drawModel = this.node ?
-            new LinearDrawingModel(this.props.viewRegion, this.node.clientWidth, this.node) : undefined;
+            new LinearDrawingModel(this.props.viewRegion, this.state.width - TrackLegend.WIDTH, this.node) : undefined;
         return (
-            <div ref={node => this.node = node} style={{margin: "10px"}}>
+            <div ref={node => this.node = node} style={{margin: "10px", border: "1px solid grey"}}>
                 {this.props.tracks.map(this.renderTrack)}
                 {
                 this.node ?

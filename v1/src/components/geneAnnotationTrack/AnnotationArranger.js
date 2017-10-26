@@ -1,9 +1,10 @@
-import { ANNOTATION_HEIGHT, LABEL_SIZE, GeneAnnotation } from './GeneAnnotation';
+import { ANNOTATION_HEIGHT, GeneAnnotation } from './GeneAnnotation';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import PropTypes from 'prop-types';
 import React from 'react';
 import SvgComponent from '../SvgComponent';
 
-const DEFAULT_MAX_ROWS = 6;
+const DEFAULT_MAX_ROWS = 7;
 const ROW_BOTTOM_PADDING = 5;
 const ANNOTATION_RIGHT_PADDING = 30;
 
@@ -15,6 +16,12 @@ const ANNOTATION_RIGHT_PADDING = 30;
 class AnnotationArranger extends SvgComponent {
     static propTypes = {
         data: PropTypes.arrayOf(PropTypes.object).isRequired, // Array of Gene objects
+
+        /**
+         * Used to calculate absolute coordinates of genes
+         */
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        
         maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
 
         /**
@@ -38,12 +45,15 @@ class AnnotationArranger extends SvgComponent {
      * @override
      */
     shouldComponentUpdate(nextProps) {
+        return this.props.data !== nextProps.data || this.props.xOffset !== nextProps.xOffset;
+        /*
         for (let key in nextProps) {
             if (this.props[key] !== nextProps[key]) {
                 return true;
             }
         }
         return false;
+        */
     }
 
     /**
@@ -53,9 +63,9 @@ class AnnotationArranger extends SvgComponent {
      * @param {Gene[]} genes - array of Gene to sort and filter
      * @return {Gene[]} subset of the input array
      */
-    _filterAndSortGenes(genes) {
-        let visibleGenes = genes.filter(gene => gene.isInView);
-        return visibleGenes.sort((gene1, gene2) => gene1.absStart - gene2.absStart);
+    _processGenes(genes) {
+        genes.forEach(gene => gene.setModel(this.props.viewRegion));
+        return genes.sort((gene1, gene2) => gene1.absStart - gene2.absStart);
     }
 
     /**
@@ -64,6 +74,7 @@ class AnnotationArranger extends SvgComponent {
      * @param {number} numHiddenGenes - number of unlabeled/hidden genes
      */
     _addHiddenGenesReminder(numHiddenGenes) {
+        /*
         if (numHiddenGenes > 0) {
             let maxRows = this.props.maxRows || DEFAULT_MAX_ROWS;
             let genesHiddenText = numHiddenGenes === 1 ? "1 gene unlabeled" : `${numHiddenGenes} genes unlabeled`;
@@ -74,6 +85,7 @@ class AnnotationArranger extends SvgComponent {
                 "font-style": "italic"
             });
         }
+        */
     }
 
     /**
@@ -82,11 +94,9 @@ class AnnotationArranger extends SvgComponent {
      * @override
      */
     render() {
-        this.group.clear();
-
         let children = [];
         let rowXExtents = new Array(this.props.maxRows).fill(-Number.MAX_VALUE);
-        let genes = this._filterAndSortGenes(this.props.data);
+        let genes = this._processGenes(this.props.data);
         let numHiddenGenes = 0;
         for (let gene of genes) {
             let geneWidth = this.props.drawModel.basesToXWidth(gene.absEnd - gene.absStart);
@@ -112,11 +122,10 @@ class AnnotationArranger extends SvgComponent {
                 isLabeled = true;
                 rowXExtents[row] = endX + ANNOTATION_RIGHT_PADDING;
             }
+            
             children.push(<GeneAnnotation
                 drawModel={this.props.drawModel}
-                svgNode={this.props.svgNode}
-                xOffset={this.props.xOffset}
-                yOffset={this.props.yOffset}
+                svgNode={this.group}
                 gene={gene}
                 isLabeled={isLabeled}
                 topY={row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING)}

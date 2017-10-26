@@ -1,5 +1,10 @@
 import React from 'react';
 
+/**
+ * A notice that a track is loading data.
+ * 
+ * @param {Object} props - props as specified by React
+ */
 function TrackLoadingNotice(props) {
     const style = {
         position: "absolute",

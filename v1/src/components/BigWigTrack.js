@@ -1,13 +1,14 @@
-import LinearDrawingModel from '../model/LinearDrawingModel';
-import BigWigDataSource from '../dataSources/BigWigDataSource';
 import React from 'react';
-import Track from './Track';
-import TrackLegend from './TrackLegend';
-import TrackLoadingNotice from './TrackLoadingNotice';
 import _ from 'lodash';
 import { scaleLinear } from 'd3-scale'
 
-const EXTRA_RENDER_WIDTH = 1; // Multiple of current region length, on each side
+import Track from './Track';
+import TrackLegend from './TrackLegend';
+import TrackLoadingNotice from './TrackLoadingNotice';
+import ScrollingData from './ScrollingData';
+
+import BigWigDataSource from '../dataSources/BigWigDataSource';
+
 const DEFAULT_HEIGHT = 30; // In pixels
 const TOP_PADDING = 5;
 
@@ -24,20 +25,32 @@ class BigWigTrack extends Track {
         this.canvasNode = null;
     }
 
+    /**
+     * @inheritdoc
+     */
     makeDefaultDataSource() {
-        return new BigWigDataSource(this.props.trackModel.url, 2 * EXTRA_RENDER_WIDTH + 1);
+        return new BigWigDataSource(this.props.trackModel.url);
     }
 
+    /**
+     * Draws the data.
+     */
     componentDidMount() {
         this.draw();
     }
 
+    /**
+     * Redraws the data if it has changed.
+     */
     componentDidUpdate(prevProps, prevState) {
         if (prevState.data !== this.state.data) {
             this.draw();
         }
     }
 
+    /**
+     * Draws the data.
+     */
     draw() {
         if (!this.canvasNode) {
             return;
@@ -55,10 +68,9 @@ class BigWigTrack extends Track {
         }
         const dataMax = _.maxBy(data, record => record.value).value;
         
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width, canvas);
-        const translate = this.props.width * EXTRA_RENDER_WIDTH;
+        const drawModel = this.props.regionExpander.makeDrawModel(this.props.viewRegion, this.props.width, canvas);
         non0Data.forEach(record => {
-            const x = Math.round(drawModel.baseToX(record.start)) + translate;
+            const x = Math.round(drawModel.baseToX(record.start));
             const y = Math.round(canvasHeight - (record.value/dataMax * canvasHeight) + TOP_PADDING);
             const width = 1;
             const height = Math.round(record.value/dataMax * canvasHeight);
@@ -68,23 +80,7 @@ class BigWigTrack extends Track {
 
     render() {
         let height = this.props.trackModel.options.height || DEFAULT_HEIGHT;
-        console.log(height);
-        const divStyle = {
-            overflow: "hidden",
-            textAlign: "center",
-        };
-        let canvasStyle = {
-            borderTop: "1px solid black",
-            borderBottom: "1px solid black",
-            display: "block",
-
-            position: "relative",
-            marginLeft: `-${this.props.width * EXTRA_RENDER_WIDTH}px`,
-            left: this.props.xOffset,
-        };
-        if (this.state.error) {
-            canvasStyle.backgroundColor = "red";
-        }
+        let canvasStyle = this.state.error ? {backgroundColor : "red"} : {};
 
         let scale = null;
         if (this.state.data && this.state.data.length > 0) {
@@ -93,16 +89,18 @@ class BigWigTrack extends Track {
         }
 
         return (
-            <div style={divStyle}>
-                <TrackLegend height={height + 2} trackModel={this.props.trackModel} scaleForAxis={scale} />
-                {this.state.isLoading ? <TrackLoadingNotice height={height} /> : null}
-                <canvas
-                    width={(this.props.width - TrackLegend.WIDTH) * (2 * EXTRA_RENDER_WIDTH + 1)}
-                    height={height}
-                    style={canvasStyle}
-                    ref={node => this.canvasNode = node}
-                />
-            </div>
+        <div style={{display: "flex", borderBottom: "1px solid grey"}}>
+            <TrackLegend height={height} trackModel={this.props.trackModel} scaleForAxis={scale} />
+            {this.state.isLoading ? <TrackLoadingNotice height={this.props.height} /> : null}
+            <ScrollingData
+                width={this.props.width}
+                height={height}
+                regionExpander={this.props.regionExpander}
+                xOffset={this.props.xOffset}
+            >
+                <canvas ref={node => this.canvasNode = node} style={canvasStyle} />
+            </ScrollingData>
+        </div>
         );
     }
 }

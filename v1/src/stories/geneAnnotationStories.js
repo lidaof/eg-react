@@ -64,6 +64,7 @@ export const annotationStory = {
         model={model}
     >
         <AnnotationArranger
+            viewRegion={model}
             data={DATA}
             maxRows={2}
             yOffset={20}

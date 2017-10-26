@@ -1,4 +1,3 @@
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -22,7 +21,6 @@ class SvgComponent extends React.Component {
          * apparent VERY quickly if this component does not get a SVG node.
          */
         // svgNode: PropTypes.instanceOf(SVGElement).isRequired,
-        model: PropTypes.instanceOf(DisplayedRegionModel), // The current region in which we are drawing
 
         /**
          * Used to convert pixels to bases and vice-versa while drawing.
@@ -42,7 +40,7 @@ class SvgComponent extends React.Component {
      */
     constructor(props) {
         super(props);
-        this.svg = SVG.adopt(this.props.svgNode);
+        this.svg = this.props.svgNode instanceof SVG.Element ? this.props.svgNode : SVG.adopt(this.props.svgNode);
         this.group = this.svg.group();
         if (props.xOffset !== 0 || props.yOffset !== 0) {
             this.applyOffset(props);

@@ -4,10 +4,16 @@ import annotationTracks from './AnnotationTracks';
 import TrackModel from '../../model/TrackModel';
 import TreeView from './TreeView';
 
+/**
+ * 
+ * @param {Object} schemaNode - object from  
+ * @param {string} nodeLabel - what to 
+ */
 function convertOldBrowserSchema(schemaNode, nodeLabel) {
     const isLeaf = schemaNode.hasOwnProperty("name");
     if (isLeaf) {
-        // Doesn't necessarily need to fulfill the TreeViewData interface, since we have a custom renderer
+        // TreeView will pass this object to our custom leaf renderer.
+        // (If we didn't have a custom renderer, this object would need to fulfill the TreeViewData interface.)
         return new TrackModel(schemaNode); 
     }
 
@@ -25,6 +31,11 @@ function convertOldBrowserSchema(schemaNode, nodeLabel) {
     };
 }
 
+/**
+ * GUI for selecting annotation tracks to add.
+ * 
+ * @author Silas Hsu
+ */
 class AnnotationTrackSelector extends React.Component {
     constructor(props) {
         super(props);

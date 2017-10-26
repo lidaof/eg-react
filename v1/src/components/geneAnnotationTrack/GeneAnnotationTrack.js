@@ -1,12 +1,14 @@
+import React from 'react';
+
 import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
 import GeneDataSource from '../../dataSources/GeneDataSource';
 
-import React from 'react';
 import SvgContainer from '../SvgContainer';
 import Track from '../Track';
 import TrackLegend from '../TrackLegend';
 import TrackLoadingNotice from '../TrackLoadingNotice';
+import ScrollingData from '../ScrollingData';
 
 const HEIGHT = 120;
 
@@ -48,40 +50,41 @@ class GeneAnnotationTrack extends Track {
     }
 
     render() {
-        let svgStyle = {
-            borderTop: "1px solid black",
-            borderBottom: "1px solid black",
-            padding: "10px",
-            height: HEIGHT,
-
-            position: "relative",
-            left: this.props.xOffset,
-        };
+        let svgStyle = {paddingTop: 10, display: "block"};
         if (this.state.error) {
             svgStyle.backgroundColor = "red";
         }
-
+        
         return (
         <div
+            style={{display: "flex", borderBottom: "1px solid grey"}}
             ref={node => this.divNode = node}
             onClick={(event) => this.setState({geneDetail: null})}
-            style={{overflow: "hidden"}}
         >
             <TrackLegend height={HEIGHT} trackModel={this.props.trackModel} />
-            {this.state.isLoading ? <TrackLoadingNotice height={HEIGHT} /> : null}
-            <SvgContainer
-                svgStyle={svgStyle}
-                model={this.props.viewRegion}
+            {this.state.isLoading ? <TrackLoadingNotice height={this.props.height} /> : null}
+            <ScrollingData
+                width={this.props.width}
+                height={HEIGHT}
+                regionExpander={this.props.regionExpander}
+                xOffset={this.props.xOffset}
             >
-                {this.state.data ? 
-                    <AnnotationArranger
-                        data={this.state.data}
-                        onGeneClick={this.geneClicked}
-                        maxRows={this.props.maxRows}
-                    />
-                    : null
-                }
-            </SvgContainer>
+                <SvgContainer
+                    model={this.props.regionExpander.makeExpandedRegion(this.props.viewRegion)}
+                    drawModelWidth={this.props.regionExpander.expandWidth(this.props.width)}
+                    svgProps={{style: svgStyle}}
+                >
+                    {this.state.data ? 
+                        <AnnotationArranger
+                            data={this.state.data}
+                            viewRegion={this.props.viewRegion}
+                            onGeneClick={this.geneClicked}
+                            maxRows={this.props.maxRows}
+                        />
+                        : null
+                    }
+                </SvgContainer>
+            </ScrollingData>
             {this.state.geneDetail}
         </div>
         );

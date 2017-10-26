@@ -5,12 +5,12 @@
  */
 class DataSource {
     /**
-     * Gets data lying within the region.
+     * Gets data lying within the region, and surrounding ones as well if a RegionExpander is passed.
      * 
-     * @param {DisplayedRegionModel} regionModel - the model containing the displayed region
+     * @param {DisplayedRegionModel} region - the model containing the displayed region
      * @return {Promise<any>} a Promise for the data
      */
-    getData(regionModel) {
+    getData(region) {
         throw new Error("Not implemented");
     }
 }

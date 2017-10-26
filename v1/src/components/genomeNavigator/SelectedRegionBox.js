@@ -24,6 +24,11 @@ class SelectedRegionBox extends SvgComponent {
         selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
 
         /**
+         * The current region the genome navigator is displaying
+         */
+        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+
+        /**
          * Called when the user presses the "GOTO" button to quicky scroll the view to the selected track region.
          *     (newStart: number, newEnd: number): void
          *         `newStart`: the absolute base number of the start of the interval to scroll to

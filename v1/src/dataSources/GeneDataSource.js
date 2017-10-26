@@ -11,19 +11,19 @@ class GeneDataSource extends DataSource {
     /**
      * Gets gene data lying within the region.
      * 
-     * @param {DisplayedRegionModel} regionModel - the model containing the displayed region
+     * @param {DisplayedRegionModel} region - the model containing the displayed region
      * @return {Promise<any>} a Promise for the data
      * @override
      */
-    getData(regionModel) {
+    getData(region) {
         let requests = [];
-        for (let region of regionModel.getRegionList()) {
-            requests.push(this._getDataForOneRegion(region));
+        for (let chromosome of region.getRegionList()) {
+            requests.push(this._getDataForChromosome(chromosome));
         }
 
         return Promise.all(requests).then((results) => {
             let combined = [].concat.apply([], results); // Concatenate all the data into one array
-            return combined.map(record => new Gene(record, regionModel));
+            return combined.map(record => new Gene(record));
         });
     }
 
@@ -33,7 +33,7 @@ class GeneDataSource extends DataSource {
      * @param {SingleChromosomeInterval} region - a region within a single chromosome for which to get data
      * @return {Promise<any>} a Promise for the data
      */
-    _getDataForOneRegion(region) {
+    _getDataForChromosome(region) {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: "refGene/hg19",

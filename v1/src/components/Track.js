@@ -1,12 +1,14 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import DataSource from '../dataSources/DataSource';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import PropTypes from 'prop-types';
-import React from 'react';
 import TrackModel from '../model/TrackModel';
+import RegionExpander from '../model/RegionExpander';
 
 /**
  * A track for the genome browser.  This extendable class provides functionality common to all tracks, such as data
- * fetching and view dragging.
+ * fetching.
  * 
  * @author Silas Hsu
  */
@@ -19,11 +21,16 @@ class Track extends React.Component {
     static propTypes = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Metadata for this track
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
+        regionExpander: PropTypes.instanceOf(RegionExpander), // How much of the surroundings of the region to display
 
         width: PropTypes.number, // The width of the track
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
         onNewData: PropTypes.func, // Callback when the track loads new data.  Called with no arguments.
         dataSourceOverride: PropTypes.instanceOf(DataSource), // Source of data for this Track; overrides the default
+    }
+
+    static defaultProps = {
+        regionExpander: RegionExpander.makeIdentityExpander(),
     }
 
     /**
@@ -38,8 +45,6 @@ class Track extends React.Component {
             data: null,
             error: null,
         };
-        // We fork the xOffset prop because we want to set it to 0 when data finishes loading, regardless of the value
-        // of the prop.
 
         this.dataSource = this.props.dataSourceOverride || this.makeDefaultDataSource();
 
@@ -47,12 +52,24 @@ class Track extends React.Component {
         this.fetchData(this.props.viewRegion);
     }
 
+    /**
+     * Gets this track's default data source.  Is called upon construction.  Subclasses must override this!
+     * 
+     * @return {DataSource} default data source for this Track
+     */
     makeDefaultDataSource() {
         throw new Error("No default data source defined");
     }
 
+    /**
+     * Uses this track's DataSource to fetch data within a view region, and then sets state.
+     * 
+     * @param {DisplayedRegionModel} viewRegion - the region for which to fetch data
+     * @return {Promise<any>} a promise that resolves when fetching is done, including when there is an error.
+     */
     fetchData(viewRegion) {
-        return this.dataSource.getData(viewRegion).then(data => {
+        let expandedRegion = this.props.regionExpander.makeExpandedRegion(viewRegion);
+        return this.dataSource.getData(expandedRegion).then(data => {
             // When the data finally comes in, be sure it is still what the user wants
             if (this.props.viewRegion === viewRegion) {
                 this.setState({
@@ -66,6 +83,7 @@ class Track extends React.Component {
             }
         })
         .catch(error => {
+            console.error(error);
             if (this.props.viewRegion === viewRegion) {
                 this.setState({
                     error: error,

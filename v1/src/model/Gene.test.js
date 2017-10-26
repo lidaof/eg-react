@@ -22,8 +22,10 @@ const ADDITIONAL_PROPS = {
     isInView: true
 }
 
-const EXPECTED = Object.assign({}, PLAIN_OBJECT, ADDITIONAL_PROPS);
+const EXPECTED = Object.assign(new Gene(PLAIN_OBJECT), ADDITIONAL_PROPS);
 
-it('constructs correctly', () => {
-    expect(new Gene(PLAIN_OBJECT, REGION)).toEqual(EXPECTED);
+it('setModel() works correctly', () => {
+    let gene = new Gene(PLAIN_OBJECT);
+    gene.setModel(REGION);
+    expect(gene).toEqual(EXPECTED);
 });

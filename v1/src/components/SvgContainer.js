@@ -2,13 +2,12 @@ import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
 import PropTypes from 'prop-types';
 import React from 'react';
-import _ from 'lodash';
 
 /**
  * A React component that contains a <svg> element.  This component's children will automatically recieve a ref to the
- * SVG node, a DisplayedRegionModel, and a LinearDrawingModel once the component mounts.  Note that the children will
- * be mounted as siblings to the SVG node, and not children to the SVG node.  For specifying direct children of the SVG,
- * a different component would be more appropriate.
+ * SVG node and a LinearDrawingModel once the component mounts.  Note that the children will be mounted as siblings to
+ * the SVG node, and not children to the SVG node.  For specifying direct children of the SVG, a different component
+ * would be more appropriate.
  * 
  * @see SvgComponent
  * @author Silas Hsu
@@ -16,31 +15,29 @@ import _ from 'lodash';
 class SvgContainer extends React.Component {
     static propTypes = {
         /**
-         * The current region in which to draw; will be passed to child elements.
+         * The current region in which to draw; will used to calculate the draw model.
          */
         model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
 
         /**
-         * Function for getting a reference to the native SVG element.  Has the signature
-         *     (svgNode: SVGAnimatedString): void
-         *         `svgNode` - the native SVG node mounted in the DOM
+         * The width to use in calculating the draw model.  If not specified, defaults to the SVG's width.
          */
-        svgRef: PropTypes.func,
+        drawModelWidth: PropTypes.number,
 
-        svgStyle: PropTypes.object, // Inline CSS to pass to the SVG node
-        onContextMenu: PropTypes.func, // Called when a right click happens in the SVG to open the context menu
-        onWheel: PropTypes.func, // Called when the mouse wheel is scrolled over the SVG
+        style: PropTypes.object, // Inline CSS to pass the div parent node
+        svgProps: PropTypes.object, // Props to pass to the SVG node.  Guess what?  refs work too!
+    }
+
+    static defaultProps = {
+        svgProps: {}
     }
 
     constructor(props) {
         super(props);
         this.state = {
-            svgDidMount: false,
+            isMounted: false,
         }
         this.svgNode = null;
-        this.svgId = _.uniqueId();
-        this.svgWidth = 0;
-        this.svgHeight = 0;
         this.drawModel = null;
 
         this.handleSvgRef = this.handleSvgRef.bind(this);
@@ -52,10 +49,8 @@ class SvgContainer extends React.Component {
      * @override
      */
     componentDidMount() {
-        this.setState({svgDidMount: true});
-        this.svgWidth = this.svgNode.clientWidth;
-        this.svgHeight = this.svgNode.clientHeight;
-        this.drawModel = new LinearDrawingModel(this.props.model, this.svgWidth, this.svgNode);
+        this.updateDrawModel(this.props);
+        this.setState({isMounted: true});
     }
 
     /**
@@ -65,9 +60,14 @@ class SvgContainer extends React.Component {
      * @override
      */
     componentWillUpdate(nextProps) {
-        if (this.props.model !== nextProps.model) {
-            this.drawModel = new LinearDrawingModel(nextProps.model, this.svgWidth, this.svgNode);
+        if (this.props.model !== nextProps.model || this.props.width !== nextProps.width) {
+            this.updateDrawModel(nextProps)
         }
+    }
+
+    updateDrawModel(props) {
+        let width = props.drawModelWidth || this.svgNode.clientWidth;
+        this.drawModel = new LinearDrawingModel(props.model, width, this.svgNode);
     }
 
     /**
@@ -77,8 +77,8 @@ class SvgContainer extends React.Component {
      */
     handleSvgRef(node) {
         this.svgNode = node;
-        if (this.props.svgRef) {
-            this.props.svgRef(this.svgNode);
+        if (this.props.svgProps.ref) {
+            this.props.svgProps.ref(node);
         }
     }
 
@@ -90,7 +90,6 @@ class SvgContainer extends React.Component {
     giveChildrenProps(children) {
         let propsToGive = {
             svgNode: this.svgNode,
-            model: this.props.model,
             drawModel: this.drawModel,
         };
         
@@ -109,21 +108,21 @@ class SvgContainer extends React.Component {
      */
     render() {
         let children = null;
-        if (this.state.svgDidMount) {
+        if (this.state.isMounted) {
             children = this.giveChildrenProps(this.props.children);
         }
-        
+
+        let svgProps = { // Defaults
+            width: "100%",
+            height: "100%",
+        }
+        Object.assign(svgProps, this.props.svgProps);
+        // We override `this.props.svgProps.ref`, but we still pass the ref to interested parents in the `handleSvgRef`.
+        svgProps.ref = this.handleSvgRef;
+
         return (
-        <div>
-            <svg
-                style={this.props.svgStyle}
-                width="100%"
-                height="100%"
-                id={this.svgId}
-                ref={this.handleSvgRef}
-                onWheel={this.props.onWheel}
-                onContextMenu={this.props.onContextMenu}
-            ></svg>
+        <div style={this.props.style}>
+            <svg {...svgProps} />
             {children}
         </div>
         );

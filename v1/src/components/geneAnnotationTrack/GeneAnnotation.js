@@ -128,7 +128,7 @@ export class GeneAnnotation extends SvgComponent {
         let labelX, textAnchor;
         // Label width is approx. because calculating bounding boxes is expensive.
         let estimatedLabelWidth = gene.name.length * ANNOTATION_HEIGHT;
-        if (startX - estimatedLabelWidth < 0) { // It's going to go off the screen; we need to move the label
+        if (gene.isInView && startX - estimatedLabelWidth < 0) { // It's going to go off the screen; we need to move the label
             labelX = 0;
             textAnchor = "start";
             // Add highlighting, as the label will overlap the other stuff

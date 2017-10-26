@@ -1,6 +1,5 @@
 import BarChartRecord from '../model/BarChartRecord';
 import DataSource from './DataSource';
-import _ from 'lodash';
 
 const bigwig = require('../vendor/bbi-js/main/bigwig');
 const bin = require('../vendor/bbi-js/utils/bin');
@@ -15,12 +14,10 @@ class BigWigDataSource extends DataSource {
      * Prepares to fetch BigWig data from a URL.
      * 
      * @param {string} url - the URL from which to fetch data
-     * @param {number} surroundingsToFetch - multiple of input region length to fetch, on each side.  Default: 1
      */
-    constructor(url, surroundingsToFetch = 1) {
+    constructor(url) {
         super();
         this.url = url;
-        this.zoomRatio = 2 * surroundingsToFetch + 1;
         this.bigWigPromise = new Promise((resolve, reject) => {
             bigwig.makeBwg(new bin.URLFetchable(url), (bigWigObj, error) => {
                 if (error) {
@@ -34,28 +31,26 @@ class BigWigDataSource extends DataSource {
     /**
      * Gets BigWig features inside the input view region.
      * 
-     * @param {DisplayedRegionModel} viewRegion - the model containing the displayed region
+     * @param {DisplayedRegionModel} region - the model containing the displayed region
      * @return {Promise<BarChartRecord[]>} a Promise for the data
      * @override
      */
-    async getData(viewRegion) {
+    async getData(region) {
         let bigWigObj = await this.bigWigPromise;
-        let expandedModel = _.clone(viewRegion);
-        expandedModel.zoom(this.zoomRatio);
 
         // FIXME window.innerWidth is not a good way to get pixelsPerBase, but it's quick and dirty.
-        let basesPerPixel = viewRegion.getWidth() / window.innerWidth;
+        let basesPerPixel = region.getWidth() / window.innerWidth;
         let zoomLevel = this._getMatchingZoomLevel(bigWigObj, basesPerPixel);
-        let promises = expandedModel.getRegionList().map(region =>
-            this._getDataForOneRegion(region, bigWigObj, zoomLevel)
+        let promises = region.getRegionList().map(chromosome =>
+            this._getDataForChromosome(chromosome, bigWigObj, zoomLevel)
         );
         let dataForEachRegion = await Promise.all(promises);
         let combinedData = [].concat.apply([], dataForEachRegion);
         return combinedData.map(dasFeature =>
             // dasFeature.segment should be a valid chromosome name, otherwise data fetch would have failed.
             new BarChartRecord(
-                viewRegion.chromosomeCoordinatesToBase(dasFeature.segment, dasFeature.min),
-                viewRegion.chromosomeCoordinatesToBase(dasFeature.segment, dasFeature.max),
+                region.chromosomeCoordinatesToBase(dasFeature.segment, dasFeature.min),
+                region.chromosomeCoordinatesToBase(dasFeature.segment, dasFeature.max),
                 dasFeature.score
             )
         );
@@ -100,7 +95,7 @@ class BigWigDataSource extends DataSource {
      * @param {number} zoomLevel - a zoom level index inside the BigWig file.  If -1, gets data at base pair resolution.
      * @return {Promise<DASFeature[]>} - a Promise for the data, an array of DASFeature provided by bbi-js
      */
-    _getDataForOneRegion(region, bigWigObj, zoomLevel) {
+    _getDataForChromosome(region, bigWigObj, zoomLevel) {
         return new Promise((resolve, reject) => {
             try {
                 if (zoomLevel === -1) {

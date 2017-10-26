@@ -1,8 +1,9 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import DomDragListener from './DomDragListener';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
-import DomDragListener from './DomDragListener';
-import PropTypes from 'prop-types';
-import React from 'react';
 
 /**
  * Listens for drag-across events as specified by {@link DomDragListener}, and also calculates changes in view region
@@ -13,20 +14,23 @@ import React from 'react';
 class ViewDragListener extends React.Component {
     static propTypes = {
         button: PropTypes.number.isRequired, // The mouse button to listen to.  See DomDragListener for possible values.
-        node: PropTypes.object, // The node to listen to.
+
+        /**
+         * The node to listen to.  One of `node` or `svgNode` is required.  `node` will override `svgNode`.
+         */
+        node: PropTypes.object,
         svgNode: PropTypes.object, // Fallback if node is not defined; gives compatibility when inside a SvgContainer.
+
+        /**
+         * The current view of the SVG; used to calculate how many base pairs the user has dragged.
+         */
+        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
 
         /**
          * Used to convert number of pixels dragged to number of bases dragged.  Is required, but not marked so to
          * suppress warnings.
          */
         drawModel: PropTypes.instanceOf(LinearDrawingModel),
-
-        /**
-         * The current view of the SVG; used to calculate how many base pairs the user has dragged.  Is required, but
-         * not marked so to suppress warnings.
-         */
-        model: PropTypes.instanceOf(DisplayedRegionModel),
 
         /**
          * Called when dragging has started.  Note that a click will also fire this event.  Has the signature

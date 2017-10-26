@@ -1,4 +1,6 @@
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import SvgComponent from '../SvgComponent';
+import PropTypes from 'prop-types';
 
 const MAX_MAJOR_TICKS = 15;
 const MINOR_TICKS = 5;
@@ -12,6 +14,10 @@ const MINOR_TICK_HEIGHT = 5;
  * @extends SvgComponent
  */
 class Ruler extends SvgComponent {
+    static propTypes = {
+        model: PropTypes.instanceOf(DisplayedRegionModel)
+    }
+
     /**
      * @typedef {Object} Ruler~Unit
      * @property {number} size - the number of base pairs in this unit

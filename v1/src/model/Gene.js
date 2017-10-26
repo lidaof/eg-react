@@ -46,17 +46,22 @@ class Gene {
      */
     constructor(plainObject, model) {
         Object.assign(this, plainObject); // Use validateGene() here for debugging if needed.
+    }
 
-        if (model !== undefined) {
-            this.absStart = model.chromosomeCoordinatesToBase(this.chromosome, this.start);
-            this.absEnd = model.chromosomeCoordinatesToBase(this.chromosome, this.end);
-            this.absExons = this.exons.map(exon => [
-                model.chromosomeCoordinatesToBase(this.chromosome, exon[0]),
-                model.chromosomeCoordinatesToBase(this.chromosome, exon[1]),
-            ]);
-            let absRegion = model.getAbsoluteRegion();
-            this.isInView = this.absStart < absRegion.end && this.absEnd > absRegion.start;
-        }
+    /**
+     * Sets a bunch of properties related to absolute base coordinates
+     * 
+     * @param {DisplayedRegionModel} model - model used to compute absolute base numbers
+     */
+    setModel(model) {
+        this.absStart = model.chromosomeCoordinatesToBase(this.chromosome, this.start);
+        this.absEnd = model.chromosomeCoordinatesToBase(this.chromosome, this.end);
+        this.absExons = this.exons.map(exon => [
+            model.chromosomeCoordinatesToBase(this.chromosome, exon[0]),
+            model.chromosomeCoordinatesToBase(this.chromosome, exon[1]),
+        ]);
+        let absRegion = model.getAbsoluteRegion();
+        this.isInView = this.absStart < absRegion.end && this.absEnd > absRegion.start;
     }
 }
 

@@ -1,9 +1,9 @@
 import GeneDataSource from './GeneDataSource';
 import makeToyRegion from '../model/toyRegion';
+import Gene from '../model/Gene';
 import $ from 'jquery';
 
 jest.mock('jquery');
-jest.mock('../model/Gene');
 
 $.ajax.mockReturnValue({
     done: (callback) => {
@@ -20,6 +20,6 @@ region.setRegion(0, 20);
 
 it('requests data from each region and then combines them', function() {
     return INSTANCE.getData(region).then((data) => {
-        expect(data).toEqual([{}, {}]);
+        expect(data).toEqual([new Gene(), new Gene()]);
     });
 });
