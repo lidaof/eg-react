@@ -1,4 +1,4 @@
-import LinearDrawingModel from './LinearDrawingModel';
+import LinearDrawingModel from '../LinearDrawingModel';
 import makeToyRegion from './toyRegion';
 
 const REGION = makeToyRegion();

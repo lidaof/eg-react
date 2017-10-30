@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import BigWigTrack from './BigWigTrack.js';
+import BigWigTrack from './BigWigTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
 import TrackLegend from './TrackLegend';
 
@@ -18,6 +18,8 @@ import ViewDragListener from './ViewDragListener';
  * @author Silas Hsu
  */
 class TrackContainer extends React.Component {
+    static MIN_DRAG_DISTANCE_FOR_REFRESH = 20;
+
     static propTypes = {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Current track view region
         /**
@@ -82,7 +84,7 @@ class TrackContainer extends React.Component {
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
     viewDragEnd(newStart, newEnd, event, coordinateDiff) {
-        if (Math.abs(coordinateDiff.dx) > 10) {
+        if (Math.abs(coordinateDiff.dx) >= TrackContainer.MIN_DRAG_DISTANCE_FOR_REFRESH) {
             this.props.newRegionCallback(newStart, newEnd);
         }
     }
@@ -106,7 +108,7 @@ class TrackContainer extends React.Component {
      * @return {Track} track component to render
      */
     renderTrack(trackModel, index) {
-        if (!trackModel || !this.node) {
+        if (!trackModel) {
             return null;
         }
 

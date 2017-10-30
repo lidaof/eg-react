@@ -1,5 +1,5 @@
 import makeToyRegion from './toyRegion';
-import Gene from './Gene';
+import Gene from '../Gene';
 
 const REGION = makeToyRegion(10, 20);
 

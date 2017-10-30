@@ -1,5 +1,5 @@
 import GeneDataSource from './GeneDataSource';
-import makeToyRegion from '../model/toyRegion';
+import makeToyRegion from '../model/test/toyRegion';
 import Gene from '../model/Gene';
 import $ from 'jquery';
 

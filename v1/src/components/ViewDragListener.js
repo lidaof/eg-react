@@ -56,8 +56,7 @@ class ViewDragListener extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.dragOriginModel = null;
+        this.dragOriginModel = this.props.model;
 
         this.dragStart = this.dragStart.bind(this);
         this.drag = this.drag.bind(this);
@@ -102,7 +101,6 @@ class ViewDragListener extends React.Component {
             let newRegion = this._getRegionOffsetByX(this.dragOriginModel, -coordinateDiff.dx);
             this.props.onViewDragEnd(newRegion.start, newRegion.end, event, coordinateDiff);
         }
-        this.dragOriginModel = null;
     }
 
     /**

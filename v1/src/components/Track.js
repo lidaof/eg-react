@@ -83,7 +83,9 @@ class Track extends React.Component {
             }
         })
         .catch(error => {
-            console.error(error);
+            if (process.env.NODE_ENV !== "test") {
+                console.error(error);
+            }
             if (this.props.viewRegion === viewRegion) {
                 this.setState({
                     error: error,
@@ -100,13 +102,13 @@ class Track extends React.Component {
      */
     componentWillReceiveProps(nextProps) {
         let nextStateObj = {};
+        if (this.props.dataSourceOverride !== nextProps.dataSourceOverride) {
+            this.dataSource = nextProps.dataSourceOverride || this.makeDefaultDataSource();
+        }
+
         if (this.props.viewRegion !== nextProps.viewRegion) {
             nextStateObj.isLoading = true;
             this.fetchData(nextProps.viewRegion);
-        }
-
-        if (this.props.dataSourceOverride !== nextProps.dataSourceOverride) {
-            this.dataSource = nextProps.dataSourceOverride || this.makeDefaultDataSource();
         }
 
         this.setState(nextStateObj);

@@ -1,6 +1,6 @@
-import { LEFT_MOUSE, RIGHT_MOUSE, DomDragListener, ListenerStateError } from './DomDragListener';
 import React from 'react';
 import { mount } from 'enzyme';
+import { LEFT_MOUSE, RIGHT_MOUSE, DomDragListener, ListenerStateError } from '../DomDragListener';
 
 describe('DomDragListener', () => {
     var domNode = null;

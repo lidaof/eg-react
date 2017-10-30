@@ -58,7 +58,7 @@ class TrackLegend extends React.PureComponent {
 
         return (
         <div style={divStyle}>
-            <svg width={TrackLegend.WIDTH} height={this.props.height} ref={node => this.svgNode = node}>
+            <svg width={TrackLegend.WIDTH} height={this.props.height}>
                 <foreignObject
                     width={TrackLegend.WIDTH - LABEL_RIGHT_MARGIN}
                     style={{fontSize: 9, textAlign: "left"}}
