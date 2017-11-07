@@ -12,51 +12,74 @@ model.setRegion(0, 1000);
 
 const DATA = [
     new Gene({
-        name: "GENE1",
-        strand: "+",
-        chromosome: "chr1",
+        chr: "chr1",
         start: 5,
         end: 100,
-        exons: [],
-        id: 1
-    }, model),
+        details: `
+            name2: "GENE1",
+            strand: "+",
+            struct: {
+                thin: []
+            },
+            id: 1
+        `
+    }),
     new Gene({
-        name: "GENE2",
-        strand: "-",
-        chromosome: "chr1",
+        chr: "chr1",
         start: 200,
         end: 400,
-        exons: [ [200, 250], [330, 400] ],
-        id: 2
-    }, model),
+        details: `
+            name2: "GENE2",
+            strand: "-",
+            struct: {
+                thin: [ [200, 250], [330, 400] ]
+            },
+            id: 2
+        `
+    }),
     new Gene({
-        name: "GENE3",
-        strand: "+",
-        chromosome: "chr1",
+        chr: "chr1",
         start: 250,
         end: 300,
-        exons: [],
-        id: 3
-    }, model),
+        details: `
+            name2: "GENE3",
+            strand: "+",
+            struct: {
+                thick: []
+            },
+            id: 3
+        `
+    }),
     new Gene({
-        name: "GENE4",
-        strand: "-",
-        chromosome: "chr1",
+        chr: "chr1",
         start: 350,
         end: 500,
-        exons: [],
-        id: 4
-    }, model),
+        details: `
+            name2: "GENE4",
+            strand: "-",
+            struct: {
+                thin: []
+            },
+            id: 4
+        `
+    }),
     new Gene({
-        name: "GENE5",
-        strand: "+",
-        chromosome: "chr1",
+        chr: "chr1",
         start: 800,
         end: 1200,
-        exons: [ [900, 1100] ],
-        id: 5
-    }, model)
+        details: `
+            name2: "GENE5",
+            strand: "+",
+            struct: {
+                thick: [ [900, 1100] ]
+            },
+            id: 5
+        `
+    })
 ];
+for (let gene of DATA) {
+    gene.setModel(model);
+}
 
 export const annotationStory = {
     storyName: "Annotations",

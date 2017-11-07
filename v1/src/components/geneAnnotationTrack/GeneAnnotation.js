@@ -102,7 +102,7 @@ export class GeneAnnotation extends SvgComponent {
 
         // Arrows
         for (let x = startX; x <= endX; x += ARROW_SEPARATION) {
-            let arrowTipX = gene.strand === "+" ?
+            let arrowTipX = gene.details.strand === "+" ?
                 x - ARROW_WIDTH : // Point to the right
                 x + ARROW_WIDTH; // Point to the left
             let arrowPoints = [
@@ -127,7 +127,7 @@ export class GeneAnnotation extends SvgComponent {
         // Label
         let labelX, textAnchor;
         // Label width is approx. because calculating bounding boxes is expensive.
-        let estimatedLabelWidth = gene.name.length * ANNOTATION_HEIGHT;
+        let estimatedLabelWidth = gene.details.name2.length * ANNOTATION_HEIGHT;
         if (gene.isInView && startX - estimatedLabelWidth < 0) { // It's going to go off the screen; we need to move the label
             labelX = 0;
             textAnchor = "start";
@@ -139,10 +139,10 @@ export class GeneAnnotation extends SvgComponent {
                 opacity: 0.65,
             });
         } else {
-            labelX = (gene.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
+            labelX = (gene.details.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
             textAnchor = "end";
         }
-        this.group.text(gene.name).attr({
+        this.group.text(gene.details.name2).attr({
             x: labelX,
             y: this.props.topY - ANNOTATION_HEIGHT,
             "text-anchor": textAnchor,

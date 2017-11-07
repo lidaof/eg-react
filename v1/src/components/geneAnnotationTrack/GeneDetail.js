@@ -36,7 +36,7 @@ class GeneDetail extends React.Component {
                 background: "white"
             }}
         >
-            <p>{this.props.gene.name}</p>
+            <p>{this.props.gene.details.name2}</p>
         </div>
         )
     }

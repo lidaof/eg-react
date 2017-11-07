@@ -106,7 +106,7 @@ class AnnotationArranger extends SvgComponent {
             }
 
             // Label width is approx. because calculating bounding boxes is expensive.
-            let estimatedLabelWidth = gene.name.length * ANNOTATION_HEIGHT;
+            let estimatedLabelWidth = gene.details.name2.length * ANNOTATION_HEIGHT;
             let startX = this.props.drawModel.baseToX(gene.absStart) - estimatedLabelWidth;
             let endX = this.props.drawModel.baseToX(gene.absEnd);
             if (startX < estimatedLabelWidth) {
@@ -130,7 +130,7 @@ class AnnotationArranger extends SvgComponent {
                 isLabeled={isLabeled}
                 topY={row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING)}
                 onClick={this.props.onGeneClick}
-                key={gene.id}
+                key={gene.details.id}
             />);
         }
         this._addHiddenGenesReminder(numHiddenGenes);

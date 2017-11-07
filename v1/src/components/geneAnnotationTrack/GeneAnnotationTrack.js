@@ -2,7 +2,8 @@ import React from 'react';
 
 import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
-import GeneDataSource from '../../dataSources/GeneDataSource';
+import Gene from '../../model/Gene';
+import FeatureSource from '../../dataSources/FeatureSource';
 
 import SvgContainer from '../SvgContainer';
 import Track from '../Track';
@@ -24,12 +25,19 @@ class GeneAnnotationTrack extends Track {
         super(props);
         this.state.geneDetail = null;
 
+        this.genes = this.state.data ? this.state.data.map(feature => new Gene(feature)) : null;
         this.divNode = null;
         this.geneClicked = this.geneClicked.bind(this);
     }
 
     makeDefaultDataSource() {
-        return new GeneDataSource();
+        return new FeatureSource("http://egg.wustl.edu/d/hg19/refGene.gz");
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if (this.state.data !== nextState.data) {
+            this.genes = nextState.data ? nextState.data.map(feature => new Gene(feature)) : null;
+        }
     }
 
     /**
@@ -74,9 +82,9 @@ class GeneAnnotationTrack extends Track {
                     drawModelWidth={this.props.regionExpander.expandWidth(this.props.width)}
                     svgProps={{style: svgStyle}}
                 >
-                    {this.state.data ? 
+                    {this.genes ? 
                         <AnnotationArranger
-                            data={this.state.data}
+                            data={this.genes}
                             viewRegion={this.props.viewRegion}
                             onGeneClick={this.geneClicked}
                             maxRows={this.props.maxRows}

@@ -21514,7 +21514,7 @@ var igv = (function (igv) {
 
                 else {
                     this.decode = decodeBed;
-                    this.delimiter = /\s+/;
+                    this.delimiter = "\t";
                 }
 
         }
@@ -21686,6 +21686,8 @@ var igv = (function (igv) {
         feature = {chr: chr, start: start, end: end, score: 1000};
 
         if (tokens.length > 3) {
+            feature.details = tokens[3];
+            /* Commented out since hammock
             // Note: these are very special rules for the gencode gene files.
             tmp = tokens[3].replace(/"/g, '');
             idName = tmp.split(';');
@@ -21700,6 +21702,7 @@ var igv = (function (igv) {
             }
             feature.id = id ? id : tmp;
             feature.name = name ? name : tmp;
+            */
         }
 
         if (tokens.length > 4) {

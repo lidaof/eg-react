@@ -1,3 +1,4 @@
+import JSON5 from 'json5';
 const validate = require('jsonschema').validate;
 
 /**
@@ -15,18 +16,20 @@ function validateGene(obj) { // eslint-disable-line no-unused-vars
 const GENE_SCHEMA = { // Only used in validateGene, but it happens to serve as good documentation too.
     type: "object",
     properties: {
-        chromosome: {type: "string"},
+        chr: {type: "string"},
         start: {type: "integer"},
         end: {type: "integer"},
-        accession: {type: "string"},
-        id: {type: "integer"},
-        strand: {type: "string"},
-        exons: {
-            type: "array",
-            items: {type: "array"}
-        },
-        description: {type: "string"},
-        name: {type: "string"},
+        details: {
+            name: {type: "string"}, // More like ID
+            name2: {type: "string"}, // Actual gene name
+            strand: {type: "string"},
+            id: {type: "integer"},
+            desc: {type: "string"},
+            struct: {
+                thick: {type: "array"},
+                thin: {type: "array"}
+            }
+        }
     }
 }
 
@@ -46,6 +49,15 @@ class Gene {
      */
     constructor(plainObject, model) {
         Object.assign(this, plainObject); // Use validateGene() here for debugging if needed.
+        this.details = JSON5.parse('{' + this.details + '}');
+        this.chromosome = this.chr;
+        if (this.details.struct.thin) {
+            this.exons = this.details.struct.thin;
+        } else if (this.details.struct.thick) {
+            this.exons = this.details.struct.thick;
+        } else {
+            throw new Error("Received object has no exon data");
+        }
     }
 
     /**
