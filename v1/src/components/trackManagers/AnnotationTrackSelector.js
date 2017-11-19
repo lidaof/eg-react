@@ -13,7 +13,6 @@ function convertOldBrowserSchema(schemaNode, nodeLabel) {
     const isLeaf = schemaNode.hasOwnProperty("name");
     if (isLeaf) {
         // TreeView will pass this object to our custom leaf renderer.
-        // (If we didn't have a custom renderer, this object would need to fulfill the TreeViewData interface.)
         return new TrackModel(schemaNode); 
     }
 
@@ -55,7 +54,7 @@ class AnnotationTrackSelector extends React.Component {
 
     render() {
         return (
-        <TreeView data={[this.data]} onNodeToggled={this.nodeToggled} leafRenderer={this.renderLeaf} />
+        <TreeView data={this.data} onNodeToggled={this.nodeToggled} leafRenderer={this.renderLeaf} />
         );
     }
 }

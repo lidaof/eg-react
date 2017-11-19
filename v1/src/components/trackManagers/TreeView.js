@@ -11,14 +11,14 @@ interface TreeViewData {
 
 function DefaultExpandButton(props) {
     if (props.isExpanded) {
-        return <span style={{marginRight: 5}}>▾</span>;
+        return <span style={{marginRight: 5}} onClick={props.onClick} >▾</span>;
     } else {
-        return <span style={{display: "inline-block", transform: "rotate(-90deg)", marginRight: 5}} >▾</span>;
+        return (
+        <span style={{display: "inline-block", transform: "rotate(-90deg)", marginRight: 5}} onClick={props.onClick} >
+            ▾
+        </span>
+        );
     }
-}
-
-function nodeHasChildren(dataObj) {
-    return dataObj.children && dataObj.children.length > 0;
 }
 
 /**
@@ -28,7 +28,7 @@ function nodeHasChildren(dataObj) {
  */
 class TreeView extends React.Component {
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.object.isRequired),
+        data: PropTypes.object.isRequired,
         onNodeToggled: PropTypes.func,
         indent: PropTypes.number,
         childIndent: PropTypes.number,
@@ -37,56 +37,47 @@ class TreeView extends React.Component {
 
     static defaultProps = {
         indent: 0,
-        childIndent: 10,
+        childIndent: 20,
     }
 
     constructor(props) {
         super(props);
         this.renderLeaf = this.renderLeaf.bind(this);
-        this.renderNonLeaf = this.renderNonLeaf.bind(this);
+        this.renderSubtree = this.renderSubtree.bind(this);
     }
 
     renderLeaf(dataObj) {
         return (
-            <div style={{marginLeft: this.props.indent || 0}} >
+            <div style={{marginLeft: this.props.indent}} >
                 {this.props.leafRenderer ? this.props.leafRenderer(dataObj) : dataObj.label}
             </div>
         );
     }
 
-    renderNonLeaf(dataObj) {
-        const nextIndent = this.props.indent + this.props.childIndent;
-        const onClick = this.props.onNodeToggled ? () => this.props.onNodeToggled(dataObj) : undefined;
+    renderSubtree(childObj, index) {
         return (
-            <div onClick={onClick} style={{marginLeft: this.props.indent || 0}} >
-                <DefaultExpandButton isExpanded={dataObj.isExpanded} />
-                {dataObj.label}
-                {
-                dataObj.isExpanded ?
-                    <TreeView
-                        data={dataObj.children}
-                        onNodeToggled={this.props.onNodeToggled}
-                        indent={nextIndent}
-                        childIndent={this.props.childIndent}
-                        leafRenderer={this.props.leafRenderer}
-                    />
-                    :
-                    null
-                }
-            </div>
+            <TreeView
+                key={index}
+                data={childObj}
+                onNodeToggled={this.props.onNodeToggled}
+                indent={this.props.childIndent}
+                childIndent={this.props.childIndent}
+                leafRenderer={this.props.leafRenderer}
+            />
         );
     }
 
     render() {
-        return (
-        <div style={{marginLeft: this.props.indent}}>
-        {
-            this.props.data.map((obj, index) => (
-                <div key={index}>
-                    { nodeHasChildren(obj) ? this.renderNonLeaf(obj) : this.renderLeaf(obj) }
-                </div>
-            ))
+        if (!this.props.data.children) {
+            return this.renderLeaf(this.props.data);
         }
+        
+        const onClick = this.props.onNodeToggled ? () => this.props.onNodeToggled(this.props.data) : undefined;
+        return (
+        <div style={{marginLeft: this.props.indent, borderLeft: "1px solid grey"}} >
+            <DefaultExpandButton isExpanded={this.props.data.isExpanded} onClick={onClick} />
+            <span onClick={onClick}> { this.props.data.label }</span>
+            { this.props.data.isExpanded ? this.props.data.children.map(this.renderSubtree) : null }
         </div>
         )
     }
