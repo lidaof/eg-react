@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactTable from 'react-table'
+import TrackModel from '../../model/TrackModel';
 import TrackSearchBox from './TrackSearchBox';
 import 'react-table/react-table.css';
 
@@ -11,8 +12,8 @@ import 'react-table/react-table.css';
  */
 class HubTrackTable extends React.PureComponent {
     static propTypes = {
-        tracks: PropTypes.arrayOf(PropTypes.object),
-        addedTracks: PropTypes.arrayOf(PropTypes.object),
+        tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
+        addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
         onTrackAdded: PropTypes.func,
     }
 

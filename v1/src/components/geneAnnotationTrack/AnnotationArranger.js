@@ -46,14 +46,6 @@ class AnnotationArranger extends SvgComponent {
      */
     shouldComponentUpdate(nextProps) {
         return this.props.data !== nextProps.data || this.props.xOffset !== nextProps.xOffset;
-        /*
-        for (let key in nextProps) {
-            if (this.props[key] !== nextProps[key]) {
-                return true;
-            }
-        }
-        return false;
-        */
     }
 
     /**
@@ -66,26 +58,6 @@ class AnnotationArranger extends SvgComponent {
     _processGenes(genes) {
         genes.forEach(gene => gene.setModel(this.props.viewRegion));
         return genes.sort((gene1, gene2) => gene1.absStart - gene2.absStart);
-    }
-
-    /**
-     * Adds a label to the SVG expressing how many genes are unlabeled
-     * 
-     * @param {number} numHiddenGenes - number of unlabeled/hidden genes
-     */
-    _addHiddenGenesReminder(numHiddenGenes) {
-        /*
-        if (numHiddenGenes > 0) {
-            let maxRows = this.props.maxRows || DEFAULT_MAX_ROWS;
-            let genesHiddenText = numHiddenGenes === 1 ? "1 gene unlabeled" : `${numHiddenGenes} genes unlabeled`;
-            this.group.text(genesHiddenText).attr({
-                x: 10,
-                y: (maxRows) * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING) + 5,
-                "font-size": LABEL_SIZE,
-                "font-style": "italic"
-            });
-        }
-        */
     }
 
     /**
@@ -133,7 +105,6 @@ class AnnotationArranger extends SvgComponent {
                 key={gene.details.id}
             />);
         }
-        this._addHiddenGenesReminder(numHiddenGenes);
 
         return <div>{children}</div>;
     }

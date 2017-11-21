@@ -117,11 +117,12 @@ class TrackContainer extends React.Component {
             viewRegion: this.props.viewRegion,
             regionExpander: this.regionExpander,
 
-            width: this.state.width - TrackLegend.WIDTH,
+            width: Math.max(0, this.state.width - TrackLegend.WIDTH),
             xOffset: this.state.xOffsets[index],
             onNewData: () => this.newTrackDataCallback(index),
             key: index // TODO make keys NOT index-based
         };
+        
         switch (trackModel.getType()) {
             case BigWigTrack.TYPE_NAME.toLowerCase():
                 return <BigWigTrack

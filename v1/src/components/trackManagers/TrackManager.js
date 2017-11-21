@@ -28,7 +28,10 @@ class TrackManager extends React.Component {
         this.submenus = [ // See doc below constructor for what each submenu object is
             {
                 buttonText: "Annotation tracks...",
-                getComponent: () => <AnnotationTrackSelector />,
+                getComponent: () => <AnnotationTrackSelector
+                    addedTracks={self.props.addedTracks}
+                    onTrackAdded={self.props.onTrackAdded}
+                />,
             },
             {
                 buttonText: "Data hubs...",

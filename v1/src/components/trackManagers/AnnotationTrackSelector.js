@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import annotationTracks from './AnnotationTracks';
 import TrackModel from '../../model/TrackModel';
@@ -36,6 +37,15 @@ function convertOldBrowserSchema(schemaNode, nodeLabel) {
  * @author Silas Hsu
  */
 class AnnotationTrackSelector extends React.Component {
+    static propTypes = {
+        addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
+        onTrackAdded: PropTypes.func,
+    }
+
+    static defaultProps = {
+        onTrackAdded: () => undefined
+    }
+
     constructor(props) {
         super(props);
         this.data = convertOldBrowserSchema(annotationTracks, "hg19");
@@ -49,10 +59,15 @@ class AnnotationTrackSelector extends React.Component {
     }
 
     renderLeaf(trackModel) {
-        return <div>{trackModel.label} <button>+</button></div>;
+        if (this.addedTrackSet.has(trackModel)) {
+            return <div>{trackModel.label} (ADDED)</div>;
+        }
+        
+        return <div>{trackModel.label} <button onClick={() => this.props.onTrackAdded(trackModel)}>+</button></div>;
     }
 
     render() {
+        this.addedTrackSet = new Set(this.props.addedTracks);
         return (
         <TreeView data={this.data} onNodeToggled={this.nodeToggled} leafRenderer={this.renderLeaf} />
         );
