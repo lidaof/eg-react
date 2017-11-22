@@ -9,7 +9,7 @@ import TrackContainer from './components/TrackContainer';
 import _ from 'lodash';
 import TrackManager from './components/trackManagers/TrackManager';
 
-import Perf from 'react-addons-perf'; // ES6
+import Perf from 'react-addons-perf';
 window.Perf = Perf;
 
 const CHROMOSOMES = [
@@ -29,11 +29,12 @@ const DEFAULT_TRACKS = [
     new TrackModel({
         type: BigWigTrack.TYPE_NAME,
         name: "GSM429321.bigWig",
-        url: 'http://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig',
+        url: "http://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig",
     }),
     new TrackModel({
         type: GeneAnnotationTrack.TYPE_NAME,
         name: "refGene",
+        url: 'http://egg.wustl.edu/d/hg19/refGene.gz',
     }),
 ];
 

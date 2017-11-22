@@ -241,12 +241,9 @@ class DisplayedRegionModel {
      * @param {number} factor - number by which to multiply this region's width
      * @param {number} [focalPoint] - (optional) measured as number of region widths from the left edge.  Default: 0.5
      */
-    zoom(factor, focalPoint) {
+    zoom(factor, focalPoint=0.5) {
         if (factor <= 0) {
             throw new RangeError("Zoom factor must be greater than 0");
-        }
-        if (focalPoint === undefined || focalPoint === null) {
-            focalPoint = 0.5;
         }
 
         let newWidth = this.getWidth() * factor;

@@ -45,18 +45,20 @@ class Gene {
      * coordinates if given a {@link DisplayedRegionModel}.
      * 
      * @param {object} plainObject - object to make a copy of
-     * @param {DisplayedRegionModel} [model] - model used to compute absolute base numbers
      */
     constructor(plainObject, model) {
         Object.assign(this, plainObject); // Use validateGene() here for debugging if needed.
         this.details = JSON5.parse('{' + this.details + '}');
         this.chromosome = this.chr;
+        this.details.name2 = this.details.name2 || this.details.name || "";
+        this.details.struct = this.details.struct || {};
+
         if (this.details.struct.thin) {
             this.exons = this.details.struct.thin;
         } else if (this.details.struct.thick) {
             this.exons = this.details.struct.thick;
         } else {
-            throw new Error("Received object has no exon data");
+            this.exons = [];
         }
     }
 

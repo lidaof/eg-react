@@ -44,6 +44,7 @@ describe("TrackContainer", () => {
                 tracks={tracks}
             />
         );
+        wrapper.setState({width: 1}); // Need to set width before tracks will render
     });
 
     it("renders one Track for each object in the `tracks` prop", () => {

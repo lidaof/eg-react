@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import RegionExpander from '../model/RegionExpander';
 
 /**
  * A component that purposely makes child visualizer elements wider, so they can be scrolled.  Such elements include
@@ -19,12 +18,11 @@ class ScrollingData extends React.Component {
     static propTypes = {
         width: PropTypes.number.isRequired, // The width of this component
         height: PropTypes.number.isRequired, // The height of this component
-        regionExpander: PropTypes.instanceOf(RegionExpander).isRequired, // Determines how wide to make child elements
+        viewExpansion: PropTypes.object.isRequired, // Determines how wide to make child elements
         xOffset: PropTypes.number, // How much to offset children's horizontal position
     }
 
     static defaultProps = {
-        regionExpander: RegionExpander.makeIdentityExpander(),
         xOffset: 0,
     }
 
@@ -33,11 +31,18 @@ class ScrollingData extends React.Component {
      * have their width and height set, and certain style props related to positioning will be merged in as well.
      */
     render() {
+        let left = 0;
+        if (this.props.xOffset > 0) {
+            left = Math.min(this.props.xOffset, this.props.viewExpansion.leftExtraPixels);
+        } else {
+            left = Math.max(-this.props.viewExpansion.rightExtraPixels, this.props.xOffset);
+        }
+
         const displayComponentStyle = {
             display: "block",
             position: "relative",
-            marginLeft: -this.props.width * this.props.regionExpander.multipleOnEachSide,
-            left: this.props.xOffset,
+            marginLeft: -this.props.viewExpansion.leftExtraPixels,
+            left: left
         };
 
         const children = React.Children.map(this.props.children, child => {
@@ -50,17 +55,17 @@ class ScrollingData extends React.Component {
                 const style = Object.assign({}, displayComponentStyle, child.props.style || {});
                 propsToMerge = {
                     style: style,
-                    width: this.props.regionExpander.expandWidth(this.props.width),
+                    width: this.props.viewExpansion.expandedWidth,
                     height: this.props.height
                 };
             } else if (child.type.name === "SvgContainer") {
-                // We want to merge into the SvgContainer.props.svgProps, not SvgContainer.props, so it's more complex.
+                // We want to merge into the SvgContainer.props.svgProps as well, so it's more complex.
                 const svgProps = child.props.svgProps || {};
                 const style = Object.assign({}, displayComponentStyle, svgProps.style || {});
                 propsToMerge = {
                     svgProps: Object.assign({}, svgProps, {
                         style: style,
-                        width: this.props.regionExpander.expandWidth(this.props.width),
+                        width: this.props.viewExpansion.expandedWidth,
                         height: this.props.height
                     })
                 };

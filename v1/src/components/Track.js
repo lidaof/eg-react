@@ -21,8 +21,8 @@ class Track extends React.Component {
     static propTypes = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Metadata for this track
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
-        regionExpander: PropTypes.instanceOf(RegionExpander), // How much of the surroundings of the region to display
 
+        viewExpansionValue: PropTypes.number, // How much to enlarge view on both sides
         width: PropTypes.number, // The width of the track
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
         onNewData: PropTypes.func, // Callback when the track loads new data.  Called with no arguments.
@@ -30,7 +30,10 @@ class Track extends React.Component {
     }
 
     static defaultProps = {
-        regionExpander: RegionExpander.makeIdentityExpander(),
+        viewExpansionValue: 0,
+        width: 100,
+        xOffset: 0,
+        onNewData: () => undefined
     }
 
     /**
@@ -68,7 +71,7 @@ class Track extends React.Component {
      * @return {Promise<any>} a promise that resolves when fetching is done, including when there is an error.
      */
     fetchData(viewRegion) {
-        let expandedRegion = this.props.regionExpander.makeExpandedRegion(viewRegion);
+        let expandedRegion = new RegionExpander(this.props.viewExpansionValue).makeExpandedRegion(viewRegion);
         return this.dataSource.getData(expandedRegion).then(data => {
             // When the data finally comes in, be sure it is still what the user wants
             if (this.props.viewRegion === viewRegion) {
@@ -77,9 +80,7 @@ class Track extends React.Component {
                     data: data,
                     error: null,
                 });
-                if (this.props.onNewData) {
-                    this.props.onNewData();
-                }
+                this.props.onNewData();
             }
         })
         .catch(error => {

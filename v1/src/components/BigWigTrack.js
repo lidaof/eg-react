@@ -8,6 +8,8 @@ import TrackLoadingNotice from './TrackLoadingNotice';
 import ScrollingData from './ScrollingData';
 
 import BigWigDataSource from '../dataSources/BigWigDataSource';
+import RegionExpander from '../model/RegionExpander';
+import LinearDrawingModel from '../model/LinearDrawingModel';
 
 const DEFAULT_HEIGHT = 30; // In pixels
 const TOP_PADDING = 5;
@@ -68,7 +70,9 @@ class BigWigTrack extends Track {
         }
         const dataMax = _.maxBy(data, record => record.value).value;
         
-        const drawModel = this.props.regionExpander.makeDrawModel(this.props.viewRegion, this.props.width, canvas);
+        let viewExpansion = new RegionExpander(this.props.viewExpansionValue)
+            .calculateExpansion(this.props.width, this.props.viewRegion);
+        const drawModel = new LinearDrawingModel(viewExpansion.expandedRegion, viewExpansion.expandedWidth, canvas);
         non0Data.forEach(record => {
             const x = Math.round(drawModel.baseToX(record.start));
             const y = Math.round(canvasHeight - (record.value/dataMax * canvasHeight) + TOP_PADDING);
@@ -88,6 +92,8 @@ class BigWigTrack extends Track {
             scale = scaleLinear().domain([dataMax, 0]).range([TOP_PADDING, height]);
         }
 
+        let viewExpansion = new RegionExpander(this.props.viewExpansionValue)
+            .calculateExpansion(this.props.width, this.props.viewRegion);
         return (
         <div style={{display: "flex", borderBottom: "1px solid grey"}}>
             <TrackLegend height={height} trackModel={this.props.trackModel} scaleForAxis={scale} />
@@ -95,7 +101,7 @@ class BigWigTrack extends Track {
             <ScrollingData
                 width={this.props.width}
                 height={height}
-                regionExpander={this.props.regionExpander}
+                viewExpansion={viewExpansion}
                 xOffset={this.props.xOffset}
             >
                 <canvas ref={node => this.canvasNode = node} style={canvasStyle} />

@@ -3,6 +3,7 @@ import React from 'react';
 import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
 import Gene from '../../model/Gene';
+import RegionExpander from '../../model/RegionExpander';
 import FeatureSource from '../../dataSources/FeatureSource';
 
 import SvgContainer from '../SvgContainer';
@@ -19,7 +20,7 @@ const HEIGHT = 120;
  * @author Silas Hsu
  */
 class GeneAnnotationTrack extends Track {
-    static TYPE_NAME = "gene annotation";
+    static TYPE_NAME = "hammock";
 
     constructor(props) {
         super(props);
@@ -31,7 +32,7 @@ class GeneAnnotationTrack extends Track {
     }
 
     makeDefaultDataSource() {
-        return new FeatureSource("http://egg.wustl.edu/d/hg19/refGene.gz");
+        return new FeatureSource(this.props.trackModel.url);
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -62,7 +63,9 @@ class GeneAnnotationTrack extends Track {
         if (this.state.error) {
             svgStyle.backgroundColor = "red";
         }
-        
+        let regionExpander = new RegionExpander(this.props.viewExpansionValue);
+        let viewExpansion = regionExpander.calculateExpansion(this.props.width, this.props.viewRegion);
+
         return (
         <div
             style={{display: "flex", borderBottom: "1px solid grey"}}
@@ -74,18 +77,19 @@ class GeneAnnotationTrack extends Track {
             <ScrollingData
                 width={this.props.width}
                 height={HEIGHT}
-                regionExpander={this.props.regionExpander}
+                viewExpansion={viewExpansion}
                 xOffset={this.props.xOffset}
             >
                 <SvgContainer
-                    model={this.props.regionExpander.makeExpandedRegion(this.props.viewRegion)}
-                    drawModelWidth={this.props.regionExpander.expandWidth(this.props.width)}
+                    model={viewExpansion.expandedRegion}
+                    drawModelWidth={viewExpansion.expandedRegion.expandedWidth}
                     svgProps={{style: svgStyle}}
                 >
-                    {this.genes ? 
+                    {this.genes ?
                         <AnnotationArranger
                             data={this.genes}
                             viewRegion={this.props.viewRegion}
+                            leftBoundary={viewExpansion.leftExtraPixels}
                             onGeneClick={this.geneClicked}
                             maxRows={this.props.maxRows}
                         />

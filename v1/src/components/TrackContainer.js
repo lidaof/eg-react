@@ -3,14 +3,16 @@ import PropTypes from 'prop-types';
 
 import BigWigTrack from './BigWigTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
+import HammockTrack from './HammockTrack';
 import TrackLegend from './TrackLegend';
 
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
-import RegionExpander from '../model/RegionExpander';
 
 import { LEFT_MOUSE } from './DomDragListener';
 import ViewDragListener from './ViewDragListener';
+
+const VIEW_EXPANSION_VALUE = 1;
 
 /**
  * Contains all tracks and makes tracks from TrackModel objects.  Also handles track dragging.
@@ -40,7 +42,6 @@ class TrackContainer extends React.Component {
         };
         this.offsetsOnDragStart = this.state.xOffsets;
         this.node = null;
-        this.regionExpander = new RegionExpander(0.75);
 
         this.viewDragStart = this.viewDragStart.bind(this);
         this.viewDrag = this.viewDrag.bind(this);
@@ -100,6 +101,10 @@ class TrackContainer extends React.Component {
         this.setState({xOffsets: newOffsets});
     }
 
+    getTrackWidth() {
+        return Math.max(0, this.state.width - TrackLegend.WIDTH);
+    }
+
     /**
      * Make a single track component with the input TrackModel.
      * 
@@ -115,9 +120,9 @@ class TrackContainer extends React.Component {
         let trackProps = {
             trackModel: trackModel,
             viewRegion: this.props.viewRegion,
-            regionExpander: this.regionExpander,
+            viewExpansionValue: VIEW_EXPANSION_VALUE,
 
-            width: Math.max(0, this.state.width - TrackLegend.WIDTH),
+            width: this.getTrackWidth(),
             xOffset: this.state.xOffsets[index],
             onNewData: () => this.newTrackDataCallback(index),
             key: index // TODO make keys NOT index-based
@@ -125,13 +130,9 @@ class TrackContainer extends React.Component {
         
         switch (trackModel.getType()) {
             case BigWigTrack.TYPE_NAME.toLowerCase():
-                return <BigWigTrack
-                    {...trackProps}
-                />;
-            case GeneAnnotationTrack.TYPE_NAME.toLowerCase():
-                return <GeneAnnotationTrack
-                    {...trackProps}
-                />;
+                return <BigWigTrack {...trackProps} />;
+            case HammockTrack.TYPE_NAME.toLowerCase():
+                return <GeneAnnotationTrack {...trackProps} />;
             default:
                 console.warn("Unknown track type " + trackModel.type);
                 return null;
@@ -139,26 +140,26 @@ class TrackContainer extends React.Component {
     }
 
     render() {
-        const drawModel = this.node ?
-            new LinearDrawingModel(this.props.viewRegion, this.state.width - TrackLegend.WIDTH, this.node) : undefined;
+        if (this.state.width === 0) {
+            return <div ref={node => this.node = node} style={{margin: "10px", border: "1px solid grey"}} />;
+        }
+
+        const width = this.getTrackWidth();
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, width, this.node);
+
         return (
-            <div ref={node => this.node = node} style={{margin: "10px", border: "1px solid grey"}}>
-                {this.props.tracks.map(this.renderTrack)}
-                {
-                this.node ?
-                    <ViewDragListener
-                        button={LEFT_MOUSE}
-                        node={this.node}
-                        drawModel={drawModel}
-                        model={this.props.viewRegion}
-                        onViewDragStart={this.viewDragStart}
-                        onViewDrag={this.viewDrag}
-                        onViewDragEnd={this.viewDragEnd}
-                    />
-                    :
-                    null
-                }
-            </div>
+        <div ref={node => this.node = node} style={{margin: "10px", border: "1px solid grey"}}>
+            {this.props.tracks.map(this.renderTrack)}
+            <ViewDragListener
+                button={LEFT_MOUSE}
+                node={this.node}
+                drawModel={drawModel}
+                model={this.props.viewRegion}
+                onViewDragStart={this.viewDragStart}
+                onViewDrag={this.viewDrag}
+                onViewDragEnd={this.viewDragEnd}
+            />
+        </div>
         );
     }
 }

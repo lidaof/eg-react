@@ -21,6 +21,8 @@ class AnnotationArranger extends SvgComponent {
          * Used to calculate absolute coordinates of genes
          */
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+
+        leftBoundary: PropTypes.number, // The x coordinate of the left boundary of the SVG, in SVG's coordinate system
         
         maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
 
@@ -30,10 +32,11 @@ class AnnotationArranger extends SvgComponent {
          *         `event`: the mouse event from the click
          *         `gene`: the Gene object that was clicked
          */
-        onGeneClick: PropTypes.func 
+        onGeneClick: PropTypes.func
     };
 
     static defaultProps = {
+        leftBoundary: 0,
         maxRows: DEFAULT_MAX_ROWS,
     };
 
@@ -97,6 +100,7 @@ class AnnotationArranger extends SvgComponent {
             
             children.push(<GeneAnnotation
                 drawModel={this.props.drawModel}
+                leftBoundary={this.props.leftBoundary}
                 svgNode={this.group}
                 gene={gene}
                 isLabeled={isLabeled}

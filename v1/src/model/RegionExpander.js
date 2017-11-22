@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import LinearDrawingModel from './LinearDrawingModel';
 
 /**
  * Utility class that does calculations related to expanding view regions for the purposes of scrolling.
@@ -25,16 +24,6 @@ class RegionExpander {
     }
 
     /**
-     * Calculates an expansion in region width according to the parameters set in the constructor.
-     * 
-     * @param {number} width - width of a region
-     * @return {number} width of a region after expansion
-     */
-    expandWidth(width) {
-        return width * this.zoomRatio;
-    }
-
-    /**
      * Expands a region according to the parameters set in the constructor.  Does not modify the input.
      * 
      * @param {DisplayedRegionModel} region - region to expand
@@ -47,16 +36,44 @@ class RegionExpander {
     }
 
     /**
-     * Makes a draw model suitable for a expanded view region.  Magnitude of expansion is set in the constructor.  Does
-     * not modify any of the inputs.
+     * Return object of calculateExpansion.  Note that expandedWidth = (original width provided to the function) +
+     * leftExtraPixels + rightExtraPixels.
      * 
-     * @param {DisplayedRegionModel} region - unexpanded region
-     * @param {number} width - unexpanded width
-     * @param {HTMLElement} node - DOM element to pass to LinearDrawingModel constructor
-     * @return {LinearDrawingModel} - draw model suitable for a expanded view region
+     * @typedef {Object} RegionExpander~ExpansionData
+     * @property {number} expandedWidth - total width, in pixels, of the expanded view
+     * @property {DisplayedRegionModel} expandedRegion - model of expanded region
+     * @property {number} - how many pixels on the left side to allocate to additional data
+     * @property {number} - how many pixels on the right side to allocate to additional data
      */
-    makeDrawModel(region, width, node) {
-        return new LinearDrawingModel(this.makeExpandedRegion(region), this.expandWidth(width), node);
+
+    /**
+     * Calculates an expansion of a view region from the input pixel width and region model.  Returns both the expanded
+     * region and how many pixels on each side of the orignal view to allocate to display additional data.  Handles
+     * cases such expanding near the edge of the genome, so that views will always remain inside the genome.
+     * 
+     * @param {number} width - the width, in pixels, of the view to expand
+     * @param {DisplayedRegionModel} region - the region that the unexpanded view will show
+     * @return {RegionExpander~ExpansionData} - data representing aspects of an expanded region
+     */
+    calculateExpansion(width, region) {
+        let pixelsPerBase = width / region.getWidth();
+        let expandedRegion = this.makeExpandedRegion(region);
+        let expandedWidth = expandedRegion.getWidth() * pixelsPerBase;
+
+        let originalAbsRegion = region.getAbsoluteRegion();
+        let expandedAbsRegion = expandedRegion.getAbsoluteRegion();
+        let leftBaseDiff = originalAbsRegion.start - expandedAbsRegion.start;
+        let rightBaseDiff = expandedAbsRegion.end - originalAbsRegion.end;
+
+        let leftExtraPixels = leftBaseDiff * pixelsPerBase;
+        let rightExtraPixels = rightBaseDiff * pixelsPerBase;
+
+        return {
+            expandedWidth: expandedWidth,
+            expandedRegion: expandedRegion,
+            leftExtraPixels: leftExtraPixels,
+            rightExtraPixels: rightExtraPixels
+        };
     }
 }
 

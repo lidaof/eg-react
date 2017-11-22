@@ -18,8 +18,9 @@ class TrackModel {
         Object.assign(this, plainObject);
         this.name = this.name || "";
         this.type = this.type || this.filetype || "";
-        this.metadata = this.metadata || {};
         this.options = this.options || {};
+        this.url = this.url || "";
+        this.metadata = this.metadata || {};
     }
 
     getType() {
