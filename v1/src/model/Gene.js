@@ -48,7 +48,7 @@ class Gene {
      */
     constructor(plainObject, model) {
         Object.assign(this, plainObject); // Use validateGene() here for debugging if needed.
-        this.details = JSON5.parse('{' + this.details + '}');
+        this.details = this.details ? JSON5.parse('{' + this.details + '}') : {};
         this.chromosome = this.chr;
         this.details.name2 = this.details.name2 || this.details.name || "";
         this.details.struct = this.details.struct || {};

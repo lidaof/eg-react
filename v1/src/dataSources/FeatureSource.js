@@ -4,8 +4,10 @@ class FeatureSource extends DataSource {
     constructor(url, isIndexed=true) {
         super();
         this.igvFeatureSource = new window.igv.FeatureSource({
+            format: 'bed',
+            delimiter: '\t',
             url: url,
-            isIndexed: isIndexed,
+            indexed: isIndexed,
         });
         this.headerPromise = this.igvFeatureSource.getFileHeader();
     }
