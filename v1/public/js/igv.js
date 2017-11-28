@@ -33368,7 +33368,7 @@ var igv = (function (igv) {
         }
         else {
             // TODO -- reuse cached features that overelap new region
-            /*
+            /* SMH
             if (self.sourceType === 'file' && (self.visibilityWindow === undefined || self.visibilityWindow <= 0)) {
                 // Expand genomic interval to grab entire chromosome
                 genomicInterval.start = 0;

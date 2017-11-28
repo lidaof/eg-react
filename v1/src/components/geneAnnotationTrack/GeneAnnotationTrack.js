@@ -36,8 +36,15 @@ class GeneAnnotationTrack extends Track {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if (this.state.data !== nextState.data) {
-            this.genes = nextState.data ? nextState.data.map(feature => new Gene(feature)) : null;
+        if (this.state.data !== nextState.data && nextState.data != null) {
+            let newGenes = [];
+            let pixelsPerBase = nextProps.width / nextProps.viewRegion.getWidth();
+            for (let feature of nextState.data) {
+                if ((feature.end - feature.start) * pixelsPerBase >= 1) {
+                    newGenes.push(new Gene(feature));
+                }
+            }
+            this.genes = newGenes;
         }
     }
 

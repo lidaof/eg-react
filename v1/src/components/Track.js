@@ -47,12 +47,13 @@ class Track extends React.Component {
             isLoading: true,
             data: null,
             error: null,
+            dataSourceOptions: null,
         };
 
         this.dataSource = this.props.dataSourceOverride || this.makeDefaultDataSource();
 
         this.fetchData = this.fetchData.bind(this);
-        this.fetchData(this.props.viewRegion);
+        this.fetchData(this.props);
     }
 
     /**
@@ -67,14 +68,14 @@ class Track extends React.Component {
     /**
      * Uses this track's DataSource to fetch data within a view region, and then sets state.
      * 
-     * @param {DisplayedRegionModel} viewRegion - the region for which to fetch data
+     * @param {Object} props - props object; contains the region for which to fetch data
      * @return {Promise<any>} a promise that resolves when fetching is done, including when there is an error.
      */
-    fetchData(viewRegion) {
-        let expandedRegion = new RegionExpander(this.props.viewExpansionValue).makeExpandedRegion(viewRegion);
+    fetchData(props) {
+        let expandedRegion = new RegionExpander(props.viewExpansionValue).makeExpandedRegion(props.viewRegion);
         return this.dataSource.getData(expandedRegion).then(data => {
             // When the data finally comes in, be sure it is still what the user wants
-            if (this.props.viewRegion === viewRegion) {
+            if (this.props.viewRegion === props.viewRegion) {
                 this.setState({
                     isLoading: false,
                     data: data,
@@ -87,7 +88,7 @@ class Track extends React.Component {
             if (process.env.NODE_ENV !== "test") {
                 console.error(error);
             }
-            if (this.props.viewRegion === viewRegion) {
+            if (this.props.viewRegion === props.viewRegion) {
                 this.setState({
                     error: error,
                 });
@@ -109,10 +110,14 @@ class Track extends React.Component {
 
         if (this.props.viewRegion !== nextProps.viewRegion) {
             nextStateObj.isLoading = true;
-            this.fetchData(nextProps.viewRegion);
+            this.fetchData(nextProps);
         }
 
         this.setState(nextStateObj);
+    }
+
+    componentWillUnmount() {
+        this.dataSource.cleanUp();
     }
 
     /**

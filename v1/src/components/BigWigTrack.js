@@ -7,7 +7,7 @@ import TrackLegend from './TrackLegend';
 import TrackLoadingNotice from './TrackLoadingNotice';
 import ScrollingData from './ScrollingData';
 
-import BigWigDataSource from '../dataSources/BigWigDataSource';
+import BigWigSource from '../dataSources/BigWigSource';
 import RegionExpander from '../model/RegionExpander';
 import LinearDrawingModel from '../model/LinearDrawingModel';
 
@@ -31,7 +31,7 @@ class BigWigTrack extends Track {
      * @inheritdoc
      */
     makeDefaultDataSource() {
-        return new BigWigDataSource(this.props.trackModel.url);
+        return new BigWigSource(this.props.trackModel.url);
     }
 
     /**

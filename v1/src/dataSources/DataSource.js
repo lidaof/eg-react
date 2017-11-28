@@ -13,6 +13,13 @@ class DataSource {
     getData(region) {
         throw new Error("Not implemented");
     }
+
+    /**
+     * Functions as this object's destructor; deallocates anything that needs manual deallocation.
+     */
+    cleanUp() {
+
+    }
 }
 
 export default DataSource;

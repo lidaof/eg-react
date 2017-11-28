@@ -9,7 +9,7 @@ const bin = require('../vendor/bbi-js/utils/bin');
  * 
  * @author Silas Hsu
  */
-class BigWigDataSource extends DataSource {
+class BigWigSource extends DataSource {
     /**
      * Prepares to fetch BigWig data from a URL.
      * 
@@ -110,4 +110,4 @@ class BigWigDataSource extends DataSource {
     }
 }
 
-export default BigWigDataSource;
+export default BigWigSource;

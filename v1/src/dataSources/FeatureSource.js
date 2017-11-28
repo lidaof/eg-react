@@ -1,27 +1,21 @@
 import DataSource from './DataSource';
+const PromiseWorker = require('promise-worker');
+const FeatureWorker = require('./Feature.worker');
 
 class FeatureSource extends DataSource {
     constructor(url, isIndexed=true) {
         super();
-        this.igvFeatureSource = new window.igv.FeatureSource({
-            format: 'bed',
-            delimiter: '\t',
-            url: url,
-            indexed: isIndexed,
-        });
-        this.headerPromise = this.igvFeatureSource.getFileHeader();
+        this.worker = new PromiseWorker(new FeatureWorker());
+        this.worker.postMessage({url: url});
     }
 
-    async getData(region) {
-        await this.headerPromise;
+    cleanUp() {
+        this.worker._worker.terminate();
+        this.worker = null;
+    }
 
-        let requests = [];
-        for (let chrInterval of region.getRegionList()) {
-            requests.push(this.igvFeatureSource.getFeatures(chrInterval.name, chrInterval.start, chrInterval.end));
-        }
-
-        // Concatenate all the data into one array
-        return Promise.all(requests).then(results => [].concat.apply([], results));
+    getData(region) {
+        return this.worker.postMessage({region: region});
     }
 }
 
