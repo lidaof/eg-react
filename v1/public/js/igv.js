@@ -32459,9 +32459,11 @@ var igv = (function (igv) {
         dataWrapper = getDataWrapper(data);
         i = 0;
 
-        while (line = dataWrapper.nextLine()) {
-            if (i < this.skipRows) continue;
+        for (let skipped = 0; skipped < this.skipRows; skipped++) {
+            dataWrapper.nextLine();
+        }
 
+        while (line = dataWrapper.nextLine()) {
             if (line.startsWith("track") || line.startsWith("#") || line.startsWith("browser")) {
                 continue;
             }
@@ -33152,21 +33154,21 @@ var igv = (function (igv) {
     }
 
     ByteArrayDataWrapper.prototype.nextLine = function () {
-
-        var c, result;
-        result = "";
+        const carriageReturn = 13;
+        const newLine = 10;
+        var characters = [];
 
         if (this.ptr >= this.length) return undefined;
 
         for (var i = this.ptr; i < this.length; i++) {
-            c = String.fromCharCode(this.data[i]);
-            if (c === '\r') continue;
-            if (c === '\n') break;
-            result = result + c;
+            let charCode = this.data[i];
+            if (charCode === carriageReturn) continue;
+            if (charCode === newLine) break;
+            characters.push(charCode);
         }
 
         this.ptr = i + 1;
-        return result;
+        return String.fromCharCode(...characters);
     }
 
 
@@ -33366,14 +33368,14 @@ var igv = (function (igv) {
         }
         else {
             // TODO -- reuse cached features that overelap new region
-
+            /*
             if (self.sourceType === 'file' && (self.visibilityWindow === undefined || self.visibilityWindow <= 0)) {
                 // Expand genomic interval to grab entire chromosome
                 genomicInterval.start = 0;
                 var chromosome = igv.browser ? igv.browser.genome.getChromosome(chr) : undefined;
                 genomicInterval.end = (chromosome === undefined ? Number.MAX_VALUE : chromosome.bpLength);
             }
-
+            */
             return self.reader.readFeatures(chr, genomicInterval.start, genomicInterval.end)
                 .then(
                     function (featureList) {
