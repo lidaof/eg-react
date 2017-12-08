@@ -14,8 +14,8 @@ describe("TrackContainer", () => {
     let wrapper = null;
     const newRegionCallback = jest.fn();
     const tracks = [
-        new TrackModel({type: BigWigTrack.TYPE_NAME}),
-        new TrackModel({type: GeneAnnotationTrack.TYPE_NAME}),
+        new TrackModel({type: "bigwig"}),
+        new TrackModel({type: "bigwig"}),
     ];
     const dragRegionStart = 0;
     const dragRegionEnd = 10;
@@ -42,6 +42,7 @@ describe("TrackContainer", () => {
                 viewRegion={viewRegion}
                 newRegionCallback={newRegionCallback}
                 tracks={tracks}
+                makeTrack={(props) => <BigWigTrack {...props} />}
             />
         );
         wrapper.setState({width: 1}); // Need to set width before tracks will render

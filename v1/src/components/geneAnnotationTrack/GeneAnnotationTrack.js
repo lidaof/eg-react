@@ -2,15 +2,15 @@ import React from 'react';
 
 import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
-import Gene from '../../model/Gene';
-import RegionExpander from '../../model/RegionExpander';
-import FeatureSource from '../../dataSources/FeatureSource';
 
-import SvgContainer from '../SvgContainer';
-import Track from '../Track';
+import { TRACK_PROP_TYPES } from '../Track'
 import TrackLegend from '../TrackLegend';
 import TrackLoadingNotice from '../TrackLoadingNotice';
+import SvgContainer from '../SvgContainer';
 import ScrollingData from '../ScrollingData';
+
+import Gene from '../../model/Gene';
+import RegionExpander from '../../model/RegionExpander';
 
 const HEIGHT = 120;
 
@@ -19,27 +19,25 @@ const HEIGHT = 120;
  * 
  * @author Silas Hsu
  */
-class GeneAnnotationTrack extends Track {
-    static TYPE_NAME = "hammock";
+class GeneAnnotationTrack extends React.Component {
+    static propTypes = TRACK_PROP_TYPES;
 
     constructor(props) {
         super(props);
-        this.state.geneDetail = null;
+        this.state = {
+            geneDetail: null
+        };
 
-        this.genes = this.state.data ? this.state.data.map(feature => new Gene(feature)) : null;
+        this.genes = this.props.data.map(feature => new Gene(feature));
         this.divNode = null;
         this.geneClicked = this.geneClicked.bind(this);
     }
 
-    makeDefaultDataSource() {
-        return new FeatureSource(this.props.trackModel.url);
-    }
-
-    componentWillUpdate(nextProps, nextState) {
-        if (this.state.data !== nextState.data && nextState.data != null) {
+    componentWillUpdate(nextProps) {
+        if (this.props.data !== nextProps.data) {
             let newGenes = [];
             let pixelsPerBase = nextProps.width / nextProps.viewRegion.getWidth();
-            for (let feature of nextState.data) {
+            for (let feature of nextProps.data) {
                 if ((feature.end - feature.start) * pixelsPerBase >= 1) {
                     newGenes.push(new Gene(feature));
                 }
@@ -67,7 +65,7 @@ class GeneAnnotationTrack extends Track {
 
     render() {
         let svgStyle = {paddingTop: 10, display: "block"};
-        if (this.state.error) {
+        if (this.props.error) {
             svgStyle.backgroundColor = "red";
         }
         let regionExpander = new RegionExpander(this.props.viewExpansionValue);
@@ -80,7 +78,7 @@ class GeneAnnotationTrack extends Track {
             onClick={(event) => this.setState({geneDetail: null})}
         >
             <TrackLegend height={HEIGHT} trackModel={this.props.trackModel} />
-            {this.state.isLoading ? <TrackLoadingNotice height={this.props.height} /> : null}
+            {this.props.isLoading ? <TrackLoadingNotice height={this.props.height} /> : null}
             <ScrollingData
                 width={this.props.width}
                 height={HEIGHT}

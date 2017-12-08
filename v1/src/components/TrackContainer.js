@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import BigWigTrack from './BigWigTrack';
-import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
-import HammockTrack from './HammockTrack';
 import TrackLegend from './TrackLegend';
+import { makeTrack } from './Track';
 
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
@@ -32,7 +30,18 @@ class TrackContainer extends React.Component {
          */
         newRegionCallback: PropTypes.func.isRequired,
         tracks: PropTypes.arrayOf(PropTypes.object).isRequired, // The tracks to display.  Array of TrackModel.
-    }
+
+        /**
+         * Function to customize how to make Track components from props.  Signature:
+         *     (props: object): React.Component
+         *         `props`: the props with which to render the component.
+         */
+        makeTrack: PropTypes.func
+    };
+
+    static defaultProps = {
+        makeTrack: makeTrack,
+    };
 
     constructor(props) {
         super(props);
@@ -127,16 +136,8 @@ class TrackContainer extends React.Component {
             onNewData: () => this.newTrackDataCallback(index),
             key: index // TODO make keys NOT index-based
         };
-        
-        switch (trackModel.getType()) {
-            case BigWigTrack.TYPE_NAME.toLowerCase():
-                return <BigWigTrack {...trackProps} />;
-            case HammockTrack.TYPE_NAME.toLowerCase():
-                return <GeneAnnotationTrack {...trackProps} />;
-            default:
-                console.warn("Unknown track type " + trackModel.type);
-                return null;
-        }
+
+        return this.props.makeTrack(trackProps);
     }
 
     render() {

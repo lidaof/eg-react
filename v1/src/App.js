@@ -1,13 +1,14 @@
-import './App.css';
-import BigWigTrack from './components/BigWigTrack';
-import GeneAnnotationTrack from './components/geneAnnotationTrack/GeneAnnotationTrack';
+import React from 'react';
+import _ from 'lodash';
+
+import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
+import TrackContainer from './components/TrackContainer';
+import TrackManager from './components/trackManagers/TrackManager';
+
 import TrackModel from './model/TrackModel';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
-import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
-import React from 'react';
-import TrackContainer from './components/TrackContainer';
-import _ from 'lodash';
-import TrackManager from './components/trackManagers/TrackManager';
+
+import './App.css';
 
 import Perf from 'react-addons-perf';
 window.Perf = Perf;
@@ -27,12 +28,12 @@ const DEFAULT_NAV_VIEW = [0, 20000000];
 
 const DEFAULT_TRACKS = [
     new TrackModel({
-        type: BigWigTrack.TYPE_NAME,
+        type: "bigwig",
         name: "GSM429321.bigWig",
         url: "http://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig",
     }),
     new TrackModel({
-        type: GeneAnnotationTrack.TYPE_NAME,
+        type: "hammock",
         name: "refGene",
         url: 'http://egg.wustl.edu/d/hg19/refGene.gz',
     }),

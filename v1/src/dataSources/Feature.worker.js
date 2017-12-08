@@ -1,7 +1,10 @@
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import makeBamIndex from '../vendor/igv/BamIndex';
 import unbgzf from '../vendor/igv/bgzf';
-importScripts('js/zlib_and_gzip.min.js');
+
+if (process.env.NODE_ENV !== "test") {
+    importScripts('js/zlib_and_gzip.min.js');
+}
 const registerPromiseWorker = require('promise-worker/register');
 
 var theWorker = null;
