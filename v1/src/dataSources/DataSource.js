@@ -1,11 +1,11 @@
 /**
- * An abstract class that represents a source of data for Tracks
+ * An abstract class that represents a source of data for a specific region.
  * 
  * @author Silas Hsu
  */
 class DataSource {
     /**
-     * Gets data lying within the region, and surrounding ones as well if a RegionExpander is passed.
+     * Gets data lying within the region.
      * 
      * @param {DisplayedRegionModel} region - the model containing the displayed region
      * @return {Promise<any>} a Promise for the data
