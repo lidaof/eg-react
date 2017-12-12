@@ -121,7 +121,7 @@ class GenomeNavigator extends React.Component {
                     <input
                         type="range"
                         min={Math.log(MIN_VIEW_LENGTH)}
-                        max={Math.log(this.state.viewModel.getGenomeLength())}
+                        max={Math.log(this.state.viewModel.getNavigationContext().getTotalBases())}
                         step="any"
                         value={Math.log(this.state.viewModel.getWidth())}
                         onChange={this.zoomSliderDragged}

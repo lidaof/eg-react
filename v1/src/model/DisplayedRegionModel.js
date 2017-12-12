@@ -1,141 +1,42 @@
-import _ from 'lodash';
-
-const MIN_ABS_BASE = 0; // Index absolute bases starting from this number.  Take caution in modifying this!
+const MIN_ABS_BASE = 0; // Index absolute bases from this number.  Take caution in modifying this!
 
 /**
- * Model that stores the currently displayed genomic region.  Internally, expresses the current region as a single open
- * interval [startBaseNumber, endBaseNumber).  Also provides helpers to convert to and from UCSC notation, e.g. 
- * "chr1:1-1000", the first 1000 bases of chromosome 1.
+ * Model that stores the view window/region in a larger navigation context (e.g. a genome).  Internally stores the
+ * region as an open interval of absolute base numbers (@see {@link NavigationContext}).
  *
  * @author Silas Hsu
  */
 class DisplayedRegionModel {
     /**
-     * Makes a new DisplayedRegionModel with specified genome name and chromosome list.  The list should be in order,
-     * and each chromosome should contain its length in bases.
+     * Makes a new DisplayedRegionModel with specified navigation context, and optionally, initial view region.
      *
-     * @param {string} name - name of this genome
-     * @param {Object[]} chromosomes - list of chromosomes in this genome
+     * @param {NavigationContext} navContext - the context in which navigation will take place
+     * @param {number} start - initial start of the view region
+     * @param {number} end - initial end of the view region
      */
-    constructor(name, chromosomes) {
-        this.name = name;
-
-        let totalBases = 0;
-        this._chromosomes = _.cloneDeep(chromosomes);
-        for (let chromosome of this._chromosomes) {
-            chromosome.startBase = totalBases;
-            totalBases += chromosome.lengthInBases;
-        }
-        this._genomeLength = totalBases;
-
-        this.setRegion(MIN_ABS_BASE, MIN_ABS_BASE);
+    constructor(navContext, start=MIN_ABS_BASE, end=MIN_ABS_BASE) {
+        this._navContext = navContext;
+        this.setRegion(start, end); // Sets this._startBase and this._endBase
     }
 
     /**
-     * Given an absolute base number, gets the index of the chromosome in which the base is located.
-     *
-     * @param {number} base - the absolute base number to look up
-     * @return {number} index of chromosome
-     * @throws {RangeError} if the base is not in the genome
+     * Makes copy of this object such that no methods on the copy will modify the original.
+     * 
+     * @return {DisplayedRegionModel} a copy of this object
      */
-    baseToChromosomeIndex(base) {
-        if (base < 0 || base > this._genomeLength) {
-            throw new RangeError("Base number not in genome");
-        }
-        // Last chromosome (highest base #) to first (lowest base #)
-        for (let i = this._chromosomes.length - 1; i > 0; i--) {
-            if (base >= this._chromosomes[i].startBase) {
-                return i;
-            }
-        }
-        return 0;
+    clone() {
+        return new DisplayedRegionModel(this._navContext, this._startBase, this._endBase);
     }
 
     /**
-     * Given an absolute base number, gets the chromosome's name and base number.
-     *
-     * @param {number} base - the absolute base number to look up
-     * @return {Object} object with keys `name` and `base`
-     * @throws {RangeError} if the base is not in the genome
+     * @return {NavigationContext} the navigation context with which this object was created
      */
-    baseToChromosomeCoordinate(base) {
-        let index = this.baseToChromosomeIndex(base); // Can throw RangeError
-        let chr = this._chromosomes[index];
-        return {
-            name: chr.name,
-            base: base - chr.startBase + 1,
-        }
+    getNavigationContext() {
+        return this._navContext;
     }
 
     /**
-     * Given a chromosome name and base number in that chromosome, gets the absolute base number in this genome.
-     *
-     * @param {string} chrName - name of the chromosome to look up
-     * @param {number} baseNum - base number in the chromosome
-     * @return {number} the absolute base in this genome
-     * @throws {RangeError} if the chromosome or its base number is not in the genome
-     */
-    chromosomeCoordinatesToBase(chrName, baseNum) {
-        let chr = this._chromosomes.find(chr => chr.name === chrName);
-        if (!chr) {
-            throw new RangeError(`Cannot find chromosome with name '${chrName}'`);
-        }
-
-        // Take care: `!baseNum` is only appropriate because the `baseNum < 1` check
-        if (!baseNum || baseNum < 1 || baseNum > chr.lengthInBases) {
-            throw new RangeError(`Base number '${baseNum}' not in chromosome '${chrName}'`);
-        }
-        return chr.startBase + baseNum - 1;
-    }
-
-    /**
-     * Parses a UCSC-style chromosomal range, like "chr1:1000-chr2:1000", and returns a object that contains the range's
-     * absolute start and end base.
-     *
-     * @param {string} string - the string to parse
-     * @return {Object} object with props `start` and `end`
-     * @throws {RangeError} if parsing fails or if something nonsensical was parsed (like end before start)
-     */
-    parseRegionString(string) {
-        let startChr, endChr, startBase, endBase;
-        let singleChrMatch, multiChrMatch;
-        // eslint-disable-next-line no-cond-assign
-        if ((singleChrMatch = string.match(/([\w:]+):(\d+)-(\d+)/)) !== null) {
-            startChr = singleChrMatch[1];
-            endChr = startChr;
-            startBase = Number.parseInt(singleChrMatch[2], 10);
-            endBase = Number.parseInt(singleChrMatch[3], 10);
-        // eslint-disable-next-line no-cond-assign
-        } else if ((multiChrMatch = string.match(/([\w:]+):(\d+)-([\w:]+):(\d+)/)) !== null) {
-            startChr = multiChrMatch[1];
-            endChr = multiChrMatch[3];
-            startBase = Number.parseInt(multiChrMatch[2], 10);
-            endBase = Number.parseInt(multiChrMatch[4], 10);
-        } else {
-            throw new RangeError("Could not parse coordinates");
-        }
-
-        let startAbsBase = this.chromosomeCoordinatesToBase(startChr, startBase);
-        let endAbsBase = this.chromosomeCoordinatesToBase(endChr, endBase) + 1;
-        if (endAbsBase < startAbsBase) {
-            throw new RangeError("Start of range must be before end of range");
-        }
-
-        return {
-            start: startAbsBase,
-            end: endAbsBase,
-        }
-    }
-
-    /**
-     * @return {number} length of the genome in base pairs
-     */
-    getGenomeLength() {
-        return this._genomeLength;
-    }
-
-    /**
-     * @return {number} the current width of the region, in base pairs
+     * @return {number} the current width of the view, in base pairs
      */
     getWidth() {
         return this._endBase - this._startBase;
@@ -165,7 +66,11 @@ class DisplayedRegionModel {
      * @return {SingleChromosomeInterval[]} a list of SingleChromosomeInterval
      */
     getRegionList() {
-        let inRegion = this._chromosomes.filter((chr) => {
+        if (this.genomeCoordinateLookup) {
+
+        }
+
+        let inRegion = this._navContext._segments.filter((chr) => {
             return (chr.startBase + chr.lengthInBases > this._startBase) && (chr.startBase < this._endBase);
         });
 
@@ -176,18 +81,26 @@ class DisplayedRegionModel {
         let rightChrEnd = this._endBase - rightChr.startBase;
 
         if (inRegion.length === 1) {
-            return [new SingleChromosomeInterval(leftChr.name, leftChrStart, rightChrEnd, leftChr)];
+            return [this._makeChromosomeInterval(leftChr, leftChrStart, rightChrEnd)];
         }
 
         let result = [];
-        result.push(new SingleChromosomeInterval(leftChr.name, leftChrStart, leftChr.lengthInBases, leftChr));
+        result.push(this._makeChromosomeInterval(leftChr, leftChrStart, leftChr.lengthInBases));
         for (let i = 1; i < inRegion.length - 1; i++) {
             let chr = inRegion[i];
-            result.push(new SingleChromosomeInterval(chr.name, 1, chr.lengthInBases, chr));
+            result.push(this._makeChromosomeInterval(chr, 1, chr.lengthInBases));
         }
-        result.push(new SingleChromosomeInterval(rightChr.name, 1, rightChrEnd, rightChr));
+        result.push(this._makeChromosomeInterval(rightChr, 1, rightChrEnd));
 
         return result;
+    }
+
+    _makeChromosomeInterval(region, relativeStart, relativeEnd) {
+        if (this.genomeCoordinateLookup) {
+            return this.genomeCoordinateLookup.getGenomicCoordinate(region, relativeStart, relativeEnd);
+        } else {
+            return new SingleChromosomeInterval(region.name, relativeStart, relativeEnd, region);
+        }
     }
 
     /**
@@ -208,25 +121,30 @@ class DisplayedRegionModel {
         }
 
         let newLength = end - start;
+        let navigableLength = this._navContext.getTotalBases();
         if (start < MIN_ABS_BASE) { // Left cut off; we need to extend right side
             end = MIN_ABS_BASE + newLength;
-        } else if (end > this._genomeLength) { // Ditto for right
-            start = this._genomeLength - newLength;
+        } else if (end > navigableLength) { // Ditto for right
+            start = navigableLength - newLength;
         }
 
         this._startBase = Math.round(Math.max(MIN_ABS_BASE, start));
-        this._endBase = Math.round(Math.min(end, this._genomeLength));
+        this._endBase = Math.round(Math.min(end, navigableLength));
     }
 
     /**
      * Pans the current region by a constant number of bases, also ensuring view boundaries stay within the genome.
      * Negative numbers pull regions on the left into view (=pan right); positive numbers pull regions on the right into
      * view (=pan left).
+     * 
+     * Returns `this`.
      *
      * @param {number} numBases - number of base pairs to pan
+     * @return {this}
      */
     pan(numBases) {
         this.setRegion(this._startBase + numBases, this._endBase + numBases);
+        return this;
     }
 
     /**
@@ -237,9 +155,12 @@ class DisplayedRegionModel {
      *
      * Note that due to rounding, zoom() is approximate; a zoom(2) followed by a zoom(0.5) may still change the region
      * boundaries by a base or two.
+     * 
+     * Returns `this`.
      *
      * @param {number} factor - number by which to multiply this region's width
      * @param {number} [focalPoint] - (optional) measured as number of region widths from the left edge.  Default: 0.5
+     * @return {this}
      */
     zoom(factor, focalPoint=0.5) {
         if (factor <= 0) {
@@ -256,6 +177,7 @@ class DisplayedRegionModel {
         let rawEnd = this._startBase + newWidth + panAmount;
 
         this.setRegion(rawStart, rawEnd);
+        return this;
     }
 }
 

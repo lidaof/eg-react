@@ -1,14 +1,17 @@
-import AnnotationArranger from '../components/geneAnnotationTrack/AnnotationArranger';
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import Gene from '../model/Gene';
 import React from 'react';
-import SvgContainer from '../components/SvgContainer';
 import { storiesOf } from '@storybook/react';
 
-const model = new DisplayedRegionModel("Wow very genome", [
-    {name: "chr1", lengthInBases: 1500},
+import SvgContainer from '../components/SvgContainer';
+import AnnotationArranger from '../components/geneAnnotationTrack/AnnotationArranger';
+
+import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import NavigationContext from '../model/NavigationContext';
+import Gene from '../model/Gene';
+
+const NAV_CONTEXT = new NavigationContext("Wow very genome", [
+    {name: "chr1", lengthInBases: 1500}
 ]);
-model.setRegion(0, 1000);
+const model = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
 
 const DATA = [
     new Gene({

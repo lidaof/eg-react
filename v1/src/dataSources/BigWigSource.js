@@ -49,8 +49,8 @@ class BigWigSource extends DataSource {
         return combinedData.map(dasFeature =>
             // dasFeature.segment should be a valid chromosome name, otherwise data fetch would have failed.
             new BarChartRecord(
-                region.chromosomeCoordinatesToBase(dasFeature.segment, dasFeature.min),
-                region.chromosomeCoordinatesToBase(dasFeature.segment, dasFeature.max),
+                region.getNavigationContext().segmentCoordinatesToBase(dasFeature.segment, dasFeature.min),
+                region.getNavigationContext().segmentCoordinatesToBase(dasFeature.segment, dasFeature.max),
                 dasFeature.score
             )
         );

@@ -7,6 +7,7 @@ import TrackManager from './components/trackManagers/TrackManager';
 
 import TrackModel from './model/TrackModel';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
+import NavigationContext from './model/NavigationContext';
 
 import './App.css';
 
@@ -43,14 +44,14 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedRegionModel: new DisplayedRegionModel("Wow very genome", CHROMOSOMES),
+            selectedRegionModel: new DisplayedRegionModel(new NavigationContext("Wow very genome", CHROMOSOMES)),
             currentTracks: DEFAULT_TRACKS.slice()
         };
         // TODO set the selected region dynamically.  Don't want it outside the genome.
         this.state.selectedRegionModel.setRegion(...DEFAULT_SELECTED_REGION);
 
         // TODO this can be set dynamically too.
-        this.initNavModel = new DisplayedRegionModel("Wow very genome", CHROMOSOMES);
+        this.initNavModel = new DisplayedRegionModel(new NavigationContext("Wow very genome", CHROMOSOMES));
         this.initNavModel.setRegion(...DEFAULT_NAV_VIEW);
 
         this.regionSelected = this.regionSelected.bind(this);

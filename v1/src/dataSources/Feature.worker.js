@@ -75,21 +75,19 @@ class FeatureSourceWorker {
     }
 
     /**
-     * Gets data lying within the region.
+     * Gets data lying within the regions.
      * 
-     * @param {DisplayedRegionModel} region - the region for which to get data
+     * @param {Object} regions - the regions for which to get data
      * @return {Promise<BedFeature[]>} Promise for the data
      */
-    async getData(region) {
-        if (!region) {
+    async getData(regions) {
+        if (!regions) {
             return [];
         }
 
         await this.indexPromise;
-
-        const getRegionList = DisplayedRegionModel.prototype.getRegionList.bind(region);
         let requests = [];
-        for (let chrInterval of getRegionList()) {
+        for (let chrInterval of regions) {
             requests.push(this._getFeatures(chrInterval.name, chrInterval.start, chrInterval.end));
         }
 
@@ -180,7 +178,7 @@ function respondToMessage(messageObj) {
         theWorker = new FeatureSourceWorker(messageObj.url);
     }
 
-    return theWorker.getData(messageObj.region);
+    return theWorker.getData(messageObj.regions);
 }
 
 // Specified by promise-worker (https://github.com/nolanlawson/promise-worker#message-format).

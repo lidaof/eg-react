@@ -68,11 +68,12 @@ class Gene {
      * @param {DisplayedRegionModel} model - model used to compute absolute base numbers
      */
     setModel(model) {
-        this.absStart = model.chromosomeCoordinatesToBase(this.chromosome, this.start);
-        this.absEnd = model.chromosomeCoordinatesToBase(this.chromosome, this.end);
+        const navContext = model.getNavigationContext();
+        this.absStart = navContext.segmentCoordinatesToBase(this.chromosome, this.start);
+        this.absEnd = navContext.segmentCoordinatesToBase(this.chromosome, this.end);
         this.absExons = this.exons.map(exon => [
-            model.chromosomeCoordinatesToBase(this.chromosome, exon[0]),
-            model.chromosomeCoordinatesToBase(this.chromosome, exon[1]),
+            navContext.segmentCoordinatesToBase(this.chromosome, exon[0]),
+            navContext.segmentCoordinatesToBase(this.chromosome, exon[1]),
         ]);
         let absRegion = model.getAbsoluteRegion();
         this.isInView = this.absStart < absRegion.end && this.absEnd > absRegion.start;

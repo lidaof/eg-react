@@ -1,7 +1,10 @@
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import GenomeNavigator from './GenomeNavigator';
 import React from 'react';
 import { shallow } from 'enzyme';
+
+import GenomeNavigator from './GenomeNavigator';
+
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import NavigationContext from '../../model/NavigationContext';
 
 const CHROMOSOMES = [
     {name: "chr1", lengthInBases: 1000},
@@ -15,9 +18,9 @@ describe('GenomeNavigator', () => {
     var render = null;
 
     beforeEach(() => {
-        initViewRegion = new DisplayedRegionModel("View region", CHROMOSOMES);
+        initViewRegion = new DisplayedRegionModel(new NavigationContext("View region", CHROMOSOMES));
         initViewRegion.setRegion(0, 1000);
-        initSelectedRegion = new DisplayedRegionModel("Selected region", CHROMOSOMES);
+        initSelectedRegion = new DisplayedRegionModel(new NavigationContext("Selected region", CHROMOSOMES));
         initSelectedRegion.setRegion(0, 1000);
 
         let component = <GenomeNavigator

@@ -1,4 +1,5 @@
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import NavigationContext from '../model/NavigationContext';
 import MainPane from '../components/genomeNavigator/MainPane';
 import React from 'react';
 import { storiesOf } from '@storybook/react';
@@ -8,14 +9,15 @@ const CHROMOSOMES = [
     {name: "chr2", lengthInBases: 2500},
     {name: "chr3", lengthInBases: 3500},
     {name: "chr4", lengthInBases: 4500}
-]
-const view1 = new DisplayedRegionModel("View 1", CHROMOSOMES);
+];
+
+const view1 = new DisplayedRegionModel(new NavigationContext("View 1", CHROMOSOMES));
 view1.setRegion(0, 7500); // Chromosomes 1 to 3
 
-const view2 = new DisplayedRegionModel("View 2", CHROMOSOMES);
+const view2 = new DisplayedRegionModel(new NavigationContext("View 2", CHROMOSOMES));
 view2.setRegion(7000, 12000);
 
-const selectedRegion = new DisplayedRegionModel("Selected region", CHROMOSOMES);
+const selectedRegion = new DisplayedRegionModel(new NavigationContext("Selected region", CHROMOSOMES));
 selectedRegion.setRegion(1000, 2000);
 
 const mainPaneView1 = {
