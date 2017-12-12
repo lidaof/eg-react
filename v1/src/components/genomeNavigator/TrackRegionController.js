@@ -33,12 +33,12 @@ class TrackRegionController extends React.Component {
      * @return {string} the currently displayed region in human-readable form
      */
     _currentRegionAsString() {
-        let regionList = this.props.model.getRegionList();
-        if (regionList.length === 1) {
-            return regionList[0].toString();
+        let intervals = this.props.model.getSegmentIntervals();
+        if (intervals.length === 1) {
+            return intervals[0].toString();
         } else {
-            let first = regionList[0];
-            let last = regionList[regionList.length - 1];
+            let first = intervals[0];
+            let last = intervals[intervals.length - 1];
             return `${first.name}:${first.start}-${last.name}:${last.end}`;
         }
     }
@@ -49,7 +49,7 @@ class TrackRegionController extends React.Component {
     parseRegion() {
         let parsedRegion = null;
         try {
-            parsedRegion = this.props.model.parseRegionString(this.input.value);
+            parsedRegion = this.props.model.getNavigationContext().parseRegionString(this.input.value);
         } catch (error) {
             if (error instanceof RangeError) {
                 this.setState({badInputMessage: error.message});

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import SegmentInterval from './SegmentInterval';
 
 /**
  * An object that represents everywhere that a user could potentially navigate and view.  The context is divided into
@@ -13,19 +14,26 @@ import _ from 'lodash';
  */
 class NavigationContext {
     /**
-     * Makes a new NavigationContext with specified name and segment list.  Each segment object must contain keys
-     * `name` and `lengthInBases`.
+     * Makes a new NavigationContext.  Each segment object in `segments` must contain keys `name` and `lengthInBases`.
+     * `GenomeCoordinateLookup` is optional; if provided, it will be used to map the segments to actual genomic
+     * coordinates.
+     * 
      * @param {string} name - name of this context
      * @param {Object[]} segments - list of segments
+     * @param {GenomeCoordinateLookup} - object that maps segments to actual genomic coordinates
      */
-    constructor(name, segments) {
+    constructor(name, segments, genomeCoordinateLookup) {
         this._name = name;
-
-        let totalBases = 0;
         this._segments = _.cloneDeep(segments);
+        this._genomeCoordinateLookup = genomeCoordinateLookup;
+        
+        let totalBases = 0;
         for (let segment of this._segments) {
             segment.startBase = totalBases;
-            totalBases += segment.lengthInBases;
+            totalBases += segment.lengthInBases || 0;
+        }
+        if (totalBases === 0) {
+            throw new Error("Total base length of context is 0.");
         }
         this._totalBases = totalBases;
     }
@@ -45,15 +53,25 @@ class NavigationContext {
     }
 
     /**
+     * Given an absolute base number, gets whether the base is navigable.
+     * 
+     * @param {number} base - absolute base number
+     * @return {boolean} whether the base is navigable
+     */
+    getIsValidBase(base) {
+        return base >= 0 && base < this._totalBases;
+    }
+
+    /**
      * Given an absolute base number, gets the index of the segment in which the base is located.
      *
      * @param {number} base - the absolute base number to look up
      * @return {number} index of segment
-     * @throws {RangeError} if the base is not navigable
+     * @throws {RangeError} if the base is invalid
      */
     baseToSegmentIndex(base) {
-        if (base < 0 || base > this._totalBases) {
-            throw new RangeError("Base number not navigable");
+        if (!this.getIsValidBase(base)) {
+            throw new RangeError("Invalid base number");
         }
         // Last segment (highest base #) to first (lowest base #)
         for (let i = this._segments.length - 1; i > 0; i--) {
@@ -70,7 +88,7 @@ class NavigationContext {
      *
      * @param {number} base - the absolute base number to look up
      * @return {Object} object with keys `name` and `base`
-     * @throws {RangeError} if the base is not navigable
+     * @throws {RangeError} if the base is invalid
      */
     baseToSegmentCoordinate(base) {
         let index = this.baseToSegmentIndex(base); // Can throw RangeError
@@ -108,11 +126,12 @@ class NavigationContext {
      * `$segmentName:$startBase-$segmentName2:$endBase`.  This format includes UCSC-style chromosomal ranges, like
      * "chr1:1000-chr2:1000".
      * 
-     * Returns a object that contains the range's absolute start and end base *as an open interval*.
+     * Returns a object that contains the range's absolute start and end base *as an open interval*.  Throws RangeError
+     * on parse failure.
      *
      * @param {string} string - the string to parse
      * @return {Object} object with props `start` and `end`
-     * @throws {RangeError} if parsing fails or if something nonsensical was parsed (like end before start)
+     * @throws {RangeError} when parsing an interval outside of the context or something otherwise nonsensical
      */
     parseRegionString(string) {
         let startSegment, endSegment, startBase, endBase;
@@ -146,7 +165,69 @@ class NavigationContext {
         }
     }
 
+    /**
+     * Gets the segments that overlap an interval, as a list of SegmentInterval.  The interval should be expressed as an
+     * open interval of absolute base numbers.
+     * 
+     * @param {number} absStart - (inclusive) start of interval, as an absolute base number
+     * @param {number} absEnd - (exclusive) end of interval, as an absolute base number
+     * @return {SegmentInterval[]} list of SegmentInterval
+     */
+    getSegmentsInInterval(absStart, absEnd) {
+        const overlappingSegments = this._segments.filter((segment) => {
+            return (segment.startBase + segment.lengthInBases > absStart) && (segment.startBase < absEnd);
+        });
 
+        const leftSegment = overlappingSegments[0];
+        const rightSegment = overlappingSegments[overlappingSegments.length - 1];
+        const leftSegmentStart = absStart - leftSegment.startBase + 1; // +1 to convert from 0-indexing to 1-indexing
+        const rightSegmentEnd = absEnd - rightSegment.startBase; // No +1 needed since we are making a closed interval
+
+        if (overlappingSegments.length === 1) {
+            return [new SegmentInterval(leftSegment, leftSegmentStart, rightSegmentEnd)];
+        }
+
+        let result = [];
+        result.push(new SegmentInterval(leftSegment, leftSegmentStart, leftSegment.lengthInBases));
+        for (let i = 1; i < overlappingSegments.length - 1; i++) {
+            let segment = overlappingSegments[i];
+            result.push(new SegmentInterval(segment, 1, segment.lengthInBases));
+        }
+        result.push(new SegmentInterval(rightSegment, 1, rightSegmentEnd));
+
+        return result;
+    }
+
+    /**
+     * Gets the segments that overlap an interval, maps it to genomic coordinates, and returns the result in a list of
+     * SegmentInterval.  The interval should be expressed as an open interval of absolute base numbers.
+     * 
+     * The mapping is done with the GenomeCoordinateLookup provided when this object was constructed.  If none was
+     * provided, the result is identical to {@link getSegmentsInInterval}.  If there are segments not in the lookup
+     * object, those segments are ignored.
+     * 
+     * @param {number} absStart - (inclusive) start of interval, as an absolute base number
+     * @param {number} absEnd - (exclusive) end of interval, as an absolute base number
+     * @return {SegmentInterval[]} list of SegmentInterval
+     */
+    getGenomeCoordinates(absStart, absEnd) {
+        const segments = this.getSegmentsInInterval(absStart, absEnd);
+        let result = segments;
+        if (this._genomeCoordinateLookup) {
+            result = [];
+
+            for (let segment of segments) {
+                let lookupResult = this._genomeCoordinateLookup.getGenomeIntervals(segment);
+                if (lookupResult) {
+                    result.push(lookupResult);
+                } else {
+                    console.warn(`Could not find genomic coordinate for segment ${segment.toString()}.  Ignoring.`);
+                }
+            }
+        }
+
+        return result;
+    }
 }
 
 export default NavigationContext;

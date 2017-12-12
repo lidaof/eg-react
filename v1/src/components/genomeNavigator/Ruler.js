@@ -71,12 +71,12 @@ class Ruler extends SvgComponent {
         let rulerLine = this.group.line(0, 0, this.props.drawModel.getDrawWidth(), 0);
         rulerLine.stroke({width: 1, color: '#bbb'});
 
-        let regionList = this.props.model.getRegionList();
-        for (let region of regionList) {
+        let intervals = this.props.model.getSegmentIntervals();
+        for (let interval of intervals) {
             // relativeBase = round down to the nearest major tick base for this region, to find where to start drawing
-            let relativeBase = Math.floor(region.start / basesPerMajorTick) * basesPerMajorTick;
-            let majorX = this.props.drawModel.baseToX(region.metadata.startBase + relativeBase);
-            let majorTickEndX = this.props.drawModel.baseToX(region.metadata.startBase + region.end);
+            let relativeBase = Math.floor(interval.start / basesPerMajorTick) * basesPerMajorTick;
+            let majorX = this.props.drawModel.baseToX(interval.segment.startBase + relativeBase);
+            let majorTickEndX = this.props.drawModel.baseToX(interval.segment.startBase + interval.end);
 
             // This loop updates relativeBase and majorX every iteration
             // Draw major and minor ticks for this region (chromosome)

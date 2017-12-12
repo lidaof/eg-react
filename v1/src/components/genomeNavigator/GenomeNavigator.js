@@ -3,7 +3,6 @@ import MainPane from './MainPane';
 import PropTypes from 'prop-types';
 import React from 'react';
 import TrackRegionController from './TrackRegionController';
-import _ from 'lodash';
 
 const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
 
@@ -40,7 +39,6 @@ class GenomeNavigator extends React.Component {
      */
     constructor(props) {
         super(props);
-        this.id = _.uniqueId();
         this.state = {
             viewModel: this.props.viewModel,
         }
@@ -69,7 +67,7 @@ class GenomeNavigator extends React.Component {
      * @param {any[]} args - arguments to provide to the method
      */
     _setModelState(methodName, args) {
-        let modelCopy = _.cloneDeep(this.state.viewModel);
+        let modelCopy = this.state.viewModel.clone();
         modelCopy[methodName].apply(modelCopy, args);
         this.setState({viewModel: modelCopy});
     }

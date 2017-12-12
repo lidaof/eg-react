@@ -41,8 +41,8 @@ class BigWigSource extends DataSource {
         // FIXME window.innerWidth is not a good way to get pixelsPerBase, but it's quick and dirty.
         let basesPerPixel = region.getWidth() / window.innerWidth;
         let zoomLevel = this._getMatchingZoomLevel(bigWigObj, basesPerPixel);
-        let promises = region.getRegionList().map(chromosome =>
-            this._getDataForChromosome(chromosome, bigWigObj, zoomLevel)
+        let promises = region.getGenomeIntervals().map(chromosomeInterval =>
+            this._getDataForChromosome(chromosomeInterval, bigWigObj, zoomLevel)
         );
         let dataForEachRegion = await Promise.all(promises);
         let combinedData = [].concat.apply([], dataForEachRegion);
@@ -90,18 +90,19 @@ class BigWigSource extends DataSource {
     /**
      * Gets BigWig features stored in a single chromosome interval.
      * 
-     * @param {SingleChromosomeInterval} region 
+     * @param {SegmentInterval} interval - single chromosome interval
      * @param {BigWig} bigWigObj - BigWig object provided by bbi-js
      * @param {number} zoomLevel - a zoom level index inside the BigWig file.  If -1, gets data at base pair resolution.
      * @return {Promise<DASFeature[]>} - a Promise for the data, an array of DASFeature provided by bbi-js
      */
-    _getDataForChromosome(region, bigWigObj, zoomLevel) {
+    _getDataForChromosome(interval, bigWigObj, zoomLevel) {
         return new Promise((resolve, reject) => {
             try {
                 if (zoomLevel === -1) {
-                    bigWigObj.readWigData(region.name, region.start, region.end, resolve);
+                    bigWigObj.readWigData(interval.name, interval.start, interval.end, resolve);
                 } else {
-                    bigWigObj.getZoomedView(zoomLevel).readWigData(region.name, region.start, region.end, resolve);
+                    bigWigObj.getZoomedView(zoomLevel)
+                        .readWigData(interval.name, interval.start, interval.end, resolve);
                 }
             } catch (error) {
                 reject(error);

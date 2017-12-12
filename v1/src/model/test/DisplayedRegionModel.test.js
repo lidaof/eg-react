@@ -50,28 +50,11 @@ describe("setRegion()", () => {
 describe("clone()", () => {
     it("makes a clone, and modifying the clone does not modify the original", () => {
         instance.setRegion(20, 30);
-        let clone = instance.clone()
+        let clone = instance.clone();
+        expect(clone).not.toBe(instance);
         clone.setRegion(0, 10);
         expectRegion(clone, 0, 10);
         expectRegion(instance, 20, 30);
-    });
-});
-
-describe("getRegionList()", () => {
-    it("gets the region properly when zoomed into one chromosome", () => {
-        instance.setRegion(10, 20);
-        let result = instance.getRegionList().map(chr => chr.toString());
-        expect(result).toEqual(["chr2:1-10"]);
-    });
-
-    it("gets the list of regions properly when zoomed across multiple chromosomes", () => {
-        instance.setRegion(4, 21);
-        let result = instance.getRegionList().map(chr => chr.toString());
-        expect(result).toEqual([
-            "chr1:5-10",
-            "chr2:1-10",
-            "chr3:1-1",
-        ]);
     });
 });
 

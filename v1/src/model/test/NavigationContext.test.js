@@ -4,6 +4,16 @@ import { CHROMOSOMES } from './toyRegion';
 const NAME = "Wow very genome";
 const instance = new NavigationContext(NAME, CHROMOSOMES);
 
+describe("constructor", () => {
+    it("errors if not given any segments", () => {
+        expect( () => new NavigationContext("Bad", []) ).toThrow(Error);
+    });
+
+    it("errors if given segments with no info", () => {
+        expect( () => new NavigationContext("Bad", [{cat: "meow"}]) ).toThrow(Error);
+    });
+});
+
 describe("Getters", () => {
     it("getName() is correct", () => {
         expect(instance.getName()).toBe(NAME);
@@ -49,5 +59,22 @@ describe("parseRegionString() and segmentCoordinatesToBase()", () => {
 
     it("errors if the base pair is out of range", () => {
         expect(() => instance.parseRegionString("chr1:1-11")).toThrow(RangeError);
+    });
+});
+
+
+describe("getSegmentsInInterval()", () => {
+    it("gets one segment properly", () => {
+        let result = instance.getSegmentsInInterval(10, 20).map(chr => chr.toString());
+        expect(result).toEqual(["chr2:1-10"]);
+    });
+
+    it("gets multiple segments properly", () => {
+        let result = instance.getSegmentsInInterval(4, 21).map(chr => chr.toString());
+        expect(result).toEqual([
+            "chr1:5-10",
+            "chr2:1-10",
+            "chr3:1-1",
+        ]);
     });
 });

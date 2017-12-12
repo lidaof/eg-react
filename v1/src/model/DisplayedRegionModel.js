@@ -61,55 +61,36 @@ class DisplayedRegionModel {
     }
 
     /**
-     * Gets the current region expressed as a list of single-chromosome intervals.
-     *
-     * @return {SingleChromosomeInterval[]} a list of SingleChromosomeInterval
+     * Gets the SegmentIntervals in the navigation context that overlap this view region.
+     * 
+     * @return {SegmentInterval[]} list of SegmentInterval
      */
-    getRegionList() {
-        if (this.genomeCoordinateLookup) {
-
-        }
-
-        let inRegion = this._navContext._segments.filter((chr) => {
-            return (chr.startBase + chr.lengthInBases > this._startBase) && (chr.startBase < this._endBase);
-        });
-
-        let leftChr = inRegion[0];
-        let rightChr = inRegion[inRegion.length - 1];
-        // SingleChromosomeIntervals are 1-indexed so we add 1
-        let leftChrStart = this._startBase - leftChr.startBase + 1;
-        let rightChrEnd = this._endBase - rightChr.startBase;
-
-        if (inRegion.length === 1) {
-            return [this._makeChromosomeInterval(leftChr, leftChrStart, rightChrEnd)];
-        }
-
-        let result = [];
-        result.push(this._makeChromosomeInterval(leftChr, leftChrStart, leftChr.lengthInBases));
-        for (let i = 1; i < inRegion.length - 1; i++) {
-            let chr = inRegion[i];
-            result.push(this._makeChromosomeInterval(chr, 1, chr.lengthInBases));
-        }
-        result.push(this._makeChromosomeInterval(rightChr, 1, rightChrEnd));
-
-        return result;
-    }
-
-    _makeChromosomeInterval(region, relativeStart, relativeEnd) {
-        if (this.genomeCoordinateLookup) {
-            return this.genomeCoordinateLookup.getGenomicCoordinate(region, relativeStart, relativeEnd);
-        } else {
-            return new SingleChromosomeInterval(region.name, relativeStart, relativeEnd, region);
-        }
+    getSegmentIntervals() {
+        return this._navContext.getSegmentsInInterval(this._startBase, this._endBase);
     }
 
     /**
-     * Safely sets the internal display interval, ensuring that it stays within the genome and makes sense. `start` and
-     * `end` should express a 0-indexed open interval of base numbers, [startBaseNumber, endBaseNumber).  This
-     * function will attempt to preserve the input length as much as possible.
+     * Gets the SegmentIntervals in the navigation context that overlap this view region, mapped to chromosomal
+     * coordinates.
+     * 
+     * @return {SegmentInterval[]} list of genomic coordinates, in the form of SegmentInterval
+     */
+    getGenomeIntervals() {
+        return this._navContext.getGenomeCoordinates(this._startBase, this._endBase);
+    }
+
+    /**
+     * Safely sets the internal display interval, ensuring that it stays within the navigation context and makes sense.
+     * `start` and `end` should express a 0-indexed open interval of base numbers, [start, end).  This method will try
+     * to preserve the input length as much as possible.
+     * 
+     * Errors if given a nonsensical interval, but does not error for intervals outside the navigation context.
+     * 
+     * Returns this.
      *
      * @param {number} start - the (inclusive) start of the region interval as a base pair number
      * @param {number} end - the (exclusive) end of the region interval as a base pair number
+     * @return {this}
      * @throws {RangeError} if end is less than start, or the inputs are undefined/infinite
      */
     setRegion(start, end) {
@@ -130,6 +111,7 @@ class DisplayedRegionModel {
 
         this._startBase = Math.round(Math.max(MIN_ABS_BASE, start));
         this._endBase = Math.round(Math.min(end, navigableLength));
+        return this;
     }
 
     /**
@@ -178,38 +160,6 @@ class DisplayedRegionModel {
 
         this.setRegion(rawStart, rawEnd);
         return this;
-    }
-}
-
-/**
- * Simple container class representing an interval within a single chromosome.  Stores intervals as a closed interval of
- * base pair numbers.
- */
-class SingleChromosomeInterval {
-
-    /**
-     * Makes a new SingleChromosomeInterval.  Makes a *shallow* copy of all the parameters.
-     *
-     * @param {string} name - the name of the chromosome
-     * @param {number} start - the (inclusive) start of the interval as a base pair number
-     * @param {number} end - the (inclusive) end of the interval as a base pair number
-     * @param {Object} metadata - additional info about this chromosome
-     */
-    constructor(name, start, end, metadata) {
-        this.name = name;
-        this.start = start;
-        this.end = end;
-        this.metadata = metadata;
-    }
-
-    /**
-     * Gets this interval represented in UCSC notation, e.g. "chr1:1-1000", the first 1000 bases of chromosome 1.
-     *
-     * @override
-     * @return {string} this interval represented in UCSC notation
-     */
-    toString() {
-        return `${this.name}:${this.start}-${this.end}`;
     }
 }
 

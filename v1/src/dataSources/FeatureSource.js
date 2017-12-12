@@ -33,7 +33,7 @@ class FeatureSource extends DataSource {
         if (!this.worker) {
             throw new Error("Cannot get data -- cleanUp() has been called.");
         }
-        return this.worker.postMessage({regions: region.getRegionList()});
+        return this.worker.postMessage({regions: region.getGenomeIntervals()});
     }
 }
 

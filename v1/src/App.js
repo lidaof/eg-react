@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import TrackContainer from './components/TrackContainer';
@@ -12,7 +11,9 @@ import NavigationContext from './model/NavigationContext';
 import './App.css';
 
 import Perf from 'react-addons-perf';
-window.Perf = Perf;
+if (process.env.NODE_ENV === 'development') {
+    window.Perf = Perf;
+}
 
 const CHROMOSOMES = [
     {name: "chr1", lengthInBases: 249250621},
@@ -61,8 +62,7 @@ class App extends React.Component {
     }
 
     regionSelected(start, end) {
-        let modelCopy = _.cloneDeep(this.state.selectedRegionModel);
-        modelCopy.setRegion(start, end);
+        let modelCopy = this.state.selectedRegionModel.clone().setRegion(start, end);
         this.setState({selectedRegionModel: modelCopy});
     }
 
