@@ -1,5 +1,6 @@
-import BarChartRecord from '../model/BarChartRecord';
 import DataSource from './DataSource';
+import BarChartRecord from '../model/BarChartRecord';
+import SegmentInterval from '../model/SegmentInterval';
 
 const bigwig = require('../vendor/bbi-js/main/bigwig');
 const bin = require('../vendor/bbi-js/utils/bin');
@@ -45,15 +46,18 @@ class BigWigSource extends DataSource {
             this._getDataForChromosome(chromosomeInterval, bigWigObj, zoomLevel)
         );
         let dataForEachRegion = await Promise.all(promises);
-        let combinedData = [].concat.apply([], dataForEachRegion);
-        return combinedData.map(dasFeature =>
-            // dasFeature.segment should be a valid chromosome name, otherwise data fetch would have failed.
-            new BarChartRecord(
-                region.getNavigationContext().segmentCoordinatesToBase(dasFeature.segment, dasFeature.min),
-                region.getNavigationContext().segmentCoordinatesToBase(dasFeature.segment, dasFeature.max),
-                dasFeature.score
-            )
-        );
+        let combinedRawData = [].concat.apply([], dataForEachRegion);
+        let result = [];
+        for (let dasFeature of combinedRawData) {
+            let absInterval = region.getNavigationContext().mapFromGenomeInterval(
+                // dasFeature.segment should be a valid chromosome name, otherwise data fetch would have failed.
+                new SegmentInterval(dasFeature.segment, dasFeature.min, dasFeature.max)
+            );
+            if (absInterval) {
+                result.push(new BarChartRecord(absInterval.start, absInterval.end, dasFeature.score))
+            }
+        }
+        return result;
     }
 
     /**

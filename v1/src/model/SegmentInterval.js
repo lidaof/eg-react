@@ -4,15 +4,17 @@
  */
 class SegmentInterval {
     /**
-     * Makes a new SegmentInterval.  Makes a *shallow* copy of all the parameters.
+     * Makes a new SegmentInterval.  Makes a *shallow* copy of all the parameters.  The first parameter should contain
+     * the segment's name.  If it is a string, it is treated as the name, and if it is an object, the object's `name`
+     * property will become the segment's name.
      *
-     * @param {Object} segment - the segment in which the interval resides
+     * @param {(Object | string)} segment - the segment in which the interval resides.  Can be a string or object.
      * @param {number} start - the (inclusive) start of the interval as a base pair number
      * @param {number} end - the (inclusive) end of the interval as a base pair number
      */
     constructor(segment, start, end) {
         this.segment = segment;
-        this.name = segment.name;
+        this.name = typeof segment === "string" ? segment : segment.name;
         this.start = start;
         this.end = end;
     }

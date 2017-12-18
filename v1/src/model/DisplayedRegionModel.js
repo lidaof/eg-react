@@ -76,7 +76,7 @@ class DisplayedRegionModel {
      * @return {SegmentInterval[]} list of genomic coordinates, in the form of SegmentInterval
      */
     getGenomeIntervals() {
-        return this._navContext.getGenomeCoordinates(this._startBase, this._endBase);
+        return this._navContext.mapAbsIntervalToGenome(this._startBase, this._endBase);
     }
 
     /**

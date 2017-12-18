@@ -24,21 +24,21 @@ describe("Getters", () => {
     });
 });
 
-describe("baseToSegmentCoordinate() and baseToSegmentIndex()", () => {
+describe("convertBaseToSegmentCoordinate() and convertBaseToSegmentIndex()", () => {
     it("returns the right info", () => {
-        expect(instance.baseToSegmentCoordinate(10)).toEqual({
+        expect(instance.convertBaseToSegmentCoordinate(10)).toEqual({
             name: "chr2",
             base: 1
         });
     });
 
     it("errors when given a base outside the genome", () => {
-        expect(() => instance.baseToSegmentCoordinate(-1)).toThrow(RangeError);
-        expect(() => instance.baseToSegmentCoordinate(100)).toThrow(RangeError);
+        expect(() => instance.convertBaseToSegmentCoordinate(-1)).toThrow(RangeError);
+        expect(() => instance.convertBaseToSegmentCoordinate(100)).toThrow(RangeError);
     });
 });
 
-describe("parseRegionString() and segmentCoordinatesToBase()", () => {
+describe("parseRegionString() and convertSegmentCoordinateToBase()", () => {
     it("parses correctly", () => {
         expect(instance.parseRegionString("chr1:1-10")).toEqual({start: 0, end: 10});
         expect(instance.parseRegionString("chr1:10-chr3:1")).toEqual({start: 9, end: 21});

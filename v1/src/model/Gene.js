@@ -1,4 +1,5 @@
 import JSON5 from 'json5';
+import SegmentInterval from './SegmentInterval';
 const validate = require('jsonschema').validate;
 
 /**
@@ -69,13 +70,25 @@ class Gene {
      */
     setModel(model) {
         const navContext = model.getNavigationContext();
-        this.absStart = navContext.segmentCoordinatesToBase(this.chromosome, this.start);
-        this.absEnd = navContext.segmentCoordinatesToBase(this.chromosome, this.end);
-        this.absExons = this.exons.map(exon => [
-            navContext.segmentCoordinatesToBase(this.chromosome, exon[0]),
-            navContext.segmentCoordinatesToBase(this.chromosome, exon[1]),
-        ]);
-        let absRegion = model.getAbsoluteRegion();
+        const interval = navContext.mapFromGenomeInterval(
+            new SegmentInterval(this.chromosome, this.start, this.end)
+        );
+        if (!interval) {
+            throw new Error("Could not map gene location to navigation context");
+        }
+
+        this.absStart = interval.start;
+        this.absEnd = interval.end;
+        this.absExons = [];
+        for (let exon of this.exons) {
+            const exonInterval = navContext.mapFromGenomeInterval(
+                new SegmentInterval(this.chromosome, exon[0], exon[1])
+            );
+            if (exonInterval) {
+                this.absExons.push([exonInterval.start, exonInterval.end])
+            }
+        }
+        const absRegion = model.getAbsoluteRegion();
         this.isInView = this.absStart < absRegion.end && this.absEnd > absRegion.start;
     }
 }

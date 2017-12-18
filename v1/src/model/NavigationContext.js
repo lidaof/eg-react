@@ -8,32 +8,36 @@ import SegmentInterval from './SegmentInterval';
  * 1.  "Absolute" coordinates, which are a single base numbers starting from 0.
  * 2.  "Segment" coordinates, which are a segment name and a base number in that segment indexed from 1.
  * 
- * So, in addition to managing segments, this class can parse and convert between these coordinate types.
+ * Segments are indexed from 1 since many APIs takes coordinates in this way.  In any case, this class can parse and
+ * convert between these coordinate types.
  * 
  * @author Silas Hsu
  */
 class NavigationContext {
     /**
      * Makes a new NavigationContext.  Each segment object in `segments` must contain keys `name` and `lengthInBases`.
-     * `GenomeCoordinateLookup` is optional; if provided, it will be used to map the segments to actual genomic
+     * `GenomeCoordinateMap` is optional; if provided, it will be used to map the segments to actual genomic
      * coordinates.
      * 
      * @param {string} name - name of this context
      * @param {Object[]} segments - list of segments
-     * @param {GenomeCoordinateLookup} - object that maps segments to actual genomic coordinates
+     * @param {GenomeCoordinateMap} - object that maps segments to actual genomic coordinates
      */
-    constructor(name, segments, genomeCoordinateLookup) {
+    constructor(name, segments, genomeCoordinateMap) {
         this._name = name;
         this._segments = _.cloneDeep(segments);
-        this._genomeCoordinateLookup = genomeCoordinateLookup;
+        this._genomeCoordinateMap = genomeCoordinateMap;
         
         let totalBases = 0;
         for (let segment of this._segments) {
+            if (!segment.name || !segment.lengthInBases) {
+                throw new Error("All segments must contain props `name` and `lengthInBases` greater than 0");
+            }
+            if (segment.startBase) {
+                console.warn("Replacing startBase property in a segment");
+            }
             segment.startBase = totalBases;
             totalBases += segment.lengthInBases || 0;
-        }
-        if (totalBases === 0) {
-            throw new Error("Total base length of context is 0.");
         }
         this._totalBases = totalBases;
     }
@@ -43,6 +47,15 @@ class NavigationContext {
      */
     getName() {
         return this._name;
+    }
+
+    /**
+     * Gets the internal segment list for this object.  Warning: modifying this will modify the context.
+     * 
+     * @return {Object[]} the internal segment list for this object
+     */
+    getSegments() {
+        return this._segments;
     }
 
     /**
@@ -69,7 +82,7 @@ class NavigationContext {
      * @return {number} index of segment
      * @throws {RangeError} if the base is invalid
      */
-    baseToSegmentIndex(base) {
+    convertBaseToSegmentIndex(base) {
         if (!this.getIsValidBase(base)) {
             throw new RangeError("Invalid base number");
         }
@@ -90,8 +103,8 @@ class NavigationContext {
      * @return {Object} object with keys `name` and `base`
      * @throws {RangeError} if the base is invalid
      */
-    baseToSegmentCoordinate(base) {
-        let index = this.baseToSegmentIndex(base); // Can throw RangeError
+    convertBaseToSegmentCoordinate(base) {
+        let index = this.convertBaseToSegmentIndex(base); // Can throw RangeError
         let segment = this._segments[index];
         return {
             name: segment.name,
@@ -108,7 +121,7 @@ class NavigationContext {
      * @return {number} the absolute base in this navigation context
      * @throws {RangeError} if the segment or its base number is not in the genome
      */
-    segmentCoordinatesToBase(segmentName, baseNum) {
+    convertSegmentCoordinateToBase(segmentName, baseNum) {
         let segment = this._segments.find(segment => segment.name === segmentName);
         if (!segment) {
             throw new RangeError(`Cannot find segment with name '${segmentName}'`);
@@ -152,9 +165,9 @@ class NavigationContext {
             throw new RangeError("Could not parse coordinates");
         }
 
-        let startAbsBase = this.segmentCoordinatesToBase(startSegment, startBase);
+        let startAbsBase = this.convertSegmentCoordinateToBase(startSegment, startBase);
         // +1 because open interval: the end is *noninclusive*
-        let endAbsBase = this.segmentCoordinatesToBase(endSegment, endBase) + 1; 
+        let endAbsBase = this.convertSegmentCoordinateToBase(endSegment, endBase) + 1; 
         if (endAbsBase < startAbsBase) {
             throw new RangeError("Start of range must be before end of range");
         }
@@ -199,10 +212,10 @@ class NavigationContext {
     }
 
     /**
-     * Gets the segments that overlap an interval, maps it to genomic coordinates, and returns the result in a list of
-     * SegmentInterval.  The interval should be expressed as an open interval of absolute base numbers.
+     * Gets the segments that overlap an absolute interval, maps it to genomic coordinates, and returns the result in a
+     * list of SegmentInterval.  The interval should be expressed as an open interval of absolute base numbers.
      * 
-     * The mapping is done with the GenomeCoordinateLookup provided when this object was constructed.  If none was
+     * The mapping is done with the GenomeCoordinateMap provided when this object was constructed.  If none was
      * provided, the result is identical to {@link getSegmentsInInterval}.  If there are segments not in the lookup
      * object, those segments are ignored.
      * 
@@ -210,24 +223,43 @@ class NavigationContext {
      * @param {number} absEnd - (exclusive) end of interval, as an absolute base number
      * @return {SegmentInterval[]} list of SegmentInterval
      */
-    getGenomeCoordinates(absStart, absEnd) {
+    mapAbsIntervalToGenome(absStart, absEnd) {
         const segments = this.getSegmentsInInterval(absStart, absEnd);
-        let result = segments;
-        if (this._genomeCoordinateLookup) {
-            result = [];
+        let results = segments;
+        if (this._genomeCoordinateMap) {
+            results = [];
 
             for (let segment of segments) {
-                let lookupResult = this._genomeCoordinateLookup.getGenomeIntervals(segment);
+                let lookupResult = this._genomeCoordinateMap.getGenomeInterval(segment);
                 if (lookupResult) {
-                    result.push(lookupResult);
-                } else {
-                    console.warn(`Could not find genomic coordinate for segment ${segment.toString()}.  Ignoring.`);
+                    results.push(lookupResult);
                 }
             }
         }
 
-        return result;
+        return results;
     }
+
+    /**
+     * TODO
+     * @param {*} singleChromosomeInterval 
+     */
+    mapFromGenomeInterval(singleChromosomeInterval) {
+        let intervalInThisContext = singleChromosomeInterval;
+        if (this._genomeCoordinateMap) {
+            intervalInThisContext = this._genomeCoordinateMap.getSegmentInterval(singleChromosomeInterval);
+        }
+
+        if (intervalInThisContext) {
+            return {
+                start: this.convertSegmentCoordinateToBase(intervalInThisContext.name, intervalInThisContext.start),
+                end: this.convertSegmentCoordinateToBase(intervalInThisContext.name, intervalInThisContext.end),
+            };
+        } else {
+            return null;
+        }
+    }
+
 }
 
 export default NavigationContext;
