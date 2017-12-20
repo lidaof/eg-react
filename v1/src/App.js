@@ -4,6 +4,7 @@ import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import TrackContainer from './components/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
 
+import Feature from './model/Feature';
 import TrackModel from './model/TrackModel';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import NavigationContext from './model/NavigationContext';
@@ -17,19 +18,19 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const CHROMOSOMES = [
-    {name: "chr1", lengthInBases: 249250621},
-    {name: "chr2", lengthInBases: 243199373},
-    {name: "chr3", lengthInBases: 198022430},
-    {name: "chr4", lengthInBases: 191154276},
-    {name: "chr5", lengthInBases: 180915260},
-    {name: "chr6", lengthInBases: 171115067},
-    {name: "chr7", lengthInBases: 159138663},
-    {name: "chr8", lengthInBases: 146364022},
-    {name: "chr9", lengthInBases: 141213431},
-    {name: "chr10", lengthInBases: 135534747},
-    {name: "chrY", lengthInBases: 59373566},
+    new Feature("chr1", 0, 249250621, true),
+    new Feature("chr2", 0, 243199373, true),
+    new Feature("chr3", 0, 198022430, true),
+    new Feature("chr4", 0, 191154276, true),
+    new Feature("chr5", 0, 180915260, true),
+    new Feature("chr6", 0, 171115067, true),
+    new Feature("chr7", 0, 159138663, true),
+    new Feature("chr8", 0, 146364022, true),
+    new Feature("chr9", 0, 141213431, true),
+    new Feature("chr10", 0, 135534747, true),
+    new Feature("chrY", 0, 59373566, true),
 ];
-const DEFAULT_SELECTED_REGION = [15599999, 16000000];
+const DEFAULT_SELECTED_REGION = [15600000, 16000000];
 const DEFAULT_NAV_VIEW = [0, 20000000];
 
 const DEFAULT_TRACKS = [
@@ -48,15 +49,13 @@ const DEFAULT_TRACKS = [
 const HG19 = new NavigationContext("Wow very genome", CHROMOSOMES);
 
 const GENES = [
-    {name: "CYP2C8", chr: "chr10", start: 96796528, end: 96829254, lengthInBases: 32726}, 
-    {name: "CYP4B1", chr: "chr1", start: 47223509, end: 47276522, lengthInBases: 53013},
-    {name: "CYP11B2", chr: "chr8", start: 143991974, end: 143999259, lengthInBases: 7285},
-    {name: "CYP26B1", chr: "chr2", start: 72356366, end: 72375167, lengthInBases: 18801},
-    {name: "CYP51A1", chr: "chr7", start: 91741462, end: 91764059, lengthInBases: 22597}
+    new Feature({name: "CYP2C8", chr: "chr10"}, 96796528, 96829254, false), 
+    new Feature({name: "CYP4B1", chr: "chr1"}, 47223509, 47276522, false),
+    new Feature({name: "CYP11B2", chr: "chr8"}, 143991974, 143999259, false),
+    new Feature({name: "CYP26B1", chr: "chr2"}, 72356366, 72375167, false),
+    new Feature({name: "CYP51A1", chr: "chr7"}, 91741462, 91764059, false)
 ];
-
-const COOR_LOOKUP = new GenomeCoordinateMap(GENES, HG19);
-
+const COOR_LOOKUP = new GenomeCoordinateMap(GENES, CHROMOSOMES);
 const GENE_SET = new NavigationContext("Set of 5 genes", GENES, COOR_LOOKUP);
 
 class App extends React.Component {

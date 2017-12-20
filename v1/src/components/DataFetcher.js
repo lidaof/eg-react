@@ -77,6 +77,9 @@ function withDataFetching(WrappedComponent, getDataSource) {
                 }
             }).catch(error => {
                 if (this.props.viewRegion === props.viewRegion) {
+                    if (process.env.NODE_ENV !== 'test') {
+                        console.error(error);
+                    }
                     this.setState({
                         isLoading: false,
                         error: error,

@@ -1,6 +1,5 @@
 import DataSource from './DataSource';
-import BarChartRecord from '../model/BarChartRecord';
-import SegmentInterval from '../model/SegmentInterval';
+import Feature from '../model/Feature';
 
 const bigwig = require('../vendor/bbi-js/main/bigwig');
 const bin = require('../vendor/bbi-js/utils/bin');
@@ -30,10 +29,21 @@ class BigWigSource extends DataSource {
     }
 
     /**
-     * Gets BigWig features inside the input view region.
+     * An object that fulfills the Interval interface with an additional prop `score` that stores the value at the
+     * coordinate.  The interval is an open 0-indexed one.
+     * 
+     * @typedef {Interval} BigWigSource~Record
+     * @property {number} start - inclusive start of the interval
+     * @property {number} end - exclusive end of the interval
+     * @property {number} value - the value of this interval
+     */
+
+    /**
+     * Gets BigWig features inside the input view region.  Returns objects that fulfill the Interval interface, and have
+     * a `value` property as well.
      * 
      * @param {DisplayedRegionModel} region - the model containing the displayed region
-     * @return {Promise<BarChartRecord[]>} a Promise for the data
+     * @return {Promise<Record[]>} a Promise for the data
      * @override
      */
     async getData(region) {
@@ -51,10 +61,11 @@ class BigWigSource extends DataSource {
         for (let dasFeature of combinedRawData) {
             let absInterval = region.getNavigationContext().mapFromGenomeInterval(
                 // dasFeature.segment should be a valid chromosome name, otherwise data fetch would have failed.
-                new SegmentInterval(dasFeature.segment, dasFeature.min, dasFeature.max)
+                new Feature(dasFeature.segment, dasFeature.min, dasFeature.max, true)
             );
             if (absInterval) {
-                result.push(new BarChartRecord(absInterval.start, absInterval.end, dasFeature.score))
+                absInterval.value = dasFeature.score;
+                result.push(absInterval);
             }
         }
         return result;
@@ -94,7 +105,7 @@ class BigWigSource extends DataSource {
     /**
      * Gets BigWig features stored in a single chromosome interval.
      * 
-     * @param {SegmentInterval} interval - single chromosome interval
+     * @param {Feature} interval - single chromosome interval
      * @param {BigWig} bigWigObj - BigWig object provided by bbi-js
      * @param {number} zoomLevel - a zoom level index inside the BigWig file.  If -1, gets data at base pair resolution.
      * @return {Promise<DASFeature[]>} - a Promise for the data, an array of DASFeature provided by bbi-js
@@ -103,10 +114,10 @@ class BigWigSource extends DataSource {
         return new Promise((resolve, reject) => {
             try {
                 if (zoomLevel === -1) {
-                    bigWigObj.readWigData(interval.name, interval.start, interval.end, resolve);
+                    bigWigObj.readWigData(interval.getName(), ...interval.get0Indexed(), resolve);
                 } else {
                     bigWigObj.getZoomedView(zoomLevel)
-                        .readWigData(interval.name, interval.start, interval.end, resolve);
+                        .readWigData(interval.getName(), ...interval.get0Indexed(), resolve);
                 }
             } catch (error) {
                 reject(error);

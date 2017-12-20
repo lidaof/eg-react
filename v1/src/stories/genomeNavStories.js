@@ -1,14 +1,19 @@
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import NavigationContext from '../model/NavigationContext';
-import MainPane from '../components/genomeNavigator/MainPane';
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 
+import MainPane from '../components/genomeNavigator/MainPane';
+
+import Feature from '../model/Feature';
+import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import NavigationContext from '../model/NavigationContext';
+
+
+
 const CHROMOSOMES = [
-    {name: "chr1", lengthInBases: 1500},
-    {name: "chr2", lengthInBases: 2500},
-    {name: "chr3", lengthInBases: 3500},
-    {name: "chr4", lengthInBases: 4500}
+    new Feature("chr1", 0, 1500, true),
+    new Feature("chr2", 0, 2500, true),
+    new Feature("chr3", 0, 3500, true),
+    new Feature("chr4", 0, 4500, true),
 ];
 
 const view1 = new DisplayedRegionModel(new NavigationContext("View 1", CHROMOSOMES));

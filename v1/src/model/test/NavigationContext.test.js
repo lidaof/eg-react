@@ -26,10 +26,9 @@ describe("Getters", () => {
 
 describe("convertBaseToSegmentCoordinate() and convertBaseToSegmentIndex()", () => {
     it("returns the right info", () => {
-        expect(instance.convertBaseToSegmentCoordinate(10)).toEqual({
-            name: "chr2",
-            base: 1
-        });
+        const coordinate = instance.convertBaseToSegmentCoordinate(10);
+        expect(coordinate.getName()).toEqual("chr2");
+        expect(coordinate.get1Indexed().start).toEqual(1);
     });
 
     it("errors when given a base outside the genome", () => {
@@ -39,9 +38,12 @@ describe("convertBaseToSegmentCoordinate() and convertBaseToSegmentIndex()", () 
 });
 
 describe("parseRegionString() and convertSegmentCoordinateToBase()", () => {
-    it("parses correctly", () => {
-        expect(instance.parseRegionString("chr1:1-10")).toEqual({start: 0, end: 10});
-        expect(instance.parseRegionString("chr1:10-chr3:1")).toEqual({start: 9, end: 21});
+    it("parses one segment correctly", () => {
+        expect(instance.parseRegionString("chr1:0-10")).toEqual({start: 0, end: 10});
+    });
+
+    it("parses two segments correctly", () => {
+        expect(instance.parseRegionString("chr1:9-chr3:1")).toEqual({start: 9, end: 21});
     });
 
     it("errors if given a nonsensical string", () => {
@@ -66,15 +68,15 @@ describe("parseRegionString() and convertSegmentCoordinateToBase()", () => {
 describe("getSegmentsInInterval()", () => {
     it("gets one segment properly", () => {
         let result = instance.getSegmentsInInterval(10, 20).map(chr => chr.toString());
-        expect(result).toEqual(["chr2:1-10"]);
+        expect(result).toEqual(["chr2:0-10"]);
     });
 
     it("gets multiple segments properly", () => {
         let result = instance.getSegmentsInInterval(4, 21).map(chr => chr.toString());
         expect(result).toEqual([
-            "chr1:5-10",
-            "chr2:1-10",
-            "chr3:1-1",
+            "chr1:4-10",
+            "chr2:0-10",
+            "chr3:0-1",
         ]);
     });
 });

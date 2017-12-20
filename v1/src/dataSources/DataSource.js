@@ -7,7 +7,7 @@ class DataSource {
     /**
      * Gets data lying within the region.
      * 
-     * @param {DisplayedRegionModel} region - the model containing the displayed region
+     * @param {DisplayedRegionModel} region - region for which to fetch data
      * @return {Promise<any>} a Promise for the data
      */
     getData(region) {

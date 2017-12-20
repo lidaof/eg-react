@@ -1,3 +1,5 @@
+import Interval from './Interval';
+
 const MIN_ABS_BASE = 0; // Index absolute bases from this number.  Take caution in modifying this!
 
 /**
@@ -51,29 +53,26 @@ class DisplayedRegionModel {
     /**
      * Gets a copy of the internally stored 0-indexed open interval that represents this displayed region.
      *
-     * @return {DisplayedRegionModel~Region} copy of the internally stored region
+     * @return {Interval} copy of the internally stored region
      */
     getAbsoluteRegion() {
-        return {
-            start: this._startBase,
-            end: this._endBase
-        }
+        return new Interval(this._startBase, this._endBase);
     }
 
     /**
-     * Gets the SegmentIntervals in the navigation context that overlap this view region.
+     * Gets the segment intervals in the navigation context that overlap this view region.  See NavigationContext for
+     * more info on segment intervals.
      * 
-     * @return {SegmentInterval[]} list of SegmentInterval
+     * @return {Feature[]} list of segment intervals
      */
     getSegmentIntervals() {
         return this._navContext.getSegmentsInInterval(this._startBase, this._endBase);
     }
 
     /**
-     * Gets the SegmentIntervals in the navigation context that overlap this view region, mapped to chromosomal
-     * coordinates.
+     * Gets the segments in the navigation context that overlap this view region, mapped to chromosomal intervals.
      * 
-     * @return {SegmentInterval[]} list of genomic coordinates, in the form of SegmentInterval
+     * @return {Feature[]} list of genomic intervals
      */
     getGenomeIntervals() {
         return this._navContext.mapAbsIntervalToGenome(this._startBase, this._endBase);

@@ -1,8 +1,11 @@
-import { ANNOTATION_HEIGHT, GeneAnnotation } from './GeneAnnotation';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import { ANNOTATION_HEIGHT, GeneAnnotation } from './GeneAnnotation';
 import SvgComponent from '../SvgComponent';
+
+import Gene from '../../model/Gene';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 const DEFAULT_MAX_ROWS = 7;
 const ROW_BOTTOM_PADDING = 5;
@@ -15,7 +18,7 @@ const ANNOTATION_RIGHT_PADDING = 30;
  */
 class AnnotationArranger extends SvgComponent {
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.object).isRequired, // Array of Gene objects
+        data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)).isRequired, // Array of Gene objects
 
         /**
          * Used to calculate absolute coordinates of genes
@@ -52,14 +55,12 @@ class AnnotationArranger extends SvgComponent {
     }
 
     /**
-     * Filters an array of Gene such that only genes visible in the current view are present, and then sorts them by
-     * start position in the genome.
+     * Sorts genes by start position in the genome, from lowest to highest.
      * 
-     * @param {Gene[]} genes - array of Gene to sort and filter
-     * @return {Gene[]} subset of the input array
+     * @param {Gene[]} genes - array of Gene to sort
+     * @return {Gene[]} sorted genes
      */
-    _processGenes(genes) {
-        genes.forEach(gene => gene.setModel(this.props.viewRegion));
+    _sortGenes(genes) {
         return genes.sort((gene1, gene2) => gene1.absStart - gene2.absStart);
     }
 
@@ -71,7 +72,7 @@ class AnnotationArranger extends SvgComponent {
     render() {
         let children = [];
         let rowXExtents = new Array(this.props.maxRows).fill(-Number.MAX_VALUE);
-        let genes = this._processGenes(this.props.data);
+        let genes = this._sortGenes(this.props.data);
         let numHiddenGenes = 0;
         for (let gene of genes) {
             let geneWidth = this.props.drawModel.basesToXWidth(gene.absEnd - gene.absStart);
@@ -81,7 +82,7 @@ class AnnotationArranger extends SvgComponent {
             }
 
             // Label width is approx. because calculating bounding boxes is expensive.
-            let estimatedLabelWidth = gene.details.name2.length * ANNOTATION_HEIGHT;
+            let estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
             let startX = this.props.drawModel.baseToX(gene.absStart) - estimatedLabelWidth;
             let endX = this.props.drawModel.baseToX(gene.absEnd);
             if (startX < estimatedLabelWidth) {

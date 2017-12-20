@@ -1,19 +1,11 @@
 import DisplayedRegionModel from '../DisplayedRegionModel';
 import NavigationContext from '../NavigationContext';
+import Feature from '../Feature';
 
 export const CHROMOSOMES = [
-    {
-        name: "chr1",
-        lengthInBases: 10,
-    },
-    {
-        name: "chr2",
-        lengthInBases: 10,
-    },
-    {
-        name: "chr3",
-        lengthInBases: 10,
-    },
+    new Feature("chr1", 0, 10, true),
+    new Feature("chr2", 0, 10, true),
+    new Feature("chr3", 0, 10, true),
 ];
 
 /**

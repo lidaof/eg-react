@@ -1,9 +1,10 @@
 /**
- * Web worker for FeatureSource.  Stores a single instance of the FeatureSourceWorker class per thread.  For additional
- * details, see the doc for FeatureSourceWorker.
+ * Web worker for BedSource.  Stores a single instance of the BedSourceWorker class per thread.  For additional
+ * details, see the doc for BedSourceWorker.
  * 
  * @author Silas Hsu
  */
+import Feature from '../model/Feature';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import makeBamIndex from '../vendor/igv/BamIndex';
 import unbgzf from '../vendor/igv/bgzf';
@@ -45,20 +46,10 @@ function requestBinary(url, range) {
 }
 
 /**
- * Representation of a feature/line in a bed file.
- * 
- * @typedef {Object} BedFeature
- * @property {string} chr - chromosome
- * @property {number} start - start base number in the chromosome
- * @property {number} end - end base number in the chromosome
- * @property {string} details - fourth column in the data; can contain anything
- */
-
-/**
  * Class containing functions that (1) get, parse, and cache the index file for a bed (or bed-like) file; and (2) unzip
  * and parse a requested region of the bed file by using the index.  Code is based off of IGV.
  */
-class FeatureSourceWorker {
+class BedSourceWorker {
     /**
      * Prepares to fetch data from a bed file located at the input url.  Assumes the index is located at the same url,
      * plus a file extension of ".tbi".  This method will request and store the tabix index from this url immediately.
@@ -78,7 +69,7 @@ class FeatureSourceWorker {
      * Gets data lying within the regions.
      * 
      * @param {Object} regions - the regions for which to get data
-     * @return {Promise<BedFeature[]>} Promise for the data
+     * @return {Promise<BedRecord[]>} Promise for the data
      */
     async getData(regions) {
         if (!regions) {
@@ -87,8 +78,9 @@ class FeatureSourceWorker {
 
         await this.indexPromise;
         let requests = [];
-        for (let chrInterval of regions) {
-            requests.push(this._getFeatures(chrInterval.name, chrInterval.start, chrInterval.end));
+        for (let region of regions) {
+            const chrInterval = Feature.deserialize(region);
+            requests.push(this._getFeatures(chrInterval.getName(), ...chrInterval.get0Indexed()));
         }
 
         // Concatenate all the data into one array
@@ -101,7 +93,7 @@ class FeatureSourceWorker {
      * @param {string} chromosome - the chromosome for which to fetch data
      * @param {number} start - the start base pair of the interval
      * @param {number} end - the end base pair of the interval
-     * @return {Promise<BedFeature[]>} Promise for the data
+     * @return {Promise<BedRecord[]>} Promise for the data
      */
     async _getFeatures(chromosome, start, end) {
         const index = await this.indexPromise;
@@ -167,7 +159,7 @@ class FeatureSourceWorker {
 }
 
  /**
-  * Respond to a postMessage call from the thread that created this worker.  Creates a instance of FeatureSourceWorker
+  * Respond to a postMessage call from the thread that created this worker.  Creates a instance of BedSourceWorker
   * if one does not already exist, and then uses it to return a Promise for data.
   *
   * @param {Object} messageObj - object passed from postMessage
@@ -175,7 +167,7 @@ class FeatureSourceWorker {
   */
 function respondToMessage(messageObj) {
     if (messageObj.url) {
-        theWorker = new FeatureSourceWorker(messageObj.url);
+        theWorker = new BedSourceWorker(messageObj.url);
     }
 
     return theWorker.getData(messageObj.regions);

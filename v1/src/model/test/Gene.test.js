@@ -1,5 +1,6 @@
 import makeToyRegion from './toyRegion';
 import Gene from '../Gene';
+import Interval from '../Interval';
 
 describe('Gene', () => {
     const INPUT = {
@@ -20,12 +21,11 @@ describe('Gene', () => {
     };
 
     it('constructs correctly', () => {
-        let gene = new Gene(INPUT);
+        let gene = new Gene(INPUT, makeToyRegion(10, 20));
         const EXPECTED = {
             chr: "chr2",
-            chromosome: "chr2",
-            start: 2,
-            end: 4,
+            _start: 2,
+            _end: 4,
             details: {
                 name: "GENE!",
                 name2: "Jene",
@@ -37,22 +37,13 @@ describe('Gene', () => {
                     thin: [[2, 4]]
                 }
             },
-            exons: [[2, 4]]
-        }
-        expect(gene).toEqual(EXPECTED);
-    });
-
-    it('setModel() works correctly', () => {
-        const ADDITIONAL_PROPS = {
-            absStart: 11,
-            absEnd: 13,
-            absExons: [ [11, 13] ],
+            exons: [[2, 4]],
+            // Additional props from the model
+            absStart: 12,
+            absEnd: 14,
+            absExons: [ new Interval(12, 14) ],
             isInView: true
         }
-        const EXPECTED = Object.assign(new Gene(INPUT), ADDITIONAL_PROPS);
-    
-        let gene = new Gene(INPUT);
-        gene.setModel(makeToyRegion(10, 20));
         expect(gene).toEqual(EXPECTED);
     });
 });

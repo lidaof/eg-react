@@ -28,21 +28,25 @@ class GeneAnnotationTrack extends React.Component {
             geneDetail: null
         };
 
-        this.genes = this.props.data.map(feature => new Gene(feature));
-        this.divNode = null;
         this.geneClicked = this.geneClicked.bind(this);
+        this.divNode = null;
+        this.genes = this._processGenes(props);
+    }
+
+    _processGenes(props) {
+        let genes = [];
+        let pixelsPerBase = props.width / props.viewRegion.getWidth();
+        for (let bedRecord of props.data) {
+            if ((bedRecord.end - bedRecord.start) * pixelsPerBase >= 1) {
+                genes.push(new Gene(bedRecord, props.viewRegion));
+            }
+        }
+        return genes;
     }
 
     componentWillUpdate(nextProps) {
         if (this.props.data !== nextProps.data) {
-            let newGenes = [];
-            let pixelsPerBase = nextProps.width / nextProps.viewRegion.getWidth();
-            for (let feature of nextProps.data) {
-                if ((feature.end - feature.start) * pixelsPerBase >= 1) {
-                    newGenes.push(new Gene(feature));
-                }
-            }
-            this.genes = newGenes;
+            this.genes = this._processGenes(nextProps);
         }
     }
 

@@ -3,13 +3,14 @@ import { shallow } from 'enzyme';
 
 import GenomeNavigator from './GenomeNavigator';
 
+import Feature from '../../model/Feature';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import NavigationContext from '../../model/NavigationContext';
 
 const CHROMOSOMES = [
-    {name: "chr1", lengthInBases: 1000},
-    {name: "chr2", lengthInBases: 2000},
-    {name: "chr3", lengthInBases: 3000},
+    new Feature("chr1", 0, 1000, true),
+    new Feature("chr2", 0, 2000, true),
+    new Feature("chr3", 0, 3000, true),
 ];
 
 describe('GenomeNavigator', () => {

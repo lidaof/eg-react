@@ -39,7 +39,7 @@ class TrackRegionController extends React.Component {
         } else {
             let first = intervals[0];
             let last = intervals[intervals.length - 1];
-            return `${first.name}:${first.start}-${last.name}:${last.end}`;
+            return first.toStringWithOther(last);
         }
     }
 

@@ -4,17 +4,18 @@ import { storiesOf } from '@storybook/react';
 import SvgContainer from '../components/SvgContainer';
 import AnnotationArranger from '../components/geneAnnotationTrack/AnnotationArranger';
 
+import Feature from '../model/Feature';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import NavigationContext from '../model/NavigationContext';
 import Gene from '../model/Gene';
 
 const NAV_CONTEXT = new NavigationContext("Wow very genome", [
-    {name: "chr1", lengthInBases: 1500}
+    new Feature("chr1", 0, 1500, true)
 ]);
 const model = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
 
-const DATA = [
-    new Gene({
+const RECORDS = [
+    {
         chr: "chr1",
         start: 5,
         end: 100,
@@ -26,8 +27,8 @@ const DATA = [
             },
             id: 1
         `
-    }),
-    new Gene({
+    },
+    {
         chr: "chr1",
         start: 200,
         end: 400,
@@ -39,8 +40,8 @@ const DATA = [
             },
             id: 2
         `
-    }),
-    new Gene({
+    },
+    {
         chr: "chr1",
         start: 250,
         end: 300,
@@ -52,8 +53,8 @@ const DATA = [
             },
             id: 3
         `
-    }),
-    new Gene({
+    },
+    {
         chr: "chr1",
         start: 350,
         end: 500,
@@ -65,8 +66,8 @@ const DATA = [
             },
             id: 4
         `
-    }),
-    new Gene({
+    },
+    {
         chr: "chr1",
         start: 800,
         end: 1200,
@@ -78,11 +79,10 @@ const DATA = [
             },
             id: 5
         `
-    })
+    }
 ];
-for (let gene of DATA) {
-    gene.setModel(model);
-}
+
+const GENES = RECORDS.map(record => new Gene(record, model));
 
 export const annotationStory = {
     storyName: "Annotations",
@@ -91,7 +91,7 @@ export const annotationStory = {
     >
         <AnnotationArranger
             viewRegion={model}
-            data={DATA}
+            data={GENES}
             maxRows={2}
             yOffset={20}
         />

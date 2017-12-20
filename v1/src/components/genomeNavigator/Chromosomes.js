@@ -25,10 +25,10 @@ class Chromosomes extends SvgComponent {
     render() {
         this.group.clear();
 
-        let intervals = this.props.model.getSegmentIntervals();
+        let segments = this.props.model.getSegmentIntervals();
         let x = 0;
-        for (let interval of intervals) {
-            let width = this.props.drawModel.basesToXWidth(interval.end - interval.start + 1);
+        for (let segment of segments) {
+            let width = this.props.drawModel.basesToXWidth(segment.getLength());
 
             this.group.rect(width, HEIGHT).attr({ // Rectangle for each chromosome
                 x: x,
@@ -43,7 +43,7 @@ class Chromosomes extends SvgComponent {
                 regionBoundaryLine.stroke({width: 4, color: '#000'});
             }
 
-            this.group.text(interval.name).attr({ // Chromosome labels
+            this.group.text(segment.getName()).attr({ // Chromosome labels
                 x: x + width/2,
                 y: LABEL_OFFSET,
                 "text-anchor": "middle",

@@ -90,11 +90,9 @@ export class GeneAnnotation extends SvgComponent {
         // someComponent.clipWith(exonClip) will make it show up only where the exons are.
         let exonClip = this.group.clip();
         for (let exon of gene.absExons) {
-            let exonStart = exon[0];
-            let exonEnd = exon[1];
-            let exonBox = this.group.rect(this.props.drawModel.basesToXWidth(exonEnd - exonStart), ANNOTATION_HEIGHT);
+            let exonBox = this.group.rect(this.props.drawModel.basesToXWidth(exon.end - exon.start), ANNOTATION_HEIGHT);
             exonBox.attr({
-                x: this.props.drawModel.baseToX(exonStart),
+                x: this.props.drawModel.baseToX(exon.start),
                 y: this.props.topY,
                 fill: COLOR
             });

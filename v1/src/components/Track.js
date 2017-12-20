@@ -6,7 +6,7 @@ import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
 import withDataFetching from './DataFetcher';
 
 import BigWigSource from '../dataSources/BigWigSource';
-import FeatureSource from '../dataSources/FeatureSource';
+import BedSource from '../dataSources/BedSource';
 
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import TrackModel from '../model/TrackModel';
@@ -28,7 +28,7 @@ export const TRACK_PROP_TYPES = {
  */
 const TYPE_TO_TRACK = {
     "bigwig": withDataFetching(BigWigTrack, (props) => new BigWigSource(props.trackModel.url)),
-    "hammock": withDataFetching(GeneAnnotationTrack, (props) => new FeatureSource(props.trackModel.url))
+    "hammock": withDataFetching(GeneAnnotationTrack, (props) => new BedSource(props.trackModel.url))
 }
 
 /**

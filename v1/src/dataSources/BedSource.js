@@ -1,20 +1,20 @@
 import DataSource from './DataSource';
 const PromiseWorker = require('promise-worker');
-const FeatureWorker = require('./Feature.worker');
+const BedWorker = require('./Bed.worker');
 
 /**
  * A DataSource that gets annotations from bed files (and derivatives, like hammock).  Spawns a web worker that unzips
  * and parses remotely hosted files.  Only indexed files supported.
  */
-class FeatureSource extends DataSource {
+class BedSource extends DataSource {
     /**
-     * Makes a new FeatureSource and spawns a webworker.
+     * Makes a new BedSource and spawns a webworker.
      * 
      * @param {string} url 
      */
     constructor(url) {
         super();
-        this.worker = new PromiseWorker(new FeatureWorker());
+        this.worker = new PromiseWorker(new BedWorker());
         this.worker.postMessage({url: url});
     }
 
@@ -27,7 +27,11 @@ class FeatureSource extends DataSource {
     }
 
     /**
-     * @inheritdoc
+     * Gets data lying within the region.  Returns a promise for an array of BedRecords.
+     * 
+     * @param {DisplayedRegionModel} region - region for which to fetch data
+     * @return {Promise<BedRecord[]>} promise for data
+     * @override
      */
     getData(region) {
         if (!this.worker) {
@@ -37,4 +41,4 @@ class FeatureSource extends DataSource {
     }
 }
 
-export default FeatureSource;
+export default BedSource;

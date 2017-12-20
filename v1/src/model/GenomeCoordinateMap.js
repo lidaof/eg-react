@@ -1,102 +1,106 @@
-import SegmentInterval from './SegmentInterval';
+import Feature from './Feature';
 
 /**
- * Class that looks up the genomic coordinates of arbitrarily-named features, and the inverse.
+ * Class that looks up the genomic coordinates of features, and the inverse.
  * 
  * @author Silas Hsu
  */
 class GenomeCoordinateMap {
     /**
-     * Make a new mapping from genomic features to the genome, and the inverse.  Object is `features` must contain name
-     * and chromosome info for the mapping to work properly.  
+     * Make a new mapping from genomic features to the genome, and the inverse.  Features must have a `chr` prop in
+     * their details which matches the names of the Features in the genome.
      * 
-     * @param {Object[]} features - array of features to map
-     * @param {NavigationContext} genome - NavigationContext where each segment is a chromosome
+     * @param {Feature[]} features - array of Feature to map to the genome
+     * @param {Feature[]} chromosomes - the genome; array of Feature storing chromosomes
      */
     constructor(features, genome) {
-        const chrNames = new Set(genome.getSegments().map(chromosome => chromosome.name));
-        let nameToFeature = {};
+        let chrNameToChromosome = {}
+        for (let chr of genome) {
+            chrNameToChromosome[chr.getName()] = chr;
+        }
+        let featureNameToFeature = {};
 
         // This loop not only populates nameToFeature, but also warns if objects in `features` are missing props
         for (const feature of features) { 
-            const name = feature.name || feature.details.name;
+            const name = feature.getName();
             if (name) {
-                if (nameToFeature[name] !== undefined) {
-                    console.warn("A feature with a duplicate name found; mapping will only include the lastest one.");
+                if (featureNameToFeature[name] !== undefined) {
+                    console.warn(`Feature with duplicate name ${name} found; only the latest one will be mapped`);
                 }
-                nameToFeature[name] = feature;
+                featureNameToFeature[name] = feature;
             } else {
                 console.warn("A feature is missing its name.  Mapping will exclude this feature.");
             }
 
-            const chr = feature.chromosome || feature.chr;
-            if (!chrNames.has(chr)) {
+            const chr = feature.details.chr;
+            if (!chrNameToChromosome[chr]) {
                 console.warn(`A feature has a unknown chromosome "${chr}".  Mapping will exclude this feature.`);
             }
         }
 
-        let chromosomeToFeatures = {};
-        for (const chr of chrNames) {
-            chromosomeToFeatures[chr] = features.filter(feature => {
-                return feature.chromosome === chr || feature.chr === chr;
+        let chrNameToFeatures = {};
+        for (const chr in chrNameToChromosome) {
+            chrNameToFeatures[chr] = features.filter(feature => {
+                return feature.details.chr === chr;
             });
         }
 
-        this._features = features;
-        this._nameToFeature = nameToFeature;
-        this._chromosomeToFeatures = chromosomeToFeatures;
-        this._genome = genome;
+        this._featureNameToFeature = featureNameToFeature;
+        this._chromosomeToFeatures = chrNameToFeatures;
+        this._chrNameToChromosome = chrNameToChromosome;
     }
 
     /**
-     * Gets the actual genetic coordinates of a segment.  Relies on the input segment's name to do the mapping; thus,
-     * the segment's name must match one of the features that were given during this object's construction.
+     * Gets the genetic coordinates of a segment interval (segment + coordinates relative to the segment's start).
+     * Relies on the input segment's name to do the mapping; thus, the segment's name must match one of the features
+     * that were given during this object's construction.
      * 
-     * @param {SegmentInterval} segmentInterval - the interval to map
-     * @return {SegmentInterval} the actual genetic coordinates of the interval.  If not found, returns null.
+     * @param {Feature} queryInterval - the interval to map
+     * @return {Feature} the actual genetic coordinates of the interval.  If not found, returns null.
      */
-    getGenomeInterval(segmentInterval) {
-        const matchingFeature = this._nameToFeature[segmentInterval.name];
-        if (!matchingFeature) {
+    mapToGenome(queryInterval) {
+        // Find a feature which matches the query interval.  We know the matching feature's genomic coordinates. 
+        const knownFeature = this._featureNameToFeature[queryInterval.getName()];
+        if (!knownFeature) {
             return null;
         }
 
-        const chrName = matchingFeature.chromosome || matchingFeature.chr;
-        const chrObj = this._genome.getSegments().find(chromosome => chromosome.name === chrName);
+        const chrObj = this._chrNameToChromosome[knownFeature.details.chr];
         if (!chrObj) {
             return null;
         }
 
+        const relativeStart = knownFeature.get0Indexed().start + queryInterval.get0Indexed().start;
+        const relativeEnd = knownFeature.get0Indexed().start + queryInterval.get0Indexed().end;
         // Segment start and end are relative to the start of the feature
-        return new SegmentInterval(
-            chrObj,
-            matchingFeature.start + segmentInterval.start - 1, 
-            matchingFeature.start + segmentInterval.end - 1
-        );
+        return new Feature(chrObj, relativeStart, relativeEnd, true);
     }
 
     /**
-     * TODO
+     * Maps a chromosome interval to a feature interval (feature + coordinates relative to the feature's start).  The
+     * input genomic interval's name must match a chromosome's name.  If multiple features overlap with the chromosome
+     * interval, then only the first overlapping feature is returned.  Returns null if mapping fails.
      * 
-     * @param {SegmentInterval} chromosomeInterval 
-     * @return {SegmentInterval}
+     * @param {Feature} chromosomeInterval - the genomic interval to map to a feature interval
+     * @return {Feature} intersection of a feature with the genomic interval
      */
-    getSegmentInterval(chromosomeInterval) {
-        // TODO if we want to do this efficiently, we should use something like a interval tree.  But for now,
-        // we will use a brute-force search.
-        let possibleFeatures = this._chromosomeToFeatures[chromosomeInterval.name];
+    mapFromGenome(chromosomeInterval) {
+        let possibleFeatures = this._chromosomeToFeatures[chromosomeInterval.getName()];
         if (!possibleFeatures) {
             return null;
         }
 
+        // TODO if we want to do this efficiently, we should use something like a interval tree.  But for now,
+        // we will use a brute-force search.
         for (let feature of possibleFeatures) {
-            let intersectionStart = Math.max(feature.start, chromosomeInterval.start);
-            let intersectionEnd = Math.min(feature.end, chromosomeInterval.end);
-            if (intersectionStart <= intersectionEnd) { // The feature intersects with the chromosome interval!
+            const [featureStart, featureEnd] = feature.get0Indexed();
+            let intersectionStart = Math.max(featureStart, chromosomeInterval.get0Indexed().start);
+            let intersectionEnd = Math.min(featureEnd, chromosomeInterval.get0Indexed().end);
+            if (intersectionStart < intersectionEnd) { // The feature intersects with the chromosome interval!
                 // We have to make sure the resulting interval's start and end are relative to the feature's start
-                let start = intersectionStart - feature.start + 1; // +1 because intervals index from 1
-                let end = intersectionEnd - feature.start; // Not +1 because inclusive interval
-                return new SegmentInterval(feature, start, end);
+                let start = intersectionStart - featureStart;
+                let end = intersectionEnd - featureStart;
+                return new Feature(feature, start, end, true);
             }
         }
         return null;
