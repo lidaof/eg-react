@@ -12,30 +12,33 @@ import Interval from './Interval';
  * a segment (Feature) which was provided on object construction, and getting the Feature's interval shall provide base
  * numbers relative to the start of that segment.  See {@link Feature} for more info.
  * 
+ * Segments in NavigationContexts are guaranteed to have non-empty unique names.
+ * 
  * @author Silas Hsu
  */
 class NavigationContext {
     /**
-     * Makes a new NavigationContext.  The only the lengths of the input segments are important.  The
-     * `GenomeCoordinateMap` is optional; if provided, it shall map the input segments to actual genomic
-     * coordinates.
+     * Makes a new NavigationContext.  Segments must have non-empty, unique names.  The `genomeMapper` argument is
+     * optional; if provided, it shall construct a map from input segments to actual genomic coordinates.
      * 
      * @param {string} name - name of this context
      * @param {Feature[]} segments - list of segments
-     * @param {GenomeCoordinateMap} - object that maps segments to actual genomic coordinates
+     * @param {GenomeMapper} [genomeMapper] - factory to construct a mapping from input segments to the genome
      */
-    constructor(name, segments, genomeCoordinateMap) {
+    constructor(name, segments, genomeMapper) {
         this._name = name;
         this._segments = segments;
         this._segmentStarts = [];
         this._segmentNameToIndex = {};
-        this._genomeCoordinateMap = genomeCoordinateMap;
 
         let totalBases = 0;
         let i = 0;
         for (let segment of segments) {
             // Make sure names are unique
             const name = segment.getName();
+            if (!name) {
+                throw new Error("All segments must have names");
+            }
             if (this._segmentNameToIndex[name] !== undefined) {
                 throw new Error(`Duplicate name ${name} detected; segments must have unique names.`);
             }
@@ -50,6 +53,8 @@ class NavigationContext {
         if (this._totalBases === 0) {
             throw new Error("Context has 0 length");
         }
+
+        this._genomeMap = genomeMapper ? genomeMapper.makeMapToGenome(this) : null;
     }
 
     /**
@@ -255,8 +260,56 @@ class NavigationContext {
     }
 
     /**
-     * Queries segments that overlap an open interval of absolute coordinates, and maps them to a list of genomic
-     * (chromosome) intervals, which behave similar to segment intervals.
+     * Maps a segment in this context to a chromosomal intervals; i.e. genomic coordinates.  If the segment is not in
+     * this context or is otherwise unmappable, returns null.
+     * 
+     * The mapping is configured with this context's construction.  If no mapping was configured, simply returns the 
+     * input segment.  
+     * 
+     * @param {number} absStart - (inclusive) start of interval, as an absolute coordinate
+     * @param {number} absEnd - (exclusive) end of interval, as an absolute coordinate
+     * @return {Feature} chromosomal interval
+     */
+    mapToGenome(segmentInterval) {
+        if (!this._genomeMap) {
+            return segmentInterval;
+        }
+        return this._genomeMap.mapToGenome(segmentInterval);
+    }
+
+    /**
+     * Given a chromosome interval (see class docstring on segment intervals), maps it to an open interval of absolute
+     * coordinates in this context.  Since segments can overlap in the genome, a target segment is also required.
+     * Failed lookups result in null.
+     * 
+     * The mapping is configured with this context's construction.  If no mapping was configured, the result is
+     * identical to `convertSegmentCoordinateToBase` called on the input interval's start and end.
+     * 
+     * @param {Feature} genomicInterval - chromosomal interval
+     * @return {(Interval | null)} open interval of absolute coordinates in this context, or null if not found.
+     */
+    mapFromGenome(chromosomeInterval, targetSegmentName) {
+        let mappedInterval;
+        if (this._genomeMap) {
+            mappedInterval = this._genomeMap.mapFromGenome(chromosomeInterval, targetSegmentName);
+            if (!mappedInterval) {
+                return null;
+            }
+        } else {
+            mappedInterval = chromosomeInterval;
+        }
+
+        const name = mappedInterval.getName();
+        const [start, end] = mappedInterval.get0Indexed();
+        return new Interval(
+            this.convertSegmentCoordinateToBase(name, start, true),
+            this.convertSegmentCoordinateToBase(name, end, true)
+        );
+    }
+
+    /**
+     * Returns the same segments and in the same order as {@link getSegmentsInInterval}, but mapped to chromosomal 
+     * intervals; i.e. genomic coordinates.
      * 
      * The mapping is done with the GenomeCoordinateMap provided when this object was constructed.  Failed lookups are
      * ignored.  If no mapping was provided, the result is identical to {@link getSegmentsInInterval}.  
@@ -267,10 +320,10 @@ class NavigationContext {
      */
     mapAbsIntervalToGenome(absStart, absEnd) {
         const segments = this.getSegmentsInInterval(absStart, absEnd);
-        if (this._genomeCoordinateMap) {
+        if (this._genomeMap) {
             let results = [];
             for (let segment of segments) {
-                let lookupResult = this._genomeCoordinateMap.mapToGenome(segment);
+                let lookupResult = this._genomeMap.mapToGenome(segment);
                 if (lookupResult) {
                     results.push(lookupResult);
                 }
@@ -293,12 +346,12 @@ class NavigationContext {
      * @return {(Interval | null)} open interval of absolute coordinates in this context, or null if not found.
      */
     mapFromGenomeInterval(genomicInterval) {
-        const interval = this._genomeCoordinateMap ?
-            this._genomeCoordinateMap.mapFromGenome(genomicInterval) : genomicInterval;
+        const segmentInterval = this._genomeMap ?
+            this._genomeMap.mapFromGenome(genomicInterval) : genomicInterval;
 
-        if (interval) {
-            const name = interval.getName();
-            const [start, end] = interval.get0Indexed();
+        if (segmentInterval) {
+            const name = segmentInterval.getName();
+            const [start, end] = segmentInterval.get0Indexed();
             return new Interval(
                 this.convertSegmentCoordinateToBase(name, start, true),
                 this.convertSegmentCoordinateToBase(name, end, true)

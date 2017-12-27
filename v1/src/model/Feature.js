@@ -6,8 +6,8 @@ import Interval from './Interval';
  * 
  * - A Feature with another Feature in its `details` prop suggests a relative interval; an indexing relative to the
  * start of another feature.
- * - A Feature with `chr` in its `details` prop suggests a genomic annotation, such as a gene.
- * - A Feature with its `details` prop set to a string literal suggests a set of chromosomal coordinates.
+ * - A Feature with its `details` prop set to a string literal can be used to look up Features with matching names in
+ * certain APIs.
  * 
  * In addition, to avoid off-by-one errors, the get0Indexed or get1Indexed methods are required to retrieve the
  * internally-stored interval.
@@ -23,7 +23,7 @@ class Feature {
      * @return {Feature} constructed Feature
      */
     static deserialize(obj) {
-        let details = obj.details;
+        let details = obj._details;
         // Does obj.details "look like" a Feature?  If so, deserialize it too.
         if (typeof details === "object" && typeof details._start === "number" && typeof details._end === "number") {
             details = Feature.deserialize(details);
@@ -35,7 +35,7 @@ class Feature {
      * Makes a new Feature.  The `is0Indexed` parameter switches interpretations of the inputs between a 0-indexed open
      * interval or a 1-indexed closed interval.
      * 
-     * @param {[Object | string]} details - data of arbitrary shape to attach to this Feature
+     * @param {Object | string} [details] - data of arbitrary shape to attach to this Feature
      * @param {number} start - start base number
      * @param {number} end - end base number
      * @param {boolean} is0Indexed - whether `start` and `end` represent a 0-indexed or 1-indexed interval
@@ -50,7 +50,14 @@ class Feature {
         if (this._end < this._start) {
             throw new Error("End less than start");
         }
-        this.details = details || {};
+        this._details = details;
+    }
+
+    /**
+     * @return {any} detailed information associated with this Feature
+     */
+    getDetails() {
+        return this._details;
     }
 
     /**
@@ -60,12 +67,13 @@ class Feature {
      * @return {string} this Feature's name
      */
     getName() {
-        if (this.details.getName) {
-            return this.details.getName();
-        } else if (this.details.name) {
-            return this.details.name;
-        } else if (typeof this.details === "string") {
-            return this.details;
+        const details = this.getDetails();
+        if (details.getName) { // `details` is probably another Feature
+            return details.getName();
+        } else if (details.name) {
+            return details.name;
+        } else if (typeof details === "string") {
+            return details;
         } else {
             return "";
         }

@@ -100,6 +100,7 @@ class AnnotationArranger extends SvgComponent {
             }
             
             children.push(<GeneAnnotation
+                viewRegion={this.props.viewRegion}
                 drawModel={this.props.drawModel}
                 leftBoundary={this.props.leftBoundary}
                 svgNode={this.group}
@@ -107,7 +108,7 @@ class AnnotationArranger extends SvgComponent {
                 isLabeled={isLabeled}
                 topY={row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING)}
                 onClick={this.props.onGeneClick}
-                key={gene.details.id}
+                key={gene.getDetails().id}
             />);
         }
 

@@ -8,9 +8,10 @@ class DataSource {
      * Gets data lying within the region.
      * 
      * @param {DisplayedRegionModel} region - region for which to fetch data
+     * @param {any} [options] - options for fetching
      * @return {Promise<any>} a Promise for the data
      */
-    getData(region) {
+    getData(region, options={}) {
         throw new Error("Not implemented");
     }
 

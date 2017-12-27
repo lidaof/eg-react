@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import SvgComponent from '../SvgComponent';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 export const ANNOTATION_HEIGHT = 8;
 export const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;
@@ -22,6 +23,7 @@ export class GeneAnnotation extends SvgComponent {
         isLabeled: PropTypes.bool.isRequired, // Whether to display the gene's name
         topY: PropTypes.number.isRequired, // The y coordinate of the top edge of the annotation
         leftBoundary: PropTypes.number.isRequired, // The x coordinate of the SVG's left boundary
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel), // Current view region
 
         /**
          * Called when this annotation is clicked.  Has the signature
@@ -62,6 +64,7 @@ export class GeneAnnotation extends SvgComponent {
     render() {
         this.group.clear();
         let gene = this.props.gene;
+        const details = gene.getDetails();
 
         const startX = this.props.drawModel.baseToX(gene.absStart);
         const endX = this.props.drawModel.baseToX(gene.absEnd);
@@ -89,7 +92,7 @@ export class GeneAnnotation extends SvgComponent {
         // Exons
         // someComponent.clipWith(exonClip) will make it show up only where the exons are.
         let exonClip = this.group.clip();
-        for (let exon of gene.absExons) {
+        for (let exon of details.absExons) {
             let exonBox = this.group.rect(this.props.drawModel.basesToXWidth(exon.end - exon.start), ANNOTATION_HEIGHT);
             exonBox.attr({
                 x: this.props.drawModel.baseToX(exon.start),
@@ -101,7 +104,7 @@ export class GeneAnnotation extends SvgComponent {
 
         // Arrows
         for (let x = startX; x <= endX; x += ARROW_SEPARATION) {
-            let arrowTipX = gene.details.strand === "+" ?
+            let arrowTipX = details.strand === "+" ?
                 x - ARROW_WIDTH : // Point to the right
                 x + ARROW_WIDTH; // Point to the left
             let arrowPoints = [
@@ -126,8 +129,8 @@ export class GeneAnnotation extends SvgComponent {
         // Label
         let labelX, textAnchor;
         // Label width is approx. because calculating bounding boxes is expensive.
-        let estimatedLabelWidth = gene.details.name2.length * ANNOTATION_HEIGHT;
-        if (gene.isInView && startX - estimatedLabelWidth < this.props.leftBoundary) {
+        let estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
+        if (gene.getIsInView(this.props.viewRegion) && startX - estimatedLabelWidth < this.props.leftBoundary) {
             // It's going to go off the screen; we need to move the label
             labelX = this.props.leftBoundary;
             textAnchor = "start";
@@ -139,11 +142,11 @@ export class GeneAnnotation extends SvgComponent {
                 opacity: 0.65,
             });
         } else {
-            labelX = (gene.details.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
+            labelX = (details.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
             textAnchor = "end";
         }
 
-        this.group.text(gene.details.name2).attr({
+        this.group.text(gene.getName()).attr({
             x: labelX,
             y: this.props.topY - ANNOTATION_HEIGHT,
             "text-anchor": textAnchor,

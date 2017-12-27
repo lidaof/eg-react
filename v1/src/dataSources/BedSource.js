@@ -8,18 +8,23 @@ const BedWorker = require('./Bed.worker');
  */
 class BedSource extends DataSource {
     /**
-     * Makes a new BedSource and spawns a webworker.
+     * Makes a new BedSource specialized to serve data from a url.  Fetching data will return BedRecords by default,
+     * unless given a BedFormatter.
      * 
-     * @param {string} url 
+     * @param {string} url - the url from which to fetch data
+     * @param {BedFormatter} [bedFormatter] - converter from BedRecords to some other format
      */
-    constructor(url) {
+    constructor(url, bedFormatter) {
         super();
+        this.bedFormatter = bedFormatter;
         this.worker = new PromiseWorker(new BedWorker());
         this.worker.postMessage({url: url});
     }
 
     /**
      * Terminates the associated web worker.  Further calls to getData will cause an error.
+     * 
+     * @override
      */
     cleanUp() {
         this.worker._worker.terminate();
@@ -27,17 +32,31 @@ class BedSource extends DataSource {
     }
 
     /**
-     * Gets data lying within the region.  Returns a promise for an array of BedRecords.
+     * Gets data lying within the region.  Returns a promise for an array of data.
      * 
      * @param {DisplayedRegionModel} region - region for which to fetch data
-     * @return {Promise<BedRecord[]>} promise for data
+     * @param {Object} [options] - data fetching options
+     * @return {Promise<Object[]>} promise for data
      * @override
      */
-    getData(region) {
+    async getData(region, options) {
         if (!this.worker) {
             throw new Error("Cannot get data -- cleanUp() has been called.");
         }
-        return this.worker.postMessage({regions: region.getGenomeIntervals()});
+
+        const navContext = region.getNavigationContext();
+        let promises = region.getSegmentIntervals().map(async segment => {
+            const chrInterval = navContext.mapToGenome(segment);
+            const bedRecords = await this.worker.postMessage({region: chrInterval});
+            if (this.bedFormatter) {
+                return this.bedFormatter.format(bedRecords, region, segment);
+            } else {
+                return bedRecords;
+            }
+        });
+
+        const dataForEachSegment = await Promise.all(promises);
+        return [].concat.apply([], dataForEachSegment);
     }
 }
 

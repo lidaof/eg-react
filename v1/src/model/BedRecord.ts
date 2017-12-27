@@ -7,3 +7,5 @@ interface BedRecord {
     end: number;
     details: string; // Free text
 }
+
+export default BedRecord;

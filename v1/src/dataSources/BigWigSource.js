@@ -39,36 +39,37 @@ class BigWigSource extends DataSource {
      */
 
     /**
-     * Gets BigWig features inside the input view region.  Returns objects that fulfill the Interval interface, and have
-     * a `value` property as well.
+     * Gets BigWig features inside the input view region.  Resolution is configured by `options`, or if missing, by
+     * `window.innerWidth`.  Returns objects that fulfill the Interval interface, and have a `value` property as well.
      * 
      * @param {DisplayedRegionModel} region - the model containing the displayed region
+     * @param {Object} [options] - object containing a `width` property used to determine fetch resolution
      * @return {Promise<Record[]>} a Promise for the data
      * @override
      */
-    async getData(region) {
-        let bigWigObj = await this.bigWigPromise;
+    async getData(region, options={}) {
+        const bigWigObj = await this.bigWigPromise;
 
-        // FIXME window.innerWidth is not a good way to get pixelsPerBase, but it's quick and dirty.
-        let basesPerPixel = region.getWidth() / window.innerWidth;
-        let zoomLevel = this._getMatchingZoomLevel(bigWigObj, basesPerPixel);
-        let promises = region.getGenomeIntervals().map(chromosomeInterval =>
-            this._getDataForChromosome(chromosomeInterval, bigWigObj, zoomLevel)
-        );
-        let dataForEachRegion = await Promise.all(promises);
-        let combinedRawData = [].concat.apply([], dataForEachRegion);
-        let result = [];
-        for (let dasFeature of combinedRawData) {
-            let absInterval = region.getNavigationContext().mapFromGenomeInterval(
-                // dasFeature.segment should be a valid chromosome name, otherwise data fetch would have failed.
-                new Feature(dasFeature.segment, dasFeature.min, dasFeature.max, true)
-            );
-            if (absInterval) {
-                absInterval.value = dasFeature.score;
-                result.push(absInterval);
+        const navContext = region.getNavigationContext();
+        const basesPerPixel = region.getWidth() / (options.width || window.innerWidth + 1); // +1 to prevent 0
+        const zoomLevel = this._getMatchingZoomLevel(bigWigObj, basesPerPixel);
+        let promises = region.getSegmentIntervals().map(async segment => {
+            const chrInterval = navContext.mapToGenome(segment);
+            const dasFeatures = await this._getDataForChromosome(chrInterval, bigWigObj, zoomLevel);
+            let result = [];
+            for (let dasFeature of dasFeatures) {
+                let absInterval = navContext.mapFromGenome(
+                    new Feature(dasFeature.segment, dasFeature.min, dasFeature.max, true), segment.getName()
+                );
+                if (absInterval) {
+                    absInterval.value = dasFeature.score;
+                    result.push(absInterval);
+                }
             }
-        }
-        return result;
+            return result;
+        });
+        let dataForEachSegment = await Promise.all(promises);
+        return [].concat.apply([], dataForEachSegment); // Combine all the data into one array
     }
 
     /**

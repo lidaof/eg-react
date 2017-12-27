@@ -8,7 +8,7 @@ import Feature from './model/Feature';
 import TrackModel from './model/TrackModel';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import NavigationContext from './model/NavigationContext';
-import GenomeCoordinateMap from './model/GenomeCoordinateMap';
+import GenomeMapper from './model/GenomeMapper';
 
 import './App.css';
 
@@ -47,16 +47,17 @@ const DEFAULT_TRACKS = [
 ];
 
 const HG19 = new NavigationContext("Wow very genome", CHROMOSOMES);
+const HG19_MAPPER = new GenomeMapper(HG19);
 
 const GENES = [
-    new Feature({name: "CYP2C8", chr: "chr10"}, 96796528, 96829254, false), 
+    new Feature({name: "CYP2C8", chr: "chr10"}, 96796528, 96829254, false),
+    new Feature({name: "CYP2C8-v2", chr: "chr10"}, 96796528, 96829254, false),
     new Feature({name: "CYP4B1", chr: "chr1"}, 47223509, 47276522, false),
     new Feature({name: "CYP11B2", chr: "chr8"}, 143991974, 143999259, false),
     new Feature({name: "CYP26B1", chr: "chr2"}, 72356366, 72375167, false),
     new Feature({name: "CYP51A1", chr: "chr7"}, 91741462, 91764059, false)
 ];
-const COOR_LOOKUP = new GenomeCoordinateMap(GENES, CHROMOSOMES);
-const GENE_SET = new NavigationContext("Set of 5 genes", GENES, COOR_LOOKUP);
+const GENE_SET = new NavigationContext("Set of 5 genes", GENES, HG19_MAPPER);
 
 class App extends React.Component {
     constructor(props) {

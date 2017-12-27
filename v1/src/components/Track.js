@@ -1,3 +1,8 @@
+/**
+ * Utility functions common to all Tracks, and to make new Tracks.
+ * 
+ * @author Silas Hsu
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -10,6 +15,7 @@ import BedSource from '../dataSources/BedSource';
 
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import TrackModel from '../model/TrackModel';
+import { GeneFormatter } from '../model/Gene';
 
 /**
  * Prop types common to all tracks
@@ -28,7 +34,9 @@ export const TRACK_PROP_TYPES = {
  */
 const TYPE_TO_TRACK = {
     "bigwig": withDataFetching(BigWigTrack, (props) => new BigWigSource(props.trackModel.url)),
-    "hammock": withDataFetching(GeneAnnotationTrack, (props) => new BedSource(props.trackModel.url))
+    "hammock": withDataFetching(
+        GeneAnnotationTrack, (props) => new BedSource(props.trackModel.url, new GeneFormatter())
+    )
 }
 
 /**

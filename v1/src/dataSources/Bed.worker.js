@@ -66,25 +66,18 @@ class BedSourceWorker {
     }
 
     /**
-     * Gets data lying within the regions.
+     * Gets data lying within the region.
      * 
-     * @param {Object} regions - the regions for which to get data
+     * @param {Object} region - the regions for which to get data
      * @return {Promise<BedRecord[]>} Promise for the data
      */
-    async getData(regions) {
-        if (!regions) {
+    async getData(region) {
+        if (!region) {
             return [];
         }
 
-        await this.indexPromise;
-        let requests = [];
-        for (let region of regions) {
-            const chrInterval = Feature.deserialize(region);
-            requests.push(this._getFeatures(chrInterval.getName(), ...chrInterval.get0Indexed()));
-        }
-
-        // Concatenate all the data into one array
-        return Promise.all(requests).then(results => [].concat.apply([], results));
+        const chrInterval = Feature.deserialize(region);
+        return this._getFeatures(chrInterval.getName(), ...chrInterval.get0Indexed());
     }
 
     /**
@@ -144,7 +137,7 @@ class BedSourceWorker {
                 chr: columns[0],
                 start: Number.parseInt(columns[1]),
                 end: Number.parseInt(columns[2]),
-                details: columns[3]
+                details: columns[3] || ""
             }
             if (feature.start > end) { // This is correct as long as the features are sorted by start
                 break;
@@ -170,7 +163,7 @@ function respondToMessage(messageObj) {
         theWorker = new BedSourceWorker(messageObj.url);
     }
 
-    return theWorker.getData(messageObj.regions);
+    return theWorker.getData(messageObj.region);
 }
 
 // Specified by promise-worker (https://github.com/nolanlawson/promise-worker#message-format).

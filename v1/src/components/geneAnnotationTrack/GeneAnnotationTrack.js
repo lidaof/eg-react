@@ -9,7 +9,6 @@ import TrackLoadingNotice from '../TrackLoadingNotice';
 import SvgContainer from '../SvgContainer';
 import ScrollingData from '../ScrollingData';
 
-import Gene from '../../model/Gene';
 import RegionExpander from '../../model/RegionExpander';
 
 const HEIGHT = 120;
@@ -30,23 +29,18 @@ class GeneAnnotationTrack extends React.Component {
 
         this.geneClicked = this.geneClicked.bind(this);
         this.divNode = null;
-        this.genes = this._processGenes(props);
+        this.viewExpansion = null;
+        this._updateViewExpansion(props);
     }
 
-    _processGenes(props) {
-        let genes = [];
-        let pixelsPerBase = props.width / props.viewRegion.getWidth();
-        for (let bedRecord of props.data) {
-            if ((bedRecord.end - bedRecord.start) * pixelsPerBase >= 1) {
-                genes.push(new Gene(bedRecord, props.viewRegion));
-            }
-        }
-        return genes;
+    _updateViewExpansion(props) {
+        const regionExpander = new RegionExpander(props.viewExpansionValue);
+        this.viewExpansion = regionExpander.calculateExpansion(props.width, props.viewRegion);
     }
 
     componentWillUpdate(nextProps) {
-        if (this.props.data !== nextProps.data) {
-            this.genes = this._processGenes(nextProps);
+        if (this.props.width !== nextProps.width || this.props.viewRegion !== nextProps.viewRegion) {
+            this._updateViewExpansion(nextProps);
         }
     }
 
@@ -72,8 +66,6 @@ class GeneAnnotationTrack extends React.Component {
         if (this.props.error) {
             svgStyle.backgroundColor = "red";
         }
-        let regionExpander = new RegionExpander(this.props.viewExpansionValue);
-        let viewExpansion = regionExpander.calculateExpansion(this.props.width, this.props.viewRegion);
 
         return (
         <div
@@ -86,19 +78,19 @@ class GeneAnnotationTrack extends React.Component {
             <ScrollingData
                 width={this.props.width}
                 height={HEIGHT}
-                viewExpansion={viewExpansion}
+                viewExpansion={this.viewExpansion}
                 xOffset={this.props.xOffset}
             >
                 <SvgContainer
-                    model={viewExpansion.expandedRegion}
-                    drawModelWidth={viewExpansion.expandedRegion.expandedWidth}
+                    model={this.viewExpansion.expandedRegion}
+                    drawModelWidth={this.viewExpansion.expandedRegion.expandedWidth}
                     svgProps={{style: svgStyle}}
                 >
-                    {this.genes ?
+                    {this.props.data ?
                         <AnnotationArranger
-                            data={this.genes}
+                            data={this.props.data}
                             viewRegion={this.props.viewRegion}
-                            leftBoundary={viewExpansion.leftExtraPixels}
+                            leftBoundary={this.viewExpansion.leftExtraPixels}
                             onGeneClick={this.geneClicked}
                             maxRows={this.props.maxRows}
                         />
