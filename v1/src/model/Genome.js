@@ -21,14 +21,31 @@ export class Genome {
     constructor(name, chromosomes) {
         this._name = name;
         this._chromosomes = chromosomes;
+        this._nameToChromosome = {};
+        for (let chromosome of chromosomes) {
+            const chrName = chromosome.getName();
+            if (this._nameToChromosome[chrName] !== undefined) {
+                console.warn(`Duplicate chromosome name "${chrName}" in genome "${name}"`);
+            }
+            this._nameToChromosome[chrName] = chromosome;
+        }
     }
 
     getName() {
         return this._name;
     }
 
-    getChromosomes() {
-        return this._chromosomes;
+    getChromosome(name) {
+        return this._nameToChromosome[name] || null;
+    }
+
+    intersectInterval(chrInterval) {
+        const chrName = chrInterval.chr;
+        const matchingChr = this.getChromosome(chrName);
+        if (!matchingChr) {
+            return null;
+        }
+        return new ChromosomeInterval(chrName, 0, matchingChr.getLength()).getOverlap(chrInterval);
     }
 
     makeNavContext() {
@@ -39,6 +56,8 @@ export class Genome {
         return new NavigationContext(this.getName(), features);
     }
 }
+
+export default Genome;
 
 export const HG19 = new Genome("hg19", [
     new Chromosome("chr1", 249250621),

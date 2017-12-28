@@ -4,7 +4,7 @@ class Feature {
      * @param {ChromosomeInterval} location 
      */
     constructor(name, location) {
-        this._name = name || location.chr;
+        this._name = name || location.toString();
         this._coordinates = location;
     }
 

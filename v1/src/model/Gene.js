@@ -46,7 +46,7 @@ export class Gene extends Feature {
 
         const absInterval = navContext.convertGenomeIntervalToBases(featureInterval, location);
         if (!absInterval) {
-            throw new RangeError("Given feature does not overlap with this Gene; cannot map to navigation context");
+            throw new RangeError("Cannot map this gene to the navigation context");
         }
 
         [this.absStart, this.absEnd] = absInterval;
@@ -124,7 +124,15 @@ export class GeneFormatter {
      * @override
      */
     format(records, region, segment) {
-        return records.map(record => new Gene(record, region.getNavigationContext(), segment));
+        let genes = [];
+        for (let record of records) {
+            try {
+                genes.push(new Gene(record, region.getNavigationContext(), segment));
+            } catch (error) {
+
+            }
+        }
+        return genes;
     }
 }
 

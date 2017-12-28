@@ -10,14 +10,18 @@ const MIN_ABS_BASE = 0; // Index absolute bases from this number.  Take caution 
  */
 class DisplayedRegionModel {
     /**
-     * Makes a new DisplayedRegionModel with specified navigation context, and optionally, initial view region.
+     * Makes a new DisplayedRegionModel with specified navigation context, and optionally, initial view region.  If not
+     * specified, the view region will be the entire navigation context.
      *
      * @param {NavigationContext} navContext - the context in which navigation will take place
-     * @param {number} start - initial start of the view region
-     * @param {number} end - initial end of the view region
+     * @param {number} [start] - initial start of the view region
+     * @param {number} [end] - initial end of the view region
      */
-    constructor(navContext, start=MIN_ABS_BASE, end=MIN_ABS_BASE) {
+    constructor(navContext, start=0, end) {
         this._navContext = navContext;
+        if (end === undefined) {
+            end = navContext.getTotalBases();
+        }
         this.setRegion(start, end); // Sets this._startBase and this._endBase
     }
 

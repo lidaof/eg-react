@@ -3,13 +3,11 @@ import React from 'react';
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import TrackContainer from './components/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
+import RegionSetSelector from './components/RegionSetSelector';
 
 import { HG19 } from './model/Genome';
-import ChromosomeInterval from './model/interval/ChromosomeInterval';
-import Feature from './model/Feature';
 import TrackModel from './model/TrackModel';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
-import NavigationContext from './model/NavigationContext';
 
 import './App.css';
 
@@ -20,7 +18,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const DEFAULT_SELECTED_REGION = [15600000, 16000000];
-const DEFAULT_NAV_VIEW = [0, 20000000];
 
 const DEFAULT_TRACKS = [
     new TrackModel({
@@ -37,15 +34,6 @@ const DEFAULT_TRACKS = [
 
 const HG19_CONTEXT = HG19.makeNavContext();
 
-const GENES = [
-    new Feature("CYP2C8", new ChromosomeInterval("chr10", 96796528, 96829254)),
-    new Feature("CYP4B1", new ChromosomeInterval("chr1", 47223509, 47276522)),
-    new Feature("CYP11B2", new ChromosomeInterval("chr8", 143991974, 143999259)),
-    new Feature("CYP26B1", new ChromosomeInterval("chr2", 72356366, 72375167)),
-    new Feature("CYP51A1", new ChromosomeInterval("chr7", 91741462, 91764059)),
-];
-const GENE_SET = new NavigationContext("Set of 5 genes", GENES);
-
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -57,13 +45,13 @@ class App extends React.Component {
         };
 
         // TODO this can be set dynamically too.
-        this.initNavModel = new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_NAV_VIEW);
+        this.initNavModel = new DisplayedRegionModel(HG19_CONTEXT);
 
         this.regionSelected = this.regionSelected.bind(this);
         this.addTrack = this.addTrack.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
         this.trackChanged = this.trackChanged.bind(this);
-        this.toggleGeneSetView = this.toggleGeneSetView.bind(this);
+        this.setRegionSet = this.setRegionSet.bind(this);
     }
 
     regionSelected(start, end) {
@@ -88,13 +76,15 @@ class App extends React.Component {
         this.setState({currentTracks: tracks});
     }
 
-    toggleGeneSetView() {
-        const nextContext = this.state.isGeneSetView ? HG19_CONTEXT : GENE_SET;
-        this.initNavModel = new DisplayedRegionModel(nextContext, ...DEFAULT_NAV_VIEW);
-        this.setState({
-            selectedRegionModel: new DisplayedRegionModel(nextContext, ...DEFAULT_SELECTED_REGION),
-            isGeneSetView: !this.state.isGeneSetView
-        });
+    setRegionSet(set) {
+        if (!set) {
+            this.initNavModel = new DisplayedRegionModel(HG19_CONTEXT);
+            this.setState({selectedRegionModel: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION)});
+        } else {
+            const selectedRegion = new DisplayedRegionModel(set.makeNavContext());
+            this.initNavModel = selectedRegion;
+            this.setState({selectedRegionModel: selectedRegion});
+        }
     }
 
     render() {
@@ -116,10 +106,12 @@ class App extends React.Component {
                 onTrackRemoved={this.removeTrack}
             />
             {
-            this.state.isGeneSetView ?
-                <button onClick={this.toggleGeneSetView}>Exit gene set view</button> :
-                <button onClick={this.toggleGeneSetView}>Gene set view!</button>
+            this.state.selectedRegionModel.getNavigationContext() !== HG19_CONTEXT ?
+                <button onClick={() => this.setRegionSet(null)} >Exit gene set view</button>
+                :
+                null
             }
+            <RegionSetSelector genome={HG19} onSetSelected={this.setRegionSet}/>
         </div>
         );
     }

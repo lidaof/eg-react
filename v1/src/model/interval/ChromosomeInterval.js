@@ -1,6 +1,19 @@
 import OpenInterval from './OpenInterval';
 
 class ChromosomeInterval extends OpenInterval {
+    static parse(string) {
+        const regexMatch = string.match(/([\w:]+):(\d+)-(\d+)/);
+        // eslint-disable-next-line no-cond-assign
+        if (regexMatch) {
+            const chr = regexMatch[1];
+            const start = Number.parseInt(regexMatch[2], 10);
+            const end = Number.parseInt(regexMatch[3], 10);
+            return new ChromosomeInterval(chr, start, end);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * 
      * @param {string} chr 
