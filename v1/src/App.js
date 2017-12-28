@@ -51,7 +51,7 @@ const HG19_MAPPER = new GenomeMapper(HG19);
 
 const GENES = [
     new Feature({name: "CYP2C8", chr: "chr10"}, 96796528, 96829254, false),
-    new Feature({name: "CYP2C8-v2", chr: "chr10"}, 96796528, 96829254, false),
+    //new Feature({name: "CYP2C8-v2", chr: "chr10"}, 96796528, 96829254, false),
     new Feature({name: "CYP4B1", chr: "chr1"}, 47223509, 47276522, false),
     new Feature({name: "CYP11B2", chr: "chr8"}, 143991974, 143999259, false),
     new Feature({name: "CYP26B1", chr: "chr2"}, 72356366, 72375167, false),

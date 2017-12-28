@@ -61,7 +61,7 @@ class SvgContainer extends React.Component {
      */
     componentWillUpdate(nextProps) {
         if (this.props.model !== nextProps.model || this.props.width !== nextProps.width) {
-            this.updateDrawModel(nextProps)
+            this.updateDrawModel(nextProps);
         }
     }
 

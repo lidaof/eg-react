@@ -18,15 +18,13 @@ const ANNOTATION_RIGHT_PADDING = 30;
  */
 class AnnotationArranger extends SvgComponent {
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)).isRequired, // Array of Gene objects
-
         /**
          * Used to calculate absolute coordinates of genes
          */
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
 
+        data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)), // Array of Gene objects
         leftBoundary: PropTypes.number, // The x coordinate of the left boundary of the SVG, in SVG's coordinate system
-        
         maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
 
         /**
@@ -39,6 +37,7 @@ class AnnotationArranger extends SvgComponent {
     };
 
     static defaultProps = {
+        data: [],
         leftBoundary: 0,
         maxRows: DEFAULT_MAX_ROWS,
     };
@@ -80,7 +79,7 @@ class AnnotationArranger extends SvgComponent {
                 numHiddenGenes++;
                 continue;
             }
-
+            
             // Label width is approx. because calculating bounding boxes is expensive.
             let estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
             let startX = this.props.drawModel.baseToX(gene.absStart) - estimatedLabelWidth;

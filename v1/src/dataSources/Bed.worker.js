@@ -37,10 +37,15 @@ function requestBinary(url, range) {
             }
         };
         xhr.onerror = reject;
+        
+        // Hack to prevent caching for byte-ranges. Attempt to fix net:err-cache errors in Chrome
+        url += url.includes("?") ? "&" : "?";
+        url += "someRandomSeed=" + Math.random().toString(36);
         xhr.open('GET', url);
         if (range) {
             xhr.setRequestHeader("Range", `bytes=${range.start}-${range.end}`);
         }
+        
         xhr.send();
     });
 }

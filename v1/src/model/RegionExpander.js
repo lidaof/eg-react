@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 /**
  * Utility class that does calculations related to expanding view regions for the purposes of scrolling.
  * 
@@ -30,7 +28,7 @@ class RegionExpander {
      * @return {DisplayedRegionModel} expanded region
      */
     makeExpandedRegion(region) {
-        let expandedModel = _.clone(region);
+        let expandedModel = region.clone();
         expandedModel.zoom(this.zoomRatio);
         return expandedModel;
     }

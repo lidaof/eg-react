@@ -83,19 +83,16 @@ class GeneAnnotationTrack extends React.Component {
             >
                 <SvgContainer
                     model={this.viewExpansion.expandedRegion}
-                    drawModelWidth={this.viewExpansion.expandedRegion.expandedWidth}
+                    drawModelWidth={this.viewExpansion.expandedWidth}
                     svgProps={{style: svgStyle}}
                 >
-                    {this.props.data ?
-                        <AnnotationArranger
-                            data={this.props.data}
-                            viewRegion={this.props.viewRegion}
-                            leftBoundary={this.viewExpansion.leftExtraPixels}
-                            onGeneClick={this.geneClicked}
-                            maxRows={this.props.maxRows}
-                        />
-                        : null
-                    }
+                    <AnnotationArranger
+                        data={this.props.data}
+                        viewRegion={this.props.viewRegion}
+                        leftBoundary={this.viewExpansion.leftExtraPixels}
+                        onGeneClick={this.geneClicked}
+                        maxRows={this.props.maxRows}
+                    />
                 </SvgContainer>
             </ScrollingData>
             {this.state.geneDetail}
