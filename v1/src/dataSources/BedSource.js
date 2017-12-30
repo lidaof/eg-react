@@ -44,12 +44,11 @@ class BedSource extends DataSource {
             throw new Error("Cannot get data -- cleanUp() has been called.");
         }
 
-        const navContext = region.getNavigationContext();
-        let promises = region.getSegmentIntervals().map(async segment => {
-            const chrInterval = navContext.mapToGenome(segment);
+        let promises = region.getFeatureIntervals().map(async featureInterval => {
+            const chrInterval = featureInterval.getGenomeCoordinates();
             const bedRecords = await this.worker.postMessage({region: chrInterval});
             if (this.bedFormatter) {
-                return this.bedFormatter.format(bedRecords, region, segment);
+                return this.bedFormatter.format(bedRecords, region, featureInterval);
             } else {
                 return bedRecords;
             }

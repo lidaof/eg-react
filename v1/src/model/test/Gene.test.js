@@ -1,6 +1,8 @@
 import makeToyRegion from './toyRegion';
 import Gene from '../Gene';
-import Interval from '../Interval';
+import OpenInterval from '../interval/OpenInterval';
+import FeatureInterval from '../interval/FeatureInterval';
+import ChromosomeInterval from '../interval/ChromosomeInterval';
 
 describe('Gene', () => {
     const INPUT = {
@@ -22,13 +24,13 @@ describe('Gene', () => {
 
     let INSTANCE;
     beforeEach(() => {
-        INSTANCE = new Gene(INPUT, makeToyRegion(10, 20), "chr2");
+        const navContext = makeToyRegion().getNavigationContext();
+        const theFeature = navContext.getFeatures().find(feature => feature.getName() === "chr2");
+        INSTANCE = new Gene(INPUT, navContext, new FeatureInterval(theFeature, 0, theFeature.getLength()));
     });
 
     it('constructs correctly', () => {
-        let INSTANCE = new Gene(INPUT, makeToyRegion(10, 20), "chr2");
-        expect(INSTANCE.chr).toBe("chr2");
-        expect([...INSTANCE.get0Indexed()]).toEqual([2, 4]);
+        expect(INSTANCE.getCoordinates()).toEqual(new ChromosomeInterval("chr2", 2, 4));
         expect([INSTANCE.absStart, INSTANCE.absEnd]).toEqual([12, 14]);
     });
 
@@ -49,7 +51,7 @@ describe('Gene', () => {
                 thin: [[2, 4]]
             },
             exons: [[2, 4]],
-            absExons: [ new Interval(12, 14) ],
+            absExons: [ new OpenInterval(12, 14) ],
         });
     });
 });

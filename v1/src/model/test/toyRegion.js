@@ -1,11 +1,12 @@
 import DisplayedRegionModel from '../DisplayedRegionModel';
 import NavigationContext from '../NavigationContext';
 import Feature from '../Feature';
+import ChromosomeInterval from '../interval/ChromosomeInterval';
 
 export const CHROMOSOMES = [
-    new Feature("chr1", 0, 10, true),
-    new Feature("chr2", 0, 10, true),
-    new Feature("chr3", 0, 10, true),
+    new Feature("chr1", new ChromosomeInterval("chr1", 0, 10)),
+    new Feature("chr2", new ChromosomeInterval("chr2", 0, 10)),
+    new Feature("chr3", new ChromosomeInterval("chr3", 0, 10)),
 ];
 
 /**

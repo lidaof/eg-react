@@ -4,32 +4,21 @@ import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import TrackContainer from './components/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
 
+import { HG19 } from './model/Genome';
+import ChromosomeInterval from './model/interval/ChromosomeInterval';
 import Feature from './model/Feature';
 import TrackModel from './model/TrackModel';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import NavigationContext from './model/NavigationContext';
-import GenomeMapper from './model/GenomeMapper';
 
 import './App.css';
 
 import Perf from 'react-addons-perf';
+
 if (process.env.NODE_ENV === 'development') {
     window.Perf = Perf;
 }
 
-const CHROMOSOMES = [
-    new Feature("chr1", 0, 249250621, true),
-    new Feature("chr2", 0, 243199373, true),
-    new Feature("chr3", 0, 198022430, true),
-    new Feature("chr4", 0, 191154276, true),
-    new Feature("chr5", 0, 180915260, true),
-    new Feature("chr6", 0, 171115067, true),
-    new Feature("chr7", 0, 159138663, true),
-    new Feature("chr8", 0, 146364022, true),
-    new Feature("chr9", 0, 141213431, true),
-    new Feature("chr10", 0, 135534747, true),
-    new Feature("chrY", 0, 59373566, true),
-];
 const DEFAULT_SELECTED_REGION = [15600000, 16000000];
 const DEFAULT_NAV_VIEW = [0, 20000000];
 
@@ -46,31 +35,29 @@ const DEFAULT_TRACKS = [
     }),
 ];
 
-const HG19 = new NavigationContext("Wow very genome", CHROMOSOMES);
-const HG19_MAPPER = new GenomeMapper(HG19);
+const HG19_CONTEXT = HG19.makeNavContext();
 
 const GENES = [
-    new Feature({name: "CYP2C8", chr: "chr10"}, 96796528, 96829254, false),
-    //new Feature({name: "CYP2C8-v2", chr: "chr10"}, 96796528, 96829254, false),
-    new Feature({name: "CYP4B1", chr: "chr1"}, 47223509, 47276522, false),
-    new Feature({name: "CYP11B2", chr: "chr8"}, 143991974, 143999259, false),
-    new Feature({name: "CYP26B1", chr: "chr2"}, 72356366, 72375167, false),
-    new Feature({name: "CYP51A1", chr: "chr7"}, 91741462, 91764059, false)
+    new Feature("CYP2C8", new ChromosomeInterval("chr10", 96796528, 96829254)),
+    new Feature("CYP4B1", new ChromosomeInterval("chr1", 47223509, 47276522)),
+    new Feature("CYP11B2", new ChromosomeInterval("chr8", 143991974, 143999259)),
+    new Feature("CYP26B1", new ChromosomeInterval("chr2", 72356366, 72375167)),
+    new Feature("CYP51A1", new ChromosomeInterval("chr7", 91741462, 91764059)),
 ];
-const GENE_SET = new NavigationContext("Set of 5 genes", GENES, HG19_MAPPER);
+const GENE_SET = new NavigationContext("Set of 5 genes", GENES);
 
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             // TODO set the selected region dynamically
-            selectedRegionModel: new DisplayedRegionModel(HG19, ...DEFAULT_SELECTED_REGION),
+            selectedRegionModel: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION),
             currentTracks: DEFAULT_TRACKS.slice(),
             isGeneSetView: false,
         };
 
         // TODO this can be set dynamically too.
-        this.initNavModel = new DisplayedRegionModel(HG19, ...DEFAULT_NAV_VIEW);
+        this.initNavModel = new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_NAV_VIEW);
 
         this.regionSelected = this.regionSelected.bind(this);
         this.addTrack = this.addTrack.bind(this);
@@ -102,7 +89,7 @@ class App extends React.Component {
     }
 
     toggleGeneSetView() {
-        const nextContext = this.state.isGeneSetView ? HG19 : GENE_SET;
+        const nextContext = this.state.isGeneSetView ? HG19_CONTEXT : GENE_SET;
         this.initNavModel = new DisplayedRegionModel(nextContext, ...DEFAULT_NAV_VIEW);
         this.setState({
             selectedRegionModel: new DisplayedRegionModel(nextContext, ...DEFAULT_SELECTED_REGION),

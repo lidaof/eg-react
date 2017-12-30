@@ -6,11 +6,12 @@ import GenomeNavigator from './GenomeNavigator';
 import Feature from '../../model/Feature';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import NavigationContext from '../../model/NavigationContext';
+import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 
 const CHROMOSOMES = [
-    new Feature("chr1", 0, 1000, true),
-    new Feature("chr2", 0, 2000, true),
-    new Feature("chr3", 0, 3000, true),
+    new Feature("chr1", new ChromosomeInterval("chr1", 0, 1000)),
+    new Feature("chr2", new ChromosomeInterval("chr2", 0, 1000)),
+    new Feature("chr3", new ChromosomeInterval("chr3", 0, 1000)),
 ];
 
 describe('GenomeNavigator', () => {

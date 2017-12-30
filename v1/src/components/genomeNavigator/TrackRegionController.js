@@ -33,7 +33,7 @@ class TrackRegionController extends React.Component {
      * @return {string} the currently displayed region in human-readable form
      */
     _currentRegionAsString() {
-        let intervals = this.props.model.getSegmentIntervals();
+        let intervals = this.props.model.getFeatureIntervals();
         if (intervals.length === 1) {
             return intervals[0].toString();
         } else {
@@ -49,7 +49,7 @@ class TrackRegionController extends React.Component {
     parseRegion() {
         let parsedRegion = null;
         try {
-            parsedRegion = this.props.model.getNavigationContext().parseRegionString(this.input.value);
+            parsedRegion = this.props.model.getNavigationContext().parse(this.input.value);
         } catch (error) {
             if (error instanceof RangeError) {
                 this.setState({badInputMessage: error.message});

@@ -4,8 +4,6 @@
  * 
  * @author Silas Hsu
  */
-import Feature from '../model/Feature';
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import makeBamIndex from '../vendor/igv/BamIndex';
 import unbgzf from '../vendor/igv/bgzf';
 
@@ -71,18 +69,17 @@ class BedSourceWorker {
     }
 
     /**
-     * Gets data lying within the region.
+     * Gets data lying within a single chromosome interval.
      * 
-     * @param {Object} region - the regions for which to get data
+     * @param {ChromosomeInterval} chrInterval - genome coordinates
      * @return {Promise<BedRecord[]>} Promise for the data
      */
-    async getData(region) {
-        if (!region) {
+    async getData(chrInterval) {
+        if (!chrInterval) {
             return [];
         }
 
-        const chrInterval = Feature.deserialize(region);
-        return this._getFeatures(chrInterval.getName(), ...chrInterval.get0Indexed());
+        return this._getFeatures(chrInterval.chr, chrInterval.start, chrInterval.end);
     }
 
     /**

@@ -1,4 +1,5 @@
 import Feature from './Feature';
+import ChromosomeInterval from './interval/ChromosomeInterval';
 import JSON5 from 'json5';
 const validate = require('jsonschema').validate;
 
@@ -36,22 +37,30 @@ export class Gene extends Feature {
      * coordinates.
      * 
      * @param {BedRecord} record - BedRecord-like object to use
-     * @param {DisplayedRegionModel} displayedRegion - used to calculate certain props, such as being in view
-     * @param {string} segmentName - the segment in the model in which the Gene lies
+     * @param {NavigationContext} navContext - used to calculate absolute coordinates
+     * @param {FeatureInterval} featureInterval - a feature which overlaps this 
      */
-    constructor(bedRecord, displayedRegion, segmentName) {
-        const navContext = displayedRegion.getNavigationContext();
+    constructor(bedRecord, navContext, featureInterval) {
+        const location = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
+        super(null, location);
 
-        super(null, bedRecord.start, bedRecord.end, true);
-        this._region = displayedRegion;
-        this._segmentName = segmentName;
+        const absInterval = navContext.convertGenomeIntervalToBases(featureInterval, location);
+        if (!absInterval) {
+            throw new RangeError("Given feature does not overlap with this Gene; cannot map to navigation context");
+        }
+
+        [this.absStart, this.absEnd] = absInterval;
+        this._navContext = navContext;
+        this._featureInterval = featureInterval;
         this._unparsedDetails = bedRecord.details;
+    }
 
-        // Set public variables chr, absStart, absEnd, absRegion, isInView
-        this.chr = bedRecord.chr;
-        [this.absStart, this.absEnd] = navContext.mapFromGenome(
-            new Feature(this.chr, ...this.get0Indexed(), true), segmentName
-        );
+    /**
+     * @override
+     */
+    getName() {
+        const details = this.getDetails();
+        return details.name2 || details.name || "";
     }
 
     /**
@@ -89,9 +98,8 @@ export class Gene extends Feature {
             // Set details.absExons
             details.absExons = [];
             for (let exon of details.exons) {
-                const exonInterval = this._region.getNavigationContext().mapFromGenome(
-                    new Feature(this.chr, ...exon, true), this._segmentName
-                );
+                const exonLocation = new ChromosomeInterval(this.getCoordinates().chr, ...exon);
+                const exonInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, exonLocation);
                 if (exonInterval) {
                     details.absExons.push(exonInterval)
                 }
@@ -100,18 +108,6 @@ export class Gene extends Feature {
             this._details = details;
         }
         return this._details;
-    }
-
-    _exonToFeature(rawExon, index) {
-        return new Feature(`Exon ${index + 1}`, rawExon[0], rawExon[1], true);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    getName() {
-        const details = this.getDetails();
-        return details.name2 || details.name || "";
     }
 }
 
@@ -124,12 +120,11 @@ export class GeneFormatter {
      * 
      * @param {BedRecord[]} bedRecords 
      * @param {DisplayedRegionModel} region
-     * @param {Feature} segment
+     * @param {FeatureInterval} segment
      * @override
      */
     format(records, region, segment) {
-        const segmentName = segment.getName();
-        return records.map(record => new Gene(record, region, segmentName));
+        return records.map(record => new Gene(record, region.getNavigationContext(), segment));
     }
 }
 

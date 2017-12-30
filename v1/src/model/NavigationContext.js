@@ -1,60 +1,53 @@
-import Feature from './Feature';
-import Interval from './Interval';
+import OpenInterval from './interval/OpenInterval';
+import FeatureInterval from './interval/FeatureInterval';
 
 /**
- * An object that represents everywhere that a user could potentially navigate and view.  The context is divided into
- * segments/features; for example, chromosomes.  Thus, there are two ways of representing coordinates:
+ * An object that represents everywhere that a user could potentially navigate and view.  A context is actually a linear
+ * list of features.  There are two ways of representing coordinates:
  * 
- * 1.  "Absolute" coordinates, which are a single base numbers starting from 0.
- * 2.  "Segment" coordinates, which are a segment and base number relative to the start of the segment.
+ * 1.  Absolute coordinates, which are a single base numbers starting from 0.
+ * 2.  Feature coordinates, which are a feature and base number relative to the start of the feature.
  * 
- * In the case of segment coordinates or intervals, methods return Feature objects.  The `details` prop shall contain
- * a segment (Feature) which was provided on object construction, and getting the Feature's interval shall provide base
- * numbers relative to the start of that segment.  See {@link Feature} for more info.
- * 
- * Segments in NavigationContexts are guaranteed to have non-empty unique names.
+ * Features in NavigationContexts must have non-empty, unique names.
  * 
  * @author Silas Hsu
  */
 class NavigationContext {
     /**
-     * Makes a new NavigationContext.  Segments must have non-empty, unique names.  The `genomeMapper` argument is
-     * optional; if provided, it shall construct a map from input segments to actual genomic coordinates.
+     * Makes a new NavigationContext.  Features must have non-empty, unique names.  The `genomeMapper` argument is
+     * optional; if provided, it shall construct a map from input features to actual genomic coordinates.
      * 
      * @param {string} name - name of this context
-     * @param {Feature[]} segments - list of segments
-     * @param {GenomeMapper} [genomeMapper] - factory to construct a mapping from input segments to the genome
+     * @param {Feature[]} features - list of features
      */
-    constructor(name, segments, genomeMapper) {
+    constructor(name, features) {
         this._name = name;
-        this._segments = segments;
-        this._segmentStarts = [];
-        this._segmentNameToIndex = {};
+        this._features = features;
+        this._featureStarts = [];
+        this._featureNameToIndex = {};
 
         let totalBases = 0;
         let i = 0;
-        for (let segment of segments) {
+        for (let feature of features) {
             // Make sure names are unique
-            const name = segment.getName();
+            const name = feature.getName();
             if (!name) {
-                throw new Error("All segments must have names");
+                throw new Error("All features must have names");
             }
-            if (this._segmentNameToIndex[name] !== undefined) {
-                throw new Error(`Duplicate name ${name} detected; segments must have unique names.`);
+            if (this._featureNameToIndex[name] !== undefined) {
+                throw new Error(`Duplicate name ${name} detected; features must have unique names.`);
             }
-            this._segmentNameToIndex[name] = i;
+            this._featureNameToIndex[name] = i;
 
-            // Add to segment list w/ additional details
-            this._segmentStarts.push(totalBases);
-            totalBases += segment.getLength();
+            // Add to feature list w/ additional details
+            this._featureStarts.push(totalBases);
+            totalBases += feature.getLength();
             i++;
         }
         this._totalBases = totalBases;
         if (this._totalBases === 0) {
             throw new Error("Context has 0 length");
         }
-
-        this._genomeMap = genomeMapper ? genomeMapper.makeMapToGenome(this) : null;
     }
 
     /**
@@ -65,28 +58,13 @@ class NavigationContext {
     }
 
     /**
-     * Gets the internal segment list for this object.  This list should be treated as read-only; modifying its elements
+     * Gets the internal feature list for this object.  This list should be treated as read-only; modifying its elements
      * may cause undefined behavior.
      * 
-     * @return {Feature[]} the internal segment list for this object
+     * @return {Feature[]} the internal feature list for this object
      */
-    getSegments() {
-        return this._segments.slice();
-    }
-
-    /**
-     * Gets the absolute coordinate of a segment's start.  Throws an error if the segment cannot be found.
-     * 
-     * @param {string} name - the segment's name
-     * @return {number} the absolute coordinate of the segment's start
-     * @throws {RangeError} if the segment's name is not in this context
-     */
-    getSegmentStart(name) {
-        const index = this._segmentNameToIndex[name];
-        if (index === undefined) {
-            throw new RangeError(`Cannot find segment with name '${name}'`);
-        }
-        return this._segmentStarts[index];
+    getFeatures() {
+        return this._features.slice();
     }
 
     /**
@@ -103,23 +81,38 @@ class NavigationContext {
      * @return {boolean} whether the base is navigable
      */
     getIsValidBase(base) {
-        return base >= 0 && base < this._totalBases;
+        return 0 <= base && base < this._totalBases;
     }
 
     /**
-     * Given an absolute coordinate, gets the index of the segment in which the base is located.
+     * Gets the absolute coordinate of a feature's start.  Throws an error if the feature cannot be found.
+     * 
+     * @param {string} name - the feature's name
+     * @return {number} the absolute coordinate of the feature's start
+     * @throws {RangeError} if the feature's name is not in this context
+     */
+    getFeatureStart(name) {
+        const index = this._featureNameToIndex[name];
+        if (index === undefined) {
+            throw new RangeError(`Cannot find feature with name '${name}'`);
+        }
+        return this._featureStarts[index];
+    }
+
+    /**
+     * Given an absolute coordinate, gets the index of the feature in which the base is located.
      *
      * @param {number} base - the absolute coordinate to look up
-     * @return {number} index of segment
+     * @return {number} index of feature
      * @throws {RangeError} if the base is invalid
      */
-    convertBaseToSegmentIndex(base) {
+    convertBaseToFeatureIndex(base) {
         if (!this.getIsValidBase(base)) {
             throw new RangeError("Invalid base number");
         }
-        // Last segment (highest base #) to first (lowest base #)
-        for (let i = this._segmentStarts.length - 1; i > 0; i--) {
-            if (base >= this._segmentStarts[i]) {
+        // Last feature (highest base #) to first (lowest base #)
+        for (let i = this._featureStarts.length - 1; i > 0; i--) {
+            if (base >= this._featureStarts[i]) {
                 return i;
             }
         }
@@ -127,240 +120,140 @@ class NavigationContext {
     }
 
     /**
-     * Given an absolute coordinate, gets the segment where it is located.  Returns a segment coordinate (see the class
-     * docstring for more info on segment coordinates).
+     * Given an absolute coordinate, gets the feature where it is located.  Returns a feature coordinate (see the class
+     * docstring for more info on feature coordinates).
      *
      * @param {number} base - the absolute coordinate to look up
-     * @return {Feature} corresponding segment coordinate
+     * @return {FeatureInterval} corresponding feature coordinate
      * @throws {RangeError} if the base is invalid
      */
-    convertBaseToSegmentCoordinate(base) {
-        const index = this.convertBaseToSegmentIndex(base); // Can throw RangeError
-        const segment = this._segments[index];
-        const coordinate = base - this._segmentStarts[index];
-        return new Feature(segment, coordinate, coordinate + 1, true); // An interval one base long
+    convertBaseToFeatureCoordinate(base) {
+        const index = this.convertBaseToFeatureIndex(base); // Can throw RangeError
+        const feature = this._features[index];
+        const coordinate = base - this._featureStarts[index];
+        return new FeatureInterval(feature, coordinate, coordinate);
     }
 
     /**
-     * Given a segment name and base number relative to the segment's start, finds the absolute coordinate in this
-     * navigation context.  Be sure to specify if the base is 0- or 1-indexed!
+     * Given a feature name and base number relative to the feature's start *indexed from 0*, finds the absolute
+     * coordinate in this navigation context.
      *
-     * @param {string} segmentName - name of the segment to look up
-     * @param {number} baseNum - base number relative to segment's start
-     * @param {boolean} isBase0Indexed - whether `baseNum` is 0-indexed
+     * @param {string} featureName - name of the feature to look up
+     * @param {number} baseNum - base number relative to feature's start
      * @return {number} the absolute base in this navigation context
-     * @throws {RangeError} if the segment name or its base number is not in this context
+     * @throws {RangeError} if the feature name or its base number is not in this context
      */
-    convertSegmentCoordinateToBase(queryName, base, isBase0Indexed) {
-        if (isBase0Indexed === undefined) {
-            throw new Error("You must specify whether the input base is 0-indexed");
-        }
-        if (!isBase0Indexed) { // Convert to 0-indexing.
-            base -= 1;
-        }
-
-        const index = this._segmentNameToIndex[queryName];
+    convertFeatureCoordinateToBase(queryName, base) {
+        const index = this._featureNameToIndex[queryName];
         if (index === undefined) {
-            throw new RangeError(`Cannot find segment with name '${queryName}'`);
+            throw new RangeError(`Cannot find feature with name '${queryName}'`);
         }
-        const segment = this._segments[index];
-        const absStart = this._segmentStarts[index];
+        const feature = this._features[index];
+        const absStart = this._featureStarts[index];
 
-        if (0 <= base && base <= segment.getLength()) {
+        if (0 <= base && base <= feature.getLength()) {
             return absStart + base;
         } else {
-            throw new RangeError(`Base number '${base}' not in segment '${queryName}'`);
+            throw new RangeError(`Base number '${base}' not in feature '${queryName}'`);
         }
     }
 
+    convertGenomeIntervalToBases(featureInterval, chrInterval) {
+        const overlap = featureInterval.getOverlap(chrInterval);
+        if (!overlap) {
+            return null;
+        }
+        const name = featureInterval.getName();
+        return new OpenInterval(
+            this.convertFeatureCoordinateToBase(name, overlap.relativeStart),
+            this.convertFeatureCoordinateToBase(name, overlap.relativeEnd)
+        );
+    }
+
     /**
-     * Parses an interval in this navigation context.  Should be formatted like "$segmentName:$startBase-$endBase" OR
-     * "$segmentName:$startBase-$segmentName2:$endBase".  This format corresponds to UCSC-style chromosomal ranges, like
+     * Parses an interval in this navigation context.  Should be formatted like "$featureName:$startBase-$endBase" OR
+     * "$featureName:$startBase-$featureName2:$endBase".  This format corresponds to UCSC-style chromosomal ranges, like
      * "chr1:1000-chr2:1000", **except that we expect 0-indexed intervals**.
      * 
      * Returns an open interval of absolute coordinates.  Throws RangeError on parse failure.
      *
      * @param {string} string - the string to parse
-     * @return {Interval} the parsed absolute interval
+     * @return {OpenInterval} the parsed absolute interval
      * @throws {RangeError} when parsing an interval outside of the context or something otherwise nonsensical
      */
-    parseRegionString(string) {
+    parse(string) {
         let startName, endName, startBase, endBase;
-        let singleSegmentMatch, multiSegmentMatch;
+        let singleFeatureMatch, multiFeatureMatch;
         // eslint-disable-next-line no-cond-assign
-        if ((singleSegmentMatch = string.match(/([\w:]+):(\d+)-(\d+)/)) !== null) {
-            startName = singleSegmentMatch[1];
+        if ((singleFeatureMatch = string.match(/([\w:]+):(\d+)-(\d+)/)) !== null) {
+            startName = singleFeatureMatch[1];
             endName = startName;
-            startBase = Number.parseInt(singleSegmentMatch[2], 10);
-            endBase = Number.parseInt(singleSegmentMatch[3], 10);
+            startBase = Number.parseInt(singleFeatureMatch[2], 10);
+            endBase = Number.parseInt(singleFeatureMatch[3], 10);
         // eslint-disable-next-line no-cond-assign
-        } else if ((multiSegmentMatch = string.match(/([\w:]+):(\d+)-([\w:]+):(\d+)/)) !== null) {
-            startName = multiSegmentMatch[1];
-            endName = multiSegmentMatch[3];
-            startBase = Number.parseInt(multiSegmentMatch[2], 10);
-            endBase = Number.parseInt(multiSegmentMatch[4], 10);
+        } else if ((multiFeatureMatch = string.match(/([\w:]+):(\d+)-([\w:]+):(\d+)/)) !== null) {
+            startName = multiFeatureMatch[1];
+            endName = multiFeatureMatch[3];
+            startBase = Number.parseInt(multiFeatureMatch[2], 10);
+            endBase = Number.parseInt(multiFeatureMatch[4], 10);
         } else {
             throw new RangeError("Could not parse coordinates");
         }
 
-        let startAbsBase = this.convertSegmentCoordinateToBase(startName, startBase, true);
-        let endAbsBase = this.convertSegmentCoordinateToBase(endName, endBase, true);
+        let startAbsBase = this.convertFeatureCoordinateToBase(startName, startBase, true);
+        let endAbsBase = this.convertFeatureCoordinateToBase(endName, endBase, true);
         if (startAbsBase < endAbsBase) {
-            return new Interval(startAbsBase, endAbsBase);
+            return new OpenInterval(startAbsBase, endAbsBase);
         } else {
-            throw new RangeError("Start of range must be before end of range");
+            throw new RangeError("Start must be before end");
         }
     }
 
     /**
-     * Queries segments that overlap an open interval of absolute coordinates.  Returns a list of segment intervals (see
-     * the class docstring for more info on segment intervals).
+     * Queries features that overlap an open interval of absolute coordinates.  Returns a list of FeatureInterval.
      * 
      * @param {number} queryStart - (inclusive) start of interval, as an absolute coordinate
      * @param {number} queryEnd - (exclusive) end of interval, as an absolute coordinate
-     * @return {Feature[]} list of segment intervals
+     * @return {FeatureInterval[]} list of feature intervals
      */
-    getSegmentsInInterval(queryStart, queryEnd) {
-        const overlappingSegments = []; // Construct overlapping segment list; it will be sorted left to right.
-        const overlappingSegmentStarts = [];
-        for (let i = 0; i < this._segments.length; i++) {
-            const segment = this._segments[i];
-            const segmentStart = this._segmentStarts[i];
-            const segmentEnd = segmentStart + segment.getLength(); // Noninclusive
+    getFeaturesInInterval(queryStart, queryEnd) {
+        const overlappingFeatures = []; // Construct overlapping feature list; it will be sorted left to right.
+        const overlappingFeatureStarts = [];
+        for (let i = 0; i < this._features.length; i++) {
+            const feature = this._features[i];
+            const featureStart = this._featureStarts[i];
+            const featureEnd = featureStart + feature.getLength(); // Noninclusive
             /*
              * You can convince yourself this is correct by considering three cases:
-             *  - the query overlaps the segment on the left side
-             *  - the query is entirely inside the segment
-             *  - the query overlaps the segment on the right side
+             *  - the query overlaps the feature on the left side
+             *  - the query is entirely inside the feature
+             *  - the query overlaps the feature on the right side
              */
-            if (queryStart < segmentEnd && segmentStart < queryEnd) { 
-                overlappingSegments.push(segment);
-                overlappingSegmentStarts.push(segmentStart);
+            if (queryStart < featureEnd && featureStart < queryEnd) { 
+                overlappingFeatures.push(feature);
+                overlappingFeatureStarts.push(featureStart);
             }
         }
 
-        const leftSegment = overlappingSegments[0];
-        const rightSegment = overlappingSegments[overlappingSegments.length - 1];
-        const leftSegmentStart = queryStart - overlappingSegmentStarts[0];
-        const rightSegmentEnd = queryEnd - overlappingSegmentStarts[overlappingSegments.length - 1];
+        const leftFeature = overlappingFeatures[0];
+        const rightFeature = overlappingFeatures[overlappingFeatures.length - 1];
+        const leftFeatureStart = queryStart - overlappingFeatureStarts[0];
+        const rightFeatureEnd = queryEnd - overlappingFeatureStarts[overlappingFeatures.length - 1];
 
-        if (overlappingSegments.length === 1) {
-            return [new Feature(leftSegment, leftSegmentStart, rightSegmentEnd, true)];
+        if (overlappingFeatures.length === 1) {
+            return [new FeatureInterval(leftFeature, leftFeatureStart, rightFeatureEnd)];
         }
 
         let result = [];
-        result.push(new Feature(leftSegment, leftSegmentStart, leftSegment.getLength(), true));
-        for (let i = 1; i < overlappingSegments.length - 1; i++) {
-            let segment = overlappingSegments[i];
-            result.push(new Feature(segment, 0, segment.getLength(), true));
+        result.push(new FeatureInterval(leftFeature, leftFeatureStart, leftFeature.getLength()));
+        for (let i = 1; i < overlappingFeatures.length - 1; i++) {
+            let feature = overlappingFeatures[i];
+            result.push(new FeatureInterval(feature, 0, feature.getLength()));
         }
-        result.push(new Feature(rightSegment, 0, rightSegmentEnd, true));
+        result.push(new FeatureInterval(rightFeature, 0, rightFeatureEnd));
 
         return result;
     }
-
-    /**
-     * Maps a segment in this context to a chromosomal intervals; i.e. genomic coordinates.  If the segment is not in
-     * this context or is otherwise unmappable, returns null.
-     * 
-     * The mapping is configured with this context's construction.  If no mapping was configured, simply returns the 
-     * input segment.  
-     * 
-     * @param {number} absStart - (inclusive) start of interval, as an absolute coordinate
-     * @param {number} absEnd - (exclusive) end of interval, as an absolute coordinate
-     * @return {Feature} chromosomal interval
-     */
-    mapToGenome(segmentInterval) {
-        if (!this._genomeMap) {
-            return segmentInterval;
-        }
-        return this._genomeMap.mapToGenome(segmentInterval);
-    }
-
-    /**
-     * Given a chromosome interval (see class docstring on segment intervals), maps it to an open interval of absolute
-     * coordinates in this context.  Since segments can overlap in the genome, a target segment is also required.
-     * Failed lookups result in null.
-     * 
-     * The mapping is configured with this context's construction.  If no mapping was configured, the result is
-     * identical to `convertSegmentCoordinateToBase` called on the input interval's start and end.
-     * 
-     * @param {Feature} genomicInterval - chromosomal interval
-     * @return {(Interval | null)} open interval of absolute coordinates in this context, or null if not found.
-     */
-    mapFromGenome(chromosomeInterval, targetSegmentName) {
-        let mappedInterval;
-        if (this._genomeMap) {
-            mappedInterval = this._genomeMap.mapFromGenome(chromosomeInterval, targetSegmentName);
-            if (!mappedInterval) {
-                return null;
-            }
-        } else {
-            mappedInterval = chromosomeInterval;
-        }
-
-        const name = mappedInterval.getName();
-        const [start, end] = mappedInterval.get0Indexed();
-        return new Interval(
-            this.convertSegmentCoordinateToBase(name, start, true),
-            this.convertSegmentCoordinateToBase(name, end, true)
-        );
-    }
-
-    /**
-     * Returns the same segments and in the same order as {@link getSegmentsInInterval}, but mapped to chromosomal 
-     * intervals; i.e. genomic coordinates.
-     * 
-     * The mapping is done with the GenomeCoordinateMap provided when this object was constructed.  Failed lookups are
-     * ignored.  If no mapping was provided, the result is identical to {@link getSegmentsInInterval}.  
-     * 
-     * @param {number} absStart - (inclusive) start of interval, as an absolute coordinate
-     * @param {number} absEnd - (exclusive) end of interval, as an absolute coordinate
-     * @return {Feature[]} list of chromosome intervals
-     */
-    mapAbsIntervalToGenome(absStart, absEnd) {
-        const segments = this.getSegmentsInInterval(absStart, absEnd);
-        if (this._genomeMap) {
-            let results = [];
-            for (let segment of segments) {
-                let lookupResult = this._genomeMap.mapToGenome(segment);
-                if (lookupResult) {
-                    results.push(lookupResult);
-                }
-            }
-            return results;
-        } else {
-            return segments;
-        }
-    }
-
-    /**
-     * Given a chromosome interval (see class docstring on segment intervals), maps it to an open interval of 
-     * absolute coordinates in this context.
-     * 
-     * The mapping is done with the GenomeCoordinateMap provided when this object was constructed.  A failed lookup
-     * results in null.  If no mapping was provided, the result is identical to `convertSegmentCoordinateToBase`, called
-     * on the input interval's start and end.
-     * 
-     * @param {Feature} genomicInterval - chromosomal interval
-     * @return {(Interval | null)} open interval of absolute coordinates in this context, or null if not found.
-     */
-    mapFromGenomeInterval(genomicInterval) {
-        const segmentInterval = this._genomeMap ?
-            this._genomeMap.mapFromGenome(genomicInterval) : genomicInterval;
-
-        if (segmentInterval) {
-            const name = segmentInterval.getName();
-            const [start, end] = segmentInterval.get0Indexed();
-            return new Interval(
-                this.convertSegmentCoordinateToBase(name, start, true),
-                this.convertSegmentCoordinateToBase(name, end, true)
-            );
-        } else {
-            return null;
-        }
-    }
-
 }
 
 export default NavigationContext;

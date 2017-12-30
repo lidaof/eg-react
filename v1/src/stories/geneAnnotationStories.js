@@ -8,10 +8,11 @@ import Feature from '../model/Feature';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import NavigationContext from '../model/NavigationContext';
 import Gene from '../model/Gene';
+import ChromosomeInterval from '../model/interval/ChromosomeInterval';
+import FeatureInterval from '../model/interval/FeatureInterval';
 
-const NAV_CONTEXT = new NavigationContext("Wow very genome", [
-    new Feature("chr1", 0, 1500, true)
-]);
+const CHR1 = new Feature("chr1", new ChromosomeInterval("chr1", 0, 1500));
+const NAV_CONTEXT = new NavigationContext("Wow very genome", [CHR1]);
 const model = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
 
 const RECORDS = [
@@ -82,7 +83,9 @@ const RECORDS = [
     }
 ];
 
-const GENES = RECORDS.map(record => new Gene(record, model));
+const GENES = RECORDS.map(record =>
+    new Gene(record, model.getNavigationContext(), new FeatureInterval(CHR1, 0, CHR1.getLength()))
+);
 
 export const annotationStory = {
     storyName: "Annotations",

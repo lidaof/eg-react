@@ -4,25 +4,25 @@ import { storiesOf } from '@storybook/react';
 import MainPane from '../components/genomeNavigator/MainPane';
 
 import Feature from '../model/Feature';
+import { Genome, Chromosome } from '../model/Genome';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import NavigationContext from '../model/NavigationContext';
 
-
-
 const CHROMOSOMES = [
-    new Feature("chr1", 0, 1500, true),
-    new Feature("chr2", 0, 2500, true),
-    new Feature("chr3", 0, 3500, true),
-    new Feature("chr4", 0, 4500, true),
+    new Chromosome("chr1", 1500),
+    new Chromosome("chr2", 2500),
+    new Chromosome("chr3", 3500),
+    new Chromosome("chr4", 4500),
 ];
+const NAV_CONTEXT = new Genome("Genome", CHROMOSOMES).makeNavContext();
 
-const view1 = new DisplayedRegionModel(new NavigationContext("View 1", CHROMOSOMES));
+const view1 = new DisplayedRegionModel(NAV_CONTEXT);
 view1.setRegion(0, 7500); // Chromosomes 1 to 3
 
-const view2 = new DisplayedRegionModel(new NavigationContext("View 2", CHROMOSOMES));
+const view2 = new DisplayedRegionModel(NAV_CONTEXT);
 view2.setRegion(7000, 12000);
 
-const selectedRegion = new DisplayedRegionModel(new NavigationContext("Selected region", CHROMOSOMES));
+const selectedRegion = new DisplayedRegionModel(NAV_CONTEXT);
 selectedRegion.setRegion(1000, 2000);
 
 const mainPaneView1 = {

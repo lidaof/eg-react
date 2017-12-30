@@ -110,7 +110,7 @@ class AnnotationArranger extends SvgComponent {
                 key={gene.getDetails().id}
             />);
         }
-
+        console.log(`${numHiddenGenes} genes hidden this render`);
         return <div>{children}</div>;
     }
 }
