@@ -1,7 +1,7 @@
 import LinearDrawingModel from '../LinearDrawingModel';
 import makeToyRegion from './toyRegion';
 
-const REGION = makeToyRegion();
+const REGION = makeToyRegion(0, 10);
 const DRAW_WIDTH = 100;
 const INSTANCE = new LinearDrawingModel(REGION, DRAW_WIDTH, null);
 

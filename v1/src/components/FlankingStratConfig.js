@@ -21,18 +21,11 @@ class FlankingStratConfig extends React.Component {
 
     inputChanged(propToChange, value) {
         const newStrat = this.props.strategy.cloneAndSetProp(propToChange, value);
-        let isError = false;
-        try {
-            newStrat.assertIsValid();
-        } catch (error) {
-            isError = true;
-            this.setState({error: error});
-        }
-
-        if (!isError) {
+        const error = newStrat.checkValid();
+        if (!error) {
             this.props.onNewStrategy(newStrat);
-            this.setState({error: null});
         }
+        this.setState({error: error});
     }
 
     render() {

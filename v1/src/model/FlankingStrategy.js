@@ -1,61 +1,92 @@
-import _ from 'lodash';
 import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
-import { Gene } from './Gene';
 
+/**
+ * An algorithm that modifies feature coordinates.
+ * 
+ * @author Silas Hsu
+ */
 class FlankingStrategy {
     static SURROUND_ALL = 0;
     static SURROUND_START = 1;
     static SURROUND_END = 2;
 
+    /**
+     * Makes a new instance.  Does not do any sanity checks; use {@link checkValid} to check if the parameters make
+     * sense.
+     * 
+     * @param {number} [type] - type of strategy; see static variables for a selection
+     * @param {number} [upstream] - number of bases upstream to expand input features
+     * @param {number} [downstream] - number of bases downstream to expand input features
+     */
     constructor(type=FlankingStrategy.SURROUND_ALL, upstream=0, downstream=0) {
         this.type = type;
         this.upstream = upstream;
         this.downstream = downstream;
     }
 
-    assertIsValid(minRegionLength=1) {
+    /**
+     * Checks if the current options make sense.  Returns an Error object if there is a problem, and null otherwise.
+     * 
+     * @return {Error} Error object, or null if everything is OK
+     */
+    checkValid() {
         const allStrats = [
             FlankingStrategy.SURROUND_ALL,
             FlankingStrategy.SURROUND_START,
             FlankingStrategy.SURROUND_END,
         ];
         if (allStrats.find(strat => strat === this.type) === undefined) {
-            throw new RangeError("Unknown strategy type");
+            return new RangeError("Unknown strategy type");
         }
 
         if (!Number.isSafeInteger(this.upstream) || !Number.isSafeInteger(this.downstream) || 
                 this.upstream < 0 || this.downstream < 0) {
-            throw new RangeError("Must give positive number of bases");
+            return new RangeError("Must give positive number of bases");
         }
 
-        if (this.type === FlankingStrategy.SURROUND_START || this.type === FlankingStrategy.SURROUND_END) {
-            if (this.upstream + this.downstream < minRegionLength) {
-                throw new RangeError("Resulting regions will be too short");
-            }
-        }
+        return null;
     }
 
+    /**
+     * Shallowly clones this, sets a prop to a value, and returns the result.
+     * 
+     * @param {string} prop - the prop to set
+     * @param {any} value - the value to set
+     * @return {FlankingStrategy} cloned and modified version of this
+     */
     cloneAndSetProp(prop, value) {
-        let newStrategy = _.clone(this);
+        let newStrategy = new FlankingStrategy(this.type, this.upstream, this.downstream);
         newStrategy[prop] = value;
         return newStrategy;
     }
 
+    /**
+     * Makes a new Feature with a locus that flanks some part of the input Feature, depending on strategy type.  The
+     * genome parameter ensures that the modified locus stays within the genome.  If the input Feature is not in the
+     * genome at all, returns null.
+     * 
+     * @param {Feature} feature - feature whose coordinates to use
+     * @param {Genome} genome - the genome in which this feature is located
+     * @return {Feature} new Feature whose locus is based off the input Feature
+     */
     makeFlankedFeature(feature, genome) {
-        let isForwardStrand = true;
-        if (feature instanceof Gene && feature.getDetails().strand === "-") {
-            isForwardStrand = false;
-        }
-
-        const unsafeInterval = this._makeFlankedCoordinates(feature.getCoordinates(), isForwardStrand);
+        const unsafeInterval = this._makeFlankedCoordinates(feature.getLocus(), feature.getIsForwardStrand());
         const safeInterval = genome.intersectInterval(unsafeInterval);
         if (!safeInterval) {
             return null;
         }
-        return new Feature(feature.getName(), safeInterval);
+        return new Feature(feature.getName(), safeInterval, feature.getIsForwardStrand());
     }
 
+    /**
+     * From the input genomic location, makes a new location flanking some part of it depending on this strategy type.
+     * Does no checks to ensure the output is within the genome.
+     * 
+     * @param {ChromosomeInterval} locus - location to flank
+     * @param {boolean} isForwardStrand - strand of the input; affects what is upstream and downstream
+     * @return {ChromosomeInterval} flanked location
+     */
     _makeFlankedCoordinates(locus, isForwardStrand) {
         let transcriptionStart, transcriptionEnd, moveUpstream, moveDownstream;
         if (isForwardStrand) {
@@ -82,7 +113,8 @@ class FlankingStrategy {
                 newInterval = [transcriptionEnd, transcriptionEnd];
                 break;
             default:
-                throw new Error("Unknown strategy type");
+                console.warn("Unknown strategy type; defaulting to SURROUND_ALL");
+                newInterval = [transcriptionStart, transcriptionEnd];
         }
 
         newInterval[0] = moveUpstream(newInterval[0]);

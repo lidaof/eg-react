@@ -11,16 +11,15 @@ export const CHROMOSOMES = [
 
 /**
  * Makes an instance of DisplayedRegionModel for testing purposes.  The genome will have 3 chromosomes, each with a
- * length of 10 bases.  Default region is [0, 10).
+ * length of 10 bases.  Start and end parameters will be passed to the DisplayedRegionModel constructor.
  * 
- * @param {number} [start] - initial absolute start of the region, inclusive.  Default: 0
- * @param {number} [end] - initial absolute end of the region, exclusive.  Default: 10
+ * @param {number} [start] - initial absolute start of the region, inclusive.
+ * @param {number} [end] - initial absolute end of the region, exclusive.
  * @return {DisplayedRegionModel} an instance for testing purposes
  */
-export function makeToyRegion(start=0, end=10) {
+export function makeToyRegion(start, end) {
     const navContext = new NavigationContext("Wow very genome", CHROMOSOMES);
-    let model = new DisplayedRegionModel(navContext);
-    model.setRegion(start, end);
+    let model = new DisplayedRegionModel(navContext, start, end);
     return model;
 }
 

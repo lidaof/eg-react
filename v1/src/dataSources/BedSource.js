@@ -8,7 +8,7 @@ const BedWorker = require('./Bed.worker');
  */
 class BedSource extends DataSource {
     /**
-     * Makes a new BedSource specialized to serve data from a url.  Fetching data will return BedRecords by default,
+     * Makes a new instance specialized to serve data from a url.  Fetching data will return BedRecords by default,
      * unless given a BedFormatter.
      * 
      * @param {string} url - the url from which to fetch data

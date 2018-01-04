@@ -84,7 +84,7 @@ const RECORDS = [
 ];
 
 const GENES = RECORDS.map(record =>
-    new Gene(record, model.getNavigationContext(), new FeatureInterval(CHR1, 0, CHR1.getLength()))
+    new Gene(record, model.getNavigationContext(), new FeatureInterval(CHR1))
 );
 
 export const annotationStory = {

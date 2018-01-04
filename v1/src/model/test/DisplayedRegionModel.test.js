@@ -1,4 +1,6 @@
-import makeToyRegion from './toyRegion';
+import { CHROMOSOMES } from './toyRegion';
+import DisplayedRegionModel from '../DisplayedRegionModel';
+import NavigationContext from '../NavigationContext';
 
 function expectRegion(instance, start, end) {
     // For a less flaky test, I would want to manually compare just the `start` and `end` props, but done this way,
@@ -6,9 +8,23 @@ function expectRegion(instance, start, end) {
     expect(instance.getAbsoluteRegion()).toEqual({start: start, end: end});
 }
 
+const NAV_CONTEXT = new NavigationContext("Gee, gnome!", CHROMOSOMES);
+const NAV_CONTEXT_LENGTH = NAV_CONTEXT.getTotalBases();
+
 var instance;
 beforeEach(() => {
-    instance = makeToyRegion();
+    instance = new DisplayedRegionModel(NAV_CONTEXT);
+});
+
+describe("constructor", () => {
+    it("by default sets view region to the entire navigation context", () => {
+        expectRegion(instance, 0, NAV_CONTEXT_LENGTH);
+    })
+
+    it("sets initial view region correctly", () => {
+        let instance2 = new DisplayedRegionModel(NAV_CONTEXT, 10, 20);
+        expectRegion(instance2, 10, 20);
+    });
 });
 
 /*
@@ -21,13 +37,13 @@ describe("setRegion()", () => {
 
     it("makes sure the region stays within bounds of the genome", () => {
         instance.setRegion(-1, 100);
-        expectRegion(instance, 0, 30);
+        expectRegion(instance, 0, NAV_CONTEXT_LENGTH);
 
         instance.setRegion(100, 150);
-        expectRegion(instance, 0, 30);
+        expectRegion(instance, 0, NAV_CONTEXT_LENGTH);
 
         instance.setRegion(-150, -100);
-        expectRegion(instance, 0, 30);
+        expectRegion(instance, 0, NAV_CONTEXT_LENGTH);
     });
 
     it("rounds the arguments", () => {
@@ -40,21 +56,21 @@ describe("setRegion()", () => {
         expectRegion(instance, 0, 15);
 
         instance.setRegion(25, 35);
-        expectRegion(instance, 20, 30);
+        expectRegion(instance, 20, NAV_CONTEXT_LENGTH);
 
         instance.setRegion(40, 45);
-        expectRegion(instance, 25, 30);
+        expectRegion(instance, 25, NAV_CONTEXT_LENGTH);
     })
 });
 
 describe("clone()", () => {
     it("makes a clone, and modifying the clone does not modify the original", () => {
-        instance.setRegion(20, 30);
+        instance.setRegion(20, NAV_CONTEXT_LENGTH);
         let clone = instance.clone();
         expect(clone).not.toBe(instance);
         clone.setRegion(0, 10);
         expectRegion(clone, 0, 10);
-        expectRegion(instance, 20, 30);
+        expectRegion(instance, 20, NAV_CONTEXT_LENGTH);
     });
 });
 

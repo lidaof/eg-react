@@ -2,23 +2,22 @@ import OpenInterval from './interval/OpenInterval';
 import FeatureInterval from './interval/FeatureInterval';
 
 /**
- * An object that represents everywhere that a user could potentially navigate and view.  A context is actually a linear
- * list of features.  There are two ways of representing coordinates:
+ * An object that represents everywhere that a user could potentially navigate and view.  A context is actually an
+ * ordered list of features.  Features in NavigationContexts must have non-empty, unique names.  There are two ways to
+ * represent coordinates:
  * 
- * 1.  Absolute coordinates, which are a single base numbers starting from 0.
+ * 1.  Absolute coordinates, which are base numbers starting from 0.
  * 2.  Feature coordinates, which are a feature and base number relative to the start of the feature.
- * 
- * Features in NavigationContexts must have non-empty, unique names.
  * 
  * @author Silas Hsu
  */
 class NavigationContext {
     /**
-     * Makes a new NavigationContext.  Features must have non-empty, unique names.  The `genomeMapper` argument is
-     * optional; if provided, it shall construct a map from input features to actual genomic coordinates.
+     * Makes a new instance.  Features must have non-empty, unique names.
      * 
      * @param {string} name - name of this context
      * @param {Feature[]} features - list of features
+     * @throws {Error} if the feature list has a problem
      */
     constructor(name, features) {
         this._name = name;
@@ -58,10 +57,10 @@ class NavigationContext {
     }
 
     /**
-     * Gets the internal feature list for this object.  This list should be treated as read-only; modifying its elements
-     * may cause undefined behavior.
+     * Gets the internal feature list.  This list should be treated as read-only; modifying its elements causes
+     * undefined behavior.
      * 
-     * @return {Feature[]} the internal feature list for this object
+     * @return {Feature[]} the internal feature list for this context
      */
     getFeatures() {
         return this._features.slice();
@@ -85,7 +84,8 @@ class NavigationContext {
     }
 
     /**
-     * Gets the absolute coordinate of a feature's start.  Throws an error if the feature cannot be found.
+     * Gets the absolute coordinate of a feature's start, given the feature's name.  Throws an error if the feature
+     * cannot be found.
      * 
      * @param {string} name - the feature's name
      * @return {number} the absolute coordinate of the feature's start
@@ -120,12 +120,12 @@ class NavigationContext {
     }
 
     /**
-     * Given an absolute coordinate, gets the feature where it is located.  Returns a feature coordinate (see the class
-     * docstring for more info on feature coordinates).
+     * Given an absolute coordinate, gets the feature in which it is located.  Returns a FeatureInterval that expresses
+     * a base number relative to the feature's start.
      *
      * @param {number} base - the absolute coordinate to look up
      * @return {FeatureInterval} corresponding feature coordinate
-     * @throws {RangeError} if the base is invalid
+     * @throws {RangeError} if the absolute base is not in this context
      */
     convertBaseToFeatureCoordinate(base) {
         const index = this.convertBaseToFeatureIndex(base); // Can throw RangeError
@@ -140,8 +140,8 @@ class NavigationContext {
      *
      * @param {string} featureName - name of the feature to look up
      * @param {number} baseNum - base number relative to feature's start
-     * @return {number} the absolute base in this navigation context
-     * @throws {RangeError} if the feature name or its base number is not in this context
+     * @return {number} the absolute base in this context
+     * @throws {RangeError} if the feature name or its relative base is not in this context
      */
     convertFeatureCoordinateToBase(queryName, base) {
         const index = this._featureNameToIndex[queryName];
@@ -158,6 +158,16 @@ class NavigationContext {
         }
     }
 
+    /**
+     * Converts genome coordinates to an interval of absolute base numbers in this context.  Since coordinates can map
+     * to multiple features, a target feature interval is required.  This method will then intersect the feature
+     * interval with the genome coordinates before conversion to absolute base numbers.
+     * 
+     * @param {FeatureInterval} featureInterval - target location in context to map to
+     * @param {ChromosomeInterval} chrInterval - genome interval
+     * @return {OpenInterval} interval of absolute base numbers in this context
+     * @throws {RangeError} if the feature does not exist in this context
+     */
     convertGenomeIntervalToBases(featureInterval, chrInterval) {
         const overlap = featureInterval.getOverlap(chrInterval);
         if (!overlap) {

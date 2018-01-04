@@ -56,7 +56,7 @@ export class Gene extends Feature {
     }
 
     /**
-     * @override
+     * @inheritdoc
      */
     getName() {
         const details = this.getDetails();
@@ -72,6 +72,14 @@ export class Gene extends Feature {
     getIsInView(region) {
         const absRegion = region.getAbsoluteRegion();
         return this.absStart < absRegion.end && this.absEnd > absRegion.start;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    getIsForwardStrand() {
+        const details = this.getDetails();
+        return details.strand !== "-";
     }
 
     /**
@@ -98,7 +106,7 @@ export class Gene extends Feature {
             // Set details.absExons
             details.absExons = [];
             for (let exon of details.exons) {
-                const exonLocation = new ChromosomeInterval(this.getCoordinates().chr, ...exon);
+                const exonLocation = new ChromosomeInterval(this.getLocus().chr, ...exon);
                 const exonInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, exonLocation);
                 if (exonInterval) {
                     details.absExons.push(exonInterval)
@@ -113,21 +121,24 @@ export class Gene extends Feature {
 
 /**
  * Turns BedRecords into Genes.
+ * 
+ * @author Silas Hsu
  */
 export class GeneFormatter {
     /**
-     * Turns BedRecords into Genes
+     * Turns BedRecords into Genes.  The second and third parameters exist to assist mapping to a navigation context.
+     * Genes that fail mapping will be ignored and skipped.
      * 
-     * @param {BedRecord[]} bedRecords 
-     * @param {DisplayedRegionModel} region
-     * @param {FeatureInterval} segment
-     * @override
+     * @param {BedRecord[]} bedRecords - the records to convert
+     * @param {DisplayedRegionModel} region - object containing navigation context and view region
+     * @param {FeatureInterval} feature - feature in navigation context to map to
+     * @return {Gene[]} array of Gene
      */
-    format(records, region, segment) {
+    format(records, region, feature) {
         let genes = [];
         for (let record of records) {
             try {
-                genes.push(new Gene(record, region.getNavigationContext(), segment));
+                genes.push(new Gene(record, region.getNavigationContext(), feature));
             } catch (error) {
 
             }

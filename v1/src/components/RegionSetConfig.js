@@ -106,8 +106,8 @@ class RegionSetConfig extends React.Component {
 
             rows.push(<tr key={i}>
                 <td>{features[i].getName()}</td>
-                <td>{features[i].getCoordinates().toString()}</td>
-                <td>{flankedFeatures[i].getCoordinates().toString()}</td>
+                <td>{features[i].getLocus().toString()}</td>
+                <td>{flankedFeatures[i].getLocus().toString()}</td>
                 <td><button onClick={() => this.deleteRegion(i)}>Delete</button></td>
             </tr>);
         }

@@ -2,22 +2,50 @@ import Feature from './Feature';
 import NavigationContext from './NavigationContext';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 
+/**
+ * Simple container for chromosome info.
+ * 
+ * @author Silas Hsu
+ */
 export class Chromosome {
+    /**
+     * Makes a new instance with specified name and length in bases.
+     * 
+     * @param {string} name - name of the chromosome
+     * @param {number} length - length of the chromosome in bases
+     */
     constructor(name, length) {
         this._name = name;
         this._length = length;
     }
 
+    /**
+     * @return {string} this chromosome's name
+     */
     getName() {
         return this._name;
     }
 
+    /**
+     * @return {number} this chromosome's length in bases
+     */
     getLength() {
         return this._length;
     }
 }
 
+/**
+ * A named set of chromosomes.
+ * 
+ * @author Silas Hsu
+ */
 export class Genome {
+    /**
+     * Makes a new instance, with name and list of chromosomes.  For best results, chromosomes should have unique names.
+     * 
+     * @param {string} name - name of the genome
+     * @param {Chromosome[]} chromosomes - list of chromosomes in the genome
+     */
     constructor(name, chromosomes) {
         this._name = name;
         this._chromosomes = chromosomes;
@@ -31,14 +59,31 @@ export class Genome {
         }
     }
 
+    /**
+     * @return {string} this genome's name
+     */
     getName() {
         return this._name;
     }
 
+    /**
+     * Gets a chromosome with the specified name.  Returns null if there is no such chromosome.
+     * 
+     * @param {string} name - chromosome name to look up
+     * @return {Chromosome} chromosome with the query name, or null if not found
+     */
     getChromosome(name) {
         return this._nameToChromosome[name] || null;
     }
 
+    /**
+     * Intersects a genomic location with this genome.  If there is no overlap, then returns null.  Possible reasons for
+     * null include unknown chromosome name or an interval past the end of a chromosome.  Can be used to check/ensure a
+     * location actually lies within the genome.
+     * 
+     * @param {ChromosomeInterval} chrInterval - genomic location to intersect with the genome
+     * @return {ChromosomeInterval} intersection result, or null if there is no overlap at all
+     */
     intersectInterval(chrInterval) {
         const chrName = chrInterval.chr;
         const matchingChr = this.getChromosome(chrName);
@@ -48,6 +93,12 @@ export class Genome {
         return new ChromosomeInterval(chrName, 0, matchingChr.getLength()).getOverlap(chrInterval);
     }
 
+    /**
+     * Makes a NavigationContext representing this genome.  It will have the same name as the genome, and the
+     * features/segments will consist of whole chromosomes.
+     * 
+     * @return {NavigationContext} NavigationContext representing this genome
+     */
     makeNavContext() {
         const features = this._chromosomes.map(chr => {
             const name = chr.getName();

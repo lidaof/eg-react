@@ -5,7 +5,7 @@
  */
 class LinearDrawingModel {
     /**
-     * Makes a new drawing model.
+     * Makes a new instance.
      * 
      * @param {DisplayedRegionModel} model - the displayed region
      * @param {number} drawWidth - the width of the canvas/svg/etc on which to draw
