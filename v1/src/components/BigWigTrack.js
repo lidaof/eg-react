@@ -64,7 +64,7 @@ class BigWigTrack extends React.Component {
         
         let viewExpansion = new RegionExpander(this.props.viewExpansionValue)
             .calculateExpansion(this.props.width, this.props.viewRegion);
-        const drawModel = new LinearDrawingModel(viewExpansion.expandedRegion, viewExpansion.expandedWidth, canvas);
+        const drawModel = new LinearDrawingModel(viewExpansion.expandedRegion, viewExpansion.expandedWidth);
         non0Data.forEach(record => {
             const x = Math.round(drawModel.baseToX(record.start));
             const y = Math.round(canvasHeight - (record.value/dataMax * canvasHeight) + TOP_PADDING);

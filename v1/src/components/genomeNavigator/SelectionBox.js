@@ -8,6 +8,13 @@ import withSvgJs from '../withSvgJs';
 
 const SELECT_BOX_HEIGHT = 60;
 
+/**
+ * Given a X coordinate on the webpage (such as those contained in MouseEvents), gets the X coordinate in the SVG.
+ * 
+ * @param {number} domX - the X coordinate on the webpage
+ * @param {SVGElement} svgNode - <svg> ref
+ * @return {number} the X coordinate in the SVG
+ */
 function domXToSvgX(domX, svgNode) {
     return domX - svgNode.getBoundingClientRect().left;
 }

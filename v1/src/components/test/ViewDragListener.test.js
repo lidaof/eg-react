@@ -11,7 +11,7 @@ const VIEW_WIDTH = 100;
 describe("ViewDragListener", () => {
     const domNode = document.createElement('div');
     const model = makeToyRegion();
-    const drawModel = new LinearDrawingModel(model, VIEW_WIDTH, domNode);
+    const drawModel = new LinearDrawingModel(model, VIEW_WIDTH);
 
     let viewDragStartCallback = jest.fn();
     let viewDragCallback = jest.fn();

@@ -146,7 +146,7 @@ class TrackContainer extends React.Component {
         }
 
         const width = this.getTrackWidth();
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, width, this.node);
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, width);
 
         return (
         <div ref={node => this.node = node} style={{margin: "10px", border: "1px solid grey"}}>
