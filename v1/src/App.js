@@ -17,6 +17,7 @@ if (process.env.NODE_ENV === 'development') {
     window.Perf = Perf;
 }
 
+const MIN_SELECTED_SIZE = 100;
 const DEFAULT_SELECTED_REGION = [15600000, 16000000];
 
 const DEFAULT_TRACKS = [
@@ -55,6 +56,9 @@ class App extends React.Component {
     }
 
     regionSelected(start, end) {
+        if (end - start < MIN_SELECTED_SIZE) {
+            return;
+        }
         let modelCopy = this.state.selectedRegionModel.clone().setRegion(start, end);
         this.setState({selectedRegionModel: modelCopy});
     }

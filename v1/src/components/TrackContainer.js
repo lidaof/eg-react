@@ -3,12 +3,10 @@ import PropTypes from 'prop-types';
 
 import TrackLegend from './TrackLegend';
 import { makeTrack } from './Track';
+import { LEFT_MOUSE } from './DragAcrossDiv';
+import DragAcrossView from './DragAcrossView';
 
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import LinearDrawingModel from '../model/LinearDrawingModel';
-
-import { LEFT_MOUSE } from './DomDragListener';
-import ViewDragListener from './ViewDragListener';
 
 const VIEW_EXPANSION_VALUE = 1;
 
@@ -66,9 +64,10 @@ class TrackContainer extends React.Component {
     /**
      * Saves the current track draw offsets.
      * 
-     * @param {MouseEvent} unusedEvent - unused
+     * @param {React.SyntheticEvent} event - the event the triggered this
      */
-    viewDragStart(unusedEvent) {
+    viewDragStart(event) {
+        event.preventDefault();
         this.offsetsOnDragStart = this.state.xOffsets.slice();
     }
 
@@ -77,7 +76,7 @@ class TrackContainer extends React.Component {
      * 
      * @param {any} [unused] - unused
      * @param {any} [unused2] - unused
-     * @param {MouseEvent} [unusedEvent] - unused
+     * @param {React.SyntheticEvent} [unusedEvent] - unused
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
     viewDrag(unused, unused2, unusedEvent, coordinateDiff) {
@@ -90,10 +89,10 @@ class TrackContainer extends React.Component {
      * 
      * @param {number} newStart - absolute start base pair of the new display region
      * @param {number} newEnd - absolute end base number of the new display region
-     * @param {MouseEvent} [event] - unused
+     * @param {React.SyntheticEvent} [unusedEvent] - unused
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
-    viewDragEnd(newStart, newEnd, event, coordinateDiff) {
+    viewDragEnd(newStart, newEnd, unusedEvent, coordinateDiff) {
         if (Math.abs(coordinateDiff.dx) >= TrackContainer.MIN_DRAG_DISTANCE_FOR_REFRESH) {
             this.props.newRegionCallback(newStart, newEnd);
         }
@@ -146,21 +145,20 @@ class TrackContainer extends React.Component {
         }
 
         const width = this.getTrackWidth();
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, width);
 
         return (
-        <div ref={node => this.node = node} style={{margin: "10px", border: "1px solid grey"}}>
+        <DragAcrossView
+            ref={node => this.node = node}
+            style={{margin: "10px", border: "1px solid grey"}}
+            button={LEFT_MOUSE}
+            onViewDragStart={this.viewDragStart}
+            onViewDrag={this.viewDrag}
+            onViewDragEnd={this.viewDragEnd}
+            displayedRegion={this.props.viewRegion}
+            widthOverride={width}
+        >
             {this.props.tracks.map(this.renderTrack)}
-            <ViewDragListener
-                button={LEFT_MOUSE}
-                node={this.node}
-                drawModel={drawModel}
-                model={this.props.viewRegion}
-                onViewDragStart={this.viewDragStart}
-                onViewDrag={this.viewDrag}
-                onViewDragEnd={this.viewDragEnd}
-            />
-        </div>
+        </DragAcrossView>
         );
     }
 }

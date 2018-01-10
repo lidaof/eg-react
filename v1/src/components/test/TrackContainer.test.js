@@ -54,7 +54,7 @@ describe("TrackContainer", () => {
 
     it("sets tracks' xOffset prop when the view is dragged, AND resets a track's xOffset when it loads data", () => {
         let instance = wrapper.instance();
-        instance.viewDragStart();
+        instance.viewDragStart(new MouseEvent('mousedown'));
         instance.viewDrag(dragRegionStart, dragRegionEnd, undefined, {dx: 10});
 
         let tracks = getRenderedTracks(wrapper);
@@ -65,7 +65,7 @@ describe("TrackContainer", () => {
         
         // Start another drag!
         instance.viewDragEnd(dragRegionStart, dragRegionEnd, undefined, {dx: 10});
-        instance.viewDragStart();
+        instance.viewDragStart(new MouseEvent('mousedown'));
         instance.viewDrag(dragRegionStart, dragRegionEnd, undefined, {dx: 10});
 
         tracks = getRenderedTracks(wrapper);

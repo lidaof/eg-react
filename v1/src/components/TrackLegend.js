@@ -57,7 +57,7 @@ class TrackLegend extends React.PureComponent {
         };
 
         return (
-        <div style={divStyle}>
+        <div style={divStyle} onMouseDown={(event) => event.stopPropagation()}>
             <svg width={TrackLegend.WIDTH} height={this.props.height}>
                 <foreignObject
                     width={TrackLegend.WIDTH - LABEL_RIGHT_MARGIN}

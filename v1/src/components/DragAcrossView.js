@@ -1,36 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import DomDragListener from './DomDragListener';
+import DragAcrossDiv from './DragAcrossDiv';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
 
 /**
- * Listens for drag-across events as specified by {@link DomDragListener}, and also calculates changes in view region
- * as the result of the drag.
+ * Same as {@link DragAcrossDiv}, but also calculates changes in view region as the result of the drag.
  * 
  * @author Silas Hsu
  */
-class ViewDragListener extends React.Component {
+class DragAcrossView extends React.Component {
     static propTypes = {
-        button: PropTypes.number.isRequired, // The mouse button to listen to.  See DomDragListener for possible values.
+        button: PropTypes.number.isRequired, // Mouse button to listen to.  See DragAcrossDiv for a selection.
 
         /**
-         * The node to listen to.  One of `node` or `svgNode` is required.  `node` will override `svgNode`.
+         * The current displayed region; used to calculate how many base pairs the user has dragged.
          */
-        node: PropTypes.object,
-        svgNode: PropTypes.object, // Fallback if node is not defined; gives compatibility when inside a SvgContainer.
+        displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
 
         /**
-         * The current view of the SVG; used to calculate how many base pairs the user has dragged.
+         * Overrides the width of the container when calculating how many bases the user has dragged.  Does not affect
+         * the actual display width.
          */
-        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-
-        /**
-         * Used to convert number of pixels dragged to number of bases dragged.  Is required, but not marked so to
-         * suppress warnings.
-         */
-        drawModel: PropTypes.instanceOf(LinearDrawingModel),
+        widthOverride: PropTypes.number,
 
         /**
          * Called when dragging has started.  Note that a click will also fire this event.  Has the signature
@@ -52,11 +45,17 @@ class ViewDragListener extends React.Component {
          * Called when dragging has ended; i.e. the user let go of the mouse button.  Same signature as onViewDrag.
          */
         onViewDragEnd: PropTypes.func,
-    }
+    };
+
+    static defaultProps = {
+        onViewDragStart: () => undefined,
+        onViewDrag: () => undefined,
+        onViewDragEnd: () => undefined,
+    };
 
     constructor(props) {
         super(props);
-        this.dragOriginModel = this.props.model;
+        this.dragOriginRegion = this.props.displayedRegion;
 
         this.dragStart = this.dragStart.bind(this);
         this.drag = this.drag.bind(this);
@@ -69,10 +68,8 @@ class ViewDragListener extends React.Component {
      * @param {MouseEvent} event - mouse event that signals a drag start
      */
     dragStart(event) {
-        this.dragOriginModel = this.props.model;
-        if (this.props.onViewDragStart) {
-            this.props.onViewDragStart(event);
-        }
+        this.dragOriginRegion = this.props.displayedRegion;
+        this.props.onViewDragStart(event);
     }
 
     /**
@@ -83,10 +80,8 @@ class ViewDragListener extends React.Component {
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
     drag(event, coordinateDiff) {
-        if (this.props.onViewDrag && this.dragOriginModel) {
-            let newRegion = this._getRegionOffsetByX(this.dragOriginModel, -coordinateDiff.dx);
-            this.props.onViewDrag(newRegion.start, newRegion.end, event, coordinateDiff);
-        }
+        let newRegion = this._getRegionOffsetByX(this.dragOriginRegion, event, -coordinateDiff.dx);
+        this.props.onViewDrag(newRegion.start, newRegion.end, event, coordinateDiff);
     }
 
     /**
@@ -97,42 +92,49 @@ class ViewDragListener extends React.Component {
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
     dragEnd(event, coordinateDiff) {
-        if (this.props.onViewDragEnd && this.dragOriginModel) {
-            let newRegion = this._getRegionOffsetByX(this.dragOriginModel, -coordinateDiff.dx);
-            this.props.onViewDragEnd(newRegion.start, newRegion.end, event, coordinateDiff);
-        }
+        let newRegion = this._getRegionOffsetByX(this.dragOriginRegion, event, -coordinateDiff.dx);
+        this.props.onViewDragEnd(newRegion.start, newRegion.end, event, coordinateDiff);
     }
 
     /**
      * Calculates the absolute displayed region panned by some number of pixels.  Does not modify any of the inputs.
      * 
-     * @param {LinearDrawingModel} model - drawing model used to convert from pixels to bases
+     * @param {DisplayedRegionModel} displayedRegion - drawing model used to convert from pixels to bases
      * @param {number} xDiff - number of pixels to pan the region
      * @return {object} - absolute region resulting from panning the input region
      */
-    _getRegionOffsetByX(model, xDiff) {
-        let baseDiff = this.props.drawModel.xWidthToBases(xDiff);
-        let startRegion = model.getAbsoluteRegion();
+    _getRegionOffsetByX(displayedRegion, event, xDiff) {
+        const drawModel = new LinearDrawingModel(displayedRegion, this.props.widthOverride || event.currentTarget.clientWidth);
+        let baseDiff = drawModel.xWidthToBases(xDiff);
+        let startRegion = displayedRegion.getAbsoluteRegion();
         return {
             start: startRegion.start + baseDiff,
             end: startRegion.end + baseDiff,
         }
     }
 
-    /**
-     * @inheritdoc
-     */
     render() {
+        let {
+            displayedRegion,
+            onViewDragStart,
+            onViewDrag,
+            onViewDragEnd,
+            widthOverride,
+            children,
+            ...remainingProps
+        } = this.props;
+
         return (
-            <DomDragListener
-                button={this.props.button}
-                onDragStart={this.dragStart}
-                onDrag={this.drag}
-                onDragEnd={this.dragEnd}
-                node={this.props.node || this.props.svgNode}
-            />
+        <DragAcrossDiv
+            onDragStart={this.dragStart}
+            onDrag={this.drag}
+            onDragEnd={this.dragEnd}
+            {...remainingProps}
+        >
+            {children}
+        </DragAcrossDiv>
         );
     }
 }
 
-export default ViewDragListener;
+export default DragAcrossView;
