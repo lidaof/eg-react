@@ -90,13 +90,12 @@ const GENES = RECORDS.map(record =>
 export const annotationStory = {
     storyName: "Annotations",
     component: <SvgContainer
-        model={model}
+        displayedRegion={model}
     >
         <AnnotationArranger
             viewRegion={model}
             data={GENES}
             maxRows={2}
-            yOffset={20}
         />
     </SvgContainer>
 }

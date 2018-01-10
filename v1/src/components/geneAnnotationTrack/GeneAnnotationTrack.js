@@ -82,9 +82,9 @@ class GeneAnnotationTrack extends React.Component {
                 xOffset={this.props.xOffset}
             >
                 <SvgContainer
-                    model={this.viewExpansion.expandedRegion}
-                    drawModelWidth={this.viewExpansion.expandedWidth}
-                    svgProps={{style: svgStyle}}
+                    displayedRegion={this.viewExpansion.expandedRegion}
+                    width={this.viewExpansion.expandedWidth}
+                    style={svgStyle}
                 >
                     <AnnotationArranger
                         data={this.props.data}

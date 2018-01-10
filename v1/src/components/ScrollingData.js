@@ -51,23 +51,12 @@ class ScrollingData extends React.Component {
             }
             
             let propsToMerge = null;
-            if (child.type === "svg" || child.type === "canvas") {
+            if (child.type === "svg" || child.type === "canvas" || child.type.name === "SvgContainer") {
                 const style = Object.assign({}, displayComponentStyle, child.props.style || {});
                 propsToMerge = {
                     style: style,
                     width: this.props.viewExpansion.expandedWidth,
                     height: this.props.height
-                };
-            } else if (child.type.name === "SvgContainer") {
-                // We want to merge into the SvgContainer.props.svgProps as well, so it's more complex.
-                const svgProps = child.props.svgProps || {};
-                const style = Object.assign({}, displayComponentStyle, svgProps.style || {});
-                propsToMerge = {
-                    svgProps: Object.assign({}, svgProps, {
-                        style: style,
-                        width: this.props.viewExpansion.expandedWidth,
-                        height: this.props.height
-                    })
                 };
             }
 

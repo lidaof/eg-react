@@ -77,7 +77,6 @@ class MainPane extends React.Component {
      */
     constructor(props) {
         super(props);
-        this.svgNode = null;
         this.mousewheel = this.mousewheel.bind(this);
     }
 
@@ -88,8 +87,8 @@ class MainPane extends React.Component {
      */
     mousewheel(event) {
         event.preventDefault();
-        let svgWidth = this.svgNode.clientWidth;
-        let focusPoint = event.clientX / svgWidth; // Proportion-based, not base-based.
+        let paneWidth = event.currentTarget.clientWidth;
+        let focusPoint = event.clientX / paneWidth; // Proportion-based, not base-based.
         if (event.deltaY > 0) { // Mouse wheel turned towards user, or spun downwards -- zoom out
             this.props.zoomCallback(1 + WHEEL_ZOOM_SPEED, focusPoint);
         } else if (event.deltaY < 0) { // Zoom in
@@ -98,35 +97,32 @@ class MainPane extends React.Component {
     }
 
     /**
-     * Doesn't draw anything by itself, but places child SvgComponents that *do* draw things.
+     * Places a <svg> and children that draw things.
      * 
      * @override
      */
     render() {
-        // Order of components matters here; components listed later will be drawn IN FRONT of ones listed before
+        // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
         <SvgContainer
-            model={this.props.model}
-            svgProps={{
-                onContextMenu: event => event.preventDefault(),
-                onWheel: this.mousewheel,
-                style: {border: "1px solid black"},
-                ref: node => this.svgNode = node
-            }}
+            displayedRegion={this.props.model}
+            onContextMenu={event => event.preventDefault()}
+            onWheel={this.mousewheel}
+            style={{border: "1px solid black"}}
         >
             <ViewDragListener button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} model={this.props.model} />
-            <Chromosomes yOffset={CHROMOSOME_Y} model={this.props.model} />
-            <Ruler yOffset={RULER_Y} model={this.props.model} />
+            <Chromosomes y={CHROMOSOME_Y} displayedRegion={this.props.model} />
+            <Ruler y={RULER_Y} displayedRegion={this.props.model} />
             <SelectedRegionBox
-                selectedRegionModel={this.props.selectedRegionModel}
-                model={this.props.model}
+                displayedRegion={this.props.model}
+                selectedRegion={this.props.selectedRegionModel}
                 gotoButtonCallback={this.props.gotoButtonCallback}
-                yOffset={SELECTED_BOX_Y}
+                y={SELECTED_BOX_Y}
             />
             <SelectionBox
                 button={LEFT_MOUSE}
                 regionSelectedCallback={this.props.regionSelectedCallback}
-                yOffset={SELECT_BOX_Y}
+                y={SELECT_BOX_Y}
             />
         </SvgContainer>
         );

@@ -1,9 +1,16 @@
-import DomDragListener from '../DomDragListener';
-import PropTypes from 'prop-types';
 import React from 'react';
-import SvgComponent from '../SvgComponent';
+import PropTypes from 'prop-types';
+import SVG from 'svg.js';
+
+import LinearDrawingModel from '../../model/LinearDrawingModel';
+import DomDragListener from '../DomDragListener';
+import withSvgJs from '../withSvgJs';
 
 const SELECT_BOX_HEIGHT = 60;
+
+function domXToSvgX(domX, svgNode) {
+    return domX - svgNode.getBoundingClientRect().left;
+}
 
 /**
  * Creates and manages the boxes that the user can drag across the screen to select a new region.  If we wanted to 
@@ -12,12 +19,19 @@ const SELECT_BOX_HEIGHT = 60;
  * 
  * @author Silas Hsu
  */
-class SelectionBox extends SvgComponent {
+class SelectionBox extends React.Component {
     static propTypes = {
+        /**
+         * <svg> ref on which to draw
+         */
+        svgNode: process.env.NODE_ENV !== "test" ? PropTypes.instanceOf(SVGElement) : () => undefined,
+        group: PropTypes.instanceOf(SVG.Element).isRequired, // An object from SVG.js to draw in
+        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // The drawing model to use
+
         /**
          * The mouse button for which the box should activate; see DomDragListener for valid values.
          */
-        button: PropTypes.number.isRequired, 
+        button: PropTypes.number.isRequired,
 
         /**
          * Called when the user lets go of the mouse, selecting a region.  Has the signature
@@ -54,7 +68,7 @@ class SelectionBox extends SvgComponent {
         }
         this.anchorX = anchorX;
 
-        this.box = this.group.rect(1, SELECT_BOX_HEIGHT);
+        this.box = this.props.group.rect(1, SELECT_BOX_HEIGHT);
         this.box.attr({
             x: this.anchorX,
             y: 0,
@@ -65,17 +79,20 @@ class SelectionBox extends SvgComponent {
     }
 
     /**
-     * Initializes the selection box
+     * Initializes the selection box.
      * 
      * @param {MouseEvent} event - a mousedown event signaling a drag start
      */
     dragStart(event) {
         event.preventDefault();
-        this._addBox(this.props.drawModel.domXToSvgX(event.clientX));
+        this._addBox(domXToSvgX(event.clientX, this.props.svgNode));
     }
 
     /**
+     * Called when the mouse changes position while dragging.
      * 
+     * @param {MouseEvent} event - the mouse event
+     * @param {object} coordinateDiff - object describing difference in coordinates relative to the drag's start
      */
     drag(event, coordinateDiff) {
         if (!this.box) {
@@ -94,7 +111,7 @@ class SelectionBox extends SvgComponent {
     }
 
     /**
-     * 
+     * Called when the user lets go of the mouse after a drag.
      */
     dragEnd() {
         if (!this.box) {
@@ -109,6 +126,9 @@ class SelectionBox extends SvgComponent {
         this.props.regionSelectedCallback(startBase, endBase);
     }
 
+    /**
+     * @inheritdoc
+     */
     render() {
         return (
         <DomDragListener
@@ -122,4 +142,4 @@ class SelectionBox extends SvgComponent {
     }
 }
 
-export default SelectionBox;
+export default withSvgJs(SelectionBox);

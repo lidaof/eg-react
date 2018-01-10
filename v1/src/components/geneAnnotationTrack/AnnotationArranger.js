@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { ANNOTATION_HEIGHT, GeneAnnotation } from './GeneAnnotation';
-import SvgComponent from '../SvgComponent';
 
 import Gene from '../../model/Gene';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
@@ -16,8 +15,13 @@ const ANNOTATION_RIGHT_PADDING = 30;
  * 
  * @author Silas Hsu
  */
-class AnnotationArranger extends SvgComponent {
+class AnnotationArranger extends React.Component {
     static propTypes = {
+        /**
+         * <svg> on which to draw
+         */
+        svgNode: process.env.NODE_ENV !== "test" ? PropTypes.instanceOf(SVGElement) : () => undefined,
+
         /**
          * Used to calculate absolute coordinates of genes
          */
@@ -43,14 +47,14 @@ class AnnotationArranger extends SvgComponent {
     };
 
     /**
-     * Shallowly compares `this.props` and `nextProps`.  Returns true if there is any difference, otherwise false.
+     * Shallowly compares the `data` prop.
      * 
      * @param {any} nextProps - next props that the component will receive
      * @return {boolean} whether the component should update
      * @override
      */
     shouldComponentUpdate(nextProps) {
-        return this.props.data !== nextProps.data || this.props.xOffset !== nextProps.xOffset;
+        return this.props.data !== nextProps.data;
     }
 
     /**
@@ -102,7 +106,7 @@ class AnnotationArranger extends SvgComponent {
                 viewRegion={this.props.viewRegion}
                 drawModel={this.props.drawModel}
                 leftBoundary={this.props.leftBoundary}
-                svgNode={this.group}
+                svgNode={this.props.svgNode}
                 gene={gene}
                 isLabeled={isLabeled}
                 topY={row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING)}
@@ -111,7 +115,7 @@ class AnnotationArranger extends SvgComponent {
             />);
         }
         console.log(`${numHiddenGenes} genes hidden this render`);
-        return <div>{children}</div>;
+        return <g>{children}</g>;
     }
 }
 

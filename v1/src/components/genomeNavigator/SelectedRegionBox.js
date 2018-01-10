@@ -1,6 +1,10 @@
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import React from 'react';
 import PropTypes from 'prop-types';
-import SvgComponent from '../SvgComponent';
+import SVG from 'svg.js';
+
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import LinearDrawingModel from '../../model/LinearDrawingModel';
+import withSvgJs from '../withSvgJs';
 
 const BOX_HEIGHT = 40;
 const GOTO_BUTTON_WIDTH = 50;
@@ -16,17 +20,12 @@ const LABEL_X_PADDING = 15;
  * 
  * @author Silas Hsu
  */
-class SelectedRegionBox extends SvgComponent {
+class SelectedRegionBox extends React.Component {
     static propTypes = {
-        /**
-         * The region that the tracks are displaying
-         */
-        selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-
-        /**
-         * The current region the genome navigator is displaying
-         */
-        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        group: PropTypes.instanceOf(SVG.Element).isRequired, // An object from SVG.js to draw in
+        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // The drawing model to use
+        displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Entire region being visualized
+        selectedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region that is selected
 
         /**
          * Called when the user presses the "GOTO" button to quicky scroll the view to the selected track region.
@@ -45,20 +44,20 @@ class SelectedRegionBox extends SvgComponent {
     constructor(props) {
         super(props);
 
-        this.box = this.group.rect(1, BOX_HEIGHT).attr({
+        this.box = this.props.group.rect(1, BOX_HEIGHT).attr({
             stroke: "#090",
             fill: "#0f0",
             "fill-opacity": 0.1,
         });
 
-        this.gotoButton = this.group.polygon().attr({
+        this.gotoButton = this.props.group.polygon().attr({
             stroke: "#090",
             fill: "#0f0",
             "fill-opacity": 0.8,
         });
         this.gotoButton.on('mousedown', this.gotoPressed, this);
 
-        this.gotoLabel = this.group.text("GOTO");
+        this.gotoLabel = this.props.group.text("GOTO");
         this.gotoLabel.font({
             size: GOTO_LABEL_HEIGHT,
             "font-style": "italic",
@@ -74,12 +73,12 @@ class SelectedRegionBox extends SvgComponent {
     gotoPressed(event) {
         event.preventDefault()
         event.stopPropagation();
-        let selectedAbsRegion = this.props.selectedRegionModel.getAbsoluteRegion();
+        let selectedAbsRegion = this.props.selectedRegion.getAbsoluteRegion();
         let halfWidth = 0;
-        if (this.props.selectedRegionModel.getWidth() < this.props.model.getWidth()) {
-            halfWidth = this.props.model.getWidth() * 0.5;
+        if (this.props.selectedRegion.getWidth() < this.props.displayedRegion.getWidth()) {
+            halfWidth = this.props.displayedRegion.getWidth() * 0.5;
         } else {
-            halfWidth = this.props.selectedRegionModel.getWidth() * 3;
+            halfWidth = this.props.selectedRegion.getWidth() * 3;
         }
         let regionCenter = (selectedAbsRegion.end + selectedAbsRegion.start) * 0.5;
         this.props.gotoButtonCallback(regionCenter - halfWidth, regionCenter + halfWidth);
@@ -92,7 +91,7 @@ class SelectedRegionBox extends SvgComponent {
      */
     render() {
         let svgWidth = this.props.drawModel.getDrawWidth();
-        let absRegion = this.props.selectedRegionModel.getAbsoluteRegion();
+        let absRegion = this.props.selectedRegion.getAbsoluteRegion();
 
         // We limit the box's start and end X because SVGs don't like to be billions of pixels wide.
         let xStart = Math.max(-10, this.props.drawModel.baseToX(absRegion.start));
@@ -136,4 +135,4 @@ class SelectedRegionBox extends SvgComponent {
     }
 }
 
-export default SelectedRegionBox;
+export default withSvgJs(SelectedRegionBox);

@@ -1,6 +1,10 @@
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import SvgComponent from '../SvgComponent';
+import React from 'react';
 import PropTypes from 'prop-types';
+import SVG from 'svg.js';
+
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import LinearDrawingModel from '../../model/LinearDrawingModel';
+import withSvgJs from '../withSvgJs';
 
 const MAX_MAJOR_TICKS = 15;
 const MINOR_TICKS = 5;
@@ -8,14 +12,15 @@ const MAJOR_TICK_HEIGHT = 10;
 const MINOR_TICK_HEIGHT = 5;
 
 /**
- * Draws a ruler that displays genomic coordinates
+ * Draws a ruler that displays feature coordinates.
  * 
  * @author Silas Hsu
- * @extends SvgComponent
  */
-class Ruler extends SvgComponent {
+class Ruler extends React.Component {
     static propTypes = {
-        model: PropTypes.instanceOf(DisplayedRegionModel)
+        group: PropTypes.instanceOf(SVG.Element).isRequired, // An object from SVG.js to draw in
+        displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
+        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // The drawing model to use
     }
 
     /**
@@ -56,9 +61,9 @@ class Ruler extends SvgComponent {
      * @override
      */
     render() {
-        this.group.clear();
+        this.props.group.clear();
 
-        let regionWidth = this.props.model.getWidth();
+        let regionWidth = this.props.displayedRegion.getWidth();
 
         // If one wanted MAX_MAJOR_TICKS to represent the min number of ticks, use Math.floor() instead.
         let log10BasesPerMajorTick = Math.ceil(Math.log10(regionWidth / MAX_MAJOR_TICKS));
@@ -68,14 +73,14 @@ class Ruler extends SvgComponent {
         let unit = this._getMajorUnit(log10BasesPerMajorTick);
 
         // The horizontal line spanning the width of the ruler
-        let rulerLine = this.group.line(0, 0, this.props.drawModel.getDrawWidth(), 0);
+        let rulerLine = this.props.group.line(0, 0, this.props.drawModel.getDrawWidth(), 0);
         rulerLine.stroke({width: 1, color: '#bbb'});
 
-        const intervals = this.props.model.getFeatureIntervals();
+        const intervals = this.props.displayedRegion.getFeatureIntervals();
         for (let interval of intervals) {
             // relativeBase = round down to the nearest major tick base for this region, to find where to start drawing
             let relativeBase = Math.floor(interval.relativeStart / basesPerMajorTick) * basesPerMajorTick;
-            let featureAbsStart = this.props.model.getNavigationContext().getFeatureStart(interval.getName());
+            let featureAbsStart = this.props.displayedRegion.getNavigationContext().getFeatureStart(interval.getName());
             let majorX = this.props.drawModel.baseToX(featureAbsStart + relativeBase);
             let majorTickEndX = this.props.drawModel.baseToX(featureAbsStart + interval.relativeEnd);
 
@@ -83,12 +88,12 @@ class Ruler extends SvgComponent {
             // Draw major and minor ticks for this region (chromosome)
             while (majorX < majorTickEndX) {
                 // The major tick line
-                let majorTickLine = this.group.line(majorX, -MAJOR_TICK_HEIGHT, majorX, 0);
+                let majorTickLine = this.props.group.line(majorX, -MAJOR_TICK_HEIGHT, majorX, 0);
                 majorTickLine.stroke({width: 2, color: '#bbb'});
 
                 // Label for the major tick
                 if (relativeBase > 0) {
-                    this.group.text(relativeBase / unit.size + unit.name).attr({
+                    this.props.group.text(relativeBase / unit.size + unit.name).attr({
                         x: majorX,
                         y: 0 + 10,
                         "text-anchor": "middle",
@@ -99,7 +104,7 @@ class Ruler extends SvgComponent {
                 let minorX = majorX + pixelsPerMinorTick;
                 let minorTickEndX = Math.min(majorX + pixelsPerMajorTick, majorTickEndX);
                 while (minorX < minorTickEndX) {
-                    let minorTickLine = this.group.line(minorX, -MINOR_TICK_HEIGHT, minorX, 0);
+                    let minorTickLine = this.props.group.line(minorX, -MINOR_TICK_HEIGHT, minorX, 0);
                     minorTickLine.stroke({width: 2, color: '#bbb'});
                     minorX += pixelsPerMinorTick
                 }
@@ -114,4 +119,4 @@ class Ruler extends SvgComponent {
     }
 }
 
-export default Ruler;
+export default withSvgJs(Ruler);

@@ -1,5 +1,7 @@
+import React from 'react';
 import PropTypes from 'prop-types';
-import SvgComponent from '../SvgComponent';
+
+import withSvgJs from '../withSvgJs';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 export const ANNOTATION_HEIGHT = 8;
@@ -17,7 +19,7 @@ const LABEL_BACKGROUND_PADDING = 2;
  * 
  * @author Silas Hsu
  */
-export class GeneAnnotation extends SvgComponent {
+class _GeneAnnotation extends React.Component {
     static propTypes = {
         gene: PropTypes.object.isRequired, // Gene to display
         isLabeled: PropTypes.bool.isRequired, // Whether to display the gene's name
@@ -52,8 +54,8 @@ export class GeneAnnotation extends SvgComponent {
      * @override
      */
     componentDidMount() {
-        this.group.on("click", this.onClick.bind(this));
-        this.group.on("mousedown", event => event.stopPropagation());
+        this.props.group.on("click", this.onClick.bind(this));
+        this.props.group.on("mousedown", event => event.stopPropagation());
     }
 
     /**
@@ -62,7 +64,7 @@ export class GeneAnnotation extends SvgComponent {
      * @override
      */
     render() {
-        this.group.clear();
+        this.props.group.clear();
         let gene = this.props.gene;
         const details = gene.getDetails();
 
@@ -72,7 +74,7 @@ export class GeneAnnotation extends SvgComponent {
         const bottomY = this.props.topY + ANNOTATION_HEIGHT;
 
         // Box that covers the whole annotation to increase the click area
-        let coveringBox = this.group.rect(endX - startX, ANNOTATION_HEIGHT).attr({
+        let coveringBox = this.props.group.rect(endX - startX, ANNOTATION_HEIGHT).attr({
             x: startX,
             y: this.props.topY,
         });
@@ -84,16 +86,16 @@ export class GeneAnnotation extends SvgComponent {
         }
 
         // Center line
-        this.group.line(startX, centerY, endX, centerY).stroke({
+        this.props.group.line(startX, centerY, endX, centerY).stroke({
             color: COLOR,
             width: 2
         });
 
         // Exons
         // someComponent.clipWith(exonClip) will make it show up only where the exons are.
-        let exonClip = this.group.clip();
+        let exonClip = this.props.group.clip();
         for (let exon of details.absExons) {
-            let exonBox = this.group.rect(this.props.drawModel.basesToXWidth(exon.end - exon.start), ANNOTATION_HEIGHT);
+            let exonBox = this.props.group.rect(this.props.drawModel.basesToXWidth(exon.end - exon.start), ANNOTATION_HEIGHT);
             exonBox.attr({
                 x: this.props.drawModel.baseToX(exon.start),
                 y: this.props.topY,
@@ -114,12 +116,12 @@ export class GeneAnnotation extends SvgComponent {
             ]
 
             // Each arrow is duplicated, but the second set will only draw inside exons.
-            this.group.polyline(arrowPoints).attr({
+            this.props.group.polyline(arrowPoints).attr({
                 fill: "none",
                 stroke: COLOR,
                 "stroke-width": 1
             });
-            this.group.polyline(arrowPoints).attr({
+            this.props.group.polyline(arrowPoints).attr({
                 fill: "none",
                 stroke: IN_EXON_ARROW_COLOR,
                 "stroke-width": 1
@@ -135,7 +137,7 @@ export class GeneAnnotation extends SvgComponent {
             labelX = this.props.leftBoundary;
             textAnchor = "start";
             // Add highlighting, as the label will overlap the other stuff
-            this.group.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, ANNOTATION_HEIGHT).attr({
+            this.props.group.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, ANNOTATION_HEIGHT).attr({
                 x: this.props.leftBoundary - LABEL_BACKGROUND_PADDING,
                 y: this.props.topY,
                 fill: "white",
@@ -146,7 +148,7 @@ export class GeneAnnotation extends SvgComponent {
             textAnchor = "end";
         }
 
-        this.group.text(gene.getName()).attr({
+        this.props.group.text(gene.getName()).attr({
             x: labelX,
             y: this.props.topY - ANNOTATION_HEIGHT,
             "text-anchor": textAnchor,
@@ -157,4 +159,5 @@ export class GeneAnnotation extends SvgComponent {
     }
 }
 
+export const GeneAnnotation = withSvgJs(_GeneAnnotation);
 export default GeneAnnotation;
