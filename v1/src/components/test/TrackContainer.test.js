@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 
 import TrackContainer from '../TrackContainer';
 
@@ -37,12 +37,11 @@ describe("TrackContainer", () => {
 
     beforeEach(() => {
         newRegionCallback.mockClear();
-        wrapper = shallow(
+        wrapper = mount(
             <TrackContainer
                 viewRegion={viewRegion}
                 newRegionCallback={newRegionCallback}
                 tracks={tracks}
-                makeTrack={(props) => <BigWigTrack {...props} />}
             />
         );
         wrapper.setState({width: 1}); // Need to set width before tracks will render

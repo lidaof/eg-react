@@ -46,7 +46,7 @@ class BigWigTrack extends React.Component {
      * Draws the data.
      */
     draw() {
-        if (!this.canvasNode) {
+        if (!this.canvasNode || process.env.NODE_ENV === "test") {
             return;
         }
         const canvas = this.canvasNode;

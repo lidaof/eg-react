@@ -99,6 +99,7 @@ class App extends React.Component {
                 viewRegion={this.state.selectedRegionModel}
                 newRegionCallback={this.regionSelected}
                 tracks={this.state.currentTracks}
+                onTracksReordered={(newOrder) => this.setState({currentTracks: newOrder})}
             />
             <TrackManager
                 addedTracks={this.state.currentTracks}

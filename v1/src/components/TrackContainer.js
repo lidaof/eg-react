@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import GenericDraggable from './GenericDraggable';
+import GenericDroppable from './GenericDroppable';
 import TrackLegend from './TrackLegend';
-import { makeTrack } from './Track';
+import { Track } from './Track';
 
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
@@ -32,22 +34,21 @@ class TrackContainer extends React.Component {
         tracks: PropTypes.arrayOf(PropTypes.object).isRequired, // The tracks to display.  Array of TrackModel.
 
         /**
-         * Function to customize how to make Track components from props.  Signature:
-         *     (props: object): React.Component
-         *         `props`: the props with which to render the component.
+         * Called when tracks are reordered.  Signature: (newOrder: TrackModel[]): void
          */
-        makeTrack: PropTypes.func
+        onTracksReordered: PropTypes.func,
     };
 
     static defaultProps = {
-        makeTrack: makeTrack,
+        onTracksReordered: () => undefined
     };
 
     constructor(props) {
         super(props);
         this.state = {
             width: 0,
-            xOffsets: Array(props.tracks.length).fill(0)
+            xOffsets: Array(props.tracks.length).fill(0),
+            allowReorder: false,
         };
         this.offsetsOnDragStart = this.state.xOffsets;
         this.node = null;
@@ -57,6 +58,7 @@ class TrackContainer extends React.Component {
         this.viewDragEnd = this.viewDragEnd.bind(this);
         this.newTrackDataCallback = this.newTrackDataCallback.bind(this);
         this.renderTrack = this.renderTrack.bind(this);
+        this.trackDropped = this.trackDropped.bind(this);
     }
 
     componentDidMount() {
@@ -133,11 +135,28 @@ class TrackContainer extends React.Component {
 
             width: this.getTrackWidth(),
             xOffset: this.state.xOffsets[index],
-            onNewData: () => this.newTrackDataCallback(index),
-            key: index // TODO make keys NOT index-based
+            onNewData: () => this.newTrackDataCallback(index)
         };
+        
+        return (
+        <GenericDraggable
+            key={trackModel.getId()}
+            draggableId={trackModel.getId()}
+            isDragDisabled={!this.state.allowReorder}
+        >
+           <Track {...trackProps} />
+        </GenericDraggable>
+        );
+    }
 
-        return this.props.makeTrack(trackProps);
+    trackDropped(dragResult) {
+        if (!dragResult.destination) {
+            return;
+        }
+        let newOrder = this.props.tracks.slice();
+        const [moved] = newOrder.splice(dragResult.source.index, 1);
+        newOrder.splice(dragResult.destination.index, 0, moved);
+        this.props.onTracksReordered(newOrder);
     }
 
     render() {
@@ -149,18 +168,26 @@ class TrackContainer extends React.Component {
         const drawModel = new LinearDrawingModel(this.props.viewRegion, width);
 
         return (
-        <div ref={node => this.node = node} style={{margin: "10px", border: "1px solid grey"}}>
-            {this.props.tracks.map(this.renderTrack)}
-            <ViewDragListener
-                button={LEFT_MOUSE}
-                node={this.node}
-                drawModel={drawModel}
-                model={this.props.viewRegion}
-                onViewDragStart={this.viewDragStart}
-                onViewDrag={this.viewDrag}
-                onViewDragEnd={this.viewDragEnd}
-            />
-        </div>
+        <GenericDroppable onDrop={this.trackDropped}>
+            <button onClick={(event) => this.setState({allowReorder: !this.state.allowReorder})} >
+                {(this.state.allowReorder ? "Dis" : "En") + "able track drag-and-drop"}
+            </button>
+            <div ref={node => {this.node = node;}} style={{margin: "10px", border: "1px solid grey"}}>
+                {this.props.tracks.map(this.renderTrack)}
+                {
+                this.state.allowReorder ? null : 
+                    <ViewDragListener
+                        button={LEFT_MOUSE}
+                        node={this.node}
+                        drawModel={drawModel}
+                        model={this.props.viewRegion}
+                        onViewDragStart={this.viewDragStart}
+                        onViewDrag={this.viewDrag}
+                        onViewDragEnd={this.viewDragEnd}
+                    />
+                }
+            </div>
+        </GenericDroppable>
         );
     }
 }

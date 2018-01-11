@@ -39,18 +39,21 @@ const TYPE_TO_TRACK = {
     )
 }
 
-/**
- * Given a props object, make a track of the proper type.
- * 
- * @param {Object} props - props to pass to the new track
- */
-export function makeTrack(props) {
-    let type = props.trackModel.getType().toLowerCase();
-    let Track = TYPE_TO_TRACK[type];
-    if (!Track) {
-        console.warn(`Unknown track type "${type}"`);
-        return null;
-    } else {
-        return <Track {...props} />;
+export class Track extends React.Component {
+    static propTypes = TRACK_PROP_TYPES;
+
+    componentWillUnmount() {
+        console.log("unmount!");
+    }
+
+    render() {
+        const type = this.props.trackModel.getType().toLowerCase();
+        let TrackSubType = TYPE_TO_TRACK[type];
+        if (!TrackSubType) {
+            console.warn(`Unknown track type "${type}"`);
+            return null;
+        } else {
+            return <TrackSubType {...this.props} />;
+        }
     }
 }
