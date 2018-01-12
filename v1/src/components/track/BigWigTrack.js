@@ -5,10 +5,10 @@ import { scaleLinear } from 'd3-scale'
 import { TRACK_PROP_TYPES } from './Track'
 import TrackLegend from './TrackLegend';
 import TrackLoadingNotice from './TrackLoadingNotice';
-import withExpandedWidth from './withExpandedWidth';
+import withExpandedWidth from '../withExpandedWidth';
 
-import RegionExpander from '../model/RegionExpander';
-import LinearDrawingModel from '../model/LinearDrawingModel';
+import RegionExpander from '../../model/RegionExpander';
+import LinearDrawingModel from '../../model/LinearDrawingModel';
 
 const DEFAULT_HEIGHT = 30; // In pixels
 const TOP_PADDING = 5;

@@ -8,14 +8,14 @@ import PropTypes from 'prop-types';
 
 import BigWigTrack from './BigWigTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
-import withDataFetching from './DataFetcher';
+import withDataFetching from '../DataFetcher';
 
-import BigWigSource from '../dataSources/BigWigSource';
-import BedSource from '../dataSources/BedSource';
+import BigWigSource from '../../dataSources/BigWigSource';
+import BedSource from '../../dataSources/BedSource';
 
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import TrackModel from '../model/TrackModel';
-import { GeneFormatter } from '../model/Gene';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import TrackModel from '../../model/TrackModel';
+import { GeneFormatter } from '../../model/Gene';
 
 /**
  * Prop types common to all tracks

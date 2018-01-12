@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import withSvgJs from '../withSvgJs';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import withSvgJs from '../../withSvgJs';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 
 export const ANNOTATION_HEIGHT = 8;
 export const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;

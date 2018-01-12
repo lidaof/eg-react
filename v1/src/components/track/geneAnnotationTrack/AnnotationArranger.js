@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import { ANNOTATION_HEIGHT, GeneAnnotation } from './GeneAnnotation';
 
-import Gene from '../../model/Gene';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import Gene from '../../../model/Gene';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 
 const DEFAULT_MAX_ROWS = 7;
 const ROW_BOTTOM_PADDING = 5;

@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { Track } from './track/Track';
+import TrackLegend from './track/TrackLegend';
+
 import GenericDraggable from './GenericDraggable';
 import GenericDroppable from './GenericDroppable';
-import TrackLegend from './TrackLegend';
-import { Track } from './Track';
 import { LEFT_MOUSE } from './DragAcrossDiv';
 import DragAcrossView from './DragAcrossView';
 

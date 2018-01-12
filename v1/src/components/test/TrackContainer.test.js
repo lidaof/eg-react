@@ -3,8 +3,8 @@ import { mount } from 'enzyme';
 
 import TrackContainer from '../TrackContainer';
 
-import BigWigTrack from '../BigWigTrack';
-import GeneAnnotationTrack from '../geneAnnotationTrack/GeneAnnotationTrack';
+import BigWigTrack from '../track/BigWigTrack';
+import GeneAnnotationTrack from '../track/geneAnnotationTrack/GeneAnnotationTrack';
 import TrackModel from '../../model/TrackModel';
 import makeToyRegion from '../../model/test/toyRegion';
 

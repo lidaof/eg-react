@@ -1,6 +1,6 @@
-import { checkStorybookRunning, getBrowserConnectedToStorybook } from '../storybookTestUtils';
-import { STORY_KIND, annotationStory } from '../../stories/geneAnnotationStories';
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { checkStorybookRunning, getBrowserConnectedToStorybook } from '../../test/storybookTestUtils';
+import { STORY_KIND, annotationStory } from '../../../stories/geneAnnotationStories';
 
 expect.extend({ toMatchImageSnapshot });
 

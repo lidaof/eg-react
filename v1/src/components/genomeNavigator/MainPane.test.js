@@ -1,4 +1,4 @@
-import { checkStorybookRunning, getBrowserConnectedToStorybook } from '../storybookTestUtils';
+import { checkStorybookRunning, getBrowserConnectedToStorybook } from '../test/storybookTestUtils';
 import { STORY_KIND, STORIES } from '../../stories/genomeNavStories';
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 

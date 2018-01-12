@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import TrackLegend from '../TrackLegend';
-import TrackModel from '../../model/TrackModel';
+import TrackModel from '../../../model/TrackModel';
 
 const wrapper = shallow(<TrackLegend height={100} trackModel={new TrackModel({name: "myTrack"})} />);
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 
 import SvgContainer from '../components/SvgContainer';
-import AnnotationArranger from '../components/geneAnnotationTrack/AnnotationArranger';
+import AnnotationArranger from '../components/track/geneAnnotationTrack/AnnotationArranger';
 
 import Feature from '../model/Feature';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';

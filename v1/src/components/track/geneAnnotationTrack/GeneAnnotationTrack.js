@@ -6,10 +6,10 @@ import GeneDetail from './GeneDetail';
 import { TRACK_PROP_TYPES } from '../Track'
 import TrackLegend from '../TrackLegend';
 import TrackLoadingNotice from '../TrackLoadingNotice';
-import SvgContainer from '../SvgContainer';
-import withExpandedWidth from '../withExpandedWidth';
+import SvgContainer from '../../SvgContainer';
+import withExpandedWidth from '../../withExpandedWidth';
 
-import RegionExpander from '../../model/RegionExpander';
+import RegionExpander from '../../../model/RegionExpander';
 
 const HEIGHT = 120;
 
