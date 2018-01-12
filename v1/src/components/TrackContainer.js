@@ -124,10 +124,6 @@ class TrackContainer extends React.Component {
      * @return {Track} track component to render
      */
     renderTrack(trackModel, index) {
-        if (!trackModel) {
-            return null;
-        }
-
         let trackProps = {
             trackModel: trackModel,
             viewRegion: this.props.viewRegion,
@@ -135,7 +131,7 @@ class TrackContainer extends React.Component {
 
             width: this.getTrackWidth(),
             xOffset: this.state.xOffsets[index],
-            onNewData: () => this.newTrackDataCallback(index)
+            onNewData: () => this.newTrackDataCallback(index),
         };
         
         return (

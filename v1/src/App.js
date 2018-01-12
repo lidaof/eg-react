@@ -31,6 +31,10 @@ const DEFAULT_TRACKS = [
         name: "refGene",
         url: 'http://egg.wustl.edu/d/hg19/refGene.gz',
     }),
+    new TrackModel({
+        type: "ruler",
+        name: "Ruler",
+    })
 ];
 
 const HG19_CONTEXT = HG19.makeNavContext();

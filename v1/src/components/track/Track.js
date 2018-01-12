@@ -8,10 +8,11 @@ import PropTypes from 'prop-types';
 
 import BigWigTrack from './BigWigTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
-import withDataFetching from '../DataFetcher';
+import RulerTrack from './RulerTrack';
 
 import BigWigSource from '../../dataSources/BigWigSource';
 import BedSource from '../../dataSources/BedSource';
+import withDataFetching from '../DataFetcher';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import TrackModel from '../../model/TrackModel';
@@ -23,7 +24,8 @@ import { GeneFormatter } from '../../model/Gene';
 export const TRACK_PROP_TYPES = {
     trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Metadata for this track
     viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
-
+    
+    onNewData: PropTypes.func, // Callback for when track finishes fetching data
     viewExpansionValue: PropTypes.number, // How much to enlarge view on both sides
     width: PropTypes.number, // The width of the track
     xOffset: PropTypes.number, // The horizontal amount to translate visualizations
@@ -36,7 +38,8 @@ const TYPE_TO_TRACK = {
     "bigwig": withDataFetching(BigWigTrack, (props) => new BigWigSource(props.trackModel.url)),
     "hammock": withDataFetching(
         GeneAnnotationTrack, (props) => new BedSource(props.trackModel.url, new GeneFormatter())
-    )
+    ),
+    "ruler": RulerTrack
 };
 
 export class Track extends React.Component {

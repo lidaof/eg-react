@@ -34,7 +34,7 @@ export default function withExpandedWidth(WrappedComponent) {
                 width: visibleWidth,
             }
 
-            const wrappedStyle = Object.assign(style, {
+            const wrappedStyle = Object.assign(style || {}, {
                 display: "block",
                 position: "relative",
                 marginLeft: -viewExpansion.leftExtraPixels,

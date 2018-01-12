@@ -6,7 +6,7 @@ import LinearDrawingModel from '../../model/LinearDrawingModel';
 
 const HEIGHT = 20;
 const BOUNDARY_LINE_EXTENT = 5;
-const LABEL_OFFSET = 100;
+const DEFAULT_LABEL_OFFSET = 100;
 
 /**
  * Draws rectangles that represent features in a navigation context, and labels for the features.  Called "Chromosomes"
@@ -18,6 +18,7 @@ class Chromosomes extends React.Component {
     static propTypes = {
         displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
         drawModel: PropTypes.instanceOf(LinearDrawingModel), // The drawing model to use
+        labelOffset: PropTypes.number,
         x: PropTypes.number,
         y: PropTypes.number
     };
@@ -59,7 +60,7 @@ class Chromosomes extends React.Component {
             children.push(<text
                 key={"text" + x}
                 x={x + width/2}
-                y={LABEL_OFFSET}
+                y={this.props.labelOffset || DEFAULT_LABEL_OFFSET}
                 style={{textAnchor: "middle", fontWeight: "bold"}}
             >
                 {interval.getName()}
