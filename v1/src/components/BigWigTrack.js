@@ -5,13 +5,15 @@ import { scaleLinear } from 'd3-scale'
 import { TRACK_PROP_TYPES } from './Track'
 import TrackLegend from './TrackLegend';
 import TrackLoadingNotice from './TrackLoadingNotice';
-import ScrollingData from './ScrollingData';
+import withExpandedWidth from './withExpandedWidth';
 
 import RegionExpander from '../model/RegionExpander';
 import LinearDrawingModel from '../model/LinearDrawingModel';
 
 const DEFAULT_HEIGHT = 30; // In pixels
 const TOP_PADDING = 5;
+
+const WideCanvas = withExpandedWidth('canvas');
 
 /**
  * Track that displays BigWig data.
@@ -90,14 +92,14 @@ class BigWigTrack extends React.Component {
         <div style={{display: "flex", borderBottom: "1px solid grey"}}>
             <TrackLegend height={height} trackModel={this.props.trackModel} scaleForAxis={scale} />
             {this.props.isLoading ? <TrackLoadingNotice height={this.props.height} /> : null}
-            <ScrollingData
-                width={this.props.width}
-                height={height}
+            <WideCanvas
+                wrappedRef={node => this.canvasNode = node}
+                visibleWidth={this.props.width}
                 viewExpansion={viewExpansion}
                 xOffset={this.props.xOffset}
-            >
-                <canvas ref={node => this.canvasNode = node} style={canvasStyle} />
-            </ScrollingData>
+                height={height}
+                style={canvasStyle}
+            />
         </div>
         );
     }

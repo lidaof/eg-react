@@ -27,7 +27,7 @@ export const TRACK_PROP_TYPES = {
     viewExpansionValue: PropTypes.number, // How much to enlarge view on both sides
     width: PropTypes.number, // The width of the track
     xOffset: PropTypes.number, // The horizontal amount to translate visualizations
-}
+};
 
 /**
  * Used in makeTrack
@@ -37,7 +37,7 @@ const TYPE_TO_TRACK = {
     "hammock": withDataFetching(
         GeneAnnotationTrack, (props) => new BedSource(props.trackModel.url, new GeneFormatter())
     )
-}
+};
 
 export class Track extends React.Component {
     static propTypes = TRACK_PROP_TYPES;
