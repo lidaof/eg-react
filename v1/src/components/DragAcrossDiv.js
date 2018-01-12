@@ -12,7 +12,7 @@ export const RIGHT_MOUSE = 2;
  */
 export class DragAcrossDiv extends React.Component {
     static propTypes = {
-        button: PropTypes.number.isRequired, // The mouse button to listen to.  See the consts defined above this class.
+        button: PropTypes.oneOf([LEFT_MOUSE, MIDDLE_MOUSE, RIGHT_MOUSE]), // The mouse button to listen to
 
         /**
          * Called when dragging starts.  Signature: (event: React.SyntheticEvent): void

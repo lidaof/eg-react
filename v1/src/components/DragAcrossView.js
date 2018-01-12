@@ -104,7 +104,10 @@ class DragAcrossView extends React.Component {
      * @return {object} - absolute region resulting from panning the input region
      */
     _getRegionOffsetByX(displayedRegion, event, xDiff) {
-        const drawModel = new LinearDrawingModel(displayedRegion, this.props.widthOverride || event.currentTarget.clientWidth);
+        const drawModel = new LinearDrawingModel(
+            displayedRegion,
+            this.props.widthOverride || event.currentTarget.clientWidth
+        );
         let baseDiff = drawModel.xWidthToBases(xDiff);
         let startRegion = displayedRegion.getAbsoluteRegion();
         return {
