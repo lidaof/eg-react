@@ -18,8 +18,8 @@ describe('Main pane', () => {
                     .evaluate(() => { // Drag mouse across the SVG; it should select the whole region
                         let svg = document.querySelector('svg');
                         let svgRect = svg.getBoundingClientRect();
-                        let mousedown = new MouseEvent('mousedown', {clientX: svgRect.left, clientY: 30});
-                        let mousemove = new MouseEvent('mousemove', {clientX: svgRect.right, clientY: 30});
+                        let mousedown = new MouseEvent('mousedown', {clientX: svgRect.left, clientY: 30, bubbles: true});
+                        let mousemove = new MouseEvent('mousemove', {clientX: svgRect.right, clientY: 30, bubbles: true});
                         svg.dispatchEvent(mousedown);
                         svg.dispatchEvent(mousemove);
                     });
@@ -33,14 +33,13 @@ describe('Main pane', () => {
                 return nightmare
                     .evaluate(() => {
                         let svg = document.querySelector('svg');
-                        let mouseup = new MouseEvent('mouseup');
+                        let mouseup = new MouseEvent('mouseup', {bubbles: true});
                         svg.dispatchEvent(mouseup);
                         return window.newSelectedRegion;
                     });
             })
             .then((newRegion) => { // Assert that the correct region was selected
-                expect(newRegion).toBeDefined();
-                expect(newRegion).not.toBeNull();
+                expect(newRegion).toBeTruthy();
                 expect(newRegion.start).toBeCloseTo(0);
                 expect(newRegion.end).toBeCloseTo(story.viewRegion.getAbsoluteRegion().end, -2); // -2 means "within 50."
                 return nightmare.end();
@@ -58,8 +57,8 @@ describe('Main pane', () => {
                     .evaluate(() => {
                         // FIXME This is flaky; for if anybody adds a polygon to the main pane this might fail
                         let polygon = document.querySelector('polygon');
-                        let mousedown = new MouseEvent('mousedown');
-                        polygon.dispatchEvent(mousedown);
+                        let click = new MouseEvent('click', {bubbles: true});
+                        polygon.dispatchEvent(click);
     
                         // Dispatch a mousewheel event on the SVG
                         let svg = document.querySelector('svg');

@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SVG from 'svg.js';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
-import withSvgJs from '../withSvgJs';
 
 const MAX_MAJOR_TICKS = 15;
 const MINOR_TICKS = 5;
 const MAJOR_TICK_HEIGHT = 10;
 const MINOR_TICK_HEIGHT = 5;
+const COLOR = "#bbb";
 
 /**
  * Draws a ruler that displays feature coordinates.
@@ -18,10 +17,11 @@ const MINOR_TICK_HEIGHT = 5;
  */
 class Ruler extends React.Component {
     static propTypes = {
-        group: PropTypes.instanceOf(SVG.Element).isRequired, // An object from SVG.js to draw in
         displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
-        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // The drawing model to use
-    }
+        drawModel: PropTypes.instanceOf(LinearDrawingModel), // The drawing model to use
+        x: PropTypes.number,
+        y: PropTypes.number,
+    };
 
     /**
      * @typedef {Object} Ruler~Unit
@@ -61,8 +61,6 @@ class Ruler extends React.Component {
      * @override
      */
     render() {
-        this.props.group.clear();
-
         let regionWidth = this.props.displayedRegion.getWidth();
 
         // If one wanted MAX_MAJOR_TICKS to represent the min number of ticks, use Math.floor() instead.
@@ -72,10 +70,7 @@ class Ruler extends React.Component {
         let pixelsPerMinorTick = pixelsPerMajorTick / MINOR_TICKS;
         let unit = this._getMajorUnit(log10BasesPerMajorTick);
 
-        // The horizontal line spanning the width of the ruler
-        let rulerLine = this.props.group.line(0, 0, this.props.drawModel.getDrawWidth(), 0);
-        rulerLine.stroke({width: 1, color: '#bbb'});
-
+        let children = [];
         const intervals = this.props.displayedRegion.getFeatureIntervals();
         for (let interval of intervals) {
             // relativeBase = round down to the nearest major tick base for this region, to find where to start drawing
@@ -88,24 +83,36 @@ class Ruler extends React.Component {
             // Draw major and minor ticks for this region (chromosome)
             while (majorX < majorTickEndX) {
                 // The major tick line
-                let majorTickLine = this.props.group.line(majorX, -MAJOR_TICK_HEIGHT, majorX, 0);
-                majorTickLine.stroke({width: 2, color: '#bbb'});
+                children.push(<line
+                    key={majorX}
+                    x1={majorX}
+                    y1={-MAJOR_TICK_HEIGHT}
+                    x2={majorX}
+                    y2={0}
+                    stroke={COLOR}
+                    strokeWidth={2}
+                />);
 
                 // Label for the major tick
                 if (relativeBase > 0) {
-                    this.props.group.text(relativeBase / unit.size + unit.name).attr({
-                        x: majorX,
-                        y: 0 + 10,
-                        "text-anchor": "middle",
-                    });
+                    children.push(<text key={"text" + majorX} x={majorX} y={20} style={{textAnchor: "middle"}}>
+                        {relativeBase / unit.size + unit.name}
+                    </text>);
                 }
 
                 // Minor ticks
                 let minorX = majorX + pixelsPerMinorTick;
                 let minorTickEndX = Math.min(majorX + pixelsPerMajorTick, majorTickEndX);
                 while (minorX < minorTickEndX) {
-                    let minorTickLine = this.props.group.line(minorX, -MINOR_TICK_HEIGHT, minorX, 0);
-                    minorTickLine.stroke({width: 2, color: '#bbb'});
+                    children.push(<line
+                        key={minorX}
+                        x1={minorX}
+                        y1={-MINOR_TICK_HEIGHT}
+                        x2={minorX}
+                        y2={0}
+                        stroke={COLOR}
+                        strokeWidth={2}
+                    />);
                     minorX += pixelsPerMinorTick
                 }
 
@@ -115,8 +122,14 @@ class Ruler extends React.Component {
             } // End while (majorX < majorTickEndX) { ... }
         } // End for (let region of regionList) { ... }
 
-        return null;
+        return (
+        <g transform={`translate(${this.props.x || 0} ${this.props.y || 0})`} >
+            {/* The horizontal line spanning the width of the ruler*/}
+            <line x1={0} y1={0} x2={this.props.drawModel.getDrawWidth()} y2={0} stroke={COLOR} strokeWidth={1} />
+            {children}
+        </g>
+        );
     }
 }
 
-export default withSvgJs(Ruler);
+export default Ruler;
