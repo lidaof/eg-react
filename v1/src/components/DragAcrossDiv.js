@@ -112,7 +112,6 @@ export class DragAcrossDiv extends React.Component {
             onMouseDown={this.mousedown}
             onMouseMove={this.mousemove}
             onMouseUp={this.mouseup}
-            onMouseLeave={this.mouseup}
             {...remainingProps}
         >
             {children}

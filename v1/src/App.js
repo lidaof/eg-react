@@ -104,10 +104,10 @@ class App extends React.Component {
                 regionSelectedCallback={this.regionSelected}
             />
             <TrackContainer
-                viewRegion={this.state.selectedRegionModel}
-                newRegionCallback={this.regionSelected}
                 tracks={this.state.currentTracks}
-                onTracksReordered={(newOrder) => this.setState({currentTracks: newOrder})}
+                viewRegion={this.state.selectedRegionModel}
+                onNewRegion={this.regionSelected}
+                onTracksChanged={(newTracks) => this.setState({currentTracks: newTracks})}
             />
             <TrackManager
                 addedTracks={this.state.currentTracks}

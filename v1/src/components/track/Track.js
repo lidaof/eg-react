@@ -1,10 +1,7 @@
-/**
- * Utility functions common to all Tracks, and to make new Tracks.
- * 
- * @author Silas Hsu
- */
 import React from 'react';
 import PropTypes from 'prop-types';
+
+import Reparentable from '../Reparentable';
 
 import BigWigTrack from './BigWigTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
@@ -24,16 +21,13 @@ import { GeneFormatter } from '../../model/Gene';
 export const TRACK_PROP_TYPES = {
     trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Metadata for this track
     viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
+    width: PropTypes.number.isRequired, // Width of the track's visualization (does not include legend)
     
-    onNewData: PropTypes.func, // Callback for when track finishes fetching data
     viewExpansionValue: PropTypes.number, // How much to enlarge view on both sides
-    width: PropTypes.number, // The width of the track
+    onNewData: PropTypes.func, // Callback for when track finishes fetching data
     xOffset: PropTypes.number, // The horizontal amount to translate visualizations
 };
 
-/**
- * Used in makeTrack
- */
 const TYPE_TO_TRACK = {
     "bigwig": withDataFetching(BigWigTrack, (props) => new BigWigSource(props.trackModel.url)),
     "hammock": withDataFetching(
@@ -42,12 +36,19 @@ const TYPE_TO_TRACK = {
     "ruler": RulerTrack
 };
 
+/**
+ * A general Track object.  Renders specific types of tracks depending on the contents of the given TrackModel.
+ * 
+ * @author Silas Hsu
+ */
 export class Track extends React.Component {
     static propTypes = TRACK_PROP_TYPES;
 
-    componentWillUnmount() {
-        console.log("unmount!");
-    }
+    static defaultProps = {
+        onNewData: () => undefined,
+        viewExpansionValue: 0,
+        xOffset: 0,
+    };
 
     render() {
         const type = this.props.trackModel.getType().toLowerCase();
@@ -56,7 +57,11 @@ export class Track extends React.Component {
             console.warn(`Unknown track type "${type}"`);
             return null;
         } else {
-            return <TrackSubType {...this.props} />;
+            return (
+            <Reparentable uid={"track-" + this.props.trackModel.getId()} >
+                <TrackSubType {...this.props} />
+            </Reparentable>
+            );
         }
     }
 }
