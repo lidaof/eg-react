@@ -7,8 +7,8 @@ import makeToyRegion from '../../model/test/toyRegion';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 
 const VIEW_WIDTH = 100;
-const model = makeToyRegion();
-const drawModel = new LinearDrawingModel(model, VIEW_WIDTH);
+const viewRegion = makeToyRegion();
+const drawModel = new LinearDrawingModel(viewRegion, VIEW_WIDTH);
 
 let viewDragStartCallback = jest.fn();
 let viewDragCallback = jest.fn();
@@ -16,7 +16,7 @@ let viewDragEndCallback = jest.fn();
 let wrapper = shallow(
     <DragAcrossView
         button={LEFT_MOUSE}
-        displayedRegion={model}
+        viewRegion={viewRegion}
         drawModel={drawModel}
         onViewDragStart={viewDragStartCallback}
         onViewDrag={viewDragCallback}
@@ -48,7 +48,7 @@ it("calls the onViewDragStart callback and w/ the right args", () => {
 const testDrag = function(functionName, mockCallback) {
     const event = {};
     let coordinateDiff = { dx: 0, dy: 0 };
-    let absRegion = model.getAbsoluteRegion();
+    let absRegion = viewRegion.getAbsoluteRegion();
     instance[functionName](event, coordinateDiff);
     expect(mockCallback).toHaveBeenCalledTimes(1);
     expect(mockCallback).toHaveBeenCalledWith(absRegion.start, absRegion.end, event, coordinateDiff);
@@ -57,8 +57,8 @@ const testDrag = function(functionName, mockCallback) {
 
     const coordinateDiff2 = { dx: VIEW_WIDTH, dy: 0 };
     // Dragged to the right, and therefore the view region should move one whole width to the LEFT.
-    const expectedStart = absRegion.start - model.getWidth();
-    const expectedEnd = absRegion.end - model.getWidth();
+    const expectedStart = absRegion.start - viewRegion.getWidth();
+    const expectedEnd = absRegion.end - viewRegion.getWidth();
     instance[functionName](event, coordinateDiff2);
     expect(mockCallback).toHaveBeenCalledTimes(1);
     expect(mockCallback).toHaveBeenCalledWith(expectedStart, expectedEnd, event, coordinateDiff2);

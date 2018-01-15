@@ -44,13 +44,13 @@ class App extends React.Component {
         super(props);
         this.state = {
             // TODO set the selected region dynamically
-            selectedRegionModel: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION),
+            selectedRegion: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION),
             currentTracks: DEFAULT_TRACKS.slice(),
             isGeneSetView: false,
         };
 
         // TODO this can be set dynamically too.
-        this.initNavModel = new DisplayedRegionModel(HG19_CONTEXT);
+        this.initNavView = new DisplayedRegionModel(HG19_CONTEXT);
 
         this.regionSelected = this.regionSelected.bind(this);
         this.addTrack = this.addTrack.bind(this);
@@ -63,8 +63,8 @@ class App extends React.Component {
         if (end - start < MIN_SELECTED_SIZE) {
             return;
         }
-        let modelCopy = this.state.selectedRegionModel.clone().setRegion(start, end);
-        this.setState({selectedRegionModel: modelCopy});
+        let modelCopy = this.state.selectedRegion.clone().setRegion(start, end);
+        this.setState({selectedRegion: modelCopy});
     }
 
     addTrack(track) {
@@ -86,11 +86,11 @@ class App extends React.Component {
 
     setRegionSet(set) {
         if (!set) {
-            this.initNavModel = new DisplayedRegionModel(HG19_CONTEXT);
+            this.initNavView = new DisplayedRegionModel(HG19_CONTEXT);
             this.setState({selectedRegionModel: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION)});
         } else {
             const selectedRegion = new DisplayedRegionModel(set.makeNavContext());
-            this.initNavModel = selectedRegion;
+            this.initNavView = selectedRegion;
             this.setState({selectedRegionModel: selectedRegion});
         }
     }
@@ -99,13 +99,13 @@ class App extends React.Component {
         return (
         <div>
             <GenomeNavigator
-                viewModel={this.initNavModel}
-                selectedRegionModel={this.state.selectedRegionModel}
+                viewRegion={this.initNavView}
+                selectedRegion={this.state.selectedRegion}
                 regionSelectedCallback={this.regionSelected}
             />
             <TrackContainer
                 tracks={this.state.currentTracks}
-                viewRegion={this.state.selectedRegionModel}
+                viewRegion={this.state.selectedRegion}
                 onNewRegion={this.regionSelected}
                 onTracksChanged={(newTracks) => this.setState({currentTracks: newTracks})}
             />
@@ -115,7 +115,7 @@ class App extends React.Component {
                 onTrackRemoved={this.removeTrack}
             />
             {
-            this.state.selectedRegionModel.getNavigationContext() !== HG19_CONTEXT ?
+            this.state.selectedRegion.getNavigationContext() !== HG19_CONTEXT ?
                 <button onClick={() => this.setRegionSet(null)} >Exit gene set view</button>
                 :
                 null

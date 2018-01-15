@@ -10,7 +10,7 @@ import LinearDrawingModel from '../model/LinearDrawingModel';
  *     svgNode: a ref to the parent's svg
  *     drawModel: a LinearDrawingModel
  * 
- * This component requires a DisplayedRegionModel (`displayedRegion`) to calculate the drawing model; other props will
+ * This component requires a DisplayedRegionModel (`viewRegion`) to calculate the drawing model; other props will
  * be passed directly to the <svg>.
  * 
  * @author Silas Hsu
@@ -20,7 +20,7 @@ class SvgContainer extends React.Component {
         /**
          * The current region in which to draw; will used to calculate the draw model.
          */
-        displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
 
         // All other props will be passed directly to the <svg>.
     };
@@ -62,7 +62,7 @@ class SvgContainer extends React.Component {
         }
 
         const width = typeof this.props.width === "number" ? this.props.width : svgNode.clientWidth;
-        const drawModel = new LinearDrawingModel(this.props.displayedRegion, width);
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, width);
         const propsToGive = {
             svgNode: svgNode,
             drawModel: drawModel,
@@ -85,7 +85,7 @@ class SvgContainer extends React.Component {
      * @override
      */
     render() {
-        let {displayedRegion, children, ...svgProps} = this.props;
+        let {viewRegion, children, ...svgProps} = this.props;
         svgProps.ref = this.handleSvgRef;
         return <svg {...svgProps} >{this.renderChildren()}</svg>;
     }

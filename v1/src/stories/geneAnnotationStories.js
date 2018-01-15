@@ -13,7 +13,7 @@ import FeatureInterval from '../model/interval/FeatureInterval';
 
 const CHR1 = new Feature("chr1", new ChromosomeInterval("chr1", 0, 1500));
 const NAV_CONTEXT = new NavigationContext("Wow very genome", [CHR1]);
-const model = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
+const viewRegion = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
 
 const RECORDS = [
     {
@@ -84,16 +84,16 @@ const RECORDS = [
 ];
 
 const GENES = RECORDS.map(record =>
-    new Gene(record, model.getNavigationContext(), new FeatureInterval(CHR1))
+    new Gene(record, viewRegion.getNavigationContext(), new FeatureInterval(CHR1))
 );
 
 export const annotationStory = {
     storyName: "Annotations",
     component: <SvgContainer
-        displayedRegion={model}
+        viewRegion={viewRegion}
     >
         <AnnotationArranger
-            viewRegion={model}
+            viewRegion={viewRegion}
             data={GENES}
             maxRows={2}
         />

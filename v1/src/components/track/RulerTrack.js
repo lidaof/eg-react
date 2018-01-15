@@ -35,10 +35,10 @@ class RulerTrack extends React.Component {
             <SvgContainer
                 width={this.props.width}
                 height={HEIGHT}
-                displayedRegion={visibleRegion}
+                viewRegion={visibleRegion}
             >
-                <Chromosomes y={0} displayedRegion={visibleRegion} labelOffset={60}/>
-                <Ruler y={20} displayedRegion={visibleRegion} />
+                <Chromosomes y={0} viewRegion={visibleRegion} labelOffset={60}/>
+                <Ruler y={20} viewRegion={visibleRegion} />
             </SvgContainer>
         </div>
         );

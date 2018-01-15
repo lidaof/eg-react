@@ -29,12 +29,12 @@ const SELECT_BOX_HEIGHT = "60px";
  */
 class MainPane extends React.Component {
     static propTypes = {
-        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view
 
         /**
          * The region that the tracks are displaying
          */
-        selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        selectedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
 
         /**
          * Called when the user selects a new region to display.  Has the signature
@@ -106,7 +106,7 @@ class MainPane extends React.Component {
      */
     areaSelected(startX, endX, event) {
         const paneWidth = event.currentTarget.clientWidth;
-        const drawModel = new LinearDrawingModel(this.props.model, paneWidth);
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, paneWidth);
         this.props.regionSelectedCallback(drawModel.xToBase(startX), drawModel.xToBase(endX));
     }
 
@@ -118,24 +118,24 @@ class MainPane extends React.Component {
     render() {
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} displayedRegion={this.props.model} >
+        <DragAcrossView button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} viewRegion={this.props.viewRegion} >
             <SelectableArea
-                viewRegion={this.props.model}
+                viewRegion={this.props.viewRegion}
                 y={SELECT_BOX_Y}
                 height={SELECT_BOX_HEIGHT}
                 onAreaSelected={this.areaSelected}
             >
                 <SvgContainer
-                    displayedRegion={this.props.model}
+                    viewRegion={this.props.viewRegion}
                     onContextMenu={event => event.preventDefault()}
                     onWheel={this.mousewheel}
                     style={{border: "2px solid black"}}
                 >
-                    <Chromosomes y={CHROMOSOME_Y} displayedRegion={this.props.model} />
-                    <Ruler y={RULER_Y} displayedRegion={this.props.model} />
+                    <Chromosomes y={CHROMOSOME_Y} viewRegion={this.props.viewRegion} />
+                    <Ruler y={RULER_Y} viewRegion={this.props.viewRegion} />
                     <SelectedRegionBox
-                        displayedRegion={this.props.model}
-                        selectedRegion={this.props.selectedRegionModel}
+                        viewRegion={this.props.viewRegion}
+                        selectedRegion={this.props.selectedRegion}
                         gotoButtonCallback={this.props.gotoButtonCallback}
                         y={SELECTED_BOX_Y}
                     />

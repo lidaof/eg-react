@@ -82,7 +82,7 @@ class GeneAnnotationTrack extends React.Component {
                 height={HEIGHT}
                 viewExpansion={this.viewExpansion}
                 xOffset={this.props.xOffset}
-                displayedRegion={this.viewExpansion.expandedRegion}
+                viewRegion={this.viewExpansion.expandedRegion}
                 style={svgStyle}
             >
                 <AnnotationArranger

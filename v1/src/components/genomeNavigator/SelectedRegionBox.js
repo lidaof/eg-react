@@ -32,7 +32,7 @@ const TEXT_STYLE = {
 class SelectedRegionBox extends React.Component {
     static propTypes = {
         drawModel: PropTypes.instanceOf(LinearDrawingModel), // The drawing model to use
-        displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Entire region being visualized
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Entire region being visualized
         selectedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region that is selected
 
         /**
@@ -57,8 +57,8 @@ class SelectedRegionBox extends React.Component {
     gotoPressed(event) {
         let selectedAbsRegion = this.props.selectedRegion.getAbsoluteRegion();
         let halfWidth = 0;
-        if (this.props.selectedRegion.getWidth() < this.props.displayedRegion.getWidth()) {
-            halfWidth = this.props.displayedRegion.getWidth() * 0.5;
+        if (this.props.selectedRegion.getWidth() < this.props.viewRegion.getWidth()) {
+            halfWidth = this.props.viewRegion.getWidth() * 0.5;
         } else {
             halfWidth = this.props.selectedRegion.getWidth() * 3;
         }

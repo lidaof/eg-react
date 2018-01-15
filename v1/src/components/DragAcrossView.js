@@ -17,7 +17,7 @@ class DragAcrossView extends React.Component {
         /**
          * The current displayed region; used to calculate how many base pairs the user has dragged.
          */
-        displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
 
         /**
          * Overrides the width of the container when calculating how many bases the user has dragged.  Does not affect
@@ -55,7 +55,7 @@ class DragAcrossView extends React.Component {
 
     constructor(props) {
         super(props);
-        this.dragOriginRegion = this.props.displayedRegion;
+        this.dragOriginRegion = this.props.viewRegion;
 
         this.dragStart = this.dragStart.bind(this);
         this.drag = this.drag.bind(this);
@@ -68,7 +68,7 @@ class DragAcrossView extends React.Component {
      * @param {MouseEvent} event - mouse event that signals a drag start
      */
     dragStart(event) {
-        this.dragOriginRegion = this.props.displayedRegion;
+        this.dragOriginRegion = this.props.viewRegion;
         this.props.onViewDragStart(event);
     }
 
@@ -99,17 +99,17 @@ class DragAcrossView extends React.Component {
     /**
      * Calculates the absolute displayed region panned by some number of pixels.  Does not modify any of the inputs.
      * 
-     * @param {DisplayedRegionModel} displayedRegion - drawing model used to convert from pixels to bases
+     * @param {DisplayedRegionModel} viewRegion - drawing model used to convert from pixels to bases
      * @param {number} xDiff - number of pixels to pan the region
      * @return {object} - absolute region resulting from panning the input region
      */
-    _getRegionOffsetByX(displayedRegion, event, xDiff) {
+    _getRegionOffsetByX(viewRegion, event, xDiff) {
         const drawModel = new LinearDrawingModel(
-            displayedRegion,
+            viewRegion,
             this.props.widthOverride || event.currentTarget.clientWidth
         );
         let baseDiff = drawModel.xWidthToBases(xDiff);
-        let startRegion = displayedRegion.getAbsoluteRegion();
+        let startRegion = viewRegion.getAbsoluteRegion();
         return {
             start: startRegion.start + baseDiff,
             end: startRegion.end + baseDiff,
@@ -118,7 +118,7 @@ class DragAcrossView extends React.Component {
 
     render() {
         let {
-            displayedRegion,
+            viewRegion,
             onViewDragStart,
             onViewDrag,
             onViewDragEnd,

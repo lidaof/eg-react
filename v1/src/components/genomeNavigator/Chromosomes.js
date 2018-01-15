@@ -16,7 +16,7 @@ const DEFAULT_LABEL_OFFSET = 100;
  */
 class Chromosomes extends React.Component {
     static propTypes = {
-        displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
         drawModel: PropTypes.instanceOf(LinearDrawingModel), // The drawing model to use
         labelOffset: PropTypes.number,
         x: PropTypes.number,
@@ -31,7 +31,7 @@ class Chromosomes extends React.Component {
     render() {
         let children = [];
 
-        const intervals = this.props.displayedRegion.getFeatureIntervals();
+        const intervals = this.props.viewRegion.getFeatureIntervals();
         let x = 0;
         for (let interval of intervals) {
             let width = this.props.drawModel.basesToXWidth(interval.getLength());

@@ -26,22 +26,22 @@ describe('GenomeNavigator', () => {
         initSelectedRegion.setRegion(0, 1000);
 
         let component = <GenomeNavigator
-            viewModel={initViewRegion}
-            selectedRegionModel={initSelectedRegion}
+            viewRegion={initViewRegion}
+            selectedRegion={initSelectedRegion}
             regionSelectedCallback={() => {}}
         />
         render = shallow(component);
     });
 
     const getViewModelFromMainPane = function() {
-        return render.find('MainPane').props().model;
+        return render.find('MainPane').props().viewRegion;
     }
 
     it('renders a MainPane with the right models', () => {
         expect(render.find('MainPane')).toHaveLength(1);
         let mainPaneProps = render.find('MainPane').props();
-        expect(mainPaneProps.model).toBe(initViewRegion);
-        expect(mainPaneProps.selectedRegionModel).toBe(initSelectedRegion);
+        expect(mainPaneProps.viewRegion).toBe(initViewRegion);
+        expect(mainPaneProps.selectedRegion).toBe(initSelectedRegion);
     });
 
     it('renders a zoom slider with the right value', () => {

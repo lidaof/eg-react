@@ -17,7 +17,7 @@ const COLOR = "#bbb";
  */
 class Ruler extends React.Component {
     static propTypes = {
-        displayedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
         drawModel: PropTypes.instanceOf(LinearDrawingModel), // The drawing model to use
         x: PropTypes.number,
         y: PropTypes.number,
@@ -61,7 +61,7 @@ class Ruler extends React.Component {
      * @override
      */
     render() {
-        let regionWidth = this.props.displayedRegion.getWidth();
+        let regionWidth = this.props.viewRegion.getWidth();
 
         // If one wanted MAX_MAJOR_TICKS to represent the min number of ticks, use Math.floor() instead.
         let log10BasesPerMajorTick = Math.ceil(Math.log10(regionWidth / MAX_MAJOR_TICKS));
@@ -71,11 +71,11 @@ class Ruler extends React.Component {
         let unit = this._getMajorUnit(log10BasesPerMajorTick);
 
         let children = [];
-        const intervals = this.props.displayedRegion.getFeatureIntervals();
+        const intervals = this.props.viewRegion.getFeatureIntervals();
         for (let interval of intervals) {
             // relativeBase = round down to the nearest major tick base for this region, to find where to start drawing
             let relativeBase = Math.floor(interval.relativeStart / basesPerMajorTick) * basesPerMajorTick;
-            let featureAbsStart = this.props.displayedRegion.getNavigationContext().getFeatureStart(interval.getName());
+            let featureAbsStart = this.props.viewRegion.getNavigationContext().getFeatureStart(interval.getName());
             let majorX = this.props.drawModel.baseToX(featureAbsStart + relativeBase);
             let majorTickEndX = this.props.drawModel.baseToX(featureAbsStart + interval.relativeEnd);
 

@@ -111,7 +111,7 @@ class DraggableTrackContainer extends React.Component {
             onViewDragStart={this.viewDragStart}
             onViewDrag={this.viewDrag}
             onViewDragEnd={this.viewDragEnd}
-            displayedRegion={this.props.viewRegion}
+            viewRegion={this.props.viewRegion}
             widthOverride={this.props.visualizationWidth}
         >
             {modifiedTracks}
