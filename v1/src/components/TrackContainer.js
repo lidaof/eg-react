@@ -7,6 +7,7 @@ import { Track } from './track/Track';
 import TrackLegend from './track/TrackLegend';
 import TrackModel from '../model/TrackModel';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
+import ZoomableTrackContainer from './ZoomableTrackContainer';
 
 const tools = {
     DRAG: 0,
@@ -134,6 +135,15 @@ class TrackContainer extends React.Component {
                 );
                 break;
             case tools.ZOOM:
+                subContainer = (
+                    <ZoomableTrackContainer
+                        legendWidth={TrackLegend.WIDTH}
+                        trackComponents={tracks}
+                        viewRegion={this.props.viewRegion}
+                        onNewRegion={this.props.onNewRegion}
+                    />
+                );
+                break;
             case tools.DRAG:
             default:
                 subContainer = (

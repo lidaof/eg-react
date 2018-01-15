@@ -4,9 +4,10 @@ import PropTypes from 'prop-types';
 import Chromosomes from './Chromosomes';
 import Ruler from './Ruler';
 import SelectedRegionBox from './SelectedRegionBox';
-import SelectionBox from './SelectionBox';
+
+import SelectableArea from '../SelectableArea';
 import SvgContainer from '../SvgContainer';
-import { LEFT_MOUSE, RIGHT_MOUSE, DragAcrossDiv } from '../DragAcrossDiv';
+import { RIGHT_MOUSE } from '../DragAcrossDiv';
 import DragAcrossView from '../DragAcrossView';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
@@ -15,20 +16,11 @@ import LinearDrawingModel from '../../model/LinearDrawingModel';
 const WHEEL_ZOOM_SPEED = 0.2;
 
 const CHROMOSOME_Y = 30;
-const SELECT_BOX_Y = 20;
 const SELECTED_BOX_Y = 30;
 const RULER_Y = CHROMOSOME_Y + 40;
 
-/**
- * Given a X coordinate on the webpage (such as those contained in React.SyntheticEvents), gets the X coordinate in the SVG.
- * 
- * @param {number} domX - the X coordinate on the webpage
- * @param {SVGElement} svgNode - <svg> ref
- * @return {number} the X coordinate in the SVG
- */
-function domXToSvgX(domX, svgNode) {
-    return domX - svgNode.getBoundingClientRect().left;
-}
+const SELECT_BOX_Y = "25px";
+const SELECT_BOX_HEIGHT = "60px";
 
 /**
  * The main pane of the genome navigator.  Manages child components and listens for events that modify the view region.
@@ -85,48 +77,8 @@ class MainPane extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            selectAnchorX: 0,
-            selectX: 0,
-        };
-        this.selectStart = this.selectStart.bind(this);
-        this.dragSelect = this.dragSelect.bind(this);
-        this.selectEnd = this.selectEnd.bind(this);
         this.mousewheel = this.mousewheel.bind(this);
-    }
-
-    /**
-     * Initializes the selection box.
-     * 
-     * @param {React.SyntheticEvent} event - a mousedown event signaling a drag start
-     */
-    selectStart(event) {
-        event.preventDefault();
-        const node = event.currentTarget;
-        this.setState({selectAnchorX: domXToSvgX(event.clientX, node), selectX: domXToSvgX(event.clientX, node)});
-    }
-
-    /**
-     * Called when the mouse changes position while dragging the selection box.
-     * 
-     * @param {React.SyntheticEvent} event - the mouse event
-     */
-    dragSelect(event) {
-        const node = event.currentTarget;
-        this.setState({selectX: domXToSvgX(event.clientX, node)});
-    }
-
-    /**
-     * Called when the user lets go of the mouse after dragging the selection box.
-     * 
-     * @param {React.SyntheticEvent} event - the mouse event
-     */
-    selectEnd(event) {
-        const drawModel = new LinearDrawingModel(this.props.model, event.currentTarget.clientWidth);
-        const start = drawModel.xToBase(Math.min(this.state.selectAnchorX, this.state.selectX));
-        const end = start + drawModel.xWidthToBases(Math.abs(this.state.selectAnchorX - this.state.selectX));
-        this.props.regionSelectedCallback(start, end);
-        this.setState({selectAnchorX: 0, selectX: 0});
+        this.areaSelected = this.areaSelected.bind(this);
     }
 
     /**
@@ -146,6 +98,19 @@ class MainPane extends React.Component {
     }
 
     /**
+     * Fires the callback signaling a new region has been selected.
+     * 
+     * @param {number} startX - the left X coordinate of the selected area
+     * @param {number} endX - the right X coordinate of the selected area
+     * @param {React.SyntheticEvent} event - the final mouse event that triggered the selection
+     */
+    areaSelected(startX, endX, event) {
+        const paneWidth = event.currentTarget.clientWidth;
+        const drawModel = new LinearDrawingModel(this.props.model, paneWidth);
+        this.props.regionSelectedCallback(drawModel.xToBase(startX), drawModel.xToBase(endX));
+    }
+
+    /**
      * Places a <svg> and children that draw things.
      * 
      * @override
@@ -154,17 +119,17 @@ class MainPane extends React.Component {
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
         <DragAcrossView button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} displayedRegion={this.props.model} >
-            <DragAcrossDiv
-                button={LEFT_MOUSE}
-                onDragStart={this.selectStart}
-                onDrag={this.dragSelect}
-                onDragEnd={this.selectEnd}
+            <SelectableArea
+                viewRegion={this.props.model}
+                y={SELECT_BOX_Y}
+                height={SELECT_BOX_HEIGHT}
+                onAreaSelected={this.areaSelected}
             >
                 <SvgContainer
                     displayedRegion={this.props.model}
                     onContextMenu={event => event.preventDefault()}
                     onWheel={this.mousewheel}
-                    style={{border: "1px solid black"}}
+                    style={{border: "2px solid black"}}
                 >
                     <Chromosomes y={CHROMOSOME_Y} displayedRegion={this.props.model} />
                     <Ruler y={RULER_Y} displayedRegion={this.props.model} />
@@ -174,9 +139,8 @@ class MainPane extends React.Component {
                         gotoButtonCallback={this.props.gotoButtonCallback}
                         y={SELECTED_BOX_Y}
                     />
-                    <SelectionBox x1={this.state.selectAnchorX} x2={this.state.selectX} y={SELECT_BOX_Y} />
                 </SvgContainer>
-            </DragAcrossDiv>
+            </SelectableArea>
         </DragAcrossView>
         );
     }
