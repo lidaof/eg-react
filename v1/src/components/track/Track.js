@@ -9,7 +9,7 @@ import RulerTrack from './RulerTrack';
 
 import BigWigSource from '../../dataSources/BigWigSource';
 import BedSource from '../../dataSources/BedSource';
-import withDataFetching from '../DataFetcher';
+import withDataFetching from '../withDataFetching';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import TrackModel from '../../model/TrackModel';
@@ -28,6 +28,9 @@ export const TRACK_PROP_TYPES = {
     xOffset: PropTypes.number, // The horizontal amount to translate visualizations
 };
 
+/**
+ * Mapping from a track model's type to a track component type to render
+ */
 const TYPE_TO_TRACK = {
     "bigwig": withDataFetching(BigWigTrack, (props) => new BigWigSource(props.trackModel.url)),
     "hammock": withDataFetching(

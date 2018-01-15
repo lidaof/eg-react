@@ -7,7 +7,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import withDataFetching from '../../DataFetcher';
+import withDataFetching from '../../withDataFetching';
 import TrackModel from '../../../model/TrackModel';
 import makeToyRegion from '../../../model/test/toyRegion';
 import DataSource from '../../../dataSources/DataSource';
