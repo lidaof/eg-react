@@ -1,8 +1,9 @@
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import MainPane from './MainPane';
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import MainPane from './MainPane';
 import TrackRegionController from './TrackRegionController';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
 
@@ -14,12 +15,6 @@ const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allow
  */
 class GenomeNavigator extends React.Component {
     static propTypes = {
-        /**
-         * The initial view of the genome.  This prop will be forked into this component's state, after which mouse
-         * events can control the view.  Setting this prop again will force a different view.
-         */
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-
         /**
          * The region that the tracks are displaying.
          */
@@ -40,8 +35,8 @@ class GenomeNavigator extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            viewRegion: this.props.viewRegion,
-        }
+            viewRegion: new DisplayedRegionModel(this.props.selectedRegion.getNavigationContext())
+        };
 
         this.zoom = this.zoom.bind(this);
         this.setNewView = this.setNewView.bind(this);
@@ -55,8 +50,10 @@ class GenomeNavigator extends React.Component {
      * @override
      */
     componentWillReceiveProps(nextProps) {
-        if (this.props.viewRegion !== nextProps.viewRegion) {
-            this.setState({viewRegion: nextProps.viewRegion});
+        const thisNavContext = this.state.viewRegion.getNavigationContext();
+        const nextNavContext = nextProps.selectedRegion.getNavigationContext();
+        if (thisNavContext !== nextNavContext) {
+            this.setState({viewRegion: new DisplayedRegionModel(nextNavContext)});
         }
     }
 

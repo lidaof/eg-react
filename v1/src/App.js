@@ -46,11 +46,7 @@ class App extends React.Component {
             // TODO set the selected region dynamically
             selectedRegion: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION),
             currentTracks: DEFAULT_TRACKS.slice(),
-            isGeneSetView: false,
         };
-
-        // TODO this can be set dynamically too.
-        this.initNavView = new DisplayedRegionModel(HG19_CONTEXT);
 
         this.regionSelected = this.regionSelected.bind(this);
         this.addTrack = this.addTrack.bind(this);
@@ -86,23 +82,17 @@ class App extends React.Component {
 
     setRegionSet(set) {
         if (!set) {
-            this.initNavView = new DisplayedRegionModel(HG19_CONTEXT);
-            this.setState({selectedRegionModel: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION)});
+            this.setState({selectedRegion: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION)});
         } else {
             const selectedRegion = new DisplayedRegionModel(set.makeNavContext());
-            this.initNavView = selectedRegion;
-            this.setState({selectedRegionModel: selectedRegion});
+            this.setState({selectedRegion: selectedRegion});
         }
     }
 
     render() {
         return (
         <div>
-            <GenomeNavigator
-                viewRegion={this.initNavView}
-                selectedRegion={this.state.selectedRegion}
-                regionSelectedCallback={this.regionSelected}
-            />
+            <GenomeNavigator selectedRegion={this.state.selectedRegion} regionSelectedCallback={this.regionSelected} />
             <TrackContainer
                 tracks={this.state.currentTracks}
                 viewRegion={this.state.selectedRegion}
