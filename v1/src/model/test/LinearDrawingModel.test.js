@@ -3,7 +3,7 @@ import makeToyRegion from './toyRegion';
 
 const REGION = makeToyRegion(0, 10);
 const DRAW_WIDTH = 100;
-const INSTANCE = new LinearDrawingModel(REGION, DRAW_WIDTH, null);
+const INSTANCE = new LinearDrawingModel(REGION, DRAW_WIDTH);
 
 test('basesToXWidth()', () =>{
     expect(INSTANCE.basesToXWidth(15)).toBeCloseTo(150);

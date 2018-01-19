@@ -9,12 +9,10 @@ class LinearDrawingModel {
      * 
      * @param {DisplayedRegionModel} model - the displayed region
      * @param {number} drawWidth - the width of the canvas/svg/etc on which to draw
-     * @param {HTMLElement} domElement - the DOM element on which to draw
      */
-    constructor(model, drawWidth, domElement) {
+    constructor(model, drawWidth) {
         this._model = model;
         this._drawWidth = drawWidth;
-        this._svgNode = domElement;
     }
 
     /**
@@ -66,16 +64,6 @@ class LinearDrawingModel {
     xToBase(pixel) {
         let basesPerPixel = this._model.getWidth() / this._drawWidth;
         return pixel * basesPerPixel + this._model.getAbsoluteRegion().start;
-    }
-
-    /**
-     * Given a X coordinate on the webpage (such as those contained in MouseEvents), gets the X coordinate in the SVG.
-     * 
-     * @param {number} domX - the X coordinate on the webpage
-     * @return {number} the X coordinate in the SVG
-     */
-    domXToSvgX(domX) {
-        return domX - this._svgNode.getBoundingClientRect().left;
     }
 }
 

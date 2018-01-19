@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
  */
 class TrackRegionController extends React.Component {
     static propTypes = {
-        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view of the genome navigator
+        selectedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view of the genome navigator
     
         /**
          * Called when the user types a region to go to and it is successfully parsed.  Has the signature
@@ -34,7 +34,7 @@ class TrackRegionController extends React.Component {
      * @return {string} the currently displayed region in human-readable form
      */
     _currentRegionAsString() {
-        let intervals = this.props.model.getFeatureIntervals();
+        let intervals = this.props.selectedRegion.getFeatureIntervals();
         if (intervals.length === 1) {
             return intervals[0].toString();
         } else {
@@ -50,7 +50,7 @@ class TrackRegionController extends React.Component {
     parseRegion() {
         let parsedRegion = null;
         try {
-            parsedRegion = this.props.model.getNavigationContext().parse(this.input.value);
+            parsedRegion = this.props.selectedRegion.getNavigationContext().parse(this.input.value);
         } catch (error) {
             if (error instanceof RangeError) {
                 this.setState({badInputMessage: error.message});

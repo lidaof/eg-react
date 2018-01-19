@@ -1,62 +1,81 @@
 import React from 'react'
-//import { scaleLinear } from 'd3-scale'
-import { select } from 'd3-selection'
-//import { transition } from 'd3-transition'
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+
+import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import LinearDrawingModel from '../model/LinearDrawingModel';
 
 /**
  * Component takes a SVG and renders a bar chart on it.
  * 
- * @author Daofeng Li and Silas Hsu
+ * @author Silas Hsu
  */
-class BarChart extends React.Component {
+class BarChart extends React.PureComponent {
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.object), // The data to display.  Array of BarChartRecord.
-        height: PropTypes.number // The height of the svg
-    }
-
-    static defaultProps = {
-        data: [],
-        height: 50,
-    }
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        data: PropTypes.arrayOf(PropTypes.object).isRequired, // The data to display.  Array of BarChartRecord.
+        width: PropTypes.number,
+        height: PropTypes.number,
+        style: PropTypes.object,
+    };
 
     /**
-     * Only updates the component if the data changes.
-     * 
-     * @param {object} nextProps - next props the component will receive
+     * Draws the data.
      */
-    shouldComponentUpdate(nextProps) {
-        return this.props.data !== nextProps.data;
+    componentDidMount() {
+        this.draw(this.canvasNode);
     }
 
     /**
-     * Renders a bar chart with d3.js.
+     * Redraws the data.
+     */
+    componentDidUpdate(prevProps) {
+        this.draw(this.canvasNode);
+    }
+
+    /**
+     * Draws the data.
+     */
+    draw(canvas) {
+        if (process.env.NODE_ENV === "test") {
+            return;
+        }
+
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const context = canvas.getContext("2d");
+        context.fillStyle = "blue";
+        context.clearRect(0, 0, canvas.width, canvasHeight);
+
+        const data = this.props.data;
+        const non0Data = data.filter(record => record.value !== 0);
+        if (non0Data.length === 0) {
+            return;
+        }
+        const dataMax = _.maxBy(data, record => record.value).value;
+        
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, canvasWidth);
+        non0Data.forEach(record => {
+            const x = Math.round(drawModel.baseToX(record.start));
+            const y = Math.round(canvasHeight - (record.value/dataMax * canvasHeight));
+            const width = 1;
+            const height = Math.round(record.value/dataMax * canvasHeight);
+            context.fillRect(x, y, width, height);
+        });
+    }
+
+    /**
+     * @inheritdoc
      */
     render() {
-        let non0Data = this.props.data.filter(record => record.value !== 0);
-        if (non0Data.length === 0) {
-            return null;
-        }
-        const dataMax = _.maxBy(this.props.data, record => record.value).value;
-        const svgHeight = this.props.height;
-        let rectSelection = select(this.props.svgNode)
-            .selectAll("rect")
-            .data(non0Data);
-
-        const shapeBars = function(selection) {
-            selection.attr("class", "bar")
-                .attr("height", record => record.value/dataMax * svgHeight)
-                .attr("width", 1)
-                .attr("x", record => this.props.drawModel.baseToX(record.start))
-                .attr("y", record => svgHeight - (record.value/dataMax * svgHeight) + 10)
-        }.bind(this);
-
-        shapeBars(rectSelection);
-        shapeBars(rectSelection.enter().append("rect"));
-        rectSelection.exit().remove();
-
-        return null;
+        return (
+        <canvas
+            width={this.props.width}
+            height={this.props.height}
+            style={this.props.style}
+            ref={node => this.canvasNode = node}>
+        </canvas>
+        );
     }
 }
 

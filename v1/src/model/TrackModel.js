@@ -14,6 +14,8 @@ const SCHEMA = { // Schema for the plain object argument to the constructor.
 */
 
 class TrackModel {
+    static nextId = 0;
+
     constructor(plainObject) {
         Object.assign(this, plainObject);
         this.name = this.name || "";
@@ -21,10 +23,17 @@ class TrackModel {
         this.options = this.options || {};
         this.url = this.url || "";
         this.metadata = this.metadata || {};
+
+        this.id = TrackModel.nextId;
+        TrackModel.nextId++;
     }
 
     getType() {
         return this.type.toLowerCase();
+    }
+
+    getId() {
+        return this.id;
     }
 }
 

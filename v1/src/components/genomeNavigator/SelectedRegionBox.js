@@ -1,6 +1,8 @@
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import React from 'react';
 import PropTypes from 'prop-types';
-import SvgComponent from '../SvgComponent';
+
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import LinearDrawingModel from '../../model/LinearDrawingModel';
 
 const BOX_HEIGHT = 40;
 const GOTO_BUTTON_WIDTH = 50;
@@ -8,25 +10,30 @@ const GOTO_BUTTON_HEIGHT = 50;
 const GOTO_LABEL_HEIGHT = 11;
 
 const GOTO_BUTTON_Y = BOX_HEIGHT/2 - GOTO_BUTTON_HEIGHT/2;
-const LABEL_Y = GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT/2 - GOTO_LABEL_HEIGHT;
+const LABEL_Y = GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT/2 + 3;
 const LABEL_X_PADDING = 15;
+
+const BOX_STYLE = {
+    stroke: "#090",
+    fill: "#0f0",
+    fillOpacity: 0.1,
+};
+
+const TEXT_STYLE = {
+    fontSize: GOTO_LABEL_HEIGHT,
+    fontStyle: "italic",
+};
 
 /**
  * A box that shows the currently selected region, or a GOTO button if the currently selected region is out of view.
  * 
  * @author Silas Hsu
  */
-class SelectedRegionBox extends SvgComponent {
+class SelectedRegionBox extends React.Component {
     static propTypes = {
-        /**
-         * The region that the tracks are displaying
-         */
-        selectedRegionModel: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-
-        /**
-         * The current region the genome navigator is displaying
-         */
-        model: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        drawModel: PropTypes.instanceOf(LinearDrawingModel), // The drawing model to use
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Entire region being visualized
+        selectedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region that is selected
 
         /**
          * Called when the user presses the "GOTO" button to quicky scroll the view to the selected track region.
@@ -37,52 +44,31 @@ class SelectedRegionBox extends SvgComponent {
         gotoButtonCallback: PropTypes.func.isRequired, // Function that takes arguments [number, number]
     }
 
-    /**
-     * Creates the box and GOTO button, and attaches event listeners
-     * 
-     * @param {Object} props - props as specified by React 
-     */
     constructor(props) {
         super(props);
-
-        this.box = this.group.rect(1, BOX_HEIGHT).attr({
-            stroke: "#090",
-            fill: "#0f0",
-            "fill-opacity": 0.1,
-        });
-
-        this.gotoButton = this.group.polygon().attr({
-            stroke: "#090",
-            fill: "#0f0",
-            "fill-opacity": 0.8,
-        });
-        this.gotoButton.on('mousedown', this.gotoPressed, this);
-
-        this.gotoLabel = this.group.text("GOTO");
-        this.gotoLabel.font({
-            size: GOTO_LABEL_HEIGHT,
-            "font-style": "italic",
-        });
-        this.gotoLabel.on('mousedown', this.gotoPressed, this);
+        this.gotoPressed = this.gotoPressed.bind(this);
     }
 
     /**
      * Handle a press of the GOTO button.  Calculates a new view and propagates it to this component's parent.
      * 
-     * @param {MouseEvent} event - a mousedown event fired from the GOTO button
+     * @param {React.SyntheticEvent} event - event fired from the GOTO button
      */
     gotoPressed(event) {
-        event.preventDefault()
-        event.stopPropagation();
-        let selectedAbsRegion = this.props.selectedRegionModel.getAbsoluteRegion();
+        let selectedAbsRegion = this.props.selectedRegion.getAbsoluteRegion();
         let halfWidth = 0;
-        if (this.props.selectedRegionModel.getWidth() < this.props.model.getWidth()) {
-            halfWidth = this.props.model.getWidth() * 0.5;
+        if (this.props.selectedRegion.getWidth() < this.props.viewRegion.getWidth()) {
+            halfWidth = this.props.viewRegion.getWidth() * 0.5;
         } else {
-            halfWidth = this.props.selectedRegionModel.getWidth() * 3;
+            halfWidth = this.props.selectedRegion.getWidth() * 3;
         }
         let regionCenter = (selectedAbsRegion.end + selectedAbsRegion.start) * 0.5;
         this.props.gotoButtonCallback(regionCenter - halfWidth, regionCenter + halfWidth);
+    }
+
+    _pointsToString(points) {
+        const coords = points.map(point => point.join(","));
+        return coords.join(" ");
     }
 
     /**
@@ -92,47 +78,54 @@ class SelectedRegionBox extends SvgComponent {
      */
     render() {
         let svgWidth = this.props.drawModel.getDrawWidth();
-        let absRegion = this.props.selectedRegionModel.getAbsoluteRegion();
+        let absRegion = this.props.selectedRegion.getAbsoluteRegion();
 
         // We limit the box's start and end X because SVGs don't like to be billions of pixels wide.
         let xStart = Math.max(-10, this.props.drawModel.baseToX(absRegion.start));
         let xEnd = Math.min(svgWidth + 10, this.props.drawModel.baseToX(absRegion.end));
         let width = Math.max(0, xEnd - xStart);
-        this.box.x(xStart);
-        this.box.width(width);
+        const box = <rect x={xStart} y={0} width={width} height={BOX_HEIGHT} style={BOX_STYLE} />;
 
-        if (xEnd <= 0) { // Box out of view to the left
-            this.gotoButton.show();
-            this.gotoLabel.show();
-            this.gotoButton.plot([
+        let gotoButton = null;
+        let gotoText = null;
+        if (xEnd <= 0) { // Arrow pointing left
+            const points = [
                 [0, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT/2],
                 [GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y],
                 [GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT]
-            ]);
-            this.gotoLabel.attr({
-                x: LABEL_X_PADDING,
-                y: LABEL_Y,
-                "text-anchor": "start",
-            });
-        } else if (xStart >= svgWidth) { // Box out of view to the right
-            this.gotoButton.show();
-            this.gotoLabel.show();
-            this.gotoButton.plot([
+            ];
+            gotoButton = <polygon points={this._pointsToString(points)} style={BOX_STYLE} onClick={this.gotoPressed} />;
+            gotoText = (<text
+                x={LABEL_X_PADDING}
+                y={LABEL_Y}
+                style={{...TEXT_STYLE, textAnchor: "start"}}
+                onClick={this.gotoPressed}
+            >
+                GOTO
+            </text>);
+        } else if (xStart >= svgWidth) { // Arrow pointing right
+            const points = [
                 [svgWidth, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT/2],
                 [svgWidth - GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y],
                 [svgWidth - GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT]
-            ]);
-            this.gotoLabel.attr({
-                x: svgWidth - LABEL_X_PADDING,
-                y: LABEL_Y,
-                "text-anchor": "end",
-            });
-        } else { // Box visible; hide the goto button
-            this.gotoButton.hide()
-            this.gotoLabel.hide();
+            ];
+            gotoButton = <polygon points={this._pointsToString(points)} style={BOX_STYLE} onClick={this.gotoPressed}/>;
+            gotoText = (<text
+                x={svgWidth - LABEL_X_PADDING}
+                y={LABEL_Y}
+                style={{...TEXT_STYLE, textAnchor: "end"}}
+                onClick={this.gotoPressed}
+            >
+                GOTO
+            </text>);
         }
-
-        return null;
+        return (
+        <g transform={`translate(${this.props.x || 0} ${this.props.y || 0})`} >
+            {box}
+            {gotoButton}
+            {gotoText}
+        </g>
+        );
     }
 }
 

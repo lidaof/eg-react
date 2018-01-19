@@ -6,12 +6,14 @@ import GeneDetail from './GeneDetail';
 import { TRACK_PROP_TYPES } from '../Track'
 import TrackLegend from '../TrackLegend';
 import TrackLoadingNotice from '../TrackLoadingNotice';
-import SvgContainer from '../SvgContainer';
-import ScrollingData from '../ScrollingData';
+import SvgContainer from '../../SvgContainer';
+import withExpandedWidth from '../../withExpandedWidth';
 
-import RegionExpander from '../../model/RegionExpander';
+import RegionExpander from '../../../model/RegionExpander';
 
 const HEIGHT = 120;
+
+const WideSvg = withExpandedWidth(SvgContainer);
 
 /**
  * A gene annotation track.
@@ -75,26 +77,22 @@ class GeneAnnotationTrack extends React.Component {
         >
             <TrackLegend height={HEIGHT} trackModel={this.props.trackModel} />
             {this.props.isLoading ? <TrackLoadingNotice height={this.props.height} /> : null}
-            <ScrollingData
-                width={this.props.width}
+            <WideSvg
+                visibleWidth={this.props.width}
                 height={HEIGHT}
                 viewExpansion={this.viewExpansion}
                 xOffset={this.props.xOffset}
+                viewRegion={this.viewExpansion.expandedRegion}
+                style={svgStyle}
             >
-                <SvgContainer
-                    model={this.viewExpansion.expandedRegion}
-                    drawModelWidth={this.viewExpansion.expandedWidth}
-                    svgProps={{style: svgStyle}}
-                >
-                    <AnnotationArranger
-                        data={this.props.data}
-                        viewRegion={this.props.viewRegion}
-                        leftBoundary={this.viewExpansion.leftExtraPixels}
-                        onGeneClick={this.geneClicked}
-                        maxRows={this.props.maxRows}
-                    />
-                </SvgContainer>
-            </ScrollingData>
+                <AnnotationArranger
+                    data={this.props.data}
+                    viewRegion={this.props.viewRegion}
+                    leftBoundary={this.viewExpansion.leftExtraPixels}
+                    onGeneClick={this.geneClicked}
+                    maxRows={this.props.maxRows}
+                />
+            </WideSvg>
             {this.state.geneDetail}
         </div>
         );

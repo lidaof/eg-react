@@ -29,8 +29,8 @@ const mainPaneView1 = {
     storyName: "Main pane, view 1",
     viewRegion: view1,
     component: <MainPane
-        model={view1}
-        selectedRegionModel={selectedRegion}
+        viewRegion={view1}
+        selectedRegion={selectedRegion}
         regionSelectedCallback={(start, end) => window.newSelectedRegion = {start: start, end: end}}
         dragCallback={() => {}}
         gotoButtonCallback={() => {}}
@@ -42,8 +42,8 @@ const mainPaneView2 = {
     storyName: "Main pane, view 2",
     viewRegion: view2,
     component: <MainPane
-        model={view2}
-        selectedRegionModel={selectedRegion}
+        viewRegion={view2}
+        selectedRegion={selectedRegion}
         regionSelectedCallback={() => {}}
         dragCallback={() => {}}
         gotoButtonCallback={(start, end) => window.gotoButtonRegion = {start: start, end: end}}
