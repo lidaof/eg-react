@@ -207,7 +207,7 @@ class NavigationContext {
             startBase = Number.parseInt(multiFeatureMatch[2], 10);
             endBase = Number.parseInt(multiFeatureMatch[4], 10);
         } else {
-            throw new RangeError("Could not parse coordinates");
+            throw new RangeError("Wrong coordinates");
         }
 
         let startAbsBase = this.convertFeatureCoordinateToBase(startName, startBase, true);

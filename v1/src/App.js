@@ -89,7 +89,7 @@ class App extends React.Component {
 
     render() {
         return (
-        <div>
+        <div className="container-fluid">
             <GenomeNavigator
                 viewModel={this.initNavModel}
                 selectedRegionModel={this.state.selectedRegionModel}

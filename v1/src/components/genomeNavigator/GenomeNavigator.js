@@ -3,6 +3,7 @@ import MainPane from './MainPane';
 import PropTypes from 'prop-types';
 import React from 'react';
 import TrackRegionController from './TrackRegionController';
+import eglogo from '../../images/eglogo.jpg';
 
 const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
 
@@ -113,23 +114,34 @@ class GenomeNavigator extends React.Component {
      */
     render() {
         return (
-            <div style={{padding: "20px"}}>
-                <label>
-                    Zoom:
-                    <input
-                        type="range"
-                        min={Math.log(MIN_VIEW_LENGTH)}
-                        max={Math.log(this.state.viewModel.getNavigationContext().getTotalBases())}
-                        step="any"
-                        value={Math.log(this.state.viewModel.getWidth())}
-                        onChange={this.zoomSliderDragged}
-                    />
-                </label>
-                <TrackRegionController
-                    model={this.props.selectedRegionModel}
-                    newRegionCallback={this.props.regionSelectedCallback}
-                />
-
+            <div className="container-fluid">
+                <nav className="navbar fixed-top">
+                    <div className="row">
+                        <div className="col-sm">
+                            <img src={eglogo} width="400px" />
+                        </div>
+                       
+                        <div className="col-md">
+                            <TrackRegionController
+                                model={this.props.selectedRegionModel}
+                                newRegionCallback={this.props.regionSelectedCallback}
+                            />
+                        </div>
+                         <div className="col-sm">
+                            <label>
+                                Zoom:
+                                <input
+                                    type="range"
+                                    min={Math.log(MIN_VIEW_LENGTH)}
+                                    max={Math.log(this.state.viewModel.getNavigationContext().getTotalBases())}
+                                    step="any"
+                                    value={Math.log(this.state.viewModel.getWidth())}
+                                    onChange={this.zoomSliderDragged}
+                                />
+                            </label>
+                        </div>
+                    </div>
+                </nav>
                 <MainPane
                     model={this.state.viewModel}
                     selectedRegionModel={this.props.selectedRegionModel}
