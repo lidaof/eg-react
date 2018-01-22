@@ -60,6 +60,7 @@ export class Track extends React.Component {
             console.warn(`Unknown track type "${type}"`);
             return null;
         } else {
+            //return <TrackSubType {...this.props} />;
             return (
             <Reparentable uid={"track-" + this.props.trackModel.getId()} >
                 <TrackSubType {...this.props} />

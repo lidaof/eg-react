@@ -7,6 +7,7 @@ import TrackModel from '../../model/TrackModel';
 
 const NUM_TICKS_SUGGESTION = 2;
 const LABEL_RIGHT_MARGIN = 30;
+const LABEL_HEIGHT = 12;
 
 /**
  * A box displaying labels, axes, and other important track info.
@@ -60,7 +61,7 @@ class TrackLegend extends React.PureComponent {
         <div style={divStyle} onMouseDown={(event) => event.stopPropagation()}>
             <svg width={TrackLegend.WIDTH} height={this.props.height}>
                 <foreignObject
-                    width={TrackLegend.WIDTH - LABEL_RIGHT_MARGIN}
+                    width={TrackLegend.WIDTH - LABEL_RIGHT_MARGIN} height={LABEL_HEIGHT}
                     style={{fontSize: 9, textAlign: "left"}}
                 >
                     {this.props.trackModel.name}

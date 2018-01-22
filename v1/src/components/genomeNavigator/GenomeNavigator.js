@@ -113,7 +113,7 @@ class GenomeNavigator extends React.Component {
     render() {
         return (
             <div className="container-fluid">
-                <nav className="navbar fixed-top">
+                <nav className="navbar">
                     <div className="row">
                         <div className="col-sm">
                             <img src={eglogo} width="400px" />
