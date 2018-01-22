@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 
 import GenomeNavigator from './GenomeNavigator';
 
@@ -15,56 +15,60 @@ const CHROMOSOMES = [
     new Feature("chr3", new ChromosomeInterval("chr3", 0, 1000)),
 ];
 const NAV_CONTEXT = new NavigationContext("View region", CHROMOSOMES);
-var render = null;
+var rendered = null;
 
 beforeEach(() => {
     const selectedRegion = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
     let component = <GenomeNavigator selectedRegion={selectedRegion} regionSelectedCallback={() => undefined} />
-    render = shallow(component);
+    rendered = mount(component);
 });
 
 const getViewModelFromMainPane = function() {
-    return render.find('MainPane').props().viewRegion;
+    return rendered.find('MainPane').props().viewRegion;
+}
+
+const findZoomSlider = function() {
+    return rendered.find('input[type="range"]')
 }
 
 it('renders a MainPane with the right initial models', () => {
-    expect(render.find('MainPane')).toHaveLength(1);
-    let mainPaneProps = render.find('MainPane').props();
+    expect(rendered.find('MainPane')).toHaveLength(1);
+    let mainPaneProps = rendered.find('MainPane').props();
     expect(mainPaneProps.viewRegion).toEqual(new DisplayedRegionModel(NAV_CONTEXT));
     expect(mainPaneProps.selectedRegion).toEqual(new DisplayedRegionModel(NAV_CONTEXT, 0, 1000));
 });
 
 it('renders a zoom slider with the right value', () => {
-    expect(render.find('input')).toHaveLength(1);
-    let sliderProps = render.find('input').props();
+    expect(findZoomSlider()).toHaveLength(1);
+    let sliderProps = findZoomSlider().props();
     expect(sliderProps.type).toEqual('range');
     expect(sliderProps.value).toBeCloseTo(Math.log(NAV_CONTEXT.getTotalBases()));
 
-    render.instance().setNewView(1000, 2000);
-    let newSliderProps = render.find('input').props();
+    rendered.instance().setNewView(1000, 2000);
+    let newSliderProps = findZoomSlider().props();
     expect(newSliderProps.value).toBeCloseTo(Math.log(1000));
 });
 
 it('sets the right view region when zooming', () => {
-    render.instance().zoom(0.5, 0.5);
+    rendered.instance().zoom(0.5, 0.5);
     let model = getViewModelFromMainPane();
     expect(model.getAbsoluteRegion()).toEqual({start: 750, end: 2250});
 });
 
 it('prohibits zooming in too far', () => {
-    render.instance().zoom(0.001, 0);
+    rendered.instance().zoom(0.001, 0);
     let model = getViewModelFromMainPane();
     expect(model.getWidth()).toBeGreaterThan(1);
 });
 
 it('setNewView() actually sets a new view', () => {
-    render.instance().setNewView(1000, 2000);
+    rendered.instance().setNewView(1000, 2000);
     let model = getViewModelFromMainPane();
     expect(model.getAbsoluteRegion()).toEqual({start: 1000, end: 2000});
 });
 
 it('zoomSliderDragged() zooms properly', () => {
-    render.find('input').simulate('change', {
+    findZoomSlider().simulate('change', {
         target: {value: Math.log(500)} // Target region size of 500
     });
     let model = getViewModelFromMainPane();

@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Chromosomes from './Chromosomes';
-import Ruler from './Ruler';
+import ChromosomeDesigner from '../../art/ChromosomeDesigner';
+import RulerDesigner from '../../art/RulerDesigner';
+import SvgDesignRenderer from '../SvgDesignRenderer';
 import SelectedRegionBox from './SelectedRegionBox';
+import withAutoWidth from '../withAutoWidth';
 
 import SelectableArea from '../SelectableArea';
-import SvgContainer from '../SvgContainer';
 import { RIGHT_MOUSE } from '../DragAcrossDiv';
 import DragAcrossView from '../DragAcrossView';
 
@@ -29,6 +30,7 @@ const SELECT_BOX_HEIGHT = "60px";
  */
 class MainPane extends React.Component {
     static propTypes = {
+        width: PropTypes.number.isRequired, // The width of the pane
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view
 
         /**
@@ -105,8 +107,7 @@ class MainPane extends React.Component {
      * @param {React.SyntheticEvent} event - the final mouse event that triggered the selection
      */
     areaSelected(startX, endX, event) {
-        const paneWidth = event.currentTarget.clientWidth;
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, paneWidth);
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
         this.props.regionSelectedCallback(drawModel.xToBase(startX), drawModel.xToBase(endX));
     }
 
@@ -116,6 +117,15 @@ class MainPane extends React.Component {
      * @override
      */
     render() {
+        if (this.props.width === 0) {
+            if (process.env.NODE_ENV !== "test") {
+                console.warn("Cannot render with a width of 0");
+            }
+            return null;
+        }
+
+        const rulerDesign = new RulerDesigner(this.props.viewRegion, this.props.width).design();
+        const chromosomeDesign = new ChromosomeDesigner(this.props.viewRegion, this.props.width).design();
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
         <DragAcrossView button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} viewRegion={this.props.viewRegion} >
@@ -125,25 +135,27 @@ class MainPane extends React.Component {
                 height={SELECT_BOX_HEIGHT}
                 onAreaSelected={this.areaSelected}
             >
-                <SvgContainer
-                    viewRegion={this.props.viewRegion}
+                <svg
+                    width={this.props.width}
+                    height={150}
                     onContextMenu={event => event.preventDefault()}
                     onWheel={this.mousewheel}
                     style={{border: "2px solid black"}}
                 >
-                    <Chromosomes y={CHROMOSOME_Y} viewRegion={this.props.viewRegion} />
-                    <Ruler y={RULER_Y} viewRegion={this.props.viewRegion} />
+                    <SvgDesignRenderer design={chromosomeDesign} y={CHROMOSOME_Y} />
+                    <SvgDesignRenderer design={rulerDesign} y={RULER_Y} />
                     <SelectedRegionBox
+                        width={this.props.width}
                         viewRegion={this.props.viewRegion}
                         selectedRegion={this.props.selectedRegion}
                         gotoButtonCallback={this.props.gotoButtonCallback}
                         y={SELECTED_BOX_Y}
                     />
-                </SvgContainer>
+                </svg>
             </SelectableArea>
         </DragAcrossView>
         );
     }
 }
 
-export default MainPane;
+export default withAutoWidth(MainPane);

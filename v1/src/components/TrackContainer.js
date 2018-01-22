@@ -8,6 +8,7 @@ import TrackLegend from './track/TrackLegend';
 import TrackModel from '../model/TrackModel';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
+import withAutoWidth from './withAutoWidth';
 
 const tools = {
     DRAG: 0,
@@ -29,6 +30,7 @@ const VIEW_EXPANSION_VALUE = 1;
  */
 class TrackContainer extends React.Component {
     static propTypes = {
+        width: PropTypes.number.isRequired, // Width of the tracks, including legends
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)), // Tracks to render
         /**
          * Callback for when a new region is selected.  Signature:
@@ -53,19 +55,13 @@ class TrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            width: 0,
             selectedTool: tools.DRAG,
         };
-        this.node = null;
         this.trackMoved = this.trackMoved.bind(this);
     }
 
-    componentDidMount() {
-        this.setState({width: this.node.clientWidth});
-    }
-
     getVisualizationWidth() {
-        return Math.max(0, this.state.width - TrackLegend.WIDTH);
+        return Math.max(0, this.props.width - TrackLegend.WIDTH);
     }
 
     /**
@@ -122,10 +118,6 @@ class TrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        if (this.state.width === 0) {
-            return <div ref={node => this.node = node} />;
-        }
-
         let subContainer;
         let tracks = this.makeTracks();
         switch (this.state.selectedTool) {
@@ -167,4 +159,4 @@ class TrackContainer extends React.Component {
     }
 }
 
-export default TrackContainer;
+export default withAutoWidth(TrackContainer);

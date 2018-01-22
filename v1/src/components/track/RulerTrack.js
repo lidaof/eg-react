@@ -3,9 +3,9 @@ import React from 'react';
 import { TRACK_PROP_TYPES } from './Track'
 import TrackLegend from './TrackLegend';
 
-import SvgContainer from '../SvgContainer';
-import Chromosomes from '../genomeNavigator/Chromosomes';
-import Ruler from '../genomeNavigator/Ruler';
+import ChromosomeDesigner from '../../art/ChromosomeDesigner';
+import RulerDesigner from '../../art/RulerDesigner';
+import SvgDesignRenderer from '../SvgDesignRenderer';
 
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 
@@ -28,18 +28,17 @@ class RulerTrack extends React.Component {
     render() {
         const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
         const visibleRegion = this.props.viewRegion.clone().pan(drawModel.xWidthToBases(-this.props.xOffset));
+
+        const rulerDesign = new RulerDesigner(visibleRegion, this.props.width).design();
+        const chromosomeDesign = new ChromosomeDesigner(visibleRegion, this.props.width, 60).design();
         
         return (
         <div style={{display: "flex", borderBottom: "1px solid grey", overflow: "hidden"}}>
             <TrackLegend height={HEIGHT} trackModel={this.props.trackModel} />
-            <SvgContainer
-                width={this.props.width}
-                height={HEIGHT}
-                viewRegion={visibleRegion}
-            >
-                <Chromosomes y={0} viewRegion={visibleRegion} labelOffset={60}/>
-                <Ruler y={20} viewRegion={visibleRegion} />
-            </SvgContainer>
+            <svg width={this.props.width} height={HEIGHT} >
+                <SvgDesignRenderer design={chromosomeDesign} />
+                <SvgDesignRenderer design={rulerDesign} y={20} />
+            </svg>
         </div>
         );
     }
