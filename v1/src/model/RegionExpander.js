@@ -40,8 +40,8 @@ class RegionExpander {
      * @typedef {Object} RegionExpander~ExpansionData
      * @property {number} expandedWidth - total width, in pixels, of the expanded view
      * @property {DisplayedRegionModel} expandedRegion - model of expanded region
-     * @property {number} - how many pixels on the left side to allocate to additional data
-     * @property {number} - how many pixels on the right side to allocate to additional data
+     * @property {number} leftExtraPixels - how many pixels on the left side to allocate to additional data
+     * @property {number} rightExtraPixels - how many pixels on the right side to allocate to additional data
      */
 
     /**

@@ -17,7 +17,7 @@ const DEFAULT_LABEL_OFFSET = 100;
 class Chromosomes extends React.Component {
     static propTypes = {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
-        drawModel: PropTypes.instanceOf(LinearDrawingModel), // The drawing model to use
+        width: PropTypes.number.isRequired, // The drawing model to use
         labelOffset: PropTypes.number,
         x: PropTypes.number,
         y: PropTypes.number
@@ -30,17 +30,18 @@ class Chromosomes extends React.Component {
      */
     render() {
         let children = [];
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
 
         const intervals = this.props.viewRegion.getFeatureIntervals();
         let x = 0;
         for (let interval of intervals) {
-            let width = this.props.drawModel.basesToXWidth(interval.getLength());
+            let intervalWidth = drawModel.basesToXWidth(interval.getLength());
             // Box for region
             children.push(<rect
                 key={"rect" + x}
                 x={x}
                 y={BOUNDARY_LINE_EXTENT}
-                width={width}
+                width={intervalWidth}
                 height={HEIGHT}
                 style={{stroke: "#000", strokeWidth: 2, fill: "#fff"}}
             />);
@@ -59,14 +60,14 @@ class Chromosomes extends React.Component {
             // Label for region
             children.push(<text
                 key={"text" + x}
-                x={x + width/2}
+                x={x + intervalWidth/2}
                 y={this.props.labelOffset || DEFAULT_LABEL_OFFSET}
                 style={{textAnchor: "middle", fontWeight: "bold"}}
             >
                 {interval.getName()}
             </text>);
 
-            x += width;
+            x += intervalWidth;
         }
 
         return <svg x={this.props.x} y={this.props.y}>{children}</svg>;

@@ -1,20 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ChromosomeDesigner from '../../art/ChromosomeDesigner';
-import RulerDesigner from '../../art/RulerDesigner';
-import SvgDesignRenderer from '../SvgDesignRenderer';
+import Chromosomes from './Chromosomes';
+import Ruler from './Ruler';
 import SelectedRegionBox from './SelectedRegionBox';
-import withAutoWidth from '../withAutoWidth';
 
 import SelectableArea from '../SelectableArea';
 import { RIGHT_MOUSE } from '../DragAcrossDiv';
 import DragAcrossView from '../DragAcrossView';
+import withAutoWidth from '../withAutoWidth';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 
 const WHEEL_ZOOM_SPEED = 0.2;
+const SVG_HEIGHT = 150;
 
 const CHROMOSOME_Y = 30;
 const SELECTED_BOX_Y = 30;
@@ -117,38 +117,37 @@ class MainPane extends React.Component {
      * @override
      */
     render() {
-        if (this.props.width === 0) {
+        const {width, viewRegion, selectedRegion, dragCallback, gotoButtonCallback} = this.props;
+        if (width === 0) {
             if (process.env.NODE_ENV !== "test") {
                 console.warn("Cannot render with a width of 0");
             }
             return null;
         }
 
-        const rulerDesign = new RulerDesigner(this.props.viewRegion, this.props.width).design();
-        const chromosomeDesign = new ChromosomeDesigner(this.props.viewRegion, this.props.width).design();
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} viewRegion={this.props.viewRegion} >
+        <DragAcrossView button={RIGHT_MOUSE} onViewDrag={dragCallback} viewRegion={viewRegion} >
             <SelectableArea
-                viewRegion={this.props.viewRegion}
+                viewRegion={viewRegion}
                 y={SELECT_BOX_Y}
                 height={SELECT_BOX_HEIGHT}
                 onAreaSelected={this.areaSelected}
             >
                 <svg
-                    width={this.props.width}
-                    height={150}
+                    width={width}
+                    height={SVG_HEIGHT}
                     onContextMenu={event => event.preventDefault()}
                     onWheel={this.mousewheel}
                     style={{border: "2px solid black"}}
                 >
-                    <SvgDesignRenderer design={chromosomeDesign} y={CHROMOSOME_Y} />
-                    <SvgDesignRenderer design={rulerDesign} y={RULER_Y} />
+                    <Chromosomes viewRegion={viewRegion} width={width} y={CHROMOSOME_Y} />
+                    <Ruler viewRegion={viewRegion} width={width} y={RULER_Y} />
                     <SelectedRegionBox
-                        width={this.props.width}
-                        viewRegion={this.props.viewRegion}
-                        selectedRegion={this.props.selectedRegion}
-                        gotoButtonCallback={this.props.gotoButtonCallback}
+                        width={width}
+                        viewRegion={viewRegion}
+                        selectedRegion={selectedRegion}
+                        gotoButtonCallback={gotoButtonCallback}
                         y={SELECTED_BOX_Y}
                     />
                 </svg>

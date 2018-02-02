@@ -1,8 +1,8 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 
-import SvgContainer from '../components/SvgContainer';
 import AnnotationArranger from '../components/track/geneAnnotationTrack/AnnotationArranger';
+import withAutoWidth from '../components/withAutoWidth';
 
 import Feature from '../model/Feature';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
@@ -10,6 +10,7 @@ import NavigationContext from '../model/NavigationContext';
 import Gene from '../model/Gene';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import FeatureInterval from '../model/interval/FeatureInterval';
+import RegionExpander from '../model/RegionExpander';
 
 const CHR1 = new Feature("chr1", new ChromosomeInterval("chr1", 0, 1500));
 const NAV_CONTEXT = new NavigationContext("Wow very genome", [CHR1]);
@@ -87,17 +88,15 @@ const GENES = RECORDS.map(record =>
     new Gene(record, viewRegion.getNavigationContext(), new FeatureInterval(CHR1))
 );
 
+function Renderer(props) {
+    const expansionData = new RegionExpander(0).calculateExpansion(props.width, viewRegion);
+    return <svg width="100%"><AnnotationArranger data={GENES} viewExpansion={expansionData} maxRows={2} /></svg>;
+}
+const AutoWidthRenderer = withAutoWidth(Renderer);
+
 export const annotationStory = {
     storyName: "Annotations",
-    component: <SvgContainer
-        viewRegion={viewRegion}
-    >
-        <AnnotationArranger
-            viewRegion={viewRegion}
-            data={GENES}
-            maxRows={2}
-        />
-    </SvgContainer>
+    component: <AutoWidthRenderer />
 }
 
 export const STORY_KIND = "Gene annotation";

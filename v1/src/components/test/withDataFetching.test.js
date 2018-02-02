@@ -1,16 +1,9 @@
-/**
- * Tests for the Track abstract component.  We define some dummy classes in this suite so we can actually instantiate
- * these abstract classes.
- * 
- * @author Silas Hsu
- */
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import withDataFetching from '../../withDataFetching';
-import TrackModel from '../../../model/TrackModel';
-import makeToyRegion from '../../../model/test/toyRegion';
-import DataSource from '../../../dataSources/DataSource';
+import withDataFetching from '../withDataFetching';
+import makeToyRegion from '../../model/test/toyRegion';
+import DataSource from '../../dataSources/DataSource';
 
 /**
  * Promise wrapper for window.setTimeout.
@@ -82,6 +75,7 @@ describe('withDataFetching', () => {
     it("Sets the data prop when finished loading", async () => {
         let wrapper = shallow(<DataFetching viewRegion={REGION} />);
         await wait(DelayedDataSource.DEFAULT_DELAY + 50); // Wait for the data source to deliver data
+        wrapper.update();
         expect(wrapper.prop("isLoading")).toBe(false);
         expect(wrapper.prop("data")).toBe(DelayedDataSource.DEFAULT_RESOLVE_VALUE);
     });
@@ -89,6 +83,7 @@ describe('withDataFetching', () => {
     it("Sets the error prop when finished loading", async () => {
         let wrapper = shallow(<ErrorFetching viewRegion={REGION} />);
         await wait(DelayedDataSource.DEFAULT_DELAY + 50); // Wait for the data source to deliver data
+        wrapper.update();
         expect(wrapper.prop("isLoading")).toBe(false);
         expect(wrapper.prop("error")).toBe(ErrorDataSource.theError);
     });
@@ -116,6 +111,7 @@ describe('withDataFetching', () => {
         wrapper.setProps({viewRegion: makeToyRegion()});
 
         await wait(350); // Wait long enough for the data for region 1 to come in
+        wrapper.update();
         expect(wrapper.prop("data")).toBe("Region2 data");
     });
 });

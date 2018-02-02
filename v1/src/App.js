@@ -11,12 +11,6 @@ import DisplayedRegionModel from './model/DisplayedRegionModel';
 
 import './App.css';
 
-import Perf from 'react-addons-perf';
-
-if (process.env.NODE_ENV === 'development') {
-    window.Perf = Perf;
-}
-
 const MIN_SELECTED_SIZE = 100;
 const DEFAULT_SELECTED_REGION = [15600000, 16000000];
 

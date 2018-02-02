@@ -45,12 +45,14 @@ it('renders a zoom slider with the right value', () => {
     expect(sliderProps.value).toBeCloseTo(Math.log(NAV_CONTEXT.getTotalBases()));
 
     rendered.instance().setNewView(1000, 2000);
+    rendered.update();
     let newSliderProps = findZoomSlider().props();
     expect(newSliderProps.value).toBeCloseTo(Math.log(1000));
 });
 
 it('sets the right view region when zooming', () => {
     rendered.instance().zoom(0.5, 0.5);
+    rendered.update();
     let model = getViewModelFromMainPane();
     expect(model.getAbsoluteRegion()).toEqual({start: 750, end: 2250});
 });
@@ -63,6 +65,7 @@ it('prohibits zooming in too far', () => {
 
 it('setNewView() actually sets a new view', () => {
     rendered.instance().setNewView(1000, 2000);
+    rendered.update();
     let model = getViewModelFromMainPane();
     expect(model.getAbsoluteRegion()).toEqual({start: 1000, end: 2000});
 });
