@@ -32,7 +32,7 @@ class Chromosomes extends React.Component {
         let children = [];
 
         const intervals = this.props.viewRegion.getFeatureIntervals();
-        let x = 0, y = 0;
+        let x = 0, y = 0; //add y to avoid dup key warnings
         for (let interval of intervals) {
             let width = this.props.drawModel.basesToXWidth(interval.getLength());
             // Box for region
