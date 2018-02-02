@@ -5,8 +5,7 @@ import TrackContainer from './components/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
 import RegionSetSelector from './components/RegionSetSelector';
 
-import { HG19 } from './model/Genome';
-import TrackModel from './model/TrackModel';
+import { HG19 } from './components/genomes/hg19';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 
 import './App.css';
@@ -18,34 +17,14 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const MIN_SELECTED_SIZE = 100;
-const DEFAULT_SELECTED_REGION = [15600000, 16000000];
-
-const DEFAULT_TRACKS = [
-    new TrackModel({
-        type: "bigwig",
-        name: "GSM429321.bigWig",
-        url: "http://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig",
-    }),
-    new TrackModel({
-        type: "hammock",
-        name: "refGene",
-        url: 'http://egg.wustl.edu/d/hg19/refGene.gz',
-    }),
-    new TrackModel({
-        type: "ruler",
-        name: "Ruler",
-    })
-];
-
-const HG19_CONTEXT = HG19.makeNavContext();
 
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             // TODO set the selected region dynamically
-            selectedRegion: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION),
-            currentTracks: DEFAULT_TRACKS.slice(),
+            selectedRegion: new DisplayedRegionModel(HG19.context, ...HG19.defaultRegion),
+            currentTracks: HG19.defaultTracks.slice(),
         };
 
         this.regionSelected = this.regionSelected.bind(this);
@@ -82,7 +61,7 @@ class App extends React.Component {
 
     setRegionSet(set) {
         if (!set) {
-            this.setState({selectedRegion: new DisplayedRegionModel(HG19_CONTEXT, ...DEFAULT_SELECTED_REGION)});
+            this.setState({selectedRegion: new DisplayedRegionModel(HG19.context, ...HG19.defaultRegion)});
         } else {
             const selectedRegion = new DisplayedRegionModel(set.makeNavContext());
             this.setState({selectedRegion: selectedRegion});
@@ -105,12 +84,12 @@ class App extends React.Component {
                 onTrackRemoved={this.removeTrack}
             />
             {
-            this.state.selectedRegion.getNavigationContext() !== HG19_CONTEXT ?
+            this.state.selectedRegion.getNavigationContext() !== HG19.context ?
                 <button onClick={() => this.setRegionSet(null)} >Exit gene set view</button>
                 :
                 null
             }
-            <RegionSetSelector genome={HG19} onSetSelected={this.setRegionSet}/>
+            <RegionSetSelector genome={HG19.genome} onSetSelected={this.setRegionSet}/>
         </div>
         );
     }

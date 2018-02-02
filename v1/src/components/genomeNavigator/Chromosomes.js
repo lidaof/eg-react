@@ -32,12 +32,12 @@ class Chromosomes extends React.Component {
         let children = [];
 
         const intervals = this.props.viewRegion.getFeatureIntervals();
-        let x = 0;
+        let x = 0, y = 0;
         for (let interval of intervals) {
             let width = this.props.drawModel.basesToXWidth(interval.getLength());
             // Box for region
             children.push(<rect
-                key={"rect" + x}
+                key={"rect" + y}
                 x={x}
                 y={BOUNDARY_LINE_EXTENT}
                 width={width}
@@ -47,7 +47,7 @@ class Chromosomes extends React.Component {
 
             if (x > 0) { // Thick line at boundaries of each feature (except the first one)
                 children.push(<line
-                    key={"line" + x}
+                    key={"line" + y}
                     x1={x}
                     y1={0}
                     x2={x}
@@ -58,7 +58,7 @@ class Chromosomes extends React.Component {
             }
             // Label for region
             children.push(<text
-                key={"text" + x}
+                key={"text" + y}
                 x={x + width/2}
                 y={this.props.labelOffset || DEFAULT_LABEL_OFFSET}
                 style={{textAnchor: "middle", fontWeight: "bold"}}
@@ -67,6 +67,7 @@ class Chromosomes extends React.Component {
             </text>);
 
             x += width;
+            y += 1;
         }
 
         return <svg x={this.props.x} y={this.props.y}>{children}</svg>;

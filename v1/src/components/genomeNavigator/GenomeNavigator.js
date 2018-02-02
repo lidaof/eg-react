@@ -116,7 +116,7 @@ class GenomeNavigator extends React.Component {
                 <nav className="navbar">
                     <div className="row">
                         <div className="col-sm">
-                            <img src={eglogo} width="400px" />
+                            <img src={eglogo} width="400px" alt="eg logo"/>
                         </div>
                        
                         <div className="col-md">
