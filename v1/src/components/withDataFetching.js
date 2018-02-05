@@ -55,7 +55,7 @@ function withDataFetching(WrappedComponent, getDataSource, getOptions=_.identity
         /**
          * Initializes state and immediately sends a request for data.
          * 
-         * @param {object} props 
+         * @param {Object} props - props as specified by React
          */
         constructor(props) {
             super(props);
@@ -120,6 +120,9 @@ function withDataFetching(WrappedComponent, getDataSource, getOptions=_.identity
             this.dataSource.cleanUp();
         }
 
+        /**
+         * @inheritdoc
+         */
         render() {
             return (
             <WrappedComponent

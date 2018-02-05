@@ -6,14 +6,13 @@ import GeneDetail from './GeneDetail';
 import { TRACK_PROP_TYPES } from '../Track'
 import TrackLegend from '../TrackLegend';
 import TrackLoadingNotice from '../TrackLoadingNotice';
-import SvgContainer from '../../SvgContainer';
 import withExpandedWidth from '../../withExpandedWidth';
 
 import RegionExpander from '../../../model/RegionExpander';
 
 const HEIGHT = 120;
 
-const WideSvg = withExpandedWidth(SvgContainer);
+const WideSvg = withExpandedWidth('svg');
 
 /**
  * A gene annotation track.
@@ -78,19 +77,18 @@ class GeneAnnotationTrack extends React.Component {
             <TrackLegend height={HEIGHT} trackModel={this.props.trackModel} />
             {this.props.isLoading ? <TrackLoadingNotice height={this.props.height} /> : null}
             <WideSvg
-                visibleWidth={this.props.width}
-                height={HEIGHT}
+                visibleWidth={this.props.width} // Three props that withExpandedWidth() adds
                 viewExpansion={this.viewExpansion}
                 xOffset={this.props.xOffset}
-                viewRegion={this.viewExpansion.expandedRegion}
+
+                height={HEIGHT}
                 style={svgStyle}
             >
                 <AnnotationArranger
                     data={this.props.data}
-                    viewRegion={this.props.viewRegion}
-                    leftBoundary={this.viewExpansion.leftExtraPixels}
-                    onGeneClick={this.geneClicked}
+                    viewExpansion={this.viewExpansion}
                     maxRows={this.props.maxRows}
+                    onGeneClick={this.geneClicked}
                 />
             </WideSvg>
             {this.state.geneDetail}

@@ -10,12 +10,6 @@ import DisplayedRegionModel from './model/DisplayedRegionModel';
 
 import './App.css';
 
-import Perf from 'react-addons-perf';
-
-if (process.env.NODE_ENV === 'development') {
-    window.Perf = Perf;
-}
-
 const MIN_SELECTED_SIZE = 100;
 
 class App extends React.Component {

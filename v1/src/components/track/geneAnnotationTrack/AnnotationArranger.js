@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { ANNOTATION_HEIGHT, GeneAnnotation } from './GeneAnnotation';
+import SvgJsManaged from '../../SvgJsManaged';
 
 import Gene from '../../../model/Gene';
-import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
+import LinearDrawingModel from '../../../model/LinearDrawingModel';
 
 const DEFAULT_MAX_ROWS = 7;
 const ROW_BOTTOM_PADDING = 5;
@@ -17,18 +18,8 @@ const ANNOTATION_RIGHT_PADDING = 30;
  */
 class AnnotationArranger extends React.Component {
     static propTypes = {
-        /**
-         * <svg> on which to draw
-         */
-        svgNode: process.env.NODE_ENV !== "test" ? PropTypes.instanceOf(SVGElement) : () => undefined,
-
-        /**
-         * Used to calculate absolute coordinates of genes
-         */
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-
         data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)), // Array of Gene objects
-        leftBoundary: PropTypes.number, // The x coordinate of the left boundary of the SVG, in SVG's coordinate system
+        viewExpansion: PropTypes.object.isRequired, // A RegionExpander~ExpansionData object
         maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
 
         /**
@@ -73,49 +64,58 @@ class AnnotationArranger extends React.Component {
      * @override
      */
     render() {
+        const {data, viewExpansion, maxRows} = this.props;
+        const drawModel = new LinearDrawingModel(viewExpansion.expandedRegion, viewExpansion.expandedWidth);
         let children = [];
-        let rowXExtents = new Array(this.props.maxRows).fill(-Number.MAX_VALUE);
-        let genes = this._sortGenes(this.props.data);
+        let maxXsForRows = new Array(maxRows).fill(0);
+        const genes = this._sortGenes(data);
         let numHiddenGenes = 0;
         for (let gene of genes) {
-            let geneWidth = this.props.drawModel.basesToXWidth(gene.absEnd - gene.absStart);
+            let geneWidth = drawModel.basesToXWidth(gene.absEnd - gene.absStart);
             if (geneWidth < 1) { // No use rendering something less than one pixel wide.
                 numHiddenGenes++;
                 continue;
             }
             
-            // Label width is approx. because calculating bounding boxes is expensive.
-            let estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
-            let startX = this.props.drawModel.baseToX(gene.absStart) - estimatedLabelWidth;
-            let endX = this.props.drawModel.baseToX(gene.absEnd);
-            if (startX < estimatedLabelWidth) {
-                endX = Math.max(endX, endX + estimatedLabelWidth);
-            }
-            let row = rowXExtents.findIndex(rightmostX => startX > rightmostX);
+            /*
+             * Label width is approximate because calculating bounding boxes is expensive.
+             * This also means startX and endX are approximate since label width is approximate.
+             */
+            const labelWidth = gene.getName().length * ANNOTATION_HEIGHT;
+            // Text appears to the left of the annotation, so subtract the estimated label width
+            const startX = drawModel.baseToX(gene.absStart) - labelWidth;
+            // Labels could also be pushed to the right if they go off the screen.
+            const endX = Math.max(drawModel.baseToX(gene.absStart) + labelWidth, drawModel.baseToX(gene.absEnd));
+            // Find the first row where the annotation won't overlap with others in the row
+            let row = maxXsForRows.findIndex(maxX => maxX < startX); 
             let isLabeled;
-            if (row === -1) {
+            if (row === -1) { // It won't fit!  Put it in the last row, unlabeled
                 isLabeled = false;
                 row = this.props.maxRows;
                 numHiddenGenes++;
             } else {
                 isLabeled = true;
-                rowXExtents[row] = endX + ANNOTATION_RIGHT_PADDING;
+                maxXsForRows[row] = endX + ANNOTATION_RIGHT_PADDING;
             }
-            
-            children.push(<GeneAnnotation
-                viewRegion={this.props.viewRegion}
-                drawModel={this.props.drawModel}
-                leftBoundary={this.props.leftBoundary}
-                svgNode={this.props.svgNode}
-                gene={gene}
-                isLabeled={isLabeled}
-                topY={row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING)}
-                onClick={this.props.onGeneClick}
+            const y = row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING);
+
+            children.push(
+            <SvgJsManaged
                 key={gene.getDetails().id}
-            />);
+                transform={`translate(0 ${y})`}
+                onClick={event => this.props.onGeneClick(event, gene)}
+            >
+                <GeneAnnotation
+                    gene={gene}
+                    isLabeled={isLabeled}
+                    drawModel={drawModel}
+                    leftBoundary={viewExpansion.leftExtraPixels}
+                />
+            </SvgJsManaged>
+            );
         }
         console.log(`${numHiddenGenes} genes hidden this render`);
-        return <g>{children}</g>;
+        return children;
     }
 }
 

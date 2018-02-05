@@ -7,12 +7,15 @@ class LinearDrawingModel {
     /**
      * Makes a new instance.
      * 
-     * @param {DisplayedRegionModel} model - the displayed region
+     * @param {DisplayedRegionModel} viewRegion - the displayed region
      * @param {number} drawWidth - the width of the canvas/svg/etc on which to draw
      */
-    constructor(model, drawWidth) {
-        this._model = model;
+    constructor(viewRegion, drawWidth) {
+        this._viewRegion = viewRegion;
         this._drawWidth = drawWidth;
+
+        this._pixelsPerBase = this._drawWidth / this._viewRegion.getWidth();
+        this._basesPerPixel = this._viewRegion.getWidth() / this._drawWidth;
     }
 
     /**
@@ -29,8 +32,7 @@ class LinearDrawingModel {
      * @return {number} width in pixels
      */
     basesToXWidth(bases) {
-        let pixelsPerBase = this._drawWidth / this._model.getWidth();
-        return bases * pixelsPerBase;
+        return bases * this._pixelsPerBase;
     }
 
     /**
@@ -40,8 +42,7 @@ class LinearDrawingModel {
      * @return {number} width in number of bases
      */
     xWidthToBases(pixels) {
-        let basesPerPixel = this._model.getWidth() / this._drawWidth;
-        return pixels * basesPerPixel;
+        return pixels * this._basesPerPixel;
     }
 
     /**
@@ -51,8 +52,7 @@ class LinearDrawingModel {
      * @return {number} X coordinate that represents the input base
      */
     baseToX(base) {
-        let pixelsPerBase = this._drawWidth / this._model.getWidth();
-        return (base - this._model.getAbsoluteRegion().start) * pixelsPerBase;
+        return (base - this._viewRegion.getAbsoluteRegion().start) * this._pixelsPerBase;
     }
 
     /**
@@ -62,8 +62,7 @@ class LinearDrawingModel {
      * @return {number} absolute base coordinate
      */
     xToBase(pixel) {
-        let basesPerPixel = this._model.getWidth() / this._drawWidth;
-        return pixel * basesPerPixel + this._model.getAbsoluteRegion().start;
+        return pixel * this._basesPerPixel + this._viewRegion.getAbsoluteRegion().start;
     }
 }
 

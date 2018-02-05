@@ -31,8 +31,8 @@ const TEXT_STYLE = {
  */
 class SelectedRegionBox extends React.Component {
     static propTypes = {
-        drawModel: PropTypes.instanceOf(LinearDrawingModel), // The drawing model to use
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Entire region being visualized
+        width: PropTypes.number.isRequired, // Draw width of the view region
         selectedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region that is selected
 
         /**
@@ -77,12 +77,13 @@ class SelectedRegionBox extends React.Component {
      * @override
      */
     render() {
-        let svgWidth = this.props.drawModel.getDrawWidth();
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
+        let drawWidth = drawModel.getDrawWidth();
         let absRegion = this.props.selectedRegion.getAbsoluteRegion();
 
         // We limit the box's start and end X because SVGs don't like to be billions of pixels wide.
-        let xStart = Math.max(-10, this.props.drawModel.baseToX(absRegion.start));
-        let xEnd = Math.min(svgWidth + 10, this.props.drawModel.baseToX(absRegion.end));
+        let xStart = Math.max(-10, drawModel.baseToX(absRegion.start));
+        let xEnd = Math.min(drawWidth + 10, drawModel.baseToX(absRegion.end));
         let width = Math.max(0, xEnd - xStart);
         const box = <rect x={xStart} y={0} width={width} height={BOX_HEIGHT} style={BOX_STYLE} />;
 
@@ -103,15 +104,15 @@ class SelectedRegionBox extends React.Component {
             >
                 GOTO
             </text>);
-        } else if (xStart >= svgWidth) { // Arrow pointing right
+        } else if (xStart >= drawWidth) { // Arrow pointing right
             const points = [
-                [svgWidth, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT/2],
-                [svgWidth - GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y],
-                [svgWidth - GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT]
+                [drawWidth, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT/2],
+                [drawWidth - GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y],
+                [drawWidth - GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT]
             ];
             gotoButton = <polygon points={this._pointsToString(points)} style={BOX_STYLE} onClick={this.gotoPressed}/>;
             gotoText = (<text
-                x={svgWidth - LABEL_X_PADDING}
+                x={drawWidth - LABEL_X_PADDING}
                 y={LABEL_Y}
                 style={{...TEXT_STYLE, textAnchor: "end"}}
                 onClick={this.gotoPressed}

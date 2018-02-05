@@ -6,14 +6,15 @@ import Ruler from './Ruler';
 import SelectedRegionBox from './SelectedRegionBox';
 
 import SelectableArea from '../SelectableArea';
-import SvgContainer from '../SvgContainer';
 import { RIGHT_MOUSE } from '../DragAcrossDiv';
 import DragAcrossView from '../DragAcrossView';
+import withAutoWidth from '../withAutoWidth';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 
 const WHEEL_ZOOM_SPEED = 0.2;
+const SVG_HEIGHT = 150;
 
 const CHROMOSOME_Y = 30;
 const SELECTED_BOX_Y = 30;
@@ -29,6 +30,7 @@ const SELECT_BOX_HEIGHT = "60px";
  */
 class MainPane extends React.Component {
     static propTypes = {
+        width: PropTypes.number.isRequired, // The width of the pane
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view
 
         /**
@@ -88,7 +90,7 @@ class MainPane extends React.Component {
      */
     mousewheel(event) {
         event.preventDefault();
-        let paneWidth = event.currentTarget.clientWidth;
+        let paneWidth = event.currentTarget.clientWidth || event.currentTarget.parentNode.clientWidth;
         let focusPoint = event.clientX / paneWidth; // Proportion-based, not base-based.
         if (event.deltaY > 0) { // Mouse wheel turned towards user, or spun downwards -- zoom out
             this.props.zoomCallback(1 + WHEEL_ZOOM_SPEED, focusPoint);
@@ -105,8 +107,7 @@ class MainPane extends React.Component {
      * @param {React.SyntheticEvent} event - the final mouse event that triggered the selection
      */
     areaSelected(startX, endX, event) {
-        const paneWidth = event.currentTarget.clientWidth;
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, paneWidth);
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
         this.props.regionSelectedCallback(drawModel.xToBase(startX), drawModel.xToBase(endX));
     }
 
@@ -116,34 +117,44 @@ class MainPane extends React.Component {
      * @override
      */
     render() {
+        const {width, viewRegion, selectedRegion, dragCallback, gotoButtonCallback} = this.props;
+        if (width === 0) {
+            if (process.env.NODE_ENV !== "test") {
+                console.warn("Cannot render with a width of 0");
+            }
+            return null;
+        }
+
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView button={RIGHT_MOUSE} onViewDrag={this.props.dragCallback} viewRegion={this.props.viewRegion} >
+        <DragAcrossView button={RIGHT_MOUSE} onViewDrag={dragCallback} viewRegion={viewRegion} >
             <SelectableArea
-                viewRegion={this.props.viewRegion}
+                viewRegion={viewRegion}
                 y={SELECT_BOX_Y}
                 height={SELECT_BOX_HEIGHT}
                 onAreaSelected={this.areaSelected}
             >
-                <SvgContainer
-                    viewRegion={this.props.viewRegion}
+                <svg
+                    width={width}
+                    height={SVG_HEIGHT}
                     onContextMenu={event => event.preventDefault()}
                     onWheel={this.mousewheel}
                     style={{border: "2px solid black"}}
                 >
-                    <Chromosomes y={CHROMOSOME_Y} viewRegion={this.props.viewRegion} />
-                    <Ruler y={RULER_Y} viewRegion={this.props.viewRegion} />
+                    <Chromosomes viewRegion={viewRegion} width={width} y={CHROMOSOME_Y} />
+                    <Ruler viewRegion={viewRegion} width={width} y={RULER_Y} />
                     <SelectedRegionBox
-                        viewRegion={this.props.viewRegion}
-                        selectedRegion={this.props.selectedRegion}
-                        gotoButtonCallback={this.props.gotoButtonCallback}
+                        width={width}
+                        viewRegion={viewRegion}
+                        selectedRegion={selectedRegion}
+                        gotoButtonCallback={gotoButtonCallback}
                         y={SELECTED_BOX_Y}
                     />
-                </SvgContainer>
+                </svg>
             </SelectableArea>
         </DragAcrossView>
         );
     }
 }
 
-export default MainPane;
+export default withAutoWidth(MainPane);

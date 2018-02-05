@@ -17,6 +17,7 @@ it("sets tracks' xOffset prop when the view is dragged, AND resets a track's xOf
 
     instance.viewDragStart(new MouseEvent('mousedown'));
     instance.viewDrag(dragRegionStart, dragRegionEnd, undefined, {dx: 10});
+    wrapper.update();
     expect(wrapper.children().length).toBeGreaterThan(0);
     wrapper.children().map(child => expect(child.prop('xOffset')).toBe(10));
     
@@ -24,10 +25,12 @@ it("sets tracks' xOffset prop when the view is dragged, AND resets a track's xOf
     instance.viewDragEnd(dragRegionStart, dragRegionEnd, undefined, {dx: 10});
     instance.viewDragStart(new MouseEvent('mousedown'));
     instance.viewDrag(dragRegionStart, dragRegionEnd, undefined, {dx: 10});
+    wrapper.update();
     wrapper.children().map(child => expect(child.prop('xOffset')).toBe(20));
 
     // Let's pretend a track finished loading data!
     instance.resetTrackOffset(0); // It's OK since earlier we asserted at least 1 rendered track
+    wrapper.update();
     expect(wrapper.childAt(0).prop('xOffset')).toBe(0);
     wrapper.children().slice(1).map(child => expect(child.prop('xOffset')).toBe(20));
 });

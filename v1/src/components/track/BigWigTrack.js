@@ -25,8 +25,10 @@ class BigWigTrack extends React.Component {
 
     render() {
         let height = this.props.trackModel.options.height || DEFAULT_HEIGHT;
-        let canvasStyle = this.props.error ? {backgroundColor: "red"} : {};
-        canvasStyle.paddingTop = TOP_PADDING;
+        let canvasStyle = {marginTop: TOP_PADDING};
+        if (this.props.error) {
+            canvasStyle.backgroundColor = "red";
+        }
 
         let scale = null;
         if (this.props.data.length > 0) {
@@ -43,12 +45,13 @@ class BigWigTrack extends React.Component {
             <WideBarChart
                 viewRegion={viewExpansion.expandedRegion}
                 data={this.props.data}
-                height={height - TOP_PADDING}
+                height={height}
                 style={canvasStyle}
                 // These three are props requested by withExpandedWidth
                 visibleWidth={this.props.width}
                 viewExpansion={viewExpansion}
                 xOffset={this.props.xOffset}
+                svg={false}
             />
         </div>
         );
