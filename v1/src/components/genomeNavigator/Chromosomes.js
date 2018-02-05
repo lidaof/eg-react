@@ -68,6 +68,7 @@ class Chromosomes extends React.Component {
             </text>);
 
             x += intervalWidth;
+            y += 1;
         }
 
         return <svg x={this.props.x} y={this.props.y}>{children}</svg>;

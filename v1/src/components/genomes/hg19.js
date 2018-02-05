@@ -26,7 +26,7 @@ const hg19Genome = new Genome("hg19", [
     new Chromosome("chr22", 51304566),
     new Chromosome("chrX ", 155270560),
     new Chromosome("chrY", 59373566),
-    new Chromosome("chrM ", 16571)
+    new Chromosome("chrM", 16571)
 ]);
 
 const hg19Context = hg19Genome.makeNavContext();
