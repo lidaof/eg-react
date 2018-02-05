@@ -1,5 +1,4 @@
 import React from 'react';
-import Designer from './Designer';
 import LinearDrawingModel from '../model/LinearDrawingModel';
 
 const MAX_MAJOR_TICKS = 15;
@@ -13,15 +12,17 @@ const COLOR = '#bbb';
  * 
  * @author Silas Hsu
  */
-export class RulerDesigner extends Designer {
+export class RulerDesigner {
     /**
+     * Configures a new instance.  What components the design() method returns depends on the passed
+     * RulerComponentFactory.  There is a default RulerComponentFactory implementation; see those docs to find out what
+     * it returns.
      * 
      * @param {DisplayedRegionModel} viewRegion - region to visualize
      * @param {number} width - width of the ruler
-     * @param {RulerComponentFactory} [rulerComponentFactory]
+     * @param {RulerComponentFactory} [rulerComponentFactory] - component generator
      */
     constructor(viewRegion, width, rulerComponentFactory=new RulerComponentFactory()) {
-        super();
         this._viewRegion = viewRegion;
         this._drawModel = new LinearDrawingModel(viewRegion, width);
         this._componentFactory = rulerComponentFactory;
@@ -60,9 +61,10 @@ export class RulerDesigner extends Designer {
     }
 
     /**
-     * Designs the ruler.
+     * Designs the ruler.  Returns an array of anything, depending on the RulerComponentFactory configured when this
+     * object was created.
      * 
-     * @override
+     * @return {any[]} - ruler design
      */
     design() {
         // If one wanted MAX_MAJOR_TICKS to represent the min number of ticks, use Math.floor() instead.
@@ -115,28 +117,67 @@ export class RulerDesigner extends Designer {
     }
 }
 
+/**
+ * A generator of components for a Ruler design.  Allows customization of RulerDesigners.  The default implementation
+ * returns React components that are valid <svg> elements.
+ * 
+ * @author Silas Hsu
+ */
 export class RulerComponentFactory {
+    /**
+     * Configures a new instance that returns React components that are valid <svg> elements.
+     * 
+     * @param {string} color - color of the elements
+     * @param {number} majorTickHeight - height of major ticks.  Minor ticks will be half this height.
+     */
     constructor(color=COLOR, majorTickHeight=MAJOR_TICK_HEIGHT) {
         this.color = color;
         this.majorTickHeight = majorTickHeight;
     }
 
+    /**
+     * Creates a component that represents a line that spans the entire width of the ruler.
+     * 
+     * @param {number} width - width of the ruler
+     */
     mainLine(width) {
         return <line key="mainLine" x1={0} y1={0} x2={width} y2={0} stroke={this.color} strokeWidth={1} />;
     }
 
+    /**
+     * Creates a component that represents a major tick of the ruler.
+     * 
+     * @param {number} x - x coordinate of the tick
+     */
     majorTick(x) {
         return <line key={x} x1={x} y1={-this.majorTickHeight} x2={x} y2={0} stroke={this.color} strokeWidth={2} />;
     }
 
+    /**
+     * Creates a component that labels a major tick of the ruler.
+     * 
+     * @param {number} x - x coordinate of the tick
+     * @param {string} text - label for the tick
+     */
     majorTickText(x, text) {
         return <text key={"text" + x}  x={x} y={20} style={{textAnchor: "middle"}} >{text}</text>;
     }
 
+    /**
+     * Creates a component that represents minor tick of the ruler.
+     * 
+     * @param {number} x - x coordinate of the tick
+     */
     minorTick(x) {
         return <line key={x} x1={x} y1={-this.majorTickHeight / 2} x2={x} y2={0} stroke={this.color} strokeWidth={1} />;
     }
 
+    /**
+     * Creates a component that labels a minor tick of the ruler.
+     * 
+     * @param {number} x - x coordinate of the tick
+     * @param {string} text - label for the tick
+     */
     minorTickText(x, text) {
         return null;
     }
