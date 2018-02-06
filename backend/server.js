@@ -4,11 +4,12 @@ const Hapi = require('hapi');
 const Good = require('good');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
+const  _ = require('lodash');
 
 const url = 'mongodb://localhost:27017'
 const dbName = 'hg19';
 
-const GENE_SEARCH_LIMIT = 20;
+const NAME_SEARCH_LIMIT = 50;
 
 const server = new Hapi.Server();
 
@@ -32,21 +33,34 @@ server.route({
 
 function partialRefGeneSearch(q, db, callback){
     let collection = db.collection('refGene');
-    let query = {$or: [ {name: { $regex: `^${q}`, $options: 'i' } }, {name2: { $regex: `^${q}`, $options: 'i' } } ] };
-    //let query = {name2: { $regex: `^${q}`, $options: 'i' } };
-    console.log(query);
-    let cursor = collection.find(query).limit(GENE_SEARCH_LIMIT);
-    let res = [];
-    cursor.each( (err, doc) => {
-        assert.equal(err, null);
-        if (doc != null){
-            //console.log(doc);
-            res.push(doc);
-        }else{
-            callback(res);
-        }
-    });
+    //let query = {$or: [ {name: { $regex: `^${q}`, $options: 'i' } }, {name2: { $regex: `^${q}`, $options: 'i' } } ] };
+    let query = {name2: { $regex: `^${q}`, $options: 'i' } };
+    //console.log(query);
+    //let cursor = collection.find(query,{ _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }).limit(NAME_SEARCH_LIMIT);
+    // let res = [];
+    // cursor.each( (err, doc) => {
+    //     assert.equal(err, null);
+    //     if (doc != null){
+    //         //console.log(doc);
+    //         res.push(doc);
+    //     }else{
+    //         callback(res);
+    //     }
+    // });
     //return res;
+    collection.find(query,
+            {
+                //fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
+                fields: { _id: 0, name2: 1 }
+            }
+        )
+        .limit(NAME_SEARCH_LIMIT)
+        .toArray((err, res) =>{
+            assert.equal(err, null);
+            let res2 = [];
+            res.forEach(r => res2.push(r.name2));
+            callback(_.uniq(res2));
+    });
 }
 
 server.route({
