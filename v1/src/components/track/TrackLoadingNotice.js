@@ -9,13 +9,13 @@ function TrackLoadingNotice(props) {
     const style = {
         position: "absolute",
         width: "100%",
-        height: props.height,
+        height: "100%",
         backgroundColor: "white",
         textAlign: "center",
-        opacity: 0.6,
+        opacity: 0.5,
         zIndex: 1,
     }
-    return <div style={style}><h3>Loading...</h3></div>;
+    return <div style={style} />;
 }
 
 export default TrackLoadingNotice;

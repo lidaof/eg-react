@@ -34,12 +34,12 @@ class DraggableTrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            xOffsets: Array(props.trackComponents.length).fill(0)
+            xOffset: 0
         };
+        this.offsetOnDragStart = 0;
         this.viewDragStart = this.viewDragStart.bind(this);
         this.viewDrag = this.viewDrag.bind(this);
         this.viewDragEnd = this.viewDragEnd.bind(this);
-        this.resetTrackOffset = this.resetTrackOffset.bind(this);
     }
 
     /**
@@ -49,7 +49,7 @@ class DraggableTrackContainer extends React.Component {
      */
     viewDragStart(event) {
         event.preventDefault();
-        this.offsetsOnDragStart = this.state.xOffsets.slice();
+        this.offsetOnDragStart = this.state.xOffset;
     }
 
     /**
@@ -61,8 +61,7 @@ class DraggableTrackContainer extends React.Component {
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
     viewDrag(unused, unused2, unusedEvent, coordinateDiff) {
-        let newOffsets = this.offsetsOnDragStart.map(initOffset => initOffset + coordinateDiff.dx);
-        this.setState({xOffsets: newOffsets});
+        this.setState({xOffset: this.offsetOnDragStart + coordinateDiff.dx});
     }
 
     /**
@@ -80,14 +79,12 @@ class DraggableTrackContainer extends React.Component {
     }
 
     /**
-     * Resets the draw offset for a track when it has loaded new data.
-     * 
-     * @param {number} index - the index of the track that got new data
+     * Resets the draw offset for the tracks when getting a new region.
      */
-    resetTrackOffset(index) {
-        let newOffsets = this.state.xOffsets.slice();
-        newOffsets[index] = 0;
-        this.setState({xOffsets: newOffsets});
+    componentWillReceiveProps(newProps) {
+        if (this.props.viewRegion !== newProps.viewRegion) {
+            this.setState({xOffset: 0});
+        }
     }
 
     /**
@@ -99,8 +96,7 @@ class DraggableTrackContainer extends React.Component {
             const key = trackComponent.props.trackModel ? trackComponent.props.trackModel.getId() : index;
             const propsToMerge = {
                 key: key,
-                xOffset: this.state.xOffsets[index],
-                onNewData: () => this.resetTrackOffset(index),
+                xOffset: this.state.xOffset
             };
             return React.cloneElement(trackComponent, propsToMerge);
         });

@@ -7,8 +7,10 @@ import React from 'react';
  * @param {React.Component} WrappedComponent - Component to wrap
  */
 function withAutoWidth(WrappedComponent) {
+    const displayName = typeof WrappedComponent === "string" ?
+        WrappedComponent : WrappedComponent.displayName || WrappedComponent.name || 'Component';
     return class extends React.Component {
-        static displayName = `WithAutoWidth(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`
+        static displayName = `WithAutoWidth(${displayName})`
 
         /**
          * Initializes state.

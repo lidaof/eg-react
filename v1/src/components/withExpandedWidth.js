@@ -8,8 +8,10 @@ import PropTypes from 'prop-types';
  * @author Silas Hsu
  */
 export default function withExpandedWidth(WrappedComponent) {
+    const displayName = typeof WrappedComponent === "string" ?
+        WrappedComponent : WrappedComponent.displayName || WrappedComponent.name || 'Component';
     return class extends React.Component {
-        static displayName = `withExpandedWidth(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+        static displayName = `withExpandedWidth(${displayName})`;
 
         static propTypes = {
             visibleWidth: PropTypes.number.isRequired, // The *visible* width of this component
@@ -30,12 +32,10 @@ export default function withExpandedWidth(WrappedComponent) {
 
             const divStyle = {
                 overflow: "hidden",
-                display: "inline-block",
                 width: visibleWidth,
             }
 
             const wrappedStyle = Object.assign(style || {}, {
-                display: "block",
                 position: "relative",
                 marginLeft: -viewExpansion.leftExtraPixels,
                 left: left

@@ -151,7 +151,8 @@ class TrackContainer extends React.Component {
         return (
         <div>
             {this.makeToolSelectButtons()}
-            <div style={{margin: "10px", border: "1px solid grey"}} >
+            {/* paddingTop to counteract track's marginTop of -1*/}
+            <div style={{border: "1px solid black", paddingTop: 1}} >
                 {subContainer}
             </div>
         </div>

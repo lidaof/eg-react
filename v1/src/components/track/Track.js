@@ -1,70 +1,160 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Reparentable from '../Reparentable';
-
 import BigWigTrack from './BigWigTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
 import RulerTrack from './RulerTrack';
+import withExpandedWidth from '../withExpandedWidth';
 
-import BigWigSource from '../../dataSources/BigWigSource';
-import BedSource from '../../dataSources/BedSource';
-import withDataFetching from '../withDataFetching';
-
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import TrackModel from '../../model/TrackModel';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import RegionExpander from '../../model/RegionExpander';
 import { GeneFormatter } from '../../model/Gene';
+import UnknownTrack from './UnknownTrack';
+import TrackLoadingNotice from './TrackLoadingNotice';
+
+export const TRACK_PROP_TYPES = {};
 
 /**
- * Prop types common to all tracks
+ * Mapping from track type name to an object fulfilling the TrackSubtype interface.
  */
-export const TRACK_PROP_TYPES = {
-    trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Metadata for this track
-    viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
-    width: PropTypes.number.isRequired, // Width of the track's visualization (does not include legend)
-    
-    viewExpansionValue: PropTypes.number, // How much to enlarge view on both sides
-    onNewData: PropTypes.func, // Callback for when track finishes fetching data
-    xOffset: PropTypes.number, // The horizontal amount to translate visualizations
+const TYPE_NAME_TO_SUBTYPE = {
+    "ruler": RulerTrack,
+    "bigwig": BigWigTrack,
 };
 
-/**
- * Mapping from a track model's type to a track component type to render
- */
-const TYPE_TO_TRACK = {
-    "bigwig": withDataFetching(BigWigTrack, (props) => new BigWigSource(props.trackModel.url)),
-    "hammock": withDataFetching(
-        GeneAnnotationTrack, (props) => new BedSource(props.trackModel.url, new GeneFormatter())
-    ),
-    "ruler": RulerTrack
-};
+const REGION_EXPANDER = new RegionExpander(1);
+const WideDiv = withExpandedWidth('div');
 
-/**
- * A general Track object.  Renders specific types of tracks depending on the contents of the given TrackModel.
- * 
- * @author Silas Hsu
- */
-export class Track extends React.Component {
-    static propTypes = TRACK_PROP_TYPES;
+export class Track extends React.PureComponent {
+    static propTypes = {
+        trackModel: PropTypes.instanceOf(TrackModel).isRequired,
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
+        width: PropTypes.number.isRequired, // Visible width of the track, including legend, metadata handle, etc.
+        xOffset: PropTypes.number, // The horizontal amount to translate visualizations
+    };
 
     static defaultProps = {
-        onNewData: () => undefined,
-        viewExpansionValue: 0,
         xOffset: 0,
     };
 
-    render() {
-        const type = this.props.trackModel.getType().toLowerCase();
-        let TrackSubType = TYPE_TO_TRACK[type];
-        if (!TrackSubType) {
-            console.warn(`Unknown track type "${type}"`);
-            return null;
-        } else {
-            return (
-            <Reparentable uid={"track-" + this.props.trackModel.getId()} >
-                <TrackSubType {...this.props} />
-            </Reparentable>
-            );
+    constructor(props) {
+        super(props);
+        this.initViewExpansion(props);
+        this.initDataSource(props);
+        this.state = {
+            data: [],
+            error: null,
+        };
+        this.state.isLoading = this.dataSource != null;
+        this.fetchData(props);
+    }
+
+    /**
+     * 
+     * @param {*} props 
+     * @return {TrackSubtype}
+     */
+    getTrackSubtype(props) {
+        const typeName = props.trackModel.getType();
+        const subtype = TYPE_NAME_TO_SUBTYPE[typeName] || UnknownTrack;
+        return subtype;
+    }
+
+    initViewExpansion(props) {
+        this.viewExpansion = REGION_EXPANDER.calculateExpansion(props.width, props.viewRegion);
+    }
+
+    /**
+     * Sets this.dataSource.
+     * @param {*} props 
+     */
+    initDataSource(props) {
+        let trackSubType = this.getTrackSubtype(props);
+        this.dataSource = trackSubType.getDataSource ? trackSubType.getDataSource(props.trackModel) : null;
+    }
+
+    /**
+     * Uses this track's DataSource to fetch data within a view region, and then sets state.
+     * 
+     * @param {Object} props - props object; contains the region for which to fetch data
+     * @return {Promise<any>} a promise that resolves when fetching is done, including when there is an error.
+     */
+    fetchData(props) {
+        if (!this.dataSource) {
+            return Promise.resolve();
+        }
+
+        return this.dataSource.getData(this.viewExpansion.expandedRegion).then(data => {
+            // When the data finally comes in, be sure it is still what the user wants
+            if (this.props.viewRegion === props.viewRegion) {
+                this.setState({
+                    isLoading: false,
+                    data: data,
+                    error: null,
+                });
+            }
+        }).catch(error => {
+            if (this.props.viewRegion === props.viewRegion) {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.error(error);
+                }
+                this.setState({
+                    isLoading: false,
+                    error: error,
+                });
+            }
+        });
+    }
+
+    /**
+     * If the view region has changed, sends a request for data
+     * 
+     * @param {object} prevProps - previous props
+     * @override
+     */
+    componentWillReceiveProps(nextProps) {
+        if (this.props.viewRegion !== nextProps.viewRegion) {
+            this.initViewExpansion(nextProps);
+            if (this.dataSource) {
+                this.setState({isLoading: true});
+                this.fetchData(nextProps);
+            }
         }
     }
+
+    /**
+     * Calls cleanUp on the associated DataSource.
+     */
+    componentWillUnmount() {
+        if (this.dataSource) {
+            this.dataSource.cleanUp();
+        }
+    }
+
+    render() {
+        const {trackModel, width, xOffset} = this.props;
+        const data = this.state.data;
+        const subtype = this.getTrackSubtype(this.props);
+        const Legend = subtype.legend;
+        const Visualizer = subtype.visualizer;
+
+        return (
+        <div style={{position: "relative", display: "flex", border: "1px solid lightgrey", marginTop: -1}}>
+            {this.state.isLoading ? <TrackLoadingNotice /> : null}
+            <Legend trackModel={trackModel} data={data} />
+            <WideDiv visibleWidth={width} viewExpansion={this.viewExpansion} xOffset={xOffset} >
+                <Visualizer
+                    data={data}
+                    viewRegion={this.viewExpansion.expandedRegion}
+                    trackModel={trackModel}
+                    width={this.viewExpansion.expandedWidth}
+                    error={this.state.error}
+                />
+            </WideDiv>
+        </div>
+        );
+    }
 }
+
+export default Track;

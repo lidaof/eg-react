@@ -6,7 +6,7 @@ import { axisLeft } from 'd3-axis';
 import TrackModel from '../../model/TrackModel';
 
 const NUM_TICKS_SUGGESTION = 2;
-const LABEL_RIGHT_MARGIN = 30;
+const AXIS_WIDTH = 30;
 
 /**
  * A box displaying labels, axes, and other important track info.
@@ -17,10 +17,10 @@ class TrackLegend extends React.PureComponent {
     static WIDTH = 120;
 
     static propTypes = {
-        height: PropTypes.number.isRequired,
         trackModel: PropTypes.instanceOf(TrackModel).isRequired,
         scaleForAxis: PropTypes.func,
-    }
+        height: PropTypes.number, // Required when scaleForAxis is defined.
+    };
 
     constructor(props) {
         super(props);
@@ -50,23 +50,30 @@ class TrackLegend extends React.PureComponent {
 
     render() {
         const divStyle = {
-            display: "inline-block",
+            display: "flex",
             width: TrackLegend.WIDTH,
-            height: this.props.height,
-            fontSize: 10,
         };
+        const pStyle = {
+            margin: 0,
+            maxWidth: this.scaleForAxis ? TrackLegend.WIDTH - AXIS_WIDTH : TrackLegend.WIDTH,
+            wordWrap: "break-word",
+            fontSize: 10
+        };
+
+        let axis = null;
+        if (this.props.scaleForAxis) {
+            if (!this.props.height) {
+                console.error("The `height` prop is required when drawing an axis.");
+            }
+            axis = <svg width={AXIS_WIDTH} height={this.props.height} style={{overflow: "visible"}} >
+                <g ref={node => this.gNode = node} transform={`translate(${AXIS_WIDTH}, 0)`} />
+            </svg>;
+        }
 
         return (
         <div style={divStyle} onMouseDown={(event) => event.stopPropagation()}>
-            <svg width={TrackLegend.WIDTH} height={this.props.height}>
-                <foreignObject
-                    width={TrackLegend.WIDTH - LABEL_RIGHT_MARGIN}
-                    style={{fontSize: 9, textAlign: "left"}}
-                >
-                    {this.props.trackModel.name}
-                </foreignObject>
-                <g ref={node => this.gNode = node} transform={`translate(${TrackLegend.WIDTH}, 0)`} />
-            </svg>
+            <p style={pStyle} >{this.props.trackModel.name}</p>
+            {axis}
         </div>
         );
     }
