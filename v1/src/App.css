@@ -28,3 +28,11 @@
     text-align: center;
     font-size: 2em;
 }
+
+.geneList {
+  padding-left: 3px;
+}
+.geneList:hover {
+  background-color: #fdbb84;
+  cursor: pointer;
+}

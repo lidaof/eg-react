@@ -1,6 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
 import axios from 'axios';
+
+import '../../App.css';
+
 /**
  * The component is used for gene search, calls the backend api endpoint for gene partial search
  * 
@@ -57,10 +60,10 @@ class GeneSearch extends React.Component{
                 <div>
                     {this.formatResults(this.state.searchResults)}
                     <div style={{position: 'absolute', zIndex:10}}>
-                        <ul style={{backgroundColor:'#43a2ca'}}>
+                        <ul style={{backgroundColor:'#43a2ca',listStyleType:'none',paddingLeft:0}}>
                             {
                                 this.state.searchResults.map(
-                                    (g) => <li key={g}>{g}</li>
+                                    (g) => <li key={g} className="geneList">{g}</li>
                                 )
                             }
                         </ul>
