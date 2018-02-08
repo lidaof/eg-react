@@ -51,6 +51,10 @@ class GeneSearch extends React.Component{
         }
     }
 
+    async handleClick(gene){
+        console.log(gene);
+    }
+
     render(){
         return (
             <div>
@@ -59,11 +63,11 @@ class GeneSearch extends React.Component{
                 </label>
                 <div>
                     {this.formatResults(this.state.searchResults)}
-                    <div style={{position: 'absolute', zIndex:10}}>
-                        <ul style={{backgroundColor:'#43a2ca',listStyleType:'none',paddingLeft:0}}>
+                    <div style={{position: 'absolute', zIndex:10, marginLeft:"95px"}}>
+                        <ul style={{backgroundColor:'#d5d9da',listStyleType:'none',paddingLeft:0}}>
                             {
                                 this.state.searchResults.map(
-                                    (g) => <li key={g} className="geneList">{g}</li>
+                                    (geneName) => <li key={geneName} className="geneList" onClick={(mouseEvent) => this.handleClick(geneName)}>{geneName}</li>
                                 )
                             }
                         </ul>
