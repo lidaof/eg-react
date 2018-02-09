@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { scaleLinear } from 'd3-scale'
 
-import { TRACK_PROP_TYPES } from './Track'
+import { VISUALIZER_PROP_TYPES } from './Track';
 import TrackLegend from './TrackLegend';
 import BarChart from '../BarChart';
 
@@ -11,6 +11,13 @@ import BigWigSource from '../../dataSources/BigWigSource';
 const DEFAULT_HEIGHT = 30; // In pixels
 const TOP_MARGIN = 5;
 
+/**
+ * Legend for BigWig tracks.
+ * 
+ * @param {Object} props - props as specified by React
+ * @return {JSX.Element} element to render
+ * @author Silas Hsu
+ */
 function BigWigLegend(props) {
     const height = props.trackModel.options.height || DEFAULT_HEIGHT;
     let scale = null;
@@ -23,15 +30,18 @@ function BigWigLegend(props) {
     </div>;
 }
 
+/**
+ * Visualizer for BigWig tracks.
+ * 
+ * @author Silas Hsu
+ */
 class BigWigVisualizer extends React.PureComponent {
+    static propTypes = VISUALIZER_PROP_TYPES;
+
     render() {
-        const {data, viewRegion, trackModel, width, error} = this.props;
+        const {data, viewRegion, trackModel, width} = this.props;
         const height = trackModel.options.height || DEFAULT_HEIGHT;
-        let style = {marginTop: TOP_MARGIN, display: "block"}; // display: block to prevent extra bottom padding
-        if (error) {
-            style.backgroundColor = "red";
-        }
-    
+        const style = {marginTop: TOP_MARGIN, display: "block"}; // display: block to prevent extra bottom padding
         return (
         <BarChart
             viewRegion={viewRegion}

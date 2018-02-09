@@ -64,17 +64,6 @@ export class Gene extends Feature {
     }
 
     /**
-     * Gets whether this overlaps a region
-     * 
-     * @param {DisplayedRegionModel} region - region to check
-     * @return {boolean} whether this overlaps the displayed region
-     */
-    getIsInView(region) {
-        const absRegion = region.getAbsoluteRegion();
-        return this.absStart < absRegion.end && this.absEnd > absRegion.start;
-    }
-
-    /**
      * @inheritdoc
      */
     getIsForwardStrand() {

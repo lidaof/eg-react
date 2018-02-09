@@ -33,15 +33,42 @@ actually entire chromosomes, then the user can effectively navigate the whole ge
 5.  From `App`, descend into interested components.
 
 ## Making a new track component
-1.  If you have any non-trival data fetching needs, extend the `DataSource` class, or use one that already exists.
+Here's an overview:
+1.  Specify customizations of your new track.  Tracks are customizable in four ways:
+  * Visualizer (required)
+  * Data source
+  * Legend
+  * Tooltips
+2.  Specify when to render your new track.
+
+### 1. Customizations
+Some of these are also explained in `TrackSubtype.ts`.
+#### Visualizer (required)
+A component that visualizes your track data.  It will receive `VISUALIZER_PROP_TYPES` (defined in `Track.js`).
+
+#### Data source
+If you have any non-trival data fetching needs, extend the `DataSource` class, or use one that already exists.
 Designing a new `DataSource` involves implementing the `getData()` method, which gets data for the view region passed to
 it.  You can return the data in any format desired.  This would also be the best place to implement cache, if desired.
-2.  Take a look at the track prop types in `Track.js`.  Your track component will receive at least these props.  If you
-have a `DataSource`, look at the docs in `withDataFetching.js`.  It automatically uses `DataSource`s and passes the data
-via props to your track.  Based on all these props you will get, make a new track component!
-3.  Back in `Track.js`, update the track component map (as of this writing, it is named `TYPE_TO_TRACK`).  When
-deciding what to render based on a `TrackModel` object, the model's type will be passed to this map.
-4.  You're all set!
+
+If you don't specify a data source, your legend and visualizer will receive no data.
+
+#### Legend
+Your track legend component.  It will receive `LEGEND_PROP_TYPES` (defined in `Track.js`).
+
+If you don't specify a legend, your track will display a minimal, default legend.
+
+#### Tooltips
+Any tooltips you want your track to generate.  The API is still in flux, but for now, this is specified via the
+`onTooltip` function prop which is passed to your Visualizer.  Tooltips must be rendered from within a Visualizer.  When
+you want to render one, call this function with an element that will form the content of the tooltip.  See docs under
+`VISUALIZER_PROP_TYPES` for more details.
+
+### 2.  Using your shiny customizations
+1.  Package your customizations into an object matching the schema in `TrackSubtype.ts`.
+2.  Import it into `Track.js`.
+3.  Add an entry to the `TYPE_NAME_TO_SUBTYPE` map.  `Track` will pull the type name from the `TrackModel` passed to it,
+and then look up the track subtype from this map.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.

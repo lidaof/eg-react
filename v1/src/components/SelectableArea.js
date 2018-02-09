@@ -1,16 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { LEFT_MOUSE, DragAcrossDiv } from './DragAcrossDiv';
-
-/**
- * Given an event, gets its clientX prop, but corrected for stupid things like margin.
- * 
- * @param {React.SyntheticEvent} event - the event for which to get a corrected clientX
- * @return {number} the corrected clientX
- */
-function getCorrectedX(event) {
-    return event.clientX - event.currentTarget.getBoundingClientRect().left;
-}
+import { getRelativeCoordinates } from '../util';
 
 /**
  * Creates and manages the boxes that the user can drag across the screen to select a new region.
@@ -58,7 +49,7 @@ class SelectableArea extends React.Component {
      */
     dragStart(event) {
         event.preventDefault();
-        const x = getCorrectedX(event);
+        const x = getRelativeCoordinates(event).x;
         this.setState({dragStartX: x, currentDragX: x});
     }
 
@@ -68,7 +59,7 @@ class SelectableArea extends React.Component {
      * @param {React.SyntheticEvent} event - the mouse event
      */
     drag(event) {
-        this.setState({currentDragX: getCorrectedX(event)});
+        this.setState({currentDragX: getRelativeCoordinates(event).x});
     }
 
     /**

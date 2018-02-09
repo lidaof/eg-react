@@ -5,10 +5,12 @@ import Ruler from '../genomeNavigator/Ruler';
 
 const HEIGHT = 65;
 
-function RulerLegend(props) {
-    return <TrackLegend height={HEIGHT} {...props} />;
-}
-
+/**
+ * A ruler.
+ * 
+ * @param {Object} props - props as specified by React
+ * @return {JSX.Element} element to render
+ */
 function RulerVisualizer(props) {
     return (
     // display: block to prevent svg from taking extra bottom space
@@ -20,7 +22,6 @@ function RulerVisualizer(props) {
 }
 
 const RulerTrack = {
-    legend: RulerLegend,
     visualizer: RulerVisualizer
 };
 

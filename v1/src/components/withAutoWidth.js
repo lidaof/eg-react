@@ -1,4 +1,5 @@
 import React from 'react';
+import getComponentName from './getComponentName';
 
 /**
  * A function that returns a component that measures its width automatically.  The wrapped component will recieve this
@@ -7,10 +8,8 @@ import React from 'react';
  * @param {React.Component} WrappedComponent - Component to wrap
  */
 function withAutoWidth(WrappedComponent) {
-    const displayName = typeof WrappedComponent === "string" ?
-        WrappedComponent : WrappedComponent.displayName || WrappedComponent.name || 'Component';
     return class extends React.Component {
-        static displayName = `WithAutoWidth(${displayName})`
+        static displayName = `WithAutoWidth(${getComponentName(WrappedComponent)})`;
 
         /**
          * Initializes state.

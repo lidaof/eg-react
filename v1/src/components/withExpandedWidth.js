@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import getComponentName from './getComponentName';
 
 /**
  * An override for the input Component's style.  Returns a Component that is wider than its visible portion, and can be
@@ -8,10 +9,8 @@ import PropTypes from 'prop-types';
  * @author Silas Hsu
  */
 export default function withExpandedWidth(WrappedComponent) {
-    const displayName = typeof WrappedComponent === "string" ?
-        WrappedComponent : WrappedComponent.displayName || WrappedComponent.name || 'Component';
     return class extends React.Component {
-        static displayName = `withExpandedWidth(${displayName})`;
+        static displayName = `withExpandedWidth(${getComponentName(WrappedComponent)})`;
 
         static propTypes = {
             visibleWidth: PropTypes.number.isRequired, // The *visible* width of this component

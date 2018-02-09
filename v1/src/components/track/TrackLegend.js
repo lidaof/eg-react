@@ -37,7 +37,7 @@ class TrackLegend extends React.PureComponent {
 
     drawAxis() {
         if (this.gNode && this.props.scaleForAxis) {
-            while(this.gNode.hasChildNodes()) {
+            while(this.gNode.hasChildNodes()) { // Believe it not, there's no function that removes all child nodes.
                 this.gNode.lastChild.remove();
             }
 
@@ -71,7 +71,7 @@ class TrackLegend extends React.PureComponent {
         }
 
         return (
-        <div style={divStyle} onMouseDown={(event) => event.stopPropagation()}>
+        <div style={divStyle} >
             <p style={pStyle} >{this.props.trackModel.name}</p>
             {axis}
         </div>

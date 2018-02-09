@@ -19,7 +19,7 @@ const ANNOTATION_RIGHT_PADDING = 30;
 class AnnotationArranger extends React.Component {
     static propTypes = {
         data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)), // Array of Gene objects
-        viewExpansion: PropTypes.object.isRequired, // A RegionExpander~ExpansionData object
+        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Draw model to use
         maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
 
         /**
@@ -64,8 +64,7 @@ class AnnotationArranger extends React.Component {
      * @override
      */
     render() {
-        const {data, viewExpansion, maxRows} = this.props;
-        const drawModel = new LinearDrawingModel(viewExpansion.expandedRegion, viewExpansion.expandedWidth);
+        const {data, drawModel, maxRows} = this.props;
         let children = [];
         let maxXsForRows = new Array(maxRows).fill(0);
         const genes = this._sortGenes(data);
@@ -109,7 +108,7 @@ class AnnotationArranger extends React.Component {
                     gene={gene}
                     isLabeled={isLabeled}
                     drawModel={drawModel}
-                    leftBoundary={viewExpansion.leftExtraPixels}
+                    leftBoundary={0}
                 />
             </SvgJsManaged>
             );

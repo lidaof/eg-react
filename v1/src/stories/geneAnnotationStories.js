@@ -11,10 +11,11 @@ import Gene from '../model/Gene';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import FeatureInterval from '../model/interval/FeatureInterval';
 import RegionExpander from '../model/RegionExpander';
+import LinearDrawingModel from '../model/LinearDrawingModel';
 
 const CHR1 = new Feature("chr1", new ChromosomeInterval("chr1", 0, 1500));
 const NAV_CONTEXT = new NavigationContext("Wow very genome", [CHR1]);
-const viewRegion = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
+const VIEW_REGION = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
 
 const RECORDS = [
     {
@@ -85,12 +86,12 @@ const RECORDS = [
 ];
 
 const GENES = RECORDS.map(record =>
-    new Gene(record, viewRegion.getNavigationContext(), new FeatureInterval(CHR1))
+    new Gene(record, VIEW_REGION.getNavigationContext(), new FeatureInterval(CHR1))
 );
 
 function Renderer(props) {
-    const expansionData = new RegionExpander(0).calculateExpansion(props.width, viewRegion);
-    return <svg width="100%"><AnnotationArranger data={GENES} viewExpansion={expansionData} maxRows={2} /></svg>;
+    const drawModel = new LinearDrawingModel(VIEW_REGION, props.width);
+    return <svg width="100%"><AnnotationArranger data={GENES} drawModel={drawModel} maxRows={2} /></svg>;
 }
 const AutoWidthRenderer = withAutoWidth(Renderer);
 

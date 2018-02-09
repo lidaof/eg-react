@@ -33,11 +33,6 @@ test('constructs correctly', () => {
     expect([INSTANCE.absStart, INSTANCE.absEnd]).toEqual([12, 14]);
 });
 
-test('getIsInView() works correctly', () => {
-    expect(INSTANCE.getIsInView(makeToyRegion(0, 10))).toBe(false);
-    expect(INSTANCE.getIsInView(makeToyRegion(10, 20))).toBe(true);
-});
-
 test('getDetails() works correctly', () => {
     expect(INSTANCE.getDetails()).toEqual({
         name: "GENE!",

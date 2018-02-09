@@ -10,7 +10,6 @@ function UnknownVisualizer(props) {
 }
 
 const UnknownTrack = {
-    legend: TrackLegend,
     visualizer: UnknownVisualizer
 };
 
