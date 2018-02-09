@@ -65,7 +65,7 @@ function partialRefGeneSearch(q, db, callback){
 
 server.route({
     method: 'GET',
-    path:'/hg19/refGene/{q}',
+    path:'/hg19/geneSuggest/{q}',
     handler: function(request, reply){
         MongoClient.connect(url, (err, client) => {
             assert.equal(null, err);
@@ -73,6 +73,39 @@ server.route({
             let que = encodeURIComponent(request.params.q);
             console.log(que);
             partialRefGeneSearch(que, db, (res) => {
+                //console.log(res);
+                reply(res).header('content-type','application/json');
+                client.close();
+            });  
+        });
+    }
+});
+
+function refGeneSearch(q, db, callback){
+    let collection = db.collection('refGene');
+    let query = {$or: [ {name: { $regex: `^${q}$`, $options: 'i' } }, {name2: { $regex: `^${q}$`, $options: 'i' } } ] };
+    collection.find(query,
+            {
+                fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
+            }
+        )
+        .limit(NAME_SEARCH_LIMIT)
+        .toArray((err, res) =>{
+            assert.equal(err, null);
+            callback(res);
+    });
+}
+
+server.route({
+    method: 'GET',
+    path:'/hg19/refGene/{q}',
+    handler: function(request, reply){
+        MongoClient.connect(url, (err, client) => {
+            assert.equal(null, err);
+            const db = client.db(dbName);
+            let que = encodeURIComponent(request.params.q);
+            console.log(que);
+            refGeneSearch(que, db, (res) => {
                 //console.log(res);
                 reply(res).header('content-type','application/json');
                 client.close();

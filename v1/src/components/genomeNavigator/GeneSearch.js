@@ -16,8 +16,9 @@ class GeneSearch extends React.Component{
     constructor(props){
         super(props);
         this.state={
-            value: '',
-            searchResults : []
+            value: '', //user's input
+            searchResults : [], //gene symbols found by auto completion
+            geneModels: [] //gene models found using gene symbol or ID
         };
         this.partialSearch = this.partialSearch.bind(this);
         this.formatResults = this.formatResults.bind(this);
@@ -43,8 +44,9 @@ class GeneSearch extends React.Component{
     async handleChange(event){
         let query = _.trim(event.target.value)
         this.setState({value: query});
+        this.setState({geneModels: []}); // clear this when use input changes
         if(query.length >= SEARCH_LENGTH_THRESHOLD){
-            let response = await axios.get(`/hg19/refGene/${query}`);
+            let response = await axios.get(`/hg19/geneSuggest/${query}`);
             this.setState({searchResults: response.data});
         }else{
             this.setState({searchResults: []});
@@ -52,23 +54,32 @@ class GeneSearch extends React.Component{
     }
 
     async handleClick(gene){
-        console.log(gene);
+        let query = _.trim(gene);
+        let response = await axios.get(`/hg19/refGene/${query}`);
+        console.log(response.data);
+        this.setState({geneModels: response.data});
     }
 
     render(){
+        let liElements = [];
+        if(this.state.geneModels.length>0){
+            this.state.geneModels.forEach(
+                (geneModel) => liElements.push(<li key={geneModel.name} className="geneList">{geneModel.name}</li>)
+            );
+        }else{
+            this.state.searchResults.forEach(
+                (geneName) => liElements.push(<li key={geneName} className="geneList" onClick={(mouseEvent) => this.handleClick(geneName)}>{geneName}</li>)
+            );
+        }
         return (
             <div>
-                <label>Type a gene:
-                    <input type="text" value={this.state.value} onChange={this.handleChange} />
-                </label>
+                <label>Type a gene:</label>
                 <div>
-                    {this.formatResults(this.state.searchResults)}
-                    <div style={{position: 'absolute', zIndex:10, marginLeft:"95px"}}>
+                    <input type="text" value={this.state.value} onChange={this.handleChange} />
+                    <div style={{position: 'absolute', zIndex:10}}>
                         <ul style={{backgroundColor:'#d5d9da',listStyleType:'none',paddingLeft:0}}>
                             {
-                                this.state.searchResults.map(
-                                    (geneName) => <li key={geneName} className="geneList" onClick={(mouseEvent) => this.handleClick(geneName)}>{geneName}</li>
-                                )
+                                liElements.map((li)=>li)   
                             }
                         </ul>
                     </div>
