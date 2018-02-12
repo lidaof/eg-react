@@ -5,6 +5,9 @@ import MainPane from './MainPane';
 import TrackRegionController from './TrackRegionController';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
+import eglogo from '../../images/eglogo.jpg';
+import GeneSearch from './GeneSearch';
+
 const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
 
 /**
@@ -109,23 +112,40 @@ class GenomeNavigator extends React.Component {
      */
     render() {
         return (
-            <div style={{padding: "20px"}}>
-                <label>
-                    Zoom:
-                    <input
-                        type="range"
-                        min={Math.log(MIN_VIEW_LENGTH)}
-                        max={Math.log(this.state.viewRegion.getNavigationContext().getTotalBases())}
-                        step="any"
-                        value={Math.log(this.state.viewRegion.getWidth())}
-                        onChange={this.zoomSliderDragged}
-                    />
-                </label>
-                <TrackRegionController
-                    selectedRegion={this.props.selectedRegion}
-                    newRegionCallback={this.props.regionSelectedCallback}
-                />
-
+            <div className="container-fluid">
+                <nav className="navbar">
+                    <div className="row">
+                        <div className="col-sm">
+                            <img src={eglogo} width="400px" alt="eg logo"/>
+                        </div>
+                       
+                        <div className="col-md">
+                            <TrackRegionController
+                                selectedRegion={this.props.selectedRegion}
+                                newRegionCallback={this.props.regionSelectedCallback}
+                            />
+                        </div>
+                        <div className="col-md">
+                            <GeneSearch
+                                selectedRegion={this.props.selectedRegion}
+                                newRegionCallback={this.props.regionSelectedCallback}
+                            />
+                        </div>
+                         <div className="col-sm">
+                            <label>
+                                Zoom: <span role="img">➕</span>
+                                 <input
+                                    type="range"
+                                    min={Math.log(MIN_VIEW_LENGTH)}
+                                    max={Math.log(this.state.viewRegion.getNavigationContext().getTotalBases())}
+                                    step="any"
+                                    value={Math.log(this.state.viewRegion.getWidth())}
+                                    onChange={this.zoomSliderDragged}
+                                /><span role="img">➖</span>
+                            </label>
+                        </div>
+                    </div>
+                </nav>
                 <MainPane
                     viewRegion={this.state.viewRegion}
                     selectedRegion={this.props.selectedRegion}

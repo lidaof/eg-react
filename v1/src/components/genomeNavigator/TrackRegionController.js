@@ -2,6 +2,7 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import React from 'react';
 import PropTypes from 'prop-types';
 
+
 /**
  * The display that is above the main pane of the genome navigator, which shows the current track region and a text
  * input to modify it.
@@ -73,15 +74,17 @@ class TrackRegionController extends React.Component {
         let region = this._currentRegionAsString();
         return (
         <div>
-            <p>Current track region: {region}</p>
             <label>
-                Set new region:
+            Current region: {region} 
+            
+                
                 <input type="text" ref={(input) => this.input = input} />
-                <button onClick={this.parseRegion.bind(this)}>Go</button>
+                <button onClick={this.parseRegion.bind(this)}>Set new region</button>
                 {
-                    this.state.badInputMessage.length > 0 ? <p>{this.state.badInputMessage}</p> : null
+                    this.state.badInputMessage.length > 0 ? <span className="alert-danger">{this.state.badInputMessage}</span> : null
                 }
             </label>
+            
         </div>
         );
     }

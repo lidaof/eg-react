@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/lidaof/eg-react#readme",
   "dependencies": {
-    "hapi": "^16.5.0",
+    "hapi": "^16.6.2",
     "json5": "^0.5.1",
     "mongodb": "^2.2.31",
     "yesno": "0.0.1"

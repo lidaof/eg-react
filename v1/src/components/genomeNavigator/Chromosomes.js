@@ -33,12 +33,12 @@ class Chromosomes extends React.Component {
         const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
 
         const intervals = this.props.viewRegion.getFeatureIntervals();
-        let x = 0;
+        let x = 0, y = 0; //add y to avoid dup key warnings
         for (let interval of intervals) {
             let intervalWidth = drawModel.basesToXWidth(interval.getLength());
             // Box for region
             children.push(<rect
-                key={"rect" + x}
+                key={"rect" + y}
                 x={x}
                 y={BOUNDARY_LINE_EXTENT}
                 width={intervalWidth}
@@ -48,7 +48,7 @@ class Chromosomes extends React.Component {
 
             if (x > 0) { // Thick line at boundaries of each feature (except the first one)
                 children.push(<line
-                    key={"line" + x}
+                    key={"line" + y}
                     x1={x}
                     y1={0}
                     x2={x}
@@ -68,6 +68,7 @@ class Chromosomes extends React.Component {
             </text>);
 
             x += intervalWidth;
+            y += 1;
         }
 
         return <svg x={this.props.x} y={this.props.y}>{children}</svg>;
