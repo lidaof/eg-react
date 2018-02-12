@@ -127,7 +127,10 @@ class GenomeNavigator extends React.Component {
                             />
                         </div>
                         <div className="col-md">
-                            <GeneSearch></GeneSearch>
+                            <GeneSearch
+                                selectedRegion={this.props.selectedRegion}
+                                newRegionCallback={this.props.regionSelectedCallback}
+                            />
                         </div>
                          <div className="col-sm">
                             <label>
