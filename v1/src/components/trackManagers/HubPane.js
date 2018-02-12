@@ -58,7 +58,7 @@ class HubPane extends React.PureComponent {
      *     Buttons to show and hide the above
      *     If there are any tracks from hubs, a track list
      * 
-     * @return {React.Component} the element to render
+     * @return {JSX.Element} the element to render
      * @override
      */
     render() {

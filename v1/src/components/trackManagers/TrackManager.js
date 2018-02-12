@@ -72,7 +72,7 @@ class TrackManager extends React.Component {
     /**
      * Renders current tracks displayed, buttons for showing submenus, and the current submenu
      * 
-     * @return {React.Component} the element to render
+     * @return {JSX.Element} the element to render
      * @override
      */
     render() {

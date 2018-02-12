@@ -44,7 +44,7 @@ class GenericDroppable extends React.PureComponent {
     /**
      * Renders any children inside a DragDropContext and Droppable.
      * 
-     * @return {React.Component} the component to render
+     * @return {JSX.ELement} the component to render
      * @override
      */
     render() {

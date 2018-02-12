@@ -6,6 +6,8 @@ import getComponentName from './getComponentName';
  * width in the `width` property.
  * 
  * @param {React.Component} WrappedComponent - Component to wrap
+ * @return {React.Component} component that measures its width automatically
+ * @author Silas Hsu
  */
 function withAutoWidth(WrappedComponent) {
     return class extends React.Component {

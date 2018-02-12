@@ -51,11 +51,12 @@ export const VISUALIZER_PROP_TYPES = {
 };
 
 /**
- * A function that returns a Component that uses the `isLoading` prop and doesn't update while it is loading.
- * `isloading` will be consumed and not passed to children.  This function exists since we don't want our visualizer to
+ * A function that returns a Component that only updates while its `isLoading` prop is false.  `isloading` will be
+ * consumed; the wrapped component will not receive it.  This function exists since we don't want our visualizer to
  * rerender while data is loading.
  * 
  * @param {React.Component} WrappedComponent - Component to wrap
+ * @return {React.Component} component that only updates while `isLoading` = false
  */
 function freezeWhileLoading(WrappedComponent) {
     return class extends React.Component {

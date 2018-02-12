@@ -94,7 +94,7 @@ export class DragAcrossDiv extends React.Component {
     }
 
     /**
-     * @return {React.Component} a div that listens to drag events
+     * @return {JSX.Element} a div that listens to drag events
      * @override
      */
     render() {

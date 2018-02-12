@@ -154,7 +154,7 @@ class HubTable extends React.PureComponent {
      * be a button to initiate loading), loading, and loaded.
      * 
      * @param {Object} reactTableRow - a Row object that ReactTable provides
-     * @return {React.Component} the cell to render
+     * @return {JSX.Element} the cell to render
      */
     getAddHubCell(reactTableRow) {
         let hub = reactTableRow.original;

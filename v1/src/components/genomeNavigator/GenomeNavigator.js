@@ -10,7 +10,6 @@ const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allow
 /**
  * A navigator that allows users to scroll around the genome and select what region for tracks to display.
  * 
- * @extends {React.Component}
  * @author Silas Hsu
  */
 class GenomeNavigator extends React.Component {

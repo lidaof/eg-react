@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import getComponentName from './getComponentName';
 
 /**
- * An override for the input Component's style.  Returns a Component that is wider than its visible portion, and can be
- * horizontally scrolled via the `xOffset` prop.  0 is horizontally centered.
+ * An override for the input Component's style.  Returns a Component whose entire width is only partially visible, and
+ * can be horizontally scrolled via the `xOffset` prop.  By default, the visible window is horizontally centered.
  * 
+ * @param {React.Component} WrappedComponent - Component to wrap
+ * @return {React.Component} component whose entire width is only partially visible
  * @author Silas Hsu
  */
 export default function withExpandedWidth(WrappedComponent) {
