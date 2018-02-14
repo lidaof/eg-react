@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import DraggableTrackContainer from './DraggableTrackContainer';
-
 import { Track } from './track/Track';
 import TrackLegend from './track/TrackLegend';
-import TrackModel from '../model/TrackModel';
+
+import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
+
 import withAutoWidth from './withAutoWidth';
+import { getRelativeCoordinates } from '../util';
+import TrackModel from '../model/TrackModel';
+import DisplayedRegionModel from '../model/DisplayedRegionModel';
 
 const tools = {
     DRAG: 0,
@@ -21,8 +24,6 @@ toolButtonContent[tools.DRAG] = "✋";
 toolButtonContent[tools.ZOOM] = "🔍";
 toolButtonContent[tools.REORDER] = "🔀";
 
-const VIEW_EXPANSION_VALUE = 1;
-
 /**
  * Container for holding all the tracks.
  * 
@@ -30,6 +31,7 @@ const VIEW_EXPANSION_VALUE = 1;
  */
 class TrackContainer extends React.Component {
     static propTypes = {
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region for tracks to display
         width: PropTypes.number.isRequired, // Width of the tracks, including legends
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)), // Tracks to render
         /**
@@ -56,8 +58,12 @@ class TrackContainer extends React.Component {
         super(props);
         this.state = {
             selectedTool: tools.DRAG,
+            mouseRelativeX: -1,
         };
+
         this.trackMoved = this.trackMoved.bind(this);
+        this.storeMouseX = this.storeMouseX.bind(this);
+        this.clearMouseX = this.clearMouseX.bind(this);
     }
 
     getVisualizationWidth() {
@@ -72,7 +78,6 @@ class TrackContainer extends React.Component {
             <Track
                 trackModel={trackModel}
                 viewRegion={this.props.viewRegion}
-                viewExpansionValue={VIEW_EXPANSION_VALUE}
                 width={this.getVisualizationWidth()}
             />
         ));
@@ -115,11 +120,28 @@ class TrackContainer extends React.Component {
     }
 
     /**
+     * Stores a mouse event's relative x coordinates in state.
+     * 
+     * @param {MouseEvent} event - mouse event whose coordinates to store
+     */
+    storeMouseX(event) {
+        const relativeX = getRelativeCoordinates(event).x;
+        this.setState({mouseRelativeX: relativeX});
+    }
+
+    /**
+     * Clears stored mouse event coordinates.
+     */
+    clearMouseX() {
+        this.setState({mouseRelativeX: -1});
+    }
+
+    /**
      * @inheritdoc
      */
     render() {
+        const tracks = this.makeTracks();
         let subContainer;
-        let tracks = this.makeTracks();
         switch (this.state.selectedTool) {
             case tools.REORDER:
                 subContainer = (
@@ -148,15 +170,38 @@ class TrackContainer extends React.Component {
                 );
         }
 
+        // paddingTop to counteract track's marginTop of -1
+        const innerDivStyle = {border: "1px solid black", paddingTop: 1, position: "relative", cursor: "crosshair"};
         return (
         <div>
             {this.makeToolSelectButtons()}
-            {/* paddingTop to counteract track's marginTop of -1*/}
-            <div style={{border: "1px solid black", paddingTop: 1}} >
+            <div style={innerDivStyle} onMouseMove={this.storeMouseX} onMouseLeave={this.clearMouseX} >
                 {subContainer}
+                <VerticalLine x={this.state.mouseRelativeX} />
             </div>
         </div>
         );
+    }
+}
+
+/**
+ * Renders a vertical line at an x coordinate.
+ * 
+ * @param {Object} props - props as specified by react.  The only used prop is `x`. 
+ */
+function VerticalLine(props) {
+    if (props.x >= 0) {
+        const style = {
+            position: "absolute",
+            top: 0,
+            left: props.x - 1,
+            height: "100%",
+            borderLeft: "1px dotted grey",
+            pointerEvents: "none"
+        };
+        return <div width={1} style={style} />;
+    } else {
+        return null;
     }
 }
 

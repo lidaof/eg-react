@@ -14,7 +14,7 @@ const DEFAULT_LABEL_OFFSET = 100;
  * 
  * @author Silas Hsu
  */
-class Chromosomes extends React.Component {
+class Chromosomes extends React.PureComponent {
     static propTypes = {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
         width: PropTypes.number.isRequired, // The drawing model to use

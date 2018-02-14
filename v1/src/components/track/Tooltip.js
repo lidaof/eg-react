@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { Manager, Target, Popper, Arrow } from 'react-popper';
+import { getPageCoordinates } from '../../util';
 
 const BACKGROUND_COLOR = "rgba(173, 216, 230, 0.9)"; // lightblue with opacity adjustment
 const ARROW_HEIGHT = 15;
@@ -11,6 +12,7 @@ const CONTENT_STYLE = {
     backgroundColor: BACKGROUND_COLOR,
     borderRadius: 5,
     marginTop: ARROW_HEIGHT,
+    pointerEvents: "none"
 };
 
 const ARROW_STYLE = { // This is for a upwards-pointing arrow; other directions will require more code.
@@ -31,14 +33,16 @@ const ARROW_STYLE = { // This is for a upwards-pointing arrow; other directions 
  */
 class Tooltip extends React.PureComponent {
     static propTypes = {
-        x: PropTypes.number, // x coordinate relative to the top left corner of the HTML body.
-        y: PropTypes.number, // y coordinate relative to the top left corner of the HTML body.
+        relativeTo: PropTypes.instanceOf(Element),
+        x: PropTypes.number, // x coordinate relative to the top left corner of `relativeTo`.
+        y: PropTypes.number, // y coordinate relative to the top left corner of `relativeTo`.
         onClose: PropTypes.func, // Called when the tooltip wants to close.  Signature: (event: MouseEvent): void
     };
 
     static defaultProps = {
         x: 0,
         y: 0,
+        relativeTo: document.body,
         onClose: () => undefined
     };
 
@@ -77,12 +81,13 @@ class Tooltip extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {x, y, children} = this.props;
-        return ReactDOM.createPortal(
+        const {x, y, relativeTo, children} = this.props;
+        let pageCoords = getPageCoordinates(relativeTo, x, y);
+        const tooltip = (
             <Manager>
-                <Target style={{position: "absolute", left: x, top: y}} />
+                <Target style={{position: "absolute", left: pageCoords.x, top: pageCoords.y}} />
                 <Popper
-                    placement="bottom"
+                    placement="bottom-start"
                     style={CONTENT_STYLE}
                     innerRef={node => this.popperRef = node}
                     onMouseDown={event => event.stopPropagation()} // Stop drag-across events when clicking inside
@@ -90,9 +95,9 @@ class Tooltip extends React.PureComponent {
                     {children}
                     <Arrow style={ARROW_STYLE} />
                 </Popper>
-            </Manager>,
-            document.body
+            </Manager>
         );
+        return ReactDOM.createPortal(tooltip, document.body);
     }
 }
 

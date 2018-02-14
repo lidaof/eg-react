@@ -64,6 +64,18 @@ class LinearDrawingModel {
     xToBase(pixel) {
         return pixel * this._basesPerPixel + this._viewRegion.getAbsoluteRegion().start;
     }
+
+    /**
+     * Gets the genomic coordinates that a pixel coordinate represents.
+     * 
+     * @param {number} pixel - pixel coordinate that represents a base
+     * @return {ChromosomeInterval} genomic coordinate that the pixel represents
+     */
+    xToGenomeCoordinate(pixel) {
+        const absBase = this.xToBase(pixel);
+        const featureCoord = this._viewRegion.getNavigationContext().convertBaseToFeatureCoordinate(absBase);
+        return featureCoord.getGenomeCoordinates();
+    }
 }
 
 export default LinearDrawingModel;

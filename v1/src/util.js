@@ -9,7 +9,7 @@
  * 
  * @param {MouseEvent} event - the event for which to get relative coordinates
  * @param {Element} [relativeTo] - calculate coordinates relative to this element.  Default is event.currentTarget.
- * @return {Object} object with props x and y that contain the relative coordinates
+ * @return {Coordinate} object with props x and y that contain the relative coordinates
  */
 export function getRelativeCoordinates(event, relativeTo) {
     if (!relativeTo) {
@@ -21,3 +21,27 @@ export function getRelativeCoordinates(event, relativeTo) {
         y: event.clientY - targetBoundingRect.top
     };
 }
+
+/**
+ * Given coordinates relative to the top left corner of an element, gets the page coordinates.
+ * 
+ * @param {Element} relativeTo - element to use as reference point
+ * @param {number} relativeX - x coordinates inside an element
+ * @param {number} relativeY - y coordinates inside an element
+ * @return {Coordinate} the page coordinates
+ */
+export function getPageCoordinates(relativeTo, relativeX, relativeY) {
+    const targetBoundingRect = relativeTo.getBoundingClientRect();
+    return {
+        x: targetBoundingRect.left + relativeX,
+        y: targetBoundingRect.top + relativeY
+    };
+}
+
+/**
+ * A (x, y) coordinate pair.
+ * 
+ * @typedef {Object} Coordinate
+ * @property {number} x - the x component
+ * @property {number} y - the y component
+ */

@@ -8,7 +8,6 @@ import UnknownTrack from './UnknownTrack';
 
 import TrackLegend from './TrackLegend';
 import TrackLoadingNotice from './TrackLoadingNotice';
-import Tooltip from './Tooltip';
 import withExpandedWidth from '../withExpandedWidth';
 import getComponentName from '../getComponentName';
 
@@ -30,24 +29,18 @@ const TYPE_NAME_TO_SUBTYPE = {
  * Props that will be passed to track legend components.
  */
 export const LEGEND_PROP_TYPES = {
-    trackModel: PropTypes.instanceOf(TrackModel),
-    data: PropTypes.array,
+    trackModel: PropTypes.instanceOf(TrackModel), // Track metadata
+    data: PropTypes.array, // Track data
 };
 
 /**
  * Props that will be passed to track visualizer components.
  */
 export const VISUALIZER_PROP_TYPES = {
-    data: PropTypes.array,
-    viewRegion: PropTypes.instanceOf(DisplayedRegionModel),
-    width: PropTypes.number,
-    trackModel: PropTypes.instanceOf(TrackModel),
-
-    /**
-     * A visualizer should call this function when it wants to display a tooltip.  Signature:
-     *     (event: MouseEvent, toooltipElement: JSX.Element): void
-     */
-    onTooltip: PropTypes.func
+    trackModel: PropTypes.instanceOf(TrackModel), // Track metadata
+    data: PropTypes.array, // Track data
+    viewRegion: PropTypes.instanceOf(DisplayedRegionModel), // Region to visualize
+    width: PropTypes.number, // Visualization width
 };
 
 /**
@@ -89,7 +82,7 @@ const WideDiv = freezeWhileLoading(withExpandedWidth('div'));
  */
 export class Track extends React.PureComponent {
     static propTypes = {
-        trackModel: PropTypes.instanceOf(TrackModel).isRequired,
+        trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
         width: PropTypes.number.isRequired, // Visible width of the track, including legend, metadata handle, etc.
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
@@ -108,15 +101,11 @@ export class Track extends React.PureComponent {
         super(props);
         this.initViewExpansion(props);
         this.initDataSource(props);
-        this.divNode = null;
-        this.handleTooltip = this.handleTooltip.bind(this);
-        this.closeTooltip = this.closeTooltip.bind(this);
 
         this.state = {
             data: [],
             isLoading: this.dataSource != null,
             error: null,
-            tooltip: null,
         };
         this.fetchData(props);
     }
@@ -204,29 +193,6 @@ export class Track extends React.PureComponent {
     }
 
     /**
-     * Sets state to open a tooltip.  The tooltip will appear at the coordinates of the passed MouseEvent.
-     * 
-     * @param {MouseEvent} event - mouse event that triggered the tooltip
-     * @param {JSX.Element} tooltipElement - content of the tooltip
-     */
-    handleTooltip(event, tooltipElement) {
-        if (tooltipElement == null && this.state.tooltip) {
-            this.closeTooltip();
-        } else {
-            const coords = {x: event.pageX, y: event.pageY};
-            const tooltip = <Tooltip {...coords} onClose={this.closeTooltip}>{tooltipElement}</Tooltip>;
-            this.setState({tooltip: tooltip});
-        }
-    }
-
-    /**
-     * Sets state to close any tooltips.
-     */
-    closeTooltip() {
-        this.setState({tooltip: null});
-    }
-
-    /**
      * Calls cleanUp on the associated DataSource.
      */
     componentWillUnmount() {
@@ -236,7 +202,7 @@ export class Track extends React.PureComponent {
     }
 
     /**
-     * Renders track legend, visualizer, loading notice, tooltip, etc.
+     * Renders track legend, visualizer, loading notice, etc.
      * 
      * @return {JSX.Element} element to render
      * @override
@@ -256,7 +222,7 @@ export class Track extends React.PureComponent {
         };
 
         return (
-        <div ref={(node) => this.divNode = node} style={style} >
+        <div style={style} >
             {this.state.isLoading ? <TrackLoadingNotice /> : null}
             <Legend trackModel={trackModel} data={data} />
             <WideDiv
@@ -270,10 +236,8 @@ export class Track extends React.PureComponent {
                     viewRegion={this.viewExpansion.expandedRegion}
                     width={this.viewExpansion.expandedWidth}
                     trackModel={trackModel}
-                    onTooltip={this.handleTooltip}
                 />
             </WideDiv>
-            {this.state.tooltip}
         </div>
         );
     }

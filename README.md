@@ -36,15 +36,19 @@ actually entire chromosomes, then the user can effectively navigate the whole ge
 Here's an overview:
 1.  Specify customizations of your new track.  Tracks are customizable in four ways:
   * Visualizer (required)
-  * Data source
   * Legend
-  * Tooltips
+  * Data source
 2.  Specify when to render your new track.
 
 ### 1. Customizations
-Some of these are also explained in `TrackSubtype.ts`.
+These are also explained in `TrackSubtype.ts`.
 #### Visualizer (required)
 A component that visualizes your track data.  It will receive `VISUALIZER_PROP_TYPES` (defined in `Track.js`).
+
+#### Legend
+Your track legend component.  It will receive `LEGEND_PROP_TYPES` (defined in `Track.js`).
+
+If you don't specify a legend, your track will display a minimal, default legend.
 
 #### Data source
 If you have any non-trival data fetching needs, extend the `DataSource` class, or use one that already exists.
@@ -53,22 +57,11 @@ it.  You can return the data in any format desired.  This would also be the best
 
 If you don't specify a data source, your legend and visualizer will receive no data.
 
-#### Legend
-Your track legend component.  It will receive `LEGEND_PROP_TYPES` (defined in `Track.js`).
-
-If you don't specify a legend, your track will display a minimal, default legend.
-
-#### Tooltips
-Any tooltips you want your track to generate.  The API is still in flux, but for now, this is specified via the
-`onTooltip` function prop which is passed to your Visualizer.  Tooltips must be rendered from within a Visualizer.  When
-you want to render one, call this function with an element that will form the content of the tooltip.  See docs under
-`VISUALIZER_PROP_TYPES` for more details.
-
 ### 2.  Using your shiny customizations
 1.  Package your customizations into an object matching the schema in `TrackSubtype.ts`.
-2.  Import it into `Track.js`.
-3.  Add an entry to the `TYPE_NAME_TO_SUBTYPE` map.  `Track` will pull the type name from the `TrackModel` passed to it,
-and then look up the track subtype from this map.
+2.  Import the object from step 1 into `Track.js`.
+3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `Track.js`, which maps track type name to track subtype objects, such as
+the one you created in step 1.  The type name will come from the `TrackModel` passed to `Track` components.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.
