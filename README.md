@@ -37,8 +37,9 @@ Here's an overview:
 1.  Specify customizations of your new track.  Tracks are customizable in four ways:
   * Visualizer (required)
   * Legend
+  * Context menu items
   * Data source
-2.  Specify when to render your new track.
+2.  Specify what track type renders your new track.
 
 ### 1. Customizations
 These are also explained in `TrackSubtype.ts`.
@@ -50,6 +51,10 @@ Your track legend component.  It will receive `LEGEND_PROP_TYPES` (defined in `T
 
 If you don't specify a legend, your track will display a minimal, default legend.
 
+#### Context menu items
+List of specific menu items to render.  Note that all tracks have some menu items by default, such as the one modifying
+label and the one removing the track.  You should not include these default items.
+
 #### Data source
 If you have any non-trival data fetching needs, extend the `DataSource` class, or use one that already exists.
 Designing a new `DataSource` involves implementing the `getData()` method, which gets data for the view region passed to
@@ -58,10 +63,13 @@ it.  You can return the data in any format desired.  This would also be the best
 If you don't specify a data source, your legend and visualizer will receive no data.
 
 ### 2.  Using your shiny customizations
+Components use customizations via `TrackModel`'s getRenderConfig() method, which returns `TrackSubtype` objects.
+
 1.  Package your customizations into an object matching the schema in `model/TrackSubtype.ts`.
 2.  Import the object from step 1 into `model/TrackModel.js`.
 3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `model/TrackModel.js`, which maps track type name to track subtype
 objects, such as the one you created in step 1.  This map is used in `TrackModel`'s getRenderConfig() method.
+Alternatively, for very fine-grained control, you can modify getRenderConfig() directly.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.

@@ -1,0 +1,17 @@
+.ContextMenu-body {
+    z-index: 1;
+    min-width: 200px;
+    background-color: white;
+    border: 1px solid grey;
+    font-size: small;
+}
+
+.ContextMenu-item {
+    border-top: 1px solid lightgrey;
+    margin-top: -1px;
+    padding: 8px 5px;
+}
+
+.ContextMenu-hoverable-item:hover {
+    background-color: #20a0ff;
+}

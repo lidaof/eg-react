@@ -37,7 +37,7 @@ class RulerVisualizer extends React.PureComponent {
         const {viewRegion, width} = this.props;
         const x = getRelativeCoordinates(event).x;
         const tooltip = (
-            <Tooltip relativeTo={event.currentTarget} x={x} y={RULER_Y} onClose={this.closeTooltip} >
+            <Tooltip relativeTo={event.currentTarget} x={x} y={RULER_Y} onClose={this.closeTooltip} ignoreMouse={true} >
                 <GenomicCoordinates viewRegion={viewRegion} width={width} x={x} />
             </Tooltip>
         );
