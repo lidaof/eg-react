@@ -58,10 +58,10 @@ it.  You can return the data in any format desired.  This would also be the best
 If you don't specify a data source, your legend and visualizer will receive no data.
 
 ### 2.  Using your shiny customizations
-1.  Package your customizations into an object matching the schema in `TrackSubtype.ts`.
-2.  Import the object from step 1 into `Track.js`.
-3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `Track.js`, which maps track type name to track subtype objects, such as
-the one you created in step 1.  The type name will come from the `TrackModel` passed to `Track` components.
+1.  Package your customizations into an object matching the schema in `model/TrackSubtype.ts`.
+2.  Import the object from step 1 into `model/TrackModel.js`.
+3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `model/TrackModel.js`, which maps track type name to track subtype
+objects, such as the one you created in step 1.  This map is used in `TrackModel`'s getRenderConfig() method.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.

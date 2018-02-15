@@ -1,11 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import BigWigTrack from './BigWigTrack';
-import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
-import RulerTrack from './RulerTrack';
-import UnknownTrack from './UnknownTrack';
-
 import TrackLegend from './TrackLegend';
 import TrackLoadingNotice from './TrackLoadingNotice';
 import withExpandedWidth from '../withExpandedWidth';
@@ -14,16 +9,6 @@ import getComponentName from '../getComponentName';
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import RegionExpander from '../../model/RegionExpander';
-
-
-/**
- * Mapping from track type name to an object fulfilling the TrackSubtype interface.
- */
-const TYPE_NAME_TO_SUBTYPE = {
-    "ruler": RulerTrack,
-    "bigwig": BigWigTrack,
-    "hammock": GeneAnnotationTrack,
-};
 
 /**
  * Props that will be passed to track legend components.
@@ -100,7 +85,8 @@ export class Track extends React.PureComponent {
     constructor(props) {
         super(props);
         this.initViewExpansion(props);
-        this.initDataSource(props);
+        const trackSubtype = props.trackModel.getRenderConfig();
+        this.dataSource = trackSubtype.getDataSource ? trackSubtype.getDataSource(props.trackModel) : null;
 
         this.state = {
             data: [],
@@ -111,36 +97,12 @@ export class Track extends React.PureComponent {
     }
 
     /**
-     * Gets a TrackSubtype object containing legend, visualizer, and other subtype-specific customizations, given the
-     * props passed to this component.  The result a lookup of the TYPE_NAME_TO_SUBTYPE map private to this module; if
-     * an appropriate subtype is not found, defaults to the UnknownTrack subtype.
-     * 
-     * @param {Object} props - props passed to this component
-     * @return {TrackSubtype} object containing legend, visualizer, and other subtype-specific customizations
-     */
-    getTrackSubtype(props) {
-        const typeName = props.trackModel.getType();
-        const subtype = TYPE_NAME_TO_SUBTYPE[typeName] || UnknownTrack;
-        return subtype;
-    }
-
-    /**
      * Sets `this.viewExpansion`, which is a widening of the view that allows scrolling data into view.
      * 
      * @param {Object} props - props passed to this component
      */
     initViewExpansion(props) {
         this.viewExpansion = REGION_EXPANDER.calculateExpansion(props.width, props.viewRegion);
-    }
-
-    /**
-     * Sets `this.dataSource`, which is dependent on the track subtype.  Setting `null` is possible.
-     * 
-     * @param {Object} props - props passed to this component
-     */
-    initDataSource(props) {
-        let trackSubType = this.getTrackSubtype(props);
-        this.dataSource = trackSubType.getDataSource ? trackSubType.getDataSource(props.trackModel) : null;
     }
 
     /**
@@ -210,7 +172,7 @@ export class Track extends React.PureComponent {
     render() {
         const {trackModel, width, xOffset} = this.props;
         const data = this.state.data;
-        const trackSubtype = this.getTrackSubtype(this.props);
+        const trackSubtype = trackModel.getRenderConfig();
         const Legend = trackSubtype.legend || TrackLegend; // Default to TrackLegend if there is none specified.
         const Visualizer = trackSubtype.visualizer;
         const style = {
