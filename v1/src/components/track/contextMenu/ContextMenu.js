@@ -10,18 +10,18 @@ import './ContextMenu.css';
 
 export const ITEM_PROP_TYPES = {
     tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
-    onChangeRequested: PropTypes.func
+    onChange: PropTypes.func
 };
 
 export const ITEM_DEFAULT_PROPS = {
     tracks: [],
-    onChangeRequested: () => undefined
+    onChange: () => undefined
 };
 
 function MenuTitle(props) {
     let text;
     if (props.selectedTracks.length === 1) {
-        text = `"${props.selectedTracks[0].name}" selected`;
+        text = `${props.selectedTracks[0].name}`;
     } else {
         text = `${props.selectedTracks.length} tracks selected`;
     }
@@ -97,6 +97,9 @@ class ContextMenu extends React.PureComponent {
     render() {
         const {x, y, allTracks, onClose} = this.props;
         const selectedTracks = allTracks.filter(track => track.isSelected);
+        if (selectedTracks.length === 0) {
+            return null;
+        }
 
         return (
         <PrecisePopover x={x} y={y} onClose={onClose} >

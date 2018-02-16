@@ -12,14 +12,14 @@ class SetLabelItem extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            inputValue: this.initInputValue()
+            inputValue: this.initInputValue(props)
         };
         this.inputChanged = this.inputChanged.bind(this);
         this.setButtonPressed = this.setButtonPressed.bind(this);
     }
 
-    initInputValue() {
-        const tracks = this.props.tracks;
+    initInputValue(props) {
+        const tracks = props.tracks;
         if (tracks.length === 0) {
             return "";
         } else if (tracks.length === 1) {
@@ -34,13 +34,19 @@ class SetLabelItem extends React.PureComponent {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (this.props.tracks !== nextProps.tracks) {
+            this.setState({inputValue: this.initInputValue(nextProps)});
+        }
+    }
+
     inputChanged(event) {
         this.setState({inputValue: event.target.value});
     }
 
     setButtonPressed() {
-        const modifier = trackModel => trackModel.name = this.state.inputValue;
-        this.props.onChange(modifier);
+        const mutator = trackModel => trackModel.name = this.state.inputValue;
+        this.props.onChange(mutator);
     }
 
     render() {

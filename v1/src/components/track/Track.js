@@ -10,6 +10,8 @@ import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import RegionExpander from '../../model/RegionExpander';
 
+import './Track.css';
+
 /**
  * Props that will be passed to track legend components.
  */
@@ -71,6 +73,8 @@ export class Track extends React.PureComponent {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
         width: PropTypes.number.isRequired, // Visible width of the track, including legend, metadata handle, etc.
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
+        onContextMenu: PropTypes.func, // Works as one would expect
+        onClick: PropTypes.func, // Works as one would expect
     };
 
     static defaultProps = {
@@ -170,7 +174,7 @@ export class Track extends React.PureComponent {
      * @override
      */
     render() {
-        const {trackModel, width, xOffset} = this.props;
+        const {trackModel, width, xOffset, onContextMenu} = this.props;
         const data = this.state.data;
         const trackSubtype = trackModel.getRenderConfig();
         const Legend = trackSubtype.legend || TrackLegend; // Default to TrackLegend if there is none specified.
@@ -180,11 +184,11 @@ export class Track extends React.PureComponent {
             display: "flex",
             border: "1px solid lightgrey",
             marginTop: -1, // -1 so borders collapse.  TODO: put tracks in a table so we can use border-collapse CSS?
-            backgroundColor: this.state.error ? "red" : "white"
+            backgroundColor: this.state.error ? "red" : "white",
         };
 
         return (
-        <div style={style} >
+        <div style={style} className={trackModel.isSelected ? "Track-selected-border" : undefined} onContextMenu={onContextMenu} >
             {this.state.isLoading ? <TrackLoadingNotice /> : null}
             <Legend trackModel={trackModel} data={data} />
             <WideDiv

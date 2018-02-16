@@ -12,6 +12,7 @@ import withAutoWidth from './withAutoWidth';
 import { getRelativeCoordinates } from '../util';
 import TrackModel from '../model/TrackModel';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import ContextMenu from './track/contextMenu/ContextMenu';
 
 const tools = {
     DRAG: 0,
@@ -59,11 +60,14 @@ class TrackContainer extends React.Component {
         this.state = {
             selectedTool: tools.DRAG,
             mouseRelativeX: -1,
+            contextMenuEvent: null,
         };
 
-        this.trackMoved = this.trackMoved.bind(this);
+        this.requestTrackReorder = this.requestTrackReorder.bind(this);
         this.storeMouseX = this.storeMouseX.bind(this);
         this.clearMouseX = this.clearMouseX.bind(this);
+        this.openContextMenu = this.openContextMenu.bind(this);
+        this.closeContextMenu = this.closeContextMenu.bind(this);
     }
 
     getVisualizationWidth() {
@@ -74,11 +78,12 @@ class TrackContainer extends React.Component {
      * @return {Track[]} track components to render
      */
     makeTracks() {
-        return this.props.tracks.map(trackModel => (
+        return this.props.tracks.map((trackModel, index) => (
             <Track
                 trackModel={trackModel}
                 viewRegion={this.props.viewRegion}
                 width={this.getVisualizationWidth()}
+                onContextMenu={(event) => this.openContextMenu(event, index)}
             />
         ));
     }
@@ -112,7 +117,7 @@ class TrackContainer extends React.Component {
      * @param {number} fromIndex - index of the track to move
      * @param {number} toIndex - index to move the track to
      */
-    trackMoved(fromIndex, toIndex) {
+    requestTrackReorder(fromIndex, toIndex) {
         let newOrder = this.props.tracks.slice();
         const [moved] = newOrder.splice(fromIndex, 1);
         newOrder.splice(toIndex, 0, moved);
@@ -136,25 +141,48 @@ class TrackContainer extends React.Component {
         this.setState({mouseRelativeX: -1});
     }
 
+    openContextMenu(event, index) {
+        event.preventDefault();
+        event.persist();
+
+        const nextTracks = this.props.tracks.map(track => track.clone());
+        for (let track of nextTracks) {
+            track.isSelected = false;
+        }
+        nextTracks[index].isSelected = true;
+        this.props.onTracksChanged(nextTracks);
+
+        this.setState({contextMenuEvent: event});
+    }
+
+    closeContextMenu() {
+        this.setState({contextMenuEvent: null});
+    }
+
     /**
      * @inheritdoc
      */
     render() {
-        const tracks = this.makeTracks();
+        const {viewRegion, onNewRegion, onTracksChanged} = this.props;
+        const {mouseRelativeX, contextMenuEvent} = this.state;
+        const trackComponents = this.makeTracks();
         let subContainer;
         switch (this.state.selectedTool) {
             case tools.REORDER:
                 subContainer = (
-                    <ReorderableTrackContainer trackComponents={tracks} onTrackMoved={this.trackMoved} />
+                    <ReorderableTrackContainer
+                        trackComponents={trackComponents}
+                        onTrackMoved={this.requestTrackReorder}
+                    />
                 );
                 break;
             case tools.ZOOM:
                 subContainer = (
                     <ZoomableTrackContainer
                         legendWidth={TrackLegend.WIDTH}
-                        trackComponents={tracks}
-                        viewRegion={this.props.viewRegion}
-                        onNewRegion={this.props.onNewRegion}
+                        trackComponents={trackComponents}
+                        viewRegion={viewRegion}
+                        onNewRegion={onNewRegion}
                     />
                 );
                 break;
@@ -163,9 +191,9 @@ class TrackContainer extends React.Component {
                 subContainer = (
                     <DraggableTrackContainer
                         visualizationWidth={this.getVisualizationWidth()}
-                        trackComponents={tracks}
-                        viewRegion={this.props.viewRegion}
-                        onNewRegion={this.props.onNewRegion}
+                        trackComponents={trackComponents}
+                        viewRegion={viewRegion}
+                        onNewRegion={onNewRegion}
                     />
                 );
         }
@@ -177,8 +205,20 @@ class TrackContainer extends React.Component {
             {this.makeToolSelectButtons()}
             <div style={innerDivStyle} onMouseMove={this.storeMouseX} onMouseLeave={this.clearMouseX} >
                 {subContainer}
-                <VerticalLine x={this.state.mouseRelativeX} />
+                <VerticalLine x={mouseRelativeX} />
             </div>
+            {
+            contextMenuEvent ? 
+                <ContextMenu
+                    x={contextMenuEvent.pageX}
+                    y={contextMenuEvent.pageY}
+                    allTracks={this.props.tracks}
+                    onTracksChanged={onTracksChanged}
+                    onClose={this.closeContextMenu}
+                />
+                :
+                null
+            }
         </div>
         );
     }
