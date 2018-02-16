@@ -11,172 +11,153 @@ const dbName = 'hg19';
 
 const NAME_SEARCH_LIMIT = 50;
 
-const server = new Hapi.Server();
+const server = new Hapi.Server({port:3001, host: '0.0.0.0'});
 
-server.connection({port:3001, host: '0.0.0.0'});
+function promiseMongoConnect(url) {
+    return new Promise((resolve, reject) => {
+        MongoClient.connect(url, (err, client) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(client);
+            }
+        });
+    });
+}
 
 server.route({
     method: 'GET',
     path: '/',
-    handler: function (request, reply){
-        reply('Hello, world!');
+    handler: function (request, h){
+        return 'Hello, world!';
     }
 });
 
 server.route({
     method: 'GET',
     path: '/{name}',
-    handler: function(request, reply){
-        reply('Hello, ' + encodeURIComponent(request.params.name) + '!');
+    handler: function(request, h){
+        return 'Hello, ' + encodeURIComponent(request.params.name) + '!';
     }
 });
 
-function partialRefGeneSearch(q, db, callback){
-    let collection = db.collection('refGene');
-    //let query = {$or: [ {name: { $regex: `^${q}`, $options: 'i' } }, {name2: { $regex: `^${q}`, $options: 'i' } } ] };
-    let query = {name2: { $regex: `^${q}`, $options: 'i' } };
-    //console.log(query);
-    //let cursor = collection.find(query,{ _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }).limit(NAME_SEARCH_LIMIT);
-    // let res = [];
-    // cursor.each( (err, doc) => {
-    //     assert.equal(err, null);
-    //     if (doc != null){
-    //         //console.log(doc);
-    //         res.push(doc);
-    //     }else{
-    //         callback(res);
-    //     }
+const partialRefGeneSearch = async function (request, h){
+    let query = {name2: { $regex: `^${encodeURIComponent(request.params.q)}`, $options: 'i' } };
+    // collection.find(query,
+    //         {
+    //             //fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
+    //             fields: { _id: 0, name2: 1 }
+    //         }
+    //     )
+    //     .limit(NAME_SEARCH_LIMIT)
+    //     .toArray((err, res) =>{
+    //         assert.equal(err, null);
+    //         let res2 = [];
+    //         res.forEach(r => res2.push(r.name2));
+    //         callback(_.uniq(res2));
     // });
-    //return res;
-    collection.find(query,
-            {
-                //fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
-                fields: { _id: 0, name2: 1 }
-            }
-        )
-        .limit(NAME_SEARCH_LIMIT)
-        .toArray((err, res) =>{
+    try {
+        const mongoClient = await promiseMongoConnect(url);
+        const db = mongoClient.db(dbName);
+        const collection = db.collection('refGene');
+        const findResult = await collection.find(query, {
+            fields: { _id: 0, name2: 1 }
+        });
+        return findResult.limit(NAME_SEARCH_LIMIT).then((err, res) =>{
             assert.equal(err, null);
             let res2 = [];
             res.forEach(r => res2.push(r.name2));
-            callback(_.uniq(res2));
-    });
+            return _.uniq(res2);
+        })
+    } catch (err) {
+        return {err2: err};
+    }
 }
 
 server.route({
     method: 'GET',
     path:'/hg19/geneSuggest/{q}',
-    handler: function(request, reply){
-        MongoClient.connect(url, (err, client) => {
-            assert.equal(null, err);
-            const db = client.db(dbName);
-            let que = encodeURIComponent(request.params.q);
-            console.log(que);
-            partialRefGeneSearch(que, db, (res) => {
-                //console.log(res);
-                reply(res).header('content-type','application/json');
-                client.close();
-            });  
-        });
-    }
+    handler: partialRefGeneSearch
 });
 
-function refGeneSearch(q, db, callback){
-    let collection = db.collection('refGene');
-    let query = {$or: [ {name: { $regex: `^${q}$`, $options: 'i' } }, {name2: { $regex: `^${q}$`, $options: 'i' } } ] };
-    collection.find(query,
-            {
-                fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
-            }
-        )
-        .limit(NAME_SEARCH_LIMIT)
-        .toArray((err, res) =>{
-            assert.equal(err, null);
-            callback(res);
-    });
+const refGeneSearch = async function (request, h){
+    let query = {$or: [ {name: { $regex: `^${encodeURIComponent(request.params.q)}$`, $options: 'i' } }, {name2: { $regex: `^${encodeURIComponent(request.params.q)}$`, $options: 'i' } } ] };
+    try {
+        const mongoClient = await promiseMongoConnect(url);
+        const db = mongoClient.db(dbName);
+        const collection = db.collection('refGene');
+        const findResult = await collection.find(query, {
+            fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
+        });
+        return findResult.limit(NAME_SEARCH_LIMIT).toArray();
+    } catch (err) {
+        return {err: err};
+    }
 }
 
 server.route({
     method: 'GET',
     path:'/hg19/refGene/{q}',
-    handler: function(request, reply){
-        MongoClient.connect(url, (err, client) => {
-            assert.equal(null, err);
-            const db = client.db(dbName);
-            let que = encodeURIComponent(request.params.q);
-            console.log(que);
-            refGeneSearch(que, db, (res) => {
-                //console.log(res);
-                reply(res).header('content-type','application/json');
-                client.close();
-            });  
-        });
-    }
+    handler: refGeneSearch
 });
 
-function cytoBandSearch(q, db, callback){
-    let collection = db.collection('cytoBand');
-    let query = {chrom:q};
+const regionGeneQuery = async function(request, h){   
+    const query = {
+        chrom: encodeURIComponent(request.params.chr),
+        txStart: { $lt: Number.parseInt(request.params.end, 10) },
+        txEnd: { $gt: Number.parseInt(request.params.start, 10) }
+    };
     console.log(query);
-    let cursor = collection.find(query);
-    let res = [];
-    cursor.each( (err, doc) => {
-        assert.equal(err, null);
-        if (doc != null){
-            //console.log(doc);
-            res.push(doc);
-        }else{
-            callback(res);
-        }
-    });
-    //return res;
+    try {
+        const mongoClient = await promiseMongoConnect(url);
+        const db = mongoClient.db(dbName);
+        const collection = db.collection('refGene');
+        const findResult = await collection.find(query, {
+            fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
+        });
+        return findResult.toArray();
+    } catch (err) {
+        return {err: err};
+    }
+}
+
+
+
+server.route({
+    method: 'GET',
+    path:'/hg19/geneQuery/{chr}/{start}/{end}',
+    handler: regionGeneQuery
+});
+
+const cytoBandSearch = async function (request, h){
+    let query = {chrom: encodeURIComponent(request.params.q)};
+    try {
+        const mongoClient = await promiseMongoConnect(url);
+        const db = mongoClient.db(dbName);
+        const collection = db.collection('cytoBand');
+        const findResult = await collection.find(query);
+        return findResult.toArray();
+    } catch (err) {
+        return {err: err};
+    }
 }
 
 server.route({
     method: 'GET',
     path:'/hg19/cytoBand/{q}',
-    handler: function(request, reply){
-        MongoClient.connect(url, (err, client) => {
-            assert.equal(null, err);
-            const db = client.db(dbName);
-            let que = encodeURIComponent(request.params.q);
-            console.log(que);
-            cytoBandSearch(que, db, (res) => {
-                //console.log(res);
-                reply(res).header('content-type','application/json');
-                client.close();
-            });  
-        });
-    }
+    handler: cytoBandSearch
 });
 
-server.register({
-    register: Good,
-    options: {
-        reporters: {
-            console: [{
-                module: 'good-squeeze',
-                name: 'Squeeze',
-                args: [{
-                    response: '*',
-                    log: '*'
-                }]
-            }, {
-                module: 'good-console'
-            }, 'stdout']
-        }
-    }
-}, (err) => {
-
-    if (err) {
-        throw err; // something bad happened loading the plugin
-    }
-
-    server.start((err) => {
-
-        if (err) {
-            throw err;
-        }
-        server.log('info', 'Server running at: ' + server.info.uri);
-    });
-});
+server  
+  .start()
+  .then(() => { server.log('info', `Server started at ${server.info.uri}`); }) 
+  .catch(err => {
+    console.log(err)
+  })
+  
+//   server  
+//   .stop()
+//   .catch(err => {
+//     console.log(err)
+//   })
+  
