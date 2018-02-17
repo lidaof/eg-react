@@ -50,12 +50,14 @@ const partialRefGeneSearch = async function (request, h){
         const findResult = await collection.find(query, {
             fields: { _id: 0, name2: 1 }
         });
-        return findResult.limit(NAME_SEARCH_LIMIT).toArray().then((res) =>{
-            let res2 = [];
-            res.forEach(r => res2.push(r.name2));
-            //console.log(res2)
-            return _.uniq(res2);
-        });
+        // return findResult.limit(NAME_SEARCH_LIMIT).toArray().then((res) =>{
+        //     let res2 = [];
+        //     res.forEach(r => res2.push(r.name2));
+        //     //console.log(res2)
+        //     return _.uniq(res2);
+        // });
+        const arrayResult = await findResult.limit(NAME_SEARCH_LIMIT).toArray();
+        return _.uniq(arrayResult.map(record => record.name2));
     } catch (err) {
         console.log(err);
         return {err2: err};
