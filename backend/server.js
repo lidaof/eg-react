@@ -43,19 +43,6 @@ server.route({
 
 const partialRefGeneSearch = async function (request, h){
     let query = {name2: { $regex: `^${encodeURIComponent(request.params.q)}`, $options: 'i' } };
-    // collection.find(query,
-    //         {
-    //             //fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
-    //             fields: { _id: 0, name2: 1 }
-    //         }
-    //     )
-    //     .limit(NAME_SEARCH_LIMIT)
-    //     .toArray((err, res) =>{
-    //         assert.equal(err, null);
-    //         let res2 = [];
-    //         res.forEach(r => res2.push(r.name2));
-    //         callback(_.uniq(res2));
-    // });
     try {
         const mongoClient = await promiseMongoConnect(url);
         const db = mongoClient.db(dbName);
@@ -63,13 +50,14 @@ const partialRefGeneSearch = async function (request, h){
         const findResult = await collection.find(query, {
             fields: { _id: 0, name2: 1 }
         });
-        return findResult.limit(NAME_SEARCH_LIMIT).then((err, res) =>{
-            assert.equal(err, null);
+        return findResult.limit(NAME_SEARCH_LIMIT).toArray().then((res) =>{
             let res2 = [];
             res.forEach(r => res2.push(r.name2));
+            //console.log(res2)
             return _.uniq(res2);
-        })
+        });
     } catch (err) {
+        console.log(err);
         return {err2: err};
     }
 }
