@@ -15,8 +15,6 @@ const dbName = 'hg19';
 
 const NAME_SEARCH_LIMIT = 50;
 
-//const server = new Hapi.Server({port:3001, host: '0.0.0.0'});
-
 function promiseMongoConnect(url) {
     return new Promise((resolve, reject) => {
         MongoClient.connect(url, (err, client) => {
@@ -72,9 +70,7 @@ const regionGeneQuery = async function(request, h){
         const mongoClient = await promiseMongoConnect(url);
         const db = mongoClient.db(dbName);
         const collection = db.collection('refGene');
-        const findResult = await collection.find(query, {
-            fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
-        });
+        const findResult = await collection.find(query);
         return findResult.toArray();
     } catch (err) {
         return {err: err};
@@ -119,7 +115,22 @@ const myServer = async () => {
         info: {
                 title: 'eg-react API Documentation',
             },
-        };
+    };
+
+    const goodOptions = {
+        ops: {
+            interval: 1000
+        },
+        reporters: {
+            myConsoleReporter: [{
+                module: 'good-squeeze',
+                name: 'Squeeze',
+                args: [{ log: '*', response: '*' }]
+            }, {
+                module: 'good-console'
+            }, 'stdout'],
+        }
+    };
     
     await server.register([
         Inert,
@@ -127,6 +138,10 @@ const myServer = async () => {
         {
             plugin: HapiSwagger,
             options: swaggerOptions
+        },
+        {
+            plugin: Good,
+            options: goodOptions
         }
     ]);
     
