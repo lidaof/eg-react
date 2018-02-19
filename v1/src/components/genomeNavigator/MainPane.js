@@ -6,12 +6,12 @@ import Ruler from './Ruler';
 import SelectedRegionBox from './SelectedRegionBox';
 
 import SelectableArea from '../SelectableArea';
-import { RIGHT_MOUSE } from '../DragAcrossDiv';
 import DragAcrossView from '../DragAcrossView';
 import withAutoWidth from '../withAutoWidth';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
+import { MouseButtons } from '../../util';
 
 const WHEEL_ZOOM_SPEED = 0.2;
 const SVG_HEIGHT = 150;
@@ -127,7 +127,7 @@ class MainPane extends React.Component {
 
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView button={RIGHT_MOUSE} onViewDrag={dragCallback} viewRegion={viewRegion} >
+        <DragAcrossView button={MouseButtons.RIGHT} onViewDrag={dragCallback} viewRegion={viewRegion} >
             <SelectableArea
                 viewRegion={viewRegion}
                 y={SELECT_BOX_Y}

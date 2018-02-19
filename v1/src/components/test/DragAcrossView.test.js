@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import DragAcrossView from '../DragAcrossView';
-import { LEFT_MOUSE } from '../DragAcrossDiv';
+import { MouseButtons } from '../../util';
 import makeToyRegion from '../../model/test/toyRegion';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 
@@ -15,7 +15,7 @@ let viewDragCallback = jest.fn();
 let viewDragEndCallback = jest.fn();
 let wrapper = shallow(
     <DragAcrossView
-        button={LEFT_MOUSE}
+        button={MouseButtons.LEFT}
         viewRegion={viewRegion}
         drawModel={drawModel}
         onViewDragStart={viewDragStartCallback}

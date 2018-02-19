@@ -1,6 +1,15 @@
 // Utility functions that don't really fit in any particular folder.
 
 /**
+ * Button consts found in MouseEvents.  See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+ */
+export const MouseButtons = {
+    LEFT: 0,
+    MIDDLE: 1,
+    RIGHT: 2
+};
+
+/**
  * Gets the x and y coordinates of a mouse event *relative to the top left corner of an element*.  By default, the
  * element is the event's `currentTarget`, the element to which the event listener has been attached.
  * 

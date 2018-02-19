@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { LEFT_MOUSE, DragAcrossDiv } from './DragAcrossDiv';
-import { getRelativeCoordinates } from '../util';
+import DragAcrossDiv from './DragAcrossDiv';
+import { MouseButtons, getRelativeCoordinates } from '../util';
 
 /**
  * Creates and manages the boxes that the user can drag across the screen to select a new region.
@@ -25,7 +25,7 @@ class SelectableArea extends React.Component {
     };
 
     static defaultProps = {
-        button: LEFT_MOUSE,
+        button: MouseButtons.LEFT,
         y: "0px",
         height: "100%",
         onAreaSelected: () => undefined
