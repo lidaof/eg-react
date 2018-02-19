@@ -1,7 +1,11 @@
 'use strict';
 
 const Hapi = require('hapi');
+const Inert = require('inert');
+const Vision = require('vision');
+const HapiSwagger = require('hapi-swagger');
 const Good = require('good');
+const Joi = require('joi');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const  _ = require('lodash');
@@ -11,7 +15,7 @@ const dbName = 'hg19';
 
 const NAME_SEARCH_LIMIT = 50;
 
-const server = new Hapi.Server({port:3001, host: '0.0.0.0'});
+//const server = new Hapi.Server({port:3001, host: '0.0.0.0'});
 
 function promiseMongoConnect(url) {
     return new Promise((resolve, reject) => {
@@ -25,22 +29,6 @@ function promiseMongoConnect(url) {
     });
 }
 
-server.route({
-    method: 'GET',
-    path: '/',
-    handler: function (request, h){
-        return 'Hello, world!';
-    }
-});
-
-server.route({
-    method: 'GET',
-    path: '/{name}',
-    handler: function(request, h){
-        return 'Hello, ' + encodeURIComponent(request.params.name) + '!';
-    }
-});
-
 const partialRefGeneSearch = async function (request, h){
     let query = {name2: { $regex: `^${encodeURIComponent(request.params.q)}`, $options: 'i' } };
     try {
@@ -50,12 +38,6 @@ const partialRefGeneSearch = async function (request, h){
         const findResult = await collection.find(query, {
             fields: { _id: 0, name2: 1 }
         });
-        // return findResult.limit(NAME_SEARCH_LIMIT).toArray().then((res) =>{
-        //     let res2 = [];
-        //     res.forEach(r => res2.push(r.name2));
-        //     //console.log(res2)
-        //     return _.uniq(res2);
-        // });
         const arrayResult = await findResult.limit(NAME_SEARCH_LIMIT).toArray();
         return _.uniq(arrayResult.map(record => record.name2));
     } catch (err) {
@@ -63,12 +45,6 @@ const partialRefGeneSearch = async function (request, h){
         return {err2: err};
     }
 }
-
-server.route({
-    method: 'GET',
-    path:'/hg19/geneSuggest/{q}',
-    handler: partialRefGeneSearch
-});
 
 const refGeneSearch = async function (request, h){
     let query = {$or: [ {name: { $regex: `^${encodeURIComponent(request.params.q)}$`, $options: 'i' } }, {name2: { $regex: `^${encodeURIComponent(request.params.q)}$`, $options: 'i' } } ] };
@@ -84,12 +60,6 @@ const refGeneSearch = async function (request, h){
         return {err: err};
     }
 }
-
-server.route({
-    method: 'GET',
-    path:'/hg19/refGene/{q}',
-    handler: refGeneSearch
-});
 
 const regionGeneQuery = async function(request, h){   
     const query = {
@@ -111,13 +81,20 @@ const regionGeneQuery = async function(request, h){
     }
 }
 
-
-
-server.route({
-    method: 'GET',
-    path:'/hg19/geneQuery/{chr}/{start}/{end}',
-    handler: regionGeneQuery
-});
+const refseqDesc = async function (request, h){
+    let query = {refseq: encodeURIComponent(request.params.q)};
+    try {
+        const mongoClient = await promiseMongoConnect(url);
+        const db = mongoClient.db(dbName);
+        const collection = db.collection('kgXref');
+        const findResult = await collection.find(query, {
+            fields: { _id: 0, refseq: 1, description: 1 }
+        });
+        return findResult.toArray();
+    } catch (err) {
+        return {err: err};
+    }
+}
 
 const cytoBandSearch = async function (request, h){
     let query = {chrom: encodeURIComponent(request.params.q)};
@@ -132,22 +109,145 @@ const cytoBandSearch = async function (request, h){
     }
 }
 
-server.route({
-    method: 'GET',
-    path:'/hg19/cytoBand/{q}',
-    handler: cytoBandSearch
-});
+const myServer = async () => {
+    const server = await new Hapi.Server({
+        host: 'localhost',
+        port: 3001,
+    });
+    
+    const swaggerOptions = {
+        info: {
+                title: 'eg-react API Documentation',
+            },
+        };
+    
+    await server.register([
+        Inert,
+        Vision,
+        {
+            plugin: HapiSwagger,
+            options: swaggerOptions
+        }
+    ]);
+    
+    try {
+        await server.start();
+        console.log('Server running at:', server.info.uri);
+    } catch(err) {
+        console.log(err);
+    }
+    
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: function (request, h){
+            return 'Hello, world!';
+        }
+    });
+    
+    server.route({
+        method: 'GET',
+        path: '/{name}',
+        handler: function(request, h){
+            return 'Hello, ' + encodeURIComponent(request.params.name) + '!';
+        }
+    });
 
-server  
-  .start()
-  .then(() => { server.log('info', `Server started at ${server.info.uri}`); }) 
-  .catch(err => {
-    console.log(err)
-  })
-  
-//   server  
-//   .stop()
-//   .catch(err => {
-//     console.log(err)
-//   })
-  
+    server.route({
+        method: 'GET',
+        path:'/hg19/geneSuggest/{q}',
+        options: {
+            handler: partialRefGeneSearch,
+            description: 'start string of gene symbol',
+            notes: 'Returns list of gene symbols matching query string',
+            tags: ['api'],
+            validate: {
+                params: {
+                    q : Joi.string()
+                            .required()
+                            .description('the start string of a gene symbol').default('HOXA'),
+                }
+            }
+        } 
+    });
+    
+    server.route({
+        method: 'GET',
+        path:'/hg19/refGene/{q}',
+        options: {
+            handler: refGeneSearch,
+            description: 'search gene symbol',
+            notes: 'Returns list of refGene entries matching query symbol',
+            tags: ['api'],
+            validate: {
+                params: {
+                    q : Joi.string()
+                            .required()
+                            .description('a gene symbol').default('TP53'),
+                }
+            }
+        } 
+    });
+
+    server.route({
+        method: 'GET',
+        path:'/hg19/geneQuery/{chr}/{start}/{end}',
+        options: {
+            handler: regionGeneQuery,
+            description: 'query genes in region',
+            notes: 'Returns list of refGene entries between start and end',
+            tags: ['api'],
+            validate: {
+                params: {
+                    chr : Joi.string()
+                            .required()
+                            .description('chromosome').default('chr7'),
+                    start : Joi.number()
+                            .required()
+                            .description('start').default(27210209),
+                    end : Joi.number()
+                            .required()
+                            .description('end').default(27219880),    
+                }
+            }
+        } 
+    });
+ 
+    server.route({
+        method: 'GET',
+        path:'/hg19/refseqDesc/{q}',
+        options: {
+            handler: refseqDesc,
+            description: 'get gene description',
+            notes: 'Returns gene description',
+            tags: ['api'],
+            validate: {
+                params: {
+                    q : Joi.string()
+                            .required()
+                            .description('refGene ID').default('NR_037940'),  
+                }
+            }
+        } 
+    });
+
+    server.route({
+        method: 'GET',
+        path:'/hg19/cytoBand/{q}',
+        options: {
+            handler: cytoBandSearch,
+            description: 'get cytoband info',
+            notes: 'get cytoband info',
+            tags: ['api'],
+            validate: {
+                params: {
+                    q : Joi.string()
+                            .required()
+                            .description('chromosome').default('chr22'),  
+                }
+            }
+        } 
+    });
+
+};
+myServer();
