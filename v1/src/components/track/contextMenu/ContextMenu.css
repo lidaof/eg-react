@@ -15,3 +15,7 @@
 .ContextMenu-hoverable-item:hover {
     background-color: #20a0ff;
 }
+
+.ContextMenu-hoverable-item-danger:hover {
+    background-color: pink;
+}

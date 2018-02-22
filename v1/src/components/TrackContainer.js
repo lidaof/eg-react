@@ -7,9 +7,10 @@ import TrackLegend from './track/TrackLegend';
 import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
+import DivWithBullseye from './DivWithBullseye';
 
 import withAutoWidth from './withAutoWidth';
-import { getRelativeCoordinates } from '../util';
+import { MouseButtons } from '../util';
 import TrackModel from '../model/TrackModel';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import ContextMenu from './track/contextMenu/ContextMenu';
@@ -59,41 +60,91 @@ class TrackContainer extends React.Component {
         super(props);
         this.state = {
             selectedTool: tools.DRAG,
-            mouseRelativeX: -1,
             contextMenuEvent: null,
         };
 
+        this.trackDiv = null;
         this.requestTrackReorder = this.requestTrackReorder.bind(this);
-        this.storeMouseX = this.storeMouseX.bind(this);
-        this.clearMouseX = this.clearMouseX.bind(this);
+        this.trackClicked = this.trackClicked.bind(this);
         this.openContextMenu = this.openContextMenu.bind(this);
         this.closeContextMenu = this.closeContextMenu.bind(this);
     }
 
-    getVisualizationWidth() {
-        return Math.max(0, this.props.width - TrackLegend.WIDTH);
+    /**
+     * Requests a change in a track's position
+     * 
+     * @param {number} fromIndex - index of the track to move
+     * @param {number} toIndex - index to move the track to
+     */
+    requestTrackReorder(fromIndex, toIndex) {
+        let newOrder = this.props.tracks.slice();
+        const [moved] = newOrder.splice(fromIndex, 1);
+        newOrder.splice(toIndex, 0, moved);
+        this.props.onTracksChanged(newOrder);
     }
 
-    /**
-     * @return {Track[]} track components to render
-     */
-    makeTracks() {
-        return this.props.tracks.map((trackModel, index) => (
-            <Track
-                trackModel={trackModel}
-                viewRegion={this.props.viewRegion}
-                width={this.getVisualizationWidth()}
-                onContextMenu={(event) => this.openContextMenu(event, index)}
-            />
-        ));
+    trackClicked(event, index) {
+        if (event.button === MouseButtons.LEFT && event.ctrlKey) { // Toggle selection of one track
+            const nextTracks = this.props.tracks.slice();
+            this.toggleOneTrack(nextTracks, index);
+            this.props.onTracksChanged(nextTracks);
+        }
+    }
+
+    openContextMenu(event, index) {
+        event.preventDefault();
+        if (event.button === MouseButtons.LEFT) {
+            this.trackClicked(event, index);
+            return;
+        } else if (event.ctrlKey) {
+            return;
+        }
+
+        event.persist();
+        this.setState({contextMenuEvent: event});
+        // If the track is not selected, select it and deselect the others.
+        if (!this.props.tracks[index].isSelected) {
+            const nextTracks = this.deselectAllTracks();
+            this.toggleOneTrack(nextTracks, index);
+            this.props.onTracksChanged(nextTracks);
+        }
+    }
+
+    closeContextMenu(event) {
+        if (this.trackDiv.contains(event.target) && event.ctrlKey) { // Click inside the track div and ctrl held
+            // Assume user is selecting multiple tracks; don't close.
+            return;
+        }
+
+        this.setState({contextMenuEvent: null});
+        if (!this.trackDiv.contains(event.target)) { // Click outside the track div
+            this.props.onTracksChanged(this.deselectAllTracks());
+        }
+    }
+
+    deselectAllTracks() {
+        return this.props.tracks.map(track => {
+            if (track.isSelected) {
+                let clone = track.clone();
+                clone.isSelected = false;
+                return clone;
+            } else {
+                return track;
+            }
+        });
+    }
+
+    toggleOneTrack(tracks, index) {
+        tracks[index] = tracks[index].clone();
+        tracks[index].isSelected = !tracks[index].isSelected;
     }
 
     /**
      * Makes the buttons that select the tool to use
      * 
-     * @return {React.Component[]} buttons to render
+     * @return {JSX.Element[]} buttons to render
      */
-    makeToolSelectButtons() {
+    renderToolSelectButtons() {
         let buttons = [];
         for (let toolName in tools) {
             const tool = tools[toolName];
@@ -111,137 +162,91 @@ class TrackContainer extends React.Component {
         return buttons;
     }
 
-    /**
-     * Requests a change in a track's position
-     * 
-     * @param {number} fromIndex - index of the track to move
-     * @param {number} toIndex - index to move the track to
-     */
-    requestTrackReorder(fromIndex, toIndex) {
-        let newOrder = this.props.tracks.slice();
-        const [moved] = newOrder.splice(fromIndex, 1);
-        newOrder.splice(toIndex, 0, moved);
-        this.props.onTracksChanged(newOrder);
+    getVisualizationWidth() {
+        return Math.max(0, this.props.width - TrackLegend.WIDTH);
     }
 
     /**
-     * Stores a mouse event's relative x coordinates in state.
-     * 
-     * @param {MouseEvent} event - mouse event whose coordinates to store
+     * @return {JSX.Element[]} track elements to render
      */
-    storeMouseX(event) {
-        const relativeX = getRelativeCoordinates(event).x;
-        this.setState({mouseRelativeX: relativeX});
+    makeTrackElements() {
+        return this.props.tracks.map((trackModel, index) => (
+            <Track
+                trackModel={trackModel}
+                viewRegion={this.props.viewRegion}
+                width={this.getVisualizationWidth()}
+                onContextMenu={event => this.openContextMenu(event, index)}
+                onClick={event => this.trackClicked(event, index)}
+            />
+        ));
     }
 
-    /**
-     * Clears stored mouse event coordinates.
-     */
-    clearMouseX() {
-        this.setState({mouseRelativeX: -1});
-    }
-
-    openContextMenu(event, index) {
-        event.preventDefault();
-        event.persist();
-
-        const nextTracks = this.props.tracks.map(track => track.clone());
-        for (let track of nextTracks) {
-            track.isSelected = false;
+    renderSubContainer() {
+        const {viewRegion, onNewRegion} = this.props;
+        const trackElements = this.makeTrackElements();
+        switch (this.state.selectedTool) {
+            case tools.REORDER:
+                return (
+                    <ReorderableTrackContainer
+                        trackComponents={trackElements}
+                        onTrackMoved={this.requestTrackReorder}
+                    />
+                );
+            case tools.ZOOM:
+                return (
+                    <ZoomableTrackContainer
+                        legendWidth={TrackLegend.WIDTH}
+                        trackComponents={trackElements}
+                        viewRegion={viewRegion}
+                        onNewRegion={onNewRegion}
+                    />
+                );
+            case tools.DRAG:
+            default:
+                return (
+                    <DraggableTrackContainer
+                        visualizationWidth={this.getVisualizationWidth()}
+                        trackComponents={trackElements}
+                        viewRegion={viewRegion}
+                        onNewRegion={onNewRegion}
+                    />
+                );
         }
-        nextTracks[index].isSelected = true;
-        this.props.onTracksChanged(nextTracks);
-
-        this.setState({contextMenuEvent: event});
     }
 
-    closeContextMenu() {
-        this.setState({contextMenuEvent: null});
+    renderContextMenu() {
+        const {tracks, onTracksChanged} = this.props;
+        const contextMenuEvent = this.state.contextMenuEvent;
+        if (contextMenuEvent) {
+            return (
+                <ContextMenu
+                    x={contextMenuEvent.pageX}
+                    y={contextMenuEvent.pageY}
+                    allTracks={tracks}
+                    onTracksChanged={onTracksChanged}
+                    onClose={this.closeContextMenu}
+                />
+            );
+        } else {
+            return null;
+        }
     }
 
     /**
      * @inheritdoc
      */
     render() {
-        const {viewRegion, onNewRegion, onTracksChanged} = this.props;
-        const {mouseRelativeX, contextMenuEvent} = this.state;
-        const trackComponents = this.makeTracks();
-        let subContainer;
-        switch (this.state.selectedTool) {
-            case tools.REORDER:
-                subContainer = (
-                    <ReorderableTrackContainer
-                        trackComponents={trackComponents}
-                        onTrackMoved={this.requestTrackReorder}
-                    />
-                );
-                break;
-            case tools.ZOOM:
-                subContainer = (
-                    <ZoomableTrackContainer
-                        legendWidth={TrackLegend.WIDTH}
-                        trackComponents={trackComponents}
-                        viewRegion={viewRegion}
-                        onNewRegion={onNewRegion}
-                    />
-                );
-                break;
-            case tools.DRAG:
-            default:
-                subContainer = (
-                    <DraggableTrackContainer
-                        visualizationWidth={this.getVisualizationWidth()}
-                        trackComponents={trackComponents}
-                        viewRegion={viewRegion}
-                        onNewRegion={onNewRegion}
-                    />
-                );
-        }
-
         // paddingTop to counteract track's marginTop of -1
-        const innerDivStyle = {border: "1px solid black", paddingTop: 1, position: "relative", cursor: "crosshair"};
+        const trackDivStyle = {border: "1px solid black", paddingTop: 1, cursor: "crosshair"};
         return (
         <div>
-            {this.makeToolSelectButtons()}
-            <div style={innerDivStyle} onMouseMove={this.storeMouseX} onMouseLeave={this.clearMouseX} >
-                {subContainer}
-                <VerticalLine x={mouseRelativeX} />
-            </div>
-            {
-            contextMenuEvent ? 
-                <ContextMenu
-                    x={contextMenuEvent.pageX}
-                    y={contextMenuEvent.pageY}
-                    allTracks={this.props.tracks}
-                    onTracksChanged={onTracksChanged}
-                    onClose={this.closeContextMenu}
-                />
-                :
-                null
-            }
+            {this.renderToolSelectButtons()}
+            <DivWithBullseye innerRef={node => this.trackDiv = node} style={trackDivStyle} >
+                {this.renderSubContainer()}
+            </DivWithBullseye>
+            {this.renderContextMenu()}
         </div>
         );
-    }
-}
-
-/**
- * Renders a vertical line at an x coordinate.
- * 
- * @param {Object} props - props as specified by react.  The only used prop is `x`. 
- */
-function VerticalLine(props) {
-    if (props.x >= 0) {
-        const style = {
-            position: "absolute",
-            top: 0,
-            left: props.x - 1,
-            height: "100%",
-            borderLeft: "1px dotted grey",
-            pointerEvents: "none"
-        };
-        return <div width={1} style={style} />;
-    } else {
-        return null;
     }
 }
 

@@ -18,33 +18,29 @@ export const ITEM_DEFAULT_PROPS = {
     onChange: () => undefined
 };
 
-function MenuTitle(props) {
-    let text;
-    if (props.selectedTracks.length === 1) {
-        text = `${props.selectedTracks[0].name}`;
-    } else {
-        text = `${props.selectedTracks.length} tracks selected`;
-    }
-
-    return <div style={{paddingLeft: 5, fontWeight: 'bold'}} >{text}</div>;
-}
-
-function RemoveItem(props) {
-    return (
-    <div onClick={props.onClick} className="ContextMenu-item ContextMenu-hoverable-item" >
-        {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}
-        ❌ {props.numTracks === 1 ? "Remove" : `Remove ${props.numTracks} tracks`}
-    </div>
-    );
-}
-
+/**
+ * Context menu specialized for managing track options and metadata.
+ * 
+ * @author Silas Hsu
+ */
 class ContextMenu extends React.PureComponent {
     static propTypes = {
-        x: PropTypes.number,
-        y: PropTypes.number,
+        x: PropTypes.number, // Page x coordinate of the menu's upper left corner
+        y: PropTypes.number, // Page y coordinate of the menu's upper left corner
+
+        /**
+         * List of tracks to manage.  Only changes selected tracks, but it accepts unselected ones as to preserve track
+         * positions in the onTracksChanged callback.
+         */
         allTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
+
+        /**
+         * Called when the menu has configured one or more tracks of allTracks.
+         *     Signature: (nextTracks: TrackModel[]): void
+         *         `nextTracks` - array of TrackModel derived from the `allTracks` prop
+         */
         onTracksChanged: PropTypes.func,
-        onClose: PropTypes.func,
+        onClose: PropTypes.func, // Called when the menu would like to close.  Signature: (event: MouseEvent): void
     };
 
     static defaultProps = {
@@ -104,7 +100,7 @@ class ContextMenu extends React.PureComponent {
         return (
         <PrecisePopover x={x} y={y} onClose={onClose} >
             <div className="ContextMenu-body">
-                <MenuTitle selectedTracks={selectedTracks} />
+                <MenuTitle tracks={selectedTracks} />
                 <SetLabelItem tracks={selectedTracks} onChange={this.changeSelectedTracks} />
                 {this.renderTrackSpecificItems(selectedTracks)}
                 <RemoveItem numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
@@ -112,6 +108,33 @@ class ContextMenu extends React.PureComponent {
         </PrecisePopover>
         );
     }
+}
+
+/**
+ * Title for the context menu.
+ * 
+ * @param {Object} props - props as specified by React.
+ * @return {JSX.Element} element to render
+ */
+function MenuTitle(props) {
+    const text = props.tracks.length === 1 ? props.tracks[0].name : `${props.tracks.length} tracks selected`;
+    return <div style={{paddingLeft: 5, fontWeight: 'bold'}} >{text}</div>;
+}
+
+/**
+ * A menu item that displays an option for track removal.  Note that the props for this item do not follow the schema
+ * for other menu items.
+ * 
+ * @param {Object} props - props as specified by React.
+ * @return {JSX.Element} element to render
+ */
+function RemoveItem(props) {
+    return (
+    <div onClick={props.onClick} className="ContextMenu-item ContextMenu-hoverable-item-danger" >
+        {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}
+        ❌ {props.numTracks === 1 ? "Remove" : `Remove ${props.numTracks} tracks`}
+    </div>
+    );
 }
 
 export default ContextMenu;

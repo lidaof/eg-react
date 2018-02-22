@@ -174,7 +174,7 @@ export class Track extends React.PureComponent {
      * @override
      */
     render() {
-        const {trackModel, width, xOffset, onContextMenu} = this.props;
+        const {trackModel, width, xOffset, onContextMenu, onClick} = this.props;
         const data = this.state.data;
         const trackSubtype = trackModel.getRenderConfig();
         const Legend = trackSubtype.legend || TrackLegend; // Default to TrackLegend if there is none specified.
@@ -188,7 +188,12 @@ export class Track extends React.PureComponent {
         };
 
         return (
-        <div style={style} className={trackModel.isSelected ? "Track-selected-border" : undefined} onContextMenu={onContextMenu} >
+        <div
+            style={style}
+            className={trackModel.isSelected ? "Track-selected-border" : undefined}
+            onContextMenu={onContextMenu}
+            onClick={onClick}
+        >
             {this.state.isLoading ? <TrackLoadingNotice /> : null}
             <Legend trackModel={trackModel} data={data} />
             <WideDiv
