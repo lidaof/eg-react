@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { ANNOTATION_HEIGHT, GeneAnnotation } from './GeneAnnotation';
 import SvgJsManaged from '../../SvgJsManaged';
 
-import Gene from '../../../model/Gene';
+import Gene from '../../../model/refGene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 
 const DEFAULT_MAX_ROWS = 7;

@@ -2,20 +2,13 @@ import React from 'react';
 import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import _ from 'lodash';
+import axios from 'axios';
 
 /**
  * A data container for gene annotations originating from hammock files.
  * 
- * @author Daofeng Li, modified from Silas's Gene component
+ * @author Daofeng Li, modified from Silas Hsu's Gene component
  */
-
-export class RefGeneRecord extends React.Component {
-    constructor(record){
-        super();
-        this.record = record;
-    }
-}
-
 
 export class Gene extends Feature {
     /**
@@ -40,13 +33,13 @@ export class Gene extends Feature {
         "cdsEndStat": "unk",
         "exonFrames": "-1,-1,-1,"
     }
-     * @param {RefGeneRecord} record - BedRecord-like object to use
+     * @param {RefGeneRecord} record - refGeneRecod object to use
      * @param {NavigationContext} navContext - used to calculate absolute coordinates
      * @param {FeatureInterval} featureInterval - a feature which overlaps this 
      */
     constructor(refGeneRecord, navContext, featureInterval) {
         
-        const location = new ChromosomeInterval(refGeneRecord.chr, refGeneRecord.txStart, refGeneRecord.txEnd);
+        const location = new ChromosomeInterval(refGeneRecord.chrom, refGeneRecord.txStart, refGeneRecord.txEnd);
         super(null, location);
 
         const absInterval = navContext.convertGenomeIntervalToBases(featureInterval, location);
@@ -58,6 +51,7 @@ export class Gene extends Feature {
         this._navContext = navContext;
         this._featureInterval = featureInterval;
         this.refGeneRecord = refGeneRecord;
+        this._details = this.getDetails();
     }
 
     /**
@@ -65,6 +59,16 @@ export class Gene extends Feature {
      */
     getName() {
         return this.refGeneRecord.name2 || this.refGeneRecord.name || "";
+    }
+
+    async _getDescription(){
+        return await axios.get(`/hg19/refseqDesc/${this.refGeneRecord.name}`);
+        // console.log(response.data[0].description);
+        // return response.data[0].description || "";
+    }
+
+    getDescription(){
+        return this._getDescription().then(response => response.data[0].description) || "" ;
     }
 
     /**
@@ -92,7 +96,7 @@ export class Gene extends Feature {
                 tmp.push([pos, exonEndList[idx]]);
             }
             details['thin'] = tmp;
-            return details;
+            //how to skip the next for loop?
         }
         const thick = [], thin = [];
         for (const [idx, pos] of exonStartList){
@@ -126,34 +130,26 @@ export class Gene extends Feature {
         }
         if (thick.length > 0){
             details['thick'] = thick;
+        }        
+        // Set details.absExons
+        details.absExons = [];
+        for (let exon of details.thick) {
+            const exonLocation = new ChromosomeInterval(this.getLocus().chr, ...exon);
+            const exonInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, exonLocation);
+            if (exonInterval) {
+                details.absExons.push(exonInterval)
+            }
+        }
+        // Set details.absUtrs
+        details.absUtrs = [];
+        for (let utr of details.thin) {
+            const utrLocation = new ChromosomeInterval(this.getLocus().chr, ...utr);
+            const utrInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, utrLocation);
+            if (utrInterval) {
+                details.absUtrs.push(utrInterval)
+            }
         }
         return details;
-        if (!this._details) {
-            const details = this._details;
-
-            // Set details.exons
-            details.struct = details.struct || {};
-            if (details.struct.thin !== undefined) {
-                details.exons = details.struct.thin;
-            } else if (details.struct.thick !== undefined) {
-                details.exons = details.struct.thick;
-            } else {
-                details.exons = [];
-            }
-
-            // Set details.absExons
-            details.absExons = [];
-            for (let exon of details.exons) {
-                const exonLocation = new ChromosomeInterval(this.getLocus().chr, ...exon);
-                const exonInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, exonLocation);
-                if (exonInterval) {
-                    details.absExons.push(exonInterval)
-                }
-            }
-
-            this._details = details;
-        }
-        return this._details;
     }
 }
 
@@ -164,10 +160,10 @@ export class Gene extends Feature {
  */
 export class GeneFormatter {
     /**
-     * Turns BedRecords into Genes.  The second and third parameters exist to assist mapping to a navigation context.
+     * Turns dbRecords into Genes.  The second and third parameters exist to assist mapping to a navigation context.
      * Genes that fail mapping will be ignored and skipped.
      * 
-     * @param {BedRecord[]} refGeneRecords - the records to convert
+     * @param {refGeneRecords[]} refGeneRecords - the records to convert
      * @param {DisplayedRegionModel} region - object containing navigation context and view region
      * @param {FeatureInterval} feature - feature in navigation context to map to
      * @return {Gene[]} array of Gene

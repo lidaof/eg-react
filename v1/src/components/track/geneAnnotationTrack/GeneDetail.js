@@ -17,7 +17,9 @@ class GeneDetail extends React.Component {
     };
 
     render() {
-        return <div style={STYLE} >{this.props.gene.getName()}</div>;
+        return <div style={STYLE} >{this.props.gene.getName()}
+            <div>{this.props.gene.getDescription()}</div>
+        </div>;
     }
 }
 

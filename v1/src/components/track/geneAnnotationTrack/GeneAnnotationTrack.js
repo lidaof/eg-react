@@ -5,9 +5,10 @@ import GeneDetail from './GeneDetail';
 import { VISUALIZER_PROP_TYPES } from '../Track';
 import TrackLegend from '../TrackLegend';
 
-import { GeneFormatter } from '../../../model/Gene';
+import { GeneFormatter } from '../../../model/refGene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
-import BedSource from '../../../dataSources/BedSource';
+//import BedSource from '../../../dataSources/BedSource';
+import MongoSource from '../../../dataSources/MongoSource';
 
 const HEIGHT = 105;
 
@@ -50,7 +51,8 @@ class GeneAnnotationVisualizer extends React.PureComponent {
 }
 
 const GeneAnnotationTrack = {
-    getDataSource: (trackModel) => new BedSource(trackModel.url, new GeneFormatter()),
+    //getDataSource: (trackModel) => new BedSource(trackModel.url, new GeneFormatter()),
+    getDataSource: (trackModel) => new MongoSource(new GeneFormatter()),
     visualizer: GeneAnnotationVisualizer
 };
 

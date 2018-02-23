@@ -4,6 +4,7 @@ import SVG from 'svg.js';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 
 export const ANNOTATION_HEIGHT = 8;
+export const UTR_HEIGHT = 6;
 export const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;
 
 const ARROW_WIDTH = 5;
@@ -16,7 +17,7 @@ const LABEL_BACKGROUND_PADDING = 2;
 /**
  * A single annotation for the gene annotation track.
  * 
- * @author Silas Hsu
+ * @author Silas Hsu and Daofeng Li
  */
 export class GeneAnnotation extends React.Component {
     static propTypes = {
@@ -59,6 +60,19 @@ export class GeneAnnotation extends React.Component {
             color: COLOR,
             width: 2
         });
+
+        // UTRs
+        // someComponent.clipWith(exonClip) will make it show up only where the exons are.
+        // let utrClip = svgJs.clip();
+        // for (let utr of details.absUtrs) {
+        //     let utrBox = svgJs.rect(drawModel.basesToXWidth(utr.end - utr.start), UTR_HEIGHT);
+        //     utrBox.attr({
+        //         x: drawModel.baseToX(utr.start),
+        //         y: 0,
+        //         fill: COLOR
+        //     });
+        //     utrClip.add(utrBox.clone());
+        // }
 
         // Exons
         // someComponent.clipWith(exonClip) will make it show up only where the exons are.
