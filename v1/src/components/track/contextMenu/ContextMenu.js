@@ -8,14 +8,25 @@ import PrecisePopover from '../PrecisePopover';
 
 import './ContextMenu.css';
 
+/**
+ * Props that menu items will recieve.
+ */
 export const ITEM_PROP_TYPES = {
+    /**
+     * Tracks to consider when rendering info that the menu item displays
+     */
     tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
+
+    /**
+     * Callback for when the item requests a change.  Signature: (mutate: TrackMutator): void
+     *     TrackMutator is defined at the bottom of this file.
+     */
     onChange: PropTypes.func
 };
 
 export const ITEM_DEFAULT_PROPS = {
     tracks: [],
-    onChange: () => undefined
+    onChange: (mutate) => undefined
 };
 
 /**
@@ -54,6 +65,12 @@ class ContextMenu extends React.PureComponent {
         this.removeSelectedTracks = this.removeSelectedTracks.bind(this);
     }
 
+    /**
+     * Renders menu items that are specific to the types of the currently selected tracks.  Does an intersection so only
+     * items that all of the selected tracks share get rendered.
+     * 
+     * @param {Track[]} selectedTracks - selected tracks; tracks that menu items should consider
+     */
     renderTrackSpecificItems(selectedTracks) {
         let menuComponents = []; // Array of arrays, one for each track
         for (let trackModel of selectedTracks) {
@@ -72,6 +89,12 @@ class ContextMenu extends React.PureComponent {
         );
     }
 
+    /**
+     * A callback for when menu items are changed.  Menu items changes via a mutator function, which mutate a
+     * TrackModel.  This method does the copy-and-mutate and passes the changed tracks to the parent element.
+     * 
+     * @param {TrackMutator} mutate - function that mutates TrackModels
+     */
     changeSelectedTracks(mutate) {
         const nextTracks = this.props.allTracks.map(track => {
             if (track.isSelected) {
@@ -85,11 +108,17 @@ class ContextMenu extends React.PureComponent {
         this.props.onTracksChanged(nextTracks);
     }
 
+    /**
+     * Requests a removal of all selected tracks.
+     */
     removeSelectedTracks() {
         const unselectedTracks = this.props.allTracks.filter(track => !track.isSelected);
         this.props.onTracksChanged(unselectedTracks);
     }
 
+    /** 
+     * @inheritdoc
+     */
     render() {
         const {x, y, allTracks, onClose} = this.props;
         const selectedTracks = allTracks.filter(track => track.isSelected);
@@ -136,5 +165,13 @@ function RemoveItem(props) {
     </div>
     );
 }
+
+/**
+ * Mutates a TrackModel.
+ * 
+ * @callback TrackMutator
+ * @param {TrackModel} track - the track model to mutate
+ * @return {void} the return value is unused
+ */
 
 export default ContextMenu;

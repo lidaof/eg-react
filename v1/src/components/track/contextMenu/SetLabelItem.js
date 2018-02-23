@@ -5,6 +5,11 @@ import './ContextMenu.css';
 
 const MULTI_VALUE_PLACEHOLDER = "[multiple values]";
 
+/**
+ * Context menu item for setting track labels.
+ * 
+ * @author Silas Hsu
+ */
 class SetLabelItem extends React.PureComponent {
     static propTypes = ITEM_PROP_TYPES;
     static defaultProps = ITEM_DEFAULT_PROPS;
@@ -18,32 +23,49 @@ class SetLabelItem extends React.PureComponent {
         this.setButtonPressed = this.setButtonPressed.bind(this);
     }
 
+    /**
+     * Gets a string that represents the labels of all the tracks.
+     * 
+     * @param {Object} props - props as specified by React; contains track objects
+     * @return {string} - string that represents the labels of all the tracks
+     */
     initInputValue(props) {
         const tracks = props.tracks;
         if (tracks.length === 0) {
             return "";
-        } else if (tracks.length === 1) {
-            return tracks[0].name;
+        } 
+
+        const firstName = tracks[0].name;
+        if (tracks.every(trackModel => trackModel.name === firstName)) {
+            return firstName;
         } else {
-            const firstName = tracks[0].name;
-            if (tracks.every(trackModel => trackModel.name === firstName)) {
-                return firstName;
-            } else {
-                return MULTI_VALUE_PLACEHOLDER;
-            }
+            return MULTI_VALUE_PLACEHOLDER;
         }
     }
 
+    /**
+     * If the tracks have changed, re-initalize the input field
+     * 
+     * @param {Object} nextProps - next props as specified by React
+     */
     componentWillReceiveProps(nextProps) {
         if (this.props.tracks !== nextProps.tracks) {
             this.setState({inputValue: this.initInputValue(nextProps)});
         }
     }
 
+    /**
+     * Sets state to the input's value, as this is a controlled component
+     * 
+     * @param {Event} event - change event
+     */
     inputChanged(event) {
         this.setState({inputValue: event.target.value});
     }
 
+    /**
+     * Requests a change in track labels.
+     */
     setButtonPressed() {
         const mutator = trackModel => trackModel.name = this.state.inputValue;
         this.props.onChange(mutator);

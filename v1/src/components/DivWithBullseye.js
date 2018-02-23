@@ -2,6 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { getRelativeCoordinates } from '../util';
 
+/**
+ * Like a <div> in every way, except it has "bullseye", dotted lines that track where the mouse is.
+ * 
+ * @author Silas Hsu
+ */
 class DivWithBullseye extends React.Component {
     static propTypes = {
         innerRef: PropTypes.func, // Ref to the div
@@ -41,6 +46,9 @@ class DivWithBullseye extends React.Component {
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     render() {
         const {innerRef, onMouseMove, onMouseLeave, style, children, ...otherProps} = this.props;
         // Default `position: relative` so the bullseye looks right
@@ -60,6 +68,12 @@ class DivWithBullseye extends React.Component {
     }
 }
 
+/**
+ * The actual intersecting lines that form the bullseye.  Uses prop `where`, an object with props `x` and `y`.
+ * 
+ * @param {Object} props - props as specified by React
+ * @return {JSX.Element} - element to render
+ */
 function Bullseye(props) {
     const {x, y} = props.where;
     const horizontalLineStyle = {

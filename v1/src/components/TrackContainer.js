@@ -27,7 +27,7 @@ toolButtonContent[tools.ZOOM] = "🔍";
 toolButtonContent[tools.REORDER] = "🔀";
 
 /**
- * Container for holding all the tracks.
+ * Container for holding all the tracks, and an avenue for manipulating state common to all tracks.
  * 
  * @author Silas Hsu
  */
@@ -83,14 +83,26 @@ class TrackContainer extends React.Component {
         this.props.onTracksChanged(newOrder);
     }
 
+    /**
+     * If the control key is held, toggles the selection of a track.
+     * 
+     * @param {MouseEvent} event - click event
+     * @param {number} index - index of the track for which to toggle selection
+     */
     trackClicked(event, index) {
-        if (event.button === MouseButtons.LEFT && event.ctrlKey) { // Toggle selection of one track
+        if (event.button === MouseButtons.LEFT && event.ctrlKey) {
             const nextTracks = this.props.tracks.slice();
             this.toggleOneTrack(nextTracks, index);
             this.props.onTracksChanged(nextTracks);
         }
     }
 
+    /**
+     * Sets state to render a track context menu, and selects the track that was clicked if it was not already selected.
+     * 
+     * @param {MouseEvent} event - context menu mouse event
+     * @param {number} index - index of the track where the click event originated
+     */
     openContextMenu(event, index) {
         event.preventDefault();
         if (event.button === MouseButtons.LEFT) {
@@ -110,6 +122,12 @@ class TrackContainer extends React.Component {
         }
     }
 
+    /**
+     * Sets state to stop rendering the track context menu, assuming the click happened outside the track container.
+     * Also may deselect tracks.
+     * 
+     * @param {MouseEvent} event - click event
+     */
     closeContextMenu(event) {
         if (this.trackDiv.contains(event.target) && event.ctrlKey) { // Click inside the track div and ctrl held
             // Assume user is selecting multiple tracks; don't close.
@@ -122,6 +140,9 @@ class TrackContainer extends React.Component {
         }
     }
 
+    /**
+     * @return {TrackModel[]} copy of this.props.tracks where all tracks are deselected.
+     */
     deselectAllTracks() {
         return this.props.tracks.map(track => {
             if (track.isSelected) {
@@ -134,15 +155,19 @@ class TrackContainer extends React.Component {
         });
     }
 
+    /**
+     * Copies and mutates an element of `tracks` so its selection is toggled.
+     * 
+     * @param {TrackModel[]} tracks - array of TrackModel to modify
+     * @param {number} index - index of track to clone and mutate
+     */
     toggleOneTrack(tracks, index) {
         tracks[index] = tracks[index].clone();
         tracks[index].isSelected = !tracks[index].isSelected;
     }
 
     /**
-     * Makes the buttons that select the tool to use
-     * 
-     * @return {JSX.Element[]} buttons to render
+     * @return {JSX.Element[]} buttons that select the tool to use
      */
     renderToolSelectButtons() {
         let buttons = [];
@@ -181,6 +206,11 @@ class TrackContainer extends React.Component {
         ));
     }
 
+    /**
+     * Renders a subtype of TrackContainer that provides specialized track manipulation, depending on the selected tool.
+     * 
+     * @return {JSX.Element} - subcontainer that renders tracks
+     */
     renderSubContainer() {
         const {viewRegion, onNewRegion} = this.props;
         const trackElements = this.makeTrackElements();
@@ -214,6 +244,9 @@ class TrackContainer extends React.Component {
         }
     }
 
+    /**
+     * @return {JSX.Element | null} context menu element, if appropriate state has been set
+     */
     renderContextMenu() {
         const {tracks, onTracksChanged} = this.props;
         const contextMenuEvent = this.state.contextMenuEvent;
