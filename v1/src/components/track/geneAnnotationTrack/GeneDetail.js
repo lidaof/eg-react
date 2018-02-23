@@ -27,8 +27,9 @@ class GeneDetail extends React.Component {
     }
 
     render() {
-        return <div style={STYLE} >{this.props.gene.getName()}
-            <div>{this.state.description || "(no data)"}</div>
+        return <div style={STYLE} >
+            {this.props.gene.getName()}
+            <div>{this.state.description || ""}</div>
         </div>;
     }
 }
