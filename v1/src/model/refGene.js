@@ -60,15 +60,16 @@ export class Gene extends Feature {
     getName() {
         return this.refGeneRecord.name2 || this.refGeneRecord.name || "";
     }
-
+/*
     async _getDescription(){
-        return await axios.get(`/hg19/refseqDesc/${this.refGeneRecord.name}`);
+        return await 
         // console.log(response.data[0].description);
         // return response.data[0].description || "";
     }
-
-    getDescription(){
-        return this._getDescription().then(response => response.data[0].description) || "" ;
+*/
+    async getDescription(){
+        const response = await axios.get(`/hg19/refseqDesc/${this.refGeneRecord.name}`);
+        return response.data[0] ? response.data[0].description : "";
     }
 
     /**
@@ -130,7 +131,8 @@ export class Gene extends Feature {
         }
         if (thick.length > 0){
             details['thick'] = thick;
-        }        
+        }
+        console.log(details);
         // Set details.absExons
         details.absExons = [];
         for (let exon of details.thick) {
@@ -144,6 +146,7 @@ export class Gene extends Feature {
         details.absUtrs = [];
         for (let utr of details.thin) {
             const utrLocation = new ChromosomeInterval(this.getLocus().chr, ...utr);
+            console.log(utrLocation.toString());
             const utrInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, utrLocation);
             if (utrInterval) {
                 details.absUtrs.push(utrInterval)

@@ -16,9 +16,19 @@ class GeneDetail extends React.Component {
         gene: PropTypes.object.isRequired, // The Gene object for which to display info
     };
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            description: "Loading..."
+        };
+        props.gene.getDescription().then(
+            description => this.setState({description: description})
+        );
+    }
+
     render() {
         return <div style={STYLE} >{this.props.gene.getName()}
-            <div>{this.props.gene.getDescription()}</div>
+            <div>{this.state.description || "(no data)"}</div>
         </div>;
     }
 }

@@ -63,16 +63,14 @@ export class GeneAnnotation extends React.Component {
 
         // UTRs
         // someComponent.clipWith(exonClip) will make it show up only where the exons are.
-        // let utrClip = svgJs.clip();
-        // for (let utr of details.absUtrs) {
-        //     let utrBox = svgJs.rect(drawModel.basesToXWidth(utr.end - utr.start), UTR_HEIGHT);
-        //     utrBox.attr({
-        //         x: drawModel.baseToX(utr.start),
-        //         y: 0,
-        //         fill: COLOR
-        //     });
-        //     utrClip.add(utrBox.clone());
-        // }
+        for (let utr of details.absUtrs) {
+            let utrBox = svgJs.rect(drawModel.basesToXWidth(utr.end - utr.start), UTR_HEIGHT);
+            utrBox.attr({
+                x: drawModel.baseToX(utr.start),
+                y: 0,
+                fill: COLOR
+            });
+        }
 
         // Exons
         // someComponent.clipWith(exonClip) will make it show up only where the exons are.
