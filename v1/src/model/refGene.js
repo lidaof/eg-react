@@ -1,4 +1,3 @@
-import React from 'react';
 import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import _ from 'lodash';
@@ -60,13 +59,10 @@ export class Gene extends Feature {
     getName() {
         return this.refGeneRecord.name2 || this.refGeneRecord.name || "";
     }
-/*
-    async _getDescription(){
-        return await 
-        // console.log(response.data[0].description);
-        // return response.data[0].description || "";
-    }
-*/
+
+    /**
+     * async function to get gene description by calling the API
+     */
     async getDescription(){
         const response = await axios.get(`/hg19/refseqDesc/${this.refGeneRecord.name}`);
         return response.data[0] ? response.data[0].description : "";
@@ -89,19 +85,19 @@ export class Gene extends Feature {
     getDetails() {
         const details = {};
         const {cdsStart, cdsEnd, exonStarts, exonEnds} = this.refGeneRecord;
-        const exonStartList = _.trim(exonStarts,',').split(',');
-        const exonEndList = _.trim(exonEnds,',').split(',');
+        const exonStartList = _.trim(exonStarts,',').split(',').map(n => Number.parseInt(n, 10));
+        const exonEndList = _.trim(exonEnds,',').split(',').map(n => Number.parseInt(n, 10));
         if(cdsStart === cdsEnd){
             let tmp = [];
-            for (const [idx, pos] of exonStartList){
-                tmp.push([pos, exonEndList[idx]]);
+            for (const idx of exonStartList.keys()){
+                tmp.push([exonStartList[idx], exonEndList[idx]]);
             }
             details['thin'] = tmp;
             //how to skip the next for loop?
         }
         const thick = [], thin = [];
-        for (const [idx, pos] of exonStartList){
-            let start = pos, end = exonEndList[idx];
+        for (const idx of exonStartList.keys()){
+            let start = exonStartList[idx], end = exonEndList[idx];
             if (end <= cdsStart){
                 thin.push([start, end]);
             }else if(end <= cdsEnd){
@@ -132,7 +128,6 @@ export class Gene extends Feature {
         if (thick.length > 0){
             details['thick'] = thick;
         }
-        console.log(details);
         // Set details.absExons
         details.absExons = [];
         for (let exon of details.thick) {
@@ -146,7 +141,6 @@ export class Gene extends Feature {
         details.absUtrs = [];
         for (let utr of details.thin) {
             const utrLocation = new ChromosomeInterval(this.getLocus().chr, ...utr);
-            console.log(utrLocation.toString());
             const utrInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, utrLocation);
             if (utrInterval) {
                 details.absUtrs.push(utrInterval)

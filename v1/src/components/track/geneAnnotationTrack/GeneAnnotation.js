@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import SVG from 'svg.js';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 
-export const ANNOTATION_HEIGHT = 8;
-export const UTR_HEIGHT = 6;
+export const ANNOTATION_HEIGHT = 9;
+export const UTR_HEIGHT = 5;
 export const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;
 
 const ARROW_WIDTH = 5;
@@ -67,7 +67,7 @@ export class GeneAnnotation extends React.Component {
             let utrBox = svgJs.rect(drawModel.basesToXWidth(utr.end - utr.start), UTR_HEIGHT);
             utrBox.attr({
                 x: drawModel.baseToX(utr.start),
-                y: 0,
+                y: 2,
                 fill: COLOR
             });
         }
