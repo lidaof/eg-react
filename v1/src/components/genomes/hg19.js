@@ -30,8 +30,8 @@ const hg19Genome = new Genome("hg19", [
 ]);
 
 const hg19Context = hg19Genome.makeNavContext();
-//const defaultRegion = hg19Context.parse("chr7:27053397-27373765");
-const defaultRegion = hg19Context.parse("chr7:27144350-27167097"); //HOXA3
+const defaultRegion = hg19Context.parse("chr7:27053397-27373765");
+//const defaultRegion = hg19Context.parse("chr7:27144350-27167097"); //HOXA3
 
 const defaultTracks = [
     new TrackModel({

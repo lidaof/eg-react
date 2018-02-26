@@ -55,7 +55,8 @@ class AnnotationArranger extends React.Component {
      * @return {Gene[]} sorted genes
      */
     _sortGenes(genes) {
-        return genes.sort((gene1, gene2) => gene1.absStart - gene2.absStart);
+        //return genes.sort((gene1, gene2) => gene1.absStart - gene2.absStart);
+        return genes.sort((gene1, gene2) => gene2.length - gene1.length);
     }
 
     /**
@@ -100,7 +101,7 @@ class AnnotationArranger extends React.Component {
 
             children.push(
             <SvgJsManaged
-                key={gene.getDetails().id}
+                key={gene.id}
                 transform={`translate(0 ${y})`}
                 onClick={event => this.props.onGeneClick(event, gene)}
             >

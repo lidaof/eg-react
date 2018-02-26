@@ -51,6 +51,9 @@ export class Gene extends Feature {
         this._featureInterval = featureInterval;
         this.refGeneRecord = refGeneRecord;
         this._details = this.getDetails();
+        this.strand = this.refGeneRecord.strand;
+        this.id = this.refGeneRecord._id;
+        this.length = this.refGeneRecord.txEnd - this.refGeneRecord.txStart;
     }
 
     /**

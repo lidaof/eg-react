@@ -7,7 +7,7 @@ export const ANNOTATION_HEIGHT = 9;
 export const UTR_HEIGHT = 5;
 export const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;
 
-const ARROW_WIDTH = 5;
+const ARROW_WIDTH = 6;
 const ARROW_SEPARATION = 10;
 const COLOR = "blue";
 const IN_EXON_ARROW_COLOR = "white";
@@ -37,7 +37,7 @@ export class GeneAnnotation extends React.Component {
         const {svgJs, gene, isLabeled, drawModel, leftBoundary} = this.props;
         svgJs.clear();
 
-        const details = gene.getDetails();
+        const details = gene._details;
         const startX = drawModel.baseToX(gene.absStart);
         const endX = drawModel.baseToX(gene.absEnd);
         const centerY = ANNOTATION_HEIGHT / 2;
@@ -61,8 +61,9 @@ export class GeneAnnotation extends React.Component {
             width: 2
         });
 
+        let skipArrow = []; // regions skip drawing arrow - utrs
+        let whiteArrow = []; // regions draw white arrow - exons
         // UTRs
-        // someComponent.clipWith(exonClip) will make it show up only where the exons are.
         for (let utr of details.absUtrs) {
             let utrBox = svgJs.rect(drawModel.basesToXWidth(utr.end - utr.start), UTR_HEIGHT);
             utrBox.attr({
@@ -70,11 +71,12 @@ export class GeneAnnotation extends React.Component {
                 y: 2,
                 fill: COLOR
             });
+            skipArrow.push([drawModel.baseToX(utr.start), drawModel.baseToX(utr.end)]);
         }
 
         // Exons
         // someComponent.clipWith(exonClip) will make it show up only where the exons are.
-        let exonClip = svgJs.clip();
+        //let exonClip = svgJs.clip();
         for (let exon of details.absExons) {
             let exonBox = svgJs.rect(drawModel.basesToXWidth(exon.end - exon.start), ANNOTATION_HEIGHT);
             exonBox.attr({
@@ -82,31 +84,49 @@ export class GeneAnnotation extends React.Component {
                 y: 0,
                 fill: COLOR
             });
-            exonClip.add(exonBox.clone());
+            whiteArrow.push([drawModel.baseToX(exon.start), drawModel.baseToX(exon.end)]);
+            //exonClip.add(exonBox.clone());
         }
-
+        //arrows should not draw outside of gene range
+        const arrowStartX = gene.strand === "+" ? startX + ARROW_WIDTH : startX;
+        const arrowEndX = gene.strand === "+" ? endX : endX - ARROW_WIDTH;
         // Arrows
-        for (let x = startX; x <= endX; x += ARROW_SEPARATION) {
-            let arrowTipX = details.strand === "+" ?
+        for (let x = arrowStartX; x <= arrowEndX; x += ARROW_SEPARATION) {
+            let stokeColor = COLOR, inUTR = false, inExon=false;
+            for (const region of skipArrow){
+                if (x >= region[0] && x <= region[1]){
+                    inUTR = true;
+                    break;
+                }
+            }
+            for (const region of whiteArrow){
+                if(x >= region[0] && x <= region[1]){
+                    inExon = true;
+                    break;
+                }
+            }
+            if (inUTR) { continue; }
+            if (inExon){ stokeColor = IN_EXON_ARROW_COLOR; }
+            let arrowTipX = gene.strand === "+" ?
                 x - ARROW_WIDTH : // Point to the right
                 x + ARROW_WIDTH; // Point to the left
             let arrowPoints = [
-                [arrowTipX, 0],
+                [arrowTipX, 0+1],
                 [x, centerY],
-                [arrowTipX, bottomY]
+                [arrowTipX, bottomY-1]
             ]
 
             // Each arrow is duplicated, but the second set will only draw inside exons.
             svgJs.polyline(arrowPoints).attr({
                 fill: "none",
-                stroke: COLOR,
+                stroke: stokeColor,
                 "stroke-width": 1
             });
-            svgJs.polyline(arrowPoints).attr({
-                fill: "none",
-                stroke: IN_EXON_ARROW_COLOR,
-                "stroke-width": 1
-            }).clipWith(exonClip); // <-- Note the .clipWith()
+            // svgJs.polyline(arrowPoints).attr({
+            //     fill: "none",
+            //     stroke: IN_EXON_ARROW_COLOR,
+            //     "stroke-width": 1
+            // }).clipWith(exonClip); // <-- Note the .clipWith()
         }
 
         // Label
@@ -125,7 +145,7 @@ export class GeneAnnotation extends React.Component {
                 opacity: 0.65,
             });
         } else {
-            labelX = (details.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
+            labelX = (gene.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
             textAnchor = "end";
         }
 
