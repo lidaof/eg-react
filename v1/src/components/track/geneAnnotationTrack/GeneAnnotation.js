@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import SVG from 'svg.js';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
+import GeneDetail from './GeneDetail';
 
 export const ANNOTATION_HEIGHT = 9;
 export const UTR_HEIGHT = 5;
@@ -13,6 +14,24 @@ const COLOR = "blue";
 const IN_EXON_ARROW_COLOR = "white";
 
 const LABEL_BACKGROUND_PADDING = 2;
+
+/*
+const viewRegion = new DisplayedRegionModel(new NavigationContext([myGene]));
+
+class StandaloneGeneAnnotation {
+    static propTypes = {
+        gene: Gene,
+        width: number,
+        viewRegion: 
+    }
+    render() {
+        const drawModel = new DisplayedRegionModel(new NavigationContext([gene]));
+        return <svg>
+        <SvgJsManaged><GeneAnnotation gene={gene} isLabeled={true} drawModel={drawModel} leftBoundary={-Infinity} /></SvgJsManaged>
+        </svg>
+    }
+}
+*/
 
 /**
  * A single annotation for the gene annotation track.
@@ -34,7 +53,7 @@ export class GeneAnnotation extends React.Component {
      * @override
      */
     render() {
-        const {svgJs, gene, isLabeled, drawModel, leftBoundary} = this.props;
+        const {svgJs, gene, isLabeled, drawModel, leftBoundary, rightBoundary} = this.props;
         svgJs.clear();
 
         const details = gene._details;
@@ -42,6 +61,7 @@ export class GeneAnnotation extends React.Component {
         const endX = drawModel.baseToX(gene.absEnd);
         const centerY = ANNOTATION_HEIGHT / 2;
         const bottomY = ANNOTATION_HEIGHT;
+        //console.log(`${gene.getName()}: ${startX} - ${endX}`);
 
         // Box that covers the whole annotation to increase the click area
         let coveringBox = svgJs.rect(endX - startX, ANNOTATION_HEIGHT).attr({
@@ -131,21 +151,29 @@ export class GeneAnnotation extends React.Component {
 
         // Label
         let labelX, textAnchor;
+        console.log(leftBoundary);
+        console.log(rightBoundary);
         // Label width is approx. because calculating bounding boxes is expensive.
         let estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
         if (startX - estimatedLabelWidth < leftBoundary && leftBoundary < endX ) {
-            // It's going to go off the screen; we need to move the label
-            labelX = leftBoundary;
-            textAnchor = "start";
-            // Add highlighting, as the label will overlap the other stuff
-            svgJs.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, ANNOTATION_HEIGHT).attr({
-                x: leftBoundary - LABEL_BACKGROUND_PADDING,
-                y: 0,
-                fill: "white",
-                opacity: 0.65,
-            });
+            if (endX + estimatedLabelWidth + 2 < rightBoundary){
+                labelX = endX + estimatedLabelWidth + 2;
+                textAnchor = "end";
+            } else {
+                // It's going to go off the screen; we need to move the label
+                labelX = leftBoundary;
+                textAnchor = "start";
+                // Add highlighting, as the label will overlap the other stuff
+                svgJs.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, ANNOTATION_HEIGHT).attr({
+                    x: leftBoundary - LABEL_BACKGROUND_PADDING,
+                    y: 0,
+                    fill: "white",
+                    opacity: 0.65,
+                });
+            }           
         } else {
-            labelX = (gene.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
+            //labelX = (gene.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
+            labelX = startX - 1;
             textAnchor = "end";
         }
 

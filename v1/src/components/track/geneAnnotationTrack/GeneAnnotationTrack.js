@@ -44,6 +44,8 @@ class GeneAnnotationVisualizer extends React.PureComponent {
                 data={this.props.data}
                 drawModel={drawModel}
                 onGeneClick={this.geneClicked}
+                leftBoundary={this.props.leftBoundary}
+                rightBoundary={this.props.rightBoundary}
             />
         </svg>
         );

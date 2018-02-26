@@ -20,6 +20,8 @@ class AnnotationArranger extends React.Component {
     static propTypes = {
         data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)), // Array of Gene objects
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Draw model to use
+        leftBoundary: PropTypes.number,
+        rightBoundary: PropTypes.number,
         maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
 
         /**
@@ -50,13 +52,21 @@ class AnnotationArranger extends React.Component {
 
     /**
      * Sorts genes by start position in the genome, from lowest to highest.
-     * 
+     * If same start position, plot longer gene first
      * @param {Gene[]} genes - array of Gene to sort
      * @return {Gene[]} sorted genes
      */
     _sortGenes(genes) {
         //return genes.sort((gene1, gene2) => gene1.absStart - gene2.absStart);
-        return genes.sort((gene1, gene2) => gene2.length - gene1.length);
+        //return genes.sort((gene1, gene2) => gene2.length - gene1.length);
+        return genes.sort((gene1, gene2) => {
+            const absStartComparison = gene1.absStart - gene2.absStart;
+            if (absStartComparison === 0) {
+                return gene2.length - gene1.length;
+            } else {
+                return absStartComparison;
+            }
+        })
     }
 
     /**
@@ -65,9 +75,9 @@ class AnnotationArranger extends React.Component {
      * @override
      */
     render() {
-        const {data, drawModel, maxRows} = this.props;
+        const {data, drawModel, leftBoundary, rightBoundary, maxRows} = this.props;
         let children = [];
-        let maxXsForRows = new Array(maxRows).fill(0);
+        let maxXsForRows = new Array(maxRows).fill(-Infinity);
         const genes = this._sortGenes(data);
         let numHiddenGenes = 0;
         for (let gene of genes) {
@@ -95,7 +105,7 @@ class AnnotationArranger extends React.Component {
                 numHiddenGenes++;
             } else {
                 isLabeled = true;
-                maxXsForRows[row] = endX + ANNOTATION_RIGHT_PADDING;
+                maxXsForRows[row] = endX + ANNOTATION_RIGHT_PADDING + labelWidth + 2;
             }
             const y = row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING);
 
@@ -109,7 +119,8 @@ class AnnotationArranger extends React.Component {
                     gene={gene}
                     isLabeled={isLabeled}
                     drawModel={drawModel}
-                    leftBoundary={0}
+                    leftBoundary={leftBoundary}
+                    rightBoundary={rightBoundary}
                 />
             </SvgJsManaged>
             );

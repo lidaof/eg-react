@@ -41,6 +41,7 @@ export const VISUALIZER_PROP_TYPES = {
     data: PropTypes.array,
     viewRegion: PropTypes.instanceOf(DisplayedRegionModel),
     width: PropTypes.number,
+    leftBoundary: PropTypes.number,
     trackModel: PropTypes.instanceOf(TrackModel),
 
     /**
@@ -269,6 +270,8 @@ export class Track extends React.PureComponent {
                     data={data}
                     viewRegion={this.viewExpansion.expandedRegion}
                     width={this.viewExpansion.expandedWidth}
+                    leftBoundary={this.viewExpansion.leftExtraPixels}
+                    rightBoundary={this.viewExpansion.expandedWidth - this.viewExpansion.rightExtraPixels}
                     trackModel={trackModel}
                     onTooltip={this.handleTooltip}
                 />

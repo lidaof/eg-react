@@ -133,22 +133,28 @@ export class Gene extends Feature {
         }
         // Set details.absExons
         details.absExons = [];
-        for (let exon of details.thick) {
-            const exonLocation = new ChromosomeInterval(this.getLocus().chr, ...exon);
-            const exonInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, exonLocation);
-            if (exonInterval) {
-                details.absExons.push(exonInterval)
+        if (details.thick) {
+            for (let exon of details.thick) {
+                const exonLocation = new ChromosomeInterval(this.getLocus().chr, ...exon);
+                const exonInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, exonLocation);
+                if (exonInterval) {
+                    details.absExons.push(exonInterval)
+                }
             }
         }
+        
         // Set details.absUtrs
         details.absUtrs = [];
-        for (let utr of details.thin) {
-            const utrLocation = new ChromosomeInterval(this.getLocus().chr, ...utr);
-            const utrInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, utrLocation);
-            if (utrInterval) {
-                details.absUtrs.push(utrInterval)
+        if (details.thin) {
+            for (let utr of details.thin) {
+                const utrLocation = new ChromosomeInterval(this.getLocus().chr, ...utr);
+                const utrInterval = this._navContext.convertGenomeIntervalToBases(this._featureInterval, utrLocation);
+                if (utrInterval) {
+                    details.absUtrs.push(utrInterval)
+                }
             }
         }
+        
         return details;
     }
 }
@@ -174,7 +180,7 @@ export class GeneFormatter {
             try {
                 genes.push(new Gene(record, region.getNavigationContext(), feature));
             } catch (error) {
-
+                console.error(error);
             }
         }
         return genes;
