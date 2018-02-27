@@ -54,4 +54,4 @@ export const HG19 = {
     context: hg19Context,
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks
-}
+};

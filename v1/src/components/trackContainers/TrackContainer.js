@@ -1,22 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Track } from './track/Track';
-import TrackLegend from './track/TrackLegend';
-import TrackContextMenu from './track/contextMenu/TrackContextMenu';
-
 import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
 
-import OutsideClickDetector from './OutsideClickDetector';
-import ContextMenuManager from './ContextMenuManager';
-import DivWithBullseye from './DivWithBullseye';
+import { Track } from '../track/Track';
+import TrackLegend from '../track/TrackLegend';
+import TrackContextMenu from '../track/contextMenu/TrackContextMenu';
 
-import withAutoWidth from './withAutoWidth';
-import { MouseButtons } from '../util';
-import TrackModel from '../model/TrackModel';
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import OutsideClickDetector from '../OutsideClickDetector';
+import ContextMenuManager from '../ContextMenuManager';
+import DivWithBullseye from '../DivWithBullseye';
+
+import withAutoWidth from '../withAutoWidth';
+import { MouseButtons } from '../../util';
+import TrackModel from '../../model/TrackModel';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 const tools = {
     DRAG: 0,
@@ -226,7 +226,7 @@ class TrackContainer extends React.Component {
             case tools.REORDER:
                 return (
                     <ReorderableTrackContainer
-                        trackComponents={trackElements}
+                        trackElements={trackElements}
                         onTrackMoved={this.requestTrackReorder}
                     />
                 );
@@ -234,7 +234,7 @@ class TrackContainer extends React.Component {
                 return (
                     <ZoomableTrackContainer
                         legendWidth={TrackLegend.WIDTH}
-                        trackComponents={trackElements}
+                        trackElements={trackElements}
                         viewRegion={viewRegion}
                         onNewRegion={onNewRegion}
                     />
@@ -244,7 +244,7 @@ class TrackContainer extends React.Component {
                 return (
                     <DraggableTrackContainer
                         visualizationWidth={this.getVisualizationWidth()}
-                        trackComponents={trackElements}
+                        trackElements={trackElements}
                         viewRegion={viewRegion}
                         onNewRegion={onNewRegion}
                     />

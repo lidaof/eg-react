@@ -1,11 +1,11 @@
 import React from 'react';
 
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
-import TrackContainer from './components/TrackContainer';
+import TrackContainer from './components/trackContainers/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
 import RegionSetSelector from './components/RegionSetSelector';
 
-import { HG19 } from './components/genomes/hg19';
+import { HG19 } from './model/genomes/hg19';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 
 import './App.css';
@@ -16,7 +16,6 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // TODO set the selected region dynamically
             selectedRegion: new DisplayedRegionModel(HG19.context, ...HG19.defaultRegion),
             currentTracks: HG19.defaultTracks.slice(),
         };
