@@ -3,17 +3,20 @@ import PropTypes from 'prop-types';
 
 import { Track } from './track/Track';
 import TrackLegend from './track/TrackLegend';
+import TrackContextMenu from './track/contextMenu/TrackContextMenu';
 
 import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
+
+import OutsideClickDetector from './OutsideClickDetector';
+import ContextMenuManager from './ContextMenuManager';
 import DivWithBullseye from './DivWithBullseye';
 
 import withAutoWidth from './withAutoWidth';
 import { MouseButtons } from '../util';
 import TrackModel from '../model/TrackModel';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import ContextMenu from './track/contextMenu/ContextMenu';
 
 const tools = {
     DRAG: 0,
@@ -63,11 +66,11 @@ class TrackContainer extends React.Component {
             contextMenuEvent: null,
         };
 
-        this.trackDiv = null;
         this.requestTrackReorder = this.requestTrackReorder.bind(this);
         this.trackClicked = this.trackClicked.bind(this);
-        this.openContextMenu = this.openContextMenu.bind(this);
-        this.closeContextMenu = this.closeContextMenu.bind(this);
+        this.handleContextMenuEvent = this.handleContextMenuEvent.bind(this);
+        this.handleMenuCloseRequest = this.handleMenuCloseRequest.bind(this);
+        this.handleOutsideClick = this.handleOutsideClick.bind(this);
     }
 
     /**
@@ -103,17 +106,15 @@ class TrackContainer extends React.Component {
      * @param {MouseEvent} event - context menu mouse event
      * @param {number} index - index of the track where the click event originated
      */
-    openContextMenu(event, index) {
-        event.preventDefault();
-        if (event.button === MouseButtons.LEFT) {
+    handleContextMenuEvent(event, index) {
+        if (event.ctrlKey) {
+            // On Chrome and possibly other web browsers, ctrl-clicking is actually a context menu event.
+            event.preventDefault();
+            event.stopPropagation();
             this.trackClicked(event, index);
-            return;
-        } else if (event.ctrlKey) {
             return;
         }
 
-        event.persist();
-        this.setState({contextMenuEvent: event});
         // If the track is not selected, select it and deselect the others.
         if (!this.props.tracks[index].isSelected) {
             const nextTracks = this.deselectAllTracks();
@@ -123,20 +124,22 @@ class TrackContainer extends React.Component {
     }
 
     /**
-     * Sets state to stop rendering the track context menu, assuming the click happened outside the track container.
-     * Also may deselect tracks.
+     * Closes the context menu only if the control key is NOT held.
      * 
-     * @param {MouseEvent} event - click event
+     * @param {MouseEvent} event - click event to evaluate
      */
-    closeContextMenu(event) {
-        if (this.trackDiv.contains(event.target) && event.ctrlKey) { // Click inside the track div and ctrl held
-            // Assume user is selecting multiple tracks; don't close.
-            return;
-        }
+    handleMenuCloseRequest(event) {
+        return !event.ctrlKey;
+    }
 
-        this.setState({contextMenuEvent: null});
-        if (!this.trackDiv.contains(event.target)) { // Click outside the track div
-            this.props.onTracksChanged(this.deselectAllTracks());
+    /**
+     * Deselects all tracks on outside clicks.
+     * 
+     * @param {MouseEvent} event - click event to evaluate
+     */
+    handleOutsideClick(event) {
+        if (this.props.tracks.some(track => track.isSelected)) {
+            this.props.onTracksChanged(this.deselectAllTracks())
         }
     }
 
@@ -165,6 +168,11 @@ class TrackContainer extends React.Component {
         tracks[index] = tracks[index].clone();
         tracks[index].isSelected = !tracks[index].isSelected;
     }
+
+    // End callback methods
+    ////////////////////
+    // Render methods //
+    ////////////////////
 
     /**
      * @return {JSX.Element[]} buttons that select the tool to use
@@ -200,7 +208,7 @@ class TrackContainer extends React.Component {
                 trackModel={trackModel}
                 viewRegion={this.props.viewRegion}
                 width={this.getVisualizationWidth()}
-                onContextMenu={event => this.openContextMenu(event, index)}
+                onContextMenu={event => this.handleContextMenuEvent(event, index)}
                 onClick={event => this.trackClicked(event, index)}
             />
         ));
@@ -245,39 +253,24 @@ class TrackContainer extends React.Component {
     }
 
     /**
-     * @return {JSX.Element | null} context menu element, if appropriate state has been set
-     */
-    renderContextMenu() {
-        const {tracks, onTracksChanged} = this.props;
-        const contextMenuEvent = this.state.contextMenuEvent;
-        if (contextMenuEvent) {
-            return (
-                <ContextMenu
-                    x={contextMenuEvent.pageX}
-                    y={contextMenuEvent.pageY}
-                    allTracks={tracks}
-                    onTracksChanged={onTracksChanged}
-                    onClose={this.closeContextMenu}
-                />
-            );
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * @inheritdoc
      */
     render() {
+        const {tracks, onTracksChanged} = this.props;
+        const contextMenu = <TrackContextMenu allTracks={tracks} onTracksChanged={onTracksChanged} />;
+
         // paddingTop to counteract track's marginTop of -1
         const trackDivStyle = {border: "1px solid black", paddingTop: 1, cursor: "crosshair"};
         return (
         <div>
             {this.renderToolSelectButtons()}
-            <DivWithBullseye innerRef={node => this.trackDiv = node} style={trackDivStyle} >
-                {this.renderSubContainer()}
-            </DivWithBullseye>
-            {this.renderContextMenu()}
+            <OutsideClickDetector onOutsideClick={this.handleOutsideClick} >
+                <ContextMenuManager shouldMenuClose={this.handleMenuCloseRequest} menuElement={contextMenu} >
+                    <DivWithBullseye style={trackDivStyle} >
+                        {this.renderSubContainer()}
+                    </DivWithBullseye>
+                </ContextMenuManager>
+            </OutsideClickDetector>
         </div>
         );
     }

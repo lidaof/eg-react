@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import TrackModel from '../../../model/TrackModel';
-import SetLabelItem from './SetLabelItem';
-import PrecisePopover from '../PrecisePopover';
+import LabelItem from './LabelItem';
 
-import './ContextMenu.css';
+import './TrackContextMenu.css';
 
 /**
  * Props that menu items will recieve.
@@ -34,11 +33,8 @@ export const ITEM_DEFAULT_PROPS = {
  * 
  * @author Silas Hsu
  */
-class ContextMenu extends React.PureComponent {
+class TrackContextMenu extends React.PureComponent {
     static propTypes = {
-        x: PropTypes.number, // Page x coordinate of the menu's upper left corner
-        y: PropTypes.number, // Page y coordinate of the menu's upper left corner
-
         /**
          * List of tracks to manage.  Only changes selected tracks, but it accepts unselected ones as to preserve track
          * positions in the onTracksChanged callback.
@@ -51,7 +47,6 @@ class ContextMenu extends React.PureComponent {
          *         `nextTracks` - array of TrackModel derived from the `allTracks` prop
          */
         onTracksChanged: PropTypes.func,
-        onClose: PropTypes.func, // Called when the menu would like to close.  Signature: (event: MouseEvent): void
     };
 
     static defaultProps = {
@@ -120,21 +115,18 @@ class ContextMenu extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {x, y, allTracks, onClose} = this.props;
-        const selectedTracks = allTracks.filter(track => track.isSelected);
+        const selectedTracks = this.props.allTracks.filter(track => track.isSelected);
         if (selectedTracks.length === 0) {
             return null;
         }
 
         return (
-        <PrecisePopover x={x} y={y} onClose={onClose} >
-            <div className="ContextMenu-body">
-                <MenuTitle tracks={selectedTracks} />
-                <SetLabelItem tracks={selectedTracks} onChange={this.changeSelectedTracks} />
-                {this.renderTrackSpecificItems(selectedTracks)}
-                <RemoveItem numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
-            </div>
-        </PrecisePopover>
+        <div className="TrackContextMenu-body">
+            <MenuTitle tracks={selectedTracks} />
+            <LabelItem tracks={selectedTracks} onChange={this.changeSelectedTracks} />
+            {this.renderTrackSpecificItems(selectedTracks)}
+            <RemoveItem numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
+        </div>
         );
     }
 }
@@ -159,7 +151,7 @@ function MenuTitle(props) {
  */
 function RemoveItem(props) {
     return (
-    <div onClick={props.onClick} className="ContextMenu-item ContextMenu-hoverable-item-danger" >
+    <div onClick={props.onClick} className="TrackContextMenu-item TrackContextMenu-hoverable-item-danger" >
         {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}
         ❌ {props.numTracks === 1 ? "Remove" : `Remove ${props.numTracks} tracks`}
     </div>
@@ -174,4 +166,4 @@ function RemoveItem(props) {
  * @return {void} the return value is unused
  */
 
-export default ContextMenu;
+export default TrackContextMenu;

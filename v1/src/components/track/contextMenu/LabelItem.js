@@ -1,7 +1,7 @@
 import React from 'react';
-import { ITEM_PROP_TYPES, ITEM_DEFAULT_PROPS } from './ContextMenu';
+import { ITEM_PROP_TYPES, ITEM_DEFAULT_PROPS } from './TrackContextMenu';
 
-import './ContextMenu.css';
+import './TrackContextMenu.css';
 
 const MULTI_VALUE_PLACEHOLDER = "[multiple values]";
 
@@ -10,7 +10,7 @@ const MULTI_VALUE_PLACEHOLDER = "[multiple values]";
  * 
  * @author Silas Hsu
  */
-class SetLabelItem extends React.PureComponent {
+class LabelItem extends React.PureComponent {
     static propTypes = ITEM_PROP_TYPES;
     static defaultProps = ITEM_DEFAULT_PROPS;
 
@@ -73,7 +73,7 @@ class SetLabelItem extends React.PureComponent {
 
     render() {
         return (
-        <div className="ContextMenu-item" style={{display: "flex", flexDirection: "column"}} >
+        <div className="TrackContextMenu-item" style={{display: "flex", flexDirection: "column"}} >
             Track label:
             <div style={{display: "flex"}} >
                 <input type="text" value={this.state.inputValue} onChange={this.inputChanged} />
@@ -84,4 +84,4 @@ class SetLabelItem extends React.PureComponent {
     }
 }
 
-export default SetLabelItem;
+export default LabelItem;
