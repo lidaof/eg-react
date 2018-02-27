@@ -9,23 +9,11 @@ import Tooltip from './Tooltip';
 import GenomicCoordinates from './GenomicCoordinates';
 
 import BigWigSource from '../../dataSources/BigWigSource';
-import { getRelativeCoordinates } from '../../util';
+import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 
 const DEFAULT_HEIGHT = 30; // In pixels
 const TOP_MARGIN = 5;
-const BAR_CHART_STYLE = {marginTop: TOP_MARGIN, display: "block"}; // display: block to prevent extra bottom padding
-
-/**
- * Rounds to some number of digits after the decimal point.  For example, roundWithPrecision(12.3456, 2) = 12.34
- * 
- * @param {number} number - the number to round
- * @param {number} precision - the number of digits to keep after the decimal point
- * @return {number} the rounded number
- */
-function roundWithPecision(number, precision) {
-    var factor = Math.pow(10, precision);
-    return Math.round(number * factor) / factor;
-}
+const BAR_CHART_STYLE = {marginTop: TOP_MARGIN, display: "block"}; // display: block prevents extra bottom padding
 
 /**
  * Legend for BigWig tracks.
@@ -81,14 +69,15 @@ class BigWigVisualizer extends React.PureComponent {
      */
     showTooltip(event, record) {
         const {viewRegion, width, trackModel} = this.props;
-        const recordValue = record ? roundWithPecision(record.value, 2) : 0;
-        const x = getRelativeCoordinates(event).x;
+        const recordValue = record ? record.value.toFixed(2) : '(no data)';
+        const relativeX = getRelativeCoordinates(event).x;
+        const pageY = getPageCoordinates(event.currentTarget, 0, this.getHeight()).y;
         const tooltip = (
-            <Tooltip relativeTo={event.currentTarget} x={x} y={this.getHeight()} onClose={this.closeTooltip} >
+            <Tooltip pageX={event.pageX} pageY={pageY} onClose={this.closeTooltip} >
                 <div style={{padding: '0px 5px 5px'}} >
                     <p style={{fontSize: '1.2em', margin: 0}} >{recordValue}</p>
                     <p style={{fontSize: '0.8em', color: 'dimgrey', margin: 0}} >
-                        <GenomicCoordinates viewRegion={viewRegion} width={width} x={x} />
+                        <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
                         <br/>
                         {trackModel.name}
                     </p>

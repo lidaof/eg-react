@@ -36,7 +36,7 @@ class GeneAnnotationVisualizer extends React.PureComponent {
      */
     openTooltip(event, gene) {
         const tooltip = (
-            <Tooltip relativeTo={document.body} x={event.pageX} y={event.pageY} onClose={this.closeTooltip} >
+            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.closeTooltip} >
                 <GeneDetail gene={gene} />
             </Tooltip>
         );

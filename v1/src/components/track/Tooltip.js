@@ -1,6 +1,9 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import PrecisePopover from './PrecisePopover';
+import { Manager, Target, Popper, Arrow } from 'react-popper';
+import OutsideClickDetector from '../OutsideClickDetector';
+import { getPageCoordinates } from '../../util';
 
 const BACKGROUND_COLOR = "rgba(173, 216, 230, 0.9)"; // lightblue with opacity adjustment
 const ARROW_SIZE = 15;
@@ -15,6 +18,15 @@ const ARROW_STYLE = { // This is for a upwards-pointing arrow; other directions 
 }
 
 /**
+ * Stops the propagation of an event.
+ * 
+ * @param {Event} event - event for which to stop propagation
+ */
+function stopEvent(event) {
+    event.stopPropagation()
+}
+
+/**
  * A tooltip with a upwards-pointing arrow, and content below.  Its position refers to the tip of the arrow.  Content is
  * managed via children.  Does not close itself; however, there is a `onClose` prop that requests closings.
  * 
@@ -22,9 +34,8 @@ const ARROW_STYLE = { // This is for a upwards-pointing arrow; other directions 
  */
 class Tooltip extends React.PureComponent {
     static propTypes = {
-        relativeTo: PropTypes.instanceOf(Element), // Element which determines the meaning of `x` and `y`
-        x: PropTypes.number, // x of the tip of the arrow, relative to the top left corner of `relativeTo`.
-        y: PropTypes.number, // x of the tip of the arrow, relative to the top left corner of `relativeTo`.
+        pageX: PropTypes.number.isRequired, // x of the tip of the arrow
+        pageY: PropTypes.number.isRequired, // x of the tip of the arrow
         ignoreMouse: PropTypes.bool, // Whether the content should be invisible to mouse events
         onClose: PropTypes.func, // Called when the tooltip wants to close.  Signature: (event: MouseEvent): void
     };
@@ -33,7 +44,7 @@ class Tooltip extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {relativeTo, x, y, ignoreMouse, onClose, children} = this.props;
+        const {pageX, pageY, onClose, ignoreMouse, children} = this.props;
         const contentStyle = {
             zIndex: 1,
             borderRadius: 5,
@@ -42,16 +53,22 @@ class Tooltip extends React.PureComponent {
             pointerEvents: ignoreMouse ? "none" : "auto"
         };
 
-        return (
-        <PrecisePopover
-            relativeTo={relativeTo}
-            x={x} y={y}
-            arrowStyle={ARROW_STYLE}
-            contentStyle={contentStyle}
-            onClose={onClose}
-        >
-            {children}
-        </PrecisePopover>
+        /**
+         * On the stopEvent for onMouseDown: despite being in document.body, parents of the Tooltip in React's virtual
+         * DOM will still get mouse events.  Stopping propagation stops several undesirable behaviors related to
+         * dragging.
+         */
+        return ReactDOM.createPortal(
+            <Manager>
+                <Target style={{position: "absolute", left: pageX, top: pageY}} />
+                <Popper placement="bottom-start" style={contentStyle} onMouseDown={stopEvent} modifiers={{preventOverflow: {boundariesElement: document.body}}} >
+                    <OutsideClickDetector onOutsideClick={onClose} >
+                        {children}
+                    </OutsideClickDetector>
+                    <Arrow style={ARROW_STYLE} />
+                </Popper>
+            </Manager>,
+            document.body
         );
     }
 }

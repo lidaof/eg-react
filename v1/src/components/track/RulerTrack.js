@@ -3,7 +3,7 @@ import { VISUALIZER_PROP_TYPES } from './Track';
 import GenomicCoordinates from './GenomicCoordinates';
 import Chromosomes from '../genomeNavigator/Chromosomes';
 import Ruler from '../genomeNavigator/Ruler';
-import { getRelativeCoordinates } from '../../util';
+import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 import Tooltip from './Tooltip';
 
 const CHROMOSOMES_Y = 60;
@@ -35,10 +35,11 @@ class RulerVisualizer extends React.PureComponent {
      */
     showTooltip(event) {
         const {viewRegion, width} = this.props;
-        const x = getRelativeCoordinates(event).x;
+        const relativeX = getRelativeCoordinates(event).x;
+        const pageY = getPageCoordinates(event.currentTarget, 0, RULER_Y).y;
         const tooltip = (
-            <Tooltip relativeTo={event.currentTarget} x={x} y={RULER_Y} onClose={this.closeTooltip} ignoreMouse={true} >
-                <GenomicCoordinates viewRegion={viewRegion} width={width} x={x} />
+            <Tooltip pageX={event.pageX} pageY={pageY} onClose={this.closeTooltip} ignoreMouse={true} >
+                <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
             </Tooltip>
         );
         this.setState({tooltip: tooltip});
@@ -57,20 +58,14 @@ class RulerVisualizer extends React.PureComponent {
     render() {
         const {width, viewRegion} = this.props;
         return (
-        <React.Fragment>
-            <svg
-                width={width}
-                height={HEIGHT}
-                style={{display: "block"}} // display: block to prevent svg from taking extra bottom space
-                onMouseMove={this.showTooltip}
-                onMouseLeave={this.closeTooltip}
-                onMouseUp={this.closeTooltip}
-            >
+        <div onMouseMove={this.showTooltip} onMouseLeave={this.closeTooltip}>
+            {/* display: block prevents svg from taking extra bottom space */ }
+            <svg width={width} height={HEIGHT} style={{display: "block"}} >
                 <Chromosomes viewRegion={viewRegion} width={width} labelOffset={CHROMOSOMES_Y} />
                 <Ruler viewRegion={viewRegion} width={width} y={RULER_Y} />
             </svg>
             {this.state.tooltip}
-        </React.Fragment>
+        </div>
         );
     } 
 }

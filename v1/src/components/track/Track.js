@@ -184,7 +184,7 @@ export class Track extends React.PureComponent {
             display: "flex",
             border: "1px solid lightgrey",
             marginTop: -1, // -1 so borders collapse.  TODO: put tracks in a table so we can use border-collapse CSS?
-            backgroundColor: this.state.error ? "red" : "white",
+            backgroundColor: this.state.error ? "pink" : "white",
         };
 
         return (
