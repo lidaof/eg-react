@@ -4,8 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "concurrently --kill-others \"npm run server\" \"cd v1 && npm start\"",
-    "server": "node main.js",
+    "start": "concurrently --kill-others \"cd backend && npm start\" \"cd v1 && npm start\"",
     "test": "mocha",
     "setup": "node setup/ingestRefGene.js refGene"
   },

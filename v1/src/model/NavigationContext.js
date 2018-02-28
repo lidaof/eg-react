@@ -67,6 +67,19 @@ class NavigationContext {
     }
 
     /**
+     * Gets the whole feature interval by feature's name
+     * @param {string} name 
+     * @return {FeatureInterval}
+     */
+    getFeatureIntervalByName(name){
+        const index = this._featureNameToIndex[name];
+        if (index === undefined) {
+            throw new RangeError(`Cannot find feature with name '${name}'`);
+        }
+        return new FeatureInterval(this._features[index]);
+    }
+
+    /**
      * @return {number} the total number of bases in this context, i.e. how many bases are navigable
      */
     getTotalBases() {

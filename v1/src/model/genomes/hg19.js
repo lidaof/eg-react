@@ -24,7 +24,7 @@ const hg19Genome = new Genome("hg19", [
     new Chromosome("chr20", 63025520),
     new Chromosome("chr21", 48129895),
     new Chromosome("chr22", 51304566),
-    new Chromosome("chrX ", 155270560),
+    new Chromosome("chrX", 155270560),
     new Chromosome("chrY", 59373566),
     new Chromosome("chrM", 16571)
 ]);

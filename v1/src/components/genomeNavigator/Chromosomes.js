@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
+import CytoBand from '../../model/CytoBand';
+import axios from 'axios';
 
 const HEIGHT = 20;
 const BOUNDARY_LINE_EXTENT = 5;
@@ -22,7 +24,24 @@ class Chromosomes extends React.PureComponent {
         x: PropTypes.number,
         y: PropTypes.number
     };
+    
+    constructor(props){
+        super(props);
+        this.state = {
+            cytoBandData: {}
+        }
+    }
 
+    componentDidMount(){
+        const intervals = this.props.viewRegion.getFeatureIntervals();
+        for (let interval of intervals) {
+            axios.get(`/hg19/cytoBand/${interval.getName()}`).then((response) => {
+                let tmp = {...this.state.cytoBandData};
+                tmp[interval.getName()] = response.data
+                this.setState({cytoBandData: tmp})
+            });
+        }          
+    }
     /**
      * Clears this group and redraws all the feature boxes
      * 
@@ -44,6 +63,7 @@ class Chromosomes extends React.PureComponent {
                 width={intervalWidth}
                 height={HEIGHT}
                 style={{stroke: "#000", strokeWidth: 2, fill: "#fff"}}
+                opacity="0.5"
             />);
 
             if (x > 0) { // Thick line at boundaries of each feature (except the first one)
@@ -69,6 +89,8 @@ class Chromosomes extends React.PureComponent {
 
             x += intervalWidth;
             y += 1;
+
+            children = [...children, ...new CytoBand(this.props.viewRegion, drawModel, x, BOUNDARY_LINE_EXTENT, HEIGHT, this.state.cytoBandData[interval.getName()])];
         }
 
         return <svg x={this.props.x} y={this.props.y}>{children}</svg>;
