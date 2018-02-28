@@ -4,6 +4,7 @@ import _ from 'lodash';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import '../../App.css';
+import StandaloneGeneAnnotation from "./StandaloneGeneAnnotation";
 
 /**
  * The component is used for gene search, calls the backend api endpoint for gene partial search
@@ -60,7 +61,7 @@ class GeneSearch extends React.Component{
     async handleClick(gene){
         let query = _.trim(gene);
         let response = await axios.get(`/hg19/refGene/${query}`);
-        console.log(response.data);
+        //console.log(response.data);
         this.setState({geneModels: response.data});
     }
 
@@ -69,26 +70,18 @@ class GeneSearch extends React.Component{
      * @param {object} geneModel 
      */
     goToGeneModel(geneModel){
-        console.log(geneModel);
-        let parsedRegion = null;
-        try {
-            parsedRegion = this.props.selectedRegion.getNavigationContext().parse(`${geneModel.chrom}:${geneModel.txStart}-${geneModel.txEnd}`);
-        } catch (error) {
-            if (error instanceof RangeError) {
-                return;
-            } else {
-                throw error;
-            }
-        }
+        let navContext = this.props.selectedRegion.getNavigationContext();
         this.setState({geneModels:[], searchResults:[], value:geneModel.name2});
-        this.props.newRegionCallback(parsedRegion.start, parsedRegion.end);
+        this.props.newRegionCallback(navContext.convertFeatureCoordinateToBase(geneModel.chrom, geneModel.txStart), 
+                                     navContext.convertFeatureCoordinateToBase(geneModel.chrom, geneModel.txEnd)
+                                    );
     }
 
     render(){
         let liElements = [];
         if(this.state.geneModels.length>0){
             this.state.geneModels.forEach(
-                (geneModel,i) => liElements.push(<li key={geneModel.name+i} className="geneList" onClick={() => this.goToGeneModel(geneModel)}>{geneModel.name} {geneModel.txStart} {geneModel.txEnd}</li>)
+                (geneModel,i) => liElements.push(<li key={geneModel.name+i} className="geneList" onClick={() => this.goToGeneModel(geneModel)}><StandaloneGeneAnnotation gene={geneModel} width={200} /></li>)
             );
         }else{
             this.state.searchResults.forEach(

@@ -15,24 +15,6 @@ const IN_EXON_ARROW_COLOR = "white";
 
 const LABEL_BACKGROUND_PADDING = 2;
 
-/*
-const viewRegion = new DisplayedRegionModel(new NavigationContext([myGene]));
-
-class StandaloneGeneAnnotation {
-    static propTypes = {
-        gene: Gene,
-        width: number,
-        viewRegion: 
-    }
-    render() {
-        const drawModel = new DisplayedRegionModel(new NavigationContext([gene]));
-        return <svg>
-        <SvgJsManaged><GeneAnnotation gene={gene} isLabeled={true} drawModel={drawModel} leftBoundary={-Infinity} /></SvgJsManaged>
-        </svg>
-    }
-}
-*/
-
 /**
  * A single annotation for the gene annotation track.
  * 
@@ -151,8 +133,6 @@ export class GeneAnnotation extends React.Component {
 
         // Label
         let labelX, textAnchor;
-        console.log(leftBoundary);
-        console.log(rightBoundary);
         // Label width is approx. because calculating bounding boxes is expensive.
         let estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
         if (startX - estimatedLabelWidth < leftBoundary && leftBoundary < endX ) {
