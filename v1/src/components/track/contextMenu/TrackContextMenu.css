@@ -1,0 +1,22 @@
+.TrackContextMenu-body {
+    z-index: 1;
+    min-width: 200px;
+    background-color: white;
+    border: 1px solid grey;
+    border-radius: 0.25rem;
+    font-size: small;
+}
+
+.TrackContextMenu-item {
+    border-top: 1px solid lightgrey;
+    margin-top: -1px;
+    padding: 8px 5px;
+}
+
+.TrackContextMenu-hoverable-item:hover {
+    background-color: #20a0ff;
+}
+
+.TrackContextMenu-hoverable-item-danger:hover {
+    background-color: pink;
+}

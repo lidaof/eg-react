@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import GenericDraggable from './GenericDraggable';
-import GenericDroppable from './GenericDroppable';
+import GenericDraggable from '../GenericDraggable';
+import GenericDroppable from '../GenericDroppable';
 
 /**
  * Track container where the tracks can be dragged and dropped.
@@ -10,12 +10,12 @@ import GenericDroppable from './GenericDroppable';
  */
 class ReorderableTrackContainer extends React.Component {
     static propTypes = {
-        trackComponents: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
+        trackElements: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
 
         /**
          * Callback for when tracks are reordered.  Signature:
          *     (fromIndex: number, toIndex: number): void
-         *         `fromIndex`: the index of the moved track in trackComponents
+         *         `fromIndex`: the index of the moved track in trackElements
          *         `toIndex`: the index to which the track should move
          */
         onTrackMoved: PropTypes.func, 
@@ -49,9 +49,9 @@ class ReorderableTrackContainer extends React.Component {
      */
     render() {
         // Add keys
-        let modifiedTracks = this.props.trackComponents.map((trackComponent, index) => {
-            const id = trackComponent.props.trackModel ? trackComponent.props.trackModel.getId() : index;
-            return <GenericDraggable key={id} draggableId={id} >{trackComponent}</GenericDraggable>;
+        let modifiedTracks = this.props.trackElements.map((trackElement, index) => {
+            const id = trackElement.props.trackModel ? trackElement.props.trackModel.getId() : index;
+            return <GenericDraggable key={id} draggableId={id} >{trackElement}</GenericDraggable>;
         });
 
         return <GenericDroppable onDrop={this.trackDropped} >{modifiedTracks}</GenericDroppable>;

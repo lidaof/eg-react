@@ -5,18 +5,24 @@ const REGION = makeToyRegion(0, 10);
 const DRAW_WIDTH = 100;
 const INSTANCE = new LinearDrawingModel(REGION, DRAW_WIDTH);
 
-test('basesToXWidth()', () =>{
+test('basesToXWidth()', () => {
     expect(INSTANCE.basesToXWidth(15)).toBeCloseTo(150);
 });
 
-test('xWidthToBases()', () =>{
+test('xWidthToBases()', () => {
     expect(INSTANCE.xWidthToBases(150)).toBeCloseTo(15);
 });
 
-test('baseToX()', () =>{
+test('baseToX()', () => {
     expect(INSTANCE.baseToX(5)).toBeCloseTo(50);
 });
 
-test('xToBase()', () =>{
+test('xToBase()', () => {
     expect(INSTANCE.xToBase(50)).toBeCloseTo(5);
+});
+
+test('xToGenomeCoordinate()', () => {
+    const result = INSTANCE.xToGenomeCoordinate(50);
+    expect(result.chr).toBe('chr1');
+    expect(result.start).toBeCloseTo(5);
 });

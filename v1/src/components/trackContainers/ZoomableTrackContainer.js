@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SelectableArea from './SelectableArea';
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import LinearDrawingModel from '../model/LinearDrawingModel';
+import SelectableArea from '../SelectableArea';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import LinearDrawingModel from '../../model/LinearDrawingModel';
 
 /**
  * Track container where the tracks can be dragged and dropped.
@@ -11,7 +11,7 @@ import LinearDrawingModel from '../model/LinearDrawingModel';
  */
 class ZoomableTrackContainer extends React.Component {
     static propTypes = {
-        trackComponents: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
+        trackElements: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // View region of the tracks
         legendWidth: PropTypes.number.isRequired, // Width of the track legends
 
@@ -54,12 +54,12 @@ class ZoomableTrackContainer extends React.Component {
      */
     render() {
         // Add keys
-        let modifiedTracks = this.props.trackComponents.map((trackComponent, index) => {
-            const key = trackComponent.props.trackModel ? trackComponent.props.trackModel.getId() : index;
+        let modifiedTracks = this.props.trackElements.map((trackElement, index) => {
+            const key = trackElement.props.trackModel ? trackElement.props.trackModel.getId() : index;
             const propsToMerge = {
                 key: key,
             };
-            return React.cloneElement(trackComponent, propsToMerge);
+            return React.cloneElement(trackElement, propsToMerge);
         });
 
         return <SelectableArea onAreaSelected={this.areaSelected} >{modifiedTracks}</SelectableArea>;

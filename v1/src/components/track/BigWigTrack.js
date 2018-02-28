@@ -2,14 +2,18 @@ import React from 'react';
 import _ from 'lodash';
 import { scaleLinear } from 'd3-scale'
 
+import BarChart from '../BarChart';
 import { VISUALIZER_PROP_TYPES } from './Track';
 import TrackLegend from './TrackLegend';
-import BarChart from '../BarChart';
+import Tooltip from './Tooltip';
+import GenomicCoordinates from './GenomicCoordinates';
 
 import BigWigSource from '../../dataSources/BigWigSource';
+import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 
 const DEFAULT_HEIGHT = 30; // In pixels
 const TOP_MARGIN = 5;
+const BAR_CHART_STYLE = {marginTop: TOP_MARGIN, display: "block"}; // display: block prevents extra bottom padding
 
 /**
  * Legend for BigWig tracks.
@@ -38,19 +42,77 @@ function BigWigLegend(props) {
 class BigWigVisualizer extends React.PureComponent {
     static propTypes = VISUALIZER_PROP_TYPES;
 
+    /**
+     * @inheritdoc
+     */
+    constructor(props) {
+        super(props);
+        this.state = {
+            tooltip: null
+        };
+        this.showTooltip = this.showTooltip.bind(this);
+        this.closeTooltip = this.closeTooltip.bind(this);
+    }
+
+    /**
+     * @return {number} the height at which the visualizer should render
+     */
+    getHeight() {
+        return this.props.trackModel.options.height || DEFAULT_HEIGHT;
+    }
+
+    /**
+     * Sets state to show a tooltip displaying a record's details.
+     * 
+     * @param {MouseEvent} event - mouse event for positioning hints
+     * @param {BarChartRecord} record - record whose details to display
+     */
+    showTooltip(event, record) {
+        const {viewRegion, width, trackModel} = this.props;
+        const recordValue = record ? record.value.toFixed(2) : '(no data)';
+        const relativeX = getRelativeCoordinates(event).x;
+        const pageY = getPageCoordinates(event.currentTarget, 0, this.getHeight()).y;
+        const tooltip = (
+            <Tooltip pageX={event.pageX} pageY={pageY} onClose={this.closeTooltip} >
+                <div style={{padding: '0px 5px 5px'}} >
+                    <p style={{fontSize: '1.2em', margin: 0}} >{recordValue}</p>
+                    <p style={{fontSize: '0.8em', color: 'dimgrey', margin: 0}} >
+                        <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
+                        <br/>
+                        {trackModel.name}
+                    </p>
+                </div>
+            </Tooltip>
+        );
+        this.setState({tooltip: tooltip});
+    }
+
+    /**
+     * Sets state to stop showing any tooltips.
+     */
+    closeTooltip() {
+        this.setState({tooltip: null});
+    }
+
+    /** 
+     * @inheritdoc
+     */
     render() {
-        const {data, viewRegion, trackModel, width} = this.props;
-        const height = trackModel.options.height || DEFAULT_HEIGHT;
-        const style = {marginTop: TOP_MARGIN, display: "block"}; // display: block to prevent extra bottom padding
+        const {data, viewRegion, width} = this.props;
         return (
-        <BarChart
-            viewRegion={viewRegion}
-            data={data}
-            width={width}
-            height={height}
-            style={style}
-            svg={false}
-        />
+        <React.Fragment>
+            <BarChart
+                viewRegion={viewRegion}
+                data={data}
+                width={width}
+                height={this.getHeight()}
+                style={BAR_CHART_STYLE}
+                renderSvg={false}
+                onRecordHover={this.showTooltip}
+                onMouseLeave={this.closeTooltip}
+            />
+            {this.state.tooltip}
+        </React.Fragment>
         );
     }
 }

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { LEFT_MOUSE } from './DragAcrossDiv';
-import DragAcrossView from './DragAcrossView';
+import { MouseButtons } from '../../util';
+import DragAcrossView from '../DragAcrossView';
 
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 /**
  * Track container where dragging across scrolls the view region.
@@ -15,7 +15,7 @@ class DraggableTrackContainer extends React.Component {
     static MIN_DRAG_DISTANCE_FOR_REFRESH = 20;
 
     static propTypes = {
-        trackComponents: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
+        trackElements: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // View region of the tracks
         visualizationWidth: PropTypes.number.isRequired, // Width of the visible portion of tracks
         /**
@@ -92,18 +92,18 @@ class DraggableTrackContainer extends React.Component {
      */
     render() {
         // Add keys
-        let modifiedTracks = this.props.trackComponents.map((trackComponent, index) => {
-            const key = trackComponent.props.trackModel ? trackComponent.props.trackModel.getId() : index;
+        let modifiedTracks = this.props.trackElements.map((trackElement, index) => {
+            const key = trackElement.props.trackModel ? trackElement.props.trackModel.getId() : index;
             const propsToMerge = {
                 key: key,
                 xOffset: this.state.xOffset
             };
-            return React.cloneElement(trackComponent, propsToMerge);
+            return React.cloneElement(trackElement, propsToMerge);
         });
 
         return (
         <DragAcrossView
-            button={LEFT_MOUSE}
+            button={MouseButtons.LEFT}
             onViewDragStart={this.viewDragStart}
             onViewDrag={this.viewDrag}
             onViewDragEnd={this.viewDragEnd}

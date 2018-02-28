@@ -8,7 +8,7 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
  * 
  * @author Silas Hsu
  */
-class Ruler extends React.Component {
+class Ruler extends React.PureComponent {
     static propTypes = {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
         width: PropTypes.number.isRequired, // The drawing model to use

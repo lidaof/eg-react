@@ -1,15 +1,15 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import DraggableTrackContainer from '../DraggableTrackContainer';
-import makeToyRegion from '../../model/test/toyRegion';
-import TrackModel from '../../model/TrackModel';
+import makeToyRegion from '../../../model/test/toyRegion';
+import TrackModel from '../../../model/TrackModel';
 
 const dragRegionStart = 0;
 const dragRegionEnd = 10;
 
 it("sets tracks' xOffset prop properly when the view is dragged", () => {
     let wrapper = shallow(<DraggableTrackContainer
-        trackComponents={[<div/>, <div/>]} 
+        trackElements={[<div/>, <div/>]} 
         viewRegion={makeToyRegion()}
         visualizationWidth={1}
     />);
@@ -33,7 +33,7 @@ it("sets tracks' xOffset prop properly when the view is dragged", () => {
 it("calls the newRegionCallback when dragging ends, IF dragged far enough", () => {
     let newRegionCallback = jest.fn();
     let wrapper = shallow(<DraggableTrackContainer
-        trackComponents={[<div/>]}
+        trackElements={[<div/>]}
         viewRegion={makeToyRegion()}
         visualizationWidth={1}
         onNewRegion={newRegionCallback}
@@ -53,7 +53,7 @@ it("calls the newRegionCallback when dragging ends, IF dragged far enough", () =
 
 it('resets xOffset after receiving a new view region', () => {
     let wrapper = shallow(<DraggableTrackContainer
-        trackComponents={[<div/>]}
+        trackElements={[<div/>]}
         viewRegion={makeToyRegion()}
         visualizationWidth={1}
     />);

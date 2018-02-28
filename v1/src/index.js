@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
-import { HG19 } from './components/genomes/hg19';
+import { HG19 } from './model/genomes/hg19';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import BrowserScene from './components/vr/BrowserScene';
 import Custom3DObject from './components/vr/Custom3DObject';

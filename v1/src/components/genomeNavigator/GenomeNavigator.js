@@ -133,7 +133,7 @@ class GenomeNavigator extends React.Component {
                         </div>
                          <div className="col-sm">
                             <label>
-                                Zoom: <span role="img">➕</span>
+                                Zoom: <span role="img" aria-label="High zoom">➕</span>
                                  <input
                                     type="range"
                                     min={Math.log(MIN_VIEW_LENGTH)}
@@ -141,7 +141,7 @@ class GenomeNavigator extends React.Component {
                                     step="any"
                                     value={Math.log(this.state.viewRegion.getWidth())}
                                     onChange={this.zoomSliderDragged}
-                                /><span role="img">➖</span>
+                                /><span role="img" aria-label="Low zoom">➖</span>
                             </label>
                         </div>
                     </div>

@@ -3,12 +3,11 @@ import React from 'react';
 import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
 import { VISUALIZER_PROP_TYPES } from '../Track';
-import TrackLegend from '../TrackLegend';
 
 import { GeneFormatter } from '../../../model/refGene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
-//import BedSource from '../../../dataSources/BedSource';
 import MongoSource from '../../../dataSources/MongoSource';
+import Tooltip from '../Tooltip';
 
 const HEIGHT = 105;
 
@@ -22,7 +21,11 @@ class GeneAnnotationVisualizer extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        this.geneClicked = this.geneClicked.bind(this);
+        this.state = {
+            tooltip: null
+        };
+        this.openTooltip = this.openTooltip.bind(this);
+        this.closeTooltip = this.closeTooltip.bind(this);
     }
 
     /**
@@ -31,23 +34,35 @@ class GeneAnnotationVisualizer extends React.PureComponent {
      * @param {MouseEvent} event 
      * @param {Gene} gene 
      */
-    geneClicked(event, gene) {
-        this.props.onTooltip(event, <GeneDetail gene={gene} />);
+    openTooltip(event, gene) {
+        const tooltip = (
+            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.closeTooltip} >
+                <GeneDetail gene={gene} />
+            </Tooltip>
+        );
+        this.setState({tooltip: tooltip});
+    }
+    
+    closeTooltip() {
+        this.setState({tooltip: null});
     }
 
     render() {
         const svgStyle = {marginTop: 5, display: "block", overflow: "visible"};
         const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
         return (
-        <svg width={this.props.width} height={HEIGHT} style={svgStyle} >
-            <AnnotationArranger
-                data={this.props.data}
-                drawModel={drawModel}
-                onGeneClick={this.geneClicked}
-                leftBoundary={this.props.leftBoundary}
-                rightBoundary={this.props.rightBoundary}
-            />
-        </svg>
+        <React.Fragment>
+            <svg width={this.props.width} height={HEIGHT} style={svgStyle} >
+                <AnnotationArranger
+                    data={this.props.data}
+                    drawModel={drawModel}
+                    onGeneClick={this.openTooltip}
+                    leftBoundary={this.props.leftBoundary}
+                    rightBoundary={this.props.rightBoundary}
+                />
+            </svg>
+            {this.state.tooltip}
+        </React.Fragment>
         );
     }
 }

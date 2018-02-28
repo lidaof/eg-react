@@ -32,9 +32,9 @@ export default function withExpandedWidth(WrappedComponent) {
             }
 
             const divStyle = {
-                overflow: "hidden",
+                overflowX: "hidden",
                 width: visibleWidth,
-            }
+            };
 
             const wrappedStyle = Object.assign(style || {}, {
                 position: "relative",
