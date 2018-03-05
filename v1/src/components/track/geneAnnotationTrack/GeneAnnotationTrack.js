@@ -4,7 +4,7 @@ import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
 import { VISUALIZER_PROP_TYPES } from '../Track';
 
-import { GeneFormatter } from '../../../model/refGene';
+import { GeneFormatter } from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import MongoSource from '../../../dataSources/MongoSource';
 import Tooltip from '../Tooltip';
@@ -68,7 +68,6 @@ class GeneAnnotationVisualizer extends React.PureComponent {
 }
 
 const GeneAnnotationTrack = {
-    //getDataSource: (trackModel) => new BedSource(trackModel.url, new GeneFormatter()),
     getDataSource: (trackModel) => new MongoSource(new GeneFormatter()),
     visualizer: GeneAnnotationVisualizer
 };

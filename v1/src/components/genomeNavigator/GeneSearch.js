@@ -80,8 +80,8 @@ class GeneSearch extends React.Component{
     render(){
         let liElements = [];
         if(this.state.geneModels.length>0){
-            this.state.geneModels.forEach(
-                (geneModel,i) => liElements.push(<li key={geneModel.name+i} className="geneList" onClick={() => this.goToGeneModel(geneModel)}><StandaloneGeneAnnotation gene={geneModel} width={200} /></li>)
+            liElements = this.state.geneModels.map(
+                (geneModel,i) => <li key={geneModel.name+i} className="geneList" onClick={() => this.goToGeneModel(geneModel)}><StandaloneGeneAnnotation gene={geneModel} width={200} /></li>
             );
         }else{
             this.state.searchResults.forEach(
@@ -95,9 +95,7 @@ class GeneSearch extends React.Component{
                     <input type="text" value={this.state.value} onChange={this.handleChange} />
                     <div style={{position: 'absolute', zIndex:10}}>
                         <ul style={{backgroundColor:'#d5d9da',listStyleType:'none',paddingLeft:0}}>
-                            {
-                                liElements.map((li)=>li)   
-                            }
+                            {liElements}
                         </ul>
                     </div>
 

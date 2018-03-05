@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { ANNOTATION_HEIGHT, GeneAnnotation } from './GeneAnnotation';
 import SvgJsManaged from '../../SvgJsManaged';
 
-import Gene from '../../../model/refGene';
+import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 
 const DEFAULT_MAX_ROWS = 7;
@@ -62,7 +62,7 @@ class AnnotationArranger extends React.Component {
         return genes.sort((gene1, gene2) => {
             const absStartComparison = gene1.absStart - gene2.absStart;
             if (absStartComparison === 0) {
-                return gene2.length - gene1.length;
+                return gene2.getLength() - gene1.getLength();
             } else {
                 return absStartComparison;
             }
@@ -86,7 +86,7 @@ class AnnotationArranger extends React.Component {
                 numHiddenGenes++;
                 continue;
             }
-            
+
             /*
              * Label width is approximate because calculating bounding boxes is expensive.
              * This also means startX and endX are approximate since label width is approximate.
@@ -98,26 +98,26 @@ class AnnotationArranger extends React.Component {
             const endX = Math.max(drawModel.baseToX(gene.absStart) + labelWidth, drawModel.baseToX(gene.absEnd));
             // Find the first row where the annotation won't overlap with others in the row
             let row = maxXsForRows.findIndex(maxX => maxX < startX); 
-            let isLabeled;
+            let isMinimal;
             if (row === -1) { // It won't fit!  Put it in the last row, unlabeled
-                isLabeled = false;
-                row = this.props.maxRows;
+                isMinimal = true;
+                row = maxRows;
                 numHiddenGenes++;
             } else {
-                isLabeled = true;
+                isMinimal = false;
                 maxXsForRows[row] = endX + ANNOTATION_RIGHT_PADDING + labelWidth + 2;
             }
             const y = row * (ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING);
 
             children.push(
             <SvgJsManaged
-                key={gene.id}
+                key={gene.refGeneRecord._id}
                 transform={`translate(0 ${y})`}
                 onClick={event => this.props.onGeneClick(event, gene)}
             >
                 <GeneAnnotation
                     gene={gene}
-                    isLabeled={isLabeled}
+                    isMinimal={isMinimal}
                     drawModel={drawModel}
                     leftBoundary={leftBoundary}
                     rightBoundary={rightBoundary}

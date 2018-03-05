@@ -59,7 +59,7 @@ class BigWigSource extends DataSource {
             let result = [];
             for (let dasFeature of dasFeatures) {
                 let absInterval = navContext.convertGenomeIntervalToBases(
-                    featureInterval, new ChromosomeInterval(dasFeature.segment, dasFeature.min, dasFeature.max)
+                    new ChromosomeInterval(dasFeature.segment, dasFeature.min, dasFeature.max), featureInterval.feature
                 );
                 if (absInterval) {
                     absInterval.value = dasFeature.score;

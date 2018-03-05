@@ -26,6 +26,23 @@ export class OpenInterval {
     }
 
     /**
+     * Intersects this and another OpenInterval, and returns the result in as a new OpenInterval.  Returns null if there
+     * is no intersection at all.
+     * 
+     * @param {OpenInterval} other - other OpenInterval to intersect
+     * @return {OpenInterval} intersection of this and the other interval
+     */
+    getOverlap(other) {
+        const intersectionStart = Math.max(this.start, other.start);
+        const intersectionEnd = Math.min(this.end, other.end);
+        if (intersectionStart < intersectionEnd) {
+            return new OpenInterval(intersectionStart, intersectionEnd);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * @return {number} the length of this interval
      */
     getLength() {

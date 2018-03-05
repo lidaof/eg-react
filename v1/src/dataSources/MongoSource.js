@@ -15,9 +15,7 @@ class MongoSource extends DataSource {
     constructor(dbFormatter) {
         super();
         this.dbFormatter = dbFormatter;
-
     }
-
 
     /**
      * Gets data lying within the region.  Returns a promise for an array of data.
@@ -28,7 +26,6 @@ class MongoSource extends DataSource {
      * @override
      */
     async getData(region, options) {
-
         let promises = region.getFeatureIntervals().map(async featureInterval => {
             const chrInterval = featureInterval.getGenomeCoordinates();
             const dbResponse = await axios.get(`/hg19/geneQuery/${chrInterval.chr}/${chrInterval.start}/${chrInterval.end}`);

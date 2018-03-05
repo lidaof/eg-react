@@ -37,11 +37,13 @@ class FeatureInterval {
     }
 
     get start() {
-        throw new Error("FeatureInterval has no prop `start`.  Use `relativeStart` instead.");
+        console.error("FeatureInterval has no prop `start`.  Use `relativeStart` instead.");
+        return this.relativeStart;
     }
 
     get end() {
-        throw new Error("FeatureInterval has no prop `end`.  Use `relativeEnd` instead.");
+        console.error("FeatureInterval has no prop `end`.  Use `relativeEnd` instead.");
+        return this.relativeEnd;
     }
 
     /**

@@ -1,11 +1,11 @@
 import OpenInterval from './OpenInterval';
 
 /**
- * An OpenInterval with a chromosome's name.  Expresses genomic coordinates.
+ * Basically an OpenInterval with a chromosome's name.  Expresses genomic coordinates.
  * 
  * @author Silas Hsu
  */
-class ChromosomeInterval extends OpenInterval {
+class ChromosomeInterval {
     /**
      * Parses a string representing a ChromosomeInterval, such as those produced by the toString() method.  Returns null
      * if parsing fails.
@@ -34,8 +34,21 @@ class ChromosomeInterval extends OpenInterval {
      * @param {number} end - end of the interval, exclusive
      */
     constructor(chr, start, end) {
-        super(start, end);
         this.chr = chr;
+        this.start = start;
+        this.end = end;
+    }
+
+    *[Symbol.iterator] () {
+        yield this.start;
+        yield this.end;
+    }
+
+    /**
+     * @return {number} the length of this interval in base pairs
+     */
+    getLength() {
+        return this.end - this.start;
     }
 
     /**
@@ -47,15 +60,11 @@ class ChromosomeInterval extends OpenInterval {
      */
     getOverlap(other) {
         if (this.chr !== other.chr) {
-            return null;
+            return null
+        } else {
+            const overlap = new OpenInterval(...this).getOverlap(new OpenInterval(...other));
+            return overlap ? new ChromosomeInterval(this.chr, ...overlap) : null;
         }
-        const intersectionStart = Math.max(this.start, other.start);
-        const intersectionEnd = Math.min(this.end, other.end);
-        if (intersectionStart < intersectionEnd) {
-            return new ChromosomeInterval(this.chr, intersectionStart, intersectionEnd);
-        }
-
-        return null;
     }
 
     /**

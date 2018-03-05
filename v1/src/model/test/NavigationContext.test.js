@@ -92,21 +92,21 @@ describe("convertGenomeIntervalToBases()", () => {
         const feature = instance.getFeatures()[0];
         const featureInterval = new FeatureInterval(feature);
         const chrInterval = new ChromosomeInterval("chr1", 5, 10);
-        expect(instance.convertGenomeIntervalToBases(featureInterval, chrInterval)).toEqual(new OpenInterval(5, 10));
+        expect(instance.convertGenomeIntervalToBases(chrInterval, featureInterval)).toEqual(new OpenInterval(5, 10));
     });
 
     it("returns null when the feature interval does not overlap with the genome interval", () => {
         const feature = instance.getFeatures()[0];
         const featureInterval = new FeatureInterval(feature);
         const chrInterval = new ChromosomeInterval("chr1", -1, -1);
-        expect(instance.convertGenomeIntervalToBases(featureInterval, chrInterval)).toEqual(null);
+        expect(instance.convertGenomeIntervalToBases(chrInterval, featureInterval)).toEqual(null);
     });
 
     it("errors when given a feature not in the context", () => {
         const chrInterval = new ChromosomeInterval("chr1", 5, 10);
         const feature = new Feature("wat is this?", chrInterval);
         const featureInterval = new FeatureInterval(feature);
-        expect(() => instance.convertGenomeIntervalToBases(featureInterval, chrInterval)).toThrow(RangeError);
+        expect(() => instance.convertGenomeIntervalToBases(chrInterval, featureInterval)).toThrow(RangeError);
     });
 });
 
