@@ -1,7 +1,7 @@
 import Autosuggest from 'react-autosuggest';
 import PropTypes from "prop-types";
 import React from "react";
-import './autosuggest.css';
+import '../../autosuggest.css';
 
 const HIERARCHY_DELIMITER = ' > ';
 

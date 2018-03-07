@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import GeneDescription from '../../GeneDescription';
+import { Gene } from '../../../model/Gene';
 
 const STYLE = {
     width: 250,
@@ -11,25 +13,16 @@ const STYLE = {
  * 
  * @author Silas Hsu
  */
-class GeneDetail extends React.Component {
+class GeneDetail extends React.PureComponent {
     static propTypes = {
-        gene: PropTypes.object.isRequired, // The Gene object for which to display info
+        gene: PropTypes.instanceOf(Gene).isRequired, // The Gene object for which to display info
     };
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            description: "Loading..."
-        };
-        props.gene.getDescription().then(
-            description => this.setState({description: description})
-        );
-    }
-
     render() {
+        const gene = this.props.gene;
         return <div style={STYLE} >
-            {this.props.gene.getName()}
-            <div>{this.state.description || ""}</div>
+            {gene.getName()}
+            <p><GeneDescription gene={gene} /></p>
         </div>;
     }
 }

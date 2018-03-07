@@ -36,7 +36,6 @@ export class Gene extends Feature {
      * @param {RefGeneRecord} record - refGeneRecod object to use
      */
     constructor(refGeneRecord) {
-        // tx n
         const location = new ChromosomeInterval(refGeneRecord.chrom, refGeneRecord.txStart, refGeneRecord.txEnd);
         super(refGeneRecord.name2, location, refGeneRecord.strand === "+");
         this.refGeneRecord = refGeneRecord;
@@ -45,14 +44,18 @@ export class Gene extends Feature {
 
     _parseDetails() {
         const {cdsStart, cdsEnd, exonStarts, exonEnds} = this.refGeneRecord;
+        this.translated = [];
+        this.utrs = [];
+        if ([cdsStart, cdsEnd, exonStarts, exonEnds].some(value => value == undefined)) { // eslint-disable-line eqeqeq
+            return;
+        }
+
         const codingInterval = new OpenInterval(cdsStart, cdsEnd);
         const parsedExonStarts = _.trim(exonStarts, ',').split(',').map(n => Number.parseInt(n, 10));
         const parsedExonEnds = _.trim(exonEnds, ',').split(',').map(n => Number.parseInt(n, 10));
         let exons = _.zip(parsedExonStarts, parsedExonEnds)
             .map(twoElementArray => new OpenInterval(...twoElementArray));
 
-        this.translated = [];
-        this.utrs = [];
         for (let exon of exons) { // Get UTRs and translated exons from the raw record
             const codingOverlap = codingInterval.getOverlap(exon);
             if (codingOverlap) {
@@ -80,12 +83,19 @@ export class Gene extends Feature {
         return response.data[0] ? response.data[0].description : "";
     }
 
+    /**
+     * Calculates absolute coordinates of the gene body and exons.  Mutates this object by setting absStart, absEnd,
+     * absTranslated, and absUtrs.
+     * 
+     * @param {NavigationContext} navContext - context with which to calculate absolute base numbers
+     * @param {string | Feature | FeatureInterval} [targetFeature] - target location in context to map to
+     */
     computeNavContextCoordinates(navContext, targetFeature) {
-        const transcribed = navContext.convertGenomeIntervalToBases(this.getLocus(), targetFeature);
         const chr = this.getLocus().chr;
+        const absInterval = navContext.convertGenomeIntervalToBases(this.getLocus(), targetFeature);
         
-        this.absStart = transcribed.start;
-        this.absEnd = transcribed.end;
+        this.absStart = absInterval.start;
+        this.absEnd = absInterval.end;
         this.absTranslated = this.translated.map(exon =>
             navContext.convertGenomeIntervalToBases(new ChromosomeInterval(chr, ...exon), targetFeature)
         );

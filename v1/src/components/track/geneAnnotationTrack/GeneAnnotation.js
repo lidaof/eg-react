@@ -9,7 +9,7 @@ export const UTR_HEIGHT = 5;
 export const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;
 
 const ARROW_WIDTH = 5;
-const ARROW_SEPARATION = 10;
+const ARROW_SEPARATION = 12;
 const COLOR = "blue";
 const BACKGROUND_COLOR = "white";
 
@@ -39,13 +39,32 @@ export class GeneAnnotation extends React.PureComponent {
     };
 
     /**
+     * 
+     * @param {number} startAbsBase 
+     * @param {number} endAbsBase 
+     * @param {number} height 
+     * @param {string} color 
+     */
+    _drawCenteredBox(startAbsBase, endAbsBase, height, color) {
+        const {drawModel, svgJs} = this.props;
+        const startX = drawModel.baseToX(startAbsBase);
+        const width = drawModel.basesToXWidth(endAbsBase - startAbsBase);
+        const box = svgJs.rect(width, height).attr({
+            x: startX,
+            y: (ANNOTATION_HEIGHT - height) / 2,
+            fill: color
+        });
+        return box;
+    }
+
+    /**
      * Draws arrows in an interval in the most aesthetically pleasing way possible.
      * 
      * @param {number} startX 
      * @param {number} endX 
      * @param {string} color 
      */
-    _drawArrowsInInterval(startX, endX, color) {
+    _drawArrowsInInterval(startX, endX, color, clip) {
         const {gene, svgJs} = this.props;
         const centerY = ANNOTATION_HEIGHT / 2;
         const bottomY = ANNOTATION_HEIGHT;
@@ -61,18 +80,21 @@ export class GeneAnnotation extends React.PureComponent {
         // Naming: if our arrows look like '<', then the tip is on the left, and the two tails are on the right.
         for (let arrowTipX = placementStartX; arrowTipX <= placementEndX; arrowTipX += ARROW_SEPARATION) {
             // Is forward strand ? point to the right : point to the left 
-            let arrowTailX = gene.getIsForwardStrand() ? arrowTipX - ARROW_WIDTH : arrowTipX + ARROW_WIDTH;
-            let arrowPoints = [
+            const arrowTailX = gene.getIsForwardStrand() ? arrowTipX - ARROW_WIDTH : arrowTipX + ARROW_WIDTH;
+            const arrowPoints = [
                 [arrowTailX, 1],
                 [arrowTipX, centerY],
                 [arrowTailX, bottomY - 1]
             ];
 
-            svgJs.polyline(arrowPoints).attr({
+            const arrow = svgJs.polyline(arrowPoints).attr({
                 fill: "none",
                 stroke: color,
                 "stroke-width": 1
             });
+            if (clip) {
+                arrow.clipWith(clip);
+            }
         }
     }
 
@@ -108,37 +130,22 @@ export class GeneAnnotation extends React.PureComponent {
             width: 2
         });
 
-        // Arrows on that center line
-        // TODO arrows may overlap with exon boxes, which doesn't look that good.  If that is annoying, we will have to
-        // calculate non-exon intervals.
-        this._drawArrowsInInterval(startX, endX, COLOR);
+        // Clip: a set of locations where an element will show up; it will not show elsewhere
+        let drawOnlyInExons = svgJs.clip();
+        // Translated exons, as thick boxes
+        for (let exon of gene.absTranslated) {
+            const exonBox = this._drawCenteredBox(...exon, ANNOTATION_HEIGHT, COLOR);
+            drawOnlyInExons.add(exonBox.clone()); // See comment for declaration of arrowClip
+        }
+
+        // Arrows
+        this._drawArrowsInInterval(startX, endX, COLOR); // Arrows on the center line
+        this._drawArrowsInInterval(startX, endX, BACKGROUND_COLOR, drawOnlyInExons); // Arrows within exons
 
         // UTRs, as thin boxes
         for (let utr of gene.absUtrs) {
-            const utrWidth = drawModel.basesToXWidth(utr.end - utr.start);
-            const utrStart = drawModel.baseToX(utr.start);
-
-            svgJs.rect(utrWidth, ANNOTATION_HEIGHT).attr({ // Box, same color as background, to cover up arrows
-                x: utrStart,
-                y: 0,
-                fill: BACKGROUND_COLOR
-            });
-            svgJs.rect(utrWidth, UTR_HEIGHT).attr({ // The actual colored box to represent the UTR
-                x: utrStart,
-                y: UTR_HEIGHT / 2,
-                fill: COLOR
-            });
-        }
-
-        // Translated exons, as thick boxes
-        for (let exon of gene.absTranslated) {
-            svgJs.rect(drawModel.basesToXWidth(exon.end - exon.start), ANNOTATION_HEIGHT).attr({
-                x: drawModel.baseToX(exon.start),
-                y: 0,
-                fill: COLOR
-            });
-            // Draw arrows of the background color inside the box
-            this._drawArrowsInInterval(drawModel.baseToX(exon.start), drawModel.baseToX(exon.end), BACKGROUND_COLOR);
+            this._drawCenteredBox(...utr, ANNOTATION_HEIGHT, BACKGROUND_COLOR); // White box to cover up arrows
+            this._drawCenteredBox(...utr, UTR_HEIGHT, COLOR); // The actual box that represents the UTR
         }
 
         // Label

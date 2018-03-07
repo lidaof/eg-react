@@ -179,7 +179,7 @@ class NavigationContext {
      * the chromosome's name as the feature name, but the second parameter can override this behavior.
      * 
      * @param {ChromosomeInterval} chrInterval - genome interval
-     * @param {string | Feature | FeatureInterval} [targetFeature] - target location in context to map to.
+     * @param {string | Feature | FeatureInterval} [targetFeature] - target location in context to map to
      * @return {OpenInterval} interval of absolute base numbers in this context
      * @throws {RangeError} if the feature does not exist in this context
      */

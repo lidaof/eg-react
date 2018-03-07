@@ -50,9 +50,7 @@ const refGeneSearch = async function (request, h){
         const mongoClient = await promiseMongoConnect(url);
         const db = mongoClient.db(dbName);
         const collection = db.collection('refGene');
-        const findResult = await collection.find(query, {
-            fields: { _id: 0, name: 1, chrom: 1, strand:1, txStart:1, txEnd:1, name2: 1 }
-        });
+        const findResult = await collection.find(query);
         return findResult.limit(NAME_SEARCH_LIMIT).toArray();
     } catch (err) {
         return {err: err};

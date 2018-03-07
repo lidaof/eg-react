@@ -6,7 +6,7 @@ import TrackRegionController from './TrackRegionController';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 import eglogo from '../../images/eglogo.jpg';
-import GeneSearch from './GeneSearch';
+import GeneSearchBox from './GeneSearchBox';
 
 const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
 
@@ -126,8 +126,8 @@ class GenomeNavigator extends React.Component {
                             />
                         </div>
                         <div className="col-md">
-                            <GeneSearch
-                                selectedRegion={this.props.selectedRegion}
+                            <GeneSearchBox
+                                navContext={this.props.selectedRegion.getNavigationContext()}
                                 newRegionCallback={this.props.regionSelectedCallback}
                             />
                         </div>
