@@ -1,5 +1,5 @@
 import React from 'react';
-import DataSource from '../dataSources/DataSource';
+import DataSource from '../../dataSources/DataSource';
 
 /**
  * An object containing all the information the Track component needs to render.

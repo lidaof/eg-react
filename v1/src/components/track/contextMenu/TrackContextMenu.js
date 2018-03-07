@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import TrackModel from '../../../model/TrackModel';
 import LabelItem from './LabelItem';
+import getSubtypeConfig from '../getSubtypeConfig';
+import TrackModel from '../../../model/TrackModel';
+
 
 import './TrackContextMenu.css';
 
@@ -69,7 +71,7 @@ class TrackContextMenu extends React.PureComponent {
     renderTrackSpecificItems(selectedTracks) {
         let menuComponents = []; // Array of arrays, one for each track
         for (let trackModel of selectedTracks) {
-            const menuItems = trackModel.getRenderConfig().menuItems;
+            const menuItems = getSubtypeConfig(trackModel).menuItems;
             if (menuItems) {
                 menuComponents.push(menuItems);
             } else { // Intersecting anything with the empty set is the empty set, so we can stop right here.

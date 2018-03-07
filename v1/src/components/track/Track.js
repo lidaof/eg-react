@@ -5,6 +5,7 @@ import TrackLegend from './TrackLegend';
 import TrackLoadingNotice from './TrackLoadingNotice';
 import withExpandedWidth from '../withExpandedWidth';
 import getComponentName from '../getComponentName';
+import getSubtypeConfig from './getSubtypeConfig';
 
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
@@ -91,7 +92,7 @@ export class Track extends React.PureComponent {
     constructor(props) {
         super(props);
         this.initViewExpansion(props);
-        const trackSubtype = props.trackModel.getRenderConfig();
+        const trackSubtype = getSubtypeConfig(props.trackModel);
         this.dataSource = trackSubtype.getDataSource ? trackSubtype.getDataSource(props.trackModel) : null;
 
         this.state = {
@@ -178,7 +179,7 @@ export class Track extends React.PureComponent {
     render() {
         const {trackModel, width, xOffset, onContextMenu, onClick} = this.props;
         const data = this.state.data;
-        const trackSubtype = trackModel.getRenderConfig();
+        const trackSubtype = getSubtypeConfig(trackModel);
         const Legend = trackSubtype.legend || TrackLegend; // Default to TrackLegend if there is none specified.
         const Visualizer = trackSubtype.visualizer;
         const style = {

@@ -63,13 +63,13 @@ it.  You can return the data in any format desired.  This would also be the best
 If you don't specify a data source, your legend and visualizer will receive no data.
 
 ### 2.  Using your shiny customizations
-Components use customizations via `TrackModel`'s getRenderConfig() method, which returns `TrackSubtype` objects.
+Components use customizations via the getSubtypeConfig() method, which returns `TrackSubtype` objects.
 
-1.  Package your customizations into an object matching the schema in `model/TrackSubtype.ts`.
-2.  Import the object from step 1 into `model/TrackModel.js`.
-3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `model/TrackModel.js`, which maps track type name to track subtype
-objects, such as the one you created in step 1.  This map is used in `TrackModel`'s getRenderConfig() method.
-Alternatively, for very fine-grained control, you can modify getRenderConfig() directly.
+1.  Package your customizations into an object matching the schema in `track/TrackSubtype.ts`.
+2.  Import the object from step 1 into `track/getSubtypeConfig.js`.
+3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `track/getSubtypeConfig.js`, which maps track type name to track subtype
+objects, such as the one you created in step 1.  Alternatively, for very fine-grained control, you can modify
+getSubtypeConfig() directly.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.
@@ -77,10 +77,12 @@ Such queries take on the order of 2 to 20 ms.  While it is fine to do it once or
 Suppose you aim to plot 500 data points on a SVG, and for each point you query the SVG's width.  That is already a
 second or more of computation -- very noticable to the user!
 
-## React gotchas
+## React (and other) gotchas
 * When using native DOM events, they take priority over React events.  This is because React waits for events to bubble
 to the root component before handling them.  This can cause undesirable effects: for example, calling
 `stopPropagation()` on a React event will not actually stop native events.  This StackOverflow post may also help if you
 have propagation problems: https://stackoverflow.com/questions/24415631/reactjs-syntheticevent-stoppropagation-only-works-with-react-events
 * React *always* unmounts components if their parents change type.  The `Reparentable` component works around this by
 using app-unique IDs, but it can cause side effects with React's native events.  Use with care.
+* Webpack does not support circular dependencies, and while compilation may be successful, an import may resolve as
+`undefined` at runtime.

@@ -1,10 +1,5 @@
 import _ from 'lodash';
 
-import RulerTrack from '../components/track/RulerTrack';
-import BigWigTrack from '../components/track/BigWigTrack';
-import GeneAnnotationTrack from '../components/track/geneAnnotationTrack/GeneAnnotationTrack';
-import UnknownTrack from '../components/track/UnknownTrack';
-
 /*
 const SCHEMA = { // Schema for the plain object argument to the constructor.
     type: "object",
@@ -19,15 +14,6 @@ const SCHEMA = { // Schema for the plain object argument to the constructor.
     }
 }
 */
-
-/**
- * Mapping from track type name to an object implementing the TrackSubtype interface.
- */
-const TYPE_NAME_TO_SUBTYPE = {
-    "ruler": RulerTrack,
-    "bigwig": BigWigTrack,
-    "hammock": GeneAnnotationTrack,
-};
 
 const DEFAULT_TRACK_NAME = "(unnamed track)";
 let nextId = 0;
@@ -56,16 +42,6 @@ class TrackModel {
         this.isSelected = false;
         this.id = nextId;
         nextId++;
-    }
-
-    /**
-     * Gets the rendering configuration appropriate for the type contained in `this.type`.  If none can be found,
-     * defaults to UnknownTrack.
-     * 
-     * @return {TrackSubtype} object containing rendering config appropriate for this model
-     */
-    getRenderConfig() {
-        return TYPE_NAME_TO_SUBTYPE[this.type.toLowerCase()] || UnknownTrack;
     }
 
     /**
