@@ -5,7 +5,7 @@ import TrackLegend from './TrackLegend';
 import TrackLoadingNotice from './TrackLoadingNotice';
 import withExpandedWidth from '../withExpandedWidth';
 import getComponentName from '../getComponentName';
-import getSubtypeConfig from './getSubtypeConfig';
+import { getSubtypeConfig } from './subtypeConfig';
 
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';

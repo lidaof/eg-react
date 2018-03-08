@@ -10,7 +10,7 @@ const MULTI_VALUE_PLACEHOLDER = "[multiple values]";
  * 
  * @author Silas Hsu
  */
-class LabelItem extends React.PureComponent {
+class LabelConfig extends React.PureComponent {
     static propTypes = ITEM_PROP_TYPES;
     static defaultProps = ITEM_DEFAULT_PROPS;
 
@@ -84,4 +84,4 @@ class LabelItem extends React.PureComponent {
     }
 }
 
-export default LabelItem;
+export default LabelConfig;

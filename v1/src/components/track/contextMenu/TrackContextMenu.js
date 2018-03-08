@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import LabelItem from './LabelItem';
-import getSubtypeConfig from '../getSubtypeConfig';
+import LabelConfig from './LabelConfig';
+import { getSubtypeConfig } from '../subtypeConfig';
 import TrackModel from '../../../model/TrackModel';
-
 
 import './TrackContextMenu.css';
 
@@ -125,7 +124,7 @@ class TrackContextMenu extends React.PureComponent {
         return (
         <div className="TrackContextMenu-body">
             <MenuTitle tracks={selectedTracks} />
-            <LabelItem tracks={selectedTracks} onChange={this.changeSelectedTracks} />
+            <LabelConfig tracks={selectedTracks} onChange={this.changeSelectedTracks} />
             {this.renderTrackSpecificItems(selectedTracks)}
             <RemoveItem numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
         </div>

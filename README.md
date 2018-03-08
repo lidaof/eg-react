@@ -66,10 +66,10 @@ If you don't specify a data source, your legend and visualizer will receive no d
 Components use customizations via the getSubtypeConfig() method, which returns `TrackSubtype` objects.
 
 1.  Package your customizations into an object matching the schema in `track/TrackSubtype.ts`.
-2.  Import the object from step 1 into `track/getSubtypeConfig.js`.
-3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `track/getSubtypeConfig.js`, which maps track type name to track subtype
-objects, such as the one you created in step 1.  Alternatively, for very fine-grained control, you can modify
-getSubtypeConfig() directly.
+2.  Import the object from step 1 into `track/subtypeConfig.js`.
+3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `track/subtypeConfig.js`, which maps track type name to track subtype
+objects, such as the one you created in step 1.  Alternatively, for very fine-grained control, you can modify the
+functions in the file directly.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.

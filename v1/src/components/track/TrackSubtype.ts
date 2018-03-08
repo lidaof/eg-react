@@ -24,6 +24,8 @@ interface TrackSubtype {
      */
     menuItems?: React.Component[];
 
+    defaultOptions?: Object // Default options, such as drawing color
+
     /**
      * A function that provides a DataSource given the props passed to Track.  Only called ONCE on Track creation.  If
      * none is provided, then the legend and visualizer will receive no data.
