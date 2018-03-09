@@ -142,6 +142,9 @@ export class GeneAnnotation extends React.PureComponent {
         let drawOnlyInExons = svgJs.clip();
         // Translated exons, as thick boxes
         for (let exon of gene.absTranslated) {
+            if (!exon) {
+                console.log(gene);
+            }
             const exonBox = this._drawCenteredBox(...exon, ANNOTATION_HEIGHT, color);
             drawOnlyInExons.add(exonBox.clone()); // See comment for declaration of arrowClip
         }

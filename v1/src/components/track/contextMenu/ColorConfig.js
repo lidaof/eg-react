@@ -4,7 +4,6 @@ import ColorPicker from '../../ColorPicker';
 import { ITEM_PROP_TYPES, ITEM_DEFAULT_PROPS } from './TrackContextMenu';
 import { aggregateOptions } from '../subtypeConfig';
 
-const OPTION_PROP_NAME = "color";
 const DEFAULT_COLOR = "#FFFFFF"; // White.  Used if a track doesn't provide a color AND its subtype provides no default.
 const MULTIPLE_COLORS = "(multiple values)";
 

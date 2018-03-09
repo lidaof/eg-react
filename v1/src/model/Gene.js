@@ -33,7 +33,7 @@ export class Gene extends Feature {
         "cdsEndStat": "unk",
         "exonFrames": "-1,-1,-1,"
     }
-     * @param {RefGeneRecord} record - refGeneRecod object to use
+     * @param {RefGeneRecord} record - refGeneRecord object to use
      */
     constructor(refGeneRecord) {
         const location = new ChromosomeInterval(refGeneRecord.chrom, refGeneRecord.txStart, refGeneRecord.txEnd);
@@ -42,6 +42,9 @@ export class Gene extends Feature {
         this._parseDetails();
     }
 
+    /**
+     * Parses `this.refGeneRecord` and sets `this.translated` and `this.utrs`.
+     */
     _parseDetails() {
         const {cdsStart, cdsEnd, exonStarts, exonEnds} = this.refGeneRecord;
         this.translated = [];
@@ -89,6 +92,7 @@ export class Gene extends Feature {
      * 
      * @param {NavigationContext} navContext - context with which to calculate absolute base numbers
      * @param {string | Feature | FeatureInterval} [targetFeature] - target location in context to map to
+     * @throws {RangeError} if this instance is not in the navigation context
      */
     computeNavContextCoordinates(navContext, targetFeature) {
         const chr = this.getLocus().chr;
@@ -96,12 +100,28 @@ export class Gene extends Feature {
         
         this.absStart = absInterval.start;
         this.absEnd = absInterval.end;
-        this.absTranslated = this.translated.map(exon =>
-            navContext.convertGenomeIntervalToBases(new ChromosomeInterval(chr, ...exon), targetFeature)
-        );
-        this.absUtrs = this.utrs.map(exon =>
-            navContext.convertGenomeIntervalToBases(new ChromosomeInterval(chr, ...exon), targetFeature)
-        );
+        this.absTranslated = [];
+        this.absUtrs = [];
+
+        const safePush = function(array, exon) {
+            try {
+                array.push(
+                    navContext.convertGenomeIntervalToBases(new ChromosomeInterval(chr, ...exon), targetFeature)
+                );
+            } catch (error) { // Ignore RangeErrors from convertGenomeIntervalToBases; let others bubble up.
+                if (!error instanceof RangeError) {
+                    throw error;
+                }
+            }
+        }
+
+        for (let exon of this.translated) {
+            safePush(this.absTranslated, exon);
+        }
+
+        for (let utr of this.utrs) {
+            safePush(this.absUtrs, utr);
+        }
     }
 }
 

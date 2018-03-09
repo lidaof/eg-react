@@ -57,7 +57,7 @@ class GeneAnnotationVisualizer extends React.PureComponent {
     }
 
     render() {
-        const {trackModel, viewRegion, width, data, leftBoundary, rightBoundary} = this.props;
+        const {trackModel, width, data, leftBoundary, rightBoundary} = this.props;
         const svgStyle = {paddingTop: 5, display: "block", overflow: "visible"};
         return (
         <React.Fragment>
