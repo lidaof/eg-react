@@ -7,7 +7,7 @@ const TRACK_MODEL = new TrackModel({name: "Right on track!"});
 
 it("renders the track's name", () => {
     const wrapper = shallow(<TrackLegend trackModel={TRACK_MODEL} />);
-    expect(wrapper.find('p').text()).toEqual(TRACK_MODEL.name);
+    expect(wrapper.find('p').text()).toEqual(TRACK_MODEL.getDisplayLabel());
 });
 
 it("renders a svg when given a scale", () => {

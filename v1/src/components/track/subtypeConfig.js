@@ -24,12 +24,30 @@ export function getSubtypeConfig(trackModel) {
 }
 
 /**
- * Gets the options object for a TrackModel, but with defaults for that subtype merged in.
+ * Aggregates a single option of multiple track models.  If all tracks have the same value for an option, returns that
+ * value; otherwise, returns the `multiValue` parameter.
  * 
- * @param {TrackModel} trackModel - track model for which to get options
- * @return {Object} options object
+ * @param {TrackModel[]} tracks - track models to aggregate
+ * @param {string} optionName - the option property to examine in each track
+ * @param {any} defaultValue - default option value if a track doesn't already have a default for its subtype
+ * @param {any} multiValue - value to return if there are multiple different option values
+ * @return {any} aggregated option value of the tracks
  */
-export function getOptions(trackModel) {
-    const subtype = getSubtypeConfig(trackModel);
-    return Object.assign({}, subtype.defaultOptions || {}, trackModel.options);
+export function aggregateOptions(tracks, optionName, defaultValue, multiValue) {
+    if (tracks.length === 0) {
+        return defaultValue;
+    }
+
+    // Returns the option value for a track, or undefined.
+    const getOption = function(track) { 
+        const subtypeDefaults = getSubtypeConfig(track).defaultOptions || {};
+        return track.options[optionName] || subtypeDefaults[optionName];
+    }
+
+    const firstOptionValue = getOption(tracks[0]);
+    if (tracks.every(track => getOption(track) === firstOptionValue)) {
+        return firstOptionValue || defaultValue;
+    } else {
+        return multiValue;
+    }
 }

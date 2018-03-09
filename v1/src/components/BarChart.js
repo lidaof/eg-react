@@ -18,6 +18,7 @@ class BarChart extends React.PureComponent {
         data: PropTypes.arrayOf(PropTypes.object).isRequired, // The data to display.  Array of BarChartRecord.
         width: PropTypes.number.isRequired, // Graphic width
         height: PropTypes.number.isRequired, // Graphic height
+        options: PropTypes.object, // Drawing options.  Will be passed to BarChartDesigner.
         style: PropTypes.object, // CSS
         renderSvg: PropTypes.bool, // Whether to render canvas (default) or svg
 
@@ -82,9 +83,9 @@ class BarChart extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {viewRegion, data, width, height, style, renderSvg, onMouseLeave} = this.props;
+        const {viewRegion, data, width, height, options, style, renderSvg, onMouseLeave} = this.props;
         this.makeXToDataMap();
-        const design = new BarChartDesigner(viewRegion, data, width, height).design();
+        const design = new BarChartDesigner(viewRegion, data, width, height, options).design();
         if (renderSvg) {
             const svgStyle = Object.assign({display: "block"}, style); // Display block to prevent extra bottom margin
             return (

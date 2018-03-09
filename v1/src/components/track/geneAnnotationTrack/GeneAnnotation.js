@@ -10,10 +10,9 @@ export const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;
 
 const ARROW_WIDTH = 5;
 const ARROW_SEPARATION = 12;
-const COLOR = "blue";
-const BACKGROUND_COLOR = "white";
-
 const LABEL_BACKGROUND_PADDING = 2;
+const DEFAULT_COLOR = "blue";
+const DEFAULT_BACKGROUND_COLOR = "white";
 
 /**
  * A single annotation for the gene annotation track.
@@ -30,7 +29,14 @@ export class GeneAnnotation extends React.PureComponent {
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
         isMinimal: PropTypes.bool, // If true, display only a minimal box
         leftBoundary: PropTypes.number, // The x coordinate of the left boundary of the initial view window
-        rightBoundary: PropTypes.number // The x coordinate of the right boundary of the initial view window
+        rightBoundary: PropTypes.number, // The x coordinate of the right boundary of the initial view window
+        color: PropTypes.string,
+        backgroundColor: PropTypes.string,
+    };
+
+    static defualtProps = {
+        color: DEFAULT_COLOR,
+        backgroundColor: DEFAULT_BACKGROUND_COLOR
     };
 
     static defaultProps = {
@@ -104,7 +110,9 @@ export class GeneAnnotation extends React.PureComponent {
      * @override
      */
     render() {
-        const {svgJs, gene, isMinimal, drawModel, leftBoundary, rightBoundary} = this.props;
+        const {svgJs, gene, isMinimal, drawModel, leftBoundary, rightBoundary, color} = this.props;
+        // Sometimes, parents will pass `undefined` literally, which defaultProps does not catch.
+        const backgroundColor = this.props.backgroundColor || DEFAULT_BACKGROUND_COLOR;
         svgJs.clear();
 
         const startX = drawModel.baseToX(gene.absStart);
@@ -118,7 +126,7 @@ export class GeneAnnotation extends React.PureComponent {
         });
 
         if (isMinimal) { // Just fill the box and end there
-            coveringBox.fill(COLOR);
+            coveringBox.fill(color);
             return null;
         } else {
             coveringBox.opacity(0);
@@ -126,7 +134,7 @@ export class GeneAnnotation extends React.PureComponent {
 
         // Center line
         svgJs.line(startX, centerY, endX, centerY).stroke({
-            color: COLOR,
+            color: color,
             width: 2
         });
 
@@ -134,18 +142,18 @@ export class GeneAnnotation extends React.PureComponent {
         let drawOnlyInExons = svgJs.clip();
         // Translated exons, as thick boxes
         for (let exon of gene.absTranslated) {
-            const exonBox = this._drawCenteredBox(...exon, ANNOTATION_HEIGHT, COLOR);
+            const exonBox = this._drawCenteredBox(...exon, ANNOTATION_HEIGHT, color);
             drawOnlyInExons.add(exonBox.clone()); // See comment for declaration of arrowClip
         }
 
         // Arrows
-        this._drawArrowsInInterval(startX, endX, COLOR); // Arrows on the center line
-        this._drawArrowsInInterval(startX, endX, BACKGROUND_COLOR, drawOnlyInExons); // Arrows within exons
+        this._drawArrowsInInterval(startX, endX, color); // Arrows on the center line
+        this._drawArrowsInInterval(startX, endX, backgroundColor, drawOnlyInExons); // Arrows within exons
 
         // UTRs, as thin boxes
         for (let utr of gene.absUtrs) {
-            this._drawCenteredBox(...utr, ANNOTATION_HEIGHT, BACKGROUND_COLOR); // White box to cover up arrows
-            this._drawCenteredBox(...utr, UTR_HEIGHT, COLOR); // The actual box that represents the UTR
+            this._drawCenteredBox(...utr, ANNOTATION_HEIGHT, backgroundColor); // White box to cover up arrows
+            this._drawCenteredBox(...utr, UTR_HEIGHT, color); // The actual box that represents the UTR
         }
 
         // Label
@@ -167,7 +175,7 @@ export class GeneAnnotation extends React.PureComponent {
             svgJs.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, ANNOTATION_HEIGHT).attr({
                 x: leftBoundary - LABEL_BACKGROUND_PADDING,
                 y: 0,
-                fill: BACKGROUND_COLOR,
+                fill: backgroundColor,
                 opacity: 0.65,
             });
         }

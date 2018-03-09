@@ -65,14 +65,12 @@ class App extends React.Component {
         return (
         <div className="container-fluid">
             <GenomeNavigator selectedRegion={this.state.selectedRegion} regionSelectedCallback={this.regionSelected} />
-            <div style={{margin: 5}}>
-                <TrackContainer
-                    tracks={this.state.currentTracks}
-                    viewRegion={this.state.selectedRegion}
-                    onNewRegion={this.regionSelected}
-                    onTracksChanged={(newTracks) => this.setState({currentTracks: newTracks})}
-                />
-            </div>
+            <TrackContainer
+                tracks={this.state.currentTracks}
+                viewRegion={this.state.selectedRegion}
+                onNewRegion={this.regionSelected}
+                onTracksChanged={(newTracks) => this.setState({currentTracks: newTracks})}
+            />
             <TrackManager
                 addedTracks={this.state.currentTracks}
                 onTrackAdded={this.addTrack}

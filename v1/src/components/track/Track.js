@@ -204,6 +204,8 @@ export class Track extends React.PureComponent {
                 visibleWidth={width}
                 viewExpansion={this.viewExpansion}
                 xOffset={xOffset}
+                // The 1px margin ensures visibility of the animated border when the track is selected.
+                style={{margin: 1, backgroundColor: trackModel.options.backgroundColor}}
             >
                 <Visualizer
                     data={data}

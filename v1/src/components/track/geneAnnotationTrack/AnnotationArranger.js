@@ -16,13 +16,15 @@ const ANNOTATION_RIGHT_PADDING = 30;
  * 
  * @author Silas Hsu
  */
-class AnnotationArranger extends React.Component {
+class AnnotationArranger extends React.PureComponent {
     static propTypes = {
         data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)), // Array of Gene objects
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Draw model to use
-        leftBoundary: PropTypes.number,
-        rightBoundary: PropTypes.number,
+        leftBoundary: PropTypes.number, // Left boundary of the view window, assuming no scrolling
+        rightBoundary: PropTypes.number, // Right boundary of the view window, assuming no scrolling
         maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
+        itemColor: PropTypes.string, // Annotation color
+        backgroundColor: PropTypes.string, // Background color
 
         /**
          * Called when a gene is clicked.  Has the signature
@@ -38,17 +40,6 @@ class AnnotationArranger extends React.Component {
         leftBoundary: 0,
         maxRows: DEFAULT_MAX_ROWS,
     };
-
-    /**
-     * Shallowly compares the `data` prop.
-     * 
-     * @param {any} nextProps - next props that the component will receive
-     * @return {boolean} whether the component should update
-     * @override
-     */
-    shouldComponentUpdate(nextProps) {
-        return this.props.data !== nextProps.data;
-    }
 
     /**
      * Sorts genes by start position in the genome, from lowest to highest.
@@ -75,7 +66,7 @@ class AnnotationArranger extends React.Component {
      * @override
      */
     render() {
-        const {data, drawModel, leftBoundary, rightBoundary, maxRows} = this.props;
+        const {data, drawModel, leftBoundary, rightBoundary, maxRows, itemColor, backgroundColor} = this.props;
         let children = [];
         let maxXsForRows = new Array(maxRows).fill(-Infinity);
         const genes = this._sortGenes(data);
@@ -121,6 +112,8 @@ class AnnotationArranger extends React.Component {
                     drawModel={drawModel}
                     leftBoundary={leftBoundary}
                     rightBoundary={rightBoundary}
+                    color={itemColor}
+                    backgroundColor={backgroundColor}
                 />
             </SvgJsManaged>
             );

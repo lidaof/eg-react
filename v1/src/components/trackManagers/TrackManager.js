@@ -78,7 +78,7 @@ class TrackManager extends React.Component {
     render() {
         let currentTrackList = this.props.addedTracks.map((track, index) => (
             <li key={index}>
-                {track.name} 
+                {track.getDisplayLabel()}
                 <button
                     className="btn btn-danger"
                     onClick={event => this.props.onTrackRemoved ? this.props.onTrackRemoved(index) : undefined}

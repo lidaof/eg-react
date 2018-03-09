@@ -262,7 +262,7 @@ class TrackContainer extends React.Component {
         // paddingTop to counteract track's marginTop of -1
         const trackDivStyle = {border: "1px solid black", paddingTop: 1, cursor: "crosshair"};
         return (
-        <div>
+        <div style={{margin: 5}} >
             {this.renderToolSelectButtons()}
             <OutsideClickDetector onOutsideClick={this.handleOutsideClick} >
                 <ContextMenuManager shouldMenuClose={this.handleMenuCloseRequest} menuElement={contextMenu} >
