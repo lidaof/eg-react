@@ -48,6 +48,13 @@ export class OpenInterval {
     getLength() {
         return this.end - this.start;
     }
+
+    /**
+     * @return {string} human-readable representation of this instance
+     */
+    toString() {
+        return `[${this.start}, ${this.end})`;
+    }
 }
 
 export default OpenInterval;

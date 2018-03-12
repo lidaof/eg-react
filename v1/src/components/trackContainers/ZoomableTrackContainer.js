@@ -53,16 +53,7 @@ class ZoomableTrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        // Add keys
-        let modifiedTracks = this.props.trackElements.map((trackElement, index) => {
-            const key = trackElement.props.trackModel ? trackElement.props.trackModel.getId() : index;
-            const propsToMerge = {
-                key: key,
-            };
-            return React.cloneElement(trackElement, propsToMerge);
-        });
-
-        return <SelectableArea onAreaSelected={this.areaSelected} >{modifiedTracks}</SelectableArea>;
+        return <SelectableArea onAreaSelected={this.areaSelected} >{this.props.trackElements}</SelectableArea>;
     }
 }
 

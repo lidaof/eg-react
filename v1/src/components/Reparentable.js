@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 
@@ -37,9 +37,12 @@ function removeMountNode(uid) {
  * 
  * Taken from https://gist.github.com/leoasis/e1d093141e5f22e4e1e346e6726dfa5b
  * 
+ * (Added by Silas Hsu) - this component will also pass props to its children.
+ * 
  * @author Leonardo Andrés Garcia Crespo
+ * @author Silas Hsu
  */
-export default class Reparentable extends Component {
+export default class Reparentable extends React.Component {
     static propTypes = {
         uid: PropTypes.string.isRequired,
         children: PropTypes.element.isRequired
@@ -62,9 +65,12 @@ export default class Reparentable extends Component {
     }
 
     renderChildrenIntoNode(node) {
-        // We use this instead of `render` because this also handles
-        // passing the context
-        ReactDOM.unstable_renderSubtreeIntoContainer(this, this.props.children, node);
+        const {uid, children, ...otherProps} = this.props;
+        // Merge props not specific to Reparentable into the children
+        const childrenWithProps = React.Children.map(children, child => React.cloneElement(child, otherProps));
+
+        // We use `unstable_renderSubtreeIntoContainer` instead of `render` because it also handles passing the context.
+        ReactDOM.unstable_renderSubtreeIntoContainer(this, childrenWithProps, node);
     }
 
     render() {
