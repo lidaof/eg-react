@@ -6,6 +6,7 @@ import SvgJsManaged from '../../SvgJsManaged';
 
 import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
+import OpenInterval from '../../../model/interval/OpenInterval';
 
 const DEFAULT_MAX_ROWS = 7;
 const ROW_BOTTOM_PADDING = 5;
@@ -20,8 +21,7 @@ class AnnotationArranger extends React.PureComponent {
     static propTypes = {
         data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)), // Array of Gene objects
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Draw model to use
-        leftBoundary: PropTypes.number, // Left boundary of the view window, assuming no scrolling
-        rightBoundary: PropTypes.number, // Right boundary of the view window, assuming no scrolling
+        viewWindow: PropTypes.instanceOf(OpenInterval), // X range of initially visible pixels
         maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
         itemColor: PropTypes.string, // Annotation color
         backgroundColor: PropTypes.string, // Background color
@@ -37,7 +37,6 @@ class AnnotationArranger extends React.PureComponent {
 
     static defaultProps = {
         data: [],
-        leftBoundary: 0,
         maxRows: DEFAULT_MAX_ROWS,
     };
 
@@ -66,15 +65,13 @@ class AnnotationArranger extends React.PureComponent {
      * @override
      */
     render() {
-        const {data, drawModel, leftBoundary, rightBoundary, maxRows, itemColor, backgroundColor} = this.props;
+        const {data, drawModel, viewWindow, maxRows, itemColor, backgroundColor} = this.props;
         let children = [];
         let maxXsForRows = new Array(maxRows).fill(-Infinity);
         const genes = this._sortGenes(data);
-        let numHiddenGenes = 0;
         for (let gene of genes) {
             let geneWidth = drawModel.basesToXWidth(gene.absEnd - gene.absStart);
             if (geneWidth < 1) { // No use rendering something less than one pixel wide.
-                numHiddenGenes++;
                 continue;
             }
 
@@ -93,7 +90,6 @@ class AnnotationArranger extends React.PureComponent {
             if (row === -1) { // It won't fit!  Put it in the last row, unlabeled
                 isMinimal = true;
                 row = maxRows;
-                numHiddenGenes++;
             } else {
                 isMinimal = false;
                 maxXsForRows[row] = endX + ANNOTATION_RIGHT_PADDING + labelWidth + 2;
@@ -110,15 +106,13 @@ class AnnotationArranger extends React.PureComponent {
                     gene={gene}
                     isMinimal={isMinimal}
                     drawModel={drawModel}
-                    leftBoundary={leftBoundary}
-                    rightBoundary={rightBoundary}
+                    viewWindow={viewWindow}
                     color={itemColor}
                     backgroundColor={backgroundColor}
                 />
             </SvgJsManaged>
             );
         }
-        console.log(`${numHiddenGenes} genes hidden this render`);
         return children;
     }
 }

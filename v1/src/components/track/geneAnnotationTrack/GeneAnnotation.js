@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import SVG from 'svg.js';
+
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import { Gene } from '../../../model/Gene';
+import OpenInterval from '../../../model/interval/OpenInterval';
 
 export const ANNOTATION_HEIGHT = 9;
 export const UTR_HEIGHT = 5;
@@ -28,8 +30,7 @@ export class GeneAnnotation extends React.PureComponent {
         gene: PropTypes.instanceOf(Gene).isRequired, // Gene structure to draw
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
         isMinimal: PropTypes.bool, // If true, display only a minimal box
-        leftBoundary: PropTypes.number, // The x coordinate of the left boundary of the initial view window
-        rightBoundary: PropTypes.number, // The x coordinate of the right boundary of the initial view window
+        viewWindow: PropTypes.instanceOf(OpenInterval), // X range of initially visible pixels
         color: PropTypes.string,
         backgroundColor: PropTypes.string,
     };
@@ -40,8 +41,7 @@ export class GeneAnnotation extends React.PureComponent {
     };
 
     static defaultProps = {
-        leftBoundary: -Infinity,
-        rightBoundary: Infinity
+        viewWindow: new OpenInterval(-Infinity, Infinity)
     };
 
     /**
@@ -110,7 +110,7 @@ export class GeneAnnotation extends React.PureComponent {
      * @override
      */
     render() {
-        const {svgJs, gene, isMinimal, drawModel, leftBoundary, rightBoundary, color} = this.props;
+        const {svgJs, gene, isMinimal, drawModel, viewWindow, color} = this.props;
         // Sometimes, parents will pass `undefined` literally, which defaultProps does not catch.
         const backgroundColor = this.props.backgroundColor || DEFAULT_BACKGROUND_COLOR;
         svgJs.clear();
@@ -163,8 +163,8 @@ export class GeneAnnotation extends React.PureComponent {
         let labelX, textAnchor;
         // Label width is approx. because calculating bounding boxes is expensive.
         const estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
-        const isBlockedLeft = startX - estimatedLabelWidth < leftBoundary; // Label obscured if put on the left
-        const isBlockedRight = endX + estimatedLabelWidth > rightBoundary; // Label obscured if put on the right
+        const isBlockedLeft = startX - estimatedLabelWidth < viewWindow.start; // Label obscured if put on the left
+        const isBlockedRight = endX + estimatedLabelWidth > viewWindow.end; // Label obscured if put on the right
         if (!isBlockedLeft) { // Yay, we can put it on the left!
             labelX = startX - 1;
             textAnchor = "end";
@@ -172,11 +172,11 @@ export class GeneAnnotation extends React.PureComponent {
             labelX = endX + 1;
             textAnchor = "start";
         } else { // Just put it directly on top of the annotation
-            labelX = leftBoundary + 1;
+            labelX = viewWindow.start + 1;
             textAnchor = "start";
             // We have to add some highlighting for contrast purposes.
             svgJs.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, ANNOTATION_HEIGHT).attr({
-                x: leftBoundary - LABEL_BACKGROUND_PADDING,
+                x: viewWindow.start - LABEL_BACKGROUND_PADDING,
                 y: 0,
                 fill: backgroundColor,
                 opacity: 0.65,

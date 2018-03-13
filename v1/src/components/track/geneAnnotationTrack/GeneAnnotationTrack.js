@@ -57,7 +57,7 @@ class GeneAnnotationVisualizer extends React.PureComponent {
     }
 
     render() {
-        const {trackModel, width, data, leftBoundary, rightBoundary} = this.props;
+        const {trackModel, width, data, viewWindow} = this.props;
         const svgStyle = {paddingTop: 5, display: "block", overflow: "visible"};
         return (
         <React.Fragment>
@@ -66,8 +66,7 @@ class GeneAnnotationVisualizer extends React.PureComponent {
                     data={data}
                     drawModel={this.drawModel}
                     onGeneClick={this.openTooltip}
-                    leftBoundary={leftBoundary}
-                    rightBoundary={rightBoundary}
+                    viewWindow={viewWindow}
                     itemColor={trackModel.options.color || DEFAULT_OPTIONS.color}
                     backgroundColor={trackModel.options.backgroundColor}
                 />

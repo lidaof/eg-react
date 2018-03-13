@@ -15,30 +15,36 @@ export default function withExpandedWidth(WrappedComponent) {
         static displayName = `withExpandedWidth(${getComponentName(WrappedComponent)})`;
 
         static propTypes = {
-            visibleWidth: PropTypes.number.isRequired, // The *visible* width of this component
-            viewExpansion: PropTypes.object.isRequired, // Info on the *actual* width of this component
+            viewExpansion: PropTypes.object.isRequired, // Info on the width of this component
             xOffset: PropTypes.number, // How much to offset children's horizontal position
-            wrappedRef: PropTypes.func, // Accessor for ref to wrapped component
+            innerRef: PropTypes.func, // Accessor for ref to wrapped component
+        };
+
+        static defaultProps = {
+            xOffset: 0
         };
 
         render() {
-            let {visibleWidth, viewExpansion, xOffset, width, style, wrappedRef, ...remainingProps} = this.props;
-            xOffset = xOffset || 0;
+            const {viewExpansion, xOffset, innerRef, style, ...remainingProps} = this.props;
             let left = 0;
             if (xOffset > 0) {
-                left = Math.min(xOffset, viewExpansion.leftExtraPixels);
+                // Dragging stuff on the left into view.  So, we limit to how many pixels exist on the left.
+                left = Math.min(xOffset, viewExpansion.viewWindow.start);
             } else {
-                left = Math.max(-viewExpansion.rightExtraPixels, xOffset);
+                // Ditto for dragging stuff on the right into view.
+                const numPixelsOnRight = viewExpansion.expandedWidth - viewExpansion.viewWindow.end;
+                left = Math.max(-numPixelsOnRight, xOffset);
             }
 
             const divStyle = {
                 overflowX: "hidden",
-                width: visibleWidth,
+                width: viewExpansion.viewWindow.getLength(),
             };
 
             const wrappedStyle = Object.assign(style || {}, {
                 position: "relative",
-                marginLeft: -viewExpansion.leftExtraPixels,
+                // This centers the view window, rather than it starting at the leftmost part of the wrapped component.
+                marginLeft: -viewExpansion.viewWindow.start,
                 left: left
             });
 
@@ -47,7 +53,7 @@ export default function withExpandedWidth(WrappedComponent) {
                 <WrappedComponent
                     width={viewExpansion.expandedWidth}
                     style={wrappedStyle}
-                    ref={wrappedRef}
+                    ref={innerRef}
                     {...remainingProps}
                 />
             </div>

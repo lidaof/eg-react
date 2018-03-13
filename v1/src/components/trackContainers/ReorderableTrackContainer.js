@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import GenericDraggable from '../GenericDraggable';
 import GenericDroppable from '../GenericDroppable';
 import TrackModel from '../../model/TrackModel';
-import { OpenInterval } from '../../model/interval/OpenInterval';
+import OpenInterval from '../../model/interval/OpenInterval';
 
 /**
  * Track container where the tracks can be dragged and dropped.

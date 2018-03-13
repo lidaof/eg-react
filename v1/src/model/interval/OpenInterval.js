@@ -4,7 +4,7 @@
  * 
  * @author Silas Hsu
  */
-export class OpenInterval {
+class OpenInterval {
     /**
      * Makes a new instance.  The input should be a 0-indexed open one.
      * 

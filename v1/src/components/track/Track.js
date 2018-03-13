@@ -10,28 +10,31 @@ import { getSubtypeConfig } from './subtypeConfig';
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import RegionExpander from '../../model/RegionExpander';
+import OpenInterval from '../../model/interval/OpenInterval';
 
 import './Track.css';
+
 
 /**
  * Props that will be passed to track legend components.
  */
 export const LEGEND_PROP_TYPES = {
-    trackModel: PropTypes.instanceOf(TrackModel), // Track metadata
-    data: PropTypes.array, // Track data
-    style: PropTypes.object, // Style
+    trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
+    data: PropTypes.array.isRequired, // Track data
 };
 
 /**
  * Props that will be passed to track visualizer components.
  */
 export const VISUALIZER_PROP_TYPES = {
-    trackModel: PropTypes.instanceOf(TrackModel), // Track metadata
-    data: PropTypes.array, // Track data
-    viewRegion: PropTypes.instanceOf(DisplayedRegionModel), // Region to visualize
-    width: PropTypes.number, // Visualization width
-    leftBoundary: PropTypes.number,
-    rightBoudary: PropTypes.number,
+    trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
+    data: PropTypes.array.isRequired, // Track data
+    viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
+    width: PropTypes.number.isRequired, // Visualization width
+    /**
+     * X range of visible pixels, assuming the user has not dragged the view
+     */
+    viewWindow: PropTypes.instanceOf(OpenInterval),
 };
 
 /**
@@ -178,7 +181,7 @@ export class Track extends React.PureComponent {
      * @override
      */
     render() {
-        const {trackModel, width, xOffset, onContextMenu, onClick} = this.props;
+        const {trackModel, xOffset, onContextMenu, onClick} = this.props;
         const data = this.state.data;
         const trackSubtype = getSubtypeConfig(trackModel);
         const Legend = trackSubtype.legend || TrackLegend; // Default to TrackLegend if there is none specified.
@@ -195,7 +198,6 @@ export class Track extends React.PureComponent {
             <Legend trackModel={trackModel} data={data} />
             <WideDiv
                 isLoading={this.state.isLoading}
-                visibleWidth={width}
                 viewExpansion={this.viewExpansion}
                 xOffset={xOffset}
                 style={{backgroundColor: trackModel.options.backgroundColor}}
@@ -204,8 +206,7 @@ export class Track extends React.PureComponent {
                     data={data}
                     viewRegion={this.viewExpansion.expandedRegion}
                     width={this.viewExpansion.expandedWidth}
-                    leftBoundary={this.viewExpansion.leftExtraPixels}
-                    rightBoundary={this.viewExpansion.expandedWidth - this.viewExpansion.rightExtraPixels}
+                    viewWindow={this.viewExpansion.viewWindow}
                     trackModel={trackModel}
                 />
             </WideDiv>

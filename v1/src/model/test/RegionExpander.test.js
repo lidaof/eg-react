@@ -15,8 +15,8 @@ it('expands a region in the middle of the genome correctly', () => {
         end: 20
     });
     expect(expansion.expandedWidth).toEqual(15);
-    expect(expansion.leftExtraPixels).toEqual(5);
-    expect(expansion.rightExtraPixels).toEqual(5);
+    expect(expansion.viewWindow.start).toEqual(5);
+    expect(expansion.viewWindow.end).toEqual(10);
     
 });
 
@@ -28,8 +28,8 @@ it('expands a region on the edge of the genome correctly', () => {
         end: 15
     });
     expect(expansion.expandedWidth).toEqual(15);
-    expect(expansion.leftExtraPixels).toEqual(0);
-    expect(expansion.rightExtraPixels).toEqual(10);
+    expect(expansion.viewWindow.start).toEqual(0);
+    expect(expansion.viewWindow.end).toEqual(5);
 });
 
 it('does not modify a region that already spans the entire genome', () => {
@@ -40,6 +40,6 @@ it('does not modify a region that already spans the entire genome', () => {
         end: 30
     });
     expect(expansion.expandedWidth).toEqual(30);
-    expect(expansion.leftExtraPixels).toEqual(0);
-    expect(expansion.rightExtraPixels).toEqual(0);
+    expect(expansion.viewWindow.start).toEqual(0);
+    expect(expansion.viewWindow.end).toEqual(30);
 });

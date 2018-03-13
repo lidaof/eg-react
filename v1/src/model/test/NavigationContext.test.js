@@ -2,7 +2,7 @@ import NavigationContext from '../NavigationContext';
 import { CHROMOSOMES } from './toyRegion';
 import Feature from '../Feature';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
-import { OpenInterval } from '../interval/OpenInterval';
+import OpenInterval from '../interval/OpenInterval';
 
 const NAME = "Wow very genome";
 const instance = new NavigationContext(NAME, CHROMOSOMES);

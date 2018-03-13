@@ -2,7 +2,7 @@ import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import _ from 'lodash';
 import axios from 'axios';
-import { OpenInterval } from './interval/OpenInterval';
+import OpenInterval from './interval/OpenInterval';
 
 /**
  * A data container for gene annotations originating from hammock files.

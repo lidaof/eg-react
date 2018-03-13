@@ -1,3 +1,5 @@
+import OpenInterval from "./interval/OpenInterval";
+
 /**
  * Utility class that does calculations related to expanding view regions for the purposes of scrolling.
  * 
@@ -34,14 +36,13 @@ class RegionExpander {
     }
 
     /**
-     * Return object of calculateExpansion.  Note that expandedWidth = (original width provided to the function) +
-     * leftExtraPixels + rightExtraPixels.
+     * Return object of calculateExpansion.  Note that the length of `viewWindow` equals the original width provided to
+     * the method.
      * 
      * @typedef {Object} RegionExpander~ExpansionData
      * @property {number} expandedWidth - total width, in pixels, of the expanded view
      * @property {DisplayedRegionModel} expandedRegion - model of expanded region
-     * @property {number} leftExtraPixels - how many pixels on the left side to allocate to additional data
-     * @property {number} rightExtraPixels - how many pixels on the right side to allocate to additional data
+     * @property {OpenInterval} viewWindow - the X range of pixels that would display the unexpanded region
      */
 
     /**
@@ -54,23 +55,22 @@ class RegionExpander {
      * @return {RegionExpander~ExpansionData} - data representing aspects of an expanded region
      */
     calculateExpansion(width, region) {
-        let pixelsPerBase = width / region.getWidth();
-        let expandedRegion = this.makeExpandedRegion(region);
-        let expandedWidth = expandedRegion.getWidth() * pixelsPerBase;
+        const pixelsPerBase = width / region.getWidth();
+        const expandedRegion = this.makeExpandedRegion(region);
+        const expandedWidth = expandedRegion.getWidth() * pixelsPerBase;
 
-        let originalAbsRegion = region.getAbsoluteRegion();
-        let expandedAbsRegion = expandedRegion.getAbsoluteRegion();
-        let leftBaseDiff = originalAbsRegion.start - expandedAbsRegion.start;
-        let rightBaseDiff = expandedAbsRegion.end - originalAbsRegion.end;
+        const originalAbsRegion = region.getAbsoluteRegion();
+        const expandedAbsRegion = expandedRegion.getAbsoluteRegion();
+        const leftBaseDiff = originalAbsRegion.start - expandedAbsRegion.start;
+        const rightBaseDiff = expandedAbsRegion.end - originalAbsRegion.end;
 
-        let leftExtraPixels = leftBaseDiff * pixelsPerBase;
-        let rightExtraPixels = rightBaseDiff * pixelsPerBase;
+        const leftExtraPixels = leftBaseDiff * pixelsPerBase;
+        const rightExtraPixels = rightBaseDiff * pixelsPerBase;
 
         return {
             expandedWidth: expandedWidth,
             expandedRegion: expandedRegion,
-            leftExtraPixels: leftExtraPixels,
-            rightExtraPixels: rightExtraPixels
+            viewWindow: new OpenInterval(leftExtraPixels, expandedWidth - rightExtraPixels),
         };
     }
 }
