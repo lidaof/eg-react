@@ -5,8 +5,8 @@ import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
 
-import { Track } from '../track/Track';
-import TrackLegend from '../track/TrackLegend';
+import Track from '../track/Track';
+import { WIDTH as LEGEND_WIDTH } from '../track/TrackLegend';
 import TrackContextMenu from '../track/contextMenu/TrackContextMenu';
 
 import OutsideClickDetector from '../OutsideClickDetector';
@@ -14,7 +14,7 @@ import ContextMenuManager from '../ContextMenuManager';
 import DivWithBullseye from '../DivWithBullseye';
 import Reparentable from '../Reparentable';
 
-import withAutoWidth from '../withAutoWidth';
+import withAutoDimensions from '../withAutoDimensions';
 import { MouseButtons } from '../../util';
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
@@ -178,7 +178,7 @@ class TrackContainer extends React.Component {
     }
 
     getVisualizationWidth() {
-        return Math.max(0, this.props.width - TrackLegend.WIDTH);
+        return Math.max(0, this.props.width - LEGEND_WIDTH);
     }
 
     /**
@@ -189,7 +189,6 @@ class TrackContainer extends React.Component {
             const id = trackModel.getId();
             return <Reparentable key={id} uid={"track-" + id} >
                 <Track
-                    key={trackModel.getId()}
                     trackModel={trackModel}
                     viewRegion={this.props.viewRegion}
                     width={this.getVisualizationWidth()}
@@ -220,7 +219,7 @@ class TrackContainer extends React.Component {
             case tools.ZOOM:
                 return (
                     <ZoomableTrackContainer
-                        legendWidth={TrackLegend.WIDTH}
+                        legendWidth={LEGEND_WIDTH}
                         trackElements={trackElements}
                         viewRegion={viewRegion}
                         onNewRegion={onNewRegion}
@@ -261,4 +260,4 @@ class TrackContainer extends React.Component {
     }
 }
 
-export default withAutoWidth(TrackContainer);
+export default withAutoDimensions(TrackContainer);

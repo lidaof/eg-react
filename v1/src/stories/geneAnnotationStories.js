@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 
 import AnnotationArranger from '../components/track/geneAnnotationTrack/AnnotationArranger';
-import withAutoWidth from '../components/withAutoWidth';
+import withAutoDimensions from '../components/withAutoDimensions';
 
 import Feature from '../model/Feature';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
@@ -93,7 +93,7 @@ function Renderer(props) {
     const drawModel = new LinearDrawingModel(VIEW_REGION, props.width);
     return <svg width="100%"><AnnotationArranger data={GENES} drawModel={drawModel} maxRows={2} /></svg>;
 }
-const AutoWidthRenderer = withAutoWidth(Renderer);
+const AutoWidthRenderer = withAutoDimensions(Renderer);
 
 export const annotationStory = {
     storyName: "Annotations",

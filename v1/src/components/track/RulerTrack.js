@@ -67,7 +67,7 @@ class RulerVisualizer extends React.PureComponent {
             {this.state.tooltip}
         </div>
         );
-    } 
+    }
 }
 
 const RulerTrack = {

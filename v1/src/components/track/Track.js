@@ -19,6 +19,7 @@ import './Track.css';
 export const LEGEND_PROP_TYPES = {
     trackModel: PropTypes.instanceOf(TrackModel), // Track metadata
     data: PropTypes.array, // Track data
+    style: PropTypes.object, // Style
 };
 
 /**
@@ -182,18 +183,11 @@ export class Track extends React.PureComponent {
         const trackSubtype = getSubtypeConfig(trackModel);
         const Legend = trackSubtype.legend || TrackLegend; // Default to TrackLegend if there is none specified.
         const Visualizer = trackSubtype.visualizer;
-        const style = {
-            position: "relative",
-            display: "flex",
-            border: "1px solid lightgrey",
-            marginTop: -1, // -1 so borders collapse.  TODO: put tracks in a table so we can use border-collapse CSS?
-            backgroundColor: this.state.error ? "pink" : "white",
-        };
 
         return (
         <div
-            style={style}
-            className={trackModel.isSelected ? "Track-selected-border" : undefined}
+            style={{backgroundColor: this.state.error ? "pink" : "white"}}
+            className={trackModel.isSelected ? "Track Track-selected-border" : "Track"}
             onContextMenu={onContextMenu}
             onClick={onClick}
         >
@@ -204,8 +198,7 @@ export class Track extends React.PureComponent {
                 visibleWidth={width}
                 viewExpansion={this.viewExpansion}
                 xOffset={xOffset}
-                // The 1px margin ensures visibility of the animated border when the track is selected.
-                style={{margin: 1, backgroundColor: trackModel.options.backgroundColor}}
+                style={{backgroundColor: trackModel.options.backgroundColor}}
             >
                 <Visualizer
                     data={data}

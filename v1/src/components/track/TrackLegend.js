@@ -4,7 +4,9 @@ import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
 
 import TrackModel from '../../model/TrackModel';
+import withAutoDimensions from '../withAutoDimensions';
 
+export const WIDTH = 120;
 const NUM_TICKS_SUGGESTION = 2;
 const AXIS_WIDTH = 30;
 
@@ -13,13 +15,12 @@ const AXIS_WIDTH = 30;
  * 
  * @author Silas Hsu
  */
-class TrackLegend extends React.PureComponent {
-    static WIDTH = 120;
-
+class _TrackLegend extends React.PureComponent {
     static propTypes = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired,
+        height: PropTypes.number.isRequired,
         scaleForAxis: PropTypes.func,
-        height: PropTypes.number, // Required when scaleForAxis is defined.
+        style: PropTypes.object,
     };
 
     constructor(props) {
@@ -49,23 +50,30 @@ class TrackLegend extends React.PureComponent {
     }
 
     render() {
-        const divStyle = {
+        const {trackModel, height, scaleForAxis, style} = this.props;
+        if (height === 0) {
+            console.warn("Warning: rendering a 0-height track legend");
+        }
+
+        const divStyle = Object.assign({
             display: "flex",
-            width: TrackLegend.WIDTH,
-        };
+            width: WIDTH,
+            height: height,
+            backgroundColor: trackModel.isSelected ? "yellow" : undefined,
+        }, style);
         const pStyle = {
             margin: 0,
-            maxWidth: this.scaleForAxis ? TrackLegend.WIDTH - AXIS_WIDTH : TrackLegend.WIDTH,
+            width: this.scaleForAxis ? WIDTH - AXIS_WIDTH : WIDTH,
+            maxHeight: height,
+            fontSize: "x-small",
+            lineHeight: 1,
             wordWrap: "break-word",
-            fontSize: 10
+            overflow: "hidden",
         };
 
         let axis = null;
-        if (this.props.scaleForAxis) {
-            if (!this.props.height) {
-                console.error("The `height` prop is required when drawing an axis.");
-            }
-            axis = <svg width={AXIS_WIDTH} height={this.props.height} style={{overflow: "visible"}} >
+        if (scaleForAxis) {
+            axis = <svg width={AXIS_WIDTH} height={height} style={{overflow: "visible"}} >
                 <g ref={node => this.gNode = node} transform={`translate(${AXIS_WIDTH}, 0)`} />
             </svg>;
         }
@@ -79,4 +87,5 @@ class TrackLegend extends React.PureComponent {
     }
 }
 
+export const TrackLegend = withAutoDimensions(_TrackLegend);
 export default TrackLegend;

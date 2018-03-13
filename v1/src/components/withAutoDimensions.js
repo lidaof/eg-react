@@ -2,16 +2,16 @@ import React from 'react';
 import getComponentName from './getComponentName';
 
 /**
- * A function that returns a component that measures its width automatically.  The wrapped component will recieve this
- * width in the `width` property.
+ * A function that returns a component that measures its width amd height automatically.  The wrapped component will
+ * recieve the values as props.  Note that the parent can override these values.
  * 
  * @param {React.Component} WrappedComponent - Component to wrap
  * @return {React.Component} component that measures its width automatically
  * @author Silas Hsu
  */
-function withAutoWidth(WrappedComponent) {
+function withAutoDimensions(WrappedComponent) {
     return class extends React.Component {
-        static displayName = `WithAutoWidth(${getComponentName(WrappedComponent)})`;
+        static displayName = `WithAutoDimensions(${getComponentName(WrappedComponent)})`;
 
         /**
          * Initializes state.
@@ -23,15 +23,16 @@ function withAutoWidth(WrappedComponent) {
             this.state = {
                 isMounted: false,
                 width: 0,
+                height: 0,
             };
-            this.divNode = null;
+            this.node = null;
         }
 
         /**
          * Measures width.
          */
         componentDidMount() {
-            this.setState({isMounted: true, width: this.divNode.offsetWidth});
+            this.setState({isMounted: true, width: this.node.offsetWidth, height: this.node.offsetHeight});
         }
 
         /**
@@ -39,12 +40,17 @@ function withAutoWidth(WrappedComponent) {
          */
         render() {
             return (
-            <div ref={node => this.divNode = node}>
-                {this.state.isMounted ? <WrappedComponent width={this.state.width} {...this.props} /> : null}
+            <div ref={node => this.node = node}>
+                {
+                this.state.isMounted ?
+                    <WrappedComponent width={this.state.width} height={this.state.height} {...this.props} />
+                    :
+                    null
+                }
             </div>
             );
         }
     }
 }
 
-export default withAutoWidth;
+export default withAutoDimensions;

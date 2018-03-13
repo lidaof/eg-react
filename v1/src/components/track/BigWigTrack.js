@@ -31,9 +31,11 @@ function BigWigLegend(props) {
         const dataMax = _.maxBy(props.data, record => record.value).value;
         scale = scaleLinear().domain([dataMax, 0]).range([0, height]);
     }
-    return <div style={{marginTop: TOP_PADDING}}>
-        <TrackLegend trackModel={props.trackModel} scaleForAxis={scale} height={height} />
-    </div>;
+    return <TrackLegend
+        trackModel={props.trackModel}
+        scaleForAxis={scale}
+        style={{paddingTop: TOP_PADDING}}
+    />;
 }
 
 /**

@@ -7,7 +7,7 @@ import SelectedRegionBox from './SelectedRegionBox';
 
 import SelectableArea from '../SelectableArea';
 import DragAcrossView from '../DragAcrossView';
-import withAutoWidth from '../withAutoWidth';
+import withAutoDimensions from '../withAutoDimensions';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
@@ -157,4 +157,4 @@ class MainPane extends React.Component {
     }
 }
 
-export default withAutoWidth(MainPane);
+export default withAutoDimensions(MainPane);
