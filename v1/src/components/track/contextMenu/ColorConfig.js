@@ -56,7 +56,7 @@ class ColorConfig extends React.PureComponent {
  * @return {JSX.Element} element to render
  */
 export function PrimaryColorConfig(props) {
-    return <ColorConfig {...props} optionPropName={"color"} label="Primary color" />;
+    return <ColorConfig {...props} optionPropName="color" label="Primary color" />;
 }
 
 /**
@@ -66,5 +66,5 @@ export function PrimaryColorConfig(props) {
  * @return {JSX.Element} element to render
  */
 export function BackgroundColorConfig(props) {
-    return <ColorConfig {...props} optionPropName={"backgroundColor"} label="Background color" />;
+    return <ColorConfig {...props} optionPropName="backgroundColor" label="Background color" />;
 }

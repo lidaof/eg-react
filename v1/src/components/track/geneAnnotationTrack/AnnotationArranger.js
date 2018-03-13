@@ -18,13 +18,17 @@ const ANNOTATION_RIGHT_PADDING = 30;
  * @author Silas Hsu
  */
 class AnnotationArranger extends React.PureComponent {
+    static HEIGHT_PER_ROW = ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING;
+
     static propTypes = {
         data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)), // Array of Gene objects
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Draw model to use
         viewWindow: PropTypes.instanceOf(OpenInterval), // X range of initially visible pixels
-        maxRows: PropTypes.number, // Max rows of annotations to draw before putting them unlabeled at the bottom
-        itemColor: PropTypes.string, // Annotation color
-        backgroundColor: PropTypes.string, // Background color
+        options: PropTypes.shape({
+            rows: PropTypes.number,
+            color: PropTypes.string,
+            backgroundColor: PropTypes.string,
+        }),
 
         /**
          * Called when a gene is clicked.  Has the signature
@@ -37,7 +41,7 @@ class AnnotationArranger extends React.PureComponent {
 
     static defaultProps = {
         data: [],
-        maxRows: DEFAULT_MAX_ROWS,
+        options: {},
     };
 
     /**
@@ -47,8 +51,6 @@ class AnnotationArranger extends React.PureComponent {
      * @return {Gene[]} sorted genes
      */
     _sortGenes(genes) {
-        //return genes.sort((gene1, gene2) => gene1.absStart - gene2.absStart);
-        //return genes.sort((gene1, gene2) => gene2.length - gene1.length);
         return genes.sort((gene1, gene2) => {
             const absStartComparison = gene1.absStart - gene2.absStart;
             if (absStartComparison === 0) {
@@ -56,7 +58,7 @@ class AnnotationArranger extends React.PureComponent {
             } else {
                 return absStartComparison;
             }
-        })
+        });
     }
 
     /**
@@ -65,9 +67,15 @@ class AnnotationArranger extends React.PureComponent {
      * @override
      */
     render() {
-        const {data, drawModel, viewWindow, maxRows, itemColor, backgroundColor} = this.props;
+        const {data, drawModel, viewWindow, options} = this.props;
+        const rows = options.rows || DEFAULT_MAX_ROWS;
+        if (rows <= 0) {
+            return null;
+        }
+
         let children = [];
-        let maxXsForRows = new Array(maxRows).fill(-Infinity);
+        // Last row is reserved for anything that doesn't fit, so we don't track the Xs for that row.
+        let maxXsForRows = new Array(rows - 1).fill(-Infinity); 
         const genes = this._sortGenes(data);
         for (let gene of genes) {
             let geneWidth = drawModel.basesToXWidth(gene.absEnd - gene.absStart);
@@ -89,7 +97,7 @@ class AnnotationArranger extends React.PureComponent {
             let isMinimal;
             if (row === -1) { // It won't fit!  Put it in the last row, unlabeled
                 isMinimal = true;
-                row = maxRows;
+                row = rows - 1;
             } else {
                 isMinimal = false;
                 maxXsForRows[row] = endX + ANNOTATION_RIGHT_PADDING + labelWidth + 2;
@@ -107,8 +115,7 @@ class AnnotationArranger extends React.PureComponent {
                     isMinimal={isMinimal}
                     drawModel={drawModel}
                     viewWindow={viewWindow}
-                    color={itemColor}
-                    backgroundColor={backgroundColor}
+                    options={options}
                 />
             </SvgJsManaged>
             );

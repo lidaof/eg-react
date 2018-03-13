@@ -4,7 +4,6 @@ import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
 
 import TrackModel from '../../model/TrackModel';
-import withAutoDimensions from '../withAutoDimensions';
 
 export const WIDTH = 120;
 const NUM_TICKS_SUGGESTION = 2;
@@ -15,7 +14,7 @@ const AXIS_WIDTH = 30;
  * 
  * @author Silas Hsu
  */
-class _TrackLegend extends React.PureComponent {
+class TrackLegend extends React.PureComponent {
     static propTypes = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired,
         height: PropTypes.number.isRequired,
@@ -87,5 +86,4 @@ class _TrackLegend extends React.PureComponent {
     }
 }
 
-export const TrackLegend = withAutoDimensions(_TrackLegend);
 export default TrackLegend;

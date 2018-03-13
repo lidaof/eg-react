@@ -20,7 +20,13 @@ const TYPE_NAME_TO_SUBTYPE = {
  * @return {TrackSubtype} object containing rendering config appropriate for this model
  */
 export function getSubtypeConfig(trackModel) {
-    return TYPE_NAME_TO_SUBTYPE[trackModel.type.toLowerCase()] || UnknownTrack;
+    const subtype = TYPE_NAME_TO_SUBTYPE[trackModel.type.toLowerCase()] || UnknownTrack;
+    if (!subtype.visualizer) {
+        throw new TypeError(`In config for type ${trackModel.type}: a visualizer is required, but it was undefined.`);
+    } else if (!subtype.legend) {
+        throw new TypeError(`In config for type ${trackModel.type}: a legend is required, but it was undefined.`);
+    }
+    return subtype;
 }
 
 /**

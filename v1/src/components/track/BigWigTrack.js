@@ -18,27 +18,6 @@ const BAR_CHART_STYLE = {paddingTop: TOP_PADDING, display: "block"}; // display:
 const DEFAULT_OPTIONS = {color: "blue"};
 
 /**
- * Legend for BigWig tracks.
- * 
- * @param {Object} props - props as specified by React
- * @return {JSX.Element} element to render
- * @author Silas Hsu
- */
-function BigWigLegend(props) {
-    const height = props.trackModel.options.height || DEFAULT_HEIGHT;
-    let scale = null;
-    if (props.data.length > 0) {
-        const dataMax = _.maxBy(props.data, record => record.value).value;
-        scale = scaleLinear().domain([dataMax, 0]).range([0, height]);
-    }
-    return <TrackLegend
-        trackModel={props.trackModel}
-        scaleForAxis={scale}
-        style={{paddingTop: TOP_PADDING}}
-    />;
-}
-
-/**
  * Visualizer for BigWig tracks.
  * 
  * @author Silas Hsu
@@ -120,6 +99,28 @@ class BigWigVisualizer extends React.PureComponent {
         </React.Fragment>
         );
     }
+}
+
+/**
+ * Legend for BigWig tracks.
+ * 
+ * @param {Object} props - props as specified by React
+ * @return {JSX.Element} element to render
+ * @author Silas Hsu
+ */
+function BigWigLegend(props) {
+    const height = props.trackModel.options.height || DEFAULT_HEIGHT;
+    let scale = null;
+    if (props.data.length > 0) {
+        const dataMax = _.maxBy(props.data, record => record.value).value;
+        scale = scaleLinear().domain([dataMax, 0]).range([0, height]);
+    }
+    return <TrackLegend
+        trackModel={props.trackModel}
+        height={height}
+        scaleForAxis={scale}
+        style={{paddingTop: TOP_PADDING}}
+    />;
 }
 
 const BigWigTrack = {

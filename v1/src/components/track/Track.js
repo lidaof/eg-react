@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import TrackLegend from './TrackLegend';
 import TrackLoadingNotice from './TrackLoadingNotice';
 import withExpandedWidth from '../withExpandedWidth';
 import getComponentName from '../getComponentName';
@@ -184,7 +183,7 @@ export class Track extends React.PureComponent {
         const {trackModel, xOffset, onContextMenu, onClick} = this.props;
         const data = this.state.data;
         const trackSubtype = getSubtypeConfig(trackModel);
-        const Legend = trackSubtype.legend || TrackLegend; // Default to TrackLegend if there is none specified.
+        const Legend = trackSubtype.legend;
         const Visualizer = trackSubtype.visualizer;
 
         return (

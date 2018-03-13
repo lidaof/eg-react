@@ -36,8 +36,9 @@ actually entire chromosomes, then the user can effectively navigate the whole ge
 Here's an overview:
 1.  Specify customizations of your new track.  Tracks are customizable in four ways:
   * Visualizer (required)
-  * Legend
+  * Legend (required)
   * Context menu items
+  * Context menu default options
   * Data source
 2.  Specify what track type renders your new track.
 
@@ -46,14 +47,17 @@ These are also explained in `TrackSubtype.ts`.
 #### Visualizer (required)
 A component that visualizes your track data.  It will receive `VISUALIZER_PROP_TYPES` (defined in `Track.js`).
 
-#### Legend
+#### Legend (required)
 Your track legend component.  It will receive `LEGEND_PROP_TYPES` (defined in `Track.js`).
-
-If you don't specify a legend, your track will display a minimal, default legend.
 
 #### Context menu items
 List of specific menu items to render.  Note that all tracks have some menu items by default, such as the one modifying
 label and the one removing the track.  You should not include these default items.
+
+#### Context menu default options
+Object that looks like the `options` prop of `TrackModel` objects.  Menu item components read and write to this object;
+for example, the `LabelConfig` component reads and writes `options.label`.  But what should the component read if the
+prop in which they are interested is not defined?  Define it here!
 
 #### Data source
 If you have any non-trival data fetching needs, extend the `DataSource` class, or use one that already exists.

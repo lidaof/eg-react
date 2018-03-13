@@ -31,17 +31,16 @@ export class GeneAnnotation extends React.PureComponent {
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
         isMinimal: PropTypes.bool, // If true, display only a minimal box
         viewWindow: PropTypes.instanceOf(OpenInterval), // X range of initially visible pixels
-        color: PropTypes.string,
-        backgroundColor: PropTypes.string,
-    };
-
-    static defualtProps = {
-        color: DEFAULT_COLOR,
-        backgroundColor: DEFAULT_BACKGROUND_COLOR
+        options: PropTypes.shape({
+            color: PropTypes.string,
+            backgroundColor: PropTypes.string,
+        }),
     };
 
     static defaultProps = {
-        viewWindow: new OpenInterval(-Infinity, Infinity)
+        isMinimal: false,
+        viewWindow: new OpenInterval(-Infinity, Infinity),
+        options: {}
     };
 
     /**
@@ -110,9 +109,9 @@ export class GeneAnnotation extends React.PureComponent {
      * @override
      */
     render() {
-        const {svgJs, gene, isMinimal, drawModel, viewWindow, color} = this.props;
-        // Sometimes, parents will pass `undefined` literally, which defaultProps does not catch.
-        const backgroundColor = this.props.backgroundColor || DEFAULT_BACKGROUND_COLOR;
+        const {svgJs, gene, isMinimal, drawModel, viewWindow, options} = this.props;
+        const color = options.color || DEFAULT_COLOR;
+        const backgroundColor = options.backgroundColor || DEFAULT_BACKGROUND_COLOR;
         svgJs.clear();
 
         const startX = drawModel.baseToX(gene.absStart);

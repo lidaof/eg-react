@@ -2,7 +2,7 @@ import React from 'react';
 import getComponentName from './getComponentName';
 
 /**
- * A function that returns a component that measures its width amd height automatically.  The wrapped component will
+ * A function that returns a component that measures its width and height automatically.  The wrapped component will
  * recieve the values as props.  Note that the parent can override these values.
  * 
  * @param {React.Component} WrappedComponent - Component to wrap
