@@ -74,15 +74,6 @@ class DisplayedRegionModel {
     }
 
     /**
-     * Gets the segments in the navigation context that overlap this view region, mapped to chromosomal intervals.
-     * 
-     * @return {ChromosomeInterval[]} list of genomic intervals
-     */
-    getGenomeIntervals() {
-        return this._navContext.mapAbsIntervalToGenome(this._startBase, this._endBase);
-    }
-
-    /**
      * Safely sets the internal display interval, ensuring that it stays within the navigation context and makes sense.
      * `start` and `end` should express a 0-indexed open interval of base numbers, [start, end).  This method will try
      * to preserve the input length as much as possible.

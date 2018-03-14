@@ -7,7 +7,7 @@ import StandaloneGeneAnnotation from './StandaloneGeneAnnotation';
 import Gene from '../../model/Gene';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import { HG19 } from '../../model/genomes/hg19';
+import HG19 from '../../model/genomes/hg19/hg19';
 
 import './IsoformSelection.css';
 import GeneDescription from '../GeneDescription';

@@ -14,13 +14,13 @@ import LinearDrawingModel from '../../model/LinearDrawingModel';
 import { MouseButtons } from '../../util';
 
 const WHEEL_ZOOM_SPEED = 0.2;
-const SVG_HEIGHT = 150;
+const SVG_HEIGHT = 100;
 
-const CHROMOSOME_Y = 30;
-const SELECTED_BOX_Y = 30;
-const RULER_Y = CHROMOSOME_Y + 40;
+const CHROMOSOME_Y = 10;
+const SELECTED_BOX_Y = 10;
+const RULER_Y = CHROMOSOME_Y + 30;
 
-const SELECT_BOX_Y = "25px";
+const SELECT_BOX_Y = "5px";
 const SELECT_BOX_HEIGHT = "60px";
 
 /**

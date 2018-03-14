@@ -5,7 +5,7 @@ import TrackContainer from './components/trackContainers/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
 import RegionSetSelector from './components/RegionSetSelector';
 
-import { HG19 } from './model/genomes/hg19';
+import HG19 from './model/genomes/hg19/hg19';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 
 import './App.css';

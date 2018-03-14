@@ -1,7 +1,8 @@
-import TrackModel from '../../model/TrackModel';
-import {Chromosome, Genome} from '../../model/Genome';
+import TrackModel from '../../../model/TrackModel';
+import {Chromosome, Genome} from '../../../model/Genome';
+import cytobands from './cytoband.json';
 
-const hg19Genome = new Genome("hg19", [
+const genome = new Genome("hg19", [
     new Chromosome("chr1", 249250621),
     new Chromosome("chr2", 243199373),
     new Chromosome("chr3", 198022430),
@@ -29,10 +30,8 @@ const hg19Genome = new Genome("hg19", [
     new Chromosome("chrM", 16571)
 ]);
 
-const hg19Context = hg19Genome.makeNavContext();
-const defaultRegion = hg19Context.parse("chr7:27053397-27373765");
-//const defaultRegion = hg19Context.parse("chr7:27144350-27167097"); //HOXA3
-
+const navContext = genome.makeNavContext();
+const defaultRegion = navContext.parse("chr7:27053397-27373765");
 const defaultTracks = [
     new TrackModel({
         type: "bigwig",
@@ -50,9 +49,12 @@ const defaultTracks = [
     })
 ];
 
-export const HG19 = {
-    genome: hg19Genome,
-    context: hg19Context,
+const HG19 = {
+    genome: genome,
+    context: navContext,
+    cytobands: cytobands,
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks
 };
+
+export default HG19;

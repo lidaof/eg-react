@@ -16,7 +16,7 @@ const LABEL_X_PADDING = 15;
 const BOX_STYLE = {
     stroke: "#090",
     fill: "#0f0",
-    fillOpacity: 0.1,
+    fillOpacity: 0.25,
 };
 
 const TEXT_STYLE = {
