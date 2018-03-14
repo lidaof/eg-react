@@ -1,9 +1,8 @@
 import NavigationContext from '../NavigationContext';
 import { CHROMOSOMES } from './toyRegion';
 import Feature from '../Feature';
-import FeatureInterval from '../interval/FeatureInterval';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
-import { OpenInterval } from '../interval/OpenInterval';
+import OpenInterval from '../interval/OpenInterval';
 
 const NAME = "Wow very genome";
 const instance = new NavigationContext(NAME, CHROMOSOMES);
@@ -90,23 +89,20 @@ describe("parse() and convertFeatureCoordinateToBase()", () => {
 describe("convertGenomeIntervalToBases()", () => {
     it("is correct", () => {
         const feature = instance.getFeatures()[0];
-        const featureInterval = new FeatureInterval(feature);
         const chrInterval = new ChromosomeInterval("chr1", 5, 10);
-        expect(instance.convertGenomeIntervalToBases(featureInterval, chrInterval)).toEqual(new OpenInterval(5, 10));
+        expect(instance.convertGenomeIntervalToBases(chrInterval, feature)).toEqual(new OpenInterval(5, 10));
     });
 
-    it("returns null when the feature interval does not overlap with the genome interval", () => {
+    it("errors when the feature does not overlap with the genome interval", () => {
         const feature = instance.getFeatures()[0];
-        const featureInterval = new FeatureInterval(feature);
         const chrInterval = new ChromosomeInterval("chr1", -1, -1);
-        expect(instance.convertGenomeIntervalToBases(featureInterval, chrInterval)).toEqual(null);
+        expect(() => instance.convertGenomeIntervalToBases(chrInterval, feature)).toThrow(RangeError);
     });
 
     it("errors when given a feature not in the context", () => {
         const chrInterval = new ChromosomeInterval("chr1", 5, 10);
         const feature = new Feature("wat is this?", chrInterval);
-        const featureInterval = new FeatureInterval(feature);
-        expect(() => instance.convertGenomeIntervalToBases(featureInterval, chrInterval)).toThrow(RangeError);
+        expect(() => instance.convertGenomeIntervalToBases(chrInterval, feature)).toThrow(RangeError);
     });
 });
 

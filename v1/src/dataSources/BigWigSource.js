@@ -58,12 +58,16 @@ class BigWigSource extends DataSource {
             const dasFeatures = await this._getDataForChromosome(chrInterval, bigWigObj, zoomLevel);
             let result = [];
             for (let dasFeature of dasFeatures) {
-                let absInterval = navContext.convertGenomeIntervalToBases(
-                    featureInterval, new ChromosomeInterval(dasFeature.segment, dasFeature.min, dasFeature.max)
-                );
-                if (absInterval) {
+                try { // ConvertGenomeIntervalToBases can throw RangeError.
+                    let absInterval = navContext.convertGenomeIntervalToBases(
+                        new ChromosomeInterval(dasFeature.segment, dasFeature.min, dasFeature.max), featureInterval.feature
+                    );
                     absInterval.value = dasFeature.score;
                     result.push(absInterval);
+                } catch (error) { // Ignore RangeErrors; let others bubble up.
+                    if (!(error instanceof RangeError)) {
+                        throw error;
+                    }
                 }
             }
             return result;

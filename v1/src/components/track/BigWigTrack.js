@@ -7,32 +7,15 @@ import { VISUALIZER_PROP_TYPES } from './Track';
 import TrackLegend from './TrackLegend';
 import Tooltip from './Tooltip';
 import GenomicCoordinates from './GenomicCoordinates';
+import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorConfig';
 
 import BigWigSource from '../../dataSources/BigWigSource';
 import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 
-const DEFAULT_HEIGHT = 30; // In pixels
-const TOP_MARGIN = 5;
-const BAR_CHART_STYLE = {marginTop: TOP_MARGIN, display: "block"}; // display: block prevents extra bottom padding
-
-/**
- * Legend for BigWig tracks.
- * 
- * @param {Object} props - props as specified by React
- * @return {JSX.Element} element to render
- * @author Silas Hsu
- */
-function BigWigLegend(props) {
-    const height = props.trackModel.options.height || DEFAULT_HEIGHT;
-    let scale = null;
-    if (props.data.length > 0) {
-        const dataMax = _.maxBy(props.data, record => record.value).value;
-        scale = scaleLinear().domain([dataMax, 0]).range([0, height]);
-    }
-    return <div style={{marginTop: TOP_MARGIN}}>
-        <TrackLegend trackModel={props.trackModel} scaleForAxis={scale} height={height} />
-    </div>;
-}
+const DEFAULT_HEIGHT = 35; // In pixels
+const TOP_PADDING = 5;
+const BAR_CHART_STYLE = {paddingTop: TOP_PADDING, display: "block"}; // display: block prevents extra bottom padding
+const DEFAULT_OPTIONS = {color: "blue"};
 
 /**
  * Visualizer for BigWig tracks.
@@ -79,7 +62,7 @@ class BigWigVisualizer extends React.PureComponent {
                     <p style={{fontSize: '0.8em', color: 'dimgrey', margin: 0}} >
                         <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
                         <br/>
-                        {trackModel.name}
+                        {trackModel.getDisplayLabel()}
                     </p>
                 </div>
             </Tooltip>
@@ -98,7 +81,7 @@ class BigWigVisualizer extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {data, viewRegion, width} = this.props;
+        const {trackModel, data, viewRegion, width} = this.props;
         return (
         <React.Fragment>
             <BarChart
@@ -106,6 +89,7 @@ class BigWigVisualizer extends React.PureComponent {
                 data={data}
                 width={width}
                 height={this.getHeight()}
+                options={{color: trackModel.options.color || DEFAULT_OPTIONS.color}}
                 style={BAR_CHART_STYLE}
                 renderSvg={false}
                 onRecordHover={this.showTooltip}
@@ -117,10 +101,34 @@ class BigWigVisualizer extends React.PureComponent {
     }
 }
 
+/**
+ * Legend for BigWig tracks.
+ * 
+ * @param {Object} props - props as specified by React
+ * @return {JSX.Element} element to render
+ * @author Silas Hsu
+ */
+function BigWigLegend(props) {
+    const height = props.trackModel.options.height || DEFAULT_HEIGHT;
+    let scale = null;
+    if (props.data.length > 0) {
+        const dataMax = _.maxBy(props.data, record => record.value).value;
+        scale = scaleLinear().domain([dataMax, 0]).range([0, height]);
+    }
+    return <TrackLegend
+        trackModel={props.trackModel}
+        height={height}
+        scaleForAxis={scale}
+        style={{paddingTop: TOP_PADDING}}
+    />;
+}
+
 const BigWigTrack = {
-    getDataSource: (trackModel) => new BigWigSource(trackModel.url),
+    visualizer: BigWigVisualizer,
     legend: BigWigLegend,
-    visualizer: BigWigVisualizer
+    menuItems: [PrimaryColorConfig, BackgroundColorConfig],
+    defaultOptions: DEFAULT_OPTIONS,
+    getDataSource: (trackModel) => new BigWigSource(trackModel.url),
 };
 
 export default BigWigTrack;

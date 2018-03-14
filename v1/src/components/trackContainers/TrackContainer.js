@@ -5,15 +5,16 @@ import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
 
-import { Track } from '../track/Track';
-import TrackLegend from '../track/TrackLegend';
+import Track from '../track/Track';
+import { WIDTH as LEGEND_WIDTH } from '../track/TrackLegend';
 import TrackContextMenu from '../track/contextMenu/TrackContextMenu';
 
 import OutsideClickDetector from '../OutsideClickDetector';
 import ContextMenuManager from '../ContextMenuManager';
 import DivWithBullseye from '../DivWithBullseye';
+import Reparentable from '../Reparentable';
 
-import withAutoWidth from '../withAutoWidth';
+import withAutoDimensions from '../withAutoDimensions';
 import { MouseButtons } from '../../util';
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
@@ -28,6 +29,14 @@ let toolButtonContent = {};
 toolButtonContent[tools.DRAG] = "✋";
 toolButtonContent[tools.ZOOM] = "🔍";
 toolButtonContent[tools.REORDER] = "🔀";
+
+/**
+ * @param {MouseEvent} event - mouse event to inspect
+ * @return {boolean} true if the control key was NOT pressed during the event
+ */
+function isNotControlKey(event) {
+    return !event.ctrlKey;
+}
 
 /**
  * Container for holding all the tracks, and an avenue for manipulating state common to all tracks.
@@ -66,24 +75,9 @@ class TrackContainer extends React.Component {
             contextMenuEvent: null,
         };
 
-        this.requestTrackReorder = this.requestTrackReorder.bind(this);
         this.trackClicked = this.trackClicked.bind(this);
         this.handleContextMenuEvent = this.handleContextMenuEvent.bind(this);
-        this.handleMenuCloseRequest = this.handleMenuCloseRequest.bind(this);
         this.handleOutsideClick = this.handleOutsideClick.bind(this);
-    }
-
-    /**
-     * Requests a change in a track's position
-     * 
-     * @param {number} fromIndex - index of the track to move
-     * @param {number} toIndex - index to move the track to
-     */
-    requestTrackReorder(fromIndex, toIndex) {
-        let newOrder = this.props.tracks.slice();
-        const [moved] = newOrder.splice(fromIndex, 1);
-        newOrder.splice(toIndex, 0, moved);
-        this.props.onTracksChanged(newOrder);
     }
 
     /**
@@ -112,24 +106,12 @@ class TrackContainer extends React.Component {
             event.preventDefault();
             event.stopPropagation();
             this.trackClicked(event, index);
-            return;
-        }
-
-        // If the track is not selected, select it and deselect the others.
-        if (!this.props.tracks[index].isSelected) {
+        } else if (!this.props.tracks[index].isSelected) {
+            // If the track is not selected, select it and deselect the others.
             const nextTracks = this.deselectAllTracks();
             this.toggleOneTrack(nextTracks, index);
             this.props.onTracksChanged(nextTracks);
         }
-    }
-
-    /**
-     * Closes the context menu only if the control key is NOT held.
-     * 
-     * @param {MouseEvent} event - click event to evaluate
-     */
-    handleMenuCloseRequest(event) {
-        return !event.ctrlKey;
     }
 
     /**
@@ -196,22 +178,25 @@ class TrackContainer extends React.Component {
     }
 
     getVisualizationWidth() {
-        return Math.max(0, this.props.width - TrackLegend.WIDTH);
+        return Math.max(0, this.props.width - LEGEND_WIDTH);
     }
 
     /**
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        return this.props.tracks.map((trackModel, index) => (
-            <Track
-                trackModel={trackModel}
-                viewRegion={this.props.viewRegion}
-                width={this.getVisualizationWidth()}
-                onContextMenu={event => this.handleContextMenuEvent(event, index)}
-                onClick={event => this.trackClicked(event, index)}
-            />
-        ));
+        return this.props.tracks.map((trackModel, index) => {
+            const id = trackModel.getId();
+            return <Reparentable key={id} uid={"track-" + id} >
+                <Track
+                    trackModel={trackModel}
+                    viewRegion={this.props.viewRegion}
+                    width={this.getVisualizationWidth()}
+                    onContextMenu={event => this.handleContextMenuEvent(event, index)}
+                    onClick={event => this.trackClicked(event, index)}
+                />
+            </Reparentable>
+        });
     }
 
     /**
@@ -220,20 +205,21 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element} - subcontainer that renders tracks
      */
     renderSubContainer() {
-        const {viewRegion, onNewRegion} = this.props;
+        const {tracks, viewRegion, onNewRegion, onTracksChanged} = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case tools.REORDER:
                 return (
                     <ReorderableTrackContainer
                         trackElements={trackElements}
-                        onTrackMoved={this.requestTrackReorder}
+                        trackModels={tracks}
+                        onTracksChanged={onTracksChanged}
                     />
                 );
             case tools.ZOOM:
                 return (
                     <ZoomableTrackContainer
-                        legendWidth={TrackLegend.WIDTH}
+                        legendWidth={LEGEND_WIDTH}
                         trackElements={trackElements}
                         viewRegion={viewRegion}
                         onNewRegion={onNewRegion}
@@ -262,18 +248,16 @@ class TrackContainer extends React.Component {
         // paddingTop to counteract track's marginTop of -1
         const trackDivStyle = {border: "1px solid black", paddingTop: 1, cursor: "crosshair"};
         return (
-        <div>
+        <OutsideClickDetector onOutsideClick={this.handleOutsideClick} style={{margin: 5}} >
             {this.renderToolSelectButtons()}
-            <OutsideClickDetector onOutsideClick={this.handleOutsideClick} >
-                <ContextMenuManager shouldMenuClose={this.handleMenuCloseRequest} menuElement={contextMenu} >
-                    <DivWithBullseye style={trackDivStyle} >
-                        {this.renderSubContainer()}
-                    </DivWithBullseye>
-                </ContextMenuManager>
-            </OutsideClickDetector>
-        </div>
+            <ContextMenuManager shouldMenuOpen={isNotControlKey} shouldMenuClose={isNotControlKey} menuElement={contextMenu} >
+                <DivWithBullseye style={trackDivStyle} >
+                    {this.renderSubContainer()}
+                </DivWithBullseye>
+            </ContextMenuManager>
+        </OutsideClickDetector>
         );
     }
 }
 
-export default withAutoWidth(TrackContainer);
+export default withAutoDimensions(TrackContainer);

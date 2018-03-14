@@ -1,3 +1,10 @@
+.Track {
+    position: relative;
+    display: flex;
+    border-bottom: 1px solid lightgrey;
+    padding: 1px;  /* Makes Track-selected-border visible if background color also exists */
+}
+
 .Track-selected-border {
     background-image:
         linear-gradient(90deg, black 50%, transparent 50%), /* Horizontal dash */

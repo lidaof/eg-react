@@ -1,8 +1,10 @@
 import React from 'react';
 import { ITEM_PROP_TYPES, ITEM_DEFAULT_PROPS } from './TrackContextMenu';
+import { aggregateOptions } from '../subtypeConfig';
 
 import './TrackContextMenu.css';
 
+const OPTION_PROP_NAME = "label";
 const MULTI_VALUE_PLACEHOLDER = "[multiple values]";
 
 /**
@@ -10,7 +12,7 @@ const MULTI_VALUE_PLACEHOLDER = "[multiple values]";
  * 
  * @author Silas Hsu
  */
-class LabelItem extends React.PureComponent {
+class LabelConfig extends React.PureComponent {
     static propTypes = ITEM_PROP_TYPES;
     static defaultProps = ITEM_DEFAULT_PROPS;
 
@@ -19,7 +21,7 @@ class LabelItem extends React.PureComponent {
         this.state = {
             inputValue: this.initInputValue(props)
         };
-        this.inputChanged = this.inputChanged.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
         this.setButtonPressed = this.setButtonPressed.bind(this);
     }
 
@@ -30,17 +32,7 @@ class LabelItem extends React.PureComponent {
      * @return {string} - string that represents the labels of all the tracks
      */
     initInputValue(props) {
-        const tracks = props.tracks;
-        if (tracks.length === 0) {
-            return "";
-        } 
-
-        const firstName = tracks[0].name;
-        if (tracks.every(trackModel => trackModel.name === firstName)) {
-            return firstName;
-        } else {
-            return MULTI_VALUE_PLACEHOLDER;
-        }
+        return aggregateOptions(props.tracks, OPTION_PROP_NAME, "", MULTI_VALUE_PLACEHOLDER);
     }
 
     /**
@@ -59,7 +51,7 @@ class LabelItem extends React.PureComponent {
      * 
      * @param {Event} event - change event
      */
-    inputChanged(event) {
+    handleInputChange(event) {
         this.setState({inputValue: event.target.value});
     }
 
@@ -67,7 +59,7 @@ class LabelItem extends React.PureComponent {
      * Requests a change in track labels.
      */
     setButtonPressed() {
-        const mutator = trackModel => trackModel.name = this.state.inputValue;
+        const mutator = trackModel => trackModel.options[OPTION_PROP_NAME] = this.state.inputValue;
         this.props.onChange(mutator);
     }
 
@@ -76,7 +68,7 @@ class LabelItem extends React.PureComponent {
         <div className="TrackContextMenu-item" style={{display: "flex", flexDirection: "column"}} >
             Track label:
             <div style={{display: "flex"}} >
-                <input type="text" value={this.state.inputValue} onChange={this.inputChanged} />
+                <input type="text" value={this.state.inputValue} onChange={this.handleInputChange} />
                 <button onClick={this.setButtonPressed} >Set</button>
             </div>
         </div>
@@ -84,4 +76,4 @@ class LabelItem extends React.PureComponent {
     }
 }
 
-export default LabelItem;
+export default LabelConfig;

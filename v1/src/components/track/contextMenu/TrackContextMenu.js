@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
+import LabelConfig from './LabelConfig';
+import { getSubtypeConfig } from '../subtypeConfig';
 import TrackModel from '../../../model/TrackModel';
-import LabelItem from './LabelItem';
 
 import './TrackContextMenu.css';
 
@@ -69,7 +70,7 @@ class TrackContextMenu extends React.PureComponent {
     renderTrackSpecificItems(selectedTracks) {
         let menuComponents = []; // Array of arrays, one for each track
         for (let trackModel of selectedTracks) {
-            const menuItems = trackModel.getRenderConfig().menuItems;
+            const menuItems = getSubtypeConfig(trackModel).menuItems;
             if (menuItems) {
                 menuComponents.push(menuItems);
             } else { // Intersecting anything with the empty set is the empty set, so we can stop right here.
@@ -78,9 +79,9 @@ class TrackContextMenu extends React.PureComponent {
             }
         }
 
-        const commonMenuComponents = _.intersection(menuComponents);
+        const commonMenuComponents = _.intersection(...menuComponents);
         return commonMenuComponents.map((MenuComponent, index) =>
-            <MenuComponent key={index} tracks={selectedTracks} onChange={null} />
+            <MenuComponent key={index} tracks={selectedTracks} onChange={this.changeSelectedTracks} />
         );
     }
 
@@ -123,9 +124,9 @@ class TrackContextMenu extends React.PureComponent {
         return (
         <div className="TrackContextMenu-body">
             <MenuTitle tracks={selectedTracks} />
-            <LabelItem tracks={selectedTracks} onChange={this.changeSelectedTracks} />
+            <LabelConfig tracks={selectedTracks} onChange={this.changeSelectedTracks} />
             {this.renderTrackSpecificItems(selectedTracks)}
-            <RemoveItem numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
+            <RemoveOption numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
         </div>
         );
     }
@@ -138,7 +139,8 @@ class TrackContextMenu extends React.PureComponent {
  * @return {JSX.Element} element to render
  */
 function MenuTitle(props) {
-    const text = props.tracks.length === 1 ? props.tracks[0].name : `${props.tracks.length} tracks selected`;
+    const numTracks = props.tracks.length;
+    const text = numTracks === 1 ? props.tracks[0].getDisplayLabel() : `${numTracks} tracks selected`;
     return <div style={{paddingLeft: 5, fontWeight: 'bold'}} >{text}</div>;
 }
 
@@ -149,7 +151,7 @@ function MenuTitle(props) {
  * @param {Object} props - props as specified by React.
  * @return {JSX.Element} element to render
  */
-function RemoveItem(props) {
+function RemoveOption(props) {
     return (
     <div onClick={props.onClick} className="TrackContextMenu-item TrackContextMenu-hoverable-item-danger" >
         {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}

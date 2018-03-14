@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Manager, Target, Popper } from 'react-popper';
 import { SketchPicker } from 'react-color';
-import OutsideClickDetector from '../../OutsideClickDetector';
+import OutsideClickDetector from './OutsideClickDetector';
 
 const PICKER_OPENER_STYLE = {
     border: '1px solid grey',

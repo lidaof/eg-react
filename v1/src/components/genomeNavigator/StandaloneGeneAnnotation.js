@@ -1,28 +1,29 @@
 import React from 'react';
-import PropTypes from 'prop-types'; 
+import PropTypes from 'prop-types';
 
-import Feature from "../../model/Feature";
-import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
-import DisplayedRegionModel from "../../model/DisplayedRegionModel";
-import NavigationContext from "../../model/NavigationContext";
-import SvgJsManaged from "../SvgJsManaged";
-import GeneAnnotation from "../track/geneAnnotationTrack/GeneAnnotation";
+import SvgJsManaged from '../SvgJsManaged';
+import { ANNOTATION_HEIGHT, GeneAnnotation } from '../track/geneAnnotationTrack/GeneAnnotation';
+import Gene from '../../model/Gene';
+import LinearDrawingModel from '../../model/LinearDrawingModel';
 
-class StandaloneGeneAnnotation {
+/**
+ * A SVG containing a happy solo GeneAnnotation.
+ * 
+ * @author Silas Hsu
+ */
+class StandaloneGeneAnnotation extends React.PureComponent {
     static propTypes = {
-        gene: PropTypes.object.isRequried,
-        width: PropTypes.number
-    }
+        gene: PropTypes.instanceOf(Gene).isRequired, // The gene to draw
+        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model 
+    };
     
     render() {
-        const {gene, width} = this.props;
-        console.log(gene);
-        console.log(width);
-        const region = new Feature(gene.name, new ChromosomeInterval(gene.txStart, gene.txEnd));
-        const drawModel = new DisplayedRegionModel(new NavigationContext(gene.name, [region]));
-        return <svg width={width}>
-        <SvgJsManaged><GeneAnnotation gene={gene} isLabeled={true} drawModel={drawModel} leftBoundary={-Infinity} /></SvgJsManaged>
+        const {gene, drawModel} = this.props;
+        return (
+        <svg width={drawModel.getDrawWidth()} height={ANNOTATION_HEIGHT} >
+            <SvgJsManaged><GeneAnnotation gene={gene} drawModel={drawModel} /></SvgJsManaged>
         </svg>
+        );
     }
 }
 

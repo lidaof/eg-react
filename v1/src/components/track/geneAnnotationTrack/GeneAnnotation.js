@@ -1,33 +1,107 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import SVG from 'svg.js';
+
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
-import GeneDetail from './GeneDetail';
+import { Gene } from '../../../model/Gene';
+import OpenInterval from '../../../model/interval/OpenInterval';
 
 export const ANNOTATION_HEIGHT = 9;
 export const UTR_HEIGHT = 5;
 export const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;
 
-const ARROW_WIDTH = 6;
-const ARROW_SEPARATION = 10;
-const COLOR = "blue";
-const IN_EXON_ARROW_COLOR = "white";
-
+const ARROW_WIDTH = 5;
+const ARROW_SEPARATION = 12;
 const LABEL_BACKGROUND_PADDING = 2;
+const DEFAULT_COLOR = "blue";
+const DEFAULT_BACKGROUND_COLOR = "white";
 
 /**
  * A single annotation for the gene annotation track.
  * 
  * @author Silas Hsu and Daofeng Li
  */
-export class GeneAnnotation extends React.Component {
+export class GeneAnnotation extends React.PureComponent {
     static propTypes = {
+        /**
+         * SVG drawing API.  Required but not marked as such to prevent warnings.
+         */
         svgJs: PropTypes.instanceOf(SVG.Element),
-        gene: PropTypes.object.isRequired, // Gene to display
-        isLabeled: PropTypes.bool.isRequired, // Whether to display the gene's name
-        drawModel: PropTypes.instanceOf(LinearDrawingModel),
-        leftBoundary: PropTypes.number.isRequired, // The x coordinate of the SVG's left boundary
+        gene: PropTypes.instanceOf(Gene).isRequired, // Gene structure to draw
+        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
+        isMinimal: PropTypes.bool, // If true, display only a minimal box
+        viewWindow: PropTypes.instanceOf(OpenInterval), // X range of initially visible pixels
+        options: PropTypes.shape({
+            color: PropTypes.string,
+            backgroundColor: PropTypes.string,
+        }),
     };
+
+    static defaultProps = {
+        isMinimal: false,
+        viewWindow: new OpenInterval(-Infinity, Infinity),
+        options: {}
+    };
+
+    /**
+     * 
+     * @param {number} startAbsBase 
+     * @param {number} endAbsBase 
+     * @param {number} height 
+     * @param {string} color 
+     */
+    _drawCenteredBox(startAbsBase, endAbsBase, height, color) {
+        const {drawModel, svgJs} = this.props;
+        const startX = drawModel.baseToX(startAbsBase);
+        const width = drawModel.basesToXWidth(endAbsBase - startAbsBase);
+        const box = svgJs.rect(width, height).attr({
+            x: startX,
+            y: (ANNOTATION_HEIGHT - height) / 2,
+            fill: color
+        });
+        return box;
+    }
+
+    /**
+     * Draws arrows in an interval in the most aesthetically pleasing way possible.
+     * 
+     * @param {number} startX 
+     * @param {number} endX 
+     * @param {string} color 
+     */
+    _drawArrowsInInterval(startX, endX, color, clip) {
+        const {gene, svgJs} = this.props;
+        const centerY = ANNOTATION_HEIGHT / 2;
+        const bottomY = ANNOTATION_HEIGHT;
+
+        let placementStartX = startX;
+        let placementEndX = endX;
+        if (gene.getIsForwardStrand()) { // Point to the right
+            placementStartX += ARROW_WIDTH;
+        } else {
+            placementEndX -= ARROW_WIDTH;
+        }
+
+        // Naming: if our arrows look like '<', then the tip is on the left, and the two tails are on the right.
+        for (let arrowTipX = placementStartX; arrowTipX <= placementEndX; arrowTipX += ARROW_SEPARATION) {
+            // Is forward strand ? point to the right : point to the left 
+            const arrowTailX = gene.getIsForwardStrand() ? arrowTipX - ARROW_WIDTH : arrowTipX + ARROW_WIDTH;
+            const arrowPoints = [
+                [arrowTailX, 1],
+                [arrowTipX, centerY],
+                [arrowTailX, bottomY - 1]
+            ];
+
+            const arrow = svgJs.polyline(arrowPoints).attr({
+                fill: "none",
+                stroke: color,
+                "stroke-width": 1
+            });
+            if (clip) {
+                arrow.clipWith(clip);
+            }
+        }
+    }
 
     /**
      * Draws the annotation.
@@ -35,23 +109,23 @@ export class GeneAnnotation extends React.Component {
      * @override
      */
     render() {
-        const {svgJs, gene, isLabeled, drawModel, leftBoundary, rightBoundary} = this.props;
+        const {svgJs, gene, isMinimal, drawModel, viewWindow, options} = this.props;
+        const color = options.color || DEFAULT_COLOR;
+        const backgroundColor = options.backgroundColor || DEFAULT_BACKGROUND_COLOR;
         svgJs.clear();
 
-        const details = gene._details;
         const startX = drawModel.baseToX(gene.absStart);
         const endX = drawModel.baseToX(gene.absEnd);
         const centerY = ANNOTATION_HEIGHT / 2;
-        const bottomY = ANNOTATION_HEIGHT;
-        //console.log(`${gene.getName()}: ${startX} - ${endX}`);
 
         // Box that covers the whole annotation to increase the click area
         let coveringBox = svgJs.rect(endX - startX, ANNOTATION_HEIGHT).attr({
             x: startX,
             y: 0,
         });
-        if (!isLabeled) { // Unlabeled: just fill the box and end there
-            coveringBox.fill(COLOR);
+
+        if (isMinimal) { // Just fill the box and end there
+            coveringBox.fill(color);
             return null;
         } else {
             coveringBox.opacity(0);
@@ -59,102 +133,53 @@ export class GeneAnnotation extends React.Component {
 
         // Center line
         svgJs.line(startX, centerY, endX, centerY).stroke({
-            color: COLOR,
+            color: color,
             width: 2
         });
 
-        let skipArrow = []; // regions skip drawing arrow - utrs
-        let whiteArrow = []; // regions draw white arrow - exons
-        // UTRs
-        for (let utr of details.absUtrs) {
-            let utrBox = svgJs.rect(drawModel.basesToXWidth(utr.end - utr.start), UTR_HEIGHT);
-            utrBox.attr({
-                x: drawModel.baseToX(utr.start),
-                y: 2,
-                fill: COLOR
-            });
-            skipArrow.push([drawModel.baseToX(utr.start), drawModel.baseToX(utr.end)]);
+        // Clip: a set of locations where an element will show up; it will not show elsewhere
+        let drawOnlyInExons = svgJs.clip();
+        // Translated exons, as thick boxes
+        for (let exon of gene.absTranslated) {
+            if (!exon) {
+                console.log(gene);
+            }
+            const exonBox = this._drawCenteredBox(...exon, ANNOTATION_HEIGHT, color);
+            drawOnlyInExons.add(exonBox.clone()); // See comment for declaration of arrowClip
         }
 
-        // Exons
-        // someComponent.clipWith(exonClip) will make it show up only where the exons are.
-        //let exonClip = svgJs.clip();
-        for (let exon of details.absExons) {
-            let exonBox = svgJs.rect(drawModel.basesToXWidth(exon.end - exon.start), ANNOTATION_HEIGHT);
-            exonBox.attr({
-                x: drawModel.baseToX(exon.start),
-                y: 0,
-                fill: COLOR
-            });
-            whiteArrow.push([drawModel.baseToX(exon.start), drawModel.baseToX(exon.end)]);
-            //exonClip.add(exonBox.clone());
-        }
-        //arrows should not draw outside of gene range
-        const arrowStartX = gene.strand === "+" ? startX + ARROW_WIDTH : startX;
-        const arrowEndX = gene.strand === "+" ? endX : endX - ARROW_WIDTH;
         // Arrows
-        for (let x = arrowStartX; x <= arrowEndX; x += ARROW_SEPARATION) {
-            let stokeColor = COLOR, inUTR = false, inExon=false;
-            for (const region of skipArrow){
-                if (x >= region[0] && x <= region[1]){
-                    inUTR = true;
-                    break;
-                }
-            }
-            for (const region of whiteArrow){
-                if(x >= region[0] && x <= region[1]){
-                    inExon = true;
-                    break;
-                }
-            }
-            if (inUTR) { continue; }
-            if (inExon){ stokeColor = IN_EXON_ARROW_COLOR; }
-            let arrowTipX = gene.strand === "+" ?
-                x - ARROW_WIDTH : // Point to the right
-                x + ARROW_WIDTH; // Point to the left
-            let arrowPoints = [
-                [arrowTipX, 0+1],
-                [x, centerY],
-                [arrowTipX, bottomY-1]
-            ]
+        this._drawArrowsInInterval(startX, endX, color); // Arrows on the center line
+        this._drawArrowsInInterval(startX, endX, backgroundColor, drawOnlyInExons); // Arrows within exons
 
-            // Each arrow is duplicated, but the second set will only draw inside exons.
-            svgJs.polyline(arrowPoints).attr({
-                fill: "none",
-                stroke: stokeColor,
-                "stroke-width": 1
-            });
-            // svgJs.polyline(arrowPoints).attr({
-            //     fill: "none",
-            //     stroke: IN_EXON_ARROW_COLOR,
-            //     "stroke-width": 1
-            // }).clipWith(exonClip); // <-- Note the .clipWith()
+        // UTRs, as thin boxes
+        for (let utr of gene.absUtrs) {
+            this._drawCenteredBox(...utr, ANNOTATION_HEIGHT, backgroundColor); // White box to cover up arrows
+            this._drawCenteredBox(...utr, UTR_HEIGHT, color); // The actual box that represents the UTR
         }
 
         // Label
         let labelX, textAnchor;
         // Label width is approx. because calculating bounding boxes is expensive.
-        let estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
-        if (startX - estimatedLabelWidth < leftBoundary && leftBoundary < endX ) {
-            if (endX + estimatedLabelWidth + 2 < rightBoundary){
-                labelX = endX + estimatedLabelWidth + 2;
-                textAnchor = "end";
-            } else {
-                // It's going to go off the screen; we need to move the label
-                labelX = leftBoundary;
-                textAnchor = "start";
-                // Add highlighting, as the label will overlap the other stuff
-                svgJs.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, ANNOTATION_HEIGHT).attr({
-                    x: leftBoundary - LABEL_BACKGROUND_PADDING,
-                    y: 0,
-                    fill: "white",
-                    opacity: 0.65,
-                });
-            }           
-        } else {
-            //labelX = (gene.strand === "+" ? startX - ARROW_WIDTH : startX) - 5;
+        const estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
+        const isBlockedLeft = startX - estimatedLabelWidth < viewWindow.start; // Label obscured if put on the left
+        const isBlockedRight = endX + estimatedLabelWidth > viewWindow.end; // Label obscured if put on the right
+        if (!isBlockedLeft) { // Yay, we can put it on the left!
             labelX = startX - 1;
             textAnchor = "end";
+        } else if (!isBlockedRight) { // Yay, we can put it on the right!
+            labelX = endX + 1;
+            textAnchor = "start";
+        } else { // Just put it directly on top of the annotation
+            labelX = viewWindow.start + 1;
+            textAnchor = "start";
+            // We have to add some highlighting for contrast purposes.
+            svgJs.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, ANNOTATION_HEIGHT).attr({
+                x: viewWindow.start - LABEL_BACKGROUND_PADDING,
+                y: 0,
+                fill: backgroundColor,
+                opacity: 0.65,
+            });
         }
 
         svgJs.text(gene.getName()).attr({

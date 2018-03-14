@@ -1,0 +1,24 @@
+.IsoformSelection {
+    padding: 0;
+    margin: 0;
+    font-size: smaller;
+    border-collapse: collapse;
+}
+
+.IsoformSelection-item {
+    border: 1px solid lightgrey;
+}
+
+.IsoformSelection-item:hover {
+    background-color: #fdbb84;
+    cursor: pointer;
+}
+
+.IsoformSelection-item td {
+    padding: 0px 5px;
+}
+
+.IsoformSelection-description {
+    font-size: x-small;
+    min-width: 200px;
+}

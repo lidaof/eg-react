@@ -1,35 +1,39 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import TrackLegend from './TrackLegend';
 import TrackLoadingNotice from './TrackLoadingNotice';
 import withExpandedWidth from '../withExpandedWidth';
 import getComponentName from '../getComponentName';
+import { getSubtypeConfig } from './subtypeConfig';
 
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import RegionExpander from '../../model/RegionExpander';
+import OpenInterval from '../../model/interval/OpenInterval';
 
 import './Track.css';
+
 
 /**
  * Props that will be passed to track legend components.
  */
 export const LEGEND_PROP_TYPES = {
-    trackModel: PropTypes.instanceOf(TrackModel), // Track metadata
-    data: PropTypes.array, // Track data
+    trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
+    data: PropTypes.array.isRequired, // Track data
 };
 
 /**
  * Props that will be passed to track visualizer components.
  */
 export const VISUALIZER_PROP_TYPES = {
-    trackModel: PropTypes.instanceOf(TrackModel), // Track metadata
-    data: PropTypes.array, // Track data
-    viewRegion: PropTypes.instanceOf(DisplayedRegionModel), // Region to visualize
-    width: PropTypes.number, // Visualization width
-    leftBoundary: PropTypes.number,
-    rightBoudary: PropTypes.number,
+    trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
+    data: PropTypes.array.isRequired, // Track data
+    viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
+    width: PropTypes.number.isRequired, // Visualization width
+    /**
+     * X range of visible pixels, assuming the user has not dragged the view
+     */
+    viewWindow: PropTypes.instanceOf(OpenInterval),
 };
 
 /**
@@ -91,7 +95,7 @@ export class Track extends React.PureComponent {
     constructor(props) {
         super(props);
         this.initViewExpansion(props);
-        const trackSubtype = props.trackModel.getRenderConfig();
+        const trackSubtype = getSubtypeConfig(props.trackModel);
         this.dataSource = trackSubtype.getDataSource ? trackSubtype.getDataSource(props.trackModel) : null;
 
         this.state = {
@@ -176,23 +180,16 @@ export class Track extends React.PureComponent {
      * @override
      */
     render() {
-        const {trackModel, width, xOffset, onContextMenu, onClick} = this.props;
+        const {trackModel, xOffset, onContextMenu, onClick} = this.props;
         const data = this.state.data;
-        const trackSubtype = trackModel.getRenderConfig();
-        const Legend = trackSubtype.legend || TrackLegend; // Default to TrackLegend if there is none specified.
+        const trackSubtype = getSubtypeConfig(trackModel);
+        const Legend = trackSubtype.legend;
         const Visualizer = trackSubtype.visualizer;
-        const style = {
-            position: "relative",
-            display: "flex",
-            border: "1px solid lightgrey",
-            marginTop: -1, // -1 so borders collapse.  TODO: put tracks in a table so we can use border-collapse CSS?
-            backgroundColor: this.state.error ? "pink" : "white",
-        };
 
         return (
         <div
-            style={style}
-            className={trackModel.isSelected ? "Track-selected-border" : undefined}
+            style={{backgroundColor: this.state.error ? "pink" : "white"}}
+            className={trackModel.isSelected ? "Track Track-selected-border" : "Track"}
             onContextMenu={onContextMenu}
             onClick={onClick}
         >
@@ -200,16 +197,15 @@ export class Track extends React.PureComponent {
             <Legend trackModel={trackModel} data={data} />
             <WideDiv
                 isLoading={this.state.isLoading}
-                visibleWidth={width}
                 viewExpansion={this.viewExpansion}
                 xOffset={xOffset}
+                style={{backgroundColor: trackModel.options.backgroundColor}}
             >
                 <Visualizer
                     data={data}
                     viewRegion={this.viewExpansion.expandedRegion}
                     width={this.viewExpansion.expandedWidth}
-                    leftBoundary={this.viewExpansion.leftExtraPixels}
-                    rightBoundary={this.viewExpansion.expandedWidth - this.viewExpansion.rightExtraPixels}
+                    viewWindow={this.viewExpansion.viewWindow}
                     trackModel={trackModel}
                 />
             </WideDiv>

@@ -1,10 +1,13 @@
 import React from 'react';
+
 import { VISUALIZER_PROP_TYPES } from './Track';
-import GenomicCoordinates from './GenomicCoordinates';
 import Chromosomes from '../genomeNavigator/Chromosomes';
 import Ruler from '../genomeNavigator/Ruler';
-import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 import Tooltip from './Tooltip';
+import GenomicCoordinates from './GenomicCoordinates';
+import TrackLegend from './TrackLegend';
+
+import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 
 const CHROMOSOMES_Y = 60;
 const RULER_Y = 20;
@@ -67,11 +70,16 @@ class RulerVisualizer extends React.PureComponent {
             {this.state.tooltip}
         </div>
         );
-    } 
+    }
+}
+
+function RulerLegend(props) {
+    return <TrackLegend height={HEIGHT} {...props} />;
 }
 
 const RulerTrack = {
-    visualizer: RulerVisualizer
+    visualizer: RulerVisualizer,
+    legend: RulerLegend
 };
 
 export default RulerTrack;

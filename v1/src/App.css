@@ -22,17 +22,3 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-
-.track {
-    border: 1px solid black;
-    text-align: center;
-    font-size: 2em;
-}
-
-.geneList {
-  padding-left: 3px;
-}
-.geneList:hover {
-  background-color: #fdbb84;
-  cursor: pointer;
-}

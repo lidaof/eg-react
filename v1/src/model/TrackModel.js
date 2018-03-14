@@ -1,10 +1,5 @@
 import _ from 'lodash';
 
-import RulerTrack from '../components/track/RulerTrack';
-import BigWigTrack from '../components/track/BigWigTrack';
-import GeneAnnotationTrack from '../components/track/geneAnnotationTrack/GeneAnnotationTrack';
-import UnknownTrack from '../components/track/UnknownTrack';
-
 /*
 const SCHEMA = { // Schema for the plain object argument to the constructor.
     type: "object",
@@ -19,17 +14,6 @@ const SCHEMA = { // Schema for the plain object argument to the constructor.
     }
 }
 */
-
-/**
- * Mapping from track type name to an object implementing the TrackSubtype interface.
- */
-const TYPE_NAME_TO_SUBTYPE = {
-    "ruler": RulerTrack,
-    "bigwig": BigWigTrack,
-    "hammock": GeneAnnotationTrack,
-};
-
-const DEFAULT_TRACK_NAME = "(unnamed track)";
 let nextId = 0;
 
 /**
@@ -46,9 +30,10 @@ class TrackModel {
      */
     constructor(plainObject) {
         Object.assign(this, plainObject);
-        this.name = this.name || DEFAULT_TRACK_NAME;
+        this.name = this.name || "";
         this.type = this.type || this.filetype || "";
-        this.options = this.options || {};
+        this.options = this.options || {}; // `options` stores dynamically-configurable options.
+        this.options.label = this.name; // ...which is why we copy this.name.
         this.url = this.url || "";
         this.metadata = this.metadata || {};
 
@@ -59,16 +44,6 @@ class TrackModel {
     }
 
     /**
-     * Gets the rendering configuration appropriate for the type contained in `this.type`.  If none can be found,
-     * defaults to UnknownTrack.
-     * 
-     * @return {TrackSubtype} object containing rendering config appropriate for this model
-     */
-    getRenderConfig() {
-        return TYPE_NAME_TO_SUBTYPE[this.type.toLowerCase()] || UnknownTrack;
-    }
-
-    /**
      * Gets this object's id.  Ids are used to keep track of track identity even through different instances of
      * TrackModel; two models with the same id are considered the same track, perhaps with different options configured.
      * 
@@ -76,6 +51,15 @@ class TrackModel {
      */
     getId() {
         return this.id;
+    }
+
+    /**
+     * Gets the label to display for this track; this method returns a reasonable default even in the absence of data.
+     * 
+     * @return {string} the display label of the track
+     */
+    getDisplayLabel() {
+        return this.options.label || "(unnamed track)";
     }
 
     /**

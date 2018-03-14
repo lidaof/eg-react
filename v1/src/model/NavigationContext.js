@@ -67,16 +67,18 @@ class NavigationContext {
     }
 
     /**
-     * Gets the whole feature interval by feature's name
-     * @param {string} name 
-     * @return {FeatureInterval}
+     * Queries the context for a feature with a certain name.  Throws an error if the feature cannot be found.
+     * 
+     * @param {string} name - name of the feature to look up
+     * @return {Feature} the found feature
+     * @throws {RangeError} if the feature's name is not in this context
      */
-    getFeatureIntervalByName(name){
+    getFeatureWithName(name) {
         const index = this._featureNameToIndex[name];
         if (index === undefined) {
             throw new RangeError(`Cannot find feature with name '${name}'`);
         }
-        return new FeatureInterval(this._features[index]);
+        return this._features[index];
     }
 
     /**
@@ -173,23 +175,36 @@ class NavigationContext {
 
     /**
      * Converts genome coordinates to an interval of absolute base numbers in this context.  Since coordinates can map
-     * to multiple features, a target feature interval is required.  This method will then intersect the feature
-     * interval with the genome coordinates before conversion to absolute base numbers.
+     * to multiple features, this method also needs a target feature or FeatureInterval.  By default, this method uses
+     * the chromosome's name as the feature name, but the second parameter can override this behavior.
      * 
-     * @param {FeatureInterval} featureInterval - target location in context to map to
+     * Throws RangeError if mapping fails, such as when the target feature doesn't exist.  It is admittedly annoying to
+     * wrap code in try/catch, but it is more important to be explictly aware that mapping can fail.
+     * 
      * @param {ChromosomeInterval} chrInterval - genome interval
+     * @param {string | Feature} [targetFeature] - target location in context to map to
      * @return {OpenInterval} interval of absolute base numbers in this context
-     * @throws {RangeError} if the feature does not exist in this context
+     * @throws {RangeError} if mapping fails
      */
-    convertGenomeIntervalToBases(featureInterval, chrInterval) {
-        const overlap = featureInterval.getOverlap(chrInterval);
-        if (!overlap) {
-            return null;
+    convertGenomeIntervalToBases(chrInterval, targetFeature) {
+        let feature;
+        if (!targetFeature) { // targetFeature: undefined or null
+            feature = this.getFeatureWithName(chrInterval.chr);
+        } else if (typeof targetFeature === "string") { // targetFeature: string
+            feature = this.getFeatureWithName(targetFeature);
+        } else { // targetFeature: Feature.  Hopefully.
+            feature = targetFeature;
         }
-        const name = featureInterval.getName();
+
+        // Do an intersection, as to cut off parts of the interval not in the context.
+        const overlap = new FeatureInterval(feature).getOverlap(chrInterval);
+        if (!overlap) {
+            throw new RangeError("Genomic location not in this context");
+        }
+        
         return new OpenInterval(
-            this.convertFeatureCoordinateToBase(name, overlap.relativeStart),
-            this.convertFeatureCoordinateToBase(name, overlap.relativeEnd)
+            this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeStart),
+            this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeEnd)
         );
     }
 

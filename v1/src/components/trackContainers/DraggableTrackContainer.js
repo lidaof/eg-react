@@ -91,15 +91,12 @@ class DraggableTrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        // Add keys
-        let modifiedTracks = this.props.trackElements.map((trackElement, index) => {
-            const key = trackElement.props.trackModel ? trackElement.props.trackModel.getId() : index;
-            const propsToMerge = {
-                key: key,
-                xOffset: this.state.xOffset
-            };
-            return React.cloneElement(trackElement, propsToMerge);
-        });
+        const propsToMerge = {
+            xOffset: this.state.xOffset
+        };
+        const tracksWithXOffset = this.props.trackElements.map(
+            trackElement => React.cloneElement(trackElement, propsToMerge)
+        );
 
         return (
         <DragAcrossView
@@ -110,7 +107,7 @@ class DraggableTrackContainer extends React.Component {
             viewRegion={this.props.viewRegion}
             widthOverride={this.props.visualizationWidth}
         >
-            {modifiedTracks}
+            {tracksWithXOffset}
         </DragAcrossView>
         );
     }

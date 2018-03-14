@@ -9,7 +9,7 @@ const dragRegionEnd = 10;
 
 it("sets tracks' xOffset prop properly when the view is dragged", () => {
     let wrapper = shallow(<DraggableTrackContainer
-        trackElements={[<div/>, <div/>]} 
+        trackElements={[<div key={1} />, <div key={2} />]} 
         viewRegion={makeToyRegion()}
         visualizationWidth={1}
     />);
@@ -33,7 +33,7 @@ it("sets tracks' xOffset prop properly when the view is dragged", () => {
 it("calls the newRegionCallback when dragging ends, IF dragged far enough", () => {
     let newRegionCallback = jest.fn();
     let wrapper = shallow(<DraggableTrackContainer
-        trackElements={[<div/>]}
+        trackElements={[<div key={1} />]}
         viewRegion={makeToyRegion()}
         visualizationWidth={1}
         onNewRegion={newRegionCallback}
@@ -53,7 +53,7 @@ it("calls the newRegionCallback when dragging ends, IF dragged far enough", () =
 
 it('resets xOffset after receiving a new view region', () => {
     let wrapper = shallow(<DraggableTrackContainer
-        trackElements={[<div/>]}
+        trackElements={[<div key={1} />]}
         viewRegion={makeToyRegion()}
         visualizationWidth={1}
     />);

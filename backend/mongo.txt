@@ -1,11 +1,11 @@
 # shell command for mongo db import
-
+# Go to the hg19 directory and run these commands
 mongoimport -d hg19 -c refGene --type tsv --file refGene.txt -f bin,name,chrom,strand,txStart,txEnd,cdsStart,cdsEnd,exonCount,exonStarts,exonEnds,score,name2,cdsStartStat,cdsEndStat,exonFrames --numInsertionWorkers 4
 mongoimport -d hg19 -c cytoBand --type tsv --file cytoBand.txt -f chrom,chromStart,chromEnd,name,gieStain
 mongoimport -d hg19 -c kgXref --type tsv --file kgXref.txt -f kgID,mRNA,spID,spDisplayID,geneSymbol,refseq,protAcc,description,rfamAcc,tRnaName
 
 
 # create index in mongo shell
-> db.refGene.createIndex({chrom:1,txStart:1,txEnd:1,name:1,name2:1})
-> db.cytoBand.createIndex({chrom:1})
-> db.kgXref.createIndex({geneSymbol:1,refseq:1})
+db.refGene.createIndex({chrom:1,txStart:1,txEnd:1,name:1,name2:1})
+db.cytoBand.createIndex({chrom:1})
+db.kgXref.createIndex({geneSymbol:1,refseq:1})

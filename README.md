@@ -1,14 +1,13 @@
 # Server
 ## Installation
-1.  Make sure that MongoDB is installed and started.
-2.  Inside the `v1` directory, run `npm install`.
-3.  Inside the root directory, run `npm install`.
-4.  Inside the root directory, run `npm run setup` and follow the prompts.
-5.  You're all set!
+Follow the instructions in `backend/mongo.txt`.  MongoDB must be running.
 
 ## Running
-Running `npm start` in the root directory starts up both the backend and the React development server.  Again, make sure
-MongoDB is up and running.  If you don't care about the back end, you may also run `npm start` in the `v1` directory.
+1.  Make sure MongoDB is running.
+2.  Enter the `backend` directory.
+3.  `npm start`.
+4.  Enter the `v1` directory.
+5.  `npm start`.
 
 # Client
 ## Quick tour
@@ -36,8 +35,9 @@ actually entire chromosomes, then the user can effectively navigate the whole ge
 Here's an overview:
 1.  Specify customizations of your new track.  Tracks are customizable in four ways:
   * Visualizer (required)
-  * Legend
+  * Legend (required)
   * Context menu items
+  * Context menu default options
   * Data source
 2.  Specify what track type renders your new track.
 
@@ -46,14 +46,17 @@ These are also explained in `TrackSubtype.ts`.
 #### Visualizer (required)
 A component that visualizes your track data.  It will receive `VISUALIZER_PROP_TYPES` (defined in `Track.js`).
 
-#### Legend
+#### Legend (required)
 Your track legend component.  It will receive `LEGEND_PROP_TYPES` (defined in `Track.js`).
-
-If you don't specify a legend, your track will display a minimal, default legend.
 
 #### Context menu items
 List of specific menu items to render.  Note that all tracks have some menu items by default, such as the one modifying
 label and the one removing the track.  You should not include these default items.
+
+#### Context menu default options
+Object that looks like the `options` prop of `TrackModel` objects.  Menu item components read and write to this object;
+for example, the `LabelConfig` component reads and writes `options.label`.  But what should the component read if the
+prop in which they are interested is not defined?  Define it here!
 
 #### Data source
 If you have any non-trival data fetching needs, extend the `DataSource` class, or use one that already exists.
@@ -63,13 +66,13 @@ it.  You can return the data in any format desired.  This would also be the best
 If you don't specify a data source, your legend and visualizer will receive no data.
 
 ### 2.  Using your shiny customizations
-Components use customizations via `TrackModel`'s getRenderConfig() method, which returns `TrackSubtype` objects.
+Components use customizations via the getSubtypeConfig() method, which returns `TrackSubtype` objects.
 
-1.  Package your customizations into an object matching the schema in `model/TrackSubtype.ts`.
-2.  Import the object from step 1 into `model/TrackModel.js`.
-3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `model/TrackModel.js`, which maps track type name to track subtype
-objects, such as the one you created in step 1.  This map is used in `TrackModel`'s getRenderConfig() method.
-Alternatively, for very fine-grained control, you can modify getRenderConfig() directly.
+1.  Package your customizations into an object matching the schema in `track/TrackSubtype.ts`.
+2.  Import the object from step 1 into `track/subtypeConfig.js`.
+3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `track/subtypeConfig.js`, which maps track type name to track subtype
+objects, such as the one you created in step 1.  Alternatively, for very fine-grained control, you can modify the
+functions in the file directly.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.
@@ -77,10 +80,12 @@ Such queries take on the order of 2 to 20 ms.  While it is fine to do it once or
 Suppose you aim to plot 500 data points on a SVG, and for each point you query the SVG's width.  That is already a
 second or more of computation -- very noticable to the user!
 
-## React gotchas
+## React (and other) gotchas
 * When using native DOM events, they take priority over React events.  This is because React waits for events to bubble
 to the root component before handling them.  This can cause undesirable effects: for example, calling
 `stopPropagation()` on a React event will not actually stop native events.  This StackOverflow post may also help if you
 have propagation problems: https://stackoverflow.com/questions/24415631/reactjs-syntheticevent-stoppropagation-only-works-with-react-events
 * React *always* unmounts components if their parents change type.  The `Reparentable` component works around this by
 using app-unique IDs, but it can cause side effects with React's native events.  Use with care.
+* Webpack does not support circular dependencies, and while compilation may be successful, an import may resolve as
+`undefined` at runtime.
