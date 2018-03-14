@@ -1,14 +1,13 @@
 # Server
 ## Installation
-1.  Make sure that MongoDB is installed and started.
-2.  Inside the `v1` directory, run `npm install`.
-3.  Inside the root directory, run `npm install`.
-4.  Inside the root directory, run `npm run setup` and follow the prompts.
-5.  You're all set!
+Follow the instructions in `backend/mongo.txt`.  MongoDB must be running.
 
 ## Running
-Running `npm start` in the root directory starts up both the backend and the React development server.  Again, make sure
-MongoDB is up and running.  If you don't care about the back end, you may also run `npm start` in the `v1` directory.
+1.  Make sure MongoDB is running.
+2.  Enter the `backend` directory.
+3.  `npm start`.
+4.  Enter the `v1` directory.
+5.  `npm start`.
 
 # Client
 ## Quick tour
