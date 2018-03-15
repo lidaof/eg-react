@@ -4,9 +4,12 @@ import { ITEM_PROP_TYPES, ITEM_DEFAULT_PROPS } from './TrackContextMenu';
 import { aggregateOptions } from '../subtypeConfig';
 
 import './TrackContextMenu.css';
+import SingleInputConfig from './SingleInputConfig';
 
 /**
- * A menu option that configures 
+ * A menu option that configures some integer-based property.
+ * 
+ * @author Silas Hsu
  */
 class NumberConfig extends React.PureComponent {
     static propTypes = Object.assign({}, ITEM_PROP_TYPES, {
@@ -35,12 +38,13 @@ class NumberConfig extends React.PureComponent {
     render() {
         const {tracks, optionPropName, label, minValue} = this.props;
         const value = aggregateOptions(tracks, optionPropName, minValue, "");
-        return (
-        <div className="TrackContextMenu-item" style={{display: "flex", alignItems: "baseline"}} >
-            <label style={{paddingRight: '1ch'}}>{label || "Number: "}</label>
-            <input type="number" min={minValue} value={value} onChange={this.handleInputChange} />
-        </div>
-        );
+        const inputElement = <input
+            type="number"
+            style={{width: "10ch"}}
+            min={minValue} value={value}
+            onChange={this.handleInputChange}
+        />;
+        return <SingleInputConfig label={label || "Number:"} inputElement={inputElement} />;
     }
 }
 

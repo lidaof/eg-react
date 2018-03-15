@@ -1,6 +1,7 @@
 import React from 'react';
 import { ITEM_PROP_TYPES, ITEM_DEFAULT_PROPS } from './TrackContextMenu';
 import { aggregateOptions } from '../subtypeConfig';
+import SingleInputConfig from './SingleInputConfig';
 
 import './TrackContextMenu.css';
 
@@ -64,15 +65,13 @@ class LabelConfig extends React.PureComponent {
     }
 
     render() {
-        return (
-        <div className="TrackContextMenu-item" style={{display: "flex", flexDirection: "column"}} >
-            Track label:
-            <div style={{display: "flex"}} >
-                <input type="text" value={this.state.inputValue} onChange={this.handleInputChange} />
-                <button onClick={this.setButtonPressed} >Set</button>
-            </div>
-        </div>
-        );
+        const input = <input type="text" value={this.state.inputValue} onChange={this.handleInputChange} />;
+        return <SingleInputConfig
+            label={"Track label:"}
+            inputElement={input}
+            renderSetButton={true}
+            onSetPressed={this.setButtonPressed}
+        />;
     }
 }
 

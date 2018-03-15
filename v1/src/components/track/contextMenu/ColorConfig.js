@@ -4,6 +4,8 @@ import ColorPicker from '../../ColorPicker';
 import { ITEM_PROP_TYPES, ITEM_DEFAULT_PROPS } from './TrackContextMenu';
 import { aggregateOptions } from '../subtypeConfig';
 
+import "./TrackContextMenu.css";
+
 const DEFAULT_COLOR = "#FFFFFF"; // White.  Used if a track doesn't provide a color AND its subtype provides no default.
 const MULTIPLE_COLORS = "(multiple values)";
 
@@ -39,11 +41,9 @@ class ColorConfig extends React.PureComponent {
     render() {
         const {tracks, optionPropName, label} = this.props;
         const color = aggregateOptions(tracks, optionPropName, DEFAULT_COLOR, MULTIPLE_COLORS);
-
         return (
-        <div className="TrackContextMenu-item" style={{display: "flex"}}>
-            <span style={{paddingRight: '1ch'}}>{label || "Color"}</span>
-            <ColorPicker color={color} onChange={this.handleColorChange} />
+        <div className="TrackContextMenu-item" >
+            <ColorPicker color={color} label={label} onChange={this.handleColorChange} />
         </div>
         );
     }
