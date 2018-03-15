@@ -23,17 +23,13 @@ const WHITE_TEXT_THRESHOLD = 255 * 1.5;
  */
 class ColorPicker extends React.PureComponent {
     static propTypes = {
-        color: PropTypes.string, // The color for the picker to display
-        label: PropTypes.string, // Label of the picker opener
+        color: PropTypes.string.isRequired, // The color for the picker to display
+        label: PropTypes.string, // Label of the picker opener.  If not provided, then displays the color's hex value.
 
         /**
          * Called when the user picks a color.  See http://casesandberg.github.io/react-color/#api-onChange
          */
         onChange: PropTypes.func,
-    };
-
-    static defaultProps = {
-        color: "white"
     };
 
     constructor(props) {

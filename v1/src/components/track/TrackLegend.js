@@ -77,9 +77,10 @@ class TrackLegend extends React.PureComponent {
             </svg>;
         }
 
+        const label = trackModel.getDisplayLabel();
         return (
         <div style={divStyle} >
-            <p style={pStyle} >{this.props.trackModel.getDisplayLabel()}</p>
+            <p style={pStyle} title={label}>{label}</p>
             {axis}
         </div>
         );

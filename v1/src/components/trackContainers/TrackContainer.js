@@ -19,16 +19,20 @@ import { MouseButtons } from '../../util';
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
-const tools = {
-    DRAG: 0,
-    ZOOM: 1,
-    REORDER: 2,
+const TOOLS = {
+    drag: {
+        buttonContent: "✋",
+        title: "Drag tool"
+    },
+    zoom: {
+        buttonContent: "🔍",
+        title: "Zoom tool",
+    },
+    reorder: {
+        buttonContent: "🔀",
+        title: "Reorder tool"
+    },
 };
-
-let toolButtonContent = {};
-toolButtonContent[tools.DRAG] = "✋";
-toolButtonContent[tools.ZOOM] = "🔍";
-toolButtonContent[tools.REORDER] = "🔀";
 
 /**
  * @param {MouseEvent} event - mouse event to inspect
@@ -71,7 +75,7 @@ class TrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedTool: tools.DRAG,
+            selectedTool: TOOLS.drag,
             contextMenuEvent: null,
         };
 
@@ -161,16 +165,17 @@ class TrackContainer extends React.Component {
      */
     renderToolSelectButtons() {
         let buttons = [];
-        for (let toolName in tools) {
-            const tool = tools[toolName];
+        for (let toolName in TOOLS) {
+            const tool = TOOLS[toolName];
             const className = tool === this.state.selectedTool ? "btn btn-primary" : "btn btn-light";
             buttons.push(
                 <button
-                    key={tool}
+                    key={toolName}
                     className={className}
+                    title={tool.title}
                     onClick={() => this.setState({selectedTool: tool})}
                 >
-                    {toolButtonContent[tool]}
+                    {tool.buttonContent}
                 </button>
             );
         }
@@ -208,7 +213,7 @@ class TrackContainer extends React.Component {
         const {tracks, viewRegion, onNewRegion, onTracksChanged} = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
-            case tools.REORDER:
+            case TOOLS.reorder:
                 return (
                     <ReorderableTrackContainer
                         trackElements={trackElements}
@@ -216,7 +221,7 @@ class TrackContainer extends React.Component {
                         onTracksChanged={onTracksChanged}
                     />
                 );
-            case tools.ZOOM:
+            case TOOLS.zoom:
                 return (
                     <ZoomableTrackContainer
                         legendWidth={LEGEND_WIDTH}
@@ -225,7 +230,7 @@ class TrackContainer extends React.Component {
                         onNewRegion={onNewRegion}
                     />
                 );
-            case tools.DRAG:
+            case TOOLS.drag:
             default:
                 return (
                     <DraggableTrackContainer
