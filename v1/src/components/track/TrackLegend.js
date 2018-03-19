@@ -31,8 +31,10 @@ class TrackLegend extends React.PureComponent {
         this.drawAxis();
     }
 
-    componentDidUpdate() {
-        this.drawAxis();
+    componentDidUpdate(nextProps) {
+        if (this.props.scaleForAxis !== nextProps.scaleForAxis) {
+            this.drawAxis();
+        }
     }
 
     drawAxis() {

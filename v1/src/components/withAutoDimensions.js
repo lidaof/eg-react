@@ -6,7 +6,7 @@ import getComponentName from './getComponentName';
  * recieve the values as props.  Note that the parent can override these values.
  * 
  * @param {React.Component} WrappedComponent - Component to wrap
- * @return {React.Component} component that measures its width automatically
+ * @return {React.Component} component that measures its width and height automatically
  * @author Silas Hsu
  */
 function withAutoDimensions(WrappedComponent) {

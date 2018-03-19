@@ -1,13 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { scaleLinear } from 'd3-scale'
 
-import BarChart from '../BarChart';
 import { VISUALIZER_PROP_TYPES } from './Track';
 import TrackLegend from './TrackLegend';
 import Tooltip from './Tooltip';
 import GenomicCoordinates from './GenomicCoordinates';
+import withDefaultOptions from './withDefaultOptions';
 import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorConfig';
+import BarChart from '../BarChart';
 
 import BigWigSource from '../../dataSources/BigWigSource';
 import { getRelativeCoordinates, getPageCoordinates } from '../../util';
@@ -25,7 +27,9 @@ const DEFAULT_OPTIONS = {color: "blue"};
  * @author Silas Hsu
  */
 class BigWigVisualizer extends React.PureComponent {
-    static propTypes = VISUALIZER_PROP_TYPES;
+    static propTypes = Object.assign({}, VISUALIZER_PROP_TYPES, {
+        options: PropTypes.object // Drawing options
+    });
 
     /**
      * @inheritdoc
@@ -81,7 +85,7 @@ class BigWigVisualizer extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {trackModel, data, viewRegion, width} = this.props;
+        const {data, viewRegion, width, options} = this.props;
         return (
         <React.Fragment>
             <BarChart
@@ -89,7 +93,7 @@ class BigWigVisualizer extends React.PureComponent {
                 data={data}
                 width={width}
                 height={this.getHeight()}
-                options={{color: trackModel.options.color || DEFAULT_OPTIONS.color}}
+                options={options}
                 style={BAR_CHART_STYLE}
                 renderSvg={false}
                 onRecordHover={this.showTooltip}
@@ -124,7 +128,7 @@ function BigWigLegend(props) {
 }
 
 const BigWigTrack = {
-    visualizer: BigWigVisualizer,
+    visualizer: withDefaultOptions(BigWigVisualizer, DEFAULT_OPTIONS),
     legend: BigWigLegend,
     menuItems: [PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,

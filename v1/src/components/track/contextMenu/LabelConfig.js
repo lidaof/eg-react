@@ -60,8 +60,8 @@ class LabelConfig extends React.PureComponent {
      * Requests a change in track labels.
      */
     setButtonPressed() {
-        const mutator = trackModel => trackModel.options[OPTION_PROP_NAME] = this.state.inputValue;
-        this.props.onChange(mutator);
+        const trackReplacer = trackModel => trackModel.cloneAndSetOption(OPTION_PROP_NAME, this.state.inputValue);
+        this.props.onChange(trackReplacer);
     }
 
     render() {

@@ -1,10 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-import { VISUALIZER_PROP_TYPES } from '../Track';
 import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
+
+import { VISUALIZER_PROP_TYPES } from '../Track';
 import Tooltip from '../Tooltip';
 import TrackLegend from '../TrackLegend';
+import withDefaultOptions from '../withDefaultOptions';
 
 import NumberConfig from '../contextMenu/NumberConfig';
 import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorConfig';
@@ -28,14 +31,15 @@ function getTrackHeight(trackModel) {
  * @author Silas Hsu
  */
 class GeneAnnotationVisualizer extends React.PureComponent {
-    static propTypes = VISUALIZER_PROP_TYPES;
+    static propTypes = Object.assign({}, VISUALIZER_PROP_TYPES, {
+        options: PropTypes.object // Drawing options
+    });
 
     constructor(props) {
         super(props);
         this.state = {
             tooltip: null
         };
-        this.options = Object.assign({}, DEFAULT_OPTIONS, props.trackModel.options);
         this.drawModel = new LinearDrawingModel(props.viewRegion, props.width);
         this.openTooltip = this.openTooltip.bind(this);
         this.closeTooltip = this.closeTooltip.bind(this);
@@ -44,9 +48,6 @@ class GeneAnnotationVisualizer extends React.PureComponent {
     componentWillReceiveProps(nextProps) {
         if (this.props.viewRegion !== nextProps.viewRegion || this.props.width !== nextProps.width) {
             this.drawModel = new LinearDrawingModel(nextProps.viewRegion, nextProps.width);
-        }
-        if (this.props.trackModel !== nextProps.trackModel) {
-            this.options = Object.assign({}, DEFAULT_OPTIONS, nextProps.trackModel.options);
         }
     }
 
@@ -70,7 +71,7 @@ class GeneAnnotationVisualizer extends React.PureComponent {
     }
 
     render() {
-        const {trackModel, width, data, viewWindow} = this.props;
+        const {trackModel, width, data, viewWindow, options} = this.props;
         const svgStyle = {paddingTop: 5, display: "block", overflow: "visible"};
         return (
         <React.Fragment>
@@ -80,7 +81,7 @@ class GeneAnnotationVisualizer extends React.PureComponent {
                     drawModel={this.drawModel}
                     onGeneClick={this.openTooltip}
                     viewWindow={viewWindow}
-                    options={this.options}
+                    options={options}
                 />
             </svg>
             {this.state.tooltip}
@@ -98,7 +99,7 @@ function NumRowsConfig(props) {
 }
 
 const GeneAnnotationTrack = {
-    visualizer: GeneAnnotationVisualizer,
+    visualizer: withDefaultOptions(GeneAnnotationVisualizer, DEFAULT_OPTIONS),
     legend: GeneAnnotationLegend,
     menuItems: [NumRowsConfig, PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,

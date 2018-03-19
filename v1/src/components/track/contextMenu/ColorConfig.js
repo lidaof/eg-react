@@ -34,8 +34,8 @@ class ColorConfig extends React.PureComponent {
      * @param {Object} color - color change object from the `react-color` package
      */
     handleColorChange(color) {
-        const mutator = trackModel => trackModel.options[this.props.optionPropName] = color.hex;
-        this.props.onChange(mutator);
+        const replaceTrack = trackModel => trackModel.cloneAndSetOption(this.props.optionPropName, color.hex);
+        this.props.onChange(replaceTrack);
     }
 
     render() {

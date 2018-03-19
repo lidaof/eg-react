@@ -18,15 +18,15 @@ export const ITEM_PROP_TYPES = {
     tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
 
     /**
-     * Callback for when the item requests a change.  Signature: (mutate: TrackMutator): void
-     *     TrackMutator is defined at the bottom of this file.
+     * Callback for when the item requests a change.  Signature: (replaceTrack: TrackReplacer): void
+     *     TrackReplacer is defined at the bottom of this file.
      */
     onChange: PropTypes.func
 };
 
 export const ITEM_DEFAULT_PROPS = {
     tracks: [],
-    onChange: (mutate) => undefined
+    onChange: (replaceTrack) => undefined
 };
 
 /**
@@ -86,17 +86,15 @@ class TrackContextMenu extends React.PureComponent {
     }
 
     /**
-     * A callback for when menu items are changed.  Menu items changes via a mutator function, which mutate a
-     * TrackModel.  This method does the copy-and-mutate and passes the changed tracks to the parent element.
+     * A callback for when menu items are changed.  Menu items should pass a function that replaces existing tracks with
+     * new versions.  Then, this method passes the new tracks to the parent element.
      * 
-     * @param {TrackMutator} mutate - function that mutates TrackModels
+     * @param {TrackReplacer} replaceTrack - function that gets a new version of the input TrackModel
      */
-    changeSelectedTracks(mutate) {
+    changeSelectedTracks(replaceTrack) {
         const nextTracks = this.props.allTracks.map(track => {
             if (track.isSelected) {
-                let copy = track.clone();
-                mutate(copy);
-                return copy;
+                return replaceTrack(track);
             } else {
                 return track;
             }
@@ -161,11 +159,13 @@ function RemoveOption(props) {
 }
 
 /**
- * Mutates a TrackModel.
+ * Gets a new version of the input TrackModel, with changes shallowly merged in, which is the React way.  That is, if
+ * the model has not changed at all, the function may return same object.  Otherwise, the function should return a new
+ * TrackModel, and any changed props should be completely replaced.
  * 
- * @callback TrackMutator
- * @param {TrackModel} track - the track model to mutate
- * @return {void} the return value is unused
+ * @callback TrackReplacer
+ * @param {TrackModel} track - TrackModel off of which to base the output
+ * @return {TrackModel} version of the input track model with any changes shallowly merged in
  */
 
 export default TrackContextMenu;

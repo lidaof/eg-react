@@ -30,8 +30,8 @@ class NumberConfig extends React.PureComponent {
     handleInputChange(event) {
         const intValue = Number.parseInt(event.target.value, 10);
         if (Number.isInteger(intValue)) {
-            const mutator = trackModel => trackModel.options[this.props.optionPropName] = intValue;
-            this.props.onChange(mutator);
+            const trackReplacer = trackModel => trackModel.cloneAndSetOption(this.props.optionPropName, intValue);
+            this.props.onChange(trackReplacer);
         }
     }
 

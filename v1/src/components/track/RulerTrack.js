@@ -19,7 +19,7 @@ const HEIGHT = 65;
  * @param {Object} props - props as specified by React
  * @return {JSX.Element} element to render
  */
-class RulerVisualizer extends React.PureComponent {
+class RulerVisualizer extends React.Component {
     static propTypes = VISUALIZER_PROP_TYPES;
 
     constructor(props) {
@@ -29,6 +29,14 @@ class RulerVisualizer extends React.PureComponent {
         };
         this.showTooltip = this.showTooltip.bind(this);
         this.closeTooltip = this.closeTooltip.bind(this);
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return (
+            this.props.viewRegion !== nextProps.viewRegion ||
+            this.props.width !== nextProps.width ||
+            this.state.tooltip !== nextState.tooltip
+        );
     }
 
     /**
@@ -59,7 +67,7 @@ class RulerVisualizer extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {width, viewRegion} = this.props;
+        const {viewRegion, width} = this.props;
         return (
         <div onMouseMove={this.showTooltip} onMouseLeave={this.closeTooltip}>
             {/* display: block prevents svg from taking extra bottom space */ }

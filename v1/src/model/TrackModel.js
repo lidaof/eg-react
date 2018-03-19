@@ -74,20 +74,34 @@ class TrackModel {
     }
 
     /**
-     * Deeply clones this, including id.
+     * **Shallowly** clones this.
      * 
-     * @return {TrackModel} a deep copy of this
+     * @return {TrackModel} a shallow copy of this
      */
     clone() {
-        return _.cloneDeep(this);
+        return _.clone(this);
     }
 
+    /**
+     * Shallowly clones `this` and `this.options`, and then modifies the clone's options.  Returns the clone.  This
+     * method will not mutate this instance.
+     * 
+     * @param {string} name - the name of the option to set
+     * @param {any} optionValue - the value of the option
+     * @return {TrackModel} shallow clone of this, with the option set
+     */
     cloneAndSetOption(name, optionValue) {
         let clone = this._cloneThisAndProp("options");
         clone.options[name] = optionValue;
         return clone;
     }
 
+    /**
+     * Shallowly clones this and also selects a particular property to be cloned one level deeper.
+     * 
+     * @param {string} prop - property name to also clone
+     * @return {TrackModel} shallow clone of this
+     */
     _cloneThisAndProp(prop) {
         let clone = _.clone(this);
         clone[prop] = _.clone(this[prop]);
