@@ -18,6 +18,9 @@ import withAutoDimensions from '../withAutoDimensions';
 import { MouseButtons } from '../../util';
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import MetadataHeader from './MetadataHeader';
+
+const METADATA_TERMS = ['Track type', 'Assay', 'Sample'];
 
 const TOOLS = {
     drag: {
@@ -82,6 +85,7 @@ class TrackContainer extends React.Component {
         this.trackClicked = this.trackClicked.bind(this);
         this.handleContextMenuEvent = this.handleContextMenuEvent.bind(this);
         this.handleOutsideClick = this.handleOutsideClick.bind(this);
+        this.selectTracksByMetadata = this.selectTracksByMetadata.bind(this);
     }
 
     /**
@@ -112,7 +116,8 @@ class TrackContainer extends React.Component {
             this.trackClicked(event, index);
         } else if (!this.props.tracks[index].isSelected) {
             // If the track is not selected, select it and deselect the others.
-            const nextTracks = this.deselectAllTracks();
+            const nextTracks = this.props.tracks.slice();
+            this.changeTrackSelection(nextTracks, false);
             this.toggleOneTrack(nextTracks, index);
             this.props.onTracksChanged(nextTracks);
         }
@@ -125,23 +130,54 @@ class TrackContainer extends React.Component {
      */
     handleOutsideClick(event) {
         if (this.props.tracks.some(track => track.isSelected)) {
-            this.props.onTracksChanged(this.deselectAllTracks())
+            const nextTracks = this.props.tracks.slice();
+            this.changeTrackSelection(nextTracks, false);
+            this.props.onTracksChanged(nextTracks);
         }
+    }
+
+    /**
+     * 
+     * @param {string} term 
+     * @param {number} index 
+     */
+    selectTracksByMetadata(term, index) {
+        const tracks = this.props.tracks;
+        const termValue = tracks[index].getMetadata(term);
+        let minIndex = index - 1;
+        while (minIndex >= 0 && tracks[minIndex].getMetadata(term) === termValue) {
+            minIndex--;
+        }
+        minIndex++;
+
+        let maxIndex = index + 1;
+        while (maxIndex < tracks.length && tracks[maxIndex].getMetadata(term) === termValue) {
+            maxIndex++;
+        }
+
+        let nextTracks = tracks.slice();
+        this.changeTrackSelection(nextTracks, false, 0, minIndex);
+        this.changeTrackSelection(nextTracks, true, minIndex, maxIndex);
+        this.changeTrackSelection(nextTracks, false, maxIndex);
+        this.props.onTracksChanged(nextTracks);
     }
 
     /**
      * @return {TrackModel[]} copy of this.props.tracks where all tracks are deselected.
      */
-    deselectAllTracks() {
-        return this.props.tracks.map(track => {
-            if (track.isSelected) {
+    changeTrackSelection(tracks, newSelectionValue, startIndex=0, endIndex) {
+        if (!endIndex) {
+            endIndex = tracks.length;
+        }
+
+        for (let i = startIndex; i < endIndex; i++) {
+            const track = tracks[i];
+            if (track.isSelected !== newSelectionValue) {
                 let clone = track.clone();
-                clone.isSelected = false;
-                return clone;
-            } else {
-                return track;
+                clone.isSelected = newSelectionValue;
+                tracks[i] = clone;
             }
-        });
+        }
     }
 
     /**
@@ -197,8 +233,10 @@ class TrackContainer extends React.Component {
                     trackModel={trackModel}
                     viewRegion={this.props.viewRegion}
                     width={this.getVisualizationWidth()}
+                    metadataTerms={METADATA_TERMS}
                     onContextMenu={event => this.handleContextMenuEvent(event, index)}
                     onClick={event => this.trackClicked(event, index)}
+                    onMetadataClick={(event, term) => this.selectTracksByMetadata(term, index)}
                 />
             </Reparentable>
         });
@@ -254,7 +292,10 @@ class TrackContainer extends React.Component {
         const trackDivStyle = {border: "1px solid black", paddingTop: 1, cursor: "crosshair"};
         return (
         <OutsideClickDetector onOutsideClick={this.handleOutsideClick} style={{margin: 5}} >
-            {this.renderToolSelectButtons()}
+            <div style={{display: "flex", alignItems: "flex-end"}} >
+                {this.renderToolSelectButtons()}
+                <MetadataHeader terms={METADATA_TERMS} />
+            </div>
             <ContextMenuManager shouldMenuOpen={isNotControlKey} shouldMenuClose={isNotControlKey} menuElement={contextMenu} >
                 <DivWithBullseye style={trackDivStyle} >
                     {this.renderSubContainer()}

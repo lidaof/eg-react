@@ -1,0 +1,10 @@
+.Tooltip-major-text {
+    font-size: 1.2em;
+    margin: 0;
+}
+
+.Tooltip-minor-text {
+    font-size: 0.8em;
+    color: dimgrey;
+    margin: 0;
+}

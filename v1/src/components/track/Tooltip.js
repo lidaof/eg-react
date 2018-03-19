@@ -36,6 +36,11 @@ class Tooltip extends React.PureComponent {
         pageX: PropTypes.number.isRequired, // x of the tip of the arrow
         pageY: PropTypes.number.isRequired, // x of the tip of the arrow
         ignoreMouse: PropTypes.bool, // Whether the content should be invisible to mouse events
+        /*
+         * CSS overrides.  Note that arrow styles are not (currently) overridable, so certain overrides, like
+         * backgroundColor, can make the tooltip look weird.
+         */
+        style: PropTypes.object,
         onClose: PropTypes.func, // Called when the tooltip wants to close.  Signature: (event: MouseEvent): void
     };
 
@@ -43,14 +48,14 @@ class Tooltip extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {pageX, pageY, onClose, ignoreMouse, children} = this.props;
-        const contentStyle = {
+        const {pageX, pageY, onClose, ignoreMouse, style, children} = this.props;
+        const contentStyle = Object.assign({
             zIndex: 1,
             borderRadius: 5,
             backgroundColor: BACKGROUND_COLOR,
             marginTop: ARROW_SIZE,
             pointerEvents: ignoreMouse ? "none" : "auto"
-        };
+        }, style);
 
         /**
          * On the stopEvent for onMouseDown: despite being in document.body, parents of the Tooltip in React's virtual
@@ -60,7 +65,7 @@ class Tooltip extends React.PureComponent {
         return ReactDOM.createPortal(
             <Manager>
                 <Target style={{position: "absolute", left: pageX, top: pageY}} />
-                <Popper placement="bottom-start" style={contentStyle} onMouseDown={stopEvent} modifiers={{preventOverflow: {boundariesElement: document.body}}} >
+                <Popper placement="bottom-start" style={contentStyle} onMouseDown={stopEvent} >
                     <OutsideClickDetector onOutsideClick={onClose} >
                         {children}
                     </OutsideClickDetector>

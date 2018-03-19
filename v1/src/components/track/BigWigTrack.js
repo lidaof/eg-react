@@ -12,6 +12,8 @@ import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorCo
 import BigWigSource from '../../dataSources/BigWigSource';
 import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 
+import './Tooltip.css';
+
 const DEFAULT_HEIGHT = 35; // In pixels
 const TOP_PADDING = 5;
 const BAR_CHART_STYLE = {paddingTop: TOP_PADDING, display: "block"}; // display: block prevents extra bottom padding
@@ -56,15 +58,13 @@ class BigWigVisualizer extends React.PureComponent {
         const relativeX = getRelativeCoordinates(event).x;
         const pageY = getPageCoordinates(event.currentTarget, 0, this.getHeight()).y;
         const tooltip = (
-            <Tooltip pageX={event.pageX} pageY={pageY} onClose={this.closeTooltip} >
-                <div style={{padding: '0px 5px 5px'}} >
-                    <p style={{fontSize: '1.2em', margin: 0}} >{recordValue}</p>
-                    <p style={{fontSize: '0.8em', color: 'dimgrey', margin: 0}} >
-                        <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
-                        <br/>
-                        {trackModel.getDisplayLabel()}
-                    </p>
-                </div>
+            <Tooltip pageX={event.pageX} pageY={pageY} style={{padding: '0px 5px 5px'}} onClose={this.closeTooltip} >
+                <p className="Tooltip-major-text" >{recordValue}</p>
+                <p className="Tooltip-minor-text" >
+                    <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
+                    <br/>
+                    {trackModel.getDisplayLabel()}
+                </p>
             </Tooltip>
         );
         this.setState({tooltip: tooltip});

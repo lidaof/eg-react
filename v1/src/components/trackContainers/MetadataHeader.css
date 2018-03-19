@@ -1,0 +1,15 @@
+.MetadataHeader-container {
+    list-style-type: none;
+    margin-left: auto;
+    margin-right: 0;
+    padding: 0;
+}
+
+.MetadataHeader-container ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    writing-mode: vertical-lr;
+    text-align: right;
+}

@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import TrackLoadingNotice from './TrackLoadingNotice';
+import MetadataIndicator from './MetadataIndicator';
+
 import withExpandedWidth from '../withExpandedWidth';
 import getComponentName from '../getComponentName';
 import { getSubtypeConfig } from './subtypeConfig';
@@ -12,7 +14,6 @@ import RegionExpander from '../../model/RegionExpander';
 import OpenInterval from '../../model/interval/OpenInterval';
 
 import './Track.css';
-
 
 /**
  * Props that will be passed to track legend components.
@@ -67,9 +68,8 @@ const WideDiv = freezeWhileLoading(withExpandedWidth('div'));
  *     - Data fetch
  *     - Legend
  *     - Visualizer
- *     - Tooltip
- * These are all determined by the TYPE_NAME_TO_SUBTYPE map private to this module.  For more information on how this
- * all works, see TrackSubtype.ts and the README.
+ * These are all determined by getSubtypeConfig.js.  For more information on how this all works, see TrackSubtype.ts and
+ * the README.
  * 
  * @author Silas Hsu
  */
@@ -77,10 +77,17 @@ export class Track extends React.PureComponent {
     static propTypes = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
-        width: PropTypes.number.isRequired, // Visible width of the track, including legend, metadata handle, etc.
+        width: PropTypes.number.isRequired, // Width of the track's visualizer
+        metadataTerms: PropTypes.arrayOf(PropTypes.string), // Terms for which to render metadata handles
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
         onContextMenu: PropTypes.func, // Works as one would expect
         onClick: PropTypes.func, // Works as one would expect
+        /**
+         * Called when user clicks on a metadata box.  Signature: (event: MouseEvent, term: string)
+         *     `event` - the click event
+         *     `term` - the metadata term associated with the box
+         */
+        onMetadataClick: PropTypes.func,
     };
 
     static defaultProps = {
@@ -180,7 +187,7 @@ export class Track extends React.PureComponent {
      * @override
      */
     render() {
-        const {trackModel, xOffset, onContextMenu, onClick} = this.props;
+        const {trackModel, xOffset, metadataTerms, onContextMenu, onClick, onMetadataClick} = this.props;
         const data = this.state.data;
         const trackSubtype = getSubtypeConfig(trackModel);
         const Legend = trackSubtype.legend;
@@ -209,6 +216,7 @@ export class Track extends React.PureComponent {
                     trackModel={trackModel}
                 />
             </WideDiv>
+            <MetadataIndicator track={trackModel} terms={metadataTerms} onClick={onMetadataClick} />
         </div>
         );
     }

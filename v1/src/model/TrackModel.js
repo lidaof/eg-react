@@ -32,10 +32,12 @@ class TrackModel {
         Object.assign(this, plainObject);
         this.name = this.name || "";
         this.type = this.type || this.filetype || "";
+        this.type = this.type.toLowerCase();
         this.options = this.options || {}; // `options` stores dynamically-configurable options.
         this.options.label = this.name; // ...which is why we copy this.name.
         this.url = this.url || "";
         this.metadata = this.metadata || {};
+        this.metadata["Track type"] = this.type;
 
         // Other misc props
         this.isSelected = false;
@@ -62,6 +64,15 @@ class TrackModel {
         return this.options.label || "(unnamed track)";
     }
 
+    getMetadata(term) {
+        const value = this.metadata[term];
+        if (Array.isArray(value)) {
+            return value[value.length - 1];
+        } else {
+            return value;
+        }
+    }
+
     /**
      * Deeply clones this, including id.
      * 
@@ -69,6 +80,18 @@ class TrackModel {
      */
     clone() {
         return _.cloneDeep(this);
+    }
+
+    cloneAndSetOption(name, optionValue) {
+        let clone = this._cloneThisAndProp("options");
+        clone.options[name] = optionValue;
+        return clone;
+    }
+
+    _cloneThisAndProp(prop) {
+        let clone = _.clone(this);
+        clone[prop] = _.clone(this[prop]);
+        return clone;
     }
 }
 
