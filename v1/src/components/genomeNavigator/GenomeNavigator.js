@@ -8,6 +8,9 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import eglogo from '../../images/eglogo.jpg';
 import GeneSearchBox from './GeneSearchBox';
 
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { faSearchMinus, faSearchPlus } from '@fortawesome/fontawesome-free-solid';
+
 const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
 
 /**
@@ -133,7 +136,11 @@ class GenomeNavigator extends React.Component {
                         </div>
                          <div className="col-sm">
                             <label>
-                                Zoom: <span role="img" aria-label="High zoom">➕</span>
+                                Zoom:
+                                <div class="btn-group"> 
+                                <button className="btn" onClick={()=>{this._setModelState("zoom", [0.5])}}>
+                                    <FontAwesomeIcon icon={faSearchPlus} />
+                                </button>
                                  <input
                                     type="range"
                                     min={Math.log(MIN_VIEW_LENGTH)}
@@ -141,7 +148,11 @@ class GenomeNavigator extends React.Component {
                                     step="any"
                                     value={Math.log(this.state.viewRegion.getWidth())}
                                     onChange={this.zoomSliderDragged}
-                                /><span role="img" aria-label="Low zoom">➖</span>
+                                />
+                                <button className="btn" onClick={()=>{this._setModelState("zoom", [2])}}>
+                                    <FontAwesomeIcon icon={faSearchMinus} />
+                                </button>
+                                </div>
                             </label>
                         </div>
                     </div>
