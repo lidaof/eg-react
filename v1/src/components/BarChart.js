@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import CanvasDesignRenderer from './CanvasDesignRenderer';
+import DesignRenderer from './DesignRenderer';
 import BarChartDesigner from '../art/BarChartDesigner';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
@@ -20,7 +20,7 @@ class BarChart extends React.PureComponent {
         height: PropTypes.number.isRequired, // Graphic height
         options: PropTypes.object, // Drawing options.  Will be passed to BarChartDesigner.
         style: PropTypes.object, // CSS
-        renderSvg: PropTypes.bool, // Whether to render canvas (default) or svg
+        type: PropTypes.number, // Render element type.  See DesignRenderer.js
 
         /**
          * Called when the user mouses over the graphic.  Signature
@@ -83,33 +83,21 @@ class BarChart extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {viewRegion, data, width, height, options, style, renderSvg, onMouseLeave} = this.props;
+        const {viewRegion, data, width, height, options, style, type, onMouseLeave} = this.props;
         this.makeXToDataMap();
         const design = new BarChartDesigner(viewRegion, data, width, height, options).design();
-        if (renderSvg) {
-            const svgStyle = Object.assign({display: "block"}, style); // Display block to prevent extra bottom margin
-            return (
-            <svg
-                width={width}
-                height={height}
-                style={svgStyle}
-                onMouseMove={this.mouseMoved}
-                onMouseLeave={onMouseLeave}
-            >
-                {design}
-            </svg>
-            );
-        } else {
-            return (
-            <CanvasDesignRenderer
-                design={design}
-                width={width}
-                height={height}
-                style={style}
-                onMouseMove={this.mouseMoved}
-                onMouseLeave={onMouseLeave}
-            />);
-        }
+        return (
+        <DesignRenderer
+            type={type}
+            width={width}
+            height={height}
+            style={style}
+            onMouseMove={this.mouseMoved}
+            onMouseLeave={onMouseLeave}
+        >
+            {design}
+        </DesignRenderer>
+        );
     }
 }
 

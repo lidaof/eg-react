@@ -1,0 +1,92 @@
+import React from 'react'
+import PropTypes from 'prop-types';
+
+export const renderTypes = {
+    CANVAS: 0,
+    SVG: 1,
+};
+
+const DEFAULT_STYLE = { display: "block" }; // display: block prevents extra bottom padding in both svg and canvas
+
+/**
+ * A component that renders SVG elements in a flexible way: in a <svg>, in a <canvas>, etc.
+ * 
+ * @author Silas Hsu
+ */
+export class DesignRenderer extends React.PureComponent {
+    static propTypes = {
+        type: PropTypes.oneOf([renderTypes.CANVAS, renderTypes.SVG]),
+        style: PropTypes.object, // CSS.  Will be merged with default styles.
+        // Remaining props get passed directly to the rendered element
+    };
+
+    static defaultProps = {
+        type: renderTypes.SVG
+    };
+
+    render() {
+        const {type, style, ...otherProps} = this.props;
+        const mergedStyle = Object.assign({}, DEFAULT_STYLE, style);
+        switch (type) {
+            case renderTypes.CANVAS:
+                return <CanvasDesignRenderer {...otherProps} style={mergedStyle} />;
+            case renderTypes.SVG:
+                return <svg {...otherProps} style={mergedStyle} />;
+            default:
+                return null;
+        }
+    }
+}
+
+/**
+ * Component that replicates draws its children the best it can on a <canvas>.  Any props are passed directly to the
+ * <canvas>.
+ * 
+ * @author Silas Hsu
+ */
+class CanvasDesignRenderer extends React.PureComponent {
+    /**
+     * Draws the canvas.
+     */
+    componentDidMount() {
+        this.draw(this.canvasNode);
+    }
+
+    /**
+     * Redraws the canvas.
+     */
+    componentDidUpdate(prevProps) {
+        this.draw(this.canvasNode);
+    }
+
+    /**
+     * Redraws the canvas.
+     */
+    draw(canvas) {
+        if (process.env.NODE_ENV === "test") { // jsdom does not support canvas
+            return;
+        }
+
+        let context = this.canvasNode.getContext("2d");
+        context.clearRect(0, 0, this.canvasNode.width, this.canvasNode.height); // Clear the canvas
+
+        this.props.children.forEach(element => {
+            const props = element.props;
+            switch (element.type) {
+                case 'rect':
+                    context.fillStyle = props.fill;
+                    context.fillRect(props.x, props.y, props.width, props.height);
+                    break;
+                default:
+                    console.error(`Drawing '${element.type}'s is unsupported.  Ignoring...`);
+            }
+        });
+    }
+
+    render() {
+        const {children, ...otherProps} = this.props;
+        return <canvas ref={node => this.canvasNode = node} {...otherProps} />;
+    }
+}
+
+export default DesignRenderer;
