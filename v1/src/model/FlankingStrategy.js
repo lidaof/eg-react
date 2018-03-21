@@ -12,8 +12,8 @@ class FlankingStrategy {
     static SURROUND_END = 2;
 
     /**
-     * Makes a new instance.  Does not do any sanity checks; use {@link checkValid} to check if the parameters make
-     * sense.
+     * Makes a new instance.  Does not do any sanity checks; nonsense parameters will cause `makeFlankedFeature` to
+     * return null.
      * 
      * @param {number} [type] - type of strategy; see static variables for a selection
      * @param {number} [upstream] - number of bases upstream to expand input features
@@ -21,31 +21,8 @@ class FlankingStrategy {
      */
     constructor(type=FlankingStrategy.SURROUND_ALL, upstream=0, downstream=0) {
         this.type = type;
-        this.upstream = upstream;
-        this.downstream = downstream;
-    }
-
-    /**
-     * Checks if the current options make sense.  Returns an Error object if there is a problem, and null otherwise.
-     * 
-     * @return {Error} Error object, or null if everything is OK
-     */
-    checkValid() {
-        const allStrats = [
-            FlankingStrategy.SURROUND_ALL,
-            FlankingStrategy.SURROUND_START,
-            FlankingStrategy.SURROUND_END,
-        ];
-        if (allStrats.find(strat => strat === this.type) === undefined) {
-            return new RangeError("Unknown strategy type");
-        }
-
-        if (!Number.isSafeInteger(this.upstream) || !Number.isSafeInteger(this.downstream) || 
-                this.upstream < 0 || this.downstream < 0) {
-            return new RangeError("Must give positive number of bases");
-        }
-
-        return null;
+        this.upstream = Number(upstream);
+        this.downstream = Number(downstream);
     }
 
     /**

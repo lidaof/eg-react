@@ -12,20 +12,9 @@ class FlankingStratConfig extends React.Component {
         onNewStrategy: () => undefined
     };
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            error: null,
-        };
-    }
-
     inputChanged(propToChange, value) {
         const newStrat = this.props.strategy.cloneAndSetProp(propToChange, value);
-        const error = newStrat.checkValid();
-        if (!error) {
-            this.props.onNewStrategy(newStrat);
-        }
-        this.setState({error: error});
+        this.props.onNewStrategy(newStrat);
     }
 
     render() {
@@ -36,6 +25,7 @@ class FlankingStratConfig extends React.Component {
                 Upstream bases
                 <input
                     type="number"
+                    min={0}
                     value={this.props.strategy.upstream}
                     onChange={event => this.inputChanged("upstream", Number.parseInt(event.target.value, 10))}
                 />
@@ -44,6 +34,7 @@ class FlankingStratConfig extends React.Component {
                 Downstream bases
                 <input
                     type="number"
+                    min={0}
                     value={this.props.strategy.downstream}
                     onChange={event => this.inputChanged("downstream", Number.parseInt(event.target.value, 10))}
                 />
@@ -59,9 +50,8 @@ class FlankingStratConfig extends React.Component {
                     <option value={FlankingStrategy.SURROUND_END}>Transcription end</option>
                 </select>
             </label>
-            {this.state.error ? this.state.error.message : null}
         </div>
-        )
+        );
     }
 }
 

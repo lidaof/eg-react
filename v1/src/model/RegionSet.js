@@ -93,6 +93,9 @@ class RegionSet {
      */
     makeNavContext() {
         const flankedFeatures = this.makeFlankedFeatures();
+        if (flankedFeatures.some(feature => feature === null)) {
+            throw new Error("Cannot make nav context out of null features.  Double check the flanking strategy.");
+        }
         return new NavigationContext(this.name, flankedFeatures);
     }
 }

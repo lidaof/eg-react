@@ -3,38 +3,6 @@ import { Chromosome, Genome } from '../Genome';
 import Feature from '../Feature';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 
-describe("checkValid()", () => {
-    it("returns an error for an unknown strategy type", () => {
-        const instance = new FlankingStrategy(-1);
-        expect(instance.checkValid()).toBeInstanceOf(Error);
-    });
-
-    it("returns an error for negative base numbers", () => {
-        const instance = new FlankingStrategy(FlankingStrategy.SURROUND_ALL, -1, 0);
-        expect(instance.checkValid()).toBeInstanceOf(Error);
-
-        const instance2 = new FlankingStrategy(FlankingStrategy.SURROUND_ALL, 0, -1);
-        expect(instance2.checkValid()).toBeInstanceOf(Error);
-    });
-
-    it("returns an error for invalid and noninteger base numbers", () => {
-        const instance = new FlankingStrategy(FlankingStrategy.SURROUND_ALL, NaN, NaN);
-        expect(instance.checkValid()).toBeInstanceOf(Error);
-
-        const instance2 = new FlankingStrategy(FlankingStrategy.SURROUND_ALL, 1.5, 2.5);
-        expect(instance2.checkValid()).toBeInstanceOf(Error);
-    });
-
-    it("returns null for a valid configuration", () => {
-        const instance = new FlankingStrategy();
-        expect(instance.checkValid()).toBeNull();
-
-        const instance2 = new FlankingStrategy(FlankingStrategy.SURROUND_START, 0, 10);
-        expect(instance2.checkValid()).toBeNull();
-    });
-});
-
-
 const GENOME = new Genome("Gee, gnome!", [new Chromosome("chr1", 10)]);
 
 describe("makeFlankedFeature()", () => {

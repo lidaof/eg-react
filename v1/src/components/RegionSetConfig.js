@@ -100,19 +100,24 @@ class RegionSetConfig extends React.Component {
 
         let rows = [];
         for (let i = 0; i < features.length; i++) {
-            if (!features[i]) {
-                continue;
-            }
+            const feature = features[i];
+            const flankedLocus = flankedFeatures[i] ? flankedFeatures[i].getLocus().toString() : "(invalid)";
 
             rows.push(<tr key={i}>
-                <td>{features[i].getName()}</td>
-                <td>{features[i].getLocus().toString()}</td>
-                <td>{flankedFeatures[i].getLocus().toString()}</td>
+                <td>{feature.getName()}</td>
+                <td>{feature.getLocus().toString()}</td>
+                <td>{feature.getIsForwardStrand ? "+" : "-"}</td>
+                <td>{flankedLocus}</td>
                 <td><button onClick={() => this.deleteRegion(i)}>Delete</button></td>
             </tr>);
         }
 
         return rows;
+    }
+
+    isSaveButtonDisabled() {
+        return this.state.set === this.props.set ||
+            this.state.set.makeFlankedFeatures().some(feature => feature === null);
     }
 
     render() {
@@ -130,7 +135,7 @@ class RegionSetConfig extends React.Component {
             </label>
             <table className="table">
                 <thead>
-                    <tr><th>Name</th><th>Locus</th><th>Coordinates to view</th></tr>
+                    <tr><th>Name</th><th>Locus</th><th>Strand</th><th>Coordinates to view</th></tr>
                 </thead>
                 <tbody>{this.renderRegions()}</tbody>
             </table>
@@ -157,11 +162,11 @@ class RegionSetConfig extends React.Component {
             <FlankingStratConfig
                 strategy={this.state.set.flankingStrategy}
                 onNewStrategy={this.changeSetStrategy}
-                />
+            />
             <div>
                 <button
                     onClick={() => this.props.onSetConfigured(this.state.set)}
-                    disabled={this.state.set === this.props.set}
+                    disabled={this.isSaveButtonDisabled()}
                 >
                     Save changes
                 </button>
