@@ -51,8 +51,13 @@ function hashCode(string) {
  */
 class MetadataIndicator extends React.PureComponent {
     static propTypes = {
-        track: PropTypes.instanceOf(TrackModel).isRequired,
-        terms: PropTypes.arrayOf(PropTypes.string),
+        track: PropTypes.instanceOf(TrackModel).isRequired, // The track for which to indicate metadata
+        terms: PropTypes.arrayOf(PropTypes.string), // Metadata terms to indicate
+        /**
+         * Called when the component is clicked.  Signature: (event: MouseEvent, term: string)
+         *     `event` - the click event
+         *     `term` - the term whose indicator was clicked
+         */
         onClick: PropTypes.func
     };
 
@@ -61,7 +66,7 @@ class MetadataIndicator extends React.PureComponent {
         onClick: () => undefined,
     };
 
-    static WIDTH = 20;
+    static WIDTH = 15;
 
     constructor(props) {
         super(props);
@@ -92,13 +97,13 @@ class MetadataIndicator extends React.PureComponent {
             color={color}
             term={term}
             termValue={termValue}
-            onClick={(event) => this.props.onClick(event, term)}
+            onClick={event => this.props.onClick(event, term)}
         />;
     }
 
     render() {
         return (
-        <div style={{display: "flex"}}>
+        <div style={{display: "flex"}} >
             {this.props.terms.map(this.renderBoxForTerm)}
         </div>
         );

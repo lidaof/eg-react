@@ -5,7 +5,6 @@ import { axisLeft } from 'd3-axis';
 
 import TrackModel from '../../model/TrackModel';
 
-export const WIDTH = 120;
 const NUM_TICKS_SUGGESTION = 2;
 const AXIS_WIDTH = 30;
 
@@ -21,6 +20,8 @@ class TrackLegend extends React.PureComponent {
         scaleForAxis: PropTypes.func,
         style: PropTypes.object,
     };
+
+    static WIDTH = 120;
 
     constructor(props) {
         super(props);
@@ -58,13 +59,13 @@ class TrackLegend extends React.PureComponent {
 
         const divStyle = Object.assign({
             display: "flex",
-            width: WIDTH,
+            width: TrackLegend.WIDTH,
             height: height,
             backgroundColor: trackModel.isSelected ? "yellow" : undefined,
         }, style);
         const pStyle = {
             margin: 0,
-            width: this.scaleForAxis ? WIDTH - AXIS_WIDTH : WIDTH,
+            width: this.scaleForAxis ? TrackLegend.WIDTH - AXIS_WIDTH : TrackLegend.WIDTH,
             maxHeight: height,
             fontSize: "x-small",
             lineHeight: 1,

@@ -80,18 +80,30 @@ export class Track extends React.PureComponent {
         width: PropTypes.number.isRequired, // Width of the track's visualizer
         metadataTerms: PropTypes.arrayOf(PropTypes.string), // Terms for which to render metadata handles
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
-        onContextMenu: PropTypes.func, // Works as one would expect
-        onClick: PropTypes.func, // Works as one would expect
+        index: PropTypes.number, // The index of the track in the parent container.  Passed directly to the callbacks.
         /**
-         * Called when user clicks on a metadata box.  Signature: (event: MouseEvent, term: string)
+         * Called on context menu events.  Signature: (event: MouseEvent, index: number): void
+         */
+        onContextMenu: PropTypes.func,
+        /**
+         * Called on click events, except those clicks that happen on the metadata indicator.
+         * Signature: (event: MouseEvent, index: number): void
+         */
+        onClick: PropTypes.func,
+        /**
+         * Called when user clicks on a metadata box.  Signature: (event: MouseEvent, term: string, index: number)
          *     `event` - the click event
          *     `term` - the metadata term associated with the box
+         *     `index` - the index prop passed to the track
          */
         onMetadataClick: PropTypes.func,
     };
 
     static defaultProps = {
         xOffset: 0,
+        onContextMenu: () => undefined,
+        onClick: () => undefined,
+        onMetadataClick: () => undefined,
     };
 
     /**
@@ -111,6 +123,11 @@ export class Track extends React.PureComponent {
             error: null,
         };
         this.fetchData(props);
+
+        this.ignoreNextClick = false;
+        this.handleContextMenu = this.handleContextMenu.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+        this.handleMetadataClick = this.handleMetadataClick.bind(this);
     }
 
     /**
@@ -155,6 +172,22 @@ export class Track extends React.PureComponent {
         });
     }
 
+    handleContextMenu(event) {
+        this.props.onContextMenu(event, this.props.index);
+    }
+
+    handleClick(event) {
+        if (!this.ignoreNextClick) {
+            this.props.onClick(event, this.props.index);
+        }
+        this.ignoreNextClick = false;
+    }
+
+    handleMetadataClick(event, term) {
+        this.ignoreNextClick = true; // Since the onClick event will be called right after this
+        this.props.onMetadataClick(event, term, this.props.index);
+    }
+
     /**
      * If the view region has changed, sends a request for data
      * 
@@ -187,7 +220,7 @@ export class Track extends React.PureComponent {
      * @override
      */
     render() {
-        const {trackModel, xOffset, metadataTerms, onContextMenu, onClick, onMetadataClick} = this.props;
+        const {trackModel, xOffset, metadataTerms} = this.props;
         const data = this.state.data;
         const trackSubtype = getSubtypeConfig(trackModel);
         const Legend = trackSubtype.legend;
@@ -197,8 +230,8 @@ export class Track extends React.PureComponent {
         <div
             style={{backgroundColor: this.state.error ? "pink" : "white"}}
             className={trackModel.isSelected ? "Track Track-selected-border" : "Track"}
-            onContextMenu={onContextMenu}
-            onClick={onClick}
+            onContextMenu={this.handleContextMenu}
+            onClick={this.handleClick}
         >
             {this.state.isLoading ? <TrackLoadingNotice /> : null}
             <Legend trackModel={trackModel} data={data} />
@@ -216,7 +249,7 @@ export class Track extends React.PureComponent {
                     trackModel={trackModel}
                 />
             </WideDiv>
-            <MetadataIndicator track={trackModel} terms={metadataTerms} onClick={onMetadataClick} />
+            <MetadataIndicator track={trackModel} terms={metadataTerms} onClick={this.handleMetadataClick} />
         </div>
         );
     }

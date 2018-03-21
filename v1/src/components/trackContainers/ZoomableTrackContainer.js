@@ -11,9 +11,10 @@ import LinearDrawingModel from '../../model/LinearDrawingModel';
  */
 class ZoomableTrackContainer extends React.Component {
     static propTypes = {
+        visualizationStartX: PropTypes.number.isRequired, // Relative X of the left edge of track visualizers
+        visualizationWidth: PropTypes.number.isRequired, // Width of the track visualizers
         trackElements: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // View region of the tracks
-        legendWidth: PropTypes.number.isRequired, // Width of the track legends
 
         /**
          * Callback for when a new region is selected.  Signature:
@@ -41,11 +42,10 @@ class ZoomableTrackContainer extends React.Component {
      * @param {React.SyntheticEvent} event - the final mouse event that triggered the selection
      */
     areaSelected(startX, endX, event) {
-        const paneWidth = event.currentTarget.clientWidth;
-        const legendWidth = this.props.legendWidth;
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, paneWidth - legendWidth);
-        const correctedStart = startX - legendWidth;
-        const correctedEnd = endX - legendWidth;
+        const {visualizationStartX, visualizationWidth, viewRegion} = this.props;
+        const drawModel = new LinearDrawingModel(viewRegion, visualizationWidth);
+        const correctedStart = startX - visualizationStartX;
+        const correctedEnd = endX - visualizationStartX;
         this.props.onNewRegion(drawModel.xToBase(correctedStart), drawModel.xToBase(correctedEnd));
     }
 

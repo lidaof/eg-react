@@ -81,6 +81,8 @@ Suppose you aim to plot 500 data points on a SVG, and for each point you query t
 second or more of computation -- very noticable to the user!
 
 ## React (and other) gotchas
+* On Macs, control + click is the same as a right click, which fires a `contextmenu` event.  Note that `click` events
+do not fire on `contextmenu` events.  The `mousedown` and `mouseup` events will still fire, though.
 * When using native DOM events, they take priority over React events.  This is because React waits for events to bubble
 to the root component before handling them.  This can cause undesirable effects: for example, calling
 `stopPropagation()` on a React event will not actually stop native events.  This StackOverflow post may also help if you
