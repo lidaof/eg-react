@@ -17,8 +17,8 @@ class GeneDescription extends React.PureComponent {
         this.state = {
             description: "Loading..."
         };
-        props.gene.getDescription().then(
-            description => this.setState({description: description})
+        props.gene.getDescription().then(description =>
+            this.setState({description: description})
         ).catch(error => {
             console.error(error);
             this.setState({description: "(Error getting description)"})

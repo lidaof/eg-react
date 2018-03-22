@@ -20,16 +20,16 @@ import withAutoDimensions from '../withAutoDimensions';
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
-const TOOLS = {
-    drag: {
+const Tools = {
+    DRAG: {
         buttonContent: "✋",
         title: "Drag tool"
     },
-    zoom: {
+    ZOOM: {
         buttonContent: "🔍",
         title: "Zoom tool",
     },
-    reorder: {
+    REORDER: {
         buttonContent: "🔀",
         title: "Reorder tool"
     },
@@ -116,7 +116,7 @@ class TrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedTool: TOOLS.drag,
+            selectedTool: Tools.DRAG,
             metadataTerms: [],
         };
 
@@ -248,8 +248,8 @@ class TrackContainer extends React.Component {
      */
     renderToolSelectButtons() {
         let buttons = [];
-        for (let toolName in TOOLS) {
-            const tool = TOOLS[toolName];
+        for (let toolName in Tools) {
+            const tool = Tools[toolName];
             const className = tool === this.state.selectedTool ? "btn btn-primary" : "btn btn-light";
             buttons.push(
                 <button
@@ -274,7 +274,7 @@ class TrackContainer extends React.Component {
         const {tracks, viewRegion, onNewRegion, onTracksChanged} = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
-            case TOOLS.reorder:
+            case Tools.REORDER:
                 return (
                     <ReorderableTrackContainer
                         trackElements={trackElements}
@@ -282,7 +282,7 @@ class TrackContainer extends React.Component {
                         onTracksChanged={onTracksChanged}
                     />
                 );
-            case TOOLS.zoom:
+            case Tools.ZOOM:
                 return (
                     <ZoomableTrackContainer
                         visualizationStartX={TrackLegend.WIDTH}
@@ -292,7 +292,7 @@ class TrackContainer extends React.Component {
                         onNewRegion={onNewRegion}
                     />
                 );
-            case TOOLS.drag:
+            case Tools.DRAG:
             default:
                 return (
                     <DraggableTrackContainer

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-export const renderTypes = {
+export const RenderTypes = {
     CANVAS: 0,
     SVG: 1,
 };
@@ -15,22 +15,22 @@ const DEFAULT_STYLE = { display: "block" }; // display: block prevents extra bot
  */
 export class DesignRenderer extends React.PureComponent {
     static propTypes = {
-        type: PropTypes.oneOf([renderTypes.CANVAS, renderTypes.SVG]),
+        type: PropTypes.oneOf([RenderTypes.CANVAS, RenderTypes.SVG]),
         style: PropTypes.object, // CSS.  Will be merged with default styles.
         // Remaining props get passed directly to the rendered element
     };
 
     static defaultProps = {
-        type: renderTypes.SVG
+        type: RenderTypes.SVG
     };
 
     render() {
         const {type, style, ...otherProps} = this.props;
         const mergedStyle = Object.assign({}, DEFAULT_STYLE, style);
         switch (type) {
-            case renderTypes.CANVAS:
+            case RenderTypes.CANVAS:
                 return <CanvasDesignRenderer {...otherProps} style={mergedStyle} />;
-            case renderTypes.SVG:
+            case RenderTypes.SVG:
                 return <svg {...otherProps} style={mergedStyle} />;
             default:
                 return null;

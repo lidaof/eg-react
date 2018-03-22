@@ -1,34 +1,56 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import withCurrentGenome from './components/withCurrentGenome';
 
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import TrackContainer from './components/trackContainers/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
 import RegionSetSelector from './components/RegionSetSelector';
 
-import { /* GENOME_NAMES, */getGenome } from './model/genomes/allGenomes';
 import HG19 from './model/genomes/hg19/hg19';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 
 import './App.css';
+import GenomePicker from './components/GenomePicker';
 
-const GENOME_NAME = 'hg19';
 const MIN_SELECTED_SIZE = 100;
 
 class App extends React.Component {
+    static propTypes = {
+        genomeConfig: PropTypes.object,
+    };
+
     constructor(props) {
         super(props);
-        const genomeConfig = getGenome(GENOME_NAME);
-        this.state = {
-            genomeName: GENOME_NAME,
-            selectedRegion: new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion),
-            currentTracks: HG19.defaultTracks.slice(),
-        };
+        this.state = this.initGenomeConfig(props);
 
         this.regionSelected = this.regionSelected.bind(this);
         this.addTrack = this.addTrack.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
         this.trackChanged = this.trackChanged.bind(this);
         this.setRegionSet = this.setRegionSet.bind(this);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.genomeConfig !== nextProps.genomeConfig) {
+            this.setState(this.initGenomeConfig(nextProps));
+        }
+    }
+
+    initGenomeConfig(props) {
+        const genomeConfig = props.genomeConfig;
+        if (genomeConfig) {
+            return {
+                selectedRegion: new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion),
+                currentTracks: genomeConfig.defaultTracks.slice(),
+            };
+        } else {
+            return {
+                selectedRegion: null,
+                currentTracks: []
+            };
+        }
     }
 
     regionSelected(start, end) {
@@ -66,6 +88,10 @@ class App extends React.Component {
     }
 
     render() {
+        if (!this.props.genomeConfig) {
+            return <GenomePicker />;
+        }
+
         return (
         <div className="container-fluid">
             <GenomeNavigator selectedRegion={this.state.selectedRegion} regionSelectedCallback={this.regionSelected} />
@@ -92,4 +118,4 @@ class App extends React.Component {
     }
 }
 
-export default App;
+export default withCurrentGenome(App);

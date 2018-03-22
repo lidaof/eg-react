@@ -1,4 +1,5 @@
 import { Chromosome, Genome } from '../Genome';
+import TrackModel from '../../../model/TrackModel';
 import cytobands from './cytoband.json';
 
 const genome = new Genome("mm10", [
@@ -28,7 +29,12 @@ const genome = new Genome("mm10", [
 
 const navContext = genome.makeNavContext();
 const defaultRegion = navContext.parse("chr6:52003276-52425961");
-const defaultTracks = [];
+const defaultTracks = [
+    new TrackModel({
+        type: "ruler",
+        name: "Ruler",
+    })
+];
 
 const MM10 = {
     genome: genome,

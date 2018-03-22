@@ -10,7 +10,7 @@ import GenomicCoordinates from './GenomicCoordinates';
 import withDefaultOptions from './withDefaultOptions';
 import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorConfig';
 import BarChart from '../BarChart';
-import { renderTypes } from '../DesignRenderer';
+import { RenderTypes } from '../DesignRenderer';
 
 import BigWigSource from '../../dataSources/BigWigSource';
 import { getRelativeCoordinates, getPageCoordinates } from '../../util';
@@ -96,7 +96,7 @@ class BigWigVisualizer extends React.PureComponent {
                 height={this.getHeight()}
                 options={options}
                 style={BAR_CHART_STYLE}
-                type={renderTypes.CANVAS}
+                type={RenderTypes.CANVAS}
                 onRecordHover={this.showTooltip}
                 onMouseLeave={this.closeTooltip}
             />
