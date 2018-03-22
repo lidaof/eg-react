@@ -1,6 +1,9 @@
+import ChromosomeInterval from "./interval/ChromosomeInterval";
+
 /**
  * A feature, or annotation, in the genome.
  * 
+ * @implements {Serializable}
  * @author Silas Hsu
  */
 class Feature {
@@ -15,6 +18,18 @@ class Feature {
         this._name = name || locus.toString();
         this._locus = locus;
         this._isForwardStrand = isForwardStrand;
+    }
+
+    serialize() {
+        return {
+            name: this._name,
+            locus: this._locus.toString(),
+            isForwardStrand: this._isForwardStrand
+        }
+    }
+
+    static deserialize(object) {
+        return new Feature(object.name, ChromosomeInterval.parse(object.locus), object.isForwardStrand);
     }
 
     /**

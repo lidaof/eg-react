@@ -4,6 +4,7 @@ import ChromosomeInterval from './interval/ChromosomeInterval';
 /**
  * An algorithm that modifies feature coordinates.
  * 
+ * @implements {Serializable}
  * @author Silas Hsu
  */
 class FlankingStrategy {
@@ -23,6 +24,14 @@ class FlankingStrategy {
         this.type = type;
         this.upstream = Number(upstream);
         this.downstream = Number(downstream);
+    }
+
+    serialize() {
+        return this;
+    }
+
+    static deserialize(object) {
+        return new FlankingStrategy(object.type, object.upstream, object.downstream);
     }
 
     /**

@@ -4,6 +4,7 @@ import NavigationContext from './NavigationContext';
 /**
  * A set of features that undergoes some configuration before being exported to a navigation context.
  * 
+ * @implements {Serializable}
  * @author Silas Hsu
  */
 class RegionSet {
@@ -23,6 +24,15 @@ class RegionSet {
         this.features = features;
         this.genome = genome;
         this.flankingStrategy = flankingStrategy;
+    }
+
+    serialize() {
+        return {
+            name: this.name,
+            features: this.features.map(feature => feature.serialize()),
+            genome: this.genome,
+            flankingStrategy: this.flankingStrategy.serialize()
+        }
     }
 
     /**
