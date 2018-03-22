@@ -1,6 +1,8 @@
 /**
- * Parses UCSC-style tab-separated cytoband data into JSON.  This is a node.js script that the client does run; we
- * only run it once to generate the JSON and git commit the result.
+ * !!! This is a node.js script that the client doesn't run !!!
+ * 
+ * Parses UCSC-style tab-separated cytoband data into JSON.  We only run it once to generate the JSON and git commit the
+ * result.  See also: {@link CytobandTypes.ts}
  * 
  * @author Silas Hsu
  */
@@ -10,6 +12,17 @@ const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
 
+const RECORD_DELIMITER = '\n';
+const FIELD_DELIMITER = '\t';
+
+/**
+ * Reads the contents of a file asynchronously.  Promisfied version of fs.readFile.
+ * 
+ * @param {string} readPath - path to read
+ * @param {string} [encoding] - encoding to read
+ * @return {Promise<string | Buffer>} - Promise for contents of the file
+ * @see https://nodejs.org/api/fs.html#fs_fs_readfile_path_options_callback
+ */
 function promiseReadFile(readPath, encoding) {
     return new Promise((resolve, reject) => {
         fs.readFile(readPath, encoding, (error, data) => {
@@ -22,6 +35,15 @@ function promiseReadFile(readPath, encoding) {
     });
 }
 
+/**
+ * Writes to a file asynchronously, creating the file if it doesn't exist, and completely replacing the contents if it
+ * already exists.  Promisfied version of fs.writeFile.
+ * 
+ * @param {string} writePath - path to write
+ * @param {string} contents - what to write
+ * @return {Promise<void>} - Promise the resolves when writing is done
+ * @see https://nodejs.org/api/fs.html#fs_fs_writefile_file_data_options_callback
+ */
 function promiseWriteFile(writePath, contents) {
     return new Promise((resolve, reject) => {
         fs.writeFile(writePath, contents, error => {
@@ -35,7 +57,14 @@ function promiseWriteFile(writePath, contents) {
 }
 
 const CYTOBAND_PROPS = ["chrom", "chromStart", "chromEnd", "name", "gieStain"];
-function makeCytobandObject(rawStringValues) {
+/**
+ * Constructs a Cytoband object from a string that contains the proper data.
+ * 
+ * @param {string[]} rawRecord - array of strings containing cytoband data
+ * @return {Cytoband | null} - cytoband object, or null if there was a problem
+ */
+function makeCytobandObject(rawRecord) {
+    const rawStringValues = rawRecord.split(FIELD_DELIMITER);
     if (rawStringValues.length !== CYTOBAND_PROPS.length) {
         return null;
     }
@@ -48,45 +77,36 @@ function makeCytobandObject(rawStringValues) {
     return object;
 }
 
-/*
-// Basic return structure
-{
-    "chr1": [
-        {
-            "chrom": "chr1",
-            "chromStart": 0,
-            "chromEnd", 2300000,
-            "name": p36.33,
-            "gieStain": gneg
-        }
-    ]
-}
-*/
-
 /**
- * Parses raw text data into a data structure containing cytoband objects.  See comment above this in the source code
- * for what the object looks like
+ * Parses raw text data into a mapping from chromosome name to a list of all cytobands in that chromosome.
  * 
- * @param {string} text - raw tab-separated cytoband data
- * @return {CytobandBlob} - cytoband data in a data structure
+ * @param {string} text - raw UCSC cytoband file contents
+ * @return {CytobandMap} - cytoband data map
  */
-function convertTextToObject(text) {
+function convertTextToCytobandMap(text) {
     let result = {};
-    const lines = text.split('\n');
-    for (let line of lines) {
-        const values = line.split('\t');
-        const cytobandObject = makeCytobandObject(values);
+    const rawRecords = text.split(RECORD_DELIMITER);
+    for (let rawRecord of rawRecords) {
+        const cytobandObject = makeCytobandObject(rawRecord);
         if (cytobandObject) {
             const chrom = cytobandObject.chrom;
             if (!result[chrom]) {
                 result[chrom] = [];
             }
             result[chrom].push(cytobandObject);
+        } else {
+            console.warn("Could not parse cytoband from data: " + rawRecord);
         }
     }
     return result;
 }
 
+/**
+ * Main entry point.
+ * 
+ * @param {string[]} argv - arguments
+ * @return {Promise<number>} exit code
+ */
 async function main(argv) {
     if (argv.length < 3) {
         console.log(`Usage: node ${argv[1]} [cytoband text file to convert to json file]`);
@@ -99,7 +119,7 @@ async function main(argv) {
     const outPath = `${inFilePath}/${inFileName}.json`;
     try {
         const input = await promiseReadFile(inPath, 'utf8');
-        const output = JSON.stringify(convertTextToObject(input));
+        const output = JSON.stringify(convertTextToCytobandMap(input));
         await promiseWriteFile(outPath, output);
         console.log(`${inPath} --> ${outPath}`);
     } catch (error) {

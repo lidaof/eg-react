@@ -1,5 +1,5 @@
+import { Chromosome, Genome } from '../Genome';
 import TrackModel from '../../../model/TrackModel';
-import {Chromosome, Genome} from '../../../model/Genome';
 import cytobands from './cytoband.json';
 
 const genome = new Genome("hg19", [
@@ -51,7 +51,7 @@ const defaultTracks = [
 
 const HG19 = {
     genome: genome,
-    context: navContext,
+    navContext: navContext,
     cytobands: cytobands,
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks

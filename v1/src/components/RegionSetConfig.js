@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import FlankingStratConfig from './FlankingStratConfig';
 
-import Genome from '../model/Genome';
+import Genome from '../model/genomes/Genome';
 import Feature from '../model/Feature';
 import FlankingStrategy from '../model/FlankingStrategy';
 import RegionSet from '../model/RegionSet';
@@ -106,7 +106,7 @@ class RegionSetConfig extends React.Component {
             rows.push(<tr key={i}>
                 <td>{feature.getName()}</td>
                 <td>{feature.getLocus().toString()}</td>
-                <td>{feature.getIsForwardStrand ? "+" : "-"}</td>
+                <td>{feature.getIsForwardStrand() ? "+" : "-"}</td>
                 <td>{flankedLocus}</td>
                 <td><button onClick={() => this.deleteRegion(i)}>Delete</button></td>
             </tr>);
@@ -135,7 +135,7 @@ class RegionSetConfig extends React.Component {
             </label>
             <table className="table">
                 <thead>
-                    <tr><th>Name</th><th>Locus</th><th>Strand</th><th>Coordinates to view</th></tr>
+                    <tr><th>Name</th><th>Locus</th><th>Strand</th><th>Coordinates to view</th><th>Delete</th></tr>
                 </thead>
                 <tbody>{this.renderRegions()}</tbody>
             </table>

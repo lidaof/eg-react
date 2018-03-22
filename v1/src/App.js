@@ -5,18 +5,22 @@ import TrackContainer from './components/trackContainers/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
 import RegionSetSelector from './components/RegionSetSelector';
 
+import { /* GENOME_NAMES, */getGenome } from './model/genomes/allGenomes';
 import HG19 from './model/genomes/hg19/hg19';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 
 import './App.css';
 
+const GENOME_NAME = 'hg19';
 const MIN_SELECTED_SIZE = 100;
 
 class App extends React.Component {
     constructor(props) {
         super(props);
+        const genomeConfig = getGenome(GENOME_NAME);
         this.state = {
-            selectedRegion: new DisplayedRegionModel(HG19.context, ...HG19.defaultRegion),
+            genomeName: GENOME_NAME,
+            selectedRegion: new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion),
             currentTracks: HG19.defaultTracks.slice(),
         };
 

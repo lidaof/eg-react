@@ -1,6 +1,6 @@
-import Feature from './Feature';
-import NavigationContext from './NavigationContext';
-import ChromosomeInterval from './interval/ChromosomeInterval';
+import Feature from '../Feature';
+import NavigationContext from '../NavigationContext';
+import ChromosomeInterval from '../interval/ChromosomeInterval';
 
 /**
  * Simple container for chromosome info.

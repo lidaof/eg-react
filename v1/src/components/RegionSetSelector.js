@@ -6,15 +6,15 @@ import RegionSetConfig from './RegionSetConfig';
 import RegionSet from '../model/RegionSet';
 import FlankingStrategy from '../model/FlankingStrategy';
 import Feature from '../model/Feature';
-import Genome from '../model/Genome';
+import Genome from '../model/genomes/Genome';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 
 const GENES = [
-    new Feature("CYP2C8", new ChromosomeInterval("chr10", 96796528, 96829254)),
-    new Feature("CYP4B1", new ChromosomeInterval("chr1", 47223509, 47276522)),
-    new Feature("CYP11B2", new ChromosomeInterval("chr8", 143991974, 143999259)),
-    new Feature("CYP26B1", new ChromosomeInterval("chr2", 72356366, 72375167)),
-    new Feature("CYP51A1", new ChromosomeInterval("chr7", 91741462, 91764059)),
+    new Feature("CYP2C8", new ChromosomeInterval("chr10", 96796528, 96829254), false),
+    new Feature("CYP4B1", new ChromosomeInterval("chr1", 47223509, 47276522), true),
+    new Feature("CYP11B2", new ChromosomeInterval("chr8", 143991974, 143999259), false),
+    new Feature("CYP26B1", new ChromosomeInterval("chr2", 72356366, 72375167), false),
+    new Feature("CYP51A1", new ChromosomeInterval("chr7", 91741462, 91764059), false),
 ];
 
 class RegionSetSelector extends React.Component {
