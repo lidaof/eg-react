@@ -10,13 +10,13 @@
 "use strict";
 
 if (typeof(require) !== 'undefined') {
-    var bin = require('./bin');
+    var bin = require('../utils/bin');
     var readInt = bin.readInt;
     var readIntBE = bin.readIntBE;
     var readInt64BE = bin.readInt64BE,
         readInt64LE = bin.readInt64LE;
 
-    var spans = require('./spans');
+    var spans = require('../utils/spans');
     var Range = spans.Range;
     var union = spans.union;
     var intersection = spans.intersection;
