@@ -137,7 +137,7 @@ class GenomeNavigator extends React.Component {
                          <div className="col-sm">
                             <label>
                                 Zoom:
-                                <div class="btn-group"> 
+                                <div className="btn-group"> 
                                 <button className="btn" onClick={()=>{this._setModelState("zoom", [0.5])}}>
                                     <FontAwesomeIcon icon={faSearchPlus} />
                                 </button>

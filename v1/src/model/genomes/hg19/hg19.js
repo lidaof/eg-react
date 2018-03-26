@@ -49,12 +49,15 @@ const defaultTracks = [
     })
 ];
 
+const twoBitURL = "http://vizhub.wustl.edu/public/hg19/hg19.2bit";
+
 const HG19 = {
     genome: genome,
     context: navContext,
     cytobands: cytobands,
     defaultRegion: defaultRegion,
-    defaultTracks: defaultTracks
+    defaultTracks: defaultTracks,
+    twoBitURL: twoBitURL
 };
 
 export default HG19;

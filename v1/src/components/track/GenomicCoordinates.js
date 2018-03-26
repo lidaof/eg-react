@@ -23,7 +23,7 @@ class GenomicCoordinates extends React.Component {
         const {viewRegion, width, x} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
         const genomeCoord = drawModel.xToGenomeCoordinate(x);
-        return `${genomeCoord.chr}:${Math.round(genomeCoord.start)}`;
+        return `${genomeCoord.chr}:${Math.floor(genomeCoord.start)}`;
     }
 }
 
