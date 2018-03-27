@@ -44,29 +44,15 @@ class MainPane extends React.Component {
          *         `newStart`: the absolute base number of the start of the selected interval
          *         `newEnd`: the absolute base number of the end of the selected interval
          */
-        regionSelectedCallback: PropTypes.func.isRequired,
+        onRegionSelected: PropTypes.func,
 
         /**
-         * Called during dragging.  Has the signature
-         *     (newStart: number,
-         *      newEnd: number,
-         *      event: React.SyntheticEvent,
-         *      coordinateDiff: {dx: number, dy: number}
-         *     ): void
-         *         `newStart`: the absolute base number of the start of the view region if it were centered on the mouse
-         *         `newEnd`: the absolute base number of the end of the view region if it were centered on the mouse
-         *         `event`: the mouse event that triggered this event
-         *         `coordinateDiff`: the location of the mouse relative to where the drag started
-         */
-        dragCallback: PropTypes.func.isRequired,
-        
-        /**
-         * Called when the user presses the "GOTO" button to quicky scroll the view to the selected track region.
+         * Called when the user wants to view a new region.
          *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the interval to scroll to
-         *         `newEnd`: the absolute base number of the end of the interval to scroll to
+         *         `newStart`: the absolute base number of the start of the interval for the pane to display next
+         *         `newEnd`: the absolute base number of the end of the interval for the pane to display next
          */
-        gotoButtonCallback: PropTypes.func.isRequired,
+        onNewViewRequested: PropTypes.func,
 
         /**
          * Called when the view should be zoomed.  Has the signature
@@ -74,8 +60,13 @@ class MainPane extends React.Component {
          *         `amount`: amount to zoom
         *          `focusPoint`: focal point of the zoom, which is where the mouse was as % of the width of the SVG.
          */
-        zoomCallback: PropTypes.func.isRequired,
-    }
+        onZoom: PropTypes.func.isRequired,
+    };
+
+    static defaultProps = {
+        onRegionSelected: () => undefined,
+        onNewView: () => undefined
+    };
 
     constructor(props) {
         super(props);
@@ -93,9 +84,9 @@ class MainPane extends React.Component {
         let paneWidth = event.currentTarget.clientWidth || event.currentTarget.parentNode.clientWidth;
         let focusPoint = event.clientX / paneWidth; // Proportion-based, not base-based.
         if (event.deltaY > 0) { // Mouse wheel turned towards user, or spun downwards -- zoom out
-            this.props.zoomCallback(1 + WHEEL_ZOOM_SPEED, focusPoint);
+            this.props.onZoom(1 + WHEEL_ZOOM_SPEED, focusPoint);
         } else if (event.deltaY < 0) { // Zoom in
-            this.props.zoomCallback(1 - WHEEL_ZOOM_SPEED, focusPoint);
+            this.props.onZoom(1 - WHEEL_ZOOM_SPEED, focusPoint);
         }
     }
 
@@ -108,7 +99,7 @@ class MainPane extends React.Component {
      */
     areaSelected(startX, endX, event) {
         const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
-        this.props.regionSelectedCallback(drawModel.xToBase(startX), drawModel.xToBase(endX));
+        this.props.onRegionSelected(drawModel.xToBase(startX), drawModel.xToBase(endX));
     }
 
     /**
@@ -117,7 +108,7 @@ class MainPane extends React.Component {
      * @override
      */
     render() {
-        const {width, viewRegion, selectedRegion, dragCallback, gotoButtonCallback} = this.props;
+        const {width, viewRegion, selectedRegion, onNewViewRequested} = this.props;
         if (width === 0) {
             if (process.env.NODE_ENV !== "test") {
                 console.warn("Cannot render with a width of 0");
@@ -127,7 +118,7 @@ class MainPane extends React.Component {
 
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView button={MouseButtons.RIGHT} onViewDrag={dragCallback} viewRegion={viewRegion} >
+        <DragAcrossView button={MouseButtons.RIGHT} onViewDrag={onNewViewRequested} viewRegion={viewRegion} >
             <SelectableArea
                 viewRegion={viewRegion}
                 y={SELECT_BOX_Y}
@@ -147,7 +138,7 @@ class MainPane extends React.Component {
                         width={width}
                         viewRegion={viewRegion}
                         selectedRegion={selectedRegion}
-                        gotoButtonCallback={gotoButtonCallback}
+                        onNewViewRequested={onNewViewRequested}
                         y={SELECTED_BOX_Y}
                     />
                 </svg>

@@ -19,6 +19,8 @@ import Reparentable from '../Reparentable';
 import withAutoDimensions from '../withAutoDimensions';
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import { ActionCreators } from '../../AppState';
+import connect from 'react-redux/lib/connect/connect';
 
 const Tools = {
     DRAG: {
@@ -83,6 +85,23 @@ function changeTrackSelection(tracks, selectionStatus, startIndex=0, endIndex) {
     }
 }
 
+/////////////////////////
+// connect() functions //
+/////////////////////////
+function mapStateToProps(state) {
+    return {
+        viewRegion: state.viewRegion,
+        tracks: state.tracks,
+        metadataTerms: state.metadataTerms
+    };
+}
+
+const callbacks = {
+    onNewRegion: ActionCreators.setViewRegion,
+    onTracksChanged: ActionCreators.setTracks,
+    onMetadataTermsChanged: ActionCreators.setMetadataTerms,
+};
+
 /**
  * Container for holding all the tracks, and an avenue for manipulating state common to all tracks.
  * 
@@ -92,7 +111,8 @@ class TrackContainer extends React.Component {
     static propTypes = {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region for tracks to display
         width: PropTypes.number.isRequired, // Width of the tracks, including legends
-        tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)), // Tracks to render
+        tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired, // Tracks to render
+        metadataTerms: PropTypes.arrayOf(PropTypes.string).isRequired, // Metadata terms
         /**
          * Callback for when a new region is selected.  Signature:
          *     (newStart: number, newEnd: number): void
@@ -100,11 +120,14 @@ class TrackContainer extends React.Component {
          *         `newEnd`: the absolute base number of the end of the new view interval
          */
         onNewRegion: PropTypes.func,
-
         /**
          * Callback requesting a change in the track models.  Signature: (newModels: TrackModel[]): void
          */
         onTracksChanged: PropTypes.func,
+        /**
+         * Callback requesting a change in the metadata terms.  Signature: (newTerms: string[]): void
+         */
+        onMetadataTermsChanged: PropTypes.func,
     };
 
     static defaultProps = {
@@ -117,7 +140,6 @@ class TrackContainer extends React.Component {
         super(props);
         this.state = {
             selectedTool: Tools.DRAG,
-            metadataTerms: [],
         };
 
         this.handleTrackClicked = this.handleTrackClicked.bind(this);
@@ -217,14 +239,15 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        return this.props.tracks.map((trackModel, index) => {
+        const {viewRegion, tracks, metadataTerms} = this.props;
+        return tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             return <Reparentable key={id} uid={"track-" + id} >
                 <Track
                     trackModel={trackModel}
-                    viewRegion={this.props.viewRegion}
+                    viewRegion={viewRegion}
                     width={this.getVisualizationWidth()}
-                    metadataTerms={this.state.metadataTerms}
+                    metadataTerms={metadataTerms}
                     index={index}
                     onContextMenu={this.handleContextMenu}
                     onClick={this.handleTrackClicked}
@@ -238,8 +261,9 @@ class TrackContainer extends React.Component {
      * @return {number} the width, in pixels, at which tracks should render their visualizers
      */
     getVisualizationWidth() {
+        const {width, metadataTerms} = this.props;
         return Math.max(0,
-            this.props.width - TrackLegend.WIDTH - this.state.metadataTerms.length * MetadataIndicator.WIDTH
+            width - TrackLegend.WIDTH - metadataTerms.length * MetadataIndicator.WIDTH
         );
     }
 
@@ -309,7 +333,7 @@ class TrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {tracks, onTracksChanged} = this.props;
+        const {tracks, metadataTerms, onTracksChanged, onMetadataTermsChanged} = this.props;
         const contextMenu = <TrackContextMenu allTracks={tracks} onTracksChanged={onTracksChanged} />;
         const trackDivStyle = {border: "1px solid black", cursor: "crosshair"};
 
@@ -317,7 +341,7 @@ class TrackContainer extends React.Component {
         <OutsideClickDetector onOutsideClick={this.deselectAllTracks} style={{margin: 5}} >
             <div style={{display: "flex", alignItems: "flex-end"}} >
                 {this.renderToolSelectButtons()}
-                <MetadataHeader terms={this.state.metadataTerms} onNewTerms={newTerms => this.setState({metadataTerms: newTerms})} />
+                <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
             </div>
             <ContextMenuManager menuElement={contextMenu} >
                 <DivWithBullseye style={trackDivStyle} >
@@ -329,4 +353,4 @@ class TrackContainer extends React.Component {
     }
 }
 
-export default withAutoDimensions(TrackContainer);
+export default connect(mapStateToProps, callbacks)(withAutoDimensions(TrackContainer));

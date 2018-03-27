@@ -1,10 +1,11 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
+import ReduxProvider from './ReduxProvider';
 
 import MainPane from '../components/genomeNavigator/MainPane';
 
 import Feature from '../model/Feature';
-import { Genome, Chromosome } from '../model/Genome';
+import { Genome, Chromosome } from '../model/genomes/Genome';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import NavigationContext from '../model/NavigationContext';
 
@@ -28,37 +29,32 @@ selectedRegion.setRegion(1000, 2000);
 const mainPaneView1 = {
     storyName: "Main pane, view 1",
     viewRegion: view1,
-    component: <MainPane
+    element: <MainPane
         viewRegion={view1}
         selectedRegion={selectedRegion}
-        regionSelectedCallback={(start, end) => window.newSelectedRegion = {start: start, end: end}}
-        dragCallback={() => {}}
-        gotoButtonCallback={() => {}}
-        zoomCallback={() => {}}
+        onRegionSelected={(start, end) => window.newSelectedRegion = {start: start, end: end}}
     />
-}
+};
 
 const mainPaneView2 = {
     storyName: "Main pane, view 2",
     viewRegion: view2,
-    component: <MainPane
+    element: <MainPane
         viewRegion={view2}
         selectedRegion={selectedRegion}
-        regionSelectedCallback={() => {}}
-        dragCallback={() => {}}
-        gotoButtonCallback={(start, end) => window.gotoButtonRegion = {start: start, end: end}}
-        zoomCallback={(amount, focusPoint) => window.zoomArgs = {amount: amount, focusPoint: focusPoint}}
+        onNewViewRequested={(start, end) => window.gotoButtonRegion = {start: start, end: end}}
+        onZoom={(amount, focusPoint) => window.zoomArgs = {amount: amount, focusPoint: focusPoint}}
     />
-}
+};
 
 export const STORIES = {
     mainPaneView1: mainPaneView1,
     mainPaneView2: mainPaneView2
-}
+};
 
 export const STORY_KIND = "Genome navigator";
 let storyInterface = storiesOf(STORY_KIND, module);
 for (let storyKey in STORIES) {
     let story = STORIES[storyKey];
-    storyInterface.add(story.storyName, () => story.component);
+    storyInterface.add(story.storyName, () => <ReduxProvider>{story.element}</ReduxProvider>);
 }

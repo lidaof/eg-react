@@ -19,7 +19,7 @@ class TrackRegionController extends React.Component {
          *         `newStart`: the absolute base number of the start of the interval
          *         `newEnd`: the absolute base number of the end of the interval
          */
-        newRegionCallback: PropTypes.func.isRequired,
+        onRegionSelected: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -64,7 +64,7 @@ class TrackRegionController extends React.Component {
         if (this.state.badInputMessage.length > 0) {
             this.setState({badInputMessage: ""});
         }
-        this.props.newRegionCallback(parsedRegion.start, parsedRegion.end);
+        this.props.onRegionSelected(parsedRegion.start, parsedRegion.end);
     }
 
     /**

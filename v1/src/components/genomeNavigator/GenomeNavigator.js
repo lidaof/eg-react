@@ -28,7 +28,11 @@ class GenomeNavigator extends React.Component {
          *         `newStart`: the absolute base number of the start of the selected interval
          *         `newEnd`: the absolute base number of the end of the selected interval
          */
-        regionSelectedCallback: PropTypes.func.isRequired,
+        onRegionSelected: PropTypes.func.isRequired,
+    };
+
+    static defaultProps = {
+        onRegionSelected: () => undefined
     };
 
     /**
@@ -68,6 +72,9 @@ class GenomeNavigator extends React.Component {
     _setModelState(methodName, args) {
         let regionCopy = this.state.viewRegion.clone();
         regionCopy[methodName].apply(regionCopy, args);
+        if (regionCopy.getWidth() < MIN_VIEW_LENGTH) {
+            return;
+        }
         this.setState({viewRegion: regionCopy});
     }
 
@@ -79,9 +86,6 @@ class GenomeNavigator extends React.Component {
      * @see DisplayedRegionModel#zoom
      */
     zoom(amount, focusPoint) {
-        if (amount < 1 && this.state.viewRegion.getWidth() * amount <= MIN_VIEW_LENGTH) {
-            return;
-        }
         this._setModelState("zoom", [amount, focusPoint]);
     }
 
@@ -122,13 +126,13 @@ class GenomeNavigator extends React.Component {
                         <div className="col-md">
                             <TrackRegionController
                                 selectedRegion={this.props.selectedRegion}
-                                newRegionCallback={this.props.regionSelectedCallback}
+                                onRegionSelected={this.props.onRegionSelected}
                             />
                         </div>
                         <div className="col-md">
                             <GeneSearchBox
                                 navContext={this.props.selectedRegion.getNavigationContext()}
-                                newRegionCallback={this.props.regionSelectedCallback}
+                                onRegionSelected={this.props.onRegionSelected}
                             />
                         </div>
                          <div className="col-sm">
@@ -149,10 +153,9 @@ class GenomeNavigator extends React.Component {
                 <MainPane
                     viewRegion={this.state.viewRegion}
                     selectedRegion={this.props.selectedRegion}
-                    regionSelectedCallback={this.props.regionSelectedCallback}
-                    dragCallback={this.setNewView}
-                    gotoButtonCallback={this.setNewView}
-                    zoomCallback={this.zoom}
+                    onRegionSelected={this.props.onRegionSelected}
+                    onNewViewRequested={this.setNewView}
+                    onZoom={this.zoom}
                 />
             </div>
         );

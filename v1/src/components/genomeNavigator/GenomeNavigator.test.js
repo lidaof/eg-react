@@ -19,7 +19,7 @@ var rendered = null;
 
 beforeEach(() => {
     const selectedRegion = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
-    let component = <GenomeNavigator selectedRegion={selectedRegion} regionSelectedCallback={() => undefined} />
+    let component = <GenomeNavigator selectedRegion={selectedRegion} />
     rendered = mount(component);
 });
 

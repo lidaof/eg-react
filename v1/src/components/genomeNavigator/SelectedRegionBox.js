@@ -41,7 +41,7 @@ class SelectedRegionBox extends React.Component {
          *         `newStart`: the absolute base number of the start of the interval to scroll to
          *         `newEnd`: the absolute base number of the end of the interval to scroll to
          */
-        gotoButtonCallback: PropTypes.func.isRequired, // Function that takes arguments [number, number]
+        onNewViewRequested: PropTypes.func.isRequired, // Function that takes arguments [number, number]
     }
 
     constructor(props) {
@@ -63,7 +63,7 @@ class SelectedRegionBox extends React.Component {
             halfWidth = this.props.selectedRegion.getWidth() * 3;
         }
         let regionCenter = (selectedAbsRegion.end + selectedAbsRegion.start) * 0.5;
-        this.props.gotoButtonCallback(regionCenter - halfWidth, regionCenter + halfWidth);
+        this.props.onNewViewRequested(regionCenter - halfWidth, regionCenter + halfWidth);
     }
 
     _pointsToString(points) {

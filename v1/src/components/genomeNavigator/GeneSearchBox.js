@@ -34,7 +34,7 @@ class GeneSearchBox extends React.PureComponent {
          *         `newStart`: the absolute base number of the start of the view interval
          *         `newEnd`: the absolute base number of the end of the view interval
          */
-        newRegionCallback: PropTypes.func.isRequired,
+        onRegionSelected: PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -81,7 +81,7 @@ class GeneSearchBox extends React.PureComponent {
      */
     setViewToGene(gene) {
         const interval = this.props.navContext.convertGenomeIntervalToBases(gene.getLocus());
-        this.props.newRegionCallback(...interval);
+        this.props.onRegionSelected(...interval);
     }
 
     render() {
