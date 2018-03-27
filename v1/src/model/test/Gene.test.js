@@ -1,7 +1,7 @@
 import Gene from '../Gene';
 import OpenInterval from '../interval/OpenInterval';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
-import { Chromosome, Genome } from '../Genome';
+import { Chromosome, Genome } from '../genomes/Genome';
 
 const RECORD = {
     "_id": "5a6a4edfc019c4d5b606c0e8",

@@ -79,10 +79,13 @@ export class Gene extends Feature {
     }
 
     /**
-     * async function to get gene description by calling the API
+     * Gets gene description by calling an API.
+     * 
+     * @param {string} genomeName - the name of the genome
+     * @return {Promise<string>} - description of the gene
      */
-    async getDescription() {
-        const response = await axios.get(`/hg19/refseqDesc/${this.refGeneRecord.name}`);
+    async getDescription(genomeName) {
+        const response = await axios.get(`/${genomeName}/refseqDesc/${this.refGeneRecord.name}`);
         return response.data[0] ? response.data[0].description : "";
     }
 

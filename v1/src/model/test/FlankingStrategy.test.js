@@ -1,5 +1,5 @@
 import FlankingStrategy from '../FlankingStrategy';
-import { Chromosome, Genome } from '../Genome';
+import { Chromosome, Genome } from '../genomes/Genome';
 import Feature from '../Feature';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 

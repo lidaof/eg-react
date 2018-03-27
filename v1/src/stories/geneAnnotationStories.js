@@ -19,87 +19,76 @@ const VIEW_REGION = new DisplayedRegionModel(NAV_CONTEXT, 0, 1000);
 
 const RECORDS = [
     {
-        chr: "chr1",
-        start: 5,
-        end: 100,
-        details: `
-            name2: "GENE1",
-            strand: "+",
-            struct: {
-                thin: []
-            },
-            id: 1
-        `
+        chrom: "chr1",
+        txStart: 5,
+        txEnd: 100,
+        cdsStart: 5,
+        cdsEnd: 100,
+        name2: "GENE1",
+        strand: "+",
+        _id: 1,
     },
     {
-        chr: "chr1",
-        start: 200,
-        end: 400,
-        details: `
-            name2: "GENE2",
-            strand: "-",
-            struct: {
-                thin: [ [200, 250], [330, 400] ]
-            },
-            id: 2
-        `
+        chrom: "chr1",
+        txStart: 200,
+        txEnd: 400,
+        cdsStart: 250,
+        cdsEnd: 330,
+        name2: "GENE2",
+        strand: "-",
+        _id: 2,
     },
     {
-        chr: "chr1",
-        start: 250,
-        end: 300,
-        details: `
-            name2: "GENE3",
-            strand: "+",
-            struct: {
-                thick: []
-            },
-            id: 3
-        `
+        chrom: "chr1",
+        txStart: 250,
+        txEnd: 300,
+        cdsStart: 250,
+        cdsEnd: 300,
+        name2: "GENE3",
+        strand: "+",
+        _id: 3,
     },
     {
-        chr: "chr1",
-        start: 350,
-        end: 500,
-        details: `
-            name2: "GENE4",
-            strand: "-",
-            struct: {
-                thin: []
-            },
-            id: 4
-        `
+        chrom: "chr1",
+        txStart: 350,
+        txEnd: 500,
+        cdsStart: 350,
+        cdsEnd: 500,
+        name2: "GENE4",
+        strand: "-",
+        _id: 4,
     },
     {
-        chr: "chr1",
-        start: 800,
-        end: 1200,
-        details: `
-            name2: "GENE5",
-            strand: "+",
-            struct: {
-                thick: [ [900, 1100] ]
-            },
-            id: 5
-        `
+        chrom: "chr1",
+        txStart: 800,
+        txEnd: 1200,
+        cdsStart: 830,
+        cdsEnd: 1100,
+        exonStarts: "830,920,",
+        exonEnds: "890,1100,",
+        name2: "GENE5",
+        strand: "+",
+        _id: 5,
     }
 ];
 
-const GENES = RECORDS.map(record =>
-    new Gene(record, VIEW_REGION.getNavigationContext(), new FeatureInterval(CHR1))
-);
+const GENES = RECORDS.map(record => {
+    let gene = new Gene(record);
+    gene.computeNavContextCoordinates(NAV_CONTEXT);
+    return gene;
+});
 
 function Renderer(props) {
     const drawModel = new LinearDrawingModel(VIEW_REGION, props.width);
-    return <svg width="100%"><AnnotationArranger data={GENES} drawModel={drawModel} maxRows={2} /></svg>;
+    return <svg width="100%"><AnnotationArranger data={GENES} drawModel={drawModel} options={{rows: 2}} /></svg>;
 }
 const AutoWidthRenderer = withAutoDimensions(Renderer);
 
 export const annotationStory = {
     storyName: "Annotations",
-    component: <AutoWidthRenderer />
-}
+    element: <AutoWidthRenderer />
+};
 
 export const STORY_KIND = "Gene annotation";
 let storyInterface = storiesOf(STORY_KIND, module);
-storyInterface.add(annotationStory.storyName, () => annotationStory.component);
+storyInterface.add(annotationStory.storyName, () => annotationStory.element);
