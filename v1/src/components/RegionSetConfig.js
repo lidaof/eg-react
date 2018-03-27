@@ -9,6 +9,17 @@ import FlankingStrategy from '../model/FlankingStrategy';
 import RegionSet from '../model/RegionSet';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 
+/**
+ * Placeholder genes for a new set
+ */
+const GENES = [
+    new Feature("CYP2C8", new ChromosomeInterval("chr10", 96796528, 96829254), false),
+    new Feature("CYP4B1", new ChromosomeInterval("chr1", 47223509, 47276522), true),
+    new Feature("CYP11B2", new ChromosomeInterval("chr8", 143991974, 143999259), false),
+    new Feature("CYP26B1", new ChromosomeInterval("chr2", 72356366, 72375167), false),
+    new Feature("CYP51A1", new ChromosomeInterval("chr7", 91741462, 91764059), false),
+];
+
 class RegionSetConfig extends React.Component {
     static propTypes = {
         /**
@@ -45,10 +56,11 @@ class RegionSetConfig extends React.Component {
         this.changeSetStrategy = this.changeSetStrategy.bind(this);
         this.addRegion = this.addRegion.bind(this);
         this.deleteRegion = this.deleteRegion.bind(this);
+        this.cancelPressed = this.cancelPressed.bind(this);
     }
 
     getRegionSetFromProps(props) {
-        return props.set || new RegionSet("", [], props.genome, new FlankingStrategy());
+        return props.set || new RegionSet("New set", GENES, props.genome, new FlankingStrategy());
     }
 
     componentWillReceiveProps(nextProps) {
@@ -120,6 +132,10 @@ class RegionSetConfig extends React.Component {
             this.state.set.makeFlankedFeatures().some(feature => feature === null);
     }
 
+    cancelPressed() {
+        this.setState({set: this.getRegionSetFromProps(this.props)});
+    }
+
     render() {
         return (
         <div>
@@ -170,7 +186,7 @@ class RegionSetConfig extends React.Component {
                 >
                     Save changes
                 </button>
-                <button onClick={() => this.setState({set: this.props.set})}>Cancel</button>
+                <button onClick={this.cancelPressed}>Cancel</button>
             </div>
         </div>
         );

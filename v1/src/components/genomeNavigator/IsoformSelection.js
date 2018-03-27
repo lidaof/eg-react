@@ -3,24 +3,34 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 
 import StandaloneGeneAnnotation from './StandaloneGeneAnnotation';
+import GeneDescription from '../GeneDescription';
+import withCurrentGenome from '../withCurrentGenome';
 
 import Gene from '../../model/Gene';
+import { Genome } from '../../model/genomes/Genome';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import HG19 from '../../model/genomes/hg19/hg19';
+import NavigationContext from '../../model/NavigationContext';
 
 import './IsoformSelection.css';
-import GeneDescription from '../GeneDescription';
 
 const DRAW_WIDTH = 200;
 
 /**
- * Isoform selection table
+ * Isoform selection table.
  * 
  * @author Silas Hsu
  */
 class IsoformSelection extends React.PureComponent {
     static propTypes = {
+        /**
+         * Genome config to use.  Needed because if genes are on different chromosomes, we need to know chromosome
+         * lengths to draw gene locations to scale.
+         */
+        genomeConfig: PropTypes.shape({
+            genome: PropTypes.instanceOf(Genome),
+            navContext: PropTypes.instanceOf(NavigationContext)
+        }).isRequired,
         geneName: PropTypes.string, // Gene name to query
         onGeneSelected: PropTypes.func // Callback for when a gene is selected.  Signature: (gene: Gene): void
     };
@@ -40,10 +50,11 @@ class IsoformSelection extends React.PureComponent {
     }
 
     async getSuggestions(geneName) {
-        const response = await axios.get(`/hg19/refGene/${geneName}`);
+        const genomeConfig = this.props.genomeConfig;
+        const response = await axios.get(`/${genomeConfig.genome.getName()}/refGene/${geneName}`);
         const genes = response.data.map(record => {
             let gene = new Gene(record);
-            gene.computeNavContextCoordinates(HG19.context); // TODO we might want to use a diff context later
+            gene.computeNavContextCoordinates(genomeConfig.navContext);
             return gene;
         });
         this.setState({isLoading: false, genes: genes});
@@ -61,7 +72,7 @@ class IsoformSelection extends React.PureComponent {
         const genes = this.state.genes;
         const leftmostStart = Math.min(...genes.map(gene => gene.absStart));
         const rightmostEnd = Math.max(...genes.map(gene => gene.absEnd));
-        const viewRegion = new DisplayedRegionModel(HG19.context, leftmostStart, rightmostEnd);
+        const viewRegion = new DisplayedRegionModel(this.props.genomeConfig.navContext, leftmostStart, rightmostEnd);
         const drawModel = new LinearDrawingModel(viewRegion, DRAW_WIDTH);
 
         const renderOneSuggestion = gene => (
@@ -98,4 +109,4 @@ class IsoformSelection extends React.PureComponent {
     }
 }
 
-export default IsoformSelection;
+export default withCurrentGenome(IsoformSelection);

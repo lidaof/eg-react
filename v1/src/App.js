@@ -1,18 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import withCurrentGenome from './components/withCurrentGenome';
-
+import GenomePicker from './components/GenomePicker';
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import TrackContainer from './components/trackContainers/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
 import RegionSetSelector from './components/RegionSetSelector';
+import withCurrentGenome from './components/withCurrentGenome';
 
-import HG19 from './model/genomes/hg19/hg19';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 
 import './App.css';
-import GenomePicker from './components/GenomePicker';
 
 const MIN_SELECTED_SIZE = 100;
 
@@ -29,7 +27,6 @@ class App extends React.Component {
         this.addTrack = this.addTrack.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
         this.trackChanged = this.trackChanged.bind(this);
-        this.setRegionSet = this.setRegionSet.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -78,15 +75,6 @@ class App extends React.Component {
         this.setState({currentTracks: tracks});
     }
 
-    setRegionSet(set) {
-        if (!set) {
-            this.setState({selectedRegion: new DisplayedRegionModel(HG19.context, ...HG19.defaultRegion)});
-        } else {
-            const selectedRegion = new DisplayedRegionModel(set.makeNavContext());
-            this.setState({selectedRegion: selectedRegion});
-        }
-    }
-
     render() {
         if (!this.props.genomeConfig) {
             return <GenomePicker />;
@@ -106,13 +94,7 @@ class App extends React.Component {
                 onTrackAdded={this.addTrack}
                 onTrackRemoved={this.removeTrack}
             />
-            {
-            this.state.selectedRegion.getNavigationContext() !== HG19.context ?
-                <button onClick={() => this.setRegionSet(null)} >Exit gene set view</button>
-                :
-                null
-            }
-            <RegionSetSelector genome={HG19.genome} onSetSelected={this.setRegionSet}/>
+            <RegionSetSelector genome={this.props.genomeConfig.genome} />
         </div>
         );
     }

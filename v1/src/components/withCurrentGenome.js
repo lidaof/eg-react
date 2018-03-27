@@ -1,12 +1,12 @@
 import { connect } from 'react-redux';
 import allGenomes from '../model/genomes/allGenomes';
 
-function mapStateToProps(state) {
+function getGenomeConfigFromStore(state) {
     return {
         genomeConfig: allGenomes[state.genomeIndex]
     };
 }
 
-const withCurrentGenome = connect(mapStateToProps);
+const withCurrentGenome = connect(getGenomeConfigFromStore);
 
 export default withCurrentGenome;

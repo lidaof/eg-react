@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import withCurrentGenome from '../withCurrentGenome';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
-import HG19 from '../../model/genomes/hg19/hg19';
 
 const HEIGHT = 15;
 const TOP_PADDING = 5;
@@ -34,6 +34,7 @@ const CYTOBAND_LABEL_SIZE = 10;
  */
 class Chromosomes extends React.PureComponent {
     static propTypes = {
+        genomeConfig: PropTypes.shape({cytobands: PropTypes.object}).isRequired, // Object with cytoband data
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
         width: PropTypes.number.isRequired, // Width with which to draw
         labelOffset: PropTypes.number, // Y offset of feature labels
@@ -49,10 +50,10 @@ class Chromosomes extends React.PureComponent {
      * @return {JSX.Element[]} cytoband elements
      */
     renderCytobandsInFeatureInterval(interval, drawModel) {
-        const {viewRegion} = this.props;
+        const {viewRegion, genomeConfig} = this.props;
 
         const locus = interval.getGenomeCoordinates();
-        const cytobandsForChr = HG19.cytobands[locus.chr] || [];
+        const cytobandsForChr = genomeConfig.cytobands[locus.chr] || [];
         let children = [];
         for (let cytoband of cytobandsForChr) {
             const cytobandLocus = new ChromosomeInterval(cytoband.chrom, cytoband.chromStart, cytoband.chromEnd);
@@ -170,4 +171,4 @@ class Chromosomes extends React.PureComponent {
     }
 }
 
-export default Chromosomes;
+export default withCurrentGenome(Chromosomes);

@@ -1,84 +1,159 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { ActionCreators } from '../AppState';
 
 import RegionSetConfig from './RegionSetConfig';
 
 import RegionSet from '../model/RegionSet';
-import FlankingStrategy from '../model/FlankingStrategy';
-import Feature from '../model/Feature';
 import Genome from '../model/genomes/Genome';
-import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 
-const GENES = [
-    new Feature("CYP2C8", new ChromosomeInterval("chr10", 96796528, 96829254), false),
-    new Feature("CYP4B1", new ChromosomeInterval("chr1", 47223509, 47276522), true),
-    new Feature("CYP11B2", new ChromosomeInterval("chr8", 143991974, 143999259), false),
-    new Feature("CYP26B1", new ChromosomeInterval("chr2", 72356366, 72375167), false),
-    new Feature("CYP51A1", new ChromosomeInterval("chr7", 91741462, 91764059), false),
-];
+/**
+ * Gets props to pass to RegionSetSelector.
+ * 
+ * @param {Object} state - redux state
+ * @return {Object} props to pass to RegionSetSelector
+ */
+function mapStateToProps(state) {
+    return {
+        sets: state.regionSets,
+        selectedSet: state.regionSetView
+    };
+}
 
+/**
+ * Callbacks to pass to RegionSetSelector.
+ */
+const callbacks = {
+    onSetsChanged: ActionCreators.setRegionSetList,
+    onSetSelected: ActionCreators.setRegionSetView,
+};
+
+/**
+ * Region set selector and config.  Can enter/exit region set view, and add/delete/modify region sets.
+ * 
+ * @author Silas Hsu
+ */
 class RegionSetSelector extends React.Component {
     static propTypes = {
-        genome: PropTypes.instanceOf(Genome).isRequired,
+        genome: PropTypes.instanceOf(Genome).isRequired, // Current genome, used to ensure regions stay in the genome
+        sets: PropTypes.arrayOf(PropTypes.instanceOf(RegionSet)).isRequired, // Currently available region sets
+        selectedSet: PropTypes.instanceOf(RegionSet), // Region set backing current region set view, if applicable
+        /**
+         * Callback to change available region sets.  Signature: (newSets: RegionSet[]): void
+         */
+        onSetsChanged: PropTypes.func,
+        /**
+         * Callback to change region set view.  Signature: (set: RegionSet): void
+         *     `set` - set with which to enter region set view, or null to exit region set view
+         */
         onSetSelected: PropTypes.func,
     };
 
     static defaultProps = {
+        onSetsChanged: () => undefined,
         onSetSelected: () => undefined
     }
 
     constructor(props) {
         super(props);
-        const set = new RegionSet("My set", GENES, props.genome, new FlankingStrategy());
         this.state = {
-            sets: [set], // Array of RegionSet
             indexBeingConfigured: 0
         };
-        this.renderItemForSet = this.renderItemForSet.bind(this);
         this.setConfigured = this.setConfigured.bind(this);
+        this.deleteSet = this.deleteSet.bind(this);
+        this.renderItemForSet = this.renderItemForSet.bind(this);
     }
 
+    /**
+     * Requests an add or a change in the available region set list.  Assumes that if there is no existing set being
+     * configured, it must be an add.
+     * 
+     * @param {RegionSet} newSet - newly configured set
+     */
     setConfigured(newSet) {
-        let newSets = this.state.sets.slice();
-        let indexBeingConfigured = this.state.indexBeingConfigured;
-        if (!newSets[this.state.indexBeingConfigured]) {
-            indexBeingConfigured = newSets.push(newSet) - 1;
+        const indexBeingConfigured = this.state.indexBeingConfigured;
+        if (indexBeingConfigured < 0 || indexBeingConfigured >= this.props.sets.length) {
+            this.addSet(newSet); // Index being configured out of bounds -- doesn't exist in current set list yet
         } else {
-            newSets[this.state.indexBeingConfigured] = newSet;
+            this.replaceSet(indexBeingConfigured, newSet);
         }
-        this.setState({
-            sets: newSets,
-            indexBeingConfigured: indexBeingConfigured
-        });
+    }
+
+    addSet(newSet) {
+        const nextSets = this.props.sets.slice();
+        nextSets.push(newSet);
+        this.props.onSetsChanged(nextSets);
+    }
+
+    replaceSet(index, replacement) {
+        const nextSets = this.props.sets.slice();
+        nextSets[index] = replacement;
+        this.props.onSetsChanged(nextSets);
+        this.handleSetChangeSideEffects(index, replacement);
+    }
+
+    deleteSet(index) {
+        const nextSets = this.props.sets.filter((unused, i) => i !== index);
+        if (nextSets.length !== this.props.sets.length) {
+            this.props.onSetsChanged(nextSets);
+            this.handleSetChangeSideEffects(index, null);
+        }
+    }
+
+    /**
+     * Requests a 
+     * @param {number} changedIndex 
+     * @param {*} replacement 
+     */
+    handleSetChangeSideEffects(changedIndex, newSet) {
+        const oldSet = this.props.sets[changedIndex];
+        if (oldSet === this.props.selectedSet) {
+            this.props.onSetSelected(newSet);
+        }
     }
 
     renderItemForSet(set, index) {
+        const isBackingView = set === this.props.selectedSet;
         const numRegions = set.features.length;
         const name = set.name || "Unnamed set";
         const text = `${name} (${numRegions} regions)`;
+
+        let useSetButton;
+        if (isBackingView) {
+            useSetButton = <button disabled={true} >Is current view</button>;
+        } else {
+            useSetButton = (
+                <button onClick={() => this.props.onSetSelected(set)} disabled={numRegions <= 0} >
+                    Enter region set view
+                </button>
+            );
+        }
+
+        const deleteButton = <button onClick={() => this.deleteSet(index)} >DELETE</button>;
+
         return (
-        <div key={index}>
-            {text}
-            <button onClick={() => this.setState({indexBeingConfigured: index})}>Configure</button>
-            <button
-                onClick={() => this.props.onSetSelected(set)}
-                disabled={numRegions <= 0}
-            >
-                Enter gene set view
+        <div key={index} style={{backgroundColor: isBackingView ? "lightgreen" : undefined}} >
+            <button className="btn btn-link" onClick={() => this.setState({indexBeingConfigured: index})} >
+                {text}
             </button>
+            {useSetButton}
+            {deleteButton}
         </div>
         );
     }
 
     render() {
-        const setBeingConfigured = this.state.sets[this.state.indexBeingConfigured];
+        const {genome, sets, selectedSet, onSetSelected} = this.props;
+        const setBeingConfigured = sets[this.state.indexBeingConfigured];
         return (
         <div>
             <h3>Select a gene/region set</h3>
-            {this.state.sets.map(this.renderItemForSet)}
-            <button onClick={() => this.setState({indexBeingConfigured: -1})} >Create new set...</button>
+            {selectedSet ? <button onClick={() => onSetSelected(null)} >Exit region set view</button> : null }
+            {sets.map(this.renderItemForSet)}
+            <button onClick={() => this.setState({indexBeingConfigured: sets.length})} >Configure new set...</button>
             <RegionSetConfig
-                genome={this.props.genome}
+                genome={genome}
                 set={setBeingConfigured}
                 onSetConfigured={this.setConfigured}
             />
@@ -87,4 +162,4 @@ class RegionSetSelector extends React.Component {
     }
 }
 
-export default RegionSetSelector;
+export default connect(mapStateToProps, callbacks)(RegionSetSelector);
