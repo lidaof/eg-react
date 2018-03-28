@@ -4,13 +4,18 @@
  * @author Silas Hsu
  */
 import { createStore } from 'redux';
-import allGenomes from './model/genomes/allGenomes';
+import { getGenomeConfig } from './model/genomes/allGenomes';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
+import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
 
+// If you want to disable autosave, you can replace STORAGE with a mock:
+// {setItem: () => null, getItem: () => null}
+const STORAGE = window.sessionStorage; 
+const SESSION_KEY = "eg-react-session";
 const MIN_VIEW_REGION_SIZE = 100;
 
 const initialState = {
-    genomeIndex: -1,
+    genomeName: "",
     viewRegion: null,
     tracks: [],
     metadataTerms: [],
@@ -35,10 +40,10 @@ export const ActionCreators = {
     /**
      * Modifies the current genome.
      * 
-     * @param {number} index - index of the requested genome
+     * @param {string} genomeName - name of the genome
      */
-    setGenome: index => {
-        return {type: ActionTypes.SET_GENOME, index: index};
+    setGenome: genomeName => {
+        return {type: ActionTypes.SET_GENOME, genomeName: genomeName};
     },
 
     setViewRegion: (newStart, newEnd) => {
@@ -72,45 +77,38 @@ export const ActionCreators = {
     }
 };
 
-/**
- * Handles a change in region set view.  Causes a change in the displayed region as well as region set.
- * 
- * @param {Object} prevState - previous redux store
- * @param {RegionSet} [nextSet] - region set to back region set view in the next state
- * @return {Object} next redux store
- */
-function handleRegionSetViewChange(prevState, nextSet) {
-    if (nextSet) {
-        return {
-            ...prevState,
-            regionSetView: nextSet,
-            viewRegion: new DisplayedRegionModel(nextSet.makeNavContext())
-        };
-    } else {
-        const genomeConfig = allGenomes[prevState.genomeIndex];
-        const nextViewRegion = genomeConfig ? 
-            new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion) : null;
-        return {
-            ...prevState,
-            regionSetView: null,
-            viewRegion: nextViewRegion
-        };
+function getInitialState() {
+    let state = initialState;
+    const blob = STORAGE.getItem(SESSION_KEY);
+    if (blob) {
+        try {
+            state = new AppStateLoader().fromJSON(blob);
+        } catch (error) {
+            console.error("Error restoring session");
+            console.error(error);
+        }
     }
+
+    return state;
 }
 
-function getNextState(prevState = initialState, action) {
+function getNextState(prevState, action) {
+    if (!prevState) {
+        return getInitialState();
+    }
+
     switch (action.type) {
-        case ActionTypes.SET_GENOME: // Resets state
+        case ActionTypes.SET_GENOME: // Setting genome resets state.
             let nextViewRegion = null;
             let nextTracks = [];
-            const genomeConfig = allGenomes[action.index];
+            const genomeConfig = getGenomeConfig(action.genomeName);
             if (genomeConfig) {
                 nextViewRegion = new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion);
                 nextTracks = genomeConfig.defaultTracks;
             }
             return {
                 ...initialState,
-                genomeIndex: action.index,
+                genomeName: action.genomeName,
                 viewRegion: nextViewRegion,
                 tracks: nextTracks
             };
@@ -129,12 +127,37 @@ function getNextState(prevState = initialState, action) {
             return { ...prevState, regionSets: action.list };
         case ActionTypes.SET_REGION_SET_VIEW:
             return handleRegionSetViewChange(prevState, action.set);
-        case "@@redux/INIT":
-            return prevState;
         default:
             console.warn("Unknown change state action; ignoring.");
             console.warn(action);
             return prevState;
+    }
+}
+
+
+/**
+ * Handles a change in region set view.  Causes a change in the displayed region as well as region set.
+ * 
+ * @param {Object} prevState - previous redux store
+ * @param {RegionSet} [nextSet] - region set to back region set view in the next state
+ * @return {Object} next redux store
+ */
+function handleRegionSetViewChange(prevState, nextSet) {
+    if (nextSet) {
+        return {
+            ...prevState,
+            regionSetView: nextSet,
+            viewRegion: new DisplayedRegionModel(nextSet.makeNavContext())
+        };
+    } else {
+        const genomeConfig = getGenomeConfig(prevState.genomeName);
+        const nextViewRegion = genomeConfig ? 
+            new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion) : null;
+        return {
+            ...prevState,
+            regionSetView: null,
+            viewRegion: nextViewRegion
+        };
     }
 }
 
@@ -143,5 +166,13 @@ export const AppState = createStore(
     getNextState,
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
+
+window.addEventListener("beforeunload", () => {
+    const state = AppState.getState();
+    if (state !== initialState) {
+        const blob = new AppStateSaver().toJSON(state);
+        STORAGE.setItem(SESSION_KEY, blob);
+    }
+});
 
 export default AppState;

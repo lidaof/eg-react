@@ -2,6 +2,7 @@
  * A 0-indexed open interval.  Intervals are iterable, so code can take advantage of the spread operator:
  *     `myFunction(...interval)` is equivalent to `myFunction(interval.start, interval.end)`
  * 
+ * @implements {Serializable}
  * @author Silas Hsu
  */
 class OpenInterval {
@@ -18,6 +19,14 @@ class OpenInterval {
         }
         this.start = start;
         this.end = end;
+    }
+
+    serialize() {
+        return [...this];
+    }
+
+    static deserialize(object) {
+        return new OpenInterval(...object);
     }
 
     *[Symbol.iterator] () {

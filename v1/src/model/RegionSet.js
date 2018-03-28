@@ -1,5 +1,8 @@
 import _ from 'lodash';
+import Feature from './Feature';
 import NavigationContext from './NavigationContext';
+import FlankingStrategy from './FlankingStrategy';
+import { getGenomeConfig } from './genomes/allGenomes';
 
 /**
  * A set of features that undergoes some configuration before being exported to a navigation context.
@@ -30,9 +33,23 @@ class RegionSet {
         return {
             name: this.name,
             features: this.features.map(feature => feature.serialize()),
-            genome: this.genome,
+            genomeName: this.genome.getName(),
             flankingStrategy: this.flankingStrategy.serialize()
         }
+    }
+
+    static deserialize(object) {
+        const genomeName = object.genomeName;
+        const genomeConfig = getGenomeConfig(genomeName);
+        if (!genomeConfig) {
+            throw new Error(`Cannot deserialize RegionSet object due to unknown genome name ${genomeName}`);
+        }
+        return new RegionSet(
+            object.name,
+            object.features.map(Feature.deserialize),
+            genomeConfig.genome,
+            FlankingStrategy.deserialize(object.flankingStrategy)
+        );
     }
 
     /**

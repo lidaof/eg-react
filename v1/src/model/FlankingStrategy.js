@@ -22,8 +22,11 @@ class FlankingStrategy {
      */
     constructor(type=FlankingStrategy.SURROUND_ALL, upstream=0, downstream=0) {
         this.type = type;
-        this.upstream = Number(upstream);
-        this.downstream = Number(downstream);
+        this.upstream = Math.round(Number(upstream));
+        this.downstream = Math.round(Number(downstream));
+        if (!Number.isSafeInteger(this.upstream) || !Number.isSafeInteger(this.downstream)) {
+            throw new RangeError(`Upstream and downstream must be integers, but got '${upstream}' and '${downstream}'`);
+        }
     }
 
     serialize() {

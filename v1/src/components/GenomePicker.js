@@ -8,31 +8,24 @@ const callbacks = { onGenomeSelected: ActionCreators.setGenome };
 
 class GenomePicker extends React.PureComponent {
     static propTypes = {
-        onGenomeSelected: PropTypes.func, // Called on genome selection.  Sigature: (genomeIndex: number): void
+        onGenomeSelected: PropTypes.func, // Called on genome selection.  Sigature: (genomeName: string): void
     };
 
     constructor(props) {
         super(props);
-        this.state = {
-            selectedValue: 0
-        };
+        this.renderGenomeOption = this.renderGenomeOption.bind(this);
     }
 
     renderGenomeOption(config, index) {
-        return <option key={index} value={index} >{config.genome.getName()}</option>
+        const genomeName = config.genome.getName();
+        return <button key={index} onClick={() => this.props.onGenomeSelected(genomeName)} >{genomeName}</button>;
     }
 
     render() {
         return (
-        <div>
+        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
             <h1>Select a genome</h1>
-            <select
-                value={this.state.selectedValue}
-                onChange={event => this.setState({selectedValue: event.target.value})}
-            >
-                {allGenomes.map(this.renderGenomeOption)}
-            </select>
-            <button onClick={() => this.props.onGenomeSelected(this.state.selectedValue)} >Confirm</button>
+            {allGenomes.map(this.renderGenomeOption)}
         </div>
         );
     }

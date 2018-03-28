@@ -7,22 +7,22 @@ import OpenInterval from './OpenInterval';
  */
 class ChromosomeInterval {
     /**
-     * Parses a string representing a ChromosomeInterval, such as those produced by the toString() method.  Returns null
-     * if parsing fails.
+     * Parses a string representing a ChromosomeInterval, such as those produced by the toString() method.  Throws an
+     * error if parsing fails.
      * 
      * @param {string} string - interval to parse
-     * @return {ChromosomeInterval} parsed instance, or null
+     * @return {ChromosomeInterval} parsed instance
+     * @throws {RangeError} if parsing fails
      */
     static parse(string) {
         const regexMatch = string.match(/([\w:]+):(\d+)-(\d+)/);
-        // eslint-disable-next-line no-cond-assign
         if (regexMatch) {
             const chr = regexMatch[1];
             const start = Number.parseInt(regexMatch[2], 10);
             const end = Number.parseInt(regexMatch[3], 10);
             return new ChromosomeInterval(chr, start, end);
         } else {
-            return null;
+            throw new RangeError("Could not parse interval");
         }
     }
 

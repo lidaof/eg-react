@@ -13,8 +13,8 @@ interface Serializable<T> {
     serialize(): Object;
 
     /**
-     * Deserializes a previously serialized object, restoring its methods.  Deserializing other objects causes
-     * undefined behavior.
+     * Deserializes a previously serialized object, restoring its methods.  Deserializing an object that didn't come
+     * from the serialize() method causes undefined behavior.
      * 
      * @param {Object} object - plain object
      * @return {T} instance of this type

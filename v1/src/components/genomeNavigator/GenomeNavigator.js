@@ -28,7 +28,7 @@ class GenomeNavigator extends React.Component {
          *         `newStart`: the absolute base number of the start of the selected interval
          *         `newEnd`: the absolute base number of the end of the selected interval
          */
-        onRegionSelected: PropTypes.func.isRequired,
+        onRegionSelected: PropTypes.func
     };
 
     static defaultProps = {

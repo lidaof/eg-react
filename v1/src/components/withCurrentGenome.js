@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
-import allGenomes from '../model/genomes/allGenomes';
+import { getGenomeConfig } from '../model/genomes/allGenomes';
 
 function getGenomeConfigFromStore(state) {
     return {
-        genomeConfig: allGenomes[state.genomeIndex]
+        genomeConfig: getGenomeConfig(state.genomeName)
     };
 }
 
