@@ -37,7 +37,7 @@ class BarChartDesigner {
         if (non0Data.length === 0) {
             return [];
         }
-        const dataMax = _.maxBy(this.data, record => record.value).value;
+        const dataMax = Math.max(...non0Data.map(record => record.value));
         
         const drawModel = new LinearDrawingModel(this.viewRegion, this.width);
         return non0Data.map((record, index) => {

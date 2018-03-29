@@ -2,6 +2,7 @@ import RulerTrack from './RulerTrack';
 import BigWigTrack from './BigWigTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
 import UnknownTrack from './UnknownTrack';
+import rmskTrack from './rmskTrack';
 
 /**
  * Mapping from track type name to an object implementing the TrackSubtype interface.
@@ -10,6 +11,7 @@ const TYPE_NAME_TO_SUBTYPE = {
     "ruler": RulerTrack,
     "bigwig": BigWigTrack,
     "hammock": GeneAnnotationTrack,
+    "rmsk": rmskTrack
 };
 
 /**

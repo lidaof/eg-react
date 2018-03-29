@@ -44,6 +44,11 @@ const defaultTracks = [
         url: 'http://egg.wustl.edu/d/hg19/refGene.gz',
     }),
     new TrackModel({
+        type: "rmsk",
+        name: "RepeatMasker",
+        url: "http://vizhub.wustl.edu/public/hg19/rmsk16.bb"
+    }),
+    new TrackModel({
         type: "ruler",
         name: "Ruler",
     })
