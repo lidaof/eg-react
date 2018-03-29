@@ -74,8 +74,8 @@ export class GeneAnnotation extends React.PureComponent {
         const centerY = ANNOTATION_HEIGHT / 2;
         const bottomY = ANNOTATION_HEIGHT;
 
-        let placementStartX = startX;
-        let placementEndX = endX;
+        let placementStartX = Math.max(0, startX);
+        let placementEndX = Math.min(endX, this.props.svgJs.doc().node.clientWidth);
         if (gene.getIsForwardStrand()) { // Point to the right
             placementStartX += ARROW_WIDTH;
         } else {
