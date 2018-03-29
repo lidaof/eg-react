@@ -8,11 +8,12 @@ import { getGenomeConfig } from './model/genomes/allGenomes';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
 
-// If you want to disable autosave, you can replace STORAGE with a mock:
-// {setItem: () => null, getItem: () => null}
-const STORAGE = window.sessionStorage; 
+let STORAGE = window.sessionStorage;
+if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
+    STORAGE = {setItem: () => null, getItem: () => null};
+}
 const SESSION_KEY = "eg-react-session";
-const MIN_VIEW_REGION_SIZE = 100;
+export const MIN_VIEW_REGION_SIZE = 80;
 
 const initialState = {
     genomeName: "",

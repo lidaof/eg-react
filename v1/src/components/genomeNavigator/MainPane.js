@@ -5,7 +5,7 @@ import Chromosomes from './Chromosomes';
 import Ruler from './Ruler';
 import SelectedRegionBox from './SelectedRegionBox';
 
-import SelectableArea from '../SelectableArea';
+import SelectableGenomeArea from '../SelectableGenomeArea';
 import DragAcrossView from '../DragAcrossView';
 import withAutoDimensions from '../withAutoDimensions';
 
@@ -119,8 +119,8 @@ class MainPane extends React.Component {
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
         <DragAcrossView button={MouseButtons.RIGHT} onViewDrag={onNewViewRequested} viewRegion={viewRegion} >
-            <SelectableArea
-                viewRegion={viewRegion}
+            <SelectableGenomeArea
+                drawModel={new LinearDrawingModel(viewRegion, width)}
                 y={SELECT_BOX_Y}
                 height={SELECT_BOX_HEIGHT}
                 onAreaSelected={this.areaSelected}
@@ -142,7 +142,7 @@ class MainPane extends React.Component {
                         y={SELECTED_BOX_Y}
                     />
                 </svg>
-            </SelectableArea>
+            </SelectableGenomeArea>
         </DragAcrossView>
         );
     }

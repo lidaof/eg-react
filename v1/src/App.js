@@ -56,7 +56,7 @@ class App extends React.Component {
     render() {
         const {genomeConfig, viewRegion, tracks, onNewViewRegion} = this.props;
         if (!genomeConfig) {
-            return <GenomePicker />;
+            return <div className="container-fluid"><GenomePicker /></div>;
         }
 
         return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SelectableArea from '../SelectableArea';
+import SelectableGenomeArea from '../SelectableGenomeArea';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 
@@ -53,7 +53,14 @@ class ZoomableTrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        return <SelectableArea onAreaSelected={this.areaSelected} >{this.props.trackElements}</SelectableArea>;
+        return (
+        <SelectableGenomeArea
+            drawModel={new LinearDrawingModel(this.props.viewRegion, this.props.visualizationWidth)}
+            onAreaSelected={this.areaSelected}
+        >
+            {this.props.trackElements}
+        </SelectableGenomeArea>
+        );
     }
 }
 

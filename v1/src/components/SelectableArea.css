@@ -1,0 +1,31 @@
+.SelectableArea-box {
+    position: absolute;
+    border: 1px solid blue;
+    background-color: rgba(0, 0, 153, 0.1);
+    z-index: 1;
+    pointer-events: none;
+
+    /* Stuff for inner text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.SelectableArea-box-too-small {
+    border: 1px solid red;
+    background-color: rgba(255, 0, 0, 0.1);
+    color: red;
+}
+
+.SelectableArea-box-text-container {
+    padding: 0px 5px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.SelectableArea-box-secondary-text {
+    color: dimgrey;
+    font-size: x-small;
+    margin: 0;
+    white-space: nowrap;
+}

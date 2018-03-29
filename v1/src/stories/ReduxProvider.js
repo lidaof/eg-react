@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { AppState, ActionCreators } from '../AppState';
 
-AppState.dispatch(ActionCreators.setGenome(0));
+AppState.dispatch(ActionCreators.setGenome("hg19"));
 
 /**
  * A Redux Provider that provides a store already initialized with some sensible defaults, like a genome.

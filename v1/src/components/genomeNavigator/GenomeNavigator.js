@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { MIN_VIEW_REGION_SIZE } from '../../AppState';
 
 import MainPane from './MainPane';
 import TrackRegionController from './TrackRegionController';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-
-import eglogo from '../../images/eglogo.jpg';
 import GeneSearchBox from './GeneSearchBox';
 
-const MIN_VIEW_LENGTH = 80; // Minimum region length, where zooming is not allowed anymore
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import eglogo from '../../images/eglogo.jpg';
 
 /**
  * A navigator that allows users to scroll around the genome and select what region for tracks to display.
@@ -72,7 +71,7 @@ class GenomeNavigator extends React.Component {
     _setModelState(methodName, args) {
         let regionCopy = this.state.viewRegion.clone();
         regionCopy[methodName].apply(regionCopy, args);
-        if (regionCopy.getWidth() < MIN_VIEW_LENGTH) {
+        if (regionCopy.getWidth() < MIN_VIEW_REGION_SIZE) {
             return;
         }
         this.setState({viewRegion: regionCopy});
@@ -140,7 +139,7 @@ class GenomeNavigator extends React.Component {
                                 Zoom: <span role="img" aria-label="High zoom">➕</span>
                                  <input
                                     type="range"
-                                    min={Math.log(MIN_VIEW_LENGTH)}
+                                    min={Math.log(MIN_VIEW_REGION_SIZE)}
                                     max={Math.log(this.state.viewRegion.getNavigationContext().getTotalBases())}
                                     step="any"
                                     value={Math.log(this.state.viewRegion.getWidth())}
