@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  
     STORAGE = {setItem: () => null, getItem: () => null};
 }
 const SESSION_KEY = "eg-react-session";
-export const MIN_VIEW_REGION_SIZE = 80;
+export const MIN_VIEW_REGION_SIZE = 5;
 
 const initialState = {
     genomeName: "",

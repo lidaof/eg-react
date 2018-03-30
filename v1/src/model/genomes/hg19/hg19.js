@@ -54,7 +54,8 @@ const HG19 = {
     navContext: navContext,
     cytobands: cytobands,
     defaultRegion: defaultRegion,
-    defaultTracks: defaultTracks
+    defaultTracks: defaultTracks,
+    twoBitURL: "http://vizhub.wustl.edu/public/hg19/hg19.2bit",
 };
 
 export default HG19;

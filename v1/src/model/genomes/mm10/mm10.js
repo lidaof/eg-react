@@ -41,7 +41,8 @@ const MM10 = {
     navContext: navContext,
     cytobands: cytobands,
     defaultRegion: defaultRegion,
-    defaultTracks: defaultTracks
+    defaultTracks: defaultTracks,
+    twoBitURL: "http://vizhub.wustl.edu/public/mm10/mm10.2bit"
 };
 
 export default MM10;

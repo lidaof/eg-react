@@ -1,6 +1,7 @@
 /**
  * implementing UCSC like binning schema in JS
  * check http://genomewiki.ucsc.edu/index.php/Bin_indexing_system
+ * modified from tabix C code
  * @author: Daofeng Li
  */
 

@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { faSearchMinus, faSearchPlus } from '@fortawesome/fontawesome-free-solid';
 import { MIN_VIEW_REGION_SIZE } from '../../AppState';
 
 import MainPane from './MainPane';
@@ -63,7 +65,7 @@ class GenomeNavigator extends React.Component {
     }
 
     /**
-     * Deep copies this.state.viewRegion, mutates it by calling `methodName` with `args`, and then calls this.setState().
+     * Copies this.state.viewRegion, mutates it by calling `methodName` with `args`, and then calls this.setState().
      * 
      * @param {string} methodName - the method to call on the model
      * @param {any[]} args - arguments to provide to the method
@@ -81,7 +83,7 @@ class GenomeNavigator extends React.Component {
      * Wrapper for calling zoom() on the view model.
      * 
      * @param {number} amount - amount to zoom
-     * @param {number} focusPoint - focal point of the zoom
+     * @param {number} [focusPoint] - focal point of the zoom
      * @see DisplayedRegionModel#zoom
      */
     zoom(amount, focusPoint) {
@@ -135,17 +137,12 @@ class GenomeNavigator extends React.Component {
                             />
                         </div>
                          <div className="col-sm">
-                            <label>
-                                Zoom: <span role="img" aria-label="High zoom">➕</span>
-                                 <input
-                                    type="range"
-                                    min={Math.log(MIN_VIEW_REGION_SIZE)}
-                                    max={Math.log(this.state.viewRegion.getNavigationContext().getTotalBases())}
-                                    step="any"
-                                    value={Math.log(this.state.viewRegion.getWidth())}
-                                    onChange={this.zoomSliderDragged}
-                                /><span role="img" aria-label="Low zoom">➖</span>
-                            </label>
+                            <ZoomControls
+                                viewRegion={this.state.viewRegion}
+                                onSliderDragged={this.zoomSliderDragged}
+                                onZoomIn={() => this.zoom(0.5)}
+                                onZoomOut={() => this.zoom(2)}
+                            />
                         </div>
                     </div>
                 </nav>
@@ -159,6 +156,30 @@ class GenomeNavigator extends React.Component {
             </div>
         );
     }
+}
+
+function ZoomControls(props) {
+    return (
+    <label>
+        Zoom:
+        <div className="btn-group"> 
+            <button className="btn" onClick={props.onZoomIn} >
+                <FontAwesomeIcon icon={faSearchPlus} />
+            </button>
+            <input
+                type="range"
+                min={Math.log(MIN_VIEW_REGION_SIZE)}
+                max={Math.log(props.viewRegion.getNavigationContext().getTotalBases())}
+                step="any"
+                value={Math.log(props.viewRegion.getWidth())}
+                onChange={props.onSliderDragged}
+            />
+            <button className="btn" onClick={props.onZoomOut} >
+                <FontAwesomeIcon icon={faSearchMinus} />
+            </button>
+        </div>
+    </label>
+    );
 }
 
 export default GenomeNavigator;
