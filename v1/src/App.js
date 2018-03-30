@@ -8,9 +8,6 @@ import RegionSetSelector from './components/RegionSetSelector';
 import HG19 from './model/genomes/hg19/hg19';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 
-import TwoBitSource from './dataSources/TwoBitSource';
-import ChromosomeInterval from './model/interval/ChromosomeInterval';
-
 import './App.css';
 
 const MIN_SELECTED_SIZE = 100;
@@ -28,10 +25,6 @@ class App extends React.Component {
         this.removeTrack = this.removeTrack.bind(this);
         this.trackChanged = this.trackChanged.bind(this);
         this.setRegionSet = this.setRegionSet.bind(this);
-
-        // const twoBitSource = new TwoBitSource("http://vizhub.wustl.edu/public/hg19/hg19.2bit");
-        // const interval = new ChromosomeInterval('chr22', 19178140, 19178170);
-        // twoBitSource.getData(interval).then(alert);
     }
 
     regionSelected(start, end) {

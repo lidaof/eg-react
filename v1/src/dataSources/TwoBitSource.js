@@ -1,10 +1,9 @@
 import DataSource from './DataSource';
-
 const twoBit = require('../vendor/bbi-js/main/twoBit');
 const bin = require('../vendor/bbi-js/utils/bin');
 
 /**
- * Reads and gets data from .2bit files hosted remotely.
+ * Reads and gets data from remotely-hosted .2bit files.
  * 
  * @author Daofeng Li
  */
@@ -27,17 +26,31 @@ class TwoBitSource extends DataSource {
         });
     }
 
-    
     /**
-     * Gets sequence stored in a single chromosome interval.
+     * Gets the sequence that covers the region.
+     * 
+     * @param {DisplayedRegionModel} region - region for which to fetch data
+     * @return {Promise<string>} - sequence in the region
+     */
+    async getData(region) {
+        const promises = region.getFeatureIntervals().map(interval =>
+            this.getSequenceInInterval(interval.getGenomeCoordinates())
+        );
+        const sequences = await Promise.all(promises);
+        return sequences.join("");
+    }
+
+    /**
+     * Gets the sequence for a single chromosome interval.
      * 
      * @param {ChromosomeInterval} interval - coordinates
-     * @param {Twobit} twoBitObj 
-     * @return {Promise} - a Promise for the data, 
+     * @return {Promise<string>} - a Promise for the sequence
      */
-    _getSeqForChromosome(interval, twoBitObj) {
+    async getSequenceInInterval(interval) {
+        const twoBitObj = await this.twoBitPromise;
         return new Promise((resolve, reject) => {
-            twoBitObj.fetch(interval.chr, ...interval, (data, error) => {
+            // We Math.max because the bbi-js API errors if given 0 as a start.
+            twoBitObj.fetch(interval.chr, Math.max(1, interval.start), interval.end, (data, error) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -47,18 +60,6 @@ class TwoBitSource extends DataSource {
         });
     }
 
-    /**
-     * Gets sequence stored in a single chromosome interval.
-     * 
-     * @param {ChromosomeInterval} interval - coordinates
-     * @return {string} - sequence in the interval, 
-     */
-    async getData(interval) {
-        const twoBitObj = await this.twoBitPromise;
-        const seq = await this._getSeqForChromosome(interval, twoBitObj);
-        //console.log(seq);
-        return seq;    
-    }
 }
 
 export default TwoBitSource;
