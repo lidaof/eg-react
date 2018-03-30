@@ -5,10 +5,10 @@ describe("parse()", () => {
         expect(ChromosomeInterval.parse("myChr:1-10")).toEqual(new ChromosomeInterval("myChr", 1, 10));
     });
 
-    it("returns null on malformed input", () => {
-        expect(ChromosomeInterval.parse("sad3*#$c)")).toBeNull();
-        expect(ChromosomeInterval.parse("chrWow!:1-10")).toBeNull();
-        expect(ChromosomeInterval.parse("chr1:-1-10")).toBeNull();
+    it("throws on malformed input", () => {
+        expect(() => ChromosomeInterval.parse("sad3*#$c)")).toThrow(RangeError);
+        expect(() => ChromosomeInterval.parse("chrWow!:1-10")).toThrow(RangeError);
+        expect(() => ChromosomeInterval.parse("chr1:-1-10")).toThrow(RangeError);
     });
 });
 

@@ -56,5 +56,5 @@ export const STORY_KIND = "Genome navigator";
 let storyInterface = storiesOf(STORY_KIND, module);
 for (let storyKey in STORIES) {
     let story = STORIES[storyKey];
-    storyInterface.add(story.storyName, () => <ReduxProvider>{story.element}</ReduxProvider>);
+    //storyInterface.add(story.storyName, () => <ReduxProvider>{story.element}</ReduxProvider>);
 }
