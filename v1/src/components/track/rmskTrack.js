@@ -9,7 +9,7 @@ import Tooltip from './Tooltip';
 import GenomicCoordinates from './GenomicCoordinates';
 import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorConfig';
 
-import BigBedSource from '../../dataSources/BigBedSource';
+import RmskSource from '../../dataSources/RmskSource';
 import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 
 const DEFAULT_HEIGHT = 35; // In pixels
@@ -84,7 +84,7 @@ class rmskVisualizer extends React.PureComponent {
      */
     render() {
         const {trackModel, data, viewRegion, width} = this.props;
-        console.log(data);
+        //console.log(data);
         return (
         <React.Fragment>
             <BarChart
@@ -131,7 +131,7 @@ const rmskTrack = {
     legend: rmskLegend,
     menuItems: [PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: (trackModel) => new BigBedSource(trackModel.url),
+    getDataSource: (trackModel) => new RmskSource(trackModel.url),
 };
 
 export default rmskTrack;

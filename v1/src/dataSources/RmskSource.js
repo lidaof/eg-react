@@ -1,15 +1,14 @@
 import DataSource from './DataSource';
-import ChromosomeInterval from '../model/interval/ChromosomeInterval';
-
+import Rmsk from '../model/Rmsk';
 const bigwig = require('../vendor/bbi-js/main/bigwig');
 const bin = require('../vendor/bbi-js/utils/bin');
 
 /**
- * Reads and gets data from BigBed files hosted remotely.
+ * Reads and gets data from BigBed files hosted remotely， only for rmsk.out converted bigBed.
  * 
  * @author Daofeng modified from Silas Hsu's BigWigSource
  */
-class BigBedSource extends DataSource {
+class RmskSource extends DataSource {
     /**
      * Prepares to fetch BigBed data from a URL.
      * 
@@ -32,7 +31,7 @@ class BigBedSource extends DataSource {
      * An object that fulfills the Interval interface with an additional prop `score` that stores the value at the
      * coordinate.  The interval is an open 0-indexed one.
      * 
-     * @typedef {OpenInterval} BigBedSource~Record
+     * @typedef {OpenInterval} RmskSource~Record
      * @property {number} start - inclusive start of the interval
      * @property {number} end - exclusive end of the interval
      * @property {number} value - the value of this interval
@@ -50,29 +49,17 @@ class BigBedSource extends DataSource {
     async getData(region, options={}) {
         const bigWigObj = await this.bigWigPromise;
 
-        const navContext = region.getNavigationContext();
+        //const navContext = region.getNavigationContext();
         const basesPerPixel = region.getWidth() / (options.width || window.innerWidth + 1); // +1 to prevent 0
         const zoomLevel = this._getMatchingZoomLevel(bigWigObj, basesPerPixel);
         let promises = region.getFeatureIntervals().map(async featureInterval => {
             const chrInterval = featureInterval.getGenomeCoordinates();
             const dasFeatures = await this._getDataForChromosome(chrInterval, bigWigObj, zoomLevel);
-            // let result = [];
-            // for (let dasFeature of dasFeatures) {
-            //     try { // ConvertGenomeIntervalToBases can throw RangeError.
-            //         let absInterval = navContext.convertGenomeIntervalToBases(
-            //             new ChromosomeInterval(dasFeature.segment, dasFeature.min, dasFeature.max), featureInterval.feature
-            //         );
-            //         absInterval.value = 1 - dasFeature.milliDel/1000.0;
-            //         result.push(absInterval);
-            //     } catch (error) { // Ignore RangeErrors; let others bubble up.
-            //         if (!(error instanceof RangeError)) {
-            //             throw error;
-            //         }
-            //     }
-            // }
-            // return result;
-            console.log(dasFeatures);
-            return dasFeatures;
+            let result = [];
+            for (let dasFeature of dasFeatures) {
+                result.push(new Rmsk(dasFeature));
+            }
+            return result;
         });
         let dataForEachSegment = await Promise.all(promises);
         return [].concat.apply([], dataForEachSegment); // Combine all the data into one array
@@ -133,4 +120,4 @@ class BigBedSource extends DataSource {
     }
 }
 
-export default BigBedSource;
+export default RmskSource;
