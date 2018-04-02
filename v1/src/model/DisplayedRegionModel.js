@@ -64,13 +64,21 @@ class DisplayedRegionModel {
     }
 
     /**
-     * Gets the segment intervals in the navigation context that overlap this view region.  See NavigationContext for
-     * more info on segment intervals.
+     * Gets the features that overlap this view region in the navigation context.
      * 
-     * @return {FeatureInterval[]} list of segment intervals
+     * @return {FeatureInterval[]} list of feature intervals that overlap this view region
      */
     getFeatureIntervals() {
         return this._navContext.getFeaturesInInterval(this._startBase, this._endBase);
+    }
+
+    /**
+     * Gets the genomic locations that overlap this view region.  The results are guaranteed to not overlap each other.
+     * 
+     * @return {ChromosomeInterval[]} list of genomic locations that overlap this view region.
+     */
+    getGenomeIntervals() {
+        return this._navContext.getLociInInterval(this._startBase, this._endBase);
     }
 
     /**

@@ -1,5 +1,6 @@
 import OpenInterval from './interval/OpenInterval';
 import FeatureInterval from './interval/FeatureInterval';
+import ChromosomeInterval from './interval/ChromosomeInterval';
 
 /**
  * An object that represents everywhere that a user could potentially navigate and view.  A context is actually an
@@ -255,42 +256,39 @@ class NavigationContext {
      * @return {FeatureInterval[]} list of feature intervals
      */
     getFeaturesInInterval(queryStart, queryEnd) {
-        const overlappingFeatures = []; // Construct overlapping feature list; it will be sorted left to right.
-        const overlappingFeatureStarts = [];
-        for (let i = 0; i < this._features.length; i++) {
+        const queryInterval = new OpenInterval(queryStart, queryEnd);
+        let results = []
+        for (let i = 0; i < this._features.length; i++) { // Check each feature for overlap with the query interval
             const feature = this._features[i];
-            const featureStart = this._featureStarts[i];
-            const featureEnd = featureStart + feature.getLength(); // Noninclusive
-            /*
-             * You can convince yourself this is correct by considering three cases:
-             *  - the query overlaps the feature on the left side
-             *  - the query is entirely inside the feature
-             *  - the query overlaps the feature on the right side
-             */
-            if (queryStart < featureEnd && featureStart < queryEnd) { 
-                overlappingFeatures.push(feature);
-                overlappingFeatureStarts.push(featureStart);
+            const absStart = this._featureStarts[i];
+            const absEnd = absStart + feature.getLength(); // Noninclusive
+            const overlap = new OpenInterval(absStart, absEnd).getOverlap(queryInterval);
+
+            if (overlap) {
+                const relativeStart = overlap.start - absStart;
+                const relativeEnd = overlap.end - absStart
+                results.push(new FeatureInterval(feature, relativeStart, relativeEnd));
+            } else if (results.length > 0) { // No overlap
+                // Since features are sorted by absolute start, we can be confident that there will be no more overlaps
+                // if we have seen some before.
+                break;
             }
         }
+        return results;
+    }
 
-        const leftFeature = overlappingFeatures[0];
-        const rightFeature = overlappingFeatures[overlappingFeatures.length - 1];
-        const leftFeatureStart = queryStart - overlappingFeatureStarts[0];
-        const rightFeatureEnd = queryEnd - overlappingFeatureStarts[overlappingFeatures.length - 1];
-
-        if (overlappingFeatures.length === 1) {
-            return [new FeatureInterval(leftFeature, leftFeatureStart, rightFeatureEnd)];
-        }
-
-        let result = [];
-        result.push(new FeatureInterval(leftFeature, leftFeatureStart, leftFeature.getLength()));
-        for (let i = 1; i < overlappingFeatures.length - 1; i++) {
-            let feature = overlappingFeatures[i];
-            result.push(new FeatureInterval(feature, 0, feature.getLength()));
-        }
-        result.push(new FeatureInterval(rightFeature, 0, rightFeatureEnd));
-
-        return result;
+    /**
+     * Queries genomic locations that overlap an open interval of absolute coordinates.  The results are guaranteed to
+     * not overlap each other.
+     * 
+     * @param {number} queryStart - (inclusive) start of interval, as an absolute coordinate
+     * @param {number} queryEnd - (exclusive) end of interval, as an absolute coordinate
+     * @return {ChromosomeInterval[]} list of genomic locations
+     */
+    getLociInInterval(queryStart, queryEnd) {
+        const featureIntervals = this.getFeaturesInInterval(queryStart, queryEnd);
+        const genomeIntervals = featureIntervals.map(interval => interval.getGenomeCoordinates());
+        return ChromosomeInterval.mergeOverlaps(genomeIntervals);
     }
 }
 

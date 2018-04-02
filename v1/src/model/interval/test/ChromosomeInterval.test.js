@@ -12,6 +12,30 @@ describe("parse()", () => {
     });
 });
 
+describe("mergeOverlaps", () => {
+    it("works for an empty array", () => {
+        expect(ChromosomeInterval.mergeOverlaps([])).toEqual([]);
+    });
+
+    it("merges intervals properly", () => {
+        const INPUT = [
+            new ChromosomeInterval("chr1", 10, 15),
+            new ChromosomeInterval("chr1", 2, 7),
+            new ChromosomeInterval("chr1", 5, 10),
+
+            new ChromosomeInterval("chr2", 5, 6),
+            new ChromosomeInterval("chr2", 0, 10),
+            new ChromosomeInterval("chr2", 11, 12),
+        ];
+        const EXPECTED = new Set([
+            new ChromosomeInterval("chr1", 2, 15),
+            new ChromosomeInterval("chr2", 0, 10),
+            new ChromosomeInterval("chr2", 11, 12),
+        ]);
+        expect(new Set(ChromosomeInterval.mergeOverlaps(INPUT))).toEqual(EXPECTED)
+    });
+});
+
 describe("getOverlap()", () => {
     it("correctly intersects", () => {
         const interval1 = new ChromosomeInterval("chr1", 0, 10);

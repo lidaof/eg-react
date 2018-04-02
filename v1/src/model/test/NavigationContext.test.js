@@ -5,7 +5,11 @@ import ChromosomeInterval from '../interval/ChromosomeInterval';
 import OpenInterval from '../interval/OpenInterval';
 
 const NAME = "Wow very genome";
-const instance = new NavigationContext(NAME, CHROMOSOMES);
+const instance = new NavigationContext(NAME, [
+    new Feature("f1", new ChromosomeInterval("chr1", 0, 10)),
+    new Feature("f2", new ChromosomeInterval("chr2", 0, 10)),
+    new Feature("f3", new ChromosomeInterval("chr2", 5, 15)), // Note overlap with feature 2!
+]);
 
 describe("constructor", () => {
     it("errors if not given any features", () => {
@@ -36,8 +40,8 @@ describe("Getters", () => {
 
 describe("getFeatureStart()", () => {
     it("is correct", () => {
-        expect(instance.getFeatureStart("chr1")).toBe(0);
-        expect(instance.getFeatureStart("chr3")).toBe(20);
+        expect(instance.getFeatureStart("f1")).toBe(0);
+        expect(instance.getFeatureStart("f3")).toBe(20);
     });
 
     it("errors when given an unknown feature name", () => {
@@ -49,7 +53,7 @@ describe("getFeatureStart()", () => {
 describe("convertBaseToFeatureCoordinate() and convertBaseToFeatureIndex()", () => {
     it("returns the right info", () => {
         const coordinate = instance.convertBaseToFeatureCoordinate(10);
-        expect(coordinate.getName()).toEqual("chr2");
+        expect(coordinate.getName()).toEqual("f2");
         expect(coordinate.relativeStart).toEqual(0);
     });
 
@@ -61,28 +65,28 @@ describe("convertBaseToFeatureCoordinate() and convertBaseToFeatureIndex()", () 
 
 describe("parse() and convertFeatureCoordinateToBase()", () => {
     it("parses one segment correctly", () => {
-        expect(instance.parse("chr1:0-10")).toEqual({start: 0, end: 10});
+        expect(instance.parse("f1:0-10")).toEqual({start: 0, end: 10});
     });
 
     it("parses two segments correctly", () => {
-        expect(instance.parse("chr1:9-chr3:1")).toEqual({start: 9, end: 21});
+        expect(instance.parse("f1:9-f3:1")).toEqual({start: 9, end: 21});
     });
 
     it("errors if given a nonsensical string", () => {
-        expect(() => instance.parse("chr1:234s-130")).toThrow(RangeError);
+        expect(() => instance.parse("f1:234s-130")).toThrow(RangeError);
     });
 
     it("errors if end base is before start base", () => {
-        expect(() => instance.parse("chr1:10-1")).toThrow(RangeError);
-        expect(() => instance.parse("chr2:1-chr1:5")).toThrow(RangeError);
+        expect(() => instance.parse("f1:10-1")).toThrow(RangeError);
+        expect(() => instance.parse("f2:1-f1:5")).toThrow(RangeError);
     });
 
     it("errors if the chromosome doesn't exist", () => {
-        expect(() => instance.parse("chr3:1-chr4:10")).toThrow(RangeError);
+        expect(() => instance.parse("f3:1-f4:10")).toThrow(RangeError);
     });
 
     it("errors if the base pair is out of range", () => {
-        expect(() => instance.parse("chr1:1-11")).toThrow(RangeError);
+        expect(() => instance.parse("f1:1-11")).toThrow(RangeError);
     });
 });
 
@@ -108,16 +112,26 @@ describe("convertGenomeIntervalToBases()", () => {
 
 describe("getFeaturesInInterval()", () => {
     it("gets one segment properly", () => {
-        let result = instance.getFeaturesInInterval(10, 20).map(chr => chr.toString());
-        expect(result).toEqual(["chr2:0-10"]);
+        let result = instance.getFeaturesInInterval(10, 20).map(interval => interval.toString());
+        expect(result).toEqual(["f2:0-10"]);
     });
 
     it("gets multiple segments properly", () => {
-        let result = instance.getFeaturesInInterval(4, 21).map(chr => chr.toString());
+        let result = instance.getFeaturesInInterval(4, 22).map(interval => interval.toString());
+        expect(result).toEqual([
+            "f1:4-10",
+            "f2:0-10",
+            "f3:0-2",
+        ]);
+    });
+});
+
+describe("getLociInInterval()", () => {
+    it("gets unique genome loci", () => {
+        let result = instance.getLociInInterval(4, 30).map(locus => locus.toString());
         expect(result).toEqual([
             "chr1:4-10",
-            "chr2:0-10",
-            "chr3:0-1",
+            "chr2:0-15"
         ]);
     });
 });
