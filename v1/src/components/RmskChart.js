@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import CanvasDesignRenderer from './CanvasDesignRenderer';
+import DesignRenderer from './DesignRenderer';
 import RmskChartDesigner from '../art/RmskChartDesigner';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import LinearDrawingModel from '../model/LinearDrawingModel';
@@ -85,33 +85,21 @@ class RmskChart extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {viewRegion, data, width, height, options, style, renderSvg, onMouseLeave} = this.props;
+        const {viewRegion, data, width, height, options, style, type, onMouseLeave} = this.props;
         this.makeXToDataMap();
         const design = new RmskChartDesigner(viewRegion, data, width, height, options).design();
-        if (renderSvg) {
-            const svgStyle = Object.assign({display: "block"}, style); // Display block to prevent extra bottom margin
-            return (
-            <svg
-                width={width}
-                height={height}
-                style={svgStyle}
-                onMouseMove={this.mouseMoved}
-                onMouseLeave={onMouseLeave}
-            >
-                {design}
-            </svg>
-            );
-        } else {
-            return (
-            <CanvasDesignRenderer
-                design={design}
-                width={width}
-                height={height}
-                style={style}
-                onMouseMove={this.mouseMoved}
-                onMouseLeave={onMouseLeave}
-            />);
-        }
+        return (
+        <DesignRenderer
+            type={type}
+            width={width}
+            height={height}
+            style={style}
+            onMouseMove={this.mouseMoved}
+            onMouseLeave={onMouseLeave}
+        >
+            {design}
+        </DesignRenderer>
+        );
     }
 }
 

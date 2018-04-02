@@ -34,7 +34,6 @@ class BarChart extends React.PureComponent {
     };
 
     static defaultProps = {
-        renderSvg: false,
         onRecordHover: (event, record) => undefined,
         onMouseLeave: (event) => undefined
     };
