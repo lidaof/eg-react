@@ -46,8 +46,12 @@ export class Rmsk extends Feature {
         this.divergence = _.round(this.milliDiv/1000.0, 1);
         this.deletion = _.round(this.milliDel/1000.0, 1);
         this.insertion = _.round(this.milliIns/1000.0, 1);
+        this.oneMinusDivergence =  1 - this.divergence; 
     }
 
+    getLocus() {
+        return this._locus;
+    }
     
 
     /**
