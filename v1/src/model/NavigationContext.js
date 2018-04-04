@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import OpenInterval from './interval/OpenInterval';
 import FeatureInterval from './interval/FeatureInterval';
 import ChromosomeInterval from './interval/ChromosomeInterval';
@@ -25,8 +26,9 @@ class NavigationContext {
         this._features = features;
         this._featureStarts = [];
         this._featureNameToIndex = {};
+        this._chrToFeatures = _.groupBy(features, feature => feature.getLocus().chr)
+        this._totalBases = 0;
 
-        let totalBases = 0;
         let i = 0;
         for (let feature of features) {
             // Make sure names are unique
@@ -40,11 +42,11 @@ class NavigationContext {
             this._featureNameToIndex[name] = i;
 
             // Add to feature list w/ additional details
-            this._featureStarts.push(totalBases);
-            totalBases += feature.getLength();
+            this._featureStarts.push(this._totalBases);
+            this._totalBases += feature.getLength();
             i++;
         }
-        this._totalBases = totalBases;
+
         if (this._totalBases === 0) {
             throw new Error("Context has 0 length");
         }
@@ -65,21 +67,6 @@ class NavigationContext {
      */
     getFeatures() {
         return this._features.slice();
-    }
-
-    /**
-     * Queries the context for a feature with a certain name.  Throws an error if the feature cannot be found.
-     * 
-     * @param {string} name - name of the feature to look up
-     * @return {Feature} the found feature
-     * @throws {RangeError} if the feature's name is not in this context
-     */
-    getFeatureWithName(name) {
-        const index = this._featureNameToIndex[name];
-        if (index === undefined) {
-            throw new RangeError(`Cannot find feature with name '${name}'`);
-        }
-        return this._features[index];
     }
 
     /**
@@ -116,26 +103,6 @@ class NavigationContext {
     }
 
     /**
-     * Given an absolute coordinate, gets the index of the feature in which the base is located.
-     *
-     * @param {number} base - the absolute coordinate to look up
-     * @return {number} index of feature
-     * @throws {RangeError} if the base is invalid
-     */
-    convertBaseToFeatureIndex(base) {
-        if (!this.getIsValidBase(base)) {
-            throw new RangeError("Invalid base number");
-        }
-        // Last feature (highest base #) to first (lowest base #)
-        for (let i = this._featureStarts.length - 1; i > 0; i--) {
-            if (base >= this._featureStarts[i]) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    /**
      * Given an absolute coordinate, gets the feature in which it is located.  Returns a FeatureInterval that expresses
      * a base number relative to the feature's start.
      *
@@ -144,7 +111,16 @@ class NavigationContext {
      * @throws {RangeError} if the absolute base is not in this context
      */
     convertBaseToFeatureCoordinate(base) {
-        const index = this.convertBaseToFeatureIndex(base); // Can throw RangeError
+        if (!this.getIsValidBase(base)) {
+            throw new RangeError("Invalid base number");
+        }
+
+        let index = this._features.length - 1; // We want the index of the feature that contains the absolute base.
+        // It's ok to -1 since there must be at least one feature, guaranteed by the constructor.
+        // Last feature (highest base #) to first (lowest base #)
+        while (index > 0 && base < this._featureStarts[index]) {
+            index--;
+        }
         const feature = this._features[index];
         const coordinate = base - this._featureStarts[index];
         return new FeatureInterval(feature, coordinate, coordinate);
@@ -176,37 +152,23 @@ class NavigationContext {
 
     /**
      * Converts genome coordinates to an interval of absolute base numbers in this context.  Since coordinates can map
-     * to multiple features, this method also needs a target feature or FeatureInterval.  By default, this method uses
-     * the chromosome's name as the feature name, but the second parameter can override this behavior.
-     * 
-     * Throws RangeError if mapping fails, such as when the target feature doesn't exist.  It is admittedly annoying to
-     * wrap code in try/catch, but it is more important to be explictly aware that mapping can fail.
+     * to multiple features, or none at all, this method returns a list of OpenInterval.
      * 
      * @param {ChromosomeInterval} chrInterval - genome interval
-     * @param {string | Feature} [targetFeature] - target location in context to map to
-     * @return {OpenInterval} interval of absolute base numbers in this context
-     * @throws {RangeError} if mapping fails
+     * @return {OpenInterval[]} intervals of absolute base numbers in this context
      */
-    convertGenomeIntervalToBases(chrInterval, targetFeature) {
-        let feature;
-        if (!targetFeature) { // targetFeature: undefined or null
-            feature = this.getFeatureWithName(chrInterval.chr);
-        } else if (typeof targetFeature === "string") { // targetFeature: string
-            feature = this.getFeatureWithName(targetFeature);
-        } else { // targetFeature: Feature.  Hopefully.
-            feature = targetFeature;
+    convertGenomeIntervalToBases(chrInterval) {
+        const potentialOverlaps = this._chrToFeatures[chrInterval.chr];
+        let absLocations = [];
+        for (let feature of potentialOverlaps) {
+            const overlap = new FeatureInterval(feature).getOverlap(chrInterval);
+            if (overlap) {
+                const absStart = this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeStart);
+                const absEnd = this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeEnd);
+                absLocations.push(new OpenInterval(absStart, absEnd));
+            }
         }
-
-        // Do an intersection, as to cut off parts of the interval not in the context.
-        const overlap = new FeatureInterval(feature).getOverlap(chrInterval);
-        if (!overlap) {
-            throw new RangeError("Genomic location not in this context");
-        }
-        
-        return new OpenInterval(
-            this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeStart),
-            this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeEnd)
-        );
+        return absLocations;
     }
 
     /**

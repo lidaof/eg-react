@@ -72,15 +72,13 @@ const RECORDS = [
     }
 ];
 
-const GENES = RECORDS.map(record => {
-    let gene = new Gene(record);
-    gene.computeNavContextCoordinates(NAV_CONTEXT);
-    return gene;
-});
+const GENES = RECORDS.map(record => new Gene(record));
 
 function Renderer(props) {
     const drawModel = new LinearDrawingModel(VIEW_REGION, props.width);
-    return <svg width="100%"><AnnotationArranger data={GENES} drawModel={drawModel} options={{rows: 2}} /></svg>;
+    return <svg width="100%">
+        <AnnotationArranger viewRegion={VIEW_REGION} drawModel={drawModel} data={GENES}  options={{rows: 2}} />
+    </svg>;
 }
 const AutoWidthRenderer = withAutoDimensions(Renderer);
 

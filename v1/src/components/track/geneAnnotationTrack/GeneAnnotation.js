@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import SVG from 'svg.js';
 
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
-import { Gene } from '../../../model/Gene';
+import Gene from '../../../model/Gene';
 import OpenInterval from '../../../model/interval/OpenInterval';
 
 export const ANNOTATION_HEIGHT = 9;
@@ -106,6 +106,7 @@ export class GeneAnnotation extends React.PureComponent {
     /**
      * Draws the annotation.
      * 
+     * @return {null}
      * @override
      */
     render() {
@@ -141,9 +142,6 @@ export class GeneAnnotation extends React.PureComponent {
         let drawOnlyInExons = svgJs.clip();
         // Translated exons, as thick boxes
         for (let exon of gene.absTranslated) {
-            if (!exon) {
-                console.log(gene);
-            }
             const exonBox = this._drawCenteredBox(...exon, ANNOTATION_HEIGHT, color);
             drawOnlyInExons.add(exonBox.clone()); // See comment for declaration of arrowClip
         }

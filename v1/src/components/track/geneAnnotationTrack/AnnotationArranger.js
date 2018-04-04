@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import { ANNOTATION_HEIGHT, GeneAnnotation } from './GeneAnnotation';
 import SvgJsManaged from '../../SvgJsManaged';
@@ -7,6 +8,7 @@ import SvgJsManaged from '../../SvgJsManaged';
 import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import OpenInterval from '../../../model/interval/OpenInterval';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 
 const DEFAULT_MAX_ROWS = 7;
 const ROW_BOTTOM_PADDING = 5;
@@ -21,8 +23,9 @@ class AnnotationArranger extends React.PureComponent {
     static HEIGHT_PER_ROW = ANNOTATION_HEIGHT + ROW_BOTTOM_PADDING;
 
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)), // Array of Gene objects
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // To compute absolute coordinates of genes
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Draw model to use
+        data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)), // Genes to draw
         viewWindow: PropTypes.instanceOf(OpenInterval), // X range of initially visible pixels
         options: PropTypes.shape({
             rows: PropTypes.number,
@@ -45,13 +48,19 @@ class AnnotationArranger extends React.PureComponent {
     };
 
     /**
-     * Sorts genes by start position in the genome, from lowest to highest.
-     * If same start position, plot longer gene first
-     * @param {Gene[]} genes - array of Gene to sort
-     * @return {Gene[]} sorted genes
+     * Filter genes by those that will be visible, and also sorts them by start base in the navigation context.
+     * 
+     * @param {Gene[]} genes - genes to filter and sort
+     * @return {Gene[]} filtered and sorted genes
      */
-    _sortGenes(genes) {
-        return genes.sort((gene1, gene2) => {
+    _processGenes(genes) {
+        const navContext = this.props.viewRegion.getNavigationContext();
+        const visibleGenes = genes.filter(gene => this.props.drawModel.basesToXWidth(gene.getLength()) >= 1);
+        const absCoordGenes = _.flatMap(visibleGenes, gene => gene.computeNavContextCoordinates(navContext));
+
+        // Sort by genes by start abs position from lowest to highest.  If same start position, the longer gene comes
+        // first.
+        return absCoordGenes.sort((gene1, gene2) => {
             const absStartComparison = gene1.absStart - gene2.absStart;
             if (absStartComparison === 0) {
                 return gene2.getLength() - gene1.getLength();
@@ -75,8 +84,9 @@ class AnnotationArranger extends React.PureComponent {
 
         let children = [];
         // Last row is reserved for anything that doesn't fit, so we don't track the Xs for that row.
-        let maxXsForRows = new Array(rows - 1).fill(-Infinity); 
-        const genes = this._sortGenes(data);
+        let maxXsForRows = new Array(rows - 1).fill(-Infinity);
+
+        const genes = this._processGenes(data);
         for (let gene of genes) {
             let geneWidth = drawModel.basesToXWidth(gene.absEnd - gene.absStart);
             if (geneWidth < 1) { // No use rendering something less than one pixel wide.
@@ -106,7 +116,7 @@ class AnnotationArranger extends React.PureComponent {
 
             children.push(
             <SvgJsManaged
-                key={gene.refGeneRecord._id}
+                key={gene.refGeneRecord._id + gene.absStart}
                 transform={`translate(0 ${y})`}
                 onClick={event => this.props.onGeneClick(event, gene)}
             >

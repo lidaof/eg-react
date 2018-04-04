@@ -12,9 +12,10 @@ import withDefaultOptions from '../withDefaultOptions';
 import NumberConfig from '../contextMenu/NumberConfig';
 import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorConfig';
 
-import { GeneFormatter } from '../../../model/Gene';
+import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import MongoSource from '../../../dataSources/MongoSource';
+import DataFormatter from '../../../dataSources/DataFormatter';
 
 const DEFAULT_OPTIONS = {
     color: "blue",
@@ -23,6 +24,12 @@ const DEFAULT_OPTIONS = {
 
 function getTrackHeight(trackModel) {
     return (trackModel.options.rows || DEFAULT_OPTIONS.rows) * AnnotationArranger.HEIGHT_PER_ROW;
+}
+
+class GeneFormatter extends DataFormatter {
+    format(data) {
+        return data.map(record => new Gene(record));
+    }
 }
 
 /**
@@ -71,17 +78,18 @@ class GeneAnnotationVisualizer extends React.PureComponent {
     }
 
     render() {
-        const {trackModel, width, data, viewWindow, options} = this.props;
+        const {trackModel, data, viewRegion, width, viewWindow, options} = this.props;
         const svgStyle = {paddingTop: 5, display: "block", overflow: "visible"};
         return (
         <React.Fragment>
             <svg width={width} height={getTrackHeight(trackModel)} style={svgStyle} >
                 <AnnotationArranger
-                    data={data}
+                    viewRegion={viewRegion}
                     drawModel={this.drawModel}
-                    onGeneClick={this.openTooltip}
+                    data={data}
                     viewWindow={viewWindow}
                     options={options}
+                    onGeneClick={this.openTooltip}
                 />
             </svg>
             {this.state.tooltip}

@@ -50,7 +50,7 @@ describe("getFeatureStart()", () => {
     });
 });
 
-describe("convertBaseToFeatureCoordinate() and convertBaseToFeatureIndex()", () => {
+describe("convertBaseToFeatureCoordinate()", () => {
     it("returns the right info", () => {
         const coordinate = instance.convertBaseToFeatureCoordinate(10);
         expect(coordinate.getName()).toEqual("f2");
@@ -91,22 +91,24 @@ describe("parse() and convertFeatureCoordinateToBase()", () => {
 });
 
 describe("convertGenomeIntervalToBases()", () => {
-    it("is correct", () => {
-        const feature = instance.getFeatures()[0];
-        const chrInterval = new ChromosomeInterval("chr1", 5, 10);
-        expect(instance.convertGenomeIntervalToBases(chrInterval, feature)).toEqual(new OpenInterval(5, 10));
-    });
-
-    it("errors when the feature does not overlap with the genome interval", () => {
+    it("is correct for 0 mappings", () => {
         const feature = instance.getFeatures()[0];
         const chrInterval = new ChromosomeInterval("chr1", -1, -1);
-        expect(() => instance.convertGenomeIntervalToBases(chrInterval, feature)).toThrow(RangeError);
+        expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([])
     });
 
-    it("errors when given a feature not in the context", () => {
+    it("is correct for one mapping", () => {
+        const feature = instance.getFeatures()[0];
         const chrInterval = new ChromosomeInterval("chr1", 5, 10);
-        const feature = new Feature("wat is this?", chrInterval);
-        expect(() => instance.convertGenomeIntervalToBases(chrInterval, feature)).toThrow(RangeError);
+        expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([new OpenInterval(5, 10)]);
+    });
+
+    it("is correct for multiple mappings", () => {
+        const chrInterval = new ChromosomeInterval("chr2", 5, 10);
+        expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([
+            new OpenInterval(15, 20),
+            new OpenInterval(20, 25)
+        ]);
     });
 });
 

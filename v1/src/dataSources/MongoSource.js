@@ -1,44 +1,36 @@
 import DataSource from './DataSource';
 import axios from 'axios';
+import DataFormatter from './DataFormatter';
 
 /**
- * A DataSource that gets annotations from mongodb.  
- * @author: Daofeng Li
+ * A DataSource that gets gene annotations from our backend.
+ *  
+ * @author Daofeng Li
  */
 class MongoSource extends DataSource {
     /**
-     * Makes a new instance specialized to serve data from a url.  Fetching data will return BedRecords by default,
-     * unless given a BedFormatter.
+     * Makes a new instance.  Fetching data will return raw object records by default, unless given a DataFormatter.
      * 
-     * @param {DBFormatter} [dbFormatter] - converter from dbRecords to some other format
+     * @param {DataFormatter} [formatter] - converter of data to some other format
      */
-    constructor(dbFormatter) {
+    constructor(formatter=new DataFormatter()) {
         super();
-        this.dbFormatter = dbFormatter;
+        this.formatter = formatter;
     }
 
     /**
-     * Gets data lying within the region.  Returns a promise for an array of data.
-     * 
-     * @param {DisplayedRegionModel} region - region for which to fetch data
-     * @param {Object} [options] - data fetching options
-     * @return {Promise<Object[]>} promise for data
-     * @override
+     * @inheritdoc
      */
     async getData(region, options) {
         let promises = region.getFeatureIntervals().map(async featureInterval => {
             const chrInterval = featureInterval.getGenomeCoordinates();
             const dbResponse = await axios.get(`/hg19/geneQuery/${chrInterval.chr}/${chrInterval.start}/${chrInterval.end}`);
-            const dbRecords = dbResponse.data;
-            if (this.dbFormatter) {
-                return this.dbFormatter.format(dbRecords, region, featureInterval);
-            } else {
-                return dbRecords;
-            }
+            return dbResponse.data;
         });
 
         const dataForEachSegment = await Promise.all(promises);
-        return [].concat.apply([], dataForEachSegment);
+        const allData = [].concat.apply([], dataForEachSegment);
+        return this.formatter.format(allData);
     }
 }
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import axios from 'axios';
 
 import StandaloneGeneAnnotation from './StandaloneGeneAnnotation';
@@ -52,11 +53,7 @@ class IsoformSelection extends React.PureComponent {
     async getSuggestions(geneName) {
         const genomeConfig = this.props.genomeConfig;
         const response = await axios.get(`/${genomeConfig.genome.getName()}/refGene/${geneName}`);
-        const genes = response.data.map(record => {
-            let gene = new Gene(record);
-            gene.computeNavContextCoordinates(genomeConfig.navContext);
-            return gene;
-        });
+        const genes = response.data.map(record => new Gene(record));
         this.setState({isLoading: false, genes: genes});
     }
 
@@ -69,10 +66,11 @@ class IsoformSelection extends React.PureComponent {
     }
 
     renderSuggestions() {
-        const genes = this.state.genes;
+        const navContext = this.props.genomeConfig.navContext;
+        const genes = _.flatMap(this.state.genes, gene => gene.computeNavContextCoordinates(navContext));
         const leftmostStart = Math.min(...genes.map(gene => gene.absStart));
         const rightmostEnd = Math.max(...genes.map(gene => gene.absEnd));
-        const viewRegion = new DisplayedRegionModel(this.props.genomeConfig.navContext, leftmostStart, rightmostEnd);
+        const viewRegion = new DisplayedRegionModel(navContext, leftmostStart, rightmostEnd);
         const drawModel = new LinearDrawingModel(viewRegion, DRAW_WIDTH);
 
         const renderOneSuggestion = gene => (
@@ -86,7 +84,7 @@ class IsoformSelection extends React.PureComponent {
                 <td className="IsoformSelection-description"><GeneDescription gene={gene} /></td>
             </tr>
         );
-        
+
         return (
         <table className="IsoformSelection">
             <tbody>

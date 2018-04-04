@@ -13,6 +13,9 @@ import BarChart from '../BarChart';
 import { RenderTypes } from '../DesignRenderer';
 
 import BigWigSource from '../../dataSources/BigWigSource';
+import DataFormatter from '../../dataSources/DataFormatter';
+import { BarChartRecord } from '../../art/BarChartDesigner';
+import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 
 import './Tooltip.css';
@@ -21,6 +24,28 @@ const DEFAULT_HEIGHT = 35; // In pixels
 const TOP_PADDING = 5;
 const BAR_CHART_STYLE = {marginTop: TOP_PADDING};
 const DEFAULT_OPTIONS = {color: "blue"};
+
+
+/*
+Expected DASFeature schema
+
+interface DASFeature {
+    max: number; // Chromosome base number, end
+    maxScore: number;
+    min: number; // Chromosome base number, start
+    score: number; // Value at the location
+    segment: string; // Chromosome name
+    type: string;
+    _chromId: number
+}
+*/
+class BarChartFormatter extends DataFormatter {
+    format(data) {
+        return data.map(feature =>
+            new BarChartRecord(new ChromosomeInterval(feature.segment, feature.min, feature.max), feature.score)
+        );
+    }
+}
 
 /**
  * Visualizer for BigWig tracks.
@@ -117,7 +142,7 @@ function BigWigLegend(props) {
     const height = props.trackModel.options.height || DEFAULT_HEIGHT;
     let scale = null;
     if (props.data.length > 0) {
-        const dataMax = _.maxBy(props.data, record => record.value).value;
+        const dataMax = _.maxBy(props.data, 'value').value;
         scale = scaleLinear().domain([dataMax, 0]).range([0, height]);
     }
     return <TrackLegend
@@ -133,7 +158,7 @@ const BigWigTrack = {
     legend: BigWigLegend,
     menuItems: [PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: (trackModel) => new BigWigSource(trackModel.url),
+    getDataSource: (trackModel) => new BigWigSource(trackModel.url, new BarChartFormatter()),
 };
 
 export default BigWigTrack;

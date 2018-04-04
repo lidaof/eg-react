@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import GeneDescription from '../../GeneDescription';
-import { Gene } from '../../../model/Gene';
+import Gene from '../../../model/Gene';
 
 const STYLE = {
     width: 250,
