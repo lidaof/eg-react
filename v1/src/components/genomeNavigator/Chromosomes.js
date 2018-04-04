@@ -13,7 +13,6 @@ const TOP_PADDING = 5;
 const DEFAULT_LABEL_OFFSET = 70;
 const FEATURE_LABEL_SIZES = [16, 12, 8];
 
-// const CENTROMERE_COLOR = "rgb(141,64,52)";
 const CYTOBAND_COLORS = {
     'gneg': {bandColor: "white", textColor: "rgb(0,0,0)"},
     'gpos25': {bandColor: "rgb(180,180,180)", textColor: "rgb(0,0,0)"},
@@ -28,7 +27,7 @@ const CYTOBAND_COLORS = {
 };
 const CYTOBAND_LABEL_SIZE = 10;
 
-const MIN_BASE_WIDTH = 2; // Min number of pixels per base in order to draw them
+const MIN_DRAW_WIDTH = 1; // Min number of pixel width in order to draw
 const baseColors = {
     g: '#3899c7',
     c: '#e05144',
@@ -75,7 +74,7 @@ class Chromosomes extends React.PureComponent {
             return;
         }
         const drawModel = new LinearDrawingModel(props.viewRegion, props.width);
-        if (drawModel.basesToXWidth(1) > MIN_BASE_WIDTH) {
+        if (drawModel.basesToXWidth(1) > MIN_DRAW_WIDTH) {
             try {
                 const sequence = await this.twoBitSource.getData(props.viewRegion);
                 if (this.props.viewRegion === props.viewRegion) { // Check that when the data comes in, we still want it
@@ -96,7 +95,7 @@ class Chromosomes extends React.PureComponent {
     componentWillReceiveProps(nextProps) {
         if (this.props.viewRegion !== nextProps.viewRegion) {
             const drawModel = new LinearDrawingModel(nextProps.viewRegion, nextProps.width);
-            if (drawModel.basesToXWidth(1) > MIN_BASE_WIDTH) {
+            if (drawModel.basesToXWidth(1) > MIN_DRAW_WIDTH) {
                 const thisInterval = this.props.viewRegion.getAbsoluteRegion();
                 const nextInterval = nextProps.viewRegion.getAbsoluteRegion();
                 const diff = nextInterval.start - thisInterval.start;
@@ -112,35 +111,25 @@ class Chromosomes extends React.PureComponent {
     }
 
     /**
-     * Gets the cytoband elements to draw within a feature interval.
      * 
-     * @param {FeatureInterval} interval - FeatureInterval containing genetic locus for which to draw cytobands
-     * @param {LinearDrawingModel} drawModel - draw model to use
-     * @return {JSX.Element[]} cytoband elements
+     * @param {*} cytoband 
+     * @param {ChromosomeInterval} cytobandLocus 
+     * @param {LinearDrawingModel} drawModel 
      */
-    renderCytobandsInFeatureInterval(interval, drawModel) {
-        const {viewRegion, genomeConfig} = this.props;
-
-        const locus = interval.getGenomeCoordinates();
-        const cytobandsForChr = genomeConfig.cytobands[locus.chr] || [];
+    renderOneCytoband(cytoband, cytobandLocus, drawModel) {
+        const absIntervals = this.props.viewRegion.getNavigationContext().convertGenomeIntervalToBases(cytobandLocus);
         let children = [];
-        for (let cytoband of cytobandsForChr) {
-            const cytobandLocus = new ChromosomeInterval(cytoband.chrom, cytoband.chromStart, cytoband.chromEnd);
-            if (!cytobandLocus.getOverlap(locus)) {
-                continue;
-            }
-
-            // Abs interval of the cytoband in the navigation context
-            const absInterval = viewRegion.getNavigationContext().convertGenomeIntervalToBases(
-                cytobandLocus, interval.feature
-            );
+        for (let absInterval of absIntervals) {
             const startX = Math.max(0, drawModel.baseToX(absInterval.start));
             const endX = Math.min(drawModel.baseToX(absInterval.end), drawModel.getDrawWidth());
             const drawWidth = endX - startX;
             const colors = CYTOBAND_COLORS[cytoband.gieStain];
             const name = cytoband.name;
+            if (drawWidth < MIN_DRAW_WIDTH) {
+                continue;
+            }
 
-            if (drawWidth >= 1 && colors.bandColor !== "white") { // Cytoband rectangle
+            if (colors.bandColor !== "white") { // Cytoband rectangle
                 const isCentromere = cytoband.gieStain === 'acen';
                 if (isCentromere) { // Cover up the outside border
                     children.push(<rect
@@ -178,7 +167,25 @@ class Chromosomes extends React.PureComponent {
                 );
             }
         }
+        return children;
+    }
 
+    /**
+     * Gets the cytoband elements to draw within a genomic interval.
+     * 
+     * @param {ChromosomeInterval} locus - genetic locus for which to draw cytobands
+     * @param {LinearDrawingModel} drawModel - draw model to use
+     * @return {JSX.Element[]} cytoband elements
+     */
+    renderCytobandsInLocus(locus, drawModel) {
+        const cytobandsForChr = this.props.genomeConfig.cytobands[locus.chr] || [];
+        let children = [];
+        for (let cytoband of cytobandsForChr) {
+            const cytobandLocus = new ChromosomeInterval(cytoband.chrom, cytoband.chromStart, cytoband.chromEnd);
+            if (cytobandLocus.getOverlap(locus)) {
+                children.push(this.renderOneCytoband(cytoband, cytobandLocus, drawModel));
+            }
+        }
         return children;
     }
 
@@ -188,7 +195,7 @@ class Chromosomes extends React.PureComponent {
      * @return {JSX.Element[]} <svg> elements representing the sequence
      */
     renderSequence(drawModel) {
-        if (drawModel.basesToXWidth(1) < MIN_BASE_WIDTH) {
+        if (drawModel.basesToXWidth(1) < MIN_DRAW_WIDTH) {
             return [];
         }
 
@@ -241,12 +248,11 @@ class Chromosomes extends React.PureComponent {
      */
     render() {
         const {viewRegion, width, labelOffset} = this.props;
-        let children = [];
         const drawModel = new LinearDrawingModel(viewRegion, width);
 
-        const intervals = viewRegion.getFeatureIntervals();
+        let children = [];
         let x = 0;
-        for (let interval of intervals) {
+        for (let interval of viewRegion.getFeatureIntervals()) {
             const drawWidth = drawModel.basesToXWidth(interval.getLength());
             children.push(<rect // Box for feature
                 key={"rect" + x}
@@ -257,10 +263,6 @@ class Chromosomes extends React.PureComponent {
                 style={{stroke: "#000", fill: "#fff"}}
                 opacity="0.5"
             />);
-
-            if (drawModel.basesToXWidth(1) < MIN_BASE_WIDTH) {
-                children.push(...this.renderCytobandsInFeatureInterval(interval, drawModel));
-            }
 
             if (x > 0) { // Thick line at boundaries of each feature, except the first one
                 children.push(<line
@@ -289,6 +291,9 @@ class Chromosomes extends React.PureComponent {
             }
 
             x += drawWidth;
+        }
+        for (let locus of viewRegion.getGenomeIntervals()) {
+            children.push(this.renderCytobandsInLocus(locus, drawModel));
         }
         children.push(this.renderSequence(drawModel));
 

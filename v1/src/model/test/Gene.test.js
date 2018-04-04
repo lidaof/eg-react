@@ -46,16 +46,16 @@ test('getDetails() works correctly', () => {
     let instance = new Gene(RECORD);
     const genome = new Genome("toy genome", [
         new Chromosome("chr0 - just to add an offset of 10", OFFSET),
-        new Chromosome("chr1", CHR_LENGTH) // !!! Shorter than the Gene !!!  We expect some exons to be missing in this case.
+        new Chromosome("chr1", CHR_LENGTH) // !!! Shorter than the Gene !!!  We expect some exons to be missing.
     ]);
-    instance.computeNavContextCoordinates(genome.makeNavContext());
-    expect(instance.absStart).toBe(OFFSET);
-    expect(instance.absEnd).toBe(CHR_LENGTH + OFFSET);
-    expect(instance.absTranslated).toEqual([
+    let newInstance = instance.computeNavContextCoordinates(genome.makeNavContext())[0];
+    expect(newInstance.absStart).toBe(OFFSET);
+    expect(newInstance.absEnd).toBe(CHR_LENGTH + OFFSET);
+    expect(newInstance.absTranslated).toEqual([
         new OpenInterval(200 + OFFSET, 300 + OFFSET),
         new OpenInterval(400 + OFFSET, CHR_LENGTH + OFFSET)
     ]);
-    expect(instance.absUtrs).toEqual([
+    expect(newInstance.absUtrs).toEqual([
         new OpenInterval(OFFSET, 200 + OFFSET)
     ]);
 });

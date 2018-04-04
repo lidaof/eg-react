@@ -5,14 +5,13 @@ import axios from 'axios';
 import OpenInterval from './interval/OpenInterval';
 
 /**
- * A data container for gene annotations originating from hammock files.
+ * A data container for gene annotations.
  * 
- * @author Daofeng Li, modified from Silas Hsu's Gene component
+ * @author Daofeng Li and Silas Hsu
  */
-
-export class Gene extends Feature {
+class Gene extends Feature {
     /**
-     * Constructs a new Gene, given an entry from mongodb.  The other parameters calculate absolute
+     * Constructs a new Gene, given an entry from MongoDB.  The other parameters calculate absolute
      * coordinates.
     {
         "_id": "5a6a4edfc019c4d5b606c0e8",
@@ -36,19 +35,34 @@ export class Gene extends Feature {
      * @param {RefGeneRecord} record - refGeneRecord object to use
      */
     constructor(refGeneRecord) {
-        const location = new ChromosomeInterval(refGeneRecord.chrom, refGeneRecord.txStart, refGeneRecord.txEnd);
-        super(refGeneRecord.name2, location, refGeneRecord.strand === "+");
+        const locus = new ChromosomeInterval(refGeneRecord.chrom, refGeneRecord.txStart, refGeneRecord.txEnd);
+        super(refGeneRecord.name2, locus, refGeneRecord.strand === "+");
         this.refGeneRecord = refGeneRecord;
-        this._parseDetails();
+        this._translated = null;
+        this._utrs = null;
+    }
+
+    get translated() {
+        if (this._translated === null) {
+            this._parseDetails();
+        }
+        return this._translated;
+    }
+
+    get utrs() {
+        if (this._utrs === null) {
+            this._parseDetails();
+        }
+        return this._utrs;
     }
 
     /**
-     * Parses `this.refGeneRecord` and sets `this.translated` and `this.utrs`.
+     * Parses `this.refGeneRecord` and sets `this._translated` and `this._utrs`.
      */
     _parseDetails() {
         const {cdsStart, cdsEnd, exonStarts, exonEnds} = this.refGeneRecord;
-        this.translated = [];
-        this.utrs = [];
+        this._translated = [];
+        this._utrs = [];
         if ([cdsStart, cdsEnd, exonStarts, exonEnds].some(value => value == undefined)) { // eslint-disable-line eqeqeq
             return;
         }
@@ -62,18 +76,18 @@ export class Gene extends Feature {
         for (let exon of exons) { // Get UTRs and translated exons from the raw record
             const codingOverlap = codingInterval.getOverlap(exon);
             if (codingOverlap) {
-                this.translated.push(codingOverlap);
+                this._translated.push(codingOverlap);
 
                 if (exon.start < codingOverlap.start) { // 5' UTR
-                    this.utrs.push(new OpenInterval(exon.start, codingOverlap.start));
+                    this._utrs.push(new OpenInterval(exon.start, codingOverlap.start));
                 }
                 if (codingOverlap.end < exon.end) { // 3' UTR
-                    this.utrs.push(new OpenInterval(codingOverlap.end, exon.end));
+                    this._utrs.push(new OpenInterval(codingOverlap.end, exon.end));
                 }
             } else {
                  // If the length of the coding interval is 0 (i.e. a pseudogene), there will be no overlap and all the
                  // exons will be interpreted as untranslated.
-                 this.utrs.push(exon);
+                 this._utrs.push(exon);
             }
         }
     }
@@ -90,67 +104,34 @@ export class Gene extends Feature {
     }
 
     /**
-     * Calculates absolute coordinates of the gene body and exons.  Mutates this object by setting absStart, absEnd,
-     * absTranslated, and absUtrs.
+     * Calculates absolute coordinates of the gene body and exons.  Returns shallow copies of this instance for each
+     * location in the navigation context.  The copies will contain additional props `absStart`, `absEnd`,
+     * `absTranslated`, and `absUtrs`.
      * 
      * @param {NavigationContext} navContext - context with which to calculate absolute base numbers
-     * @param {string | Feature | FeatureInterval} [targetFeature] - target location in context to map to
-     * @throws {RangeError} if this instance is not in the navigation context
+     * @return {Gene[]} shallow copies with additional props containing absolute base numbers
      */
-    computeNavContextCoordinates(navContext, targetFeature) {
-        const chr = this.getLocus().chr;
-        const absInterval = navContext.convertGenomeIntervalToBases(this.getLocus(), targetFeature);
-        
-        this.absStart = absInterval.start;
-        this.absEnd = absInterval.end;
-        this.absTranslated = [];
-        this.absUtrs = [];
+    computeNavContextCoordinates(navContext) {
+        const locusStart = this.getLocus().start;
+        const absLocations = navContext.convertGenomeIntervalToBases(this.getLocus());
+        let results = [];
+        for (let absLocation of absLocations) {
+            let clone = _.clone(this);
+            clone.absStart = absLocation.start;
+            clone.absEnd = absLocation.end;
 
-        const safePush = function(array, exon) {
-            try {
-                array.push(
-                    navContext.convertGenomeIntervalToBases(new ChromosomeInterval(chr, ...exon), targetFeature)
+            const computeInternalInterval = function(interval) {
+                const startDistFromLocus = interval.start - locusStart;
+                const endDistFromLocus = interval.end - locusStart;
+                return absLocation.getOverlap(
+                    new OpenInterval(absLocation.start + startDistFromLocus, absLocation.start + endDistFromLocus)
                 );
-            } catch (error) { // Ignore RangeErrors from convertGenomeIntervalToBases; let others bubble up.
-                if (!error instanceof RangeError) {
-                    throw error;
-                }
-            }
+            };
+            clone.absTranslated = clone.translated.map(computeInternalInterval).filter(interval => interval != null);
+            clone.absUtrs = clone.utrs.map(computeInternalInterval).filter(interval => interval != null);
+            results.push(clone);
         }
-
-        for (let exon of this.translated) {
-            safePush(this.absTranslated, exon);
-        }
-
-        for (let utr of this.utrs) {
-            safePush(this.absUtrs, utr);
-        }
-    }
-}
-
-/**
- * Turns BedRecords into Genes.
- * 
- * @author Silas Hsu
- */
-export class GeneFormatter {
-    /**
-     * Turns dbRecords into Genes.  The second and third parameters exist to assist mapping to a navigation context.
-     * Genes that fail mapping will be ignored and skipped.
-     * 
-     * @param {refGeneRecords[]} refGeneRecords - the records to convert
-     * @param {DisplayedRegionModel} region - object containing navigation context and view region
-     * @param {FeatureInterval} feature - feature in navigation context to map to
-     * @return {Gene[]} array of Gene
-     */
-    format(records, region, featureInterval) {
-        let genes = [];
-        for (let record of records) {
-            const gene = new Gene(record);
-            gene.computeNavContextCoordinates(region.getNavigationContext(), featureInterval.feature);
-            genes.push(gene);
-        }
-        return genes;
+        return results;
     }
 }
 

@@ -1,4 +1,5 @@
 import OpenInterval from './OpenInterval';
+import _ from 'lodash';
 
 /**
  * Basically an OpenInterval with a chromosome's name.  Expresses genomic coordinates.
@@ -24,6 +25,36 @@ class ChromosomeInterval {
         } else {
             throw new RangeError("Could not parse interval");
         }
+    }
+
+    /**
+     * Merges all intervals that overlap.  Does not mutate any inputs.
+     * 
+     * @param {ChromosomeInterval[]} intervals - interval list to inspect for overlaps
+     * @return {ChromosomeInterval[]} - version of input list with overlapping intervals merged
+     */
+    static mergeOverlaps(intervals) {
+        const groupedByChr = _.groupBy(intervals, 'chr');
+        let allMerged = [];
+        for (let chr in groupedByChr) { // Merge intervals by chromosome
+            const sorted = groupedByChr[chr].sort((a, b) => a.start - b.start); // Sorted by smallest start first
+            let merged = [ sorted[0] ]; // Init with the first interval
+            for (let i = 1; i < sorted.length; i++) {
+                const prevInterval = merged[merged.length - 1];
+                const currInterval = sorted[i];
+                if (prevInterval.end < currInterval.start) { // No overlap
+                    merged.push(currInterval);
+                } else if (prevInterval.end < currInterval.end) { // Overlap, and ends after the previous interval's end
+                    // Replace prevInterval with an extended version
+                    merged[merged.length - 1] = new ChromosomeInterval(chr, prevInterval.start, currInterval.end);
+                }
+            }
+
+            for (let interval of merged) {
+                allMerged.push(interval);
+            }
+        }
+        return allMerged;
     }
 
     /**

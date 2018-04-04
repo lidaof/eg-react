@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Gene } from '../model/Gene';
+import Gene from '../model/Gene';
 import withCurrentGenome from './withCurrentGenome';
 
 /**

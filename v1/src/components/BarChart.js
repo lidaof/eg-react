@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import DesignRenderer from './DesignRenderer';
 import BarChartDesigner from '../art/BarChartDesigner';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import LinearDrawingModel from '../model/LinearDrawingModel';
 import { getRelativeCoordinates } from '../util';
 
 /**
@@ -46,7 +45,6 @@ class BarChart extends React.PureComponent {
     constructor(props) {
         super(props);
         this.mouseMoved = this.mouseMoved.bind(this);
-        this.makeXToDataMap = this.makeXToDataMap.bind(this);
         this.xToData = [];
     }
 
@@ -57,25 +55,8 @@ class BarChart extends React.PureComponent {
      */
     mouseMoved(event) {
         const coords = getRelativeCoordinates(event);
-        const record = this.xToData[coords.x] || null;
+        const record = this.xToData[Math.round(coords.x)] || null;
         this.props.onRecordHover(event, record);
-    }
-
-    /**
-     * Makes a map from x coordinates to the max record at the coordinate.  Sets this.xToData.
-     */
-    makeXToDataMap() {
-        const {viewRegion, width, data} = this.props;
-        const drawModel = new LinearDrawingModel(viewRegion, width);
-
-        this.xToData = [];
-        data.forEach(record => {
-            const x = Math.round(drawModel.baseToX(record.start));
-            const existingRecord = this.xToData[x];
-            if (!existingRecord || record.value > existingRecord.value) {
-                this.xToData[x] = record;
-            }
-        });
     }
 
     /**
@@ -83,8 +64,9 @@ class BarChart extends React.PureComponent {
      */
     render() {
         const {viewRegion, data, width, height, options, style, type, onMouseLeave} = this.props;
-        this.makeXToDataMap();
-        const design = new BarChartDesigner(viewRegion, data, width, height, options).design();
+        const designer = new BarChartDesigner(viewRegion, data, width, height, options);
+        const design = designer.design();
+        this.xToData = designer.getCoordinateMap();
         return (
         <DesignRenderer
             type={type}

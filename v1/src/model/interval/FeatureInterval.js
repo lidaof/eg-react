@@ -29,10 +29,10 @@ class FeatureInterval {
         this.relativeEnd = end;
 
         if (!this.isValidBase(start)) {
-            throw new RangeError(`Start base ${start} not in feature`);
+            throw new RangeError(`Start base ${start} not in feature ${feature.getName()}`);
         }
         if (!this.isValidBase(end)) {
-            throw new RangeError(`End base ${end} not in feature`);
+            throw new RangeError(`End base ${end} not in feature ${feature.getName()}`);
         }
     }
 
