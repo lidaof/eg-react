@@ -71,6 +71,9 @@ class CanvasDesignRenderer extends React.PureComponent {
         context.clearRect(0, 0, this.canvasNode.width, this.canvasNode.height); // Clear the canvas
 
         this.props.children.forEach(element => {
+            if (!element) {
+                return; // Do nothing
+            }
             const props = element.props;
             switch (element.type) {
                 case 'rect':

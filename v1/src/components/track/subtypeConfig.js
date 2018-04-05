@@ -11,7 +11,7 @@ const TYPE_NAME_TO_SUBTYPE = {
     "ruler": RulerTrack,
     "bigwig": BigWigTrack,
     "hammock": GeneAnnotationTrack,
-    "rmsk": RmskTrack
+    //"rmsk": RmskTrack
 };
 
 /**

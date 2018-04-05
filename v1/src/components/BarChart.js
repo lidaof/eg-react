@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types';
 
 import DesignRenderer from './DesignRenderer';
-import BarChartDesigner from '../art/BarChartDesigner';
+import { BarPlotDesigner, BarElementFactory, SimpleBarElementFactory } from '../art/BarPlotDesigner';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { getRelativeCoordinates } from '../util';
 
@@ -17,7 +17,7 @@ class BarChart extends React.PureComponent {
         data: PropTypes.arrayOf(PropTypes.object).isRequired, // The data to display.  Array of BarChartRecord.
         width: PropTypes.number.isRequired, // Graphic width
         height: PropTypes.number.isRequired, // Graphic height
-        options: PropTypes.object, // Drawing options.  Will be passed to BarChartDesigner.
+        elementFactory: PropTypes.instanceOf(BarElementFactory), // Drawing customizations
         style: PropTypes.object, // CSS
         type: PropTypes.number, // Render element type.  See DesignRenderer.js
 
@@ -63,9 +63,10 @@ class BarChart extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {viewRegion, data, width, height, options, style, type, onMouseLeave} = this.props;
-        const designer = new BarChartDesigner(viewRegion, data, width, height, options);
-        const design = designer.design();
+        const {viewRegion, data, width, height, style, type, onMouseLeave} = this.props;
+        const elementFactory = this.props.elementFactory || new SimpleBarElementFactory(height);
+        const designer = new BarPlotDesigner(viewRegion, width, elementFactory);
+        const design = designer.design(data);
         this.xToData = designer.getCoordinateMap();
         return (
         <DesignRenderer

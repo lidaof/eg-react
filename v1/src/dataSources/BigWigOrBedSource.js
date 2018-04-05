@@ -1,24 +1,26 @@
 import DataSource from './DataSource';
-import ChromosomeInterval from '../model/interval/ChromosomeInterval';
-
+import DataFormatter from './DataFormatter';
 const bigwig = require('../vendor/bbi-js/main/bigwig');
 const bin = require('../vendor/bbi-js/utils/bin');
 
 /**
- * Reads and gets data from BigWig files hosted remotely.
+ * Reads and gets data from bigwig or bigbed files hosted remotely.  Gets DASFeature records, which vary in schema
+ * depending on the file.
  * 
  * @author Silas Hsu
  */
-class BigWigOrBedSource extends DataSource {
+export class BigWigOrBedSource extends DataSource {
     /**
-     * Prepares to fetch BigWig data from a URL.
+     * Prepares to fetch bigwig or bigbed data from a URL.  Fetching data returns DASFeature, unless given some data
+     * formatter.
      * 
      * @param {string} url - the URL from which to fetch data
+     * @param {DataFormatter} [formatter] - converter of data to some other format
      */
-    constructor(url, dasFormatter=new DasFormatter()) {
+    constructor(url, formatter=new DataFormatter()) {
         super();
         this.url = url;
-        this.dasFormatter = dasFormatter;
+        this.formatter = formatter;
         this.bigWigPromise = new Promise((resolve, reject) => {
             bigwig.makeBwg(new bin.URLFetchable(url), (bigWigObj, error) => {
                 if (error) {
@@ -29,37 +31,26 @@ class BigWigOrBedSource extends DataSource {
         });
     }
 
-
-
     /**
      * Gets BigWig features inside the input view region.  Resolution is configured by `options`, or if missing, by
      * `window.innerWidth`.  Returns objects that fulfill the Interval interface, and have a `value` property as well.
      * 
      * @param {DisplayedRegionModel} region - the model containing the displayed region
      * @param {Object} [options] - object containing a `width` property used to determine fetch resolution
-     * @return {Promise<Object[]>} a Promise for the data
+     * @return {Promise<Record[]>} a Promise for the data
      * @override
      */
     async getData(region, options={}) {
         const bigWigObj = await this.bigWigPromise;
-
-        const navContext = region.getNavigationContext();
         const basesPerPixel = region.getWidth() / (options.width || window.innerWidth + 1); // +1 to prevent 0
         const zoomLevel = this._getMatchingZoomLevel(bigWigObj, basesPerPixel);
-        let promises = region.getFeatureIntervals().map(async featureInterval => {
-            const chrInterval = featureInterval.getGenomeCoordinates();
-            const dasFeatures = await this._getDataForChromosome(chrInterval, bigWigObj, zoomLevel);
-            let result = [];
-            for (let dasFeature of dasFeatures) {
-                const formatted = this.dasFormatter.format(dasFeature, navContext, featureInterval.feature);
-                if (formatted) {
-                    result.push(formatted);
-                }
-            }
-            return result;
-        });
-        let dataForEachSegment = await Promise.all(promises);
-        return [].concat.apply([], dataForEachSegment); // Combine all the data into one array
+
+        let promises = region.getGenomeIntervals().map(locus =>
+            this._getDataForChromosome(locus, bigWigObj, zoomLevel)
+        );
+        const dataForEachSegment = await Promise.all(promises);
+        const allData = [].concat.apply([], dataForEachSegment); // Combine all the data into one array
+        return this.formatter.format(allData);
     }
 
     /**
@@ -106,59 +97,3 @@ class BigWigOrBedSource extends DataSource {
 }
 
 export default BigWigOrBedSource;
-
-/*
-interface DASFeature {
-    max: number; // Chromosome base number, end
-    maxScore: number;
-    min: number; // Chromosome base number, start
-    score: number; // Value at the location
-    segment: string; // Chromosome name
-    type: string;
-    _chromId: number
-}
-*/
-
-
-class DasFormatter {
-    /**
-     * 
-     * @param {DASFeature} dasFeature 
-     * @param {NavigationContext} navContext 
-     * @param {Feature} contextFeature 
-     */
-    format(dasFeature, navContext, contextFeature) {
-        return dasFeature;
-    }
-}
-
-/**
- * An object that fulfills the Interval interface with an additional prop `score` that stores the value at the
- * coordinate.  The interval is an open 0-indexed one.
- * 
- * @typedef {OpenInterval} BigWigSource~Record
- * @property {number} start - inclusive start of the interval
- * @property {number} end - exclusive end of the interval
- * @property {number} value - the value of this interval
- */
-
-export class NumericalDasFormatter extends DasFormatter {
-
-    format(dasFeature, navContext, contextFeature) {
-        try { // ConvertGenomeIntervalToBases can throw RangeError.
-            let absInterval = navContext.convertGenomeIntervalToBases(
-                new ChromosomeInterval(dasFeature.segment, dasFeature.min, dasFeature.max), contextFeature
-            );
-            absInterval.value = dasFeature.score;
-            return absInterval
-        } catch (error) { // Ignore RangeErrors; let others bubble up.
-            if (!(error instanceof RangeError)) {
-                throw error;
-            }
-        }
-    }
-}
-
-export class RepeatDasFormatter extends DasFormatter {
-    
-}

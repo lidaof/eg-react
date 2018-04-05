@@ -2,17 +2,46 @@ import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import _ from 'lodash';
 
+const CLASS_TO_ID = {
+    "SINE": 1,
+    "SINE?": 1,
+    "LINE": 2,
+    "LINE?": 2,
+    "LTR": 3,
+    "LTR?": 3,
+    "DNA": 4,
+    "DNA?": 4,
+    "RC": 4,
+    "RC?": 4,
+    "Simple_repeat": 5,
+    "Satellite": 6,
+    "Satellite?": 6,
+    "Low_complexity": 7,
+    "RNA": 8,
+    "rRNA": 8,
+    "scRNA": 8,
+    "snRNA": 8,
+    "srpRNA": 8,
+    "tRNA": 8,
+    "ncRNA": 8,
+    "Other": 9,
+    "Unknown": 10,
+    "Unknown?": 10,
+    "Retroposon": 11,
+    "Retrotransposon": 11,
+    "ARTEFACT": 12,
+};
+
 /**
- * A data container for a rmsk record.
+ * A data container for a RepeatMasker record.
  * 
  * @author Daofeng Li
  */
-
-export class Rmsk extends Feature {
-    /**
-     * Constructs a new rmskRecord, given an entry dasFeature queried from bigBed.  
+class RepeatMaskerRecord extends Feature {
+    /*
+    Input DASFeature schema
     {
-       genoLeft: "-132404898"
+        genoLeft: "-132404898"
         label: "AT_rich"
         max: 26733765
         milliDel: "0"
@@ -31,7 +60,11 @@ export class Rmsk extends Feature {
         type: "bigbed"
         _chromId: 41
     }
-     * @param {rmskRecord} record - refGeneRecord object to use
+    */
+    /**
+     * Constructs a new rmskRecord, given a properly-structured DASFeature
+     *
+     * @param {DASFeature} record - DASFeature to use
      */
     constructor(rmskRecord) {
         const location = new ChromosomeInterval(rmskRecord.segment, rmskRecord.min, rmskRecord.max);
@@ -49,18 +82,6 @@ export class Rmsk extends Feature {
         this.oneMinusDivergence =  1 - this.divergence; 
     }
 
-    getLocus() {
-        return this._locus;
-    }
-    
-
-    /**
-     * display details when click a rmsk
-     */
-    getDescription() {
-        return this.name;
-    }
-
 }
 
-export default Rmsk;
+export default RepeatMaskerRecord;

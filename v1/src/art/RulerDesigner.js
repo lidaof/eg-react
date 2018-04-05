@@ -14,18 +14,18 @@ const COLOR = '#bbb';
  */
 export class RulerDesigner {
     /**
-     * Configures a new instance.  What components the design() method returns depends on the passed
-     * RulerComponentFactory.  There is a default RulerComponentFactory implementation; see those docs to find out what
+     * Configures a new instance.  What elements the design() method returns depends on the passed
+     * RulerElementFactory.  There is a default RulerElementFactory implementation; see those docs to find out what
      * it returns.
      * 
      * @param {DisplayedRegionModel} viewRegion - region to visualize
      * @param {number} width - width of the ruler
-     * @param {RulerComponentFactory} [rulerComponentFactory] - component generator
+     * @param {RulerElementFactory} [rulerElementFactory] - element generator
      */
-    constructor(viewRegion, width, rulerComponentFactory=new RulerComponentFactory()) {
+    constructor(viewRegion, width, rulerElementFactory=new RulerElementFactory()) {
         this._viewRegion = viewRegion;
         this._drawModel = new LinearDrawingModel(viewRegion, width);
-        this._componentFactory = rulerComponentFactory;
+        this._elementFactory = rulerElementFactory;
     }
 
     /**
@@ -61,7 +61,7 @@ export class RulerDesigner {
     }
 
     /**
-     * Designs the ruler.  Returns an array of anything, depending on the RulerComponentFactory configured when this
+     * Designs the ruler.  Returns an array of anything, depending on the RulerElementFactory configured when this
      * object was created.
      * 
      * @return {any[]} - ruler design
@@ -77,7 +77,7 @@ export class RulerDesigner {
 
         let children = [];
         // The horizontal line spanning the width of the ruler
-        children.push(this._componentFactory.mainLine(this._drawModel.getDrawWidth()));
+        children.push(this._elementFactory.mainLine(this._drawModel.getDrawWidth()));
 
         const intervals = this._viewRegion.getFeatureIntervals();
         for (let interval of intervals) {
@@ -91,9 +91,9 @@ export class RulerDesigner {
             // Draw major and minor ticks for this region (chromosome)
             while (majorX < majorTickEndX) {
                 // Major ticks
-                children.push(this._componentFactory.majorTick(majorX));
+                children.push(this._elementFactory.majorTick(majorX));
                 if (relativeBase > 0) {
-                    children.push(this._componentFactory.majorTickText(majorX, relativeBase / unit.size + unit.name));
+                    children.push(this._elementFactory.majorTickText(majorX, relativeBase / unit.size + unit.name));
                 }
 
                 // Minor ticks
@@ -101,8 +101,8 @@ export class RulerDesigner {
                 let minorTickEndX = Math.min(majorX + pixelsPerMajorTick, majorTickEndX);
                 let minorBase = relativeBase + basesPerMinorTick;
                 while (minorX < minorTickEndX) {
-                    children.push(this._componentFactory.minorTick(minorX));
-                    children.push(this._componentFactory.minorTickText(minorX, minorBase / unit.size));
+                    children.push(this._elementFactory.minorTick(minorX));
+                    children.push(this._elementFactory.minorTickText(minorX, minorBase / unit.size));
                     minorBase += basesPerMinorTick;
                     minorX += pixelsPerMinorTick;
                 }
@@ -118,14 +118,14 @@ export class RulerDesigner {
 }
 
 /**
- * A generator of components for a Ruler design.  Allows customization of RulerDesigners.  The default implementation
- * returns React components that are valid <svg> elements.
+ * A generator of elements for a Ruler design.  Allows customization of RulerDesigners.  The default implementation
+ * returns React elements that are valid <svg> elements.
  * 
  * @author Silas Hsu
  */
-export class RulerComponentFactory {
+export class RulerElementFactory {
     /**
-     * Configures a new instance that returns React components that are valid <svg> elements.
+     * Configures a new instance that returns React elements that are valid <svg> elements.
      * 
      * @param {string} color - color of the elements
      * @param {number} majorTickHeight - height of major ticks.  Minor ticks will be half this height.
@@ -136,47 +136,52 @@ export class RulerComponentFactory {
     }
 
     /**
-     * Creates a component that represents a line that spans the entire width of the ruler.
+     * Creates a element that represents a line that spans the entire width of the ruler.
      * 
      * @param {number} width - width of the ruler
+     * @return {JSX.Element} 
      */
     mainLine(width) {
         return <line key="mainLine" x1={0} y1={0} x2={width} y2={0} stroke={this.color} strokeWidth={1} />;
     }
 
     /**
-     * Creates a component that represents a major tick of the ruler.
+     * Creates a element that represents a major tick of the ruler.
      * 
      * @param {number} x - x coordinate of the tick
+     * @return {JSX.Element} 
      */
     majorTick(x) {
         return <line key={x} x1={x} y1={-this.majorTickHeight} x2={x} y2={0} stroke={this.color} strokeWidth={2} />;
     }
 
     /**
-     * Creates a component that labels a major tick of the ruler.
+     * Creates a element that labels a major tick of the ruler.
      * 
      * @param {number} x - x coordinate of the tick
      * @param {string} text - label for the tick
+     * @return {JSX.Element} 
      */
     majorTickText(x, text) {
         return <text key={"text" + x}  x={x} y={20} style={{textAnchor: "middle"}} >{text}</text>;
     }
 
     /**
-     * Creates a component that represents minor tick of the ruler.
+     * Creates a element that represents minor tick of the ruler.
      * 
      * @param {number} x - x coordinate of the tick
+     * @return {JSX.Element} 
      */
     minorTick(x) {
         return <line key={x} x1={x} y1={-this.majorTickHeight / 2} x2={x} y2={0} stroke={this.color} strokeWidth={1} />;
     }
 
     /**
-     * Creates a component that labels a minor tick of the ruler.
+     * Creates a element that labels a minor tick of the ruler.
      * 
      * @param {number} x - x coordinate of the tick
      * @param {string} text - label for the tick
+     * @return {JSX.Element}
      */
     minorTickText(x, text) {
         return null;

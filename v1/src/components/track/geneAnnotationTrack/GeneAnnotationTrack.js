@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import AnnotationArranger from './AnnotationArranger';
 import GeneDetail from './GeneDetail';
@@ -7,7 +6,6 @@ import GeneDetail from './GeneDetail';
 import { VISUALIZER_PROP_TYPES } from '../Track';
 import Tooltip from '../Tooltip';
 import TrackLegend from '../TrackLegend';
-import withDefaultOptions from '../withDefaultOptions';
 
 import NumberConfig from '../contextMenu/NumberConfig';
 import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorConfig';
@@ -38,9 +36,7 @@ class GeneFormatter extends DataFormatter {
  * @author Silas Hsu
  */
 class GeneAnnotationVisualizer extends React.PureComponent {
-    static propTypes = Object.assign({}, VISUALIZER_PROP_TYPES, {
-        options: PropTypes.object // Drawing options
-    });
+    static propTypes = VISUALIZER_PROP_TYPES;
 
     constructor(props) {
         super(props);
@@ -107,7 +103,7 @@ function NumRowsConfig(props) {
 }
 
 const GeneAnnotationTrack = {
-    visualizer: withDefaultOptions(GeneAnnotationVisualizer, DEFAULT_OPTIONS),
+    visualizer: GeneAnnotationVisualizer,
     legend: GeneAnnotationLegend,
     menuItems: [NumRowsConfig, PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
