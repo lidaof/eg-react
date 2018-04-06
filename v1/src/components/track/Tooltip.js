@@ -45,9 +45,25 @@ class Tooltip extends React.PureComponent {
     };
 
     /**
+     * @return {boolean} true if `props.children` will render something
+     */
+    willRenderChildren() {
+        let hasContent = false;
+        React.Children.forEach(this.props.children, child => {
+            if (child !== null) {
+                hasContent = true;
+            }
+        });
+        return hasContent;
+    }
+
+    /**
      * @inheritdoc
      */
     render() {
+        if (!this.willRenderChildren()) {
+            return null;
+        }
         const {pageX, pageY, onClose, ignoreMouse, style, children} = this.props;
         const contentStyle = Object.assign({
             zIndex: 1,

@@ -1,8 +1,6 @@
-import React from 'react';
 import _ from 'lodash';
-import { scaleLinear } from 'd3-scale'
+import BarElementFactory from './BarElementFactory';
 import LinearDrawingModel from '../model/LinearDrawingModel';
-
 
 /**
  * Data that BarPlotDesigner needs.
@@ -29,7 +27,9 @@ export class BarPlotRecord {
 }
 
 /**
- * A designer of horizontal bar plots.
+ * A designer of horizontal bar plots.  In addition to that, one can also retrieve a mapping from x coordinate to a
+ * record at that location.  Currently only does a one-to-one mapping; if records overlap, the map will only get one
+ * of them.
  * 
  * @author Silas Hsu
  */
@@ -80,9 +80,9 @@ export class BarPlotDesigner {
     }
 
     /**
-     * Returns a mapping from x coordinate to BarChartRecord, created by the most recent call to design().
+     * Returns a mapping from x coordinate to BarPlotRecord, which was created by the most recent call to design().
      * 
-     * @return {Object} mapping from x coordinate to BarChartRecord
+     * @return {Object} mapping from x coordinate to BarPlotRecord
      */
     getCoordinateMap() {
         return this._xToDataMap;
@@ -91,9 +91,9 @@ export class BarPlotDesigner {
     /**
      * When designing the visualization, updates the coordinate map.
      * 
-     * @param {number} xStart - 
-     * @param {number} xWidth 
-     * @param {BarPlotRecord} record 
+     * @param {number} xStart - start coordinate of the record
+     * @param {number} xWidth - width the record occupies
+     * @param {BarPlotRecord} record - the actual record to store in the coordinate map
      */
     _addToCoordinateMap(xStart, xWidth, record) {
         const xEnd = xStart + xWidth
@@ -107,35 +107,3 @@ export class BarPlotDesigner {
 }
 
 export default BarPlotDesigner;
-
-export class BarElementFactory {
-    setDataMinMax(min, max) {
-
-    }
-
-    drawOneRecord(record, x, width) {
-
-    }
-}
-
-export class SimpleBarElementFactory extends BarElementFactory {
-    constructor(height, options) {
-        super();
-        this._height = height;
-        this._options = options || {};
-        this._valueToHeight = null;
-    }
-
-    setDataMinMax(min, max) {
-        this._valueToHeight = scaleLinear().domain([min, max]).range([0, this._height]);
-    }
-
-    drawOneRecord(record, x, width) {
-        const drawHeight = this._valueToHeight(record.getValue());
-        if (drawHeight === 0) {
-            return null;
-        }
-        const y = this._height - drawHeight;
-        return <rect key={x} x={x} y={y} width={width} height={drawHeight} fill={this._options.color} />;
-    }
-}

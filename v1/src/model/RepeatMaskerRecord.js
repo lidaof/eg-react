@@ -32,12 +32,44 @@ const CLASS_TO_ID = {
     "ARTEFACT": 12,
 };
 
+const CLASS_ID_TO_DETAILS = {
+    1: "SINE - short interspersed nuclear elements",
+    2: "LINE - long interspersed nuclear element",
+    3: "LTR - long terminal repeat element",
+    4: "DNA transposon",
+    5: "Simple repeat, micro-satellite",
+    6: "Satellite repeat",
+    7: "Low complexity repeat",
+    8: "RNA repeat",
+    9: "Other repeats",
+    10: "Unknown",
+    11: "Retroposon",
+    12: "ARTEFACT",
+};
+
+const DEFAULT_CLASS_COLORS = {
+    1: "#CC0000",
+    2: "#FF6600",
+    3: "#006600",
+    4: "#4A72E8",
+    5: "#AB833B",
+    6: "#660000",
+    7: "#663333",
+    8: "#CC33FF",
+    9: "#488E8E",
+    10: "#5C5C5C",
+    11: "#EA53C4",
+    12: "#00FFAA",
+};
+
 /**
  * A data container for a RepeatMasker record.
  * 
  * @author Daofeng Li
  */
 class RepeatMaskerRecord extends Feature {
+    static DEFAULT_CLASS_COLORS = DEFAULT_CLASS_COLORS;
+
     /*
     Input DASFeature schema
     {
@@ -67,8 +99,8 @@ class RepeatMaskerRecord extends Feature {
      * @param {DASFeature} record - DASFeature to use
      */
     constructor(rmskRecord) {
-        const location = new ChromosomeInterval(rmskRecord.segment, rmskRecord.min, rmskRecord.max);
-        super(rmskRecord.label, location, rmskRecord.orientation === "+");
+        const locus = new ChromosomeInterval(rmskRecord.segment, rmskRecord.min, rmskRecord.max);
+        super(rmskRecord.label, locus, rmskRecord.orientation === "+");
         this.repClass = rmskRecord.repClass;
         this.repFamily = rmskRecord.repFamily;
         this.swScore = Number.parseInt(rmskRecord.swScore, 10);
@@ -82,6 +114,26 @@ class RepeatMaskerRecord extends Feature {
         this.oneMinusDivergence =  1 - this.divergence; 
     }
 
+    /**
+     * @return {number} the 1 - divergence% value
+     */
+    getValue() {
+        return 1 - this.divergence;
+    }
+
+    /**
+     * @return {number} the repeat class ID
+     */
+    getCategoryId() {
+        return CLASS_TO_ID[this.repClass];
+    }
+
+    /**
+     * @return {string} human-readable description of the repeat class
+     */
+    getClassDetails() {
+        return CLASS_ID_TO_DETAILS[this.getCategoryId()] || "???";
+    }
 }
 
 export default RepeatMaskerRecord;

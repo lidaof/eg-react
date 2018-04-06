@@ -1,13 +1,11 @@
 import React from 'react';
 
 import { VISUALIZER_PROP_TYPES } from './Track';
+import HoverTooltipContext from './HoverTooltipContext';
 import Chromosomes from '../genomeNavigator/Chromosomes';
 import Ruler from '../genomeNavigator/Ruler';
-import Tooltip from './Tooltip';
 import GenomicCoordinates from './GenomicCoordinates';
 import TrackLegend from './TrackLegend';
-
-import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 
 const CHROMOSOMES_Y = 60;
 const RULER_Y = 20;
@@ -24,43 +22,19 @@ class RulerVisualizer extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            tooltip: null
-        };
-        this.showTooltip = this.showTooltip.bind(this);
-        this.closeTooltip = this.closeTooltip.bind(this);
+        this.getTooltipContents = this.getTooltipContents.bind(this);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
         return (
             this.props.viewRegion !== nextProps.viewRegion ||
-            this.props.width !== nextProps.width ||
-            this.state.tooltip !== nextState.tooltip
+            this.props.width !== nextProps.width
         );
     }
 
-    /**
-     * Sets state to show a tooltip displaying genomic coordinates.
-     * 
-     * @param {MouseEvent} event - mouse event for positioning hints
-     */
-    showTooltip(event) {
+    getTooltipContents(relativeX) {
         const {viewRegion, width} = this.props;
-        const relativeX = getRelativeCoordinates(event).x;
-        const pageY = getPageCoordinates(event.currentTarget, 0, RULER_Y).y;
-        const tooltip = (
-            <Tooltip pageX={event.pageX} pageY={pageY} onClose={this.closeTooltip} ignoreMouse={true} >
-                <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
-            </Tooltip>
-        );
-        this.setState({tooltip: tooltip});
-    }
-
-    /**
-     * Sets state to stop showing any tooltips.
-     */
-    closeTooltip(event) {
-        this.setState({tooltip: null});
+        return <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />;
     }
 
     /**
@@ -69,14 +43,13 @@ class RulerVisualizer extends React.Component {
     render() {
         const {viewRegion, width} = this.props;
         return (
-        <div onMouseMove={this.showTooltip} onMouseLeave={this.closeTooltip}>
+        <HoverTooltipContext tooltipRelativeY={RULER_Y} getTooltipContents={this.getTooltipContents} >
             {/* display: block prevents svg from taking extra bottom space */ }
             <svg width={width} height={HEIGHT} style={{display: "block"}} >
                 <Chromosomes viewRegion={viewRegion} width={width} labelOffset={CHROMOSOMES_Y} />
                 <Ruler viewRegion={viewRegion} width={width} y={RULER_Y} />
             </svg>
-            {this.state.tooltip}
-        </div>
+        </HoverTooltipContext>
         );
     }
 }

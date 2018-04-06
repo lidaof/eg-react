@@ -15,10 +15,10 @@ const AXIS_WIDTH = 30;
  */
 class TrackLegend extends React.PureComponent {
     static propTypes = {
-        trackModel: PropTypes.instanceOf(TrackModel).isRequired,
-        height: PropTypes.number.isRequired,
-        scaleForAxis: PropTypes.func,
-        style: PropTypes.object,
+        trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
+        height: PropTypes.number.isRequired, // Height of the legend
+        scaleForAxis: PropTypes.func, // A d3 scale function, used for drawing axes
+        style: PropTypes.object, // CSS
     };
 
     static WIDTH = 120;

@@ -1,20 +1,17 @@
 import React from 'react';
-import _ from 'lodash';
-import { scaleLinear } from 'd3-scale';
 
 import { VISUALIZER_PROP_TYPES } from './Track';
-import TrackLegend from './TrackLegend';
-import Tooltip from './Tooltip';
 import GenomicCoordinates from './GenomicCoordinates';
+import BarPlot from './BarPlot';
 import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorConfig';
-import BarChart from '../BarChart';
-import { RenderTypes } from '../DesignRenderer';
+import NumericalLegend from './NumericalLegend';
 
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
 import DataFormatter from '../../dataSources/DataFormatter';
-import { BarPlotRecord, SimpleBarElementFactory } from '../../art/BarPlotDesigner';
+import { RenderTypes } from '../../art/DesignRenderer';
+import { BarPlotRecord } from '../../art/BarPlotDesigner';
+import { SimpleBarElementFactory } from '../../art/BarElementFactory';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
-import { getRelativeCoordinates, getPageCoordinates } from '../../util';
 
 import './Tooltip.css';
 
@@ -38,7 +35,7 @@ interface DASFeature {
     _chromId: number
 }
 */
-class BarChartFormatter extends DataFormatter {
+class BarPlotFormatter extends DataFormatter {
     format(data) {
         return data.map(feature =>
             new BarPlotRecord(new ChromosomeInterval(feature.segment, feature.min, feature.max), feature.score)
@@ -61,10 +58,8 @@ class BigWigVisualizer extends React.PureComponent {
         super(props);
         this.state = {
             elementFactory: new SimpleBarElementFactory(props.options.height, props.options),
-            tooltip: null
         };
-        this.showTooltip = this.showTooltip.bind(this);
-        this.closeTooltip = this.closeTooltip.bind(this);
+        this.getTooltipContents = this.getTooltipContents.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -73,35 +68,18 @@ class BigWigVisualizer extends React.PureComponent {
         }
     }
 
-    /**
-     * Sets state to show a tooltip displaying a record's details.
-     * 
-     * @param {MouseEvent} event - mouse event for positioning hints
-     * @param {BarChartRecord} record - record whose details to display
-     */
-    showTooltip(event, record) {
-        const {viewRegion, width, trackModel, options} = this.props;
+    getTooltipContents(relativeX, record) {
+        const {viewRegion, width, trackModel} = this.props;
         const recordValue = record ? record.value.toFixed(2) : '(no data)';
-        const relativeX = getRelativeCoordinates(event).x;
-        const pageY = getPageCoordinates(event.currentTarget, 0, options.height).y;
-        const tooltip = (
-            <Tooltip pageX={event.pageX} pageY={pageY} style={{padding: '0px 5px 5px'}} onClose={this.closeTooltip} >
-                <p className="Tooltip-major-text" >{recordValue}</p>
-                <p className="Tooltip-minor-text" >
-                    <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
-                    <br/>
-                    {trackModel.getDisplayLabel()}
-                </p>
-            </Tooltip>
+        return (
+        <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
+            <li className="Tooltip-major-text" >{recordValue}</li>
+            <li className="Tooltip-minor-text" >
+                <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
+            </li>
+            <li className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</li>
+        </ul>
         );
-        this.setState({tooltip: tooltip});
-    }
-
-    /**
-     * Sets state to stop showing any tooltips.
-     */
-    closeTooltip() {
-        this.setState({tooltip: null});
     }
 
     /** 
@@ -110,20 +88,16 @@ class BigWigVisualizer extends React.PureComponent {
     render() {
         const {data, viewRegion, width, options} = this.props;
         return (
-        <React.Fragment>
-            <BarChart
-                viewRegion={viewRegion}
-                data={data}
-                width={width}
-                height={options.height}
-                elementFactory={this.state.elementFactory}
-                style={BAR_CHART_STYLE}
-                type={RenderTypes.CANVAS}
-                onRecordHover={this.showTooltip}
-                onMouseLeave={this.closeTooltip}
-            />
-            {this.state.tooltip}
-        </React.Fragment>
+        <BarPlot
+            viewRegion={viewRegion}
+            data={data}
+            width={width}
+            height={options.height}
+            elementFactory={this.state.elementFactory}
+            style={BAR_CHART_STYLE}
+            type={RenderTypes.CANVAS}
+            getTooltipContents={this.getTooltipContents}
+        />
         );
     }
 }
@@ -136,17 +110,12 @@ class BigWigVisualizer extends React.PureComponent {
  * @author Silas Hsu
  */
 function BigWigLegend(props) {
-    const height = props.options.height;
-    let scale = null;
-    if (props.data.length > 0) {
-        const dataMax = _.maxBy(props.data, 'value').value;
-        scale = scaleLinear().domain([dataMax, 0]).range([0, height]);
-    }
-    return <TrackLegend
+    return <NumericalLegend
         trackModel={props.trackModel}
-        height={height}
-        scaleForAxis={scale}
-        style={{paddingTop: TOP_PADDING}}
+        height={props.options.height + TOP_PADDING}
+        data={props.data}
+        getDataValue={record => record.getValue()}
+        topPadding={TOP_PADDING}
     />;
 }
 
@@ -155,7 +124,7 @@ const BigWigTrack = {
     legend: BigWigLegend,
     menuItems: [PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: (trackModel) => new BigWigOrBedSource(trackModel.url, new BarChartFormatter()),
+    getDataSource: (trackModel) => new BigWigOrBedSource(trackModel.url, new BarPlotFormatter()),
 };
 
 export default BigWigTrack;
