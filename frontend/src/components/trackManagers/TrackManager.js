@@ -2,8 +2,31 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import AnnotationTrackSelector from './AnnotationTrackSelector';
 import HubPane from './HubPane'
+import CustomTrackAdder from './CustomTrackAdder';
 
 import './TrackManager.css';
+
+/**
+ * A complete specification for a submenu.
+ * 
+ * @typedef {Object} Submenu
+ * @property {string} buttonText - the text on the button that will toggle display of the submenu
+ * @property {React.Component} component - submenu componennt.  Will get all the props of the parent.
+ */
+const SUBMENUS = [
+    {
+        buttonText: "Annotation tracks...",
+        component: AnnotationTrackSelector,
+    },
+    {
+        buttonText: "Data hubs...",
+        component: HubPane,
+    },
+    {
+        buttonText: "Custom track...",
+        component: CustomTrackAdder,
+    },
+];
 
 /**
  * All the UI for managing tracks: adding them, deleting them, looking at what tracks are available, etc.
@@ -17,6 +40,11 @@ class TrackManager extends React.Component {
         onTrackRemoved: PropTypes.func
     };
 
+    static defaultProps = {
+        onTrackAdded: () => undefined,
+        onTrackRemoved: () => undefined,
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -24,36 +52,7 @@ class TrackManager extends React.Component {
         };
 
         this.submenuButtonClicked = this.submenuButtonClicked.bind(this);
-        let self = this;
-        this.submenus = [ // See doc below constructor for what each submenu object is
-            {
-                buttonText: "Annotation tracks...",
-                getComponent: () => <AnnotationTrackSelector
-                    addedTracks={self.props.addedTracks}
-                    onTrackAdded={self.props.onTrackAdded}
-                />,
-            },
-            {
-                buttonText: "Data hubs...",
-                getComponent: () => <HubPane
-                    addedTracks={self.props.addedTracks}
-                    onTrackAdded={self.props.onTrackAdded}
-                />,
-            },
-            {
-                buttonText: "Custom track...",
-                getComponent: () => null,
-            },
-        ];
     }
-
-    /**
-     * A complete specification for a submenu.
-     * 
-     * @typedef {Object} TrackManager~Submenu
-     * @property {string} buttonText - the text on the button that will toggle display of the submenu
-     * @property {() => React.Component} getComponent - a function that provides the component to render for the submenu
-     */
 
     /**
      * Sets state, toggling a particular submenu's display status.  Also ensures that only one submenu is displayed at
@@ -76,32 +75,30 @@ class TrackManager extends React.Component {
      * @override
      */
     render() {
-        let currentTrackList = this.props.addedTracks.map((track, index) => (
+        const {addedTracks, onTrackRemoved} = this.props;
+        const activeSubmenu = this.state.activeSubmenu;
+        const currentTrackList = addedTracks.map((track, index) => (
             <li key={index}>
                 {track.getDisplayLabel()}
-                <button
-                    className="btn btn-danger"
-                    onClick={event => this.props.onTrackRemoved ? this.props.onTrackRemoved(index) : undefined}
-                >
-                    Remove
-                </button>
+                <button className="btn btn-danger" onClick={() => onTrackRemoved(index)} >Remove</button>
             </li>
             )
         );
 
-        let submenuButtons = this.submenus.map((submenu, index) =>
+        const submenuButtons = SUBMENUS.map((submenu, index) =>
             <button
                 key={index}
-                className={this.state.activeSubmenu === submenu ? "btn btn-primary" : "btn btn-light"}
+                className={activeSubmenu === submenu ? "btn btn-primary" : "btn btn-light"}
                 onClick={() => this.submenuButtonClicked(submenu)}
             >
                 {submenu.buttonText}
             </button>
-        , this);
+        );
 
-        let submenu = null;
-        if (this.state.activeSubmenu) {
-            submenu = <div className="TrackManager-submenu">{this.state.activeSubmenu.getComponent()}</div>;
+        let submenuElement = null;
+        if (activeSubmenu) {
+            const Submenu = activeSubmenu.component;
+            submenuElement = <div className="TrackManager-submenu"><Submenu {...this.props} /></div>;
         }
 
         return (
@@ -114,7 +111,7 @@ class TrackManager extends React.Component {
                     {submenuButtons}
                 </div>
             </div>
-            {submenu}
+            {submenuElement}
         </div>);
     }
 }
