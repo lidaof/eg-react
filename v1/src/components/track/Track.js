@@ -21,6 +21,7 @@ import './Track.css';
 export const LEGEND_PROP_TYPES = {
     trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
     data: PropTypes.array.isRequired, // Track data
+    options: PropTypes.object.isRequired, // Options for the track
 };
 
 /**
@@ -31,6 +32,7 @@ export const VISUALIZER_PROP_TYPES = {
     data: PropTypes.array.isRequired, // Track data
     viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
     width: PropTypes.number.isRequired, // Visualization width
+    options: PropTypes.object.isRequired, // Options for the track
     /**
      * X range of visible pixels, assuming the user has not dragged the view
      */
@@ -114,6 +116,7 @@ export class Track extends React.PureComponent {
     constructor(props) {
         super(props);
         this.initViewExpansion(props);
+        this.initTrackOptions(props);
         const trackSubtype = getSubtypeConfig(props.trackModel);
         this.dataSource = trackSubtype.getDataSource ? trackSubtype.getDataSource(props.trackModel) : null;
 
@@ -137,6 +140,16 @@ export class Track extends React.PureComponent {
      */
     initViewExpansion(props) {
         this.viewExpansion = REGION_EXPANDER.calculateExpansion(props.width, props.viewRegion);
+    }
+
+    /**
+     * Sets `this.trackOptions`, which are the track model's options merged into the default options for the track type.
+     * 
+     * @param {Object} props - props passed to this component
+     */
+    initTrackOptions(props) {
+        const trackSubtype = getSubtypeConfig(props.trackModel);
+        this.trackOptions = Object.assign({}, trackSubtype.defaultOptions, props.trackModel.options);
     }
 
     /**
@@ -202,6 +215,10 @@ export class Track extends React.PureComponent {
                 this.fetchData(nextProps);
             }
         }
+
+        if (this.props.trackModel.options !== nextProps.trackModel.options) {
+            this.initTrackOptions(nextProps);
+        }
     }
 
     /**
@@ -234,7 +251,7 @@ export class Track extends React.PureComponent {
             onClick={this.handleClick}
         >
             {this.state.isLoading ? <TrackLoadingNotice /> : null}
-            <Legend trackModel={trackModel} data={data} />
+            <Legend trackModel={trackModel} data={data} options={this.trackOptions} />
             <WideDiv
                 isLoading={this.state.isLoading}
                 viewExpansion={this.viewExpansion}
@@ -247,6 +264,7 @@ export class Track extends React.PureComponent {
                     width={this.viewExpansion.expandedWidth}
                     viewWindow={this.viewExpansion.viewWindow}
                     trackModel={trackModel}
+                    options={this.trackOptions} 
                 />
             </WideDiv>
             <MetadataIndicator track={trackModel} terms={metadataTerms} onClick={this.handleMetadataClick} />

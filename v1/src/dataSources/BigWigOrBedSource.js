@@ -9,7 +9,7 @@ const bin = require('../vendor/bbi-js/utils/bin');
  * 
  * @author Silas Hsu
  */
-export class BigWigSource extends DataSource {
+class BigWigOrBedSource extends DataSource {
     /**
      * Prepares to fetch bigwig or bigbed data from a URL.  Fetching data returns DASFeature, unless given some data
      * formatter.
@@ -96,4 +96,4 @@ export class BigWigSource extends DataSource {
     }
 }
 
-export default BigWigSource;
+export default BigWigOrBedSource;

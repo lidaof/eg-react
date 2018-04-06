@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* -*- mode: javascript; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 
 // 
@@ -7,28 +8,27 @@
 // das.js: queries and low-level data model.
 //
 
-define(function(require, exports, module) {
-"use strict";
 
-if (typeof(require) !== 'undefined') {
-}
-
-//
-// DAS 1.6 features command
-//
-
-function DASFeature() {
-}
-
-function DASGroup(id) {
-    if (id)
-        this.id = id;
-}
-
-if (typeof(module) !== 'undefined') {
-    module.exports = {
-        DASGroup: DASGroup,
-        DASFeature: DASFeature,
-    };
-}
-});
+    "use strict";
+    
+    if (typeof(require) !== 'undefined') {
+    }
+    
+    //
+    // DAS 1.6 features command
+    //
+    
+    function DASFeature() {
+    }
+    
+    function DASGroup(id) {
+        if (id)
+            this.id = id;
+    }
+    
+    if (typeof(module) !== 'undefined') {
+        module.exports = {
+            DASGroup: DASGroup,
+            DASFeature: DASFeature,
+        };
+    }

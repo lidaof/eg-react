@@ -25,7 +25,9 @@ interface TrackSubtype {
     menuItems?: React.Component[];
 
     /**
-     * Default options that are provided to menu item components.  These are NOT provided to anything else by default!
+     * Default options; should be the same schema as track model's `options` prop.  Visualizers, legends, and context
+     * menu items will receive an options prop which is the track model's options merged into the default options for
+     * the track type.
      */
     defaultOptions?: Object;
 

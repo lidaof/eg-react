@@ -37,7 +37,7 @@ Here's an overview:
   * Visualizer (required)
   * Legend (required)
   * Context menu items
-  * Context menu default options
+  * Track default options
   * Data source
 2.  Specify what track type renders your new track.
 
@@ -53,10 +53,9 @@ Your track legend component.  It will receive `LEGEND_PROP_TYPES` (defined in `T
 List of specific menu items to render.  Note that all tracks have some menu items by default, such as the one modifying
 label and the one removing the track.  You should not include these default items.
 
-#### Context menu default options
-Object that looks like the `options` prop of `TrackModel` objects.  Menu item components read and write to this object;
-for example, the `LabelConfig` component reads and writes `options.label`.  But what should the component read if the
-prop in which they are interested is not defined?  Define it here!
+#### Default options
+Object that looks like the `options` prop of `TrackModel` objects.  Visualizers, legends, and context menu items will
+receive an options object which is track model's options merged into the default options for the track type.
 
 #### Data source
 If you have any non-trival data fetching needs, extend the `DataSource` class, or use one that already exists.
