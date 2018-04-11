@@ -9,7 +9,7 @@ interface BedRecord {
     end: number;
 
     /**
-     * Free text of the 4th column of the bed file, where columns are indexed from 1
+     * Free text of the 4th column of the bed file
      */
     details: string;
 }

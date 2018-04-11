@@ -4,13 +4,13 @@
  * 
  * @author Silas Hsu
  */
+import registerPromiseWorker from 'promise-worker/register';
 import makeBamIndex from '../vendor/igv/BamIndex';
 import unbgzf from '../vendor/igv/bgzf';
 
 if (process.env.NODE_ENV !== "test") {
     importScripts('js/zlib_and_gzip.min.js');
 }
-const registerPromiseWorker = require('promise-worker/register');
 
 var theWorker = null;
 

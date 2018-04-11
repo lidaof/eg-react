@@ -107,7 +107,7 @@ const GeneAnnotationTrack = {
     legend: GeneAnnotationLegend,
     menuItems: [NumRowsConfig, PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: (trackModel) => new MongoSource(new GeneFormatter()),
+    getDataSource: trackModel => new MongoSource(new GeneFormatter()),
 };
 
 export default GeneAnnotationTrack;

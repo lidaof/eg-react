@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TrackModel from '../../model/TrackModel';
 
-const TRACK_TYPES = ['bigWig'];
+const TRACK_TYPES = ['bigWig', 'bedGraph']; // Just add a new entry here to support adding a new track type.
 
 /**
  * UI for adding custom tracks.

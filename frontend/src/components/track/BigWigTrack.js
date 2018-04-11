@@ -124,7 +124,7 @@ const BigWigTrack = {
     legend: BigWigLegend,
     menuItems: [PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: (trackModel) => new BigWigOrBedSource(trackModel.url, new BarPlotFormatter()),
+    getDataSource: trackModel => new BigWigOrBedSource(trackModel.url, new BarPlotFormatter()),
 };
 
 export default BigWigTrack;

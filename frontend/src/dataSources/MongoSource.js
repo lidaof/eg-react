@@ -1,5 +1,7 @@
-import DataSource from './DataSource';
 import axios from 'axios';
+import _ from 'lodash';
+
+import DataSource from './DataSource';
 import DataFormatter from './DataFormatter';
 
 /**
@@ -22,14 +24,15 @@ class MongoSource extends DataSource {
      * @inheritdoc
      */
     async getData(region, options) {
-        let promises = region.getFeatureIntervals().map(async featureInterval => {
-            const chrInterval = featureInterval.getGenomeCoordinates();
-            const dbResponse = await axios.get(`/hg19/geneQuery/${chrInterval.chr}/${chrInterval.start}/${chrInterval.end}`);
-            return dbResponse.data;
-        });
+        let promises = region.getGenomeIntervals().map(locus =>
+            /**
+             * Gets an object that looks like {data: []}
+             */
+            axios.get(`/hg19/geneQuery/${locus.chr}/${locus.start}/${locus.end}`)
+        );
 
         const dataForEachSegment = await Promise.all(promises);
-        const allData = [].concat.apply([], dataForEachSegment);
+        const allData = _.flatMap(dataForEachSegment, 'data');
         return this.formatter.format(allData);
     }
 }

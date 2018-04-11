@@ -1,10 +1,15 @@
+import PromiseWorker from 'promise-worker';
+import BedWorker from './Bed.worker';
 import DataSource from './DataSource';
-const PromiseWorker = require('promise-worker');
-const BedWorker = require('./Bed.worker');
+import DataFormatter from './DataFormatter';
 
 /**
- * A DataSource that gets annotations from bed files (and derivatives, like hammock).  Spawns a web worker that unzips
- * and parses remotely hosted files.  Only indexed files supported.
+ * A DataSource that gets annotations from bed files (and derivatives, like bedGraph).  Only indexed files supported.
+ * Without any data formatting, gets BedRecords.  See {@link BedRecord.ts}.
+ * 
+ * Be sure to call cleanUp() with this data source, as it spawns a web worker that needs manual termination.
+ * 
+ * @author Silas Hsu
  */
 class BedSource extends DataSource {
     /**
@@ -12,11 +17,11 @@ class BedSource extends DataSource {
      * unless given a BedFormatter.
      * 
      * @param {string} url - the url from which to fetch data
-     * @param {BedFormatter} [bedFormatter] - converter from BedRecords to some other format
+     * @param {DataFormatter} [bedFormatter] - converter from BedRecords to some other format
      */
-    constructor(url, bedFormatter) {
+    constructor(url, bedFormatter=new DataFormatter()) {
         super();
-        this.bedFormatter = bedFormatter;
+        this.formatter = bedFormatter;
         this.worker = new PromiseWorker(new BedWorker());
         this.worker.postMessage({url: url});
     }
@@ -44,18 +49,12 @@ class BedSource extends DataSource {
             throw new Error("Cannot get data -- cleanUp() has been called.");
         }
 
-        let promises = region.getFeatureIntervals().map(async featureInterval => {
-            const chrInterval = featureInterval.getGenomeCoordinates();
-            const bedRecords = await this.worker.postMessage({region: chrInterval});
-            if (this.bedFormatter) {
-                return this.bedFormatter.format(bedRecords, region, featureInterval);
-            } else {
-                return bedRecords;
-            }
-        });
-
+        let promises = region.getGenomeIntervals().map(locus =>
+            this.worker.postMessage({region: locus})
+        );
         const dataForEachSegment = await Promise.all(promises);
-        return [].concat.apply([], dataForEachSegment);
+        const allData = [].concat.apply([], dataForEachSegment);
+        return this.formatter.format(allData);
     }
 }
 

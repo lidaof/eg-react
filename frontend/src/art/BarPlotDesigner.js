@@ -46,7 +46,7 @@ export class BarPlotDesigner {
         this._viewRegion = viewRegion;
         this._width = width;
         this._elementFactory = barElementFactory;
-        this._xToDataMap = []; // We have this, because we cannot guarantee the design will have mouse listeners.
+        this._xToDataMap = []; // We have this, because we will not be attaching mouse listeners to each bar
     }
 
     /**

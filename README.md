@@ -6,12 +6,12 @@ Follow the instructions in `backend/mongo.txt`.  MongoDB must be running.
 1.  Make sure MongoDB is running.
 2.  Enter the `backend` directory.
 3.  `npm start`.
-4.  Enter the `v1` directory.
+4.  Enter the `frontend` directory.
 5.  `npm start`.
 
 # Client
 ## Quick tour
-The client code is in the `v1` folder.  Here is a quick tour of `v1/src`:
+The client code is in the `frontend` folder.  Here is a quick tour of `frontend/src`:
 
 * `components`: All React components.
   * `genomeNavigator`: the navigation bar at the top that allows users to navigate

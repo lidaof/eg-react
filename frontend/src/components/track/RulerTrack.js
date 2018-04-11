@@ -26,10 +26,7 @@ class RulerVisualizer extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return (
-            this.props.viewRegion !== nextProps.viewRegion ||
-            this.props.width !== nextProps.width
-        );
+        return this.props.viewRegion !== nextProps.viewRegion || this.props.width !== nextProps.width;
     }
 
     getTooltipContents(relativeX) {
