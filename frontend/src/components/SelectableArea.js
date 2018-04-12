@@ -130,7 +130,7 @@ class SelectableArea extends React.Component {
         const {button, height, y, getInnerElement, getIsWidthSelectable, children} = this.props;
         let theBox = null;
         const width = Math.abs(this.state.dragStartX - this.state.currentDragX);
-        if (this.state.isDragging && width > 0) {
+        if (this.state.isDragging) {
             const x = Math.min(this.state.dragStartX, this.state.currentDragX);
             let className = "SelectableArea-box";
             if (!getIsWidthSelectable(width)) {

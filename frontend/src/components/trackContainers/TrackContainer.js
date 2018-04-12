@@ -21,20 +21,34 @@ import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { ActionCreators } from '../../AppState';
 import connect from 'react-redux/lib/connect/connect';
+import ZoomOutTrackContainer from './ZoomOutTrackContainer';
 
 const Tools = {
+    CROSSHAIR: {
+        buttonContent: "✛",
+        title: "Crosshairs",
+        cursor: "crosshair",
+    },
     DRAG: {
         buttonContent: "✋",
-        title: "Drag tool"
-    },
-    ZOOM: {
-        buttonContent: "🔍",
-        title: "Zoom tool",
+        title: "Drag tool",
+        cursor: "pointer",
     },
     REORDER: {
         buttonContent: "🔀",
-        title: "Reorder tool"
+        title: "Reorder tool",
+        cursor: "all-scroll",
     },
+    ZOOM_IN: {
+        buttonContent: "⬚🔍+",
+        title: "Zoom-in tool",
+        cursor: "zoom-in",
+    },
+    ZOOM_OUT: {
+        buttonContent: "🔍-",
+        title: "Zoom-out tool",
+        cursor: "zoom-out",
+    }
 };
 
 ///////////////////////////
@@ -139,7 +153,7 @@ class TrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedTool: Tools.DRAG,
+            selectedTool: Tools.CROSSHAIR,
         };
 
         this.handleTrackClicked = this.handleTrackClicked.bind(this);
@@ -299,33 +313,35 @@ class TrackContainer extends React.Component {
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
-                return (
-                    <ReorderableTrackContainer
-                        trackElements={trackElements}
-                        trackModels={tracks}
-                        onTracksChanged={onTracksChanged}
-                    />
-                );
-            case Tools.ZOOM:
-                return (
-                    <ZoomableTrackContainer
-                        visualizationStartX={TrackLegend.WIDTH}
-                        visualizationWidth={this.getVisualizationWidth()}
-                        trackElements={trackElements}
-                        viewRegion={viewRegion}
-                        onNewRegion={onNewRegion}
-                    />
-                );
+                return <ReorderableTrackContainer
+                    trackElements={trackElements}
+                    trackModels={tracks}
+                    onTracksChanged={onTracksChanged}
+                />;
+            case Tools.ZOOM_IN:
+                return <ZoomableTrackContainer
+                    visualizationStartX={TrackLegend.WIDTH}
+                    visualizationWidth={this.getVisualizationWidth()}
+                    trackElements={trackElements}
+                    viewRegion={viewRegion}
+                    onNewRegion={onNewRegion}
+                />;
             case Tools.DRAG:
+                return <DraggableTrackContainer
+                    visualizationWidth={this.getVisualizationWidth()}
+                    trackElements={trackElements}
+                    viewRegion={viewRegion}
+                    onNewRegion={onNewRegion}
+                />;
+            case Tools.ZOOM_OUT:
+                return <ZoomOutTrackContainer
+                    trackElements={trackElements}
+                    viewRegion={viewRegion}
+                    onNewRegion={onNewRegion}
+                />;
+            case Tools.CROSSHAIR:
             default:
-                return (
-                    <DraggableTrackContainer
-                        visualizationWidth={this.getVisualizationWidth()}
-                        trackElements={trackElements}
-                        viewRegion={viewRegion}
-                        onNewRegion={onNewRegion}
-                    />
-                );
+                return trackElements;
         }
     }
 
@@ -335,7 +351,7 @@ class TrackContainer extends React.Component {
     render() {
         const {tracks, metadataTerms, onTracksChanged, onMetadataTermsChanged} = this.props;
         const contextMenu = <TrackContextMenu allTracks={tracks} onTracksChanged={onTracksChanged} />;
-        const trackDivStyle = {border: "1px solid black", cursor: "crosshair"};
+        const trackDivStyle = {border: "1px solid black", cursor: this.state.selectedTool.cursor};
 
         return (
         <OutsideClickDetector onOutsideClick={this.deselectAllTracks} style={{margin: 5}} >
@@ -344,7 +360,7 @@ class TrackContainer extends React.Component {
                 <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
             </div>
             <ContextMenuManager menuElement={contextMenu} >
-                <DivWithBullseye style={trackDivStyle} >
+                <DivWithBullseye style={trackDivStyle}>
                     {this.renderSubContainer()}
                 </DivWithBullseye>
             </ContextMenuManager>
