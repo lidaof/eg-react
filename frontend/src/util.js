@@ -42,8 +42,8 @@ export function getRelativeCoordinates(event, relativeTo) {
 export function getPageCoordinates(relativeTo, relativeX, relativeY) {
     const targetBoundingRect = relativeTo.getBoundingClientRect();
     return {
-        x: targetBoundingRect.left + relativeX,
-        y: targetBoundingRect.top + relativeY
+        x: window.scrollX + targetBoundingRect.left + relativeX,
+        y: window.scrollY + targetBoundingRect.top + relativeY
     };
 }
 
