@@ -38,6 +38,9 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            isShowingRegionSetUI: false
+        };
         this.addTrack = this.addTrack.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
     }
@@ -68,7 +71,11 @@ class App extends React.Component {
                 onTrackAdded={this.addTrack}
                 onTrackRemoved={this.removeTrack}
             />
-            <RegionSetSelector genome={genomeConfig.genome} />
+            <hr/>
+            <button onClick={() => this.setState({isShowingRegionSetUI: !this.state.isShowingRegionSetUI})}>
+                Show/hide region set config
+            </button>
+            {this.state.isShowingRegionSetUI ? <RegionSetSelector genome={genomeConfig.genome} /> : null}
         </div>
         );
     }

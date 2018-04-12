@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import CustomHubAdder from './CustomHubAdder';
 import HubTable from './HubTable';
 import HubTrackTable from './HubTrackTable';
-import PropTypes from 'prop-types';
 
-import "./HubPane.css";
+import './HubPane.css';
 
 /**
  * The window containing UI for loading public track hubs, loading custom hubs, and adding tracks from hubs.
@@ -72,16 +73,7 @@ class HubPane extends React.PureComponent {
             </button>
 
             <button className="btn btn-light" onClick={this.toggleCustomHubInput}>Custom hub...</button>
-            {
-            this.state.isCustomHubInputVisible ?
-                <div>
-                    <h4>Custom hub</h4>
-                    <label>Custom hub URL<input type="text" /></label>
-                    <button>Load custom hub</button>
-                </div>
-                : null
-            }
-
+            {this.state.isCustomHubInputVisible ? <CustomHubAdder onTracksAdded={this.addToAvailableTracks} /> : null}
             {this.state.isHubTableVisible ? <HubTable onHubLoaded={this.addToAvailableTracks} /> : null}
             {
             this.state.availableTracks.length > 0 ?

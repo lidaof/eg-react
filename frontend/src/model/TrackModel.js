@@ -30,7 +30,7 @@ class TrackModel {
      */
     constructor(plainObject) {
         Object.assign(this, plainObject);
-        this.name = this.name || "";
+        this.name = this.label || this.name || "";
         this.type = this.type || this.filetype || "";
         this.type = this.type.toLowerCase();
         this.options = this.options || {}; // `options` stores dynamically-configurable options.
