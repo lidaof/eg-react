@@ -15,7 +15,7 @@ class Feature {
      * @param {boolean} [isForwardStrand] - whether this feature is on the forward strand.  Default: true
      */
     constructor(name, locus, isForwardStrand=true) {
-        this._name = name || locus.toString();
+        this._name = name == undefined ? locus.toString() : name; // eslint-disable-line eqeqeq
         this._locus = locus;
         this._isForwardStrand = isForwardStrand;
     }

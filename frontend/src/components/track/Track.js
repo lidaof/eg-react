@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import memoizeOne from 'memoize-one';
 
 import TrackLoadingNotice from './TrackLoadingNotice';
 import MetadataIndicator from './MetadataIndicator';
@@ -63,6 +64,8 @@ function freezeWhileLoading(WrappedComponent) {
 }
 
 const REGION_EXPANDER = new RegionExpander(1);
+// This memoization is very important, as it avoids rerendering the visualizer when extraneous props change
+REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
 const WideDiv = freezeWhileLoading(withExpandedWidth('div'));
 
 /**
@@ -115,8 +118,6 @@ export class Track extends React.PureComponent {
      */
     constructor(props) {
         super(props);
-        this.initViewExpansion(props);
-        this.initTrackOptions(props);
         const trackSubtype = getSubtypeConfig(props.trackModel);
         this.dataSource = trackSubtype.getDataSource ? trackSubtype.getDataSource(props.trackModel) : null;
 
@@ -131,44 +132,53 @@ export class Track extends React.PureComponent {
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleMetadataClick = this.handleMetadataClick.bind(this);
+        this.mergeDefaultOptions = memoizeOne(this.mergeDefaultOptions);
     }
 
     /**
-     * Sets `this.viewExpansion`, which is a widening of the view that allows scrolling data into view.
+     * If the view region has changed, sends a request for data
      * 
-     * @param {Object} props - props passed to this component
+     * @param {object} prevProps - previous props
+     * @override
      */
-    initViewExpansion(props) {
-        this.viewExpansion = REGION_EXPANDER.calculateExpansion(props.width, props.viewRegion);
+    componentDidUpdate(prevProps) {
+        if (this.props.viewRegion !== prevProps.viewRegion) {
+            if (this.dataSource) {
+                this.setState({isLoading: true});
+                this.fetchData(this.props);
+            }
+        }
     }
 
     /**
-     * Sets `this.trackOptions`, which are the track model's options merged into the default options for the track type.
-     * 
-     * @param {Object} props - props passed to this component
+     * Calls cleanUp on the associated DataSource.
      */
-    initTrackOptions(props) {
-        const trackSubtype = getSubtypeConfig(props.trackModel);
-        this.trackOptions = Object.assign({}, trackSubtype.defaultOptions, props.trackModel.options);
+    componentWillUnmount() {
+        if (this.dataSource) {
+            this.dataSource.cleanUp();
+        }
     }
 
     /**
      * Uses this track's DataSource to fetch data within a view region, and then sets state.
      * 
      * @param {Object} props - props object; contains the region for which to fetch data
-     * @return {Promise<any>} a promise that resolves when fetching is done, including when there is an error.
+     * @return {Promise<void>} a promise that resolves when fetching is done, including when there is an error.
      */
     fetchData(props) {
         if (!this.dataSource) {
             return Promise.resolve();
         }
 
-        return this.dataSource.getData(this.viewExpansion.expandedRegion).then(data => {
+        const viewExpansion = REGION_EXPANDER.calculateExpansion(props.width, props.viewRegion);
+        return this.dataSource.getData(viewExpansion.expandedRegion, props).then(data => {
             // When the data finally comes in, be sure it is still what the user wants
             if (this.props.viewRegion === props.viewRegion) {
+                const trackSubtype = getSubtypeConfig(this.props.trackModel);
+                const processedData = trackSubtype.processData ? trackSubtype.processData(data, this.props) : data;
                 this.setState({
                     isLoading: false,
-                    data: data,
+                    data: processedData,
                     error: null,
                 });
             }
@@ -202,32 +212,11 @@ export class Track extends React.PureComponent {
     }
 
     /**
-     * If the view region has changed, sends a request for data
      * 
-     * @param {object} prevProps - previous props
-     * @override
      */
-    componentWillReceiveProps(nextProps) {
-        if (this.props.viewRegion !== nextProps.viewRegion) {
-            this.initViewExpansion(nextProps);
-            if (this.dataSource) {
-                this.setState({isLoading: true});
-                this.fetchData(nextProps);
-            }
-        }
-
-        if (this.props.trackModel.options !== nextProps.trackModel.options) {
-            this.initTrackOptions(nextProps);
-        }
-    }
-
-    /**
-     * Calls cleanUp on the associated DataSource.
-     */
-    componentWillUnmount() {
-        if (this.dataSource) {
-            this.dataSource.cleanUp();
-        }
+    mergeDefaultOptions(trackOptions) {
+        const trackSubtype = getSubtypeConfig(this.props.trackModel);
+        return Object.assign({}, trackSubtype.defaultOptions, this.props.trackModel.options);
     }
 
     /**
@@ -237,11 +226,14 @@ export class Track extends React.PureComponent {
      * @override
      */
     render() {
-        const {trackModel, xOffset, metadataTerms} = this.props;
+        const {width, viewRegion, trackModel, xOffset, metadataTerms} = this.props;
+        const viewExpansion = REGION_EXPANDER.calculateExpansion(width, viewRegion);
+        const {expandedRegion, expandedWidth, viewWindow} = viewExpansion;
         const data = this.state.data;
         const trackSubtype = getSubtypeConfig(trackModel);
         const Legend = trackSubtype.legend;
         const Visualizer = trackSubtype.visualizer;
+        const options = this.mergeDefaultOptions(trackModel.options);
 
         return (
         <div
@@ -251,20 +243,20 @@ export class Track extends React.PureComponent {
             onClick={this.handleClick}
         >
             {this.state.isLoading ? <TrackLoadingNotice /> : null}
-            <Legend trackModel={trackModel} data={data} options={this.trackOptions} />
+            <Legend trackModel={trackModel} data={data} options={options} />
             <WideDiv
                 isLoading={this.state.isLoading}
-                viewExpansion={this.viewExpansion}
+                viewExpansion={viewExpansion}
                 xOffset={xOffset}
                 style={{backgroundColor: trackModel.options.backgroundColor}}
             >
                 <Visualizer
                     data={data}
-                    viewRegion={this.viewExpansion.expandedRegion}
-                    width={this.viewExpansion.expandedWidth}
-                    viewWindow={this.viewExpansion.viewWindow}
+                    viewRegion={expandedRegion}
+                    width={expandedWidth}
+                    viewWindow={viewWindow}
                     trackModel={trackModel}
-                    options={this.trackOptions} 
+                    options={options}
                 />
             </WideDiv>
             <MetadataIndicator track={trackModel} terms={metadataTerms} onClick={this.handleMetadataClick} />

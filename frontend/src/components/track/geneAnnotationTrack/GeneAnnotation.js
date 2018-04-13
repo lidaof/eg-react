@@ -6,9 +6,9 @@ import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import Gene from '../../../model/Gene';
 import OpenInterval from '../../../model/interval/OpenInterval';
 
-export const ANNOTATION_HEIGHT = 9;
-export const UTR_HEIGHT = 5;
-export const LABEL_SIZE = ANNOTATION_HEIGHT * 1.5;
+const HEIGHT = 9;
+const UTR_HEIGHT = 5;
+const LABEL_SIZE = HEIGHT * 1.5;
 
 const ARROW_WIDTH = 5;
 const ARROW_SEPARATION = 12;
@@ -21,7 +21,9 @@ const DEFAULT_BACKGROUND_COLOR = "white";
  * 
  * @author Silas Hsu and Daofeng Li
  */
-export class GeneAnnotation extends React.PureComponent {
+class GeneAnnotation extends React.PureComponent {
+    static HEIGHT = HEIGHT;
+
     static propTypes = {
         /**
          * SVG drawing API.  Required but not marked as such to prevent warnings.
@@ -56,7 +58,7 @@ export class GeneAnnotation extends React.PureComponent {
         const width = drawModel.basesToXWidth(endAbsBase - startAbsBase);
         const box = svgJs.rect(width, height).attr({
             x: startX,
-            y: (ANNOTATION_HEIGHT - height) / 2,
+            y: (HEIGHT - height) / 2,
             fill: color
         });
         return box;
@@ -70,12 +72,15 @@ export class GeneAnnotation extends React.PureComponent {
      * @param {string} color 
      */
     _drawArrowsInInterval(startX, endX, color, clip) {
-        const {gene, svgJs} = this.props;
-        const centerY = ANNOTATION_HEIGHT / 2;
-        const bottomY = ANNOTATION_HEIGHT;
+        if (endX - startX < ARROW_WIDTH) {
+            return;
+        }
+        const {gene, drawModel, svgJs} = this.props;
+        const centerY = HEIGHT / 2;
+        const bottomY = HEIGHT;
 
         let placementStartX = Math.max(0, startX);
-        let placementEndX = Math.min(endX, this.props.svgJs.doc().node.clientWidth);
+        let placementEndX = Math.min(endX, drawModel.getDrawWidth());
         if (gene.getIsForwardStrand()) { // Point to the right
             placementStartX += ARROW_WIDTH;
         } else {
@@ -117,10 +122,10 @@ export class GeneAnnotation extends React.PureComponent {
 
         const startX = drawModel.baseToX(gene.absStart);
         const endX = drawModel.baseToX(gene.absEnd);
-        const centerY = ANNOTATION_HEIGHT / 2;
+        const centerY = HEIGHT / 2;
 
         // Box that covers the whole annotation to increase the click area
-        let coveringBox = svgJs.rect(endX - startX, ANNOTATION_HEIGHT).attr({
+        let coveringBox = svgJs.rect(endX - startX, HEIGHT).attr({
             x: startX,
             y: 0,
         });
@@ -142,7 +147,7 @@ export class GeneAnnotation extends React.PureComponent {
         let drawOnlyInExons = svgJs.clip();
         // Translated exons, as thick boxes
         for (let exon of gene.absTranslated) {
-            const exonBox = this._drawCenteredBox(...exon, ANNOTATION_HEIGHT, color);
+            const exonBox = this._drawCenteredBox(...exon, HEIGHT, color);
             drawOnlyInExons.add(exonBox.clone()); // See comment for declaration of arrowClip
         }
 
@@ -152,14 +157,14 @@ export class GeneAnnotation extends React.PureComponent {
 
         // UTRs, as thin boxes
         for (let utr of gene.absUtrs) {
-            this._drawCenteredBox(...utr, ANNOTATION_HEIGHT, backgroundColor); // White box to cover up arrows
+            this._drawCenteredBox(...utr, HEIGHT, backgroundColor); // White box to cover up arrows
             this._drawCenteredBox(...utr, UTR_HEIGHT, color); // The actual box that represents the UTR
         }
 
         // Label
         let labelX, textAnchor;
         // Label width is approx. because calculating bounding boxes is expensive.
-        const estimatedLabelWidth = gene.getName().length * ANNOTATION_HEIGHT;
+        const estimatedLabelWidth = gene.getName().length * HEIGHT;
         const isBlockedLeft = startX - estimatedLabelWidth < viewWindow.start; // Label obscured if put on the left
         const isBlockedRight = endX + estimatedLabelWidth > viewWindow.end; // Label obscured if put on the right
         if (!isBlockedLeft) { // Yay, we can put it on the left!
@@ -172,7 +177,7 @@ export class GeneAnnotation extends React.PureComponent {
             labelX = viewWindow.start + 1;
             textAnchor = "start";
             // We have to add some highlighting for contrast purposes.
-            svgJs.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, ANNOTATION_HEIGHT).attr({
+            svgJs.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, HEIGHT).attr({
                 x: viewWindow.start - LABEL_BACKGROUND_PADDING,
                 y: 0,
                 fill: backgroundColor,
@@ -182,7 +187,7 @@ export class GeneAnnotation extends React.PureComponent {
 
         svgJs.text(gene.getName()).attr({
             x: labelX,
-            y: -ANNOTATION_HEIGHT,
+            y: -HEIGHT,
             "text-anchor": textAnchor,
             "font-size": LABEL_SIZE,
         });

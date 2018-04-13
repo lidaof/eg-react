@@ -48,6 +48,34 @@ export function getPageCoordinates(relativeTo, relativeX, relativeY) {
 }
 
 /**
+ * Debug function for the shouldComponentUpdate method of React.PureComponent.  Logs what props/state changed if there
+ * is a rerender.
+ * 
+ * @param {Object} thisProps - current props
+ * @param {Object} thisState - current state
+ * @param {Object} nextProps - next props component will receive
+ * @param {Object} nextState - next state component will receive
+ * @return {boolean} whether component should update, according to React.PureComponent
+ */
+export function debugShouldComponentUpdate(thisProps, thisState, nextProps, nextState) {
+    for (let propName in nextProps) {
+        if (thisProps[propName] !== nextProps[propName]) {
+            console.log(propName);
+            return true;
+        } 
+    }
+
+    for (let stateName in nextState) {
+        if (thisState[stateName] !== nextState[stateName]) {
+            console.log(stateName);
+            return true;
+        } 
+    }
+
+    return false;
+}
+
+/**
  * A (x, y) coordinate pair.
  * 
  * @typedef {Object} Coordinate

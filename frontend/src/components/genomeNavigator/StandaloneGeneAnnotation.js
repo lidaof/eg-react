@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import SvgJsManaged from '../SvgJsManaged';
-import { ANNOTATION_HEIGHT, GeneAnnotation } from '../track/geneAnnotationTrack/GeneAnnotation';
+import GeneAnnotation from '../track/geneAnnotationTrack/GeneAnnotation';
 import Gene from '../../model/Gene';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 
@@ -20,7 +20,7 @@ class StandaloneGeneAnnotation extends React.PureComponent {
     render() {
         const {gene, drawModel} = this.props;
         return (
-        <svg width={drawModel.getDrawWidth()} height={ANNOTATION_HEIGHT} >
+        <svg width={drawModel.getDrawWidth()} height={GeneAnnotation.HEIGHT} >
             <SvgJsManaged><GeneAnnotation gene={gene} drawModel={drawModel} /></SvgJsManaged>
         </svg>
         );

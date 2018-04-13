@@ -34,8 +34,24 @@ interface TrackSubtype {
     /**
      * A function that provides a DataSource given the props passed to Track.  Only called ONCE on Track creation.  If
      * none is provided, then the legend and visualizer will receive no data.
+     * 
+     * @param {Object} props - props that Track receives
+     * @return {DataSource} data source for the track
      */
     getDataSource?(props: Object): DataSource;
+
+    /**
+     * Sometimes, the data from a DataSource might need some processing or formatting before use.  If this function is
+     * specified, any data will first pass through this function before being going to legend and visualizer.
+     * 
+     * We have this function as part of Track instead of DataSource, because view regions can change faster than data
+     * sources can fetch data.  If processing happens in DataSource, it could waste work if the view region becomes
+     * out-of-date.
+     * 
+     * @param {any} data - data from the track's data source
+     * @param {Object} props - current Track props
+     */
+    processData?(data: any, props: Object): any;
 }
 
 export default TrackSubtype;

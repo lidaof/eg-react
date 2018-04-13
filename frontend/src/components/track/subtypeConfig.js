@@ -16,6 +16,17 @@ const TYPE_NAME_TO_SUBTYPE = {
     "repeatmasker": RepeatMaskerTrack,
 };
 
+
+// Check if all the subtypes are clean
+for (let subtypeName in TYPE_NAME_TO_SUBTYPE) {
+    const subtype = TYPE_NAME_TO_SUBTYPE[subtypeName];
+    if (!subtype.visualizer) {
+        throw new TypeError(`In config for type ${subtype}: a visualizer is required, but it was undefined.`);
+    } else if (!subtype.legend) {
+        throw new TypeError(`In config for type ${subtype}: a legend is required, but it was undefined.`);
+    }
+}
+
 /**
  * Gets the rendering configuration appropriate for the type contained in the track model's type.  If none can be found,
  * defaults to UnknownTrack.
@@ -24,13 +35,7 @@ const TYPE_NAME_TO_SUBTYPE = {
  * @return {TrackSubtype} object containing rendering config appropriate for this model
  */
 export function getSubtypeConfig(trackModel) {
-    const subtype = TYPE_NAME_TO_SUBTYPE[trackModel.type.toLowerCase()] || UnknownTrack;
-    if (!subtype.visualizer) {
-        throw new TypeError(`In config for type ${trackModel.type}: a visualizer is required, but it was undefined.`);
-    } else if (!subtype.legend) {
-        throw new TypeError(`In config for type ${trackModel.type}: a legend is required, but it was undefined.`);
-    }
-    return subtype;
+    return TYPE_NAME_TO_SUBTYPE[trackModel.type.toLowerCase()] || UnknownTrack;
 }
 
 /**

@@ -1,7 +1,7 @@
+/*
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 
-import AnnotationArranger from '../components/track/geneAnnotationTrack/AnnotationArranger';
 import withAutoDimensions from '../components/withAutoDimensions';
 
 import Feature from '../model/Feature';
@@ -90,3 +90,4 @@ export const annotationStory = {
 export const STORY_KIND = "Gene annotation";
 let storyInterface = storiesOf(STORY_KIND, module);
 storyInterface.add(annotationStory.storyName, () => annotationStory.element);
+*/

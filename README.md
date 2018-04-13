@@ -64,6 +64,10 @@ it.  You can return the data in any format desired.  This would also be the best
 
 If you don't specify a data source, your legend and visualizer will receive no data.
 
+#### Data processing
+Sometimes, the data from a DataSource might need some processing or formatting before use.  If this function is
+specified, any data will first pass through this function before being going to legend and visualizer.
+
 ### 2.  Using your shiny customizations
 Components use customizations via the getSubtypeConfig() method, which returns `TrackSubtype` objects.
 
