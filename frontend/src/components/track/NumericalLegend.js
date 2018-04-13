@@ -14,7 +14,7 @@ class NumericalLegend extends React.PureComponent {
     static propTypes = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired,
         height: PropTypes.number.isRequired,
-        data: PropTypes.arrayOf(PropTypes.object).isRequired, // D
+        data: PropTypes.arrayOf(PropTypes.object).isRequired,
         getDataValue: PropTypes.func.isRequired, // Callback for getting the value of each record in `data`
         topPadding: PropTypes.number,
         bottomPadding: PropTypes.number,

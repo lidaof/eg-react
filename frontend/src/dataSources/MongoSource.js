@@ -1,8 +1,6 @@
 import axios from 'axios';
 import _ from 'lodash';
-
 import DataSource from './DataSource';
-import DataFormatter from './DataFormatter';
 
 /**
  * A DataSource that gets gene annotations from our backend.
@@ -10,16 +8,6 @@ import DataFormatter from './DataFormatter';
  * @author Daofeng Li
  */
 class MongoSource extends DataSource {
-    /**
-     * Makes a new instance.  Fetching data will return raw object records by default, unless given a DataFormatter.
-     * 
-     * @param {DataFormatter} [formatter] - converter of data to some other format
-     */
-    constructor(formatter=new DataFormatter()) {
-        super();
-        this.formatter = formatter;
-    }
-
     /**
      * @inheritdoc
      */
@@ -32,8 +20,7 @@ class MongoSource extends DataSource {
         );
 
         const dataForEachSegment = await Promise.all(promises);
-        const allData = _.flatMap(dataForEachSegment, 'data');
-        return this.formatter.format(allData);
+        return _.flatMap(dataForEachSegment, 'data');
     }
 }
 

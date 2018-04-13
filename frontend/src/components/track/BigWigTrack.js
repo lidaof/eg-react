@@ -7,7 +7,6 @@ import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorCo
 import NumericalLegend from './NumericalLegend';
 
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
-import DataFormatter from '../../dataSources/DataFormatter';
 import { RenderTypes } from '../../art/DesignRenderer';
 import { BarPlotRecord } from '../../art/BarPlotDesigner';
 import { SimpleBarElementFactory } from '../../art/BarElementFactory';
@@ -35,12 +34,10 @@ interface DASFeature {
     _chromId: number
 }
 */
-class BarPlotFormatter extends DataFormatter {
-    format(data) {
-        return data.map(feature =>
-            new BarPlotRecord(new ChromosomeInterval(feature.segment, feature.min, feature.max), feature.score)
-        );
-    }
+function convertToBarPlotRecords(data) {
+    return data.map(feature =>
+        new BarPlotRecord(new ChromosomeInterval(feature.segment, feature.min, feature.max), feature.score)
+    );
 }
 
 /**
@@ -124,7 +121,8 @@ const BigWigTrack = {
     legend: BigWigLegend,
     menuItems: [PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: trackModel => new BigWigOrBedSource(trackModel.url, new BarPlotFormatter()),
+    getDataSource: trackModel => new BigWigOrBedSource(trackModel.url),
+    processData: convertToBarPlotRecords,
 };
 
 export default BigWigTrack;

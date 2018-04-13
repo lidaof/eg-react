@@ -2,12 +2,13 @@ import React from 'react';
 
 import BigWigTrack from './BigWigTrack';
 import BarPlot from './BarPlot';
+import HiddenItemsMessage from './HiddenItemsMessage';
 import { VISUALIZER_PROP_TYPES } from './Track';
 import { BackgroundColorConfig } from './contextMenu/ColorConfig';
 
 import RepeatMaskerRecord from '../../model/RepeatMaskerRecord';
+import LinearDrawingModel from '../../model/LinearDrawingModel';
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
-import DataFormatter from '../../dataSources/DataFormatter';
 import { CategoricalBarElementFactory } from '../../art/BarElementFactory';
 import { RenderTypes } from '../../art/DesignRenderer';
 
@@ -20,10 +21,20 @@ const DEFAULT_OPTIONS = {
     categoryColors: RepeatMaskerRecord.DEFAULT_CLASS_COLORS,
 };
 
-class RepeatMaskerFormatter extends DataFormatter {
-    format(data) {
-        return data.map(feature => new RepeatMaskerRecord(feature));
-    }
+/**
+ * From the raw data source records, filters repeats too small to see.
+ * 
+ * @param {Object[]} records - raw plain-object records
+ * @param {Object} trackProps - props passed to Track
+ * @return {Object} object with keys `repeats` and `numHidden`.  See doc above for details
+ */
+function processRepeats(records, trackProps) {
+    const drawModel = new LinearDrawingModel(trackProps.viewRegion, trackProps.width);
+    const visibleRecords = records.filter(record => drawModel.basesToXWidth(record.max - record.min) >= 0.25);
+    return {
+        repeats: visibleRecords.map(record => new RepeatMaskerRecord(record)),
+        numHidden: records.length - visibleRecords.length
+    };
 }
 
 /**
@@ -78,26 +89,30 @@ class RepeatVisualizer extends React.PureComponent {
     render() {
         const {data, viewRegion, width, options} = this.props;
         return (
-        <BarPlot
-            viewRegion={viewRegion}
-            data={data}
-            width={width}
-            height={options.height}
-            elementFactory={this.state.elementFactory}
-            style={BAR_CHART_STYLE}
-            type={RenderTypes.CANVAS}
-            getTooltipContents={this.getTooltipContents}
-        />
+        <React.Fragment>
+            <BarPlot
+                viewRegion={viewRegion}
+                data={data.repeats || []}
+                width={width}
+                height={options.height}
+                elementFactory={this.state.elementFactory}
+                style={BAR_CHART_STYLE}
+                type={RenderTypes.CANVAS}
+                getTooltipContents={this.getTooltipContents}
+            />
+            <HiddenItemsMessage width={width} numHidden={data.numHidden} />
+        </React.Fragment>
         );
     }
 }
 
 const RepeatMaskerTrack = {
     visualizer: RepeatVisualizer,
-    legend: BigWigTrack.legend,
+    legend: (props) => <BigWigTrack.legend {...props} data={props.data.repeats || []} />,
     menuItems: [BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: (trackModel) => new BigWigOrBedSource(trackModel.url, new RepeatMaskerFormatter()),
+    getDataSource: trackModel => new BigWigOrBedSource(trackModel.url),
+    processData: processRepeats
 };
 
 export default RepeatMaskerTrack;

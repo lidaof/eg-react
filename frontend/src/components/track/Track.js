@@ -21,7 +21,7 @@ import './Track.css';
  */
 export const LEGEND_PROP_TYPES = {
     trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
-    data: PropTypes.array.isRequired, // Track data
+    data: PropTypes.any.isRequired, // Track data
     options: PropTypes.object.isRequired, // Options for the track
 };
 
@@ -30,7 +30,7 @@ export const LEGEND_PROP_TYPES = {
  */
 export const VISUALIZER_PROP_TYPES = {
     trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
-    data: PropTypes.array.isRequired, // Track data
+    data: PropTypes.any.isRequired, // Track data
     viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to visualize
     width: PropTypes.number.isRequired, // Visualization width
     options: PropTypes.object.isRequired, // Options for the track

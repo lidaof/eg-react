@@ -1,7 +1,6 @@
 import DataSource from './DataSource';
-import DataFormatter from './DataFormatter';
-const bigwig = require('../vendor/bbi-js/main/bigwig');
-const bin = require('../vendor/bbi-js/utils/bin');
+import bigwig from '../vendor/bbi-js/main/bigwig';
+import bin from '../vendor/bbi-js/utils/bin';
 
 /**
  * Reads and gets data from bigwig or bigbed files hosted remotely.  Gets DASFeature records, which vary in schema
@@ -15,12 +14,10 @@ class BigWigOrBedSource extends DataSource {
      * formatter.
      * 
      * @param {string} url - the URL from which to fetch data
-     * @param {DataFormatter} [formatter] - converter of data to some other format
      */
-    constructor(url, formatter=new DataFormatter()) {
+    constructor(url, formatter) {
         super();
         this.url = url;
-        this.formatter = formatter;
         this.bigWigPromise = new Promise((resolve, reject) => {
             bigwig.makeBwg(new bin.URLFetchable(url), (bigWigObj, error) => {
                 if (error) {
@@ -49,8 +46,7 @@ class BigWigOrBedSource extends DataSource {
             this._getDataForChromosome(locus, bigWigObj, zoomLevel)
         );
         const dataForEachSegment = await Promise.all(promises);
-        const allData = [].concat.apply([], dataForEachSegment); // Combine all the data into one array
-        return this.formatter.format(allData);
+        return [].concat.apply([], dataForEachSegment); // Combine all the data into one array
     }
 
     /**

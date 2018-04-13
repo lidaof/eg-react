@@ -6,6 +6,7 @@ import GeneDetail from './GeneDetail';
 import { VISUALIZER_PROP_TYPES } from '../Track';
 import Tooltip from '../Tooltip';
 import TrackLegend from '../TrackLegend';
+import HiddenItemsMessage from '../HiddenItemsMessage';
 
 import NumberConfig from '../contextMenu/NumberConfig';
 import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorConfig';
@@ -16,6 +17,7 @@ import MongoSource from '../../../dataSources/MongoSource';
 import IntervalArranger from '../../../art/IntervalArranger';
 import GeneAnnotation from './GeneAnnotation';
 import SvgJsManaged from '../../SvgJsManaged';
+
 
 const ROW_VERTICAL_PADDING = 5;
 const ROW_HEIGHT = GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
@@ -47,11 +49,11 @@ function getTrackHeight(trackModel) {
 /**
  * From the raw data source records, filters out genes too small to see, and calculates absolute coordinates of those
  * that remain.  Returns an object with keys `genes`, which is an array of Genes that survived filtering, and
- * `numGenesHidden`, the the number of genes that were filtered out.
+ * `numHidden`, the the number of genes that were filtered out.
  * 
  * @param {Object[]} records - raw plain-object records
  * @param {Object} trackProps - props passed to Track
- * @return {Object} object with keys `genes` and `numGenesHidden`.  See doc above for details
+ * @return {Object} object with keys `genes` and `numHidden`.  See doc above for details
  */
 function processGenes(records, trackProps) {
     const genes = records.map(record => new Gene(record));
@@ -61,7 +63,7 @@ function processGenes(records, trackProps) {
     const absCoordGenes = _.flatMap(visibleGenes, gene => gene.computeNavContextCoordinates(navContext));
     return {
         genes: absCoordGenes,
-        numGenesHidden: genes.length - visibleGenes.length,
+        numHidden: genes.length - visibleGenes.length,
     };
 }
 
@@ -134,22 +136,13 @@ class GeneAnnotationVisualizer extends React.PureComponent {
     render() {
         const {data, trackModel, width} = this.props;
         const svgStyle = {paddingTop: 5, display: "block", overflow: "visible"};
-        let hiddenGenesMessage = null;
-        if (data.numGenesHidden) {
-            hiddenGenesMessage = (
-                <p style={{margin: 0, width: width, fontStyle: "italic", fontSize: "smaller", textAlign: "center"}} >
-                    {`${data.numGenesHidden} items too small - zoom in to view`}
-                </p>
-            );
-        }
-
         return (
         <React.Fragment>
             <svg width={width} height={getTrackHeight(trackModel)} style={svgStyle} >
                 {this.renderGenes()}
             </svg>
             {this.state.tooltip}
-            {hiddenGenesMessage}
+            <HiddenItemsMessage width={width} numHidden={data.numHidden} />
         </React.Fragment>
         );
     }
