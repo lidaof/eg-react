@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Manager, Target, Popper } from 'react-popper';
-import TrackModel from '../../model/TrackModel';
+import TrackModel from '../../../model/TrackModel';
 
 import './Tooltip.css';
 

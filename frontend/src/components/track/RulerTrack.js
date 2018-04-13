@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { VISUALIZER_PROP_TYPES } from './Track';
-import HoverTooltipContext from './HoverTooltipContext';
+import HoverTooltipContext from './commonComponents/HoverTooltipContext';
 import Chromosomes from '../genomeNavigator/Chromosomes';
 import Ruler from '../genomeNavigator/Ruler';
-import GenomicCoordinates from './GenomicCoordinates';
-import TrackLegend from './TrackLegend';
+import GenomicCoordinates from './commonComponents/GenomicCoordinates';
+import TrackLegend from './commonComponents/TrackLegend';
 
 const CHROMOSOMES_Y = 60;
 const RULER_Y = 20;

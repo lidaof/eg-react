@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { Manager, Target, Popper, Arrow } from 'react-popper';
-import OutsideClickDetector from '../OutsideClickDetector';
+import OutsideClickDetector from '../../OutsideClickDetector';
 
 const BACKGROUND_COLOR = "rgba(173, 216, 230, 0.9)"; // lightblue with opacity adjustment
 const ARROW_SIZE = 15;

@@ -7,9 +7,9 @@ import ZoomableTrackContainer from './ZoomableTrackContainer';
 import MetadataHeader from './MetadataHeader';
 
 import Track from '../track/Track';
-import TrackLegend from '../track/TrackLegend';
+import TrackLegend from '../track/commonComponents/TrackLegend';
 import TrackContextMenu from '../track/contextMenu/TrackContextMenu';
-import MetadataIndicator from '../track/MetadataIndicator';
+import MetadataIndicator from '../track/commonComponents/MetadataIndicator';
 
 import OutsideClickDetector from '../OutsideClickDetector';
 import ContextMenuManager from '../ContextMenuManager';

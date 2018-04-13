@@ -1,8 +1,8 @@
 import React from 'react';
 
 import BigWigTrack from './BigWigTrack';
-import BarPlot from './BarPlot';
-import HiddenItemsMessage from './HiddenItemsMessage';
+import BarPlot from './commonComponents/BarPlot';
+import HiddenItemsMessage from './commonComponents/HiddenItemsMessage';
 import { VISUALIZER_PROP_TYPES } from './Track';
 import { BackgroundColorConfig } from './contextMenu/ColorConfig';
 
@@ -12,7 +12,7 @@ import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
 import { CategoricalBarElementFactory } from '../../art/BarElementFactory';
 import { RenderTypes } from '../../art/DesignRenderer';
 
-import './Tooltip.css';
+import './commonComponents/Tooltip.css';
 
 const TOP_PADDING = 5;
 const BAR_CHART_STYLE = {paddingTop: TOP_PADDING};

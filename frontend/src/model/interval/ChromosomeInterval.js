@@ -4,6 +4,7 @@ import _ from 'lodash';
 /**
  * Basically an OpenInterval with a chromosome's name.  Expresses genomic coordinates.
  * 
+ * @implements {Serializable}
  * @author Silas Hsu
  */
 class ChromosomeInterval {
@@ -68,6 +69,14 @@ class ChromosomeInterval {
         this.chr = chr;
         this.start = start;
         this.end = end;
+    }
+
+    serialize() {
+        return [this.chr, this.start, this.end];
+    }
+
+    static deserialize(array) {
+        return new ChromosomeInterval(...array);
     }
 
     *[Symbol.iterator] () {

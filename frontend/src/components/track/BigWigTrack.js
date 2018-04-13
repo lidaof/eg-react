@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { VISUALIZER_PROP_TYPES } from './Track';
-import GenomicCoordinates from './GenomicCoordinates';
-import BarPlot from './BarPlot';
+import GenomicCoordinates from './commonComponents/GenomicCoordinates';
+import BarPlot from './commonComponents/BarPlot';
 import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorConfig';
-import NumericalLegend from './NumericalLegend';
+import NumericalLegend from './commonComponents/NumericalLegend';
 
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
 import { RenderTypes } from '../../art/DesignRenderer';
@@ -12,7 +12,7 @@ import { BarPlotRecord } from '../../art/BarPlotDesigner';
 import { SimpleBarElementFactory } from '../../art/BarElementFactory';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 
-import './Tooltip.css';
+import './commonComponents/Tooltip.css';
 
 const TOP_PADDING = 5;
 const BAR_CHART_STYLE = {marginTop: TOP_PADDING};

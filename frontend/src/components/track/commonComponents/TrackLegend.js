@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
 
-import TrackModel from '../../model/TrackModel';
+import TrackModel from '../../../model/TrackModel';
 
 const NUM_TICKS_SUGGESTION = 2;
 const AXIS_WIDTH = 30;

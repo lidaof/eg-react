@@ -1,5 +1,5 @@
 import React from 'react';
-import TrackLegend from './TrackLegend';
+import TrackLegend from './commonComponents/TrackLegend';
 import withAutoDimensions from '../withAutoDimensions';
 
 /**

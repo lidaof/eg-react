@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import MetadataSelectionMenu from './MetadataSelectionMenu';
-import MetadataIndicator from '../track/MetadataIndicator';
+import MetadataIndicator from '../track/commonComponents/MetadataIndicator';
 import './MetadataHeader.css';
 
 class MetadataHeader extends React.PureComponent {

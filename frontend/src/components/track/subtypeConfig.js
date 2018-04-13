@@ -16,7 +16,6 @@ const TYPE_NAME_TO_SUBTYPE = {
     "repeatmasker": RepeatMaskerTrack,
 };
 
-
 // Check if all the subtypes are clean
 for (let subtypeName in TYPE_NAME_TO_SUBTYPE) {
     const subtype = TYPE_NAME_TO_SUBTYPE[subtypeName];

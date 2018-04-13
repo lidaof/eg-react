@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { scaleLinear } from 'd3-scale';
 import TrackLegend from './TrackLegend';
-import TrackModel from '../../model/TrackModel';
+import TrackModel from '../../../model/TrackModel';
 
 /**
  * A TrackLegend specialized in displaying an axis for numerical data.

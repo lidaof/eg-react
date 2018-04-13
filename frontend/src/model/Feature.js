@@ -23,13 +23,13 @@ class Feature {
     serialize() {
         return {
             name: this._name,
-            locus: this._locus.toString(),
+            locus: this._locus.serialize(),
             isForwardStrand: this._isForwardStrand
         }
     }
 
     static deserialize(object) {
-        return new Feature(object.name, ChromosomeInterval.parse(object.locus), object.isForwardStrand);
+        return new Feature(object.name, ChromosomeInterval.deserialize(object.locus), object.isForwardStrand);
     }
 
     /**

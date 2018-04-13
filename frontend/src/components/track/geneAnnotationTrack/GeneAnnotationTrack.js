@@ -4,9 +4,9 @@ import _ from 'lodash';
 import GeneDetail from './GeneDetail';
 
 import { VISUALIZER_PROP_TYPES } from '../Track';
-import Tooltip from '../Tooltip';
-import TrackLegend from '../TrackLegend';
-import HiddenItemsMessage from '../HiddenItemsMessage';
+import Tooltip from '../commonComponents/Tooltip';
+import TrackLegend from '../commonComponents/TrackLegend';
+import HiddenItemsMessage from '../commonComponents/HiddenItemsMessage';
 
 import NumberConfig from '../contextMenu/NumberConfig';
 import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorConfig';

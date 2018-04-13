@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-import DesignRenderer from '../../art/DesignRenderer';
-import { BarPlotDesigner } from '../../art/BarPlotDesigner';
-import { BarElementFactory, SimpleBarElementFactory } from '../../art/BarElementFactory';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import HoverTooltipContext from './HoverTooltipContext';
+import DesignRenderer from '../../../art/DesignRenderer';
+import { BarPlotDesigner } from '../../../art/BarPlotDesigner';
+import { BarElementFactory, SimpleBarElementFactory } from '../../../art/BarElementFactory';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
+
 
 /**
  * Component that renders a bar chart graphic.
@@ -16,9 +17,10 @@ class BarPlot extends React.PureComponent {
     static propTypes = {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to display
         /**
-         * The data to display.  Array of BarPlotRecord.  See BarPlotDesigner.js for details.
+         * Data to display: array of objects that implement the interface of BarPlotRecord.  See BarPlotDesigner.js for
+         * details.
          */
-        data: PropTypes.arrayOf(PropTypes.object).isRequired, 
+        data: PropTypes.arrayOf(PropTypes.object).isRequired,
         width: PropTypes.number.isRequired, // Graphic width
         height: PropTypes.number.isRequired, // Graphic height
         elementFactory: PropTypes.instanceOf(BarElementFactory), // Drawing customizations to pass to BarPlotDesigner

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import LinearDrawingModel from '../../model/LinearDrawingModel'
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
+import LinearDrawingModel from '../../../model/LinearDrawingModel'
 
 /**
  * Calculates genomic coordinates at a page coordinate and displays them.

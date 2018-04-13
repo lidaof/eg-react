@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 
-import TrackLoadingNotice from './TrackLoadingNotice';
-import MetadataIndicator from './MetadataIndicator';
+import TrackLoadingNotice from './commonComponents/TrackLoadingNotice';
+import MetadataIndicator from './commonComponents/MetadataIndicator';
 
 import withExpandedWidth from '../withExpandedWidth';
 import getComponentName from '../getComponentName';
