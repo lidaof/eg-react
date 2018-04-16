@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
 
+import TranslatableG from '../../TranslatableG';
 import TrackModel from '../../../model/TrackModel';
 
 const NUM_TICKS_SUGGESTION = 2;
@@ -76,7 +77,7 @@ class TrackLegend extends React.PureComponent {
         let axis = null;
         if (scaleForAxis) {
             axis = <svg width={AXIS_WIDTH} height={height} style={{overflow: "visible"}} >
-                <g ref={node => this.gNode = node} transform={`translate(${AXIS_WIDTH}, 0)`} />
+                <TranslatableG innerRef={node => this.gNode = node} x={AXIS_WIDTH} />
             </svg>;
         }
 

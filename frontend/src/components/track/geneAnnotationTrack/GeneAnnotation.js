@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import AnnotationArrows from '../commonComponents/AnnotationArrows';
+import TranslatableG from '../../TranslatableG';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import Gene from '../../../model/Gene';
 import OpenInterval from '../../../model/interval/OpenInterval';
@@ -81,7 +82,7 @@ class GeneAnnotation extends React.PureComponent {
         const startX = Math.max(-1, drawModel.baseToX(absLocation.start));
         const endX = Math.min(drawModel.baseToX(absLocation.end), drawModel.getDrawWidth() + 1);
         const containerProps = {
-            transform: `translate(0 ${y})`,
+            y: y,
             onClick: event => onClick(event, gene)
         };
 
@@ -93,7 +94,7 @@ class GeneAnnotation extends React.PureComponent {
             fill={isMinimal ? color : backgroundColor}
         />;
         if (isMinimal) { // Just render a box if minimal.
-            return <g {...containerProps} >{coveringRect}</g>;
+            return <TranslatableG {...containerProps} >{coveringRect}</TranslatableG>;
         }
 
         const centerY = HEIGHT / 2;
@@ -160,7 +161,7 @@ class GeneAnnotation extends React.PureComponent {
         );
 
         return (
-        <g {...containerProps} >
+        <TranslatableG {...containerProps} >
             {coveringRect}
             {centerLine}
             {exons}
@@ -171,7 +172,7 @@ class GeneAnnotation extends React.PureComponent {
             {utrs}
             {labelBackground}
             {label}
-        </g>
+        </TranslatableG>
         );
     }
 }

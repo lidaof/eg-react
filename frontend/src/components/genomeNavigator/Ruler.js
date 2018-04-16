@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import TranslatableG from '../TranslatableG';
 import RulerDesigner from '../../art/RulerDesigner';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
@@ -17,8 +18,9 @@ class Ruler extends React.PureComponent {
     };
 
     render() {
-        const designer = new RulerDesigner(this.props.viewRegion, this.props.width);
-        return <g transform={`translate(${this.props.x || 0} ${this.props.y || 0})`} >{designer.design()}</g>;
+        const {viewRegion, width, x, y} = this.props;
+        const designer = new RulerDesigner(viewRegion, width);
+        return <TranslatableG x={x} y={y} >{designer.design()}</TranslatableG>;
     }
 }
 

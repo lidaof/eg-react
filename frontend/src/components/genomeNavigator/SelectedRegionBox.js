@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import TranslatableG from '../TranslatableG';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 
@@ -66,20 +67,16 @@ class SelectedRegionBox extends React.Component {
         this.props.onNewViewRequested(regionCenter - halfWidth, regionCenter + halfWidth);
     }
 
-    _pointsToString(points) {
-        const coords = points.map(point => point.join(","));
-        return coords.join(" ");
-    }
-
     /**
      * Moves the box and GOTO button to where it needs to go and shows/hides the GOTO button as needed.
      * 
      * @override
      */
     render() {
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
+        const {viewRegion, selectedRegion, x, y} = this.props;
+        const drawModel = new LinearDrawingModel(viewRegion, this.props.width);
         let drawWidth = drawModel.getDrawWidth();
-        let absRegion = this.props.selectedRegion.getAbsoluteRegion();
+        let absRegion = selectedRegion.getAbsoluteRegion();
 
         // We limit the box's start and end X because SVGs don't like to be billions of pixels wide.
         let xStart = Math.max(-10, drawModel.baseToX(absRegion.start));
@@ -95,7 +92,7 @@ class SelectedRegionBox extends React.Component {
                 [GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y],
                 [GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT]
             ];
-            gotoButton = <polygon points={this._pointsToString(points)} style={BOX_STYLE} onClick={this.gotoPressed} />;
+            gotoButton = <polygon points={points} style={BOX_STYLE} onClick={this.gotoPressed} />;
             gotoText = (<text
                 x={LABEL_X_PADDING}
                 y={LABEL_Y}
@@ -110,7 +107,7 @@ class SelectedRegionBox extends React.Component {
                 [drawWidth - GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y],
                 [drawWidth - GOTO_BUTTON_WIDTH, GOTO_BUTTON_Y + GOTO_BUTTON_HEIGHT]
             ];
-            gotoButton = <polygon points={this._pointsToString(points)} style={BOX_STYLE} onClick={this.gotoPressed}/>;
+            gotoButton = <polygon points={points} style={BOX_STYLE} onClick={this.gotoPressed}/>;
             gotoText = (<text
                 x={drawWidth - LABEL_X_PADDING}
                 y={LABEL_Y}
@@ -121,11 +118,11 @@ class SelectedRegionBox extends React.Component {
             </text>);
         }
         return (
-        <g transform={`translate(${this.props.x || 0} ${this.props.y || 0})`} >
+        <TranslatableG x={x} y={y} >
             {box}
             {gotoButton}
             {gotoText}
-        </g>
+        </TranslatableG>
         );
     }
 }
