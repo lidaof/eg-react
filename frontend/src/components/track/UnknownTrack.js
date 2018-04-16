@@ -10,11 +10,8 @@ import withAutoDimensions from '../withAutoDimensions';
  * @author Silas Hsu
  */
 function UnknownVisualizer(props) {
-    return (
-    <div style={{textAlign: "center", width: props.width}} >
-        {`Unknown track type: "${props.trackModel.type}"`}
-    </div>
-    );
+    const message = `Unknown track type: "${props.trackModel.type}"`;
+    return <div style={{textAlign: "center", width: props.width}} >{message}</div>;
 }
 
 const UnknownTrack = {

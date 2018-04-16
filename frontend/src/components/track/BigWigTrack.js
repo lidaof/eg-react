@@ -34,6 +34,13 @@ interface DASFeature {
     _chromId: number
 }
 */
+/**
+ * Converts raw records from bbi-js to BarPlotRecords.  The array returned by this function will appear as the `data`
+ * prop of the legend and visualizer.
+ * 
+ * @param {Object[]} data - raw, plain-object records
+ * @return {BarPlotRecord[]} BarPlotRecords to draw
+ */
 function convertToBarPlotRecords(data) {
     return data.map(feature =>
         new BarPlotRecord(new ChromosomeInterval(feature.segment, feature.min, feature.max), feature.score)

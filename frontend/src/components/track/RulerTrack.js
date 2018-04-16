@@ -14,8 +14,7 @@ const HEIGHT = 65;
 /**
  * A ruler.
  * 
- * @param {Object} props - props as specified by React
- * @return {JSX.Element} element to render
+ * @author Silas Hsu
  */
 class RulerVisualizer extends React.Component {
     static propTypes = VISUALIZER_PROP_TYPES;
@@ -25,6 +24,13 @@ class RulerVisualizer extends React.Component {
         this.getTooltipContents = this.getTooltipContents.bind(this);
     }
 
+    /**
+     * Updates only on changes to view region or width.
+     * 
+     * @param {Object} nextProps - props as specified by React
+     * @return {boolean} whether this component should rerender
+     * @override
+     */
     shouldComponentUpdate(nextProps, nextState) {
         return this.props.viewRegion !== nextProps.viewRegion || this.props.width !== nextProps.width;
     }
@@ -34,9 +40,6 @@ class RulerVisualizer extends React.Component {
         return <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />;
     }
 
-    /**
-     * @inheritdoc
-     */
     render() {
         const {viewRegion, width} = this.props;
         return (

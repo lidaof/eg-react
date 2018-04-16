@@ -22,7 +22,8 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * From the raw data source records, filters repeats too small to see.
+ * From the raw data source records, filters repeats too small to see.  The object returned by this function will appear
+ * as the `data` prop of the legend and visualizer.
  * 
  * @param {Object[]} records - raw plain-object records
  * @param {Object} trackProps - props passed to Track
