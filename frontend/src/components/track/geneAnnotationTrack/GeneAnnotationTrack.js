@@ -14,7 +14,6 @@ import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import MongoSource from '../../../dataSources/MongoSource';
 import GeneAnnotation from './GeneAnnotation';
-import SvgJsManaged from '../../SvgJsManaged';
 
 const ROW_VERTICAL_PADDING = 5;
 const ROW_HEIGHT = GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
@@ -100,22 +99,17 @@ class GeneAnnotationVisualizer extends React.PureComponent {
     renderGene(gene, absInterval, y, isLastRow) {
         const {viewRegion, width, viewWindow, options} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
-        return (
-        <SvgJsManaged
+        return <GeneAnnotation
             key={gene.refGeneRecord._id + gene.absStart}
-            transform={`translate(0 ${y})`}
-            onClick={event => this.openTooltip(event, gene)}
-        >
-            <GeneAnnotation
-                gene={gene}
-                isMinimal={isLastRow}
-                drawModel={drawModel}
-                absLocation={absInterval}
-                viewWindow={viewWindow}
-                options={options}
-            />
-        </SvgJsManaged>
-        );
+            gene={gene}
+            absLocation={absInterval}
+            y={y}
+            isMinimal={isLastRow}
+            drawModel={drawModel}
+            viewWindow={viewWindow}
+            options={options}
+            onClick={this.openTooltip}
+        />;
     }
 
     render() {

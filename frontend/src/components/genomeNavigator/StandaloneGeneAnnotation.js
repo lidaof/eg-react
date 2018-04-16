@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import SvgJsManaged from '../SvgJsManaged';
 import GeneAnnotation from '../track/geneAnnotationTrack/GeneAnnotation';
 import Gene from '../../model/Gene';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
@@ -23,7 +22,7 @@ class StandaloneGeneAnnotation extends React.PureComponent {
         const {gene, absLocation, drawModel} = this.props;
         return (
         <svg width={drawModel.getDrawWidth()} height={GeneAnnotation.HEIGHT} >
-            <SvgJsManaged><GeneAnnotation gene={gene} absLocation={absLocation} drawModel={drawModel} /></SvgJsManaged>
+            <GeneAnnotation gene={gene} absLocation={absLocation} drawModel={drawModel} />
         </svg>
         );
     }

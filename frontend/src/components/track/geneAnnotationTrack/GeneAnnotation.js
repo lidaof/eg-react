@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SVG from 'svg.js';
+import _ from 'lodash';
 
+import AnnotationArrows from '../commonComponents/AnnotationArrows';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import Gene from '../../../model/Gene';
 import OpenInterval from '../../../model/interval/OpenInterval';
@@ -10,14 +11,12 @@ const HEIGHT = 9;
 const UTR_HEIGHT = 5;
 const LABEL_SIZE = HEIGHT * 1.5;
 
-const ARROW_WIDTH = 5;
-const ARROW_SEPARATION = 12;
 const LABEL_BACKGROUND_PADDING = 2;
 const DEFAULT_COLOR = "blue";
 const DEFAULT_BACKGROUND_COLOR = "white";
 
 /**
- * A single annotation for the gene annotation track.
+ * A visualization of Gene objects.  Renders SVG elements.
  * 
  * @author Silas Hsu and Daofeng Li
  */
@@ -25,15 +24,12 @@ class GeneAnnotation extends React.PureComponent {
     static HEIGHT = HEIGHT;
 
     static propTypes = {
-        /**
-         * SVG drawing API.  Required but not marked as such to prevent warnings.
-         */
-        svgJs: PropTypes.instanceOf(SVG.Element),
         gene: PropTypes.instanceOf(Gene).isRequired, // Gene structure to draw
+        absLocation: PropTypes.instanceOf(OpenInterval).isRequired, // Location of gene in the nav context coordinates
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
-        absLocation: PropTypes.instanceOf(OpenInterval).isRequired,
+        y: PropTypes.number, // y offset
+        viewWindow: PropTypes.instanceOf(OpenInterval), // X range of visible pixels, used for label positioning
         isMinimal: PropTypes.bool, // If true, display only a minimal box
-        viewWindow: PropTypes.instanceOf(OpenInterval), // X range of initially visible pixels
         options: PropTypes.shape({
             color: PropTypes.string,
             backgroundColor: PropTypes.string,
@@ -41,72 +37,34 @@ class GeneAnnotation extends React.PureComponent {
     };
 
     static defaultProps = {
-        isMinimal: false,
+        y: 0,
         viewWindow: new OpenInterval(-Infinity, Infinity),
-        options: {}
+        isMinimal: false,
+        options: {},
+        onClick: () => undefined
     };
 
-    /**
-     * 
-     * @param {number} startAbsBase 
-     * @param {number} endAbsBase 
-     * @param {number} height 
-     * @param {string} color 
-     */
-    _drawCenteredBox(startAbsBase, endAbsBase, height, color) {
-        const {drawModel, svgJs} = this.props;
-        const startX = drawModel.baseToX(startAbsBase);
-        const width = drawModel.basesToXWidth(endAbsBase - startAbsBase);
-        const box = svgJs.rect(width, height).attr({
-            x: startX,
-            y: (HEIGHT - height) / 2,
-            fill: color
-        });
-        return box;
+    constructor(props) {
+        super(props);
+        this.state = {
+            exonClipId: _.uniqueId("GeneAnnotation")
+        };
     }
 
     /**
-     * Draws arrows in an interval in the most aesthetically pleasing way possible.
-     * 
-     * @param {number} startX 
-     * @param {number} endX 
-     * @param {string} color 
+     * Renders a series of rectangles centered on the horizontal axis of the annotation.
+     * @param {OpenInterval[]} absIntervals - nav context intervals in which to draw
+     * @param {number} height - height of all the rectangles
+     * @param {string} color - color of all the rectangles
+     * @return {JSX.Element[]} <rect> elements
      */
-    _drawArrowsInInterval(startX, endX, color, clip) {
-        if (endX - startX < ARROW_WIDTH) {
-            return;
-        }
-        const {gene, drawModel, svgJs} = this.props;
-        const centerY = HEIGHT / 2;
-        const bottomY = HEIGHT;
-
-        let placementStartX = Math.max(0, startX);
-        let placementEndX = Math.min(endX, drawModel.getDrawWidth());
-        if (gene.getIsForwardStrand()) { // Point to the right
-            placementStartX += ARROW_WIDTH;
-        } else {
-            placementEndX -= ARROW_WIDTH;
-        }
-
-        // Naming: if our arrows look like '<', then the tip is on the left, and the two tails are on the right.
-        for (let arrowTipX = placementStartX; arrowTipX <= placementEndX; arrowTipX += ARROW_SEPARATION) {
-            // Is forward strand ? point to the right : point to the left 
-            const arrowTailX = gene.getIsForwardStrand() ? arrowTipX - ARROW_WIDTH : arrowTipX + ARROW_WIDTH;
-            const arrowPoints = [
-                [arrowTailX, 1],
-                [arrowTipX, centerY],
-                [arrowTailX, bottomY - 1]
-            ];
-
-            const arrow = svgJs.polyline(arrowPoints).attr({
-                fill: "none",
-                stroke: color,
-                "stroke-width": 1
-            });
-            if (clip) {
-                arrow.clipWith(clip);
-            }
-        }
+    renderCenteredRects(absIntervals, height, color) {
+        const drawModel = this.props.drawModel;
+        return absIntervals.map(interval => {
+            const x = drawModel.baseToX(interval.start);
+            const width = drawModel.basesToXWidth(interval.getLength());
+            return <rect key={x} x={x} y={(HEIGHT - height) / 2} width={width} height={height} fill={color} />;
+        });
     }
 
     /**
@@ -116,55 +74,61 @@ class GeneAnnotation extends React.PureComponent {
      * @override
      */
     render() {
-        const {svgJs, gene, isMinimal, drawModel, viewWindow, absLocation, options} = this.props;
+        const {gene, absLocation, drawModel, y, viewWindow, isMinimal, options, onClick} = this.props;
+        const exonClipId = this.state.exonClipId;
         const color = options.color || DEFAULT_COLOR;
         const backgroundColor = options.backgroundColor || DEFAULT_BACKGROUND_COLOR;
-        svgJs.clear();
+        const startX = Math.max(-1, drawModel.baseToX(absLocation.start));
+        const endX = Math.min(drawModel.baseToX(absLocation.end), drawModel.getDrawWidth() + 1);
+        const containerProps = {
+            transform: `translate(0 ${y})`,
+            onClick: event => onClick(event, gene)
+        };
 
-        const startX = drawModel.baseToX(absLocation.start);
-        const endX = drawModel.baseToX(absLocation.end);
+        const coveringRect = <rect // Box that covers the whole annotation to increase the click area
+            x={startX}
+            y={0}
+            width={endX - startX}
+            height={HEIGHT}
+            fill={isMinimal ? color : backgroundColor}
+        />;
+        if (isMinimal) { // Just render a box if minimal.
+            return <g {...containerProps} >{coveringRect}</g>;
+        }
+
         const centerY = HEIGHT / 2;
+        const centerLine = <line x1={startX} y1={centerY} x2={endX} y2={centerY} stroke={color} strokeWidth={2} />;
 
-        // Box that covers the whole annotation to increase the click area
-        let coveringBox = svgJs.rect(endX - startX, HEIGHT).attr({
-            x: startX,
-            y: 0,
-        });
-
-        if (isMinimal) { // Just fill the box and end there
-            coveringBox.fill(color);
-            return null;
-        } else {
-            coveringBox.opacity(0);
-        }
+        // Exons, which are split into translated and non-translated ones (i.e. utrs)
         const {absTranslated, absUtrs} = gene.getAbsExons(absLocation);
+        const exons = this.renderCenteredRects(absTranslated, HEIGHT, color); // These are the translated exons
 
-        // Center line
-        svgJs.line(startX, centerY, endX, centerY).stroke({
-            color: color,
-            width: 2
-        });
+        const isToRight = gene.getIsForwardStrand();
+        const intronArrows = <AnnotationArrows
+            startX={startX}
+            endX={endX}
+            height={HEIGHT}
+            isToRight={isToRight}
+            color={color}
+        />;
+        // clipPath is an invisible element that defines where another element may draw.  We pass its id to exonArrows.
+        const exonClip = <clipPath id={exonClipId} >{exons}</clipPath>;
+        const exonArrows = <AnnotationArrows
+            startX={startX}
+            endX={endX}
+            height={HEIGHT}
+            isToRight={isToRight}
+            color={backgroundColor}
+            clipId={exonClipId}
+        />;
 
-        // Clip: a set of locations where an element will show up; it will not show elsewhere
-        let drawOnlyInExons = svgJs.clip();
-        // Translated exons, as thick boxes
-        for (let exon of absTranslated) {
-            const exonBox = this._drawCenteredBox(...exon, HEIGHT, color);
-            drawOnlyInExons.add(exonBox.clone()); // See comment for declaration of arrowClip
-        }
-
-        // Arrows
-        this._drawArrowsInInterval(startX, endX, color); // Arrows on the center line
-        this._drawArrowsInInterval(startX, endX, backgroundColor, drawOnlyInExons); // Arrows within exons
-
-        // UTRs, as thin boxes
-        for (let utr of absUtrs) {
-            this._drawCenteredBox(...utr, HEIGHT, backgroundColor); // White box to cover up arrows
-            this._drawCenteredBox(...utr, UTR_HEIGHT, color); // The actual box that represents the UTR
-        }
+        // utrArrowCover covers up arrows where the UTRs will be
+        const utrArrowCover = this.renderCenteredRects(absUtrs, HEIGHT, backgroundColor);
+        const utrs = this.renderCenteredRects(absUtrs, UTR_HEIGHT, color);
 
         // Label
         let labelX, textAnchor;
+        let labelBackground = null;
         // Label width is approx. because calculating bounding boxes is expensive.
         const estimatedLabelWidth = gene.getName().length * HEIGHT;
         const isBlockedLeft = startX - estimatedLabelWidth < viewWindow.start; // Label obscured if put on the left
@@ -178,23 +142,37 @@ class GeneAnnotation extends React.PureComponent {
         } else { // Just put it directly on top of the annotation
             labelX = viewWindow.start + 1;
             textAnchor = "start";
-            // We have to add some highlighting for contrast purposes.
-            svgJs.rect(estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2, HEIGHT).attr({
-                x: viewWindow.start - LABEL_BACKGROUND_PADDING,
-                y: 0,
-                fill: backgroundColor,
-                opacity: 0.65,
-            });
+            // We have to add some background for contrast purposes.
+            labelBackground = <rect
+                x={viewWindow.start - LABEL_BACKGROUND_PADDING}
+                y={0}
+                width={estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2}
+                height={HEIGHT}
+                fill={backgroundColor}
+                opacity={0.65}
+            />;
         }
 
-        svgJs.text(gene.getName()).attr({
-            x: labelX,
-            y: -HEIGHT,
-            "text-anchor": textAnchor,
-            "font-size": LABEL_SIZE,
-        });
+        const label = (
+            <text x={labelX} y={0} alignmentBaseline="hanging" textAnchor={textAnchor} fontSize={LABEL_SIZE} >
+                {gene.getName()}
+            </text>
+        );
 
-        return null;
+        return (
+        <g {...containerProps} >
+            {coveringRect}
+            {centerLine}
+            {exons}
+            {exonClip}
+            {intronArrows}
+            {exonArrows}
+            {utrArrowCover}
+            {utrs}
+            {labelBackground}
+            {label}
+        </g>
+        );
     }
 }
 
