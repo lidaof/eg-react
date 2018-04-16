@@ -31,6 +31,7 @@ class GeneAnnotation extends React.PureComponent {
         svgJs: PropTypes.instanceOf(SVG.Element),
         gene: PropTypes.instanceOf(Gene).isRequired, // Gene structure to draw
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
+        absLocation: PropTypes.instanceOf(OpenInterval).isRequired,
         isMinimal: PropTypes.bool, // If true, display only a minimal box
         viewWindow: PropTypes.instanceOf(OpenInterval), // X range of initially visible pixels
         options: PropTypes.shape({
@@ -115,13 +116,13 @@ class GeneAnnotation extends React.PureComponent {
      * @override
      */
     render() {
-        const {svgJs, gene, isMinimal, drawModel, viewWindow, options} = this.props;
+        const {svgJs, gene, isMinimal, drawModel, viewWindow, absLocation, options} = this.props;
         const color = options.color || DEFAULT_COLOR;
         const backgroundColor = options.backgroundColor || DEFAULT_BACKGROUND_COLOR;
         svgJs.clear();
 
-        const startX = drawModel.baseToX(gene.absStart);
-        const endX = drawModel.baseToX(gene.absEnd);
+        const startX = drawModel.baseToX(absLocation.start);
+        const endX = drawModel.baseToX(absLocation.end);
         const centerY = HEIGHT / 2;
 
         // Box that covers the whole annotation to increase the click area
@@ -136,6 +137,7 @@ class GeneAnnotation extends React.PureComponent {
         } else {
             coveringBox.opacity(0);
         }
+        const {absTranslated, absUtrs} = gene.getAbsExons(absLocation);
 
         // Center line
         svgJs.line(startX, centerY, endX, centerY).stroke({
@@ -146,7 +148,7 @@ class GeneAnnotation extends React.PureComponent {
         // Clip: a set of locations where an element will show up; it will not show elsewhere
         let drawOnlyInExons = svgJs.clip();
         // Translated exons, as thick boxes
-        for (let exon of gene.absTranslated) {
+        for (let exon of absTranslated) {
             const exonBox = this._drawCenteredBox(...exon, HEIGHT, color);
             drawOnlyInExons.add(exonBox.clone()); // See comment for declaration of arrowClip
         }
@@ -156,7 +158,7 @@ class GeneAnnotation extends React.PureComponent {
         this._drawArrowsInInterval(startX, endX, backgroundColor, drawOnlyInExons); // Arrows within exons
 
         // UTRs, as thin boxes
-        for (let utr of gene.absUtrs) {
+        for (let utr of absUtrs) {
             this._drawCenteredBox(...utr, HEIGHT, backgroundColor); // White box to cover up arrows
             this._drawCenteredBox(...utr, UTR_HEIGHT, color); // The actual box that represents the UTR
         }

@@ -5,7 +5,7 @@ import BedSource from '../../dataSources/BedSource';
 
 function convertToBarPlotRecords(data) {
     return data.map(record =>
-        new BarPlotRecord(new ChromosomeInterval(record.chr, record.start, record.end), Number(record.details))
+        new BarPlotRecord(new ChromosomeInterval(record.chr, record.start, record.end), Number(record[3]))
     );
 }
 

@@ -62,7 +62,7 @@ class FlankingStrategy {
         if (!safeInterval) {
             return null;
         }
-        return new Feature(feature.getName(), safeInterval, feature.getIsForwardStrand());
+        return new Feature(feature.getName(), safeInterval, feature.getStrand());
     }
 
     /**

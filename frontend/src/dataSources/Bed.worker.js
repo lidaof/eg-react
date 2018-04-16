@@ -128,23 +128,26 @@ class BedSourceWorker {
         let features = [];
         for (let line of lines) {
             const columns = line.split('\t');
-            if (columns.length < 4) {
+            if (columns.length < 3) {
                 continue;
             }
             if (columns[0] !== chromosome) {
                 continue;
             }
             
-            const feature = {
+            let feature = {
                 chr: columns[0],
                 start: Number.parseInt(columns[1]),
                 end: Number.parseInt(columns[2]),
-                details: columns[3] || ""
-            }
+            };
+
             if (feature.start > end) { // This is correct as long as the features are sorted by start
                 break;
             }
             if (feature.end >= start && feature.start <= end) {
+                for (let i = 3; i < columns.length; i++) { // Copy the rest of the columns to the feature
+                    feature[i] = columns[i];
+                }
                 features.push(feature);
             }
         }

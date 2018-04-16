@@ -14,22 +14,22 @@ class Feature {
      * @param {ChromosomeInterval} locus - genomic location of the feature
      * @param {boolean} [isForwardStrand] - whether this feature is on the forward strand.  Default: true
      */
-    constructor(name, locus, isForwardStrand=true) {
+    constructor(name, locus, strand) {
         this._name = name == undefined ? locus.toString() : name; // eslint-disable-line eqeqeq
         this._locus = locus;
-        this._isForwardStrand = isForwardStrand;
+        this._strand = strand;
     }
 
     serialize() {
         return {
             name: this._name,
             locus: this._locus.serialize(),
-            isForwardStrand: this._isForwardStrand
+            strand: this._strand
         }
     }
 
     static deserialize(object) {
-        return new Feature(object.name, ChromosomeInterval.deserialize(object.locus), object.isForwardStrand);
+        return new Feature(object.name, ChromosomeInterval.deserialize(object.locus), object.strand);
     }
 
     /**
@@ -40,13 +40,6 @@ class Feature {
     }
 
     /**
-     * @return {number} the length of this feature
-     */
-    getLength() {
-        return this._locus.getLength();
-    }
-
-    /**
      * @return {ChromosomeInterval} the genomic location of this feature
      */
     getLocus() {
@@ -54,10 +47,44 @@ class Feature {
     }
 
     /**
+     * @return {number} the length of this feature's locus
+     */
+    getLength() {
+        return this._locus.getLength();
+    }
+
+    /**
+     * @return {string} raw strand info of this instance
+     */
+    getStrand() {
+        return this._strand;
+    }
+
+    /**
      * @return {boolean} whether this feature is on the forward strand
      */
     getIsForwardStrand() {
-        return this._isForwardStrand;
+        return this._strand === "+";
+    }
+
+    /**
+     * @return {boolean} whether this feature is on the reverse strand
+     */
+    getIsReverseStrand() {
+        return this._strand === "-";
+    }
+
+    /**
+     * 
+     * @param {NavigationContext} navContext 
+     * @return {OpenInterval[]} 
+     */
+    computeNavContextCoordinates(navContext) {
+        const absLocations = navContext.convertGenomeIntervalToBases(this.getLocus());
+        for (let interval of absLocations) {
+            interval.feature = this;
+        }
+        return absLocations;
     }
 }
 

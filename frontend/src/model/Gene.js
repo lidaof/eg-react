@@ -36,7 +36,7 @@ class Gene extends Feature {
      */
     constructor(refGeneRecord) {
         const locus = new ChromosomeInterval(refGeneRecord.chrom, refGeneRecord.txStart, refGeneRecord.txEnd);
-        super(refGeneRecord.name2, locus, refGeneRecord.strand === "+");
+        super(refGeneRecord.name2, locus, refGeneRecord.strand);
         this.refGeneRecord = refGeneRecord;
         this._translated = null;
         this._utrs = null;
@@ -103,35 +103,19 @@ class Gene extends Feature {
         return response.data[0] ? response.data[0].description : "";
     }
 
-    /**
-     * Calculates absolute coordinates of the gene body and exons.  Returns shallow copies of this instance for each
-     * location in the navigation context.  The copies will contain additional props `absStart`, `absEnd`,
-     * `absTranslated`, and `absUtrs`.
-     * 
-     * @param {NavigationContext} navContext - context with which to calculate absolute base numbers
-     * @return {Gene[]} shallow copies with additional props containing absolute base numbers
-     */
-    computeNavContextCoordinates(navContext) {
+    getAbsExons(absLocation) {
         const locusStart = this.getLocus().start;
-        const absLocations = navContext.convertGenomeIntervalToBases(this.getLocus());
-        let results = [];
-        for (let absLocation of absLocations) {
-            let clone = _.clone(this);
-            clone.absStart = absLocation.start;
-            clone.absEnd = absLocation.end;
-
-            const computeInternalInterval = function(interval) {
-                const startDistFromLocus = interval.start - locusStart;
-                const endDistFromLocus = interval.end - locusStart;
-                return absLocation.getOverlap(
-                    new OpenInterval(absLocation.start + startDistFromLocus, absLocation.start + endDistFromLocus)
-                );
-            };
-            clone.absTranslated = clone.translated.map(computeInternalInterval).filter(interval => interval != null);
-            clone.absUtrs = clone.utrs.map(computeInternalInterval).filter(interval => interval != null);
-            results.push(clone);
+        const computeInternalInterval = function(interval) {
+            const startDistFromLocus = interval.start - locusStart;
+            const endDistFromLocus = interval.end - locusStart;
+            return absLocation.getOverlap(
+                new OpenInterval(absLocation.start + startDistFromLocus, absLocation.start + endDistFromLocus)
+            );
         }
-        return results;
+        return {
+            absTranslated: this.translated.map(computeInternalInterval).filter(interval => interval != null),
+            absUtrs: this.utrs.map(computeInternalInterval).filter(interval => interval != null)
+        };
     }
 }
 

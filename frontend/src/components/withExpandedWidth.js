@@ -17,6 +17,8 @@ export default function withExpandedWidth(WrappedComponent) {
         static propTypes = {
             viewExpansion: PropTypes.object.isRequired, // Info on the width of this component
             xOffset: PropTypes.number, // How much to offset children's horizontal position
+            style: PropTypes.object, // Style of the outer div
+            innerStyle: PropTypes.object, // Style to merge of wrapped component.  Some styles may be overriden.
             innerRef: PropTypes.func, // Accessor for ref to wrapped component
         };
 
@@ -25,7 +27,7 @@ export default function withExpandedWidth(WrappedComponent) {
         };
 
         render() {
-            const {viewExpansion, xOffset, innerRef, style, ...remainingProps} = this.props;
+            const {viewExpansion, xOffset, innerRef, style, innerStyle, ...remainingProps} = this.props;
             let left = 0;
             if (xOffset > 0) {
                 // Dragging stuff on the left into view.  So, we limit to how many pixels exist on the left.
@@ -36,12 +38,12 @@ export default function withExpandedWidth(WrappedComponent) {
                 left = Math.max(-numPixelsOnRight, xOffset);
             }
 
-            const divStyle = {
+            const divStyle = Object.assign(style || {}, {
                 overflowX: "hidden",
                 width: viewExpansion.viewWindow.getLength(),
-            };
+            });
 
-            const wrappedStyle = Object.assign(style || {}, {
+            const wrappedStyle = Object.assign(innerStyle || {}, {
                 position: "relative",
                 // This centers the view window, rather than it starting at the leftmost part of the wrapped component.
                 marginLeft: -viewExpansion.viewWindow.start,
@@ -51,10 +53,10 @@ export default function withExpandedWidth(WrappedComponent) {
             return (
             <div style={divStyle}>
                 <WrappedComponent
+                    {...remainingProps}
                     width={viewExpansion.expandedWidth}
                     style={wrappedStyle}
                     ref={innerRef}
-                    {...remainingProps}
                 />
             </div>
             );
