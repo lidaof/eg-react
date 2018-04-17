@@ -1,6 +1,6 @@
 import RulerTrack from './RulerTrack';
 import BigWigTrack from './BigWigTrack';
-import BedTrack from './BedTrack';
+import BedTrack from './bedTrack/BedTrack';
 import BedGraphTrack from './BedGraphTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
 import RepeatMaskerTrack from './RepeatMaskerTrack';

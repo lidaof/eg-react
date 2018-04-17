@@ -1,4 +1,9 @@
-// Utility functions that don't really fit in any particular folder.
+/**
+ * Utility functions that don't really fit in any particular folder.
+ * 
+ * @author Silas Hsu
+ */ 
+import parseColor from 'parse-color';
 
 /**
  * Button consts found in MouseEvents.  See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -73,6 +78,24 @@ export function debugShouldComponentUpdate(thisProps, thisState, nextProps, next
     }
 
     return false;
+}
+
+/**
+ * Gets a color that contrasts well with the input color.  Useful for determining font color for a given background
+ * color.  Thanks to https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
+ * 
+ * @param {string} color - color for which to find a contrasting color
+ * @return {string} a color that contrasts well with the input color
+ */
+export function getContrastingColor(color) {
+    const parsedColor = parseColor(color);
+    const [r, g, b] = parsedColor.rgb;
+    const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    if (brightness < 0.5) {
+        return "white";
+    } else {
+        return "black";
+    }
 }
 
 /**

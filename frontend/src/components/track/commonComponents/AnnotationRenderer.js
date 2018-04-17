@@ -7,20 +7,38 @@ import Feature from '../../../model/Feature';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 import IntervalArranger from '../../../art/IntervalArranger';
 
+/**
+ * An arranger and renderer of features, or annotations.
+ * 
+ * @author Silas Hsu
+ */
 class AnnotationRenderer extends React.PureComponent {
     static propTypes = {
-        features: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired,
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-        width: PropTypes.number.isRequired,
-        numRows: PropTypes.number.isRequired,
-        rowHeight: PropTypes.number.isRequired,
+        features: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired, // Features to render
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // View region in which to render
+        width: PropTypes.number.isRequired, // Width, in pixels, of the visualization
+        numRows: PropTypes.number.isRequired, // Max number of rows in which to arrange annotations
+        rowHeight: PropTypes.number.isRequired, // Height of each row
+        /**
+         * Callback for getting an annotation element to render.  Signature:
+         *     (feature: Feature, absInterval: OpenInterval, y: number, isLastRow: boolean): JSX.Element
+         *         `feature`: feature for which to get annotation element
+         *         `absInterval`: location of the feature in navigation context
+         *         `y`: y coordinate to render the annotation
+         *         `isLastRow`: whether the annotation is assigned to the last configured row
+         */
         getAnnotationElement: PropTypes.func.isRequired,
-        getHorizontalPadding: PropTypes.func,
+        /**
+         * Minimum horizontal padding to give to annotations.  If a number, it is used as a constant.  If a function, it
+         * is used as a callback with signature (feature: Feature): number
+         *     `feature`: feature for which to get horizontal padding
+         */
+        getHorizontalPadding: PropTypes.oneOfType([PropTypes.number, PropTypes.func]),
     };
 
     static defaultProps = {
-        getHorizontalPadding: feature => 0,
-    }
+        getHorizontalPadding: 0
+    };
 
     render() {
         const {features, viewRegion, width, numRows, rowHeight, getHorizontalPadding, getAnnotationElement} = this.props;
@@ -30,7 +48,10 @@ class AnnotationRenderer extends React.PureComponent {
 
         // Arrange all the absolute intervals (rowAssignments)
         const drawModel = new LinearDrawingModel(viewRegion, width);
-        const paddingCallback = interval => getHorizontalPadding(interval.feature);
+        const isPaddingConst = typeof getHorizontalPadding === "number";
+        const paddingCallback = (interval => isPaddingConst ?
+            getHorizontalPadding : getHorizontalPadding(interval.feature)
+        );
         const intervalArranger = new IntervalArranger(drawModel, numRows - 1, paddingCallback);
         const rowAssignments = intervalArranger.arrange(intervals);
 

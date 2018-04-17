@@ -1,5 +1,6 @@
 import React from 'react';
 
+import GeneAnnotation from './GeneAnnotation';
 import GeneDetail from './GeneDetail';
 import { VISUALIZER_PROP_TYPES } from '../Track';
 import Tooltip from '../commonComponents/Tooltip';
@@ -13,7 +14,6 @@ import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorC
 import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import MongoSource from '../../../dataSources/MongoSource';
-import GeneAnnotation from './GeneAnnotation';
 
 const ROW_VERTICAL_PADDING = 5;
 const ROW_HEIGHT = GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
@@ -92,10 +92,22 @@ class GeneAnnotationVisualizer extends React.PureComponent {
         this.setState({tooltip: tooltip});
     }
 
+    /**
+     * Sets state to close tooltip.
+     */
     closeTooltip() {
         this.setState({tooltip: null});
     }
 
+    /**
+     * Renders one gene annotation.
+     * 
+     * @param {Gene} gene - gene to render
+     * @param {OpenInterval} absInterval - location of the gene in navigation context
+     * @param {number} y - y coordinate to render the annotation
+     * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
+     * @return {JSX.Element} element visualizing the gene
+     */
     renderGene(gene, absInterval, y, isLastRow) {
         const {viewRegion, width, viewWindow, options} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
@@ -126,7 +138,7 @@ class GeneAnnotationVisualizer extends React.PureComponent {
                     rowHeight={ROW_HEIGHT}
                     getHorizontalPadding={getHorizontalPadding}
                     getAnnotationElement={this.renderGene}
-                    color={options.color} // It doesn't actually use this prop, but we pass it to trigger rerenders.
+                    options={options} // It doesn't actually use this prop, but we pass it to trigger rerenders.
                 />
             </svg>
             {this.state.tooltip}

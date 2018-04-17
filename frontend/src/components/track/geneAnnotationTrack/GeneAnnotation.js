@@ -2,17 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import AnnotationArrows from '../commonComponents/AnnotationArrows';
 import TranslatableG from '../../TranslatableG';
+import AnnotationArrows from '../commonComponents/AnnotationArrows';
+import BackgroundedText from '../commonComponents/BackgroundedText';
+
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import Gene from '../../../model/Gene';
 import OpenInterval from '../../../model/interval/OpenInterval';
 
 const HEIGHT = 9;
 const UTR_HEIGHT = 5;
-const LABEL_SIZE = HEIGHT * 1.5;
-
-const LABEL_BACKGROUND_PADDING = 2;
 const DEFAULT_COLOR = "blue";
 const DEFAULT_BACKGROUND_COLOR = "white";
 
@@ -21,7 +20,7 @@ const DEFAULT_BACKGROUND_COLOR = "white";
  * 
  * @author Silas Hsu and Daofeng Li
  */
-class GeneAnnotation extends React.PureComponent {
+class GeneAnnotation extends React.Component {
     static HEIGHT = HEIGHT;
 
     static propTypes = {
@@ -29,12 +28,21 @@ class GeneAnnotation extends React.PureComponent {
         absLocation: PropTypes.instanceOf(OpenInterval).isRequired, // Location of gene in the nav context coordinates
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
         y: PropTypes.number, // y offset
-        viewWindow: PropTypes.instanceOf(OpenInterval), // X range of visible pixels, used for label positioning
+        /**
+         * x range of visible pixels, used for label positioning.  By default, assumes all pixels are visible.
+         */
+        viewWindow: PropTypes.instanceOf(OpenInterval),
         isMinimal: PropTypes.bool, // If true, display only a minimal box
         options: PropTypes.shape({
             color: PropTypes.string,
             backgroundColor: PropTypes.string,
         }),
+        /**
+         * Callback for click events.  Signature: (event: MouseEvent, gene: Gene): void
+         *     `event`: the triggering click event
+         *     `gene`: the same Gene as the one passed via props
+         */
+        onClick: PropTypes.func,
     };
 
     static defaultProps = {
@@ -42,7 +50,7 @@ class GeneAnnotation extends React.PureComponent {
         viewWindow: new OpenInterval(-Infinity, Infinity),
         isMinimal: false,
         options: {},
-        onClick: () => undefined
+        onClick: (event, gene) => undefined
     };
 
     constructor(props) {
@@ -129,7 +137,7 @@ class GeneAnnotation extends React.PureComponent {
 
         // Label
         let labelX, textAnchor;
-        let labelBackground = null;
+        let labelHasBackground = false;
         // Label width is approx. because calculating bounding boxes is expensive.
         const estimatedLabelWidth = gene.getName().length * HEIGHT;
         const isBlockedLeft = startX - estimatedLabelWidth < viewWindow.start; // Label obscured if put on the left
@@ -143,21 +151,21 @@ class GeneAnnotation extends React.PureComponent {
         } else { // Just put it directly on top of the annotation
             labelX = viewWindow.start + 1;
             textAnchor = "start";
-            // We have to add some background for contrast purposes.
-            labelBackground = <rect
-                x={viewWindow.start - LABEL_BACKGROUND_PADDING}
-                y={0}
-                width={estimatedLabelWidth + LABEL_BACKGROUND_PADDING * 2}
-                height={HEIGHT}
-                fill={backgroundColor}
-                opacity={0.65}
-            />;
+            labelHasBackground = true; // Need to add background for contrast purposes
         }
-
         const label = (
-            <text x={labelX} y={0} alignmentBaseline="hanging" textAnchor={textAnchor} fontSize={LABEL_SIZE} >
+            <BackgroundedText
+                x={labelX}
+                y={0}
+                height={HEIGHT}
+                fill={color}
+                alignmentBaseline="hanging"
+                textAnchor={textAnchor}
+                backgroundColor={backgroundColor}
+                backgroundOpacity={labelHasBackground ? 0.65 : 0}
+            >
                 {gene.getName()}
-            </text>
+            </BackgroundedText>
         );
 
         return (
@@ -170,7 +178,6 @@ class GeneAnnotation extends React.PureComponent {
             {exonArrows}
             {utrArrowCover}
             {utrs}
-            {labelBackground}
             {label}
         </TranslatableG>
         );

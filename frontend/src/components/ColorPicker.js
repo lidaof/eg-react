@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { Manager, Target, Popper } from 'react-popper';
 import { SketchPicker } from 'react-color';
 import parseColor from 'parse-color';
-import _ from 'lodash';
+
 import OutsideClickDetector from './OutsideClickDetector';
+import { getContrastingColor } from '../util';
 
 const PICKER_OPENER_STYLE = {
     border: '1px solid grey',
@@ -14,7 +15,6 @@ const PICKER_OPENER_STYLE = {
     minWidth: 50,
     minHeight: '1em',
 };
-const WHITE_TEXT_THRESHOLD = 255 * 1.5;
 
 /**
  * A color picker.
@@ -61,11 +61,11 @@ class ColorPicker extends React.PureComponent {
     render() {
         const {color, label, onChange} = this.props;
 
-        let openerStyle = {backgroundColor: this.props.color};
-        const parsedColor = parseColor(this.props.color);
-        if (_.sum(parsedColor.rgb) < WHITE_TEXT_THRESHOLD) {
-            openerStyle.color = "white";
-        }
+        const parsedColor = parseColor(color);
+        let openerStyle = {
+            backgroundColor: color,
+            color: getContrastingColor(color)
+        };
         Object.assign(openerStyle, PICKER_OPENER_STYLE);
 
         const pickerOpener = <span style={openerStyle} onClick={this.openPicker} >{label || parsedColor.hex}</span>;
