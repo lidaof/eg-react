@@ -94,6 +94,10 @@ class GeneAnnotation extends React.Component {
             onClick: event => onClick(event, gene)
         };
 
+        if (endX - startX < 0) {
+            return null;
+        }
+
         const coveringRect = <rect // Box that covers the whole annotation to increase the click area
             x={startX}
             y={0}

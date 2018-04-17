@@ -41,16 +41,20 @@ class BedAnnotation extends React.Component {
 
     render() {
         const {feature, drawModel, absLocation, y, color, onClick} = this.props;
-        const x = drawModel.baseToX(absLocation.start);
-        const width = drawModel.basesToXWidth(absLocation.getLength());
+        const startX = Math.max(-1, drawModel.baseToX(absLocation.start));
+        const endX = Math.min(drawModel.baseToX(absLocation.end), drawModel.getDrawWidth() + 1);
+        const width = endX - startX;
+        if (width < 0) {
+            return null;
+        }
 
-        const mainBody = <rect x={x} y={0} width={width} height={HEIGHT} fill={color} />;
+        const mainBody = <rect x={startX} y={0} width={width} height={HEIGHT} fill={color} />;
 
         let arrows = null;
         if (feature.getIsForwardStrand() || feature.getIsReverseStrand()) {
             arrows = <AnnotationArrows
-                startX={x}
-                endX={x + width}
+                startX={startX}
+                endX={endX}
                 height={HEIGHT}
                 isToRight={feature.getIsForwardStrand()}
                 color="white"
@@ -60,7 +64,7 @@ class BedAnnotation extends React.Component {
         let label = null;
         const estimatedLabelWidth = feature.getName().length * HEIGHT;
         if (estimatedLabelWidth < 0.5 * width) {
-            const centerX = x + 0.5 * width;
+            const centerX = startX + 0.5 * width;
             label = (
                 <BackgroundedText
                     x={centerX}

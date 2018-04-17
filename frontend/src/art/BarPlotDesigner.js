@@ -66,10 +66,14 @@ export class BarPlotDesigner {
 
         const drawModel = new LinearDrawingModel(this._viewRegion, this._width);
         const navContext = this._viewRegion.getNavigationContext();
+        const absViewInterval = this._viewRegion.getAbsoluteRegion();
         let elements = [];
         for (let record of data) {
             const absLocations = navContext.convertGenomeIntervalToBases(record.getLocus());
             for (let location of absLocations) {
+                if (!location.getOverlap(absViewInterval)) {
+                    continue;
+                }
                 const x = Math.round(drawModel.baseToX(location.start));
                 const width = Math.ceil(drawModel.basesToXWidth(location.getLength()));
                 this._addToCoordinateMap(x, width, record);
