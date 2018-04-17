@@ -49,6 +49,11 @@ const defaultTracks = [
         url: "http://vizhub.wustl.edu/public/hg19/rmsk16.bb"
     }),
     new TrackModel({
+        type: "methylc",
+        name: "Methylation",
+        url: "http://vizhub.wustl.edu/public/hg19/methylc2/h1.lifttohg19.gz"
+    }),
+    new TrackModel({
         type: "ruler",
         name: "Ruler",
     })

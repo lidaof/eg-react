@@ -3,6 +3,7 @@ import BigWigTrack from './BigWigTrack';
 import BedGraphTrack from './BedGraphTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
 import RepeatMaskerTrack from './RepeatMaskerTrack';
+import MethylCTrack from './MethylCTrack';
 import UnknownTrack from './UnknownTrack';
 
 /**
@@ -14,6 +15,7 @@ const TYPE_NAME_TO_SUBTYPE = {
     "bedgraph": BedGraphTrack,
     "hammock": GeneAnnotationTrack,
     "repeatmasker": RepeatMaskerTrack,
+    "methylc": MethylCTrack,
 };
 
 // Check if all the subtypes are clean
