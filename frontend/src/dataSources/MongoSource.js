@@ -12,12 +12,17 @@ class MongoSource extends DataSource {
      * @inheritdoc
      */
     async getData(region, options) {
-        let promises = region.getGenomeIntervals().map(locus =>
+        let promises = region.getGenomeIntervals().map(locus => {
+            const params = {
+                chr: locus.chr,
+                start: locus.start,
+                end: locus.end
+            };
             /**
              * Gets an object that looks like {data: []}
              */
-            axios.get(`/hg19/geneQuery/${locus.chr}/${locus.start}/${locus.end}`)
-        );
+            return axios.get(`/hg19/genes/queryRegion`, {params: params});
+        });
 
         const dataForEachSegment = await Promise.all(promises);
         return _.flatMap(dataForEachSegment, 'data');

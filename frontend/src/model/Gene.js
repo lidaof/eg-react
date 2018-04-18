@@ -99,8 +99,13 @@ class Gene extends Feature {
      * @return {Promise<string>} - description of the gene
      */
     async getDescription(genomeName) {
-        const response = await axios.get(`/${genomeName}/refseqDesc/${this.refGeneRecord.name}`);
-        return response.data[0] ? response.data[0].description : "";
+        try {
+            const response = await axios.get(`/${genomeName}/genes/${this.refGeneRecord.name}/description`);
+            return response.data.description || "";
+        } catch (error) {
+            console.error(error);
+            return "ERROR";
+        }
     }
 
     getAbsExons(absLocation) {

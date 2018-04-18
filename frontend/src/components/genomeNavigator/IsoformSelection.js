@@ -50,8 +50,12 @@ class IsoformSelection extends React.PureComponent {
     }
 
     async getSuggestions(geneName) {
-        const genomeConfig = this.props.genomeConfig;
-        const response = await axios.get(`/${genomeConfig.genome.getName()}/refGene/${geneName}`);
+        const genomeName = this.props.genomeConfig.genome.getName();
+        const params = {
+            q: geneName,
+            isExact: true
+        };
+        const response = await axios.get(`/${genomeName}/genes/queryName`, {params: params});
         const genes = response.data.map(record => new Gene(record));
         this.setState({isLoading: false, genes: genes});
     }
