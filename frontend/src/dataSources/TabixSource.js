@@ -1,5 +1,6 @@
 import DataSource from './DataSource';
 import _ from 'lodash';
+import MethylCRecord from '../model/MethylCRecord';
 
 const tabix = require('../vendor/bbi-js/main/tabix');
 const bin = require('../vendor/bbi-js/utils/bin');
@@ -40,8 +41,9 @@ class TabixSource extends DataSource {
             this.getFeaturesInInterval(interval.getGenomeCoordinates())
         );
         const features = await Promise.all(promises);
-        //console.log(features);
-        return _.flatten(features);
+        const results = _.flatten(features).map(feature => new MethylCRecord(feature));
+        console.log(results);
+        return results;
     }
 
     /**
