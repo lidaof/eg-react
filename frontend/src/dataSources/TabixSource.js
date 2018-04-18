@@ -1,4 +1,6 @@
 import DataSource from './DataSource';
+import _ from 'lodash';
+
 const tabix = require('../vendor/bbi-js/main/tabix');
 const bin = require('../vendor/bbi-js/utils/bin');
 
@@ -38,7 +40,8 @@ class TabixSource extends DataSource {
             this.getFeaturesInInterval(interval.getGenomeCoordinates())
         );
         const features = await Promise.all(promises);
-        return features.join("");
+        //console.log(features);
+        return _.flatten(features);
     }
 
     /**
@@ -55,6 +58,7 @@ class TabixSource extends DataSource {
                 if (error) {
                     reject(error);
                 } else {
+                    //console.log(data);
                     resolve(data)
                 }
             });

@@ -4,7 +4,7 @@ import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import TabixSource from '../../dataSources/TabixSource';
 
 function convertToBarPlotRecords(data) {
-    console.log(data);
+    //console.log(data);
     return data.map(record =>
         new BarPlotRecord(new ChromosomeInterval(record.chr, record.start, record.end), Number(record.details))
     );
