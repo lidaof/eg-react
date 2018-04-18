@@ -7,19 +7,23 @@ import RepeatMaskerTrack from './RepeatMaskerTrack';
 import UnknownTrack from './UnknownTrack';
 
 /**
- * Mapping from track type name to an object implementing the TrackSubtype interface.  Make sure all keys are lowercase!
+ * Mapping from track type name to an object implementing the TrackSubtype interface.  Uppercase letters are disallowed
+ * in type names, because we want comparisons to be case-insensitive.
  */
 const TYPE_NAME_TO_SUBTYPE = {
     "ruler": RulerTrack,
     "bigwig": BigWigTrack,
     "bed": BedTrack,
     "bedgraph": BedGraphTrack,
-    "hammock": GeneAnnotationTrack,
+    "geneannotation": GeneAnnotationTrack,
     "repeatmasker": RepeatMaskerTrack,
 };
 
 if (process.env.NODE_ENV !== "production") { // Check if all the subtypes are clean
     for (let subtypeName in TYPE_NAME_TO_SUBTYPE) {
+        if (subtypeName.toLowerCase() !== subtypeName) {
+            throw new TypeError(`Uppercase letters are disallowed in type names.  Offender: "${subtypeName}"`);
+        }
         const subtype = TYPE_NAME_TO_SUBTYPE[subtypeName];
         if (!subtype.visualizer) {
             throw new TypeError(`In config for type "${subtypeName}": a visualizer is required, but it was undefined.`);

@@ -39,9 +39,9 @@ const defaultTracks = [
         url: "http://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig",
     }),
     new TrackModel({
-        type: "hammock",
+        type: "geneAnnotation",
         name: "refGene",
-        url: 'http://egg.wustl.edu/d/hg19/refGene.gz',
+        genome: "hg19",
     }),
     new TrackModel({
         type: "bed",

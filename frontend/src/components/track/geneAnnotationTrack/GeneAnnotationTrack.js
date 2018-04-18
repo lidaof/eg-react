@@ -13,7 +13,7 @@ import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorC
 
 import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
-import MongoSource from '../../../dataSources/MongoSource';
+import GeneSource from '../../../dataSources/GeneSource';
 
 const ROW_VERTICAL_PADDING = 5;
 const ROW_HEIGHT = GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
@@ -161,7 +161,7 @@ const GeneAnnotationTrack = {
     legend: GeneAnnotationLegend,
     menuItems: [NumRowsConfig, PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: trackModel => new MongoSource(),
+    getDataSource: trackModel => new GeneSource(trackModel.genome),
     processData: processGenes,
 };
 

@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import connect from 'react-redux/lib/connect/connect';
+import { ActionCreators } from '../../AppState';
 
 import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
+import ZoomOutTrackContainer from './ZoomOutTrackContainer';
 import MetadataHeader from './MetadataHeader';
 
 import Track from '../track/Track';
@@ -15,13 +18,10 @@ import OutsideClickDetector from '../OutsideClickDetector';
 import ContextMenuManager from '../ContextMenuManager';
 import DivWithBullseye from '../DivWithBullseye';
 import Reparentable from '../Reparentable';
-
 import withAutoDimensions from '../withAutoDimensions';
+
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import { ActionCreators } from '../../AppState';
-import connect from 'react-redux/lib/connect/connect';
-import ZoomOutTrackContainer from './ZoomOutTrackContainer';
 
 const Tools = {
     CROSSHAIR: {
