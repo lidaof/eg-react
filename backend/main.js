@@ -49,7 +49,7 @@ async function main(argv) {
         mongoClient = await mongoUtils.getMongoClient(dbUrl);
         console.log(`Established MongoDB connection at ${dbUrl}`);
     } catch (error) {
-        console.error(error);
+        console.error(error.toString());
         console.error("Couldn't establish a MongoDB connection; aborting...");
         process.exit(ExitCodes.MONGO_ERROR);
     }

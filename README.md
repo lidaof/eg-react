@@ -1,6 +1,6 @@
 # Server
 ## Installation
-Follow the instructions in `backend/mongo.txt`.  MongoDB must be running.
+Enter the `backend` directory.  `npm install`, and then `npm run setup`.  MongoDB must be running.
 
 ## Running
 1.  Make sure MongoDB is running.

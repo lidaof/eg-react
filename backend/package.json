@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "setup": "node setup/setupMongo.js",
     "start": "node main.js dev",
     "start-prod": "node main.js prod"
   },
@@ -22,6 +23,7 @@
     "joi": "^13.1.2",
     "lodash": "^4.17.5",
     "mongodb": "^3.0.1",
-    "vision": "^5.3.1"
+    "vision": "^5.3.1",
+    "yesno": "0.0.1"
   }
 }
