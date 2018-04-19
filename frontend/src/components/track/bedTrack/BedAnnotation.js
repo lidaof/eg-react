@@ -26,6 +26,7 @@ class BedAnnotation extends React.Component {
         absLocation: PropTypes.instanceOf(OpenInterval).isRequired, // Location of the feature in navigation context
         y: PropTypes.number, // Y offset
         color: PropTypes.string, // Primary color to draw
+        isMinimal: PropTypes.bool, // Whether to just render a plain box
         /**
          * Callback for click events.  Signature: (event: MouseEvent, feature: Feature): void
          *     `event`: the triggering click event
@@ -40,7 +41,7 @@ class BedAnnotation extends React.Component {
     };
 
     render() {
-        const {feature, drawModel, absLocation, y, color, onClick} = this.props;
+        const {feature, drawModel, absLocation, y, color, isMinimal, onClick} = this.props;
         const startX = Math.max(-1, drawModel.baseToX(absLocation.start));
         const endX = Math.min(drawModel.baseToX(absLocation.end), drawModel.getDrawWidth() + 1);
         const width = endX - startX;
@@ -49,6 +50,9 @@ class BedAnnotation extends React.Component {
         }
 
         const mainBody = <rect x={startX} y={0} width={width} height={HEIGHT} fill={color} />;
+        if (isMinimal) {
+            return <TranslatableG y={y} onClick={event => onClick(event, feature)} >{mainBody}</TranslatableG>;
+        }
 
         let arrows = null;
         if (feature.getIsForwardStrand() || feature.getIsReverseStrand()) {

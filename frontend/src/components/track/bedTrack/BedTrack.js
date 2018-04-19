@@ -2,9 +2,12 @@ import React from 'react';
 
 import { VISUALIZER_PROP_TYPES } from '../Track';
 import BedAnnotation from './BedAnnotation';
+import FeatureDetail from './FeatureDetail';
 
 import TrackLegend from '../commonComponents/TrackLegend';
 import AnnotationRenderer from '../commonComponents/AnnotationRenderer';
+import HiddenItemsMessage from '../commonComponents/HiddenItemsMessage';
+import Tooltip from '../commonComponents/Tooltip';
 import GeneAnnotationTrack from '../geneAnnotationTrack/GeneAnnotationTrack';
 
 import Feature from '../../../model/Feature';
@@ -36,8 +39,7 @@ function getTrackHeight(options) {
 
 /**
  * From the raw data source records, filters out those too small to see.  Returns an object with keys `features`, which
- * are the parsed Feature from the  an array of Genes that survived filtering, and
- * `numHidden`, the the number of genes that were filtered out.
+ * are the parsed Features, and `numHidden`, the the number of features that were filtered out.
  * 
  * @param {Object[]} records - raw plain-object records
  * @param {Object} trackProps - props passed to Track
@@ -47,10 +49,14 @@ function processBedRecords(records, trackProps) {
     const drawModel = new LinearDrawingModel(trackProps.viewRegion, trackProps.width);
     const visibleRecords = records.filter(record => drawModel.basesToXWidth(record.end - record.start) >= 1);
     const features = visibleRecords.map(record => new Feature(
-        record[BedColumnIndices.NAME],
+        // "." is a placeholder that means "undefined" in the bed file.
+        record[BedColumnIndices.NAME] === "." ? "" : record[BedColumnIndices.NAME],
         new ChromosomeInterval(record.chr, record.start, record.end),
         record[BedColumnIndices.STRAND]
     ));
+    for (let i = 0; i < features.length; i++) {
+        features[i].index = i; // Assign each feature an index so we can use it as a key when rendering
+    }
     return {
         features: features,
         numHidden: records.length - visibleRecords.length,
@@ -58,7 +64,7 @@ function processBedRecords(records, trackProps) {
 }
 
 /**
- * Visualizer for BED tracks.
+ * Visualizer for BED tracks.  FIXME: code duplication with GeneAnnotationTrack
  * 
  * @author Silas Hsu
  */
@@ -67,7 +73,34 @@ class BedVisualizer extends React.PureComponent {
 
     constructor(props) {
         super(props);
+        this.state = {
+            tooltip: null
+        };
+        this.openTooltip = this.openTooltip.bind(this);
+        this.closeTooltip = this.closeTooltip.bind(this);
         this.renderAnnotation = this.renderAnnotation.bind(this);
+    }
+
+    /**
+     * Called when an annotation is clicked.  Sets state so a detail box is displayed.
+     * 
+     * @param {MouseEvent} event 
+     * @param {Feature} feature
+     */
+    openTooltip(event, feature) {
+        const tooltip = (
+            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.closeTooltip} >
+                <FeatureDetail feature={feature} />
+            </Tooltip>
+        );
+        this.setState({tooltip: tooltip});
+    }
+
+    /**
+     * Sets state to close tooltip.
+     */
+    closeTooltip() {
+        this.setState({tooltip: null});
     }
 
     /**
@@ -83,30 +116,36 @@ class BedVisualizer extends React.PureComponent {
         const {viewRegion, width, options} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
         return <BedAnnotation
-            key={feature.getName()}
+            key={feature.index}
             feature={feature}
             drawModel={drawModel}
             absLocation={absInterval}
             y={y}
+            isMinimal={isLastRow}
             color={options.color}
+            onClick={this.openTooltip}
         />;
     }
 
     render() {
         const {data, viewRegion, width, options} = this.props;
         return (
-        <svg width={width} height={getTrackHeight(options) + 5} style={{paddingTop: 5, display: "block", overflow: "visible"}} >
-            <AnnotationRenderer
-                features={data.features || []}
-                viewRegion={viewRegion}
-                width={width}
-                numRows={options.rows}
-                rowHeight={ROW_HEIGHT}
-                getAnnotationElement={this.renderAnnotation}
-                getHorizontalPadding={5}
-                color={options.color} // It doesn't actually use this prop, but we pass it to trigger rerenders.
-            />
-        </svg>
+        <React.Fragment>
+            <svg width={width} height={getTrackHeight(options) + 5} style={{paddingTop: 5, display: "block", overflow: "visible"}} >
+                <AnnotationRenderer
+                    features={data.features || []}
+                    viewRegion={viewRegion}
+                    width={width}
+                    numRows={options.rows}
+                    rowHeight={ROW_HEIGHT}
+                    getAnnotationElement={this.renderAnnotation}
+                    getHorizontalPadding={5}
+                    color={options.color} // It doesn't actually use this prop, but we pass it to trigger rerenders.
+                />
+            </svg>
+            {this.state.tooltip}
+            <HiddenItemsMessage width={width} numHidden={data.numHidden} />
+        </React.Fragment>
         );
     }
 }

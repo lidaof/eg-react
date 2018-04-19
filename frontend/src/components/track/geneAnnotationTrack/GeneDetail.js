@@ -2,11 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import GeneDescription from '../../GeneDescription';
 import Gene from '../../../model/Gene';
-
-const STYLE = {
-    width: 250,
-    height: 150,
-};
+import FeatureDetail from '../bedTrack/FeatureDetail';
+import '../commonComponents/Tooltip.css';
 
 /**
  * Box that contains gene details when a gene annotation is clicked.
@@ -20,9 +17,9 @@ class GeneDetail extends React.PureComponent {
 
     render() {
         const gene = this.props.gene;
-        return <div style={STYLE} >
-            {gene.getName()}
-            <p><GeneDescription gene={gene} /></p>
+        return <div style={{padding: 5, maxWidth: 400}}>
+            <FeatureDetail feature={gene} />
+            <i><GeneDescription gene={gene} /></i>
         </div>;
     }
 }

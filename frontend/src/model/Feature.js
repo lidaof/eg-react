@@ -75,7 +75,14 @@ class Feature {
     }
 
     /**
-     * 
+     * @return {boolean} whether this feature has strand info
+     */
+    getHasStrand() {
+        return this.getIsForwardStrand() || this.getIsReverseStrand();
+    }
+
+    /**
+     *
      * @param {NavigationContext} navContext 
      * @return {OpenInterval[]} 
      */
