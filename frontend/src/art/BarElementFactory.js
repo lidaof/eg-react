@@ -29,6 +29,10 @@ export class BarElementFactory {
     drawOneRecord(record, x, width) {
 
     }
+
+    drawBackground(x, width) {
+
+    }
 }
 
 /**
@@ -56,6 +60,10 @@ export class SimpleBarElementFactory extends BarElementFactory {
      */
     setDataMinMax(min, max) {
         this._valueToY = scaleLinear().domain([max, min]).range([0, this._height]);
+    }
+
+    drawBackground(x, width) {
+        
     }
 
     /**
@@ -98,12 +106,68 @@ export class CategoricalBarElementFactory extends BarElementFactory {
         this.simpleFactory.setDataMinMax(min, max);
     }
 
+    drawBackground(x, width) {
+        
+    }
+
     /**
      * @inheritdoc
      */
     drawOneRecord(record, x, width) {
         const categoryId = record.getCategoryId();
         const color = this._options.categoryColors[categoryId];
+        const element = this.simpleFactory.drawOneRecord(record, x, width);
+        if (!element) {
+            return null;
+        }
+        return React.cloneElement(element, {
+            fill: color
+        });
+    }
+}
+
+/**
+ * Draws records that may have different categories.  Records given to BarPlotDesigner must implement BarPlotRecord, as
+ * well as have a `getContext()` method.
+ * 
+ * @author Silas Hsu
+ */
+export class MethylCBarElementFactory extends BarElementFactory {
+    /**
+     * Makes a new instance.  Options schema:
+     *  - `categoryColors` - mapping from category id to color
+     * 
+     * @param {number} height - max height of bars
+     * @param {Object} options - drawing options
+     */
+    constructor(height, options) {
+        super();
+        this._options = options;
+        this.simpleFactory = new SimpleBarElementFactory(height, options);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    setDataMinMax(min, max) {
+        this.simpleFactory.setDataMinMax(min, max);
+    }
+
+    drawBackground(x, width) {
+        const y = this.simpleFactory_valueToY(1);
+        const drawHeight = this._height - y;
+        if (drawHeight <= 0) {
+            return null;
+        }
+        return <rect key={x} x={x} y={y} width={width} height={drawHeight} fill={this._options.countColor} />;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    drawOneRecord(record, x, width) {
+        const context = record.getContext();
+        const color = this._options.contextColors[context].color;
         const element = this.simpleFactory.drawOneRecord(record, x, width);
         if (!element) {
             return null;

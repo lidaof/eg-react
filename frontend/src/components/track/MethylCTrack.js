@@ -6,7 +6,7 @@ import { VISUALIZER_PROP_TYPES } from './Track';
 import { BackgroundColorConfig } from './contextMenu/ColorConfig';
 
 import MethylCRecord from '../../model/MethylCRecord';
-import { SimpleBarElementFactory } from '../../art/BarElementFactory';
+import { MethylCBarElementFactory } from '../../art/BarElementFactory';
 import { RenderTypes } from '../../art/DesignRenderer';
 
 import './commonComponents/Tooltip.css';
@@ -18,7 +18,8 @@ const TOP_PADDING = 5;
 const BAR_CHART_STYLE = {paddingTop: TOP_PADDING};
 const DEFAULT_OPTIONS = {
     height: 40,
-    categoryColors: MethylCRecord.DEFAULT_CLASS_COLORS,
+    contextColors: MethylCRecord.DEFAULT_CONTEXT_COLORS,
+    countColor: MethylCRecord.DEFAULT_COUNT_COLOR,
 };
 
 
@@ -36,7 +37,7 @@ class MethylCVisualizer extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            elementFactory: new SimpleBarElementFactory(props.options.height, props.options),
+            elementFactory: new MethylCBarElementFactory(props.options.height, props.options),
         };
         this.getTooltipContents = this.getTooltipContents.bind(this);
     }
@@ -44,7 +45,7 @@ class MethylCVisualizer extends React.PureComponent {
     componentWillReceiveProps(nextProps) {
         if (this.props.options !== nextProps.options) {
             this.setState({
-                elementFactory: new SimpleBarElementFactory(nextProps.options.height, nextProps.options)
+                elementFactory: new MethylCBarElementFactory(nextProps.options.height, nextProps.options)
             });
         }
     }
@@ -53,7 +54,7 @@ class MethylCVisualizer extends React.PureComponent {
         if (!record) {
             return null;
         }
-        console.log(record);
+        //console.log(record);
         return (
         <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
             <li>

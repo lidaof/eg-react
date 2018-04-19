@@ -74,6 +74,8 @@ export class BarPlotDesigner {
                 const width = Math.ceil(drawModel.basesToXWidth(location.getLength()));
                 this._addToCoordinateMap(x, width, record);
                 elements.push(this._elementFactory.drawOneRecord(record, x, width));
+                //elements.push(this._elementFactory.drawBackground(x, width));
+
             }
         }
         return elements;
