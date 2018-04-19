@@ -24,11 +24,6 @@ import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 const Tools = {
-    CROSSHAIR: {
-        buttonContent: "✛",
-        title: "Crosshairs",
-        cursor: "crosshair",
-    },
     DRAG: {
         buttonContent: "✋",
         title: "Drag tool",
@@ -50,6 +45,7 @@ const Tools = {
         cursor: "zoom-out",
     }
 };
+const DEFAULT_CURSOR = "crosshair";
 
 ///////////////////////////
 // Track selection utils //
@@ -153,13 +149,27 @@ class TrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedTool: Tools.CROSSHAIR,
+            selectedTool: {}
         };
 
+        this.toggleTool = this.toggleTool.bind(this);
         this.handleTrackClicked = this.handleTrackClicked.bind(this);
         this.handleMetadataClicked = this.handleMetadataClicked.bind(this);
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.deselectAllTracks = this.deselectAllTracks.bind(this);
+    }
+
+    /**
+     * Toggles the selection of a tool, or switches tool.
+     * 
+     * @param {Tool} tool - tool to toggle or to switch to
+     */
+    toggleTool(tool) {
+        if (this.state.selectedTool === tool) {
+            this.setState({selectedTool: {}});
+        } else {
+            this.setState({selectedTool: tool});
+        }
     }
 
     /**
@@ -294,7 +304,7 @@ class TrackContainer extends React.Component {
                     key={toolName}
                     className={className}
                     title={tool.title}
-                    onClick={() => this.setState({selectedTool: tool})}
+                    onClick={() => this.toggleTool(tool)}
                 >
                     {tool.buttonContent}
                 </button>
@@ -339,7 +349,6 @@ class TrackContainer extends React.Component {
                     viewRegion={viewRegion}
                     onNewRegion={onNewRegion}
                 />;
-            case Tools.CROSSHAIR:
             default:
                 return trackElements;
         }
@@ -351,7 +360,7 @@ class TrackContainer extends React.Component {
     render() {
         const {tracks, metadataTerms, onTracksChanged, onMetadataTermsChanged} = this.props;
         const contextMenu = <TrackContextMenu allTracks={tracks} onTracksChanged={onTracksChanged} />;
-        const trackDivStyle = {border: "1px solid black", cursor: this.state.selectedTool.cursor};
+        const trackDivStyle = {border: "1px solid black", cursor: this.state.selectedTool.cursor || DEFAULT_CURSOR};
 
         return (
         <OutsideClickDetector onOutsideClick={this.deselectAllTracks} style={{margin: 5}} >
