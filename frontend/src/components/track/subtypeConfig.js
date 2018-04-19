@@ -1,6 +1,7 @@
 import RulerTrack from './RulerTrack';
 import BigWigTrack from './BigWigTrack';
 import BedTrack from './bedTrack/BedTrack';
+import BigBedTrack from './BigBedTrack';
 import BedGraphTrack from './BedGraphTrack';
 import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
 import RepeatMaskerTrack from './RepeatMaskerTrack';
@@ -14,6 +15,7 @@ const TYPE_NAME_TO_SUBTYPE = {
     "ruler": RulerTrack,
     "bigwig": BigWigTrack,
     "bed": BedTrack,
+    "bigbed": BigBedTrack,
     "bedgraph": BedGraphTrack,
     "geneannotation": GeneAnnotationTrack,
     "repeatmasker": RepeatMaskerTrack,

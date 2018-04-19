@@ -68,9 +68,13 @@ class BackgroundedText extends React.Component {
     }
 
     render() {
-        const {height, horizontalPadding, backgroundColor, backgroundOpacity, fontSize, ...textProps} = this.props;
+        const {height, horizontalPadding, backgroundColor, backgroundOpacity, fontSize, children,
+            ...textProps} = this.props;
         if (fontSize) {
             console.warn("The `fontSize` prop is invalid.  Use the `height` prop to set font size.");
+        }
+        if (!children || children.length === 0) {
+            return null;
         }
 
         let background = null;
@@ -85,7 +89,12 @@ class BackgroundedText extends React.Component {
             />;
         }
 
-        return <React.Fragment>{background} <text {...textProps} fontSize={1.5 * height} /></React.Fragment>;
+        return (
+        <React.Fragment>
+            {background}
+            <text {...textProps} fontSize={1.5 * height}>{children}</text>
+        </React.Fragment>
+        );
     }
 }
 
