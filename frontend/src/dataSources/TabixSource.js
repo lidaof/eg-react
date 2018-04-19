@@ -42,7 +42,7 @@ class TabixSource extends DataSource {
         );
         const features = await Promise.all(promises);
         const results = _.flatten(features).map(feature => new MethylCRecord(feature));
-        console.log(results);
+        //console.log(results);
         return results;
     }
 

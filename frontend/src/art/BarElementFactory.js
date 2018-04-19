@@ -30,9 +30,6 @@ export class BarElementFactory {
 
     }
 
-    drawBackground(x, width) {
-
-    }
 }
 
 /**
@@ -59,11 +56,10 @@ export class SimpleBarElementFactory extends BarElementFactory {
      * @inheritdoc
      */
     setDataMinMax(min, max) {
+        // if (this._options.logScale) {
+            
+        // }
         this._valueToY = scaleLinear().domain([max, min]).range([0, this._height]);
-    }
-
-    drawBackground(x, width) {
-        
     }
 
     /**
@@ -106,10 +102,6 @@ export class CategoricalBarElementFactory extends BarElementFactory {
         this.simpleFactory.setDataMinMax(min, max);
     }
 
-    drawBackground(x, width) {
-        
-    }
-
     /**
      * @inheritdoc
      */
@@ -142,6 +134,7 @@ export class MethylCBarElementFactory extends BarElementFactory {
      */
     constructor(height, options) {
         super();
+        this._height = height;
         this._options = options;
         this.simpleFactory = new SimpleBarElementFactory(height, options);
     }
@@ -150,16 +143,18 @@ export class MethylCBarElementFactory extends BarElementFactory {
      * @inheritdoc
      */
     setDataMinMax(min, max) {
-        this.simpleFactory.setDataMinMax(min, max);
+        this.simpleFactory.setDataMinMax(0, 1);
     }
 
-    drawBackground(x, width) {
-        const y = this.simpleFactory_valueToY(1);
-        const drawHeight = this._height - y;
+    drawBackground(record, x, width) {
+        const context = record.getContext();
+        const color = this._options.contextColors[context].background;
+        const y = 0;
+        const drawHeight = this._height;
         if (drawHeight <= 0) {
             return null;
         }
-        return <rect key={x} x={x} y={y} width={width} height={drawHeight} fill={this._options.countColor} />;
+        return <rect x={x} y={y} width={width} height={drawHeight} fill={color} fillOpacity={0.5} />;
     }
 
     /**
@@ -169,12 +164,19 @@ export class MethylCBarElementFactory extends BarElementFactory {
         const context = record.getContext();
         const color = this._options.contextColors[context].color;
         const element = this.simpleFactory.drawOneRecord(record, x, width);
+        const elementBg = this.drawBackground(record, x, width);
         if (!element) {
             return null;
         }
-        return React.cloneElement(element, {
-            fill: color
-        });
+        const elementWithColor = React.cloneElement(element, {
+                fill: color
+            });
+        const elementWithBg = <g key={x}>{elementBg}{elementWithColor}</g>;
+        //console.log(elementWithBg);
+        // return React.cloneElement(element, {
+        //     fill: color
+        // });
+        return elementWithBg;
     }
 }
 

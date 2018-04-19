@@ -59,6 +59,27 @@ class CanvasDesignRenderer extends React.PureComponent {
         this.draw(this.canvasNode);
     }
 
+    drawOneElement(context, element) {
+        if (!element) {
+            return; // Do nothing
+        }
+        const props = element.props;
+        switch (element.type) {
+            case 'rect':
+                context.fillStyle = props.fill;
+                context.globalAlpha = props.fillOpacity || 1;
+                context.fillRect(props.x, props.y, props.width, props.height);
+                break;
+            case 'g':
+                React.Children.forEach(props.children, child => this.drawOneElement(context, child));
+                break;
+            case undefined:
+                break;
+            default:
+                console.error(`Drawing '${element.type}'s is unsupported.  Ignoring...`);
+        }
+    }
+
     /**
      * Redraws the canvas.
      */
@@ -70,20 +91,7 @@ class CanvasDesignRenderer extends React.PureComponent {
         let context = this.canvasNode.getContext("2d");
         context.clearRect(0, 0, this.canvasNode.width, this.canvasNode.height); // Clear the canvas
 
-        this.props.children.forEach(element => {
-            if (!element) {
-                return; // Do nothing
-            }
-            const props = element.props;
-            switch (element.type) {
-                case 'rect':
-                    context.fillStyle = props.fill;
-                    context.fillRect(props.x, props.y, props.width, props.height);
-                    break;
-                default:
-                    console.error(`Drawing '${element.type}'s is unsupported.  Ignoring...`);
-            }
-        });
+        this.props.children.forEach(element => this.drawOneElement(context, element));
     }
 
     render() {

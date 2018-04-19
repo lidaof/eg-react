@@ -2,6 +2,7 @@ import React from 'react';
 
 import BigWigTrack from './BigWigTrack';
 import BarPlot from './commonComponents/BarPlot';
+import TrackLegend from './commonComponents/NumericalLegend';
 import { VISUALIZER_PROP_TYPES } from './Track';
 import { BackgroundColorConfig } from './contextMenu/ColorConfig';
 
@@ -11,7 +12,6 @@ import { RenderTypes } from '../../art/DesignRenderer';
 
 import './commonComponents/Tooltip.css';
 import TabixSource from '../../dataSources/TabixSource';
-import { BarPlotRecord } from '../../art/BarPlotDesigner';
 
 
 const TOP_PADDING = 5;
@@ -87,6 +87,16 @@ class MethylCVisualizer extends React.PureComponent {
         </React.Fragment>
         );
     }
+}
+
+function MethyCLegend(props) {
+    const height = 0; // Ok you fill this out
+    const scale = null;
+    return <TrackLegend
+        trackModel={props.trackModel}
+        height={height}
+        scaleForAxis={scale}
+    />
 }
 
 const MethylCTrack = {
