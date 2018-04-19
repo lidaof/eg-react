@@ -1,8 +1,10 @@
-import _ from "lodash";
-import DataHubParser from '../../DataHubParser';
-import PropTypes from "prop-types";
+
 import React from "react";
+import PropTypes from "prop-types";
+import _ from "lodash";
 import ReactTable from "react-table";
+import DataHubParser from '../../model/DataHubParser';
+
 import "react-table/react-table.css";
 
 const collectionData = {

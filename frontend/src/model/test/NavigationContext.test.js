@@ -94,7 +94,10 @@ describe("convertGenomeIntervalToBases()", () => {
     it("is correct for 0 mappings", () => {
         const feature = instance.getFeatures()[0];
         const chrInterval = new ChromosomeInterval("chr1", -1, -1);
-        expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([])
+        expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([]);
+
+        const nonsense = new ChromosomeInterval("akjsdhlk", 0, 0);
+        expect(instance.convertGenomeIntervalToBases(nonsense)).toEqual([]);
     });
 
     it("is correct for one mapping", () => {

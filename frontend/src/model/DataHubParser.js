@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import JSON5 from 'json5';
-import TrackModel from './model/TrackModel';
+import TrackModel from './TrackModel';
 
 class HubParser {
     constructor(tracksStartIndex=1) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DataHubParser from '../../DataHubParser';
+import DataHubParser from '../../model/DataHubParser';
 
 class CustomHubAdder extends React.Component {
     static propTypes = {

@@ -13,6 +13,7 @@ import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorC
 
 import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 import GeneSource from '../../../dataSources/GeneSource';
 
 const ROW_VERTICAL_PADDING = 5;
@@ -110,11 +111,12 @@ class GeneAnnotationVisualizer extends React.PureComponent {
      */
     renderGene(gene, absInterval, y, isLastRow) {
         const {viewRegion, width, viewWindow, options} = this.props;
+        const navContext = viewRegion.getNavigationContext();
         const drawModel = new LinearDrawingModel(viewRegion, width);
         return <GeneAnnotation
             key={gene.refGeneRecord._id + gene.absStart}
             gene={gene}
-            absLocation={absInterval}
+            navContextLocation={new DisplayedRegionModel(navContext, ...absInterval)}
             y={y}
             isMinimal={isLastRow}
             drawModel={drawModel}

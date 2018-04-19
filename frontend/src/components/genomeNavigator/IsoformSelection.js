@@ -76,17 +76,20 @@ class IsoformSelection extends React.PureComponent {
         const viewRegion = new DisplayedRegionModel(navContext, leftmostStart, rightmostEnd);
         const drawModel = new LinearDrawingModel(viewRegion, DRAW_WIDTH);
 
-        const renderOneSuggestion = (gene, i) => (
+        const renderOneSuggestion = (gene, i) => {
+            const location = new DisplayedRegionModel(navContext, ...absLocations[i]);
+            return (
             <tr
                 key={gene.refGeneRecord._id}
                 className="IsoformSelection-item"
                 onClick={() => this.props.onGeneSelected(gene)}
             >
                 <td>{gene.getLocus().toString()}</td>
-                <td><StandaloneGeneAnnotation gene={gene} absLocation={absLocations[i]} drawModel={drawModel} /></td>
+                <td><StandaloneGeneAnnotation gene={gene} navContextLocation={location} drawModel={drawModel} /></td>
                 <td className="IsoformSelection-description"><GeneDescription gene={gene} /></td>
             </tr>
-        );
+            );
+        };
 
         return (
         <table className="IsoformSelection">

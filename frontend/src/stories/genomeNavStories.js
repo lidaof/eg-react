@@ -1,7 +1,7 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import ReduxProvider from './ReduxProvider';
 
+import { ReduxProvider } from '../testUtils';
 import MainPane from '../components/genomeNavigator/MainPane';
 
 import Feature from '../model/Feature';

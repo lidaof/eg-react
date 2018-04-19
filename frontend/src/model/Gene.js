@@ -103,23 +103,32 @@ class Gene extends Feature {
             const response = await axios.get(`/${genomeName}/genes/${this.refGeneRecord.name}/description`);
             return response.data.description || "";
         } catch (error) {
-            console.error(error);
-            return "ERROR";
+            return "";
         }
     }
 
-    getAbsExons(absLocation) {
-        const locusStart = this.getLocus().start;
-        const computeInternalInterval = function(interval) {
-            const startDistFromLocus = interval.start - locusStart;
-            const endDistFromLocus = interval.end - locusStart;
-            return absLocation.getOverlap(
-                new OpenInterval(absLocation.start + startDistFromLocus, absLocation.start + endDistFromLocus)
-            );
+    /**
+     * Gets the absolute locations of exons, given the gene body's location within the navigation context.  The
+     * navigation context location need not cover the entire gene body, but it *must* overlap with it.
+     * 
+     * @param {DisplayedRegionModel} navContext - location in navigation context that overlaps this instance
+     * @return {Object} object with keys `absTranslated` and `absUtrs`
+     */
+    getAbsExons(navContextLocation) {
+        // The absolute location's genome start base.  Directly comparable with exons' base numbers.
+        const navContext = navContextLocation.getNavigationContext();
+        const absLocation = navContextLocation.getAbsoluteRegion();
+        const absLocationGenomeBase = navContext
+            .convertBaseToFeatureCoordinate(absLocation.start)
+            .getGenomeCoordinates().start;
+        const computeExonInterval = function(exon) {
+            const distFromAbsLocation = exon.start - absLocationGenomeBase;
+            const start = absLocation.start + distFromAbsLocation;
+            return absLocation.getOverlap( new OpenInterval(start, start + exon.getLength()) );
         }
         return {
-            absTranslated: this.translated.map(computeInternalInterval).filter(interval => interval != null),
-            absUtrs: this.utrs.map(computeInternalInterval).filter(interval => interval != null)
+            absTranslated: this.translated.map(computeExonInterval).filter(interval => interval != null),
+            absUtrs: this.utrs.map(computeExonInterval).filter(interval => interval != null)
         };
     }
 }

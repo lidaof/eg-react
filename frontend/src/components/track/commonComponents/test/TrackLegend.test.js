@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import TrackLegend from '../TrackLegend';
-import TrackModel from '../../../model/TrackModel';
+import TrackModel from '../../../../model/TrackModel';
 
 const TRACK_MODEL = new TrackModel({name: "Right on track!"});
 

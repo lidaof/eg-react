@@ -9,6 +9,7 @@ import BackgroundedText from '../commonComponents/BackgroundedText';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import Gene from '../../../model/Gene';
 import OpenInterval from '../../../model/interval/OpenInterval';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 
 const HEIGHT = 9;
 const UTR_HEIGHT = 5;
@@ -25,7 +26,7 @@ class GeneAnnotation extends React.Component {
 
     static propTypes = {
         gene: PropTypes.instanceOf(Gene).isRequired, // Gene structure to draw
-        absLocation: PropTypes.instanceOf(OpenInterval).isRequired, // Location of gene in the nav context coordinates
+        navContextLocation: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Location of gene in nav context
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
         y: PropTypes.number, // y offset
         /**
@@ -83,7 +84,8 @@ class GeneAnnotation extends React.Component {
      * @override
      */
     render() {
-        const {gene, absLocation, drawModel, y, viewWindow, isMinimal, options, onClick} = this.props;
+        const {gene, navContextLocation, drawModel, y, viewWindow, isMinimal, options, onClick} = this.props;
+        const absLocation = navContextLocation.getAbsoluteRegion();
         const exonClipId = this.state.exonClipId;
         const color = options.color || DEFAULT_COLOR;
         const backgroundColor = options.backgroundColor || DEFAULT_BACKGROUND_COLOR;
@@ -113,7 +115,7 @@ class GeneAnnotation extends React.Component {
         const centerLine = <line x1={startX} y1={centerY} x2={endX} y2={centerY} stroke={color} strokeWidth={2} />;
 
         // Exons, which are split into translated and non-translated ones (i.e. utrs)
-        const {absTranslated, absUtrs} = gene.getAbsExons(absLocation);
+        const {absTranslated, absUtrs} = gene.getAbsExons(navContextLocation);
         const exons = this.renderCenteredRects(absTranslated, HEIGHT, color); // These are the translated exons
 
         const isToRight = gene.getIsForwardStrand();

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import GeneAnnotation from '../track/geneAnnotationTrack/GeneAnnotation';
 import Gene from '../../model/Gene';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
-import OpenInterval from '../../model/interval/OpenInterval';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 /**
  * A SVG containing a happy solo GeneAnnotation.
@@ -14,15 +14,15 @@ import OpenInterval from '../../model/interval/OpenInterval';
 class StandaloneGeneAnnotation extends React.PureComponent {
     static propTypes = {
         gene: PropTypes.instanceOf(Gene).isRequired, // The gene to draw
-        absLocation: PropTypes.instanceOf(OpenInterval).isRequired, // Location of the gene in nav context coordinates
+        navContextLocation: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Location in nav context
         drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
     };
     
     render() {
-        const {gene, absLocation, drawModel} = this.props;
+        const {gene, navContextLocation, drawModel} = this.props;
         return (
         <svg width={drawModel.getDrawWidth()} height={GeneAnnotation.HEIGHT} >
-            <GeneAnnotation gene={gene} absLocation={absLocation} drawModel={drawModel} />
+            <GeneAnnotation gene={gene} navContextLocation={navContextLocation} drawModel={drawModel} />
         </svg>
         );
     }

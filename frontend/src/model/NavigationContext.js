@@ -116,7 +116,7 @@ class NavigationContext {
         }
 
         let index = this._features.length - 1; // We want the index of the feature that contains the absolute base.
-        // It's ok to -1 since there must be at least one feature, guaranteed by the constructor.
+        // It's ok to subtract 1 since there must be at least one feature, guaranteed by the constructor.
         // Last feature (highest base #) to first (lowest base #)
         while (index > 0 && base < this._featureStarts[index]) {
             index--;
@@ -158,7 +158,7 @@ class NavigationContext {
      * @return {OpenInterval[]} intervals of absolute base numbers in this context
      */
     convertGenomeIntervalToBases(chrInterval) {
-        const potentialOverlaps = this._chrToFeatures[chrInterval.chr];
+        const potentialOverlaps = this._chrToFeatures[chrInterval.chr] || [];
         let absLocations = [];
         for (let feature of potentialOverlaps) {
             const overlap = new FeatureInterval(feature).getOverlap(chrInterval);

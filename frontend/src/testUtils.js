@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { AppState, ActionCreators } from '../AppState';
+import { AppState, ActionCreators } from './AppState';
 
 AppState.dispatch(ActionCreators.setGenome("hg19"));
 
@@ -9,8 +9,6 @@ AppState.dispatch(ActionCreators.setGenome("hg19"));
  * 
  * @param {Object} props - props as specified by React
  */
-function ReduxProvider(props) {
+export function ReduxProvider(props) {
     return <Provider store={AppState} {...props} />;
 }
-
-export default ReduxProvider;

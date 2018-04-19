@@ -1,7 +1,9 @@
 import Gene from '../Gene';
+import NavigationContext from '../NavigationContext';
+import Feature from '../Feature';
+import DisplayedRegionModel from '../DisplayedRegionModel';
 import OpenInterval from '../interval/OpenInterval';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
-import { Chromosome, Genome } from '../genomes/Genome';
 
 const RECORD = {
     "_id": "5a6a4edfc019c4d5b606c0e8",
@@ -23,12 +25,16 @@ const RECORD = {
     "exonFrames": "-1,-1,-1,"
 };
 
-test('constructs correctly', () => {
+it('constructs correctly', () => {
     let instance = new Gene(RECORD);
     expect(instance.getName()).toBe("My Gene");
     expect(instance.getLocus()).toEqual(new ChromosomeInterval("chr1", 0, 1000));
-    expect(instance.getIsForwardStrand()).toBe(false);
+    expect(instance.getIsReverseStrand()).toBe(true);
     expect(instance.refGeneRecord).toBe(RECORD);
+});
+
+it('gets exons and utrs correctly', () => {
+    let instance = new Gene(RECORD);
     expect(instance.translated).toEqual([
         new OpenInterval(200, 300),
         new OpenInterval(400, 600),
@@ -40,22 +46,20 @@ test('constructs correctly', () => {
     ]);
 });
 
-test('getDetails() works correctly', () => {
-    const OFFSET = 10;
-    const CHR_LENGTH = 500;
-    let instance = new Gene(RECORD);
-    const genome = new Genome("toy genome", [
-        new Chromosome("chr0 - just to add an offset of 10", OFFSET),
-        new Chromosome("chr1", CHR_LENGTH) // !!! Shorter than the Gene !!!  We expect some exons to be missing.
+it('getAbsExons() works correctly', () => {
+    const navContext = new NavigationContext("toy context", [
+        new Feature("feature1", new ChromosomeInterval("chr1", 500, 1000))
     ]);
-    let newInstance = instance.computeNavContextCoordinates(genome.makeNavContext())[0];
-    expect(newInstance.absStart).toBe(OFFSET);
-    expect(newInstance.absEnd).toBe(CHR_LENGTH + OFFSET);
-    expect(newInstance.absTranslated).toEqual([
-        new OpenInterval(200 + OFFSET, 300 + OFFSET),
-        new OpenInterval(400 + OFFSET, CHR_LENGTH + OFFSET)
+    // The gene's location in this navigation context should be the entire context, so we don't specify start and end
+    const navContextLocation = new DisplayedRegionModel(navContext); 
+
+    const instance = new Gene(RECORD);
+    const result = instance.getAbsExons(navContextLocation);
+    expect(result.absTranslated).toEqual([
+        new OpenInterval(0, 100), // = chr1:500-600
+        new OpenInterval(200, 300) // = chr1:700-800
     ]);
-    expect(newInstance.absUtrs).toEqual([
-        new OpenInterval(OFFSET, 200 + OFFSET)
+    expect(result.absUtrs).toEqual([
+        new OpenInterval(300, 500) // = chr1:800-1000
     ]);
 });
