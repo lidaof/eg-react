@@ -54,4 +54,25 @@ class MethylCRecord extends Feature {
     }
 }
 
+combineSites = (bag) => { //bag is array of methylcRecord on sites belong to one CG, CHG or CHH
+   if (bag.length === 1) {
+       //change end to start +2 or +3 depending on context
+       //constructor the string?
+   } else {
+    //do math
+
+   }
+}
+
+combineMethyCRecords = (records) => {
+    //records need be sorted, since the records were obtained from tabix, they are already sorted
+    let results = [];
+    for (let record of records) {
+        if (record._isForwardStrand) { //first base in CG
+            //make bags
+        }
+    }
+    return ;
+}
+
 export default MethylCRecord;
