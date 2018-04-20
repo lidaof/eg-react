@@ -9,7 +9,6 @@ import ZoomableTrackContainer from './ZoomableTrackContainer';
 import ZoomOutTrackContainer from './ZoomOutTrackContainer';
 import MetadataHeader from './MetadataHeader';
 
-import Track from '../track/Track';
 import TrackLegend from '../track/commonComponents/TrackLegend';
 import TrackContextMenu from '../track/contextMenu/TrackContextMenu';
 import MetadataIndicator from '../track/commonComponents/MetadataIndicator';
@@ -22,6 +21,8 @@ import withAutoDimensions from '../withAutoDimensions';
 
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import ErrorBoundary from '../ErrorBoundary';
+import { getSubtypeConfig } from '../track/subtypeConfig';
 
 const Tools = {
     DRAG: {
@@ -266,17 +267,20 @@ class TrackContainer extends React.Component {
         const {viewRegion, tracks, metadataTerms} = this.props;
         return tracks.map((trackModel, index) => {
             const id = trackModel.getId();
+            const Track = getSubtypeConfig(trackModel).component;
             return <Reparentable key={id} uid={"track-" + id} >
-                <Track
-                    trackModel={trackModel}
-                    viewRegion={viewRegion}
-                    width={this.getVisualizationWidth()}
-                    metadataTerms={metadataTerms}
-                    index={index}
-                    onContextMenu={this.handleContextMenu}
-                    onClick={this.handleTrackClicked}
-                    onMetadataClick={this.handleMetadataClicked}
-                />
+                <ErrorBoundary errorMessage="😢 Track crashed 😢">
+                    <Track
+                        trackModel={trackModel}
+                        viewRegion={viewRegion}
+                        width={this.getVisualizationWidth()}
+                        metadataTerms={metadataTerms}
+                        index={index}
+                        onContextMenu={this.handleContextMenu}
+                        onClick={this.handleTrackClicked}
+                        onMetadataClick={this.handleMetadataClicked}
+                    />
+                </ErrorBoundary>
             </Reparentable>
         });
     }

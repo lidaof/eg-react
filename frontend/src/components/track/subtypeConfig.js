@@ -13,12 +13,12 @@ import UnknownTrack from './UnknownTrack';
  */
 const TYPE_NAME_TO_SUBTYPE = {
     "ruler": RulerTrack,
-    "bigwig": BigWigTrack,
-    "bed": BedTrack,
-    "bigbed": BigBedTrack,
-    "bedgraph": BedGraphTrack,
-    "geneannotation": GeneAnnotationTrack,
-    "repeatmasker": RepeatMaskerTrack,
+    //"bigwig": BigWigTrack,
+    //"bed": BedTrack,
+    //"bigbed": BigBedTrack,
+    //"bedgraph": BedGraphTrack,
+    //"geneannotation": GeneAnnotationTrack,
+    //"repeatmasker": RepeatMaskerTrack,
 };
 
 if (process.env.NODE_ENV !== "production") { // Check if all the subtypes are clean
@@ -27,10 +27,8 @@ if (process.env.NODE_ENV !== "production") { // Check if all the subtypes are cl
             throw new TypeError(`Uppercase letters are disallowed in type names.  Offender: "${subtypeName}"`);
         }
         const subtype = TYPE_NAME_TO_SUBTYPE[subtypeName];
-        if (!subtype.visualizer) {
-            throw new TypeError(`In config for type "${subtypeName}": a visualizer is required, but it was undefined.`);
-        } else if (!subtype.legend) {
-            throw new TypeError(`In config for type "${subtypeName}": a legend is required, but it was undefined.`);
+        if (!subtype.component) {
+            throw new TypeError(`In config for type "${subtypeName}": a component is required, but it was undefined.`);
         }
     }
 }

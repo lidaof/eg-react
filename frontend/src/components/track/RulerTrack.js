@@ -1,23 +1,28 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-import { VISUALIZER_PROP_TYPES } from './Track';
+import NewTrack from './NewTrack';
 import HoverTooltipContext from './commonComponents/HoverTooltipContext';
 import Chromosomes from '../genomeNavigator/Chromosomes';
 import Ruler from '../genomeNavigator/Ruler';
 import GenomicCoordinates from './commonComponents/GenomicCoordinates';
 import TrackLegend from './commonComponents/TrackLegend';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 const CHROMOSOMES_Y = 60;
 const RULER_Y = 20;
 const HEIGHT = 65;
 
 /**
- * A ruler.
+ * A ruler display.
  * 
  * @author Silas Hsu
  */
 class RulerVisualizer extends React.Component {
-    static propTypes = VISUALIZER_PROP_TYPES;
+    static propTypes = {
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        width: PropTypes.number.isRequired,
+    };
 
     constructor(props) {
         super(props);
@@ -54,13 +59,19 @@ class RulerVisualizer extends React.Component {
     }
 }
 
-function RulerLegend(props) {
-    return <TrackLegend height={HEIGHT} {...props} />;
+
+function RulerTrack(props) {
+    return <NewTrack
+        {...props}
+        legendElement={<TrackLegend height={HEIGHT} trackModel={props.trackModel} />}
+        getVisualizerElement={(viewRegion, width, viewWindow) =>
+            <RulerVisualizer viewRegion={viewRegion} width={width} />
+        }
+    />;
 }
 
-const RulerTrack = {
-    visualizer: RulerVisualizer,
-    legend: RulerLegend
+const RulerTrackConfig = {
+    component: RulerTrack
 };
 
-export default RulerTrack;
+export default RulerTrackConfig;
