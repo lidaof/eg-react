@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import LinearDrawingModel from '../../../model/LinearDrawingModel';
-import Feature from '../../../model/Feature';
-import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
-import IntervalArranger from '../../../art/IntervalArranger';
+import LinearDrawingModel from '../../../../model/LinearDrawingModel';
+import Feature from '../../../../model/Feature';
+import DisplayedRegionModel from '../../../../model/DisplayedRegionModel';
+import IntervalArranger from '../../../../art/IntervalArranger';
 
 /**
  * An arranger and renderer of features, or annotations.
@@ -18,7 +18,7 @@ class AnnotationRenderer extends React.PureComponent {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // View region in which to render
         width: PropTypes.number.isRequired, // Width, in pixels, of the visualization
         numRows: PropTypes.number.isRequired, // Max number of rows in which to arrange annotations
-        rowHeight: PropTypes.number.isRequired, // Height of each row
+        rowHeight: PropTypes.number.isRequired, // Height of each row of annotations, in pixels
         /**
          * Callback for getting an annotation element to render.  Signature:
          *     (feature: Feature, absInterval: OpenInterval, y: number, isLastRow: boolean): JSX.Element

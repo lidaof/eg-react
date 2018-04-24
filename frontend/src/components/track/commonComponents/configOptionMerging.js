@@ -3,21 +3,17 @@ import PropTypes from 'prop-types';
 import getComponentName from '../../getComponentName';
 import TrackModel from '../../../model/TrackModel';
 
-/**
- * 
- * @param {function} getDataSource 
- * @param {any} defaultData 
- * @return {function}
- */
-function configDefaultOptions(defaultOptions) {
-    return withDefaultOptions.bind(null, defaultOptions);
+
+function configOptionMerging(toMerge={}) {
+    return withOptionMerging.bind(null, toMerge);
 }
 
-function withDefaultOptions(defaultOptions, WrappedComponent) {
+function withOptionMerging(toMerge, WrappedComponent) {
     return class extends React.Component {
         static displayName = `withDefaultOptions(${getComponentName(WrappedComponent)})`;
         static propTypes = {
-            trackModel: PropTypes.instanceOf(TrackModel).isRequired
+            trackModel: PropTypes.instanceOf(TrackModel).isRequired,
+            options: PropTypes.object
         };
 
         /**
@@ -28,18 +24,18 @@ function withDefaultOptions(defaultOptions, WrappedComponent) {
         constructor(props) {
             super(props);
             this.state = {
-                options: this.getMergedOptionsObject(props.trackModel.options)
+                options: this.getMergedOptionsObject(props)
             };
         }
 
         componentWillReceiveProps(nextProps) {
             if (this.props.trackModel.options !== nextProps.trackModel.options) {
-                this.setState({options: this.getMergedOptionsObject(nextProps.trackModel.options)});
+                this.setState({options: this.getMergedOptionsObject(nextProps)});
             }
         }
 
-        getMergedOptionsObject(trackOptions) {
-            return Object.assign({}, defaultOptions, trackOptions);
+        getMergedOptionsObject(props) {
+            return Object.assign({}, props.options, toMerge, props.trackModel.options);
         }
 
         render() {
@@ -48,4 +44,4 @@ function withDefaultOptions(defaultOptions, WrappedComponent) {
     }
 }
 
-export default configDefaultOptions;
+export default configOptionMerging;

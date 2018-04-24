@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 import GeneDescription from '../../GeneDescription';
 import Gene from '../../../model/Gene';
-import FeatureDetail from '../bedTrack/FeatureDetail';
+
 import '../commonComponents/Tooltip.css';
 
 /**

@@ -1,19 +1,25 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import _ from 'lodash';
 
-import { VISUALIZER_PROP_TYPES } from '../Track';
 import BedAnnotation from './BedAnnotation';
-import FeatureDetail from './FeatureDetail';
-
-import TrackLegend from '../commonComponents/TrackLegend';
-import AnnotationRenderer from '../commonComponents/AnnotationRenderer';
-import HiddenItemsMessage from '../commonComponents/HiddenItemsMessage';
-import Tooltip from '../commonComponents/Tooltip';
+import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
+import NewTrack from '../NewTrack';
 import GeneAnnotationTrack from '../geneAnnotationTrack/GeneAnnotationTrack';
+
+import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
+import Tooltip from '../commonComponents/Tooltip';
+import configOptionMerging from '../commonComponents/configOptionMerging';
+import { configStaticDataSource } from '../commonComponents/configDataFetch';
+import configDataProcessing from '../commonComponents/configDataProcessing';
+import withTooltip from '../commonComponents/withTooltip';
+
+import BedSource from '../../../dataSources/BedSource';
+import DataProcessor from '../../../dataSources/DataProcessor';
 
 import Feature from '../../../model/Feature';
 import ChromosomeInterval from '../../../model/interval/ChromosomeInterval';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
-import BedSource from '../../../dataSources/BedSource';
 
 const BedColumnIndices = {
     NAME: 3,
@@ -26,81 +32,72 @@ const DEFAULT_OPTIONS = {
     rows: 5,
 };
 
-const ROW_HEIGHT = BedAnnotation.HEIGHT + 2;
 /**
- * Gets the height of the track.
- * 
- * @param {Object} options - options object to use to get height
- * @return {number} height of the track
+ * Converter of BedRecords to Feature.
  */
-function getTrackHeight(options) {
-    return options.rows * ROW_HEIGHT;
-}
+class BedProcessor extends DataProcessor {
+    /**
+     * Extracts Features from the `data` prop.
+     * 
+     * @param {Object} props - track props, whose `data` prop should include an array of BedRecord
+     * @return {Feature[]} extracted Features from the props
+     */
+    process(props) {
+        if (!props.data) {
+            return [];
+        };
 
-/**
- * From the raw data source records, filters out those too small to see.  Returns an object with keys `features`, which
- * are the parsed Features, and `numHidden`, the the number of features that were filtered out.
- * 
- * @param {Object[]} records - raw plain-object records
- * @param {Object} trackProps - props passed to Track
- * @return {Object} object with keys `genes` and `numHidden`.  See doc above for details
- */
-function processBedRecords(records, trackProps) {
-    const drawModel = new LinearDrawingModel(trackProps.viewRegion, trackProps.width);
-    const visibleRecords = records.filter(record => drawModel.basesToXWidth(record.end - record.start) >= 1);
-    const features = visibleRecords.map(record => new Feature(
-        // "." is a placeholder that means "undefined" in the bed file.
-        record[BedColumnIndices.NAME] === "." ? "" : record[BedColumnIndices.NAME],
-        new ChromosomeInterval(record.chr, record.start, record.end),
-        record[BedColumnIndices.STRAND]
-    ));
-    for (let i = 0; i < features.length; i++) {
-        features[i].index = i; // Assign each feature an index so we can use it as a key when rendering
+        let features = props.data.map(record => new Feature(
+            // "." is a placeholder that means "undefined" in the bed file.
+            record[BedColumnIndices.NAME] === "." ? "" : record[BedColumnIndices.NAME],
+            new ChromosomeInterval(record.chr, record.start, record.end),
+            record[BedColumnIndices.STRAND]
+        ));
+        for (let i = 0; i < features.length; i++) {
+            features[i].index = i; // Assign each feature an index so we can use it as a key when rendering
+        }
+        return features;
     }
-    return {
-        features: features,
-        numHidden: records.length - visibleRecords.length,
-    };
 }
 
 /**
- * Visualizer for BED tracks.  FIXME: code duplication with GeneAnnotationTrack
+ * Track component for BED annotations.
  * 
  * @author Silas Hsu
  */
-class BedVisualizer extends React.PureComponent {
-    static propTypes = VISUALIZER_PROP_TYPES;
+export class BedTrack extends React.Component {
+    static propTypes = Object.assign({}, NewTrack.trackContainerProps, {
+        data: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired,
+        options: PropTypes.object,
+        onShowTooltip: PropTypes.func,
+        onHideTooltip: PropTypes.func,
+    });
+
+    static defaultProps = {
+        options: {},
+        onShowTooltip: element => undefined,
+        onHideTooltip: () => undefined,
+    };
 
     constructor(props) {
         super(props);
-        this.state = {
-            tooltip: null
-        };
-        this.openTooltip = this.openTooltip.bind(this);
-        this.closeTooltip = this.closeTooltip.bind(this);
+        this.renderTooltip = this.renderTooltip.bind(this);
         this.renderAnnotation = this.renderAnnotation.bind(this);
     }
 
     /**
-     * Called when an annotation is clicked.  Sets state so a detail box is displayed.
+     * Renders the tooltip for a feature.
      * 
-     * @param {MouseEvent} event 
-     * @param {Feature} feature
+     * @param {MouseEvent} event - mouse event that triggered the tooltip request
+     * @param {Feature} feature - Feature for which to display details
      */
-    openTooltip(event, feature) {
+    renderTooltip(event, feature) {
         const tooltip = (
-            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.closeTooltip} >
+            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} >
                 <FeatureDetail feature={feature} />
             </Tooltip>
         );
-        this.setState({tooltip: tooltip});
-    }
-
-    /**
-     * Sets state to close tooltip.
-     */
-    closeTooltip() {
-        this.setState({tooltip: null});
+        this.props.onShowTooltip(tooltip);
     }
 
     /**
@@ -110,10 +107,12 @@ class BedVisualizer extends React.PureComponent {
      * @param {OpenInterval} absInterval - location of the feature in navigation context
      * @param {number} y - y coordinate to render the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
+     * @param {DisplayedRegionModel} - region in which to draw
+     * @param {number} - width of the drawing area
+     * @param {Object} - x range of visible pixels
      * @return {JSX.Element} element visualizing the feature
      */
-    renderAnnotation(feature, absInterval, y, isLastRow) {
-        const {viewRegion, width, options} = this.props;
+    renderAnnotation(feature, absInterval, y, isLastRow, viewRegion, width, viewWindow) {
         const drawModel = new LinearDrawingModel(viewRegion, width);
         return <BedAnnotation
             key={feature.index}
@@ -122,41 +121,31 @@ class BedVisualizer extends React.PureComponent {
             absLocation={absInterval}
             y={y}
             isMinimal={isLastRow}
-            color={options.color}
-            onClick={this.openTooltip}
+            color={this.props.options.color}
+            onClick={this.renderTooltip}
         />;
     }
 
     render() {
-        const {data, viewRegion, width, options} = this.props;
-        return (
-        <React.Fragment>
-            <svg width={width} height={getTrackHeight(options) + 5} style={{paddingTop: 5, display: "block", overflow: "visible"}} >
-                <AnnotationRenderer
-                    features={data.features || []}
-                    viewRegion={viewRegion}
-                    width={width}
-                    numRows={options.rows}
-                    rowHeight={ROW_HEIGHT}
-                    getAnnotationElement={this.renderAnnotation}
-                    getHorizontalPadding={5}
-                    color={options.color} // It doesn't actually use this prop, but we pass it to trigger rerenders.
-                />
-            </svg>
-            {this.state.tooltip}
-            <HiddenItemsMessage width={width} numHidden={data.numHidden} />
-        </React.Fragment>
-        );
+        return <AnnotationTrack
+            {...this.props}
+            rowHeight={BedAnnotation.HEIGHT + 2}
+            getHorizontalPadding={5}
+            getAnnotationElement={this.renderAnnotation}
+        />;
     }
 }
 
-const BedTrack = {
-    visualizer: BedVisualizer,
-    legend: (props) => <TrackLegend height={getTrackHeight(props.options)} {...props} />,
+const withOptionMerging = configOptionMerging(DEFAULT_OPTIONS);
+const withDataFetch = configStaticDataSource(props => new BedSource(props.trackModel.url));
+const withDataProcessing = configDataProcessing(new BedProcessor());
+const configure = _.flowRight([withOptionMerging, withDataFetch, withDataProcessing, withTooltip]);
+const ConfiguredBedTrack = configure(BedTrack);
+
+export const BedTrackConfig = {
+    component: ConfiguredBedTrack,
     menuItems: GeneAnnotationTrack.menuItems,
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: trackModel => new BedSource(trackModel.url),
-    processData: processBedRecords,
 };
 
-export default BedTrack;
+export default BedTrackConfig;

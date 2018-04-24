@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import TranslatableG from '../../TranslatableG';
-import AnnotationArrows from '../commonComponents/AnnotationArrows';
+import AnnotationArrows from '../commonComponents/annotation/AnnotationArrows';
 import BackgroundedText from '../commonComponents/BackgroundedText';
 
 import LinearDrawingModel from '../../../model/LinearDrawingModel';

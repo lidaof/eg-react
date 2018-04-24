@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import getComponentName from '../../getComponentName';
 
 /**
@@ -7,13 +8,17 @@ import getComponentName from '../../getComponentName';
  * @param {any} defaultData 
  * @return {function}
  */
-export function configDataProcessing(processData, shouldProcessData=(prevProps, nextProps) => true) {
-    return withDataProcessing.bind(null, processData, shouldProcessData);
+function configDataProcessing(dataProcessor) {
+    return withDataProcessing.bind(null, dataProcessor);
 }
 
-function withDataProcessing(processData, shouldProcessData, WrappedComponent) {
+function withDataProcessing(dataProcessor, WrappedComponent) {
     return class extends React.Component {
         static displayName = `withDataProcessing(${getComponentName(WrappedComponent)})`;
+
+        static propTypes = {
+            data: PropTypes.any
+        };
 
         /**
          * Initializes data source and state.
@@ -23,19 +28,19 @@ function withDataProcessing(processData, shouldProcessData, WrappedComponent) {
         constructor(props) {
             super(props);
             this.state = {
-                processedData: processData(props)
+                processedData: dataProcessor.process(props)
             };
         }
 
         componentWillReceiveProps(nextProps) {
-            if (shouldProcessData(this.props, nextProps)) {
-                this.setState({processedData: processData(props)});
+            if (dataProcessor.shouldProcess(this.props, nextProps)) {
+                this.setState({processedData: dataProcessor.process(nextProps)});
             }
         }
 
         render() {
             const {data, ...otherProps} = this.props;
-            return <WrappedComponent data={this.processedData} {...otherProps} />;
+            return <WrappedComponent data={this.state.processedData} {...otherProps} />;
         }
     }
 }

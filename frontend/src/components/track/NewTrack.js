@@ -22,10 +22,11 @@ const WideDiv = withExpandedWidth('div');
  * @author Silas Hsu
  */
 export class NewTrack extends React.Component {
-    static propTypes = {
-        ///////////////////////////////////////
-        // Props provided by TrackContainers // -- Track subtypes should pass these through
-        ///////////////////////////////////////
+    /**
+     * Props that TrackContainers provide.  Track subtypes should require them in their propTypes, and use them in any
+     * way they wish.  Be sure to pass them through to this component!
+     */
+    static trackContainerProps = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
         width: PropTypes.number.isRequired, // Width of the track's visualizer
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
@@ -48,10 +49,10 @@ export class NewTrack extends React.Component {
          *     `index` - the index prop passed to the track
          */
         onMetadataClick: PropTypes.func,
+    };
 
-        //////////////////////////////////////////////
-        // Props that track subtypes should provide //
-        //////////////////////////////////////////////
+    static propTypes = Object.assign({}, NewTrack.trackContainerProps, {
+        // Track containers do not provide the following.  Track subtypes must provide them.
         legendElement: PropTypes.node.isRequired, // Track legend to render
         /**
          * Callback that renders visualizer.  Should return a React element.  Signature
@@ -61,16 +62,22 @@ export class NewTrack extends React.Component {
          *         `viewWindow` - x range of visible pixels assuming an xOffset of 0
          */
         getVisualizerElement: PropTypes.func.isRequired,
+
+        // `isLoading` and `error` can be provided by the configDataFetch HOC.
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any, // If present, applies error styling
-        visualizerBackgroundColor: PropTypes.string, // Background color, for the visualizer ONLY
-    };
+
+        options: PropTypes.shape({ // Track options object
+            backgroundColor: PropTypes.string // Visualizer background color
+        })
+    });
 
     static defaultProps = {
         xOffset: 0,
-        onContextMenu: (event) => undefined,
-        onClick: (event) => undefined,
-        onMetadataClick: (event, term) => undefined,
+        onContextMenu: (event, index) => undefined,
+        onClick: (event, index) => undefined,
+        onMetadataClick: (event, term, index) => undefined,
+        options: {}
     };
 
     constructor(props) {
@@ -106,7 +113,7 @@ export class NewTrack extends React.Component {
     render() {
         const {
             trackModel, width, viewRegion, metadataTerms, xOffset, // Track container props
-            legendElement, getVisualizerElement, isLoading, error, visualizerBackgroundColor, // Track subtype props
+            legendElement, getVisualizerElement, isLoading, error, options, // Track subtype props
         } = this.props;
         const viewExpansion = REGION_EXPANDER.calculateExpansion(width, viewRegion);
         const {expandedRegion, expandedWidth, viewWindow} = viewExpansion;
@@ -123,7 +130,7 @@ export class NewTrack extends React.Component {
             <WideDiv
                 viewExpansion={viewExpansion}
                 xOffset={xOffset}
-                style={{backgroundColor: visualizerBackgroundColor}}
+                style={{backgroundColor: options.backgroundColor}}
             >
                 {getVisualizerElement(expandedRegion, expandedWidth, viewWindow)}
             </WideDiv>

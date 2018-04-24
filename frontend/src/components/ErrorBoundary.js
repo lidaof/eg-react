@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const ERROR_STYLE = {
-    backgroundColor: "pink",
-    textAlign: "center"
-};
+// eslint-disable-next-line jsx-a11y/accessible-emoji
+const DEFAULT_ERROR_ELEMENT = <div style={{backgroundColor: "pink", textAlign: "center"}}>😵 Component crashed 😵</div>;
 
 /**
  * A component that catches errors in child elements, and can display a custom error message.
@@ -13,27 +11,27 @@ const ERROR_STYLE = {
  */
 class ErrorBoundary extends React.Component {
     static propTypes = {
-        errorMessage: PropTypes.string, // Custom error message to display if any children crash
+        getErrorElement: PropTypes.func, // Custom error element to render.  Signature: (error: any): JSX.Element
     };
 
     static defaultProps = {
-        errorMessage: "😢 Component crashed 😢"
+        getErrorElement: error => DEFAULT_ERROR_ELEMENT
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            error: false
+            error: null
         };
     }
 
     componentDidCatch(error, info) {
-        this.setState({error: true});
+        this.setState({error: error});
     }
 
     render() {
         if (this.state.error) {
-            return <div style={ERROR_STYLE}>{this.props.errorMessage}</div>;
+            return this.props.getErrorElement(this.state.error);
         } else {
             return this.props.children;
         }

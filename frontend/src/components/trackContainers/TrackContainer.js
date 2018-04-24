@@ -21,7 +21,7 @@ import withAutoDimensions from '../withAutoDimensions';
 
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import ErrorBoundary from '../ErrorBoundary';
+import TrackErrorBoundary from './TrackErrorBoundary';
 import { getSubtypeConfig } from '../track/subtypeConfig';
 
 const Tools = {
@@ -269,7 +269,12 @@ class TrackContainer extends React.Component {
             const id = trackModel.getId();
             const Track = getSubtypeConfig(trackModel).component;
             return <Reparentable key={id} uid={"track-" + id} >
-                <ErrorBoundary errorMessage="😢 Track crashed 😢">
+                <TrackErrorBoundary
+                    trackModel={trackModel}
+                    index={index}
+                    onContextMenu={this.handleContextMenu}
+                    onClick={this.handleTrackClicked}
+                >
                     <Track
                         trackModel={trackModel}
                         viewRegion={viewRegion}
@@ -280,7 +285,7 @@ class TrackContainer extends React.Component {
                         onClick={this.handleTrackClicked}
                         onMetadataClick={this.handleMetadataClicked}
                     />
-                </ErrorBoundary>
+                </TrackErrorBoundary>
             </Reparentable>
         });
     }

@@ -1,103 +1,66 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import GeneAnnotation from './GeneAnnotation';
 import GeneDetail from './GeneDetail';
-import { VISUALIZER_PROP_TYPES } from '../Track';
+import NewTrack from '../NewTrack';
+
+import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
+import withTooltip from '../commonComponents/withTooltip';
 import Tooltip from '../commonComponents/Tooltip';
-import TrackLegend from '../commonComponents/TrackLegend';
-import HiddenItemsMessage from '../commonComponents/HiddenItemsMessage';
-import AnnotationRenderer from '../commonComponents/AnnotationRenderer';
+import configOptionMerging from '../commonComponents/configOptionMerging';
+import { configStaticDataSource } from '../commonComponents/configDataFetch';
+import configDataProcessing from '../commonComponents/configDataProcessing';
 
 import NumberConfig from '../contextMenu/NumberConfig';
 import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorConfig';
 
+import GeneSource from '../../../dataSources/GeneSource';
+import DataProcessor from '../../../dataSources/DataProcessor';
+
 import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
-import GeneSource from '../../../dataSources/GeneSource';
 
 const ROW_VERTICAL_PADDING = 5;
-const ROW_HEIGHT = GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
 const DEFAULT_OPTIONS = {
     color: "blue",
     rows: 10
 };
 
-/**
- * Gets the horizontal (left and right) padding required by each gene.  Does this by estimating label width.
- * 
- * @param {Gene} gene - gene to display
- * @return {number} requested horizontal padding
- */
-function getHorizontalPadding(gene) {
-    return gene.getName().length * GeneAnnotation.HEIGHT;
+class GeneProcessor extends DataProcessor {
+    process(props) {
+        if (!props.data) {
+            return [];
+        };
+
+        return props.data.map(record => new Gene(record));
+    }
 }
 
-/**
- * Gets the height of the track.
- * 
- * @param {Object} options - options object to use to get height
- * @return {number} height of the track
- */
-function getTrackHeight(options) {
-    return options.rows * ROW_HEIGHT;
-}
-
-/**
- * From the raw data source records, filters out genes too small to see.  Returns an object with keys `genes`, which is
- * an array of Genes that survived filtering, and `numHidden`, the the number of genes that were filtered out.
- * 
- * @param {Object[]} records - raw plain-object records
- * @param {Object} trackProps - props passed to Track
- * @return {Object} object with keys `genes` and `numHidden`.  See doc above for details
- */
-function processGenes(records, trackProps) {
-    const drawModel = new LinearDrawingModel(trackProps.viewRegion, trackProps.width);
-    const visibleRecords = records.filter(record => drawModel.basesToXWidth(record.txEnd - record.txStart) >= 1);
-    return {
-        genes: visibleRecords.map(record => new Gene(record)),
-        numHidden: records.length - visibleRecords.length,
-    };
-}
-
-/**
- * A gene annotation visualizer.
- * 
- * @author Silas Hsu
- */
-class GeneAnnotationVisualizer extends React.PureComponent {
-    static propTypes = VISUALIZER_PROP_TYPES;
+class GeneAnnotationTrack extends React.Component {
+    static propTypes = Object.assign({}, NewTrack.trackContainerProps, {
+        data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)).isRequired,
+        options: PropTypes.object,
+        onShowTooltip: PropTypes.func,
+        onHideTooltip: PropTypes.func,
+    });
 
     constructor(props) {
         super(props);
-        this.state = {
-            tooltip: null
-        };
-        this.openTooltip = this.openTooltip.bind(this);
-        this.closeTooltip = this.closeTooltip.bind(this);
-        this.renderGene = this.renderGene.bind(this);
+        this.renderAnnotation = this.renderAnnotation.bind(this);
+        this.renderTooltip = this.renderTooltip.bind(this);
     }
 
     /**
-     * Called when a gene annotation is clicked.  Sets state so a detail box is displayed.
+     * Gets the horizontal (left and right) padding required by each gene.  Does this by estimating label width.
      * 
-     * @param {MouseEvent} event 
-     * @param {Gene} gene 
+     * @param {Gene} gene - gene to display
+     * @return {number} requested horizontal padding
      */
-    openTooltip(event, gene) {
-        const tooltip = (
-            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.closeTooltip} >
-                <GeneDetail gene={gene} />
-            </Tooltip>
-        );
-        this.setState({tooltip: tooltip});
-    }
-
-    /**
-     * Sets state to close tooltip.
-     */
-    closeTooltip() {
-        this.setState({tooltip: null});
+    getHorizontalPadding(gene) {
+        return gene.getName().length * GeneAnnotation.HEIGHT;
     }
 
     /**
@@ -107,64 +70,66 @@ class GeneAnnotationVisualizer extends React.PureComponent {
      * @param {OpenInterval} absInterval - location of the gene in navigation context
      * @param {number} y - y coordinate to render the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
+     * @param {DisplayedRegionModel} - region in which to draw
+     * @param {number} - width of the drawing area
+     * @param {Object} - x range of visible pixels
      * @return {JSX.Element} element visualizing the gene
      */
-    renderGene(gene, absInterval, y, isLastRow) {
-        const {viewRegion, width, viewWindow, options} = this.props;
+    renderAnnotation(gene, absInterval, y, isLastRow, viewRegion, width, viewWindow) {
         const navContext = viewRegion.getNavigationContext();
         const drawModel = new LinearDrawingModel(viewRegion, width);
         return <GeneAnnotation
-            key={gene.refGeneRecord._id + gene.absStart}
+            key={gene.refGeneRecord._id}
             gene={gene}
             navContextLocation={new DisplayedRegionModel(navContext, ...absInterval)}
             y={y}
             isMinimal={isLastRow}
             drawModel={drawModel}
             viewWindow={viewWindow}
-            options={options}
-            onClick={this.openTooltip}
+            options={this.props.options}
+            onClick={this.renderTooltip}
         />;
     }
 
-    render() {
-        const {data, viewRegion, width, options} = this.props;
-        const svgStyle = {paddingTop: 5, display: "block", overflow: "visible"};
-        return (
-        <React.Fragment>
-            <svg width={width} height={getTrackHeight(options)} style={svgStyle} >
-                <AnnotationRenderer
-                    features={data.genes || []}
-                    viewRegion={viewRegion}
-                    width={width}
-                    numRows={options.rows}
-                    rowHeight={ROW_HEIGHT}
-                    getHorizontalPadding={getHorizontalPadding}
-                    getAnnotationElement={this.renderGene}
-                    options={options} // It doesn't actually use this prop, but we pass it to trigger rerenders.
-                />
-            </svg>
-            {this.state.tooltip}
-            <HiddenItemsMessage width={width} numHidden={data.numHidden} />
-        </React.Fragment>
+    /**
+     * Renders the tooltip for a gene.
+     * 
+     * @param {MouseEvent} event - mouse event that triggered the tooltip request
+     * @param {Gene} gene - gene for which to display details
+     */
+    renderTooltip(event, gene) {
+        const tooltip = (
+            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} >
+                <GeneDetail gene={gene} />
+            </Tooltip>
         );
+        this.props.onShowTooltip(tooltip);
+    }
+
+    render() {
+        return <AnnotationTrack
+            {...this.props}
+            rowHeight={GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING}
+            getHorizontalPadding={this.getHorizontalPadding}
+            getAnnotationElement={this.renderAnnotation}
+        />;
     }
 }
 
-function GeneAnnotationLegend(props) {
-    return <TrackLegend height={getTrackHeight(props.options)} {...props} />
-}
+const withOptionMerging = configOptionMerging(DEFAULT_OPTIONS);
+const withDataFetch = configStaticDataSource(props => new GeneSource(props.trackModel.genome));
+const withDataProcessing = configDataProcessing(new GeneProcessor());
+const configure = _.flowRight([withOptionMerging, withDataFetch, withDataProcessing, withTooltip]);
+const ConfiguredAnnotationTrack = configure(GeneAnnotationTrack);
 
 function NumRowsConfig(props) {
     return <NumberConfig {...props} optionPropName="rows" label="Rows to draw: " minValue={1} />
 }
 
-const GeneAnnotationTrack = {
-    visualizer: GeneAnnotationVisualizer,
-    legend: GeneAnnotationLegend,
+const GeneAnnotationConfig = {
+    component: ConfiguredAnnotationTrack,
     menuItems: [NumRowsConfig, PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: trackModel => new GeneSource(trackModel.genome),
-    processData: processGenes,
 };
 
-export default GeneAnnotationTrack;
+export default GeneAnnotationConfig;

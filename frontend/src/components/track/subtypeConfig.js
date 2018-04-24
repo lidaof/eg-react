@@ -14,10 +14,10 @@ import UnknownTrack from './UnknownTrack';
 const TYPE_NAME_TO_SUBTYPE = {
     "ruler": RulerTrack,
     //"bigwig": BigWigTrack,
-    //"bed": BedTrack,
-    //"bigbed": BigBedTrack,
+    "bed": BedTrack,
+    "bigbed": BigBedTrack,
     //"bedgraph": BedGraphTrack,
-    //"geneannotation": GeneAnnotationTrack,
+    "geneannotation": GeneAnnotationTrack,
     //"repeatmasker": RepeatMaskerTrack,
 };
 

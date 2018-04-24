@@ -1,36 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 import getComponentName from '../../getComponentName';
+import DataSource from '../../../dataSources/DataSource';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
+import { REGION_EXPANDER } from '../NewTrack';
 
 /**
- * A function that constructs a higher-order component.  This HOC will automatically fetch data when view region
- * changes, using the fetch configuration given to this function.  It will then pass the data to the wrapped component
- * in the `data` prop.
+ * Components wrapped by this function will automatically fetch data when view region changes, using the data source
+ * passed via props.  It passes the following extra props to the wrapped components:
+ *  - `data`: fetched data.  It is initially `null`.
+ *  - `isLoading`: whether data fetch is currently in progress
+ *  - `error`: error object, if any errors happened during data fetch
  * 
- * The first paramter is a callback for getting a DataSource, signature (props: Object): DataSource.  It will be passed
- * initial props, and should return a DataSource.  It will be called only ONCE on element initialization.
- * 
- * @param {function} getDataSource - callback for getting a DataSource
- * @param {any} initialData - initial data to pass to wrapped components
- * @param {RegionExpander} [regionExpander] - object that expands the region before fetching
- * @return {function} function that wraps React components
- */
-function configDataFetch(getDataSource, initialData, regionExpander) {
-    return withDataFetch.bind(null, getDataSource, initialData, regionExpander);
-}
-
-/**
- * See {@link configDataFetch}.
- * 
+ * @param {React.Component} WrappedComponent - component to wrap
  * @return {React.Component} component that fetches data on view region changes
  */
-export function withDataFetch(getDataSource, initialData, regionExpander, WrappedComponent) {
+export function withDataFetch(WrappedComponent) {
     return class extends React.Component {
         static displayName = `withDataFetch(${getComponentName(WrappedComponent)})`;
 
         static propTypes = {
-            viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired
+            dataSource: PropTypes.instanceOf(DataSource).isRequired,
+            viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
         };
 
         /**
@@ -40,13 +31,12 @@ export function withDataFetch(getDataSource, initialData, regionExpander, Wrappe
          */
         constructor(props) {
             super(props);
-            this.dataSource = getDataSource(props);
             this.state = {
-                data: initialData,
+                data: null,
                 isLoading: true,
                 error: null,
             };
-            this.fetchData(props);
+            this.fetchData();
         }
 
         /**
@@ -63,24 +53,16 @@ export function withDataFetch(getDataSource, initialData, regionExpander, Wrappe
         }
 
         /**
-         * Calls cleanUp on the associated DataSource.
-         */
-        componentWillUnmount() {
-            this.dataSource.cleanUp();
-        }
-
-        /**
          * Uses this instance's DataSource to fetch data within a view region, and then sets state.
          * 
          * @return {Promise<void>} a promise that resolves when fetching is done, including when there is an error.
          */
         fetchData() {
             const requestedViewRegion = this.props.viewRegion; // Take a snapshot of this.props.viewRegion
-            let regionToFetch = requestedViewRegion;
-            if (regionExpander) {
-                regionToFetch = regionExpander.calculateExpansion(props.width, requestedViewRegion).expandedRegion;
-            }
-            return this.dataSource.getData(regionToFetch, props).then(data => {
+            const regionToFetch = REGION_EXPANDER
+                .calculateExpansion(this.props.width, requestedViewRegion)
+                .expandedRegion;
+            return this.props.dataSource.getData(regionToFetch, this.props).then(data => {
                 // When the data finally comes in, be sure it is still what the user wants
                 if (this.props.viewRegion === requestedViewRegion) {
                     this.setState({
@@ -109,4 +91,48 @@ export function withDataFetch(getDataSource, initialData, regionExpander, Wrappe
     } // End class extends React.Component
 } // End function withDataFetch(...)
 
-export default configDataFetch;
+/**
+ * A function that constructs a higher-order component.  It returns a function that does much of the same thing as
+ * `withDataFetch`, except that it configures a default data source, such that that output component classes do not
+ * require a DataSource in props.
+ * 
+ * The first parameter is a callback that provides this default DataSource, signature (props: Object): DataSource, where
+ * `props` are the component's initial props.  This callback will be used ONCE on component initialization, and the
+ * returned DataSource will persist for the life of the component.
+ * 
+ * @param {function} getDataSource - callback for getting a DataSource
+ * @return {function} function that wraps React components
+ */
+export function configStaticDataSource(getDataSource) {
+    return function(WrappedComponent) {
+        return withStaticDataSource(getDataSource, withDataFetch(WrappedComponent));
+    }
+}
+
+/**
+ * Helper for {@link configStaticDataSource}.
+ * 
+ * @param {function} getDataSource - callback for getting a DataSource
+ * @param {typeof React.Component} WrappedComponent - component class to enhance with a DataSource
+ * @return {typeof React.Component} - enhanced component class
+ */
+function withStaticDataSource(getDataSource, WrappedComponent) {
+    return class extends React.Component {
+        static displayName = `withStaticDataSource(${getComponentName(WrappedComponent)})`;
+
+        constructor(props) {
+            super(props);
+            this.state = {
+                dataSource: getDataSource(props)
+            };
+        }
+
+        componentWillUnmount() {
+            this.state.dataSource.cleanUp();
+        }
+
+        render() {
+            return <WrappedComponent dataSource={this.state.dataSource} {...this.props} />;
+        }
+    }
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import TranslatableG from '../../TranslatableG';
-import AnnotationArrows from '../commonComponents/AnnotationArrows';
+import AnnotationArrows from '../commonComponents/annotation/AnnotationArrows';
 import BackgroundedText from '../commonComponents/BackgroundedText';
 
 import Feature from '../../../model/Feature';
@@ -32,7 +32,7 @@ class BedAnnotation extends React.Component {
          *     `event`: the triggering click event
          *     `feature`: the same Feature as the one passed via props
          */
-        onClick: PropTypes.func, 
+        onClick: PropTypes.func,
     };
 
     static defaultProps = {
