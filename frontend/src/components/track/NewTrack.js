@@ -130,7 +130,7 @@ export class NewTrack extends React.Component {
             <WideDiv
                 viewExpansion={viewExpansion}
                 xOffset={xOffset}
-                style={{backgroundColor: options.backgroundColor}}
+                outerStyle={{backgroundColor: options.backgroundColor}}
             >
                 {getVisualizerElement(expandedRegion, expandedWidth, viewWindow)}
             </WideDiv>

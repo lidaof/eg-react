@@ -40,12 +40,24 @@ class GeneProcessor extends DataProcessor {
 }
 
 class GeneAnnotationTrack extends React.Component {
-    static propTypes = Object.assign({}, NewTrack.trackContainerProps, {
+    static propTypes = Object.assign({},
+        NewTrack.trackContainerProps,
+        configOptionMerging.INJECTED_PROPS,
+        configStaticDataSource.INJECTED_PROPS,
+        withTooltip.INJECTED_PROPS,
+        {
+        /**
+         * Genes to render.  GeneProcessor provides this.
+         */
         data: PropTypes.arrayOf(PropTypes.instanceOf(Gene)).isRequired,
-        options: PropTypes.object,
-        onShowTooltip: PropTypes.func,
-        onHideTooltip: PropTypes.func,
-    });
+        }
+    );
+
+    static defaultProps = {
+        options: {},
+        onShowTooltip: tooltip => undefined,
+        onHideTooltip: () => undefined,
+    };
 
     constructor(props) {
         super(props);

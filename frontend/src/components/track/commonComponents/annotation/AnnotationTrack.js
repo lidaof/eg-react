@@ -58,10 +58,13 @@ class AnnotationTrack extends React.Component {
             backgroundColor: PropTypes.string, // Background color
             displayMode: PropTypes.any // Unused for now.
         }).isRequired,
+        isLoading: PropTypes.bool, // If true, applies loading styling
+        error: PropTypes.any, // If present, applies error styling
+
         /**
          * Horizontal padding between annotations.  See AnnotationRenderer for details.
          */
-        getHorizontalPadding: PropTypes.oneOfType([PropTypes.number, PropTypes.func]).isRequired, 
+        getHorizontalPadding: PropTypes.oneOfType([PropTypes.number, PropTypes.func]).isRequired,
         /**
          * Callback for getting a single annotation to render.  Signature: (...annotationArgs, ...visArgs): JSX.Element
          *     `annotationArgs`: arguments from AnnotationRenderer's getAnnotationElement callback

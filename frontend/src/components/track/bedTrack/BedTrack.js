@@ -66,12 +66,18 @@ class BedProcessor extends DataProcessor {
  * @author Silas Hsu
  */
 export class BedTrack extends React.Component {
-    static propTypes = Object.assign({}, NewTrack.trackContainerProps, {
+    static propTypes = Object.assign({}, 
+        NewTrack.trackContainerProps,
+        configOptionMerging.INJECTED_PROPS,
+        configStaticDataSource.INJECTED_PROPS,
+        withTooltip.INJECTED_PROPS,
+        {
+        /**
+         * Features to render.  BedProcessor provides this.
+         */
         data: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired,
-        options: PropTypes.object,
-        onShowTooltip: PropTypes.func,
-        onHideTooltip: PropTypes.func,
-    });
+        }
+    );
 
     static defaultProps = {
         options: {},
