@@ -2,19 +2,9 @@ import React from 'react';
 import NewTrack from './NewTrack';
 import TrackLegend from './commonComponents/TrackLegend';
 import withAutoDimensions from '../withAutoDimensions';
+import ErrorMessage from '../ErrorMessage';
 
 const AutoDimensionLegend = withAutoDimensions(TrackLegend);
-
-/**
- * Displays a simple error message.
- * 
- * @param {Object} props - props as specified by React
- * @return {JSX.Element} - element to render
- */
-function UnknownVisualizer(props) {
-    const message = `Unknown track type: "${props.trackModel.type}"`;
-    return <div style={{textAlign: "center", width: props.width}} >{message}</div>;
-}
 
 /**
  * A placeholder when we don't recognize a track's type.  It basically does nothing.
@@ -25,10 +15,11 @@ function UnknownVisualizer(props) {
  */
 function UnknownTrack(props) {
     const {width, trackModel} = props;
+    const message = `Unknown track type: "${trackModel.type}"`;
     return <NewTrack 
         {...props}
         legend={<AutoDimensionLegend trackModel={trackModel} />}
-        visualizer={<UnknownVisualizer trackModel={trackModel} width={width} />}
+        visualizer={<ErrorMessage width={width} >{message}</ErrorMessage>}
     />;
 }
 

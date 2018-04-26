@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ErrorMessage from './ErrorMessage';
 
 // eslint-disable-next-line jsx-a11y/accessible-emoji
-const DEFAULT_ERROR_ELEMENT = <div style={{backgroundColor: "pink", textAlign: "center"}}>😵 Component crashed 😵</div>;
+const DEFAULT_ERROR_ELEMENT = <ErrorMessage>😵 Component crashed 😵</ErrorMessage>;
 
 /**
  * A component that catches errors in child elements, and can display a custom error message.

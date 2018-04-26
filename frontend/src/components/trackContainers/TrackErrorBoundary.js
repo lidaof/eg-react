@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ErrorBoundary from '../ErrorBoundary';
+import ErrorMessage from '../ErrorMessage';
 import TrackModel from '../../model/TrackModel';
 
 import '../track/Track.css';
@@ -35,15 +36,14 @@ class TrackErrorBoundary extends React.Component {
     renderErrorMessage(error) {
         const {trackModel, index, onContextMenu, onClick} = this.props;
         return (
-        <div
+        <ErrorMessage
             className={trackModel.isSelected ? "Track-selected-border" : undefined}
-            style={{backgroundColor: "pink", textAlign: "center"}}
             onContextMenu={event => onContextMenu(event, index)}
             onClick={event => onClick(event, index)}
         >
             {/* eslint-disable-line jsx-a11y/accessible-emoji */}
             😵 Track crashed 😵
-        </div>
+        </ErrorMessage>
         );
     }
 
