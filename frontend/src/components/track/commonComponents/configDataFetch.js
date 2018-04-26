@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import getComponentName from '../../getComponentName';
 import DataSource from '../../../dataSources/DataSource';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
-import { REGION_EXPANDER } from '../NewTrack';
 
 /**
  * Component classes returned by this function will automatically fetch data when view region changes, using the data
@@ -65,10 +64,7 @@ export function withDataFetch(WrappedComponent) {
          */
         fetchData() {
             const requestedViewRegion = this.props.viewRegion; // Take a snapshot of this.props.viewRegion
-            const regionToFetch = REGION_EXPANDER
-                .calculateExpansion(this.props.width, requestedViewRegion)
-                .expandedRegion;
-            return this.props.dataSource.getData(regionToFetch, this.props).then(data => {
+            return this.props.dataSource.getData(requestedViewRegion, this.props).then(data => {
                 // When the data finally comes in, be sure it is still what the user wants
                 if (this.props.viewRegion === requestedViewRegion) {
                     this.setState({

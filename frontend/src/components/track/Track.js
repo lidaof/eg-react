@@ -5,7 +5,6 @@ import memoizeOne from 'memoize-one';
 import TrackLoadingNotice from './commonComponents/TrackLoadingNotice';
 import MetadataIndicator from './commonComponents/MetadataIndicator';
 
-import withExpandedWidth from '../withExpandedWidth';
 import getComponentName from '../getComponentName';
 import { getSubtypeConfig } from './subtypeConfig';
 
@@ -66,7 +65,7 @@ function freezeWhileLoading(WrappedComponent) {
 const REGION_EXPANDER = new RegionExpander(1);
 // This memoization is very important, as it avoids rerendering the visualizer when extraneous props change
 REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
-const WideDiv = freezeWhileLoading(withExpandedWidth('div'));
+const WideDiv = freezeWhileLoading('div');
 
 /**
  * Manages the following common to all tracks:

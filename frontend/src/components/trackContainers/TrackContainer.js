@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import memoizeOne from 'memoize-one';
 import connect from 'react-redux/lib/connect/connect';
 import { ActionCreators } from '../../AppState';
 
@@ -21,6 +22,7 @@ import withAutoDimensions from '../withAutoDimensions';
 
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import RegionExpander from '../../model/RegionExpander';
 import TrackErrorBoundary from './TrackErrorBoundary';
 import { getSubtypeConfig } from '../track/subtypeConfig';
 
@@ -47,6 +49,9 @@ const Tools = {
     }
 };
 const DEFAULT_CURSOR = "crosshair";
+const REGION_EXPANDER = new RegionExpander(1);
+// Simple caching for the calculateExpansion computation
+REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
 
 ///////////////////////////
 // Track selection utils //
@@ -147,10 +152,25 @@ class TrackContainer extends React.Component {
         onTracksChanged: () => undefined,
     };
 
+    static getDerivedStateFromProps(nextProps) {
+        const {viewRegion, width, metadataTerms} = nextProps;
+        const visualizationWidth = Math.max(0,
+            width - TrackLegend.WIDTH - metadataTerms.length * MetadataIndicator.WIDTH
+        );
+        return {
+            visualizerInfo: REGION_EXPANDER.calculateExpansion(visualizationWidth, viewRegion),
+        };
+    }
+
     constructor(props) {
         super(props);
         this.state = {
-            selectedTool: {}
+            selectedTool: {},
+            visualizerInfo: {
+                width: 0,
+                viewRegion: null,
+                viewWindow: null,
+            },
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -264,7 +284,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const {viewRegion, tracks, metadataTerms} = this.props;
+        const {tracks, metadataTerms} = this.props;
         return tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const Track = getSubtypeConfig(trackModel).component;
@@ -277,8 +297,7 @@ class TrackContainer extends React.Component {
                 >
                     <Track
                         trackModel={trackModel}
-                        viewRegion={viewRegion}
-                        width={this.getVisualizationWidth()}
+                        {...this.state.visualizerInfo}
                         metadataTerms={metadataTerms}
                         index={index}
                         onContextMenu={this.handleContextMenu}
@@ -294,10 +313,7 @@ class TrackContainer extends React.Component {
      * @return {number} the width, in pixels, at which tracks should render their visualizers
      */
     getVisualizationWidth() {
-        const {width, metadataTerms} = this.props;
-        return Math.max(0,
-            width - TrackLegend.WIDTH - metadataTerms.length * MetadataIndicator.WIDTH
-        );
+        return this.state.visualizerInfo.viewWindow.getLength();
     }
 
     /**

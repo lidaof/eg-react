@@ -63,10 +63,8 @@ class RulerVisualizer extends React.Component {
 function RulerTrack(props) {
     return <NewTrack
         {...props}
-        legendElement={<TrackLegend height={HEIGHT} trackModel={props.trackModel} />}
-        getVisualizerElement={(viewRegion, width, viewWindow) =>
-            <RulerVisualizer viewRegion={viewRegion} width={width} />
-        }
+        legend={<TrackLegend height={HEIGHT} trackModel={props.trackModel} />}
+        visualizer={<RulerVisualizer viewRegion={props.viewRegion} width={props.width} />}
     />;
 }
 

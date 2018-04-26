@@ -68,8 +68,8 @@ class RegionExpander {
         const rightExtraPixels = rightBaseDiff * pixelsPerBase;
 
         return {
-            expandedWidth: expandedWidth,
-            expandedRegion: expandedRegion,
+            width: expandedWidth,
+            viewRegion: expandedRegion,
             viewWindow: new OpenInterval(leftExtraPixels, expandedWidth - rightExtraPixels),
         };
     }

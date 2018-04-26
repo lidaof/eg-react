@@ -18,9 +18,15 @@ const SVG_STYLE = {
 };
 
 /**
- * Filters out Features too small to see
+ * Filters out Features too small to see.
  */
 class FeatureProcessor extends DataProcessor {
+    shouldProcess(prevProps, nextProps) {
+        return prevProps.data !== nextProps.data ||
+            prevProps.viewRegion !== nextProps.viewRegion ||
+            prevProps.width !== nextProps.width;
+    }
+
     process(props) {
         if (!props.data) {
             return {
@@ -66,9 +72,8 @@ class AnnotationTrack extends React.Component {
          */
         getHorizontalPadding: PropTypes.oneOfType([PropTypes.number, PropTypes.func]).isRequired,
         /**
-         * Callback for getting a single annotation to render.  Signature: (...annotationArgs, ...visArgs): JSX.Element
+         * Callback for getting a single annotation to render.  Signature: (...annotationArgs): JSX.Element
          *     `annotationArgs`: arguments from AnnotationRenderer's getAnnotationElement callback
-         *     `visArgs`: arguments from Track's getVisualizerElement callback
          */
         getAnnotationElement: PropTypes.func,
     });
@@ -85,9 +90,8 @@ class AnnotationTrack extends React.Component {
         return this.props.options.rows * this.props.rowHeight;
     }
 
-    renderVisualizer(viewRegion, width, viewWindow) {
-        const visArgs = [viewRegion, width, viewWindow];
-        const {data, rowHeight, options, getHorizontalPadding, getAnnotationElement} = this.props;
+    renderVisualizer() {
+        const {data, viewRegion, width, rowHeight, options, getHorizontalPadding, getAnnotationElement} = this.props;
         return (
         <React.Fragment>
             <svg width={width} height={this.getHeight()} style={SVG_STYLE} >
@@ -98,7 +102,7 @@ class AnnotationTrack extends React.Component {
                     numRows={options.rows}
                     rowHeight={rowHeight}
                     getHorizontalPadding={getHorizontalPadding}
-                    getAnnotationElement={(...annotationArgs) => getAnnotationElement(...annotationArgs, ...visArgs)}
+                    getAnnotationElement={getAnnotationElement}
                     options={options} // It doesn't actually use this prop, but we pass it to trigger rerenders.
                 />
             </svg>
@@ -110,8 +114,8 @@ class AnnotationTrack extends React.Component {
     render() {
         return <NewTrack
             {...this.props}
-            legendElement={<TrackLegend height={this.getHeight()} {...this.props} />}
-            getVisualizerElement={this.renderVisualizer}
+            legend={<TrackLegend height={this.getHeight()} {...this.props} />}
+            visualizer={this.renderVisualizer()}
         />;
     }
 }

@@ -113,12 +113,10 @@ export class BedTrack extends React.Component {
      * @param {OpenInterval} absInterval - location of the feature in navigation context
      * @param {number} y - y coordinate to render the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
-     * @param {DisplayedRegionModel} - region in which to draw
-     * @param {number} - width of the drawing area
-     * @param {Object} - x range of visible pixels
      * @return {JSX.Element} element visualizing the feature
      */
-    renderAnnotation(feature, absInterval, y, isLastRow, viewRegion, width, viewWindow) {
+    renderAnnotation(feature, absInterval, y, isLastRow) {
+        const {viewRegion, width, viewWindow, options} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
         return <BedAnnotation
             key={feature.index}
@@ -127,7 +125,7 @@ export class BedTrack extends React.Component {
             absLocation={absInterval}
             y={y}
             isMinimal={isLastRow}
-            color={this.props.options.color}
+            color={options.color}
             onClick={this.renderTooltip}
         />;
     }

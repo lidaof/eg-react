@@ -11,11 +11,12 @@ const DEFAULT_ERROR_ELEMENT = <div style={{backgroundColor: "pink", textAlign: "
  */
 class ErrorBoundary extends React.Component {
     static propTypes = {
-        getErrorElement: PropTypes.func, // Custom error element to render.  Signature: (error: any): JSX.Element
+        getFallbackElement: PropTypes.func, // Element to show on error.  Signature: (error: any): JSX.Element
+        // Other props passed to children
     };
 
     static defaultProps = {
-        getErrorElement: error => DEFAULT_ERROR_ELEMENT
+        getFallbackElement: error => DEFAULT_ERROR_ELEMENT
     };
 
     constructor(props) {
@@ -31,9 +32,10 @@ class ErrorBoundary extends React.Component {
 
     render() {
         if (this.state.error) {
-            return this.props.getErrorElement(this.state.error);
+            return this.props.getFallbackElement(this.state.error);
         } else {
-            return this.props.children;
+            const {getFallbackElement, children, ...otherProps} = this.props;
+            return React.Children.map(this.props.children, child => React.cloneElement(child, otherProps));
         }
     }
 }

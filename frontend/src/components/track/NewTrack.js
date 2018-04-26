@@ -1,20 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import memoizeOne from 'memoize-one';
 
 import TrackLoadingNotice from './commonComponents/TrackLoadingNotice';
 import MetadataIndicator from './commonComponents/MetadataIndicator';
-import withExpandedWidth from '../withExpandedWidth';
 
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import RegionExpander from '../../model/RegionExpander';
+import OpenInterval from '../../model/interval/OpenInterval';
 
 import './Track.css';
-
-export const REGION_EXPANDER = new RegionExpander(1);
-REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
-const WideDiv = withExpandedWidth('div');
 
 /**
  * Displays track legends, visualizers, and metadata bars more-or-less consistently.
@@ -29,7 +23,8 @@ export class NewTrack extends React.Component {
     static trackContainerProps = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
         width: PropTypes.number.isRequired, // Width of the track's visualizer
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the genome to display
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the nav context to display
+        viewWindow: PropTypes.instanceOf(OpenInterval).isRequired, // Visible portion of the visualizer
         metadataTerms: PropTypes.arrayOf(PropTypes.string), // Terms for which to render metadata handles
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
         index: PropTypes.number, // Number to use as the last parameter in the following callbacks
@@ -53,15 +48,8 @@ export class NewTrack extends React.Component {
 
     static propTypes = Object.assign({}, NewTrack.trackContainerProps, {
         // Track containers do not provide the following.  Track subtypes must provide them.
-        legendElement: PropTypes.node.isRequired, // Track legend to render
-        /**
-         * Callback that renders visualizer.  Should return a React element.  Signature
-         *     (viewRegion: DisplayedRegionModel, width: number, viewWindow: OpenInterval): JSX.Element
-         *         `viewRegion` - region to visualize
-         *         `width` - width to visualize
-         *         `viewWindow` - x range of visible pixels assuming an xOffset of 0
-         */
-        getVisualizerElement: PropTypes.func.isRequired,
+        legend: PropTypes.node.isRequired, // Track legend to render
+        visualizer: PropTypes.node.isRequired, // Track visualizer to render
 
         // `isLoading` and `error` can be provided by the configDataFetch HOC.
         isLoading: PropTypes.bool, // If true, applies loading styling
@@ -112,12 +100,9 @@ export class NewTrack extends React.Component {
      */
     render() {
         const {
-            trackModel, width, viewRegion, metadataTerms, xOffset, // Track container props
-            legendElement, getVisualizerElement, isLoading, error, options, // Track subtype props
+            trackModel, width, viewRegion, viewWindow, metadataTerms, xOffset, // Track container props
+            legend, visualizer, isLoading, error, options, // Track subtype props
         } = this.props;
-        const viewExpansion = REGION_EXPANDER.calculateExpansion(width, viewRegion);
-        const {expandedRegion, expandedWidth, viewWindow} = viewExpansion;
-
         return (
         <div
             style={{backgroundColor: error ? "pink" : "white"}}
@@ -126,18 +111,60 @@ export class NewTrack extends React.Component {
             onClick={this.handleClick}
         >
             {isLoading ? <TrackLoadingNotice /> : null}
-            {legendElement}
-            <WideDiv
-                viewExpansion={viewExpansion}
+            {legend}
+            <ViewWindow
+                viewWindow={viewWindow}
+                fullWidth={width}
                 xOffset={xOffset}
-                outerStyle={{backgroundColor: options.backgroundColor}}
+                style={{backgroundColor: options.backgroundColor}}
             >
-                {getVisualizerElement(expandedRegion, expandedWidth, viewWindow)}
-            </WideDiv>
+                {visualizer}
+            </ViewWindow>
             <MetadataIndicator track={trackModel} terms={metadataTerms} onClick={this.handleMetadataClick} />
         </div>
         );
     }
+}
+
+/**
+ * A component that has a "window" that displays only a portion of its (presumably) wider children.  The window can be
+ * horizontally scrolled via the `xOffset` prop.  By default the view window is horizontally centered on the children.
+ * 
+ * @param {Object} props - props as specified by React
+ * @return {JSX.Element} element to render
+ */
+function ViewWindow(props) {
+    const {viewWindow, fullWidth, style, children} = props;
+    const xOffset = props.xOffset || 0;
+    let left = 0;
+    if (xOffset > 0) {
+        // Dragging stuff on the left into view.  So, we limit to how many pixels exist on the left.
+        left = Math.min(xOffset, viewWindow.start);
+    } else {
+        // Ditto for dragging stuff on the right into view.
+        const numPixelsOnRight = fullWidth - viewWindow.end;
+        left = Math.max(-numPixelsOnRight, xOffset);
+    }
+
+    const outerStyle = Object.assign({}, style, {
+        overflowX: "hidden",
+        width: viewWindow.getLength(),
+    });
+
+    const innerStyle = {
+        position: "relative",
+        // This centers the view window, rather than it starting at the leftmost part of the inner element.
+        marginLeft: -viewWindow.start,
+        left: left
+    };
+
+    return (
+    <div style={outerStyle}>
+        <div width={fullWidth} style={innerStyle} >
+            {children}
+        </div>
+    </div>
+    );
 }
 
 export default NewTrack;

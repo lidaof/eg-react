@@ -24,13 +24,11 @@ function UnknownVisualizer(props) {
  * @author Silas Hsu
  */
 function UnknownTrack(props) {
-    const trackModel = props.trackModel;
+    const {width, trackModel} = props;
     return <NewTrack 
         {...props}
-        legendElement={<AutoDimensionLegend trackModel={trackModel} />}
-        getVisualizerElement={
-            (viewRegion, width, viewWindow) => <UnknownVisualizer trackModel={trackModel} width={width} />
-        }
+        legend={<AutoDimensionLegend trackModel={trackModel} />}
+        visualizer={<UnknownVisualizer trackModel={trackModel} width={width} />}
     />;
 }
 
