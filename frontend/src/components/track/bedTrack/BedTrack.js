@@ -116,7 +116,7 @@ export class BedTrack extends React.Component {
      * @return {JSX.Element} element visualizing the feature
      */
     renderAnnotation(feature, absInterval, y, isLastRow) {
-        const {viewRegion, width, viewWindow, options} = this.props;
+        const {viewRegion, width, options} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
         return <BedAnnotation
             key={feature.index}

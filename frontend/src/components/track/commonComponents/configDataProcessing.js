@@ -34,9 +34,7 @@ function withDataProcessing(dataProcessor, WrappedComponent) {
     return class extends React.Component {
         static displayName = `withDataProcessing(${getComponentName(WrappedComponent)})`;
 
-        static propTypes = {
-            data: PropTypes.any // Data to process
-        };
+        static propTypes = dataProcessor.getInputPropTypes();
 
         /**
          * Initializes data source and state.

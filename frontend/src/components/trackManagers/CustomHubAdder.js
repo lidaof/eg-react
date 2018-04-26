@@ -31,7 +31,8 @@ class CustomHubAdder extends React.Component {
                 url: this.state.inputUrl
             });
         } catch (error) {
-            this.setState({isLoading: false, error: error.toString()});
+            console.error(error);
+            this.setState({isLoading: false, error: "Error: HTTP " + error.status});
         }
 
         if (tracks) {

@@ -6,7 +6,7 @@ import { axisLeft } from 'd3-axis';
 import TranslatableG from '../../TranslatableG';
 import TrackModel from '../../../model/TrackModel';
 
-const NUM_TICKS_SUGGESTION = 2;
+const NUM_TICKS_SUGGESTION = 3;
 const AXIS_WIDTH = 30;
 
 /**

@@ -1,24 +1,24 @@
-import RulerTrack from './RulerTrack';
-import BigWigTrack from './BigWigTrack';
-import BedTrack from './bedTrack/BedTrack';
-import BigBedTrack from './BigBedTrack';
-import BedGraphTrack from './BedGraphTrack';
-import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
-import RepeatMaskerTrack from './RepeatMaskerTrack';
-import UnknownTrack from './UnknownTrack';
+import RulerTrackConfig from './RulerTrack';
+import BigWigTrackConfig from './BigWigTrack';
+import BedTrackConfig from './bedTrack/BedTrack';
+import BigBedTrackConfig from './BigBedTrack';
+import BedGraphTrackConfig from './BedGraphTrack';
+import GeneAnnotationTrackConfig from './geneAnnotationTrack/GeneAnnotationTrack';
+import RepeatMaskerTrackConfig from './RepeatMaskerTrack';
+import UnknownTrackConfig from './UnknownTrack';
 
 /**
  * Mapping from track type name to an object implementing the TrackSubtype interface.  Uppercase letters are disallowed
  * in type names, because we want comparisons to be case-insensitive.
  */
 const TYPE_NAME_TO_SUBTYPE = {
-    "ruler": RulerTrack,
-    //"bigwig": BigWigTrack,
-    "bed": BedTrack,
-    "bigbed": BigBedTrack,
-    //"bedgraph": BedGraphTrack,
-    "geneannotation": GeneAnnotationTrack,
-    //"repeatmasker": RepeatMaskerTrack,
+    "ruler": RulerTrackConfig,
+    "bigwig": BigWigTrackConfig,
+    "bed": BedTrackConfig,
+    "bigbed": BigBedTrackConfig,
+    "bedgraph": BedGraphTrackConfig,
+    "geneannotation": GeneAnnotationTrackConfig,
+    //"repeatmasker": RepeatMaskerTrackConfig,
 };
 
 if (process.env.NODE_ENV !== "production") { // Check if all the subtypes are clean
@@ -41,7 +41,7 @@ if (process.env.NODE_ENV !== "production") { // Check if all the subtypes are cl
  * @return {TrackSubtype} object containing rendering config appropriate for this model
  */
 export function getSubtypeConfig(trackModel) {
-    return TYPE_NAME_TO_SUBTYPE[trackModel.type.toLowerCase()] || UnknownTrack;
+    return TYPE_NAME_TO_SUBTYPE[trackModel.type.toLowerCase()] || UnknownTrackConfig;
 }
 
 /**

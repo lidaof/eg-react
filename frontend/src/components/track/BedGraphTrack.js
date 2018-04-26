@@ -1,28 +1,57 @@
+import _ from 'lodash';
+
 import BigWigTrack from './BigWigTrack';
-import { BarPlotRecord } from '../../art/BarPlotDesigner';
-import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
+import NumericalTrack from './commonComponents/NumericalTrack';
+import configDataProcessing from './commonComponents/configDataProcessing';
+import { configStaticDataSource } from './commonComponents/configDataFetch';
+import configOptionMerging from './commonComponents/configOptionMerging';
+
 import BedSource from '../../dataSources/BedSource';
+import DataProcessor from '../../dataSources/DataProcessor';
+import { NumericalFeature } from '../../model/BarRecord';
+import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 
 /**
- * Converts raw records from BedSource to BarPlotRecords.  The array returned by this function will appear as the `data`
- * prop of the legend and visualizer.
- * 
- * @param {Object[]} data - raw, plain-object records
- * @return {BarPlotRecord[]} BarPlotRecords to draw
+ * Converter of BED records into NumericalFeatures
  */
-function convertToBarPlotRecords(data) {
-    return data.map(record =>
-        new BarPlotRecord(new ChromosomeInterval(record.chr, record.start, record.end), Number(record[3]))
-    );
+class BedProcessor extends DataProcessor {
+    /**
+     * Parses a number with a default of 0 if parsing fails.
+     * 
+     * @param {string} string - number to parse
+     * @return {number} parsed number, or 0 if parsing fails
+     */
+    safelyParseNumber(string) {
+        const result = Number(string);
+        return Number.isFinite(result) ? result : 0;
+    }
+
+    /**
+     * Converts raw records from BedSource to NumericalFeatures
+     * 
+     * @param {Object[]} props - object whose `data` prop contains BED records
+     * @return {NumericalFeature[]} numerical features to draw
+     */
+    process(props) {
+        if (!props.data) {
+            return [];
+        }
+
+        return props.data.map(record => new NumericalFeature(
+            new ChromosomeInterval(record.chr, record.start, record.end), this.safelyParseNumber(record[3])
+        ))
+    }
 }
 
-const BedGraphTrack = {
-    visualizer: BigWigTrack.visualizer,
-    legend: BigWigTrack.legend,
+const withDefaultOptions = configOptionMerging(BigWigTrack.defaultOptions);
+const withDataFetch = configStaticDataSource(props => new BedSource(props.trackModel.url));
+const withDataProcessing = configDataProcessing(new BedProcessor());
+const configure = _.flowRight([withDefaultOptions, withDataFetch, withDataProcessing]);
+
+const BedGraphConfig = {
+    component: configure(NumericalTrack),
     menuItems: BigWigTrack.menuItems,
     defaultOptions: BigWigTrack.defaultOptions,
-    getDataSource: trackModel => new BedSource(trackModel.url),
-    processData: convertToBarPlotRecords,
 };
 
-export default BedGraphTrack;
+export default BedGraphConfig;

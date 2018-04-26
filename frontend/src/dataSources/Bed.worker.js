@@ -7,6 +7,7 @@
 import registerPromiseWorker from 'promise-worker/register';
 import makeBamIndex from '../vendor/igv/BamIndex';
 import unbgzf from '../vendor/igv/bgzf';
+import axios from 'axios';
 
 if (process.env.NODE_ENV !== "test") {
     importScripts('js/zlib_and_gzip.min.js');
@@ -23,29 +24,17 @@ const MAX_GZIP_BLOCK_SIZE = 1 << 16;
  * @param {Object} range - object with number keys `start` and `end`.  Range of bytes to request.
  * @return {Promise<ArrayBuffer>} Promise for binary data from the url
  */
-function requestBinary(url, range) {
-    return new Promise((resolve, reject) => {
-        let xhr = new XMLHttpRequest();
-        xhr.responseType = "arraybuffer";
-        xhr.onload = (event) => {
-            if (xhr.status >= 400) {
-                reject(xhr.response);
-            } else {
-                resolve(xhr.response);
-            }
-        };
-        xhr.onerror = reject;
-        
+async function requestBinary(url, range) {
+    const options = {
+        responseType: 'arraybuffer',
+    };
+    if (range) {
+        options.headers = {Range: `bytes=${range.start}-${range.end}`};
         // Hack to prevent caching for byte-ranges. Attempt to fix net:err-cache errors in Chrome
-        url += url.includes("?") ? "&" : "?";
-        url += "someRandomSeed=" + Math.random().toString(36);
-        xhr.open('GET', url);
-        if (range) {
-            xhr.setRequestHeader("Range", `bytes=${range.start}-${range.end}`);
-        }
-        
-        xhr.send();
-    });
+        options.params = {someRandomSeed: Math.random().toString(36)};
+    }
+    const response = await axios.get(url, options);
+    return response.data;
 }
 
 /**

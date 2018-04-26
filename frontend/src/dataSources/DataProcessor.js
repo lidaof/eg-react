@@ -5,6 +5,10 @@
  * @author Silas Hsu
  */
 class DataProcessor {
+    getInputPropTypes() {
+        return undefined;
+    }
+
     /**
      * Similar to `shouldComponentUpdate` of React components, this function should get whether data should be
      * processed given a change in props.

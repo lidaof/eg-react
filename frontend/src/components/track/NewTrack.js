@@ -15,7 +15,7 @@ import './Track.css';
  * 
  * @author Silas Hsu
  */
-export class NewTrack extends React.Component {
+class NewTrack extends React.Component {
     /**
      * Props that TrackContainers provide.  Track subtypes should require them in their propTypes, and use them in any
      * way they wish.  Be sure to pass them through to this component!
@@ -23,7 +23,11 @@ export class NewTrack extends React.Component {
     static trackContainerProps = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
         width: PropTypes.number.isRequired, // Width of the track's visualizer
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The region of the nav context to display
+        /**
+         * The region of the nav context to display.  This component doesn't use it, but most visualizers would
+         * probably be interested.
+         */
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, 
         viewWindow: PropTypes.instanceOf(OpenInterval).isRequired, // Visible portion of the visualizer
         metadataTerms: PropTypes.arrayOf(PropTypes.string), // Terms for which to render metadata handles
         xOffset: PropTypes.number, // The horizontal amount to translate visualizations
@@ -100,7 +104,7 @@ export class NewTrack extends React.Component {
      */
     render() {
         const {
-            trackModel, width, viewRegion, viewWindow, metadataTerms, xOffset, // Track container props
+            trackModel, width, viewWindow, metadataTerms, xOffset, // Track container props
             legend, visualizer, isLoading, error, options, // Track subtype props
         } = this.props;
         return (
