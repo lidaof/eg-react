@@ -1,7 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { scaleLinear } from 'd3-scale';
 
+import Track from './commonComponents/Track';
 import AnnotationTrack from './commonComponents/annotation/AnnotationTrack';
 import TrackLegend from './commonComponents/TrackLegend';
 import Tooltip from './commonComponents/tooltip/Tooltip';
@@ -46,6 +48,16 @@ const configure = _.flowRight([withOptionMerging, withDataFetch, withTooltip]);
  * @author Silas Hsu
  */
 class RepeatTrack extends React.Component {
+    static propTypes = Object.assign({},
+        Track.trackContainerProps,
+        configOptionMerging.INJECTED_PROPS,
+        configStaticDataSource.INJECTED_PROPS,
+        withTooltip.INJECTED_PROPS,
+        {
+        data: PropTypes.arrayOf(PropTypes.instanceOf(RepeatMaskerFeature)).isRequired, // RepeatMaskerFeature to render
+        }
+    );
+
     constructor(props) {
         super(props);
         this.state = {

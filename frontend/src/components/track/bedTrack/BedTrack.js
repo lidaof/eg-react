@@ -63,10 +63,7 @@ export class BedTrack extends React.Component {
         configStaticDataSource.INJECTED_PROPS,
         withTooltip.INJECTED_PROPS,
         {
-        /**
-         * Features to render.  BedProcessor provides this.
-         */
-        data: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired,
+        data: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired, // Features to render
         }
     );
 

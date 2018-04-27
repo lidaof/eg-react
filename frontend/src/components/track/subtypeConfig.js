@@ -8,8 +8,8 @@ import RepeatMaskerTrackConfig from './RepeatMaskerTrack';
 import UnknownTrackConfig from './UnknownTrack';
 
 /**
- * Mapping from track type name to an object implementing the TrackSubtype interface.  Uppercase letters are disallowed
- * in type names, because we want comparisons to be case-insensitive.
+ * Mapping from track type name to an object implementing the TrackSubtype interface.  Type names may not contain
+ * uppercase letters, because we want comparisons to be case-insensitive.
  */
 const TYPE_NAME_TO_SUBTYPE = {
     "ruler": RulerTrackConfig,
@@ -24,7 +24,7 @@ const TYPE_NAME_TO_SUBTYPE = {
 if (process.env.NODE_ENV !== "production") { // Check if all the subtypes are clean
     for (let subtypeName in TYPE_NAME_TO_SUBTYPE) {
         if (subtypeName.toLowerCase() !== subtypeName) {
-            throw new TypeError(`Uppercase letters are disallowed in type names.  Offender: "${subtypeName}"`);
+            throw new TypeError(`Type names may not contain uppercase letters.  Offender: "${subtypeName}"`);
         }
         const subtype = TYPE_NAME_TO_SUBTYPE[subtypeName];
         if (!subtype.component) {

@@ -6,7 +6,8 @@ import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 
 /**
  * Component classes returned by this function will automatically fetch data when view region changes, using the data
- * source passed via props.
+ * source passed via props.  Wrapped components will recieve three props `data`, `isLoading`, and `error`.  If
+ * `isLoading` is false, the `data` prop is guaranteed to be in sync with the view region.
  * 
  * The `doFormat` parameter is an optional function that modifies raw data from the data source.  It only receives data,
  * so if one requires other props, the `withDataProcessing` HOC should be used instead.
