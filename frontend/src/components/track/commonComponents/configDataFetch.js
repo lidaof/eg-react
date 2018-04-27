@@ -8,19 +8,24 @@ import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
  * Component classes returned by this function will automatically fetch data when view region changes, using the data
  * source passed via props.
  * 
+ * The `doFormat` parameter is an optional function that modifies raw data from the data source.  It only receives data,
+ * so if one requires other props, the `withDataProcessing` HOC should be used instead.
+ * 
  * Consumed props:
  *  - `dataSource`
  * 
  * Injected props:
- *  - {any} `data`: fetched data.  Initially `null`.
+ *  - {any} `data`: fetched data.  Initially set to the initialData parameter.
  *  - {boolean} `isLoading`: whether data fetch is currently in progress.  Initially `true`.
  *  - {any} `error`: error object, if any errors happened during data fetch.  Initially `null`.
  * 
+ * @param {function} [doFormat] - data modifier function
+ * @param {any} [initialData] - initial data to pass to wrapped component class.  Default is empty array.
  * @param {typeof React.Component} WrappedComponent - component class to wrap
  * @return {typeof React.Component} component class that fetches data on view region changes
  * @author Silas Hsu
  */
-export function withDataFetch(WrappedComponent) {
+export function withDataFetch(doFormat, initialData=[], WrappedComponent) {
     return class extends React.Component {
         static displayName = `withDataFetch(${getComponentName(WrappedComponent)})`;
 
@@ -37,7 +42,7 @@ export function withDataFetch(WrappedComponent) {
         constructor(props) {
             super(props);
             this.state = {
-                data: null,
+                data: initialData,
                 isLoading: true,
                 error: null,
             };
@@ -69,7 +74,7 @@ export function withDataFetch(WrappedComponent) {
                 if (this.props.viewRegion === requestedViewRegion) {
                     this.setState({
                         isLoading: false,
-                        data: data,
+                        data: doFormat ? doFormat(data) : data,
                         error: null,
                     });
                 }
@@ -109,6 +114,8 @@ withDataFetch.INJECTED_PROPS = {
  * `props` are the component's initial props.  This callback will be used ONCE on component initialization, and the
  * returned DataSource will persist for the life of the component.
  * 
+ * The second and third parameters are those passed to {@link withDataFetch}.  See that doc for more.
+ * 
  * Consumed props:
  *  - Same as {@link withDataFetch}
  * 
@@ -116,12 +123,14 @@ withDataFetch.INJECTED_PROPS = {
  *  - Same as {@link withDataFetch}
  * 
  * @param {function} getDataSource - callback for getting a DataSource
+ * @param {function} [doFormat] - data modifier function
+ * @param {any} [initialData] - initial data to pass to wrapped component class.  Default is empty array.
  * @return {function} function that wraps React component classes
  * @author Silas Hsu
  */
-export function configStaticDataSource(getDataSource) {
+export function configStaticDataSource(getDataSource, doFormat, initialData=[]) {
     return function(WrappedComponent) {
-        return withStaticDataSource(getDataSource, withDataFetch(WrappedComponent));
+        return withStaticDataSource(getDataSource, withDataFetch(doFormat, initialData, WrappedComponent));
     }
 }
 configStaticDataSource.INJECTED_PROPS = withDataFetch.INJECTED_PROPS;

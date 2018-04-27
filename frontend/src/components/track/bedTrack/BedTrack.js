@@ -11,12 +11,9 @@ import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
 import configOptionMerging from '../commonComponents/configOptionMerging';
 import { configStaticDataSource } from '../commonComponents/configDataFetch';
-import configDataProcessing from '../commonComponents/configDataProcessing';
 import withTooltip from '../commonComponents/tooltip/withTooltip';
 
 import BedSource from '../../../dataSources/BedSource';
-import DataProcessor from '../../../dataSources/DataProcessor';
-
 import Feature from '../../../model/Feature';
 import ChromosomeInterval from '../../../model/interval/ChromosomeInterval';
 
@@ -32,32 +29,27 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * Converter of BedRecords to Feature.
+ * Converts BedRecords to Features.
+ * 
+ * @param {BedRecord[]} data - bed records to convert
+ * @return {Feature[]} bed records in the form of Feature
  */
-class BedProcessor extends DataProcessor {
-    /**
-     * Extracts Features from the `data` prop.
-     * 
-     * @param {Object} props - track props, whose `data` prop should include an array of BedRecord
-     * @return {Feature[]} extracted Features from the props
-     */
-    process(props) {
-        if (!props.data) {
-            return [];
-        };
-
-        let features = props.data.map(record => new Feature(
-            // "." is a placeholder that means "undefined" in the bed file.
-            record[BedColumnIndices.NAME] === "." ? "" : record[BedColumnIndices.NAME],
-            new ChromosomeInterval(record.chr, record.start, record.end),
-            record[BedColumnIndices.STRAND]
-        ));
-        for (let i = 0; i < features.length; i++) {
-            features[i].index = i; // Assign each feature an index so we can use it as a key when rendering
-        }
-        return features;
+function formatBedRecords(data) {
+    let features = data.map(record => new Feature(
+        // "." is a placeholder that means "undefined" in the bed file.
+        record[BedColumnIndices.NAME] === "." ? "" : record[BedColumnIndices.NAME],
+        new ChromosomeInterval(record.chr, record.start, record.end),
+        record[BedColumnIndices.STRAND]
+    ));
+    for (let i = 0; i < features.length; i++) {
+        features[i].index = i; // Assign each feature an index so we can use it as a key when rendering
     }
+    return features;
 }
+
+const withOptionMerging = configOptionMerging(DEFAULT_OPTIONS);
+const withDataFetch = configStaticDataSource(props => new BedSource(props.trackModel.url), formatBedRecords);
+const configure = _.flowRight([withOptionMerging, withDataFetch, withTooltip]);
 
 /**
  * Track component for BED annotations.
@@ -137,14 +129,8 @@ export class BedTrack extends React.Component {
     }
 }
 
-const withOptionMerging = configOptionMerging(DEFAULT_OPTIONS);
-const withDataFetch = configStaticDataSource(props => new BedSource(props.trackModel.url));
-const withDataProcessing = configDataProcessing(new BedProcessor());
-const configure = _.flowRight([withOptionMerging, withDataFetch, withDataProcessing, withTooltip]);
-const ConfiguredBedTrack = configure(BedTrack);
-
 export const BedTrackConfig = {
-    component: ConfiguredBedTrack,
+    component: configure(BedTrack),
     menuItems: GeneAnnotationTrack.menuItems,
     defaultOptions: DEFAULT_OPTIONS,
 };

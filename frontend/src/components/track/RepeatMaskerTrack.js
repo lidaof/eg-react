@@ -7,14 +7,12 @@ import TrackLegend from './commonComponents/TrackLegend';
 import Tooltip from './commonComponents/tooltip/Tooltip';
 import configOptionMerging from './commonComponents/configOptionMerging';
 import { configStaticDataSource } from './commonComponents/configDataFetch';
-import configDataProcessing from './commonComponents/configDataProcessing';
 import withTooltip from './commonComponents/tooltip/withTooltip';
 
 import { BackgroundColorConfig } from './contextMenu/ColorConfig';
 
 import RepeatMaskerFeature from '../../model/RepeatMaskerFeature';
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
-import DataProcessor from '../../dataSources/DataProcessor';
 
 import './commonComponents/tooltip/Tooltip.css';
 
@@ -26,21 +24,18 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * Converts DASFeatures to RepeatMaskerFeatures
+ * Converter of DASFeatures to RepeatMaskerFeatures.
+ * 
+ * @param {DASFeature[]} data - DASFeatures to convert
+ * @return {RepeatMaskerFeature[]} RepeatMaskerFeatures made from the input
  */
-class RepeatProcessor extends DataProcessor {
-    process(props) {
-        if (!props.data) {
-            return [];
-        }
-        return props.data.map(record => new RepeatMaskerFeature(record));
-    }
+function formatDasFeatures(data) {
+    return data.map(feature => new RepeatMaskerFeature(feature))
 }
 
 const withOptionMerging = configOptionMerging(DEFAULT_OPTIONS);
-const withDataFetch = configStaticDataSource(props => new BigWigOrBedSource(props.trackModel.url));
-const withDataProcessing = configDataProcessing(new RepeatProcessor());
-const configure = _.flowRight([withOptionMerging, withDataFetch, withDataProcessing, withTooltip]);
+const withDataFetch = configStaticDataSource(props => new BigWigOrBedSource(props.trackModel.url), formatDasFeatures);
+const configure = _.flowRight([withOptionMerging, withDataFetch, withTooltip]);
 
 /**
  * RepeatMasker track.

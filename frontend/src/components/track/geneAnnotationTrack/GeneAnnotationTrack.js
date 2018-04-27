@@ -11,14 +11,11 @@ import withTooltip from '../commonComponents/tooltip/withTooltip';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
 import configOptionMerging from '../commonComponents/configOptionMerging';
 import { configStaticDataSource } from '../commonComponents/configDataFetch';
-import configDataProcessing from '../commonComponents/configDataProcessing';
 
 import NumberConfig from '../contextMenu/NumberConfig';
 import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorConfig';
 
 import GeneSource from '../../../dataSources/GeneSource';
-import DataProcessor from '../../../dataSources/DataProcessor';
-
 import Gene from '../../../model/Gene';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
@@ -29,16 +26,25 @@ const DEFAULT_OPTIONS = {
     rows: 10
 };
 
-class GeneProcessor extends DataProcessor {
-    process(props) {
-        if (!props.data) {
-            return [];
-        };
-
-        return props.data.map(record => new Gene(record));
-    }
+/**
+ * Converts gene data objects from the server to Gene objects.
+ * 
+ * @param {Object[]} data - raw data from server
+ * @return {Gene[]} genes made from raw data
+ */
+function formatDatabaseRecords(data) {
+    return data.map(record => new Gene(record));
 }
 
+const withOptionMerging = configOptionMerging(DEFAULT_OPTIONS);
+const withDataFetch = configStaticDataSource(props => new GeneSource(props.trackModel.genome), formatDatabaseRecords);
+const configure = _.flowRight([withOptionMerging, withDataFetch, withTooltip]);
+
+/**
+ * Track that displays gene annotations.
+ * 
+ * @author Silas Hsu
+ */
 class GeneAnnotationTrack extends React.Component {
     static propTypes = Object.assign({},
         Track.trackContainerProps,
@@ -127,18 +133,13 @@ class GeneAnnotationTrack extends React.Component {
     }
 }
 
-const withOptionMerging = configOptionMerging(DEFAULT_OPTIONS);
-const withDataFetch = configStaticDataSource(props => new GeneSource(props.trackModel.genome));
-const withDataProcessing = configDataProcessing(new GeneProcessor());
-const configure = _.flowRight([withOptionMerging, withDataFetch, withDataProcessing, withTooltip]);
-const ConfiguredAnnotationTrack = configure(GeneAnnotationTrack);
 
 function NumRowsConfig(props) {
     return <NumberConfig {...props} optionPropName="rows" label="Rows to draw: " minValue={1} />
 }
 
 const GeneAnnotationConfig = {
-    component: ConfiguredAnnotationTrack,
+    component: configure(GeneAnnotationTrack),
     menuItems: [NumRowsConfig, PrimaryColorConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
 };

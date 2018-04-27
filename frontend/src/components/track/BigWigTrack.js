@@ -1,15 +1,11 @@
 import _ from 'lodash';
 
 import NumericalTrack from './commonComponents/NumericalTrack';
-import configDataProcessing from './commonComponents/configDataProcessing';
 import { configStaticDataSource } from './commonComponents/configDataFetch';
 import configOptionMerging from './commonComponents/configOptionMerging';
-
 import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorConfig';
 
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
-import DataProcessor from '../../dataSources/DataProcessor';
-
 import { NumericalFeature } from '../../model/BarRecord';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import BarRecordAggregator from '../../model/BarRecordAggregator';
@@ -33,29 +29,20 @@ interface DASFeature {
     _chromId: number
 */
 /**
- * Converter of DASFeatures to NumericalFeatures.
+ * Converter of DASFeatures to NumericalFeature.
+ * 
+ * @param {DASFeature[]} data - DASFeatures to convert
+ * @return {NumericalFeature[]} NumericalFeatures made from the input
  */
-class DASFeatureProcessor extends DataProcessor {
-    /**
-     * Converts raw records from bbi-js to NumericalFeatures.
-     * 
-     * @param {Object} props - object whose `data` prop contains BED records
-     * @return {NumericalFeature[]} numerical features to draw
-     */
-    process(props) {
-        if (!props.data) {
-            return [];
-        }
-        return props.data.map(feature =>
-            new NumericalFeature(new ChromosomeInterval(feature.segment, feature.min, feature.max), feature.score)
-        );
-    }
+function formatDasFeatures(data) {
+    return data.map(feature =>
+        new NumericalFeature(new ChromosomeInterval(feature.segment, feature.min, feature.max), feature.score)
+    );
 }
 
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
-const withDataFetch = configStaticDataSource(props => new BigWigOrBedSource(props.trackModel.url));
-const withDataProcessing = configDataProcessing(new DASFeatureProcessor());
-const configure = _.flowRight([withDefaultOptions, withDataFetch, withDataProcessing]);
+const withDataFetch = configStaticDataSource(props => new BigWigOrBedSource(props.trackModel.url), formatDasFeatures);
+const configure = _.flowRight([withDefaultOptions, withDataFetch]);
 
 const BigWigConfig = {
     component: configure(NumericalTrack),
