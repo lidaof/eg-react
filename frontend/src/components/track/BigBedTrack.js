@@ -4,7 +4,7 @@ import { BedTrack, BedTrackConfig } from './bedTrack/BedTrack';
 import configOptionMerging from './commonComponents/configOptionMerging';
 import { configStaticDataSource } from './commonComponents/configDataFetch';
 import configDataProcessing from './commonComponents/configDataProcessing';
-import withTooltip from './commonComponents/withTooltip';
+import withTooltip from './commonComponents/tooltip/withTooltip';
 
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
 import DataProcessor from '../../dataSources/DataProcessor';

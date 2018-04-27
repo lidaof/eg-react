@@ -1,5 +1,5 @@
 import React from 'react';
-import NewTrack from './NewTrack';
+import Track from './commonComponents/Track';
 import TrackLegend from './commonComponents/TrackLegend';
 import withAutoDimensions from '../withAutoDimensions';
 import ErrorMessage from '../ErrorMessage';
@@ -16,7 +16,7 @@ const AutoDimensionLegend = withAutoDimensions(TrackLegend);
 function UnknownTrack(props) {
     const {width, trackModel} = props;
     const message = `Unknown track type: "${trackModel.type}"`;
-    return <NewTrack 
+    return <Track 
         {...props}
         legend={<AutoDimensionLegend trackModel={trackModel} />}
         visualizer={<ErrorMessage width={width} >{message}</ErrorMessage>}

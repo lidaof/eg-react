@@ -4,11 +4,11 @@ import _ from 'lodash';
 
 import GeneAnnotation from './GeneAnnotation';
 import GeneDetail from './GeneDetail';
-import NewTrack from '../NewTrack';
 
+import Track from '../commonComponents/Track';
 import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
-import withTooltip from '../commonComponents/withTooltip';
-import Tooltip from '../commonComponents/Tooltip';
+import withTooltip from '../commonComponents/tooltip/withTooltip';
+import Tooltip from '../commonComponents/tooltip/Tooltip';
 import configOptionMerging from '../commonComponents/configOptionMerging';
 import { configStaticDataSource } from '../commonComponents/configDataFetch';
 import configDataProcessing from '../commonComponents/configDataProcessing';
@@ -41,7 +41,7 @@ class GeneProcessor extends DataProcessor {
 
 class GeneAnnotationTrack extends React.Component {
     static propTypes = Object.assign({},
-        NewTrack.trackContainerProps,
+        Track.trackContainerProps,
         configOptionMerging.INJECTED_PROPS,
         configStaticDataSource.INJECTED_PROPS,
         withTooltip.INJECTED_PROPS,

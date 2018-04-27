@@ -4,15 +4,15 @@ import _ from 'lodash';
 
 import BedAnnotation from './BedAnnotation';
 import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
-import NewTrack from '../NewTrack';
+import Track from '../commonComponents/Track';
 import GeneAnnotationTrack from '../geneAnnotationTrack/GeneAnnotationTrack';
 
 import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
-import Tooltip from '../commonComponents/Tooltip';
+import Tooltip from '../commonComponents/tooltip/Tooltip';
 import configOptionMerging from '../commonComponents/configOptionMerging';
 import { configStaticDataSource } from '../commonComponents/configDataFetch';
 import configDataProcessing from '../commonComponents/configDataProcessing';
-import withTooltip from '../commonComponents/withTooltip';
+import withTooltip from '../commonComponents/tooltip/withTooltip';
 
 import BedSource from '../../../dataSources/BedSource';
 import DataProcessor from '../../../dataSources/DataProcessor';
@@ -66,7 +66,7 @@ class BedProcessor extends DataProcessor {
  */
 export class BedTrack extends React.Component {
     static propTypes = Object.assign({}, 
-        NewTrack.trackContainerProps,
+        Track.trackContainerProps,
         configOptionMerging.INJECTED_PROPS,
         configStaticDataSource.INJECTED_PROPS,
         withTooltip.INJECTED_PROPS,

@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import HoverTooltipContext from './HoverTooltipContext';
+import HoverTooltipContext from './tooltip/HoverTooltipContext';
 import ErrorMessage from '../../ErrorMessage';
 
 import DesignRenderer from '../../../art/DesignRenderer';

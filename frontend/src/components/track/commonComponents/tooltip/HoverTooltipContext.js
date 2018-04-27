@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Tooltip from './Tooltip';
-import { getRelativeCoordinates, getPageCoordinates } from '../../../util';
+import { getRelativeCoordinates, getPageCoordinates } from '../../../../util';
 
 /**
  * A <div> that displays a tooltip whenever the user hovers over it.

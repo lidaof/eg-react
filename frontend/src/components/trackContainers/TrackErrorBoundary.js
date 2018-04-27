@@ -4,7 +4,7 @@ import ErrorBoundary from '../ErrorBoundary';
 import ErrorMessage from '../ErrorMessage';
 import TrackModel from '../../model/TrackModel';
 
-import '../track/Track.css';
+import '../track/commonComponents/Track.css';
 
 /**
  * A component that catches errors, and still behaves somewhat like a Track in TrackContainers.

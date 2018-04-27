@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import NewTrack from './NewTrack';
-import HoverTooltipContext from './commonComponents/HoverTooltipContext';
+import Track from './commonComponents/Track';
+import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 import Chromosomes from '../genomeNavigator/Chromosomes';
 import Ruler from '../genomeNavigator/Ruler';
 import GenomicCoordinates from './commonComponents/GenomicCoordinates';
@@ -61,7 +61,7 @@ class RulerVisualizer extends React.Component {
 
 
 function RulerTrack(props) {
-    return <NewTrack
+    return <Track
         {...props}
         legend={<TrackLegend height={HEIGHT} trackModel={props.trackModel} />}
         visualizer={<RulerVisualizer viewRegion={props.viewRegion} width={props.width} />}

@@ -4,11 +4,11 @@ import { scaleLinear } from 'd3-scale';
 
 import AnnotationTrack from './commonComponents/annotation/AnnotationTrack';
 import TrackLegend from './commonComponents/TrackLegend';
-import Tooltip from './commonComponents/Tooltip';
+import Tooltip from './commonComponents/tooltip/Tooltip';
 import configOptionMerging from './commonComponents/configOptionMerging';
 import { configStaticDataSource } from './commonComponents/configDataFetch';
 import configDataProcessing from './commonComponents/configDataProcessing';
-import withTooltip from './commonComponents/withTooltip';
+import withTooltip from './commonComponents/tooltip/withTooltip';
 
 import { BackgroundColorConfig } from './contextMenu/ColorConfig';
 
@@ -16,7 +16,7 @@ import RepeatMaskerFeature from '../../model/RepeatMaskerFeature';
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
 import DataProcessor from '../../dataSources/DataProcessor';
 
-import './commonComponents/Tooltip.css';
+import './commonComponents/tooltip/Tooltip.css';
 
 const TOP_PADDING = 5;
 const DEFAULT_OPTIONS = {

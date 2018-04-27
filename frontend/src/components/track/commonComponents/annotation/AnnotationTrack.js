@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import NewTrack from '../../NewTrack';
+import Track from '../Track';
 
 import Feature from '../../../../model/Feature';
 import AnnotationRenderer from './AnnotationRenderer';
@@ -49,7 +49,7 @@ const withDataProcessing = configDataProcessing(new FeatureProcessor());
  * @author Silas Hsu
  */
 class AnnotationTrack extends React.Component {
-    static propTypes = Object.assign({}, NewTrack.trackContainerProps, {
+    static propTypes = Object.assign({}, Track.trackContainerProps, {
         /**
          * Data from FeatureProcessor.  Users of AnnotationTrack need only provide an array of Feature.
          */
@@ -113,7 +113,7 @@ class AnnotationTrack extends React.Component {
 
     render() {
         const legend = this.props.legend || <TrackLegend height={this.getHeight()} {...this.props} />;
-        return <NewTrack
+        return <Track
             {...this.props}
             legend={legend}
             visualizer={this.renderVisualizer()}

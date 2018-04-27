@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import TrackLoadingNotice from './commonComponents/TrackLoadingNotice';
-import MetadataIndicator from './commonComponents/MetadataIndicator';
+import TrackLoadingNotice from './TrackLoadingNotice';
+import MetadataIndicator from './MetadataIndicator';
 
-import TrackModel from '../../model/TrackModel';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import OpenInterval from '../../model/interval/OpenInterval';
+import TrackModel from '../../../model/TrackModel';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
+import OpenInterval from '../../../model/interval/OpenInterval';
 
 import './Track.css';
 
@@ -15,7 +15,7 @@ import './Track.css';
  * 
  * @author Silas Hsu
  */
-class NewTrack extends React.Component {
+class Track extends React.Component {
     /**
      * Props that TrackContainers provide.  Track subtypes should require them in their propTypes, and use them in any
      * way they wish.  Be sure to pass them through to this component!
@@ -50,7 +50,7 @@ class NewTrack extends React.Component {
         onMetadataClick: PropTypes.func,
     };
 
-    static propTypes = Object.assign({}, NewTrack.trackContainerProps, {
+    static propTypes = Object.assign({}, Track.trackContainerProps, {
         // Track containers do not provide the following.  Track subtypes must provide them.
         legend: PropTypes.node.isRequired, // Track legend to render
         visualizer: PropTypes.node.isRequired, // Track visualizer to render
@@ -171,4 +171,4 @@ function ViewWindow(props) {
     );
 }
 
-export default NewTrack;
+export default Track;

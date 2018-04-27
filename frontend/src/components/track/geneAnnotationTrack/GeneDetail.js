@@ -4,7 +4,7 @@ import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 import GeneDescription from '../../GeneDescription';
 import Gene from '../../../model/Gene';
 
-import '../commonComponents/Tooltip.css';
+import '../commonComponents/tooltip/Tooltip.css';
 
 /**
  * Box that contains gene details when a gene annotation is clicked.

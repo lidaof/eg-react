@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Feature from '../../../../model/Feature';
-import '../../commonComponents/Tooltip.css';
+import '../../commonComponents/tooltip/Tooltip.css';
 
 /**
  * Box that contains feature details when a annotation is clicked.

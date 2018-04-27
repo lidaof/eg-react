@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { scaleLinear } from 'd3-scale';
 
-import NewTrack from '../NewTrack';
+import Track from './Track';
 import BarPlot from './BarPlot';
 import TrackLegend from './TrackLegend';
 import GenomicCoordinates from './GenomicCoordinates';
@@ -24,7 +24,7 @@ class NumericalTrack extends React.Component {
     /**
      * Don't forget to look at NumericalFeatureProcessor's propTypes!
      */
-    static propTypes = Object.assign({}, NewTrack.trackContainerProps,
+    static propTypes = Object.assign({}, Track.trackContainerProps,
         {
         /**
          * NumericalFeatureProcessor provides these.  Parents should provide an array of NumericalFeature.
@@ -162,7 +162,7 @@ class NumericalTrack extends React.Component {
             height={options.height}
             scaleForAxis={this.state.valueToY}
         />;
-        return <NewTrack
+        return <Track
             {...this.props}
             legend={legend}
             visualizer={this.renderVisualizer()}
