@@ -4,6 +4,7 @@ import memoizeOne from 'memoize-one';
 import connect from 'react-redux/lib/connect/connect';
 import { ActionCreators } from '../../AppState';
 
+import TrackHandle from './TrackHandle';
 import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
@@ -17,14 +18,11 @@ import MetadataIndicator from '../track/commonComponents/MetadataIndicator';
 import OutsideClickDetector from '../OutsideClickDetector';
 import ContextMenuManager from '../ContextMenuManager';
 import DivWithBullseye from '../DivWithBullseye';
-import Reparentable from '../Reparentable';
 import withAutoDimensions from '../withAutoDimensions';
 
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import RegionExpander from '../../model/RegionExpander';
-import TrackErrorBoundary from './TrackErrorBoundary';
-import { getSubtypeConfig } from '../track/subtypeConfig';
 
 const Tools = {
     DRAG: {
@@ -285,28 +283,18 @@ class TrackContainer extends React.Component {
      */
     makeTrackElements() {
         const {tracks, metadataTerms} = this.props;
-        return tracks.map((trackModel, index) => {
-            const id = trackModel.getId();
-            const Track = getSubtypeConfig(trackModel).component;
-            return <Reparentable key={id} uid={"track-" + id} >
-                <TrackErrorBoundary
-                    trackModel={trackModel}
-                    index={index}
-                    onContextMenu={this.handleContextMenu}
-                    onClick={this.handleTrackClicked}
-                >
-                    <Track
-                        trackModel={trackModel}
-                        {...this.state.visualizerInfo}
-                        metadataTerms={metadataTerms}
-                        index={index}
-                        onContextMenu={this.handleContextMenu}
-                        onClick={this.handleTrackClicked}
-                        onMetadataClick={this.handleMetadataClicked}
-                    />
-                </TrackErrorBoundary>
-            </Reparentable>
-        });
+        return tracks.map((trackModel, index) => 
+            <TrackHandle
+                key={trackModel.getId()}
+                trackModel={trackModel}
+                {...this.state.visualizerInfo}
+                metadataTerms={metadataTerms}
+                index={index}
+                onContextMenu={this.handleContextMenu}
+                onClick={this.handleTrackClicked}
+                onMetadataClick={this.handleMetadataClicked}
+            />
+        );
     }
 
     /**

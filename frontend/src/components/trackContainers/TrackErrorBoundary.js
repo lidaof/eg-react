@@ -49,7 +49,7 @@ class TrackErrorBoundary extends React.Component {
     }
 
     render() {
-        return <ErrorBoundary getFallbackElement={this.renderErrorMessage} {...this.props} />;
+        return <ErrorBoundary getFallbackElement={this.renderErrorMessage} >{this.props.children}</ErrorBoundary>;
     }
 }
 

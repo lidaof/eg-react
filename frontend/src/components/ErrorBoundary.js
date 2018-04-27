@@ -13,7 +13,6 @@ const DEFAULT_ERROR_ELEMENT = <ErrorMessage>😵 Component crashed 😵</ErrorMe
 class ErrorBoundary extends React.Component {
     static propTypes = {
         getFallbackElement: PropTypes.func, // Element to show on error.  Signature: (error: any): JSX.Element
-        // Other props passed to children
     };
 
     static defaultProps = {
@@ -35,8 +34,7 @@ class ErrorBoundary extends React.Component {
         if (this.state.error) {
             return this.props.getFallbackElement(this.state.error);
         } else {
-            const {getFallbackElement, children, ...otherProps} = this.props;
-            return React.Children.map(this.props.children, child => React.cloneElement(child, otherProps));
+            return this.props.children;
         }
     }
 }
