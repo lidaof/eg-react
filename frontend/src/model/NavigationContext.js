@@ -15,15 +15,18 @@ import ChromosomeInterval from './interval/ChromosomeInterval';
  */
 class NavigationContext {
     /**
-     * Makes a new instance.  Features must have non-empty, unique names.
+     * Makes a new instance.  Features must have non-empty, unique names.  The `isGenome` parameter does not change any
+     * of the instance's functionality, but if it is true, it optimizes mapping functions.
      * 
      * @param {string} name - name of this context
      * @param {Feature[]} features - list of features
+     * @param {boolean} isGenome - whether the context covers the entire genome
      * @throws {Error} if the feature list has a problem
      */
-    constructor(name, features) {
+    constructor(name, features, isGenome=false) {
         this._name = name;
         this._features = features;
+        this._isGenome = isGenome;
         this._featureStarts = [];
         this._featureNameToIndex = {};
         this._chrToFeatures = _.groupBy(features, feature => feature.getLocus().chr)
@@ -158,6 +161,12 @@ class NavigationContext {
      * @return {OpenInterval[]} intervals of absolute base numbers in this context
      */
     convertGenomeIntervalToBases(chrInterval) {
+        if (this._isGenome) {
+            return new OpenInterval(
+                this.convertFeatureCoordinateToBase(chrInterval.chr, chrInterval.start),
+                this.convertFeatureCoordinateToBase(chrInterval.chr, chrInterval.end),
+            );
+        }
         const potentialOverlaps = this._chrToFeatures[chrInterval.chr] || [];
         let absLocations = [];
         for (let feature of potentialOverlaps) {

@@ -29,14 +29,13 @@ class NumericalFeatureProcessor extends DataProcessor {
     getInputPropTypes() {
         return INPUT_PROP_TYPES;
     }
-    /*
+
     shouldProcess(prevProps, nextProps) {
         return prevProps.data !== nextProps.data ||
             prevProps.viewRegion !== nextProps.viewRegion ||
             prevProps.width !== nextProps.width ||
             prevProps.options.aggregator !== nextProps.options.aggregator;
     }
-    */
 
     /**
      * Processes data in the way described by the class docstring.
