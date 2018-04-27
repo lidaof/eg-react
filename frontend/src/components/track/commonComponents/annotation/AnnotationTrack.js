@@ -12,7 +12,6 @@ import HiddenItemsMessage from '../HiddenItemsMessage';
 import TrackLegend from '../TrackLegend';
 
 const SVG_STYLE = {
-    paddingTop: 5,
     display: "block",
     overflow: "visible",
 };
@@ -21,10 +20,10 @@ const SVG_STYLE = {
  * Filters out Features too small to see.
  */
 class FeatureProcessor extends DataProcessor {
-    shouldProcess(prevProps, nextProps) {
-        return prevProps.data !== nextProps.data ||
-            prevProps.viewRegion !== nextProps.viewRegion ||
-            prevProps.width !== nextProps.width;
+    getInputPropTypes() {
+        return {
+            data: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired
+        };
     }
 
     process(props) {
@@ -35,7 +34,7 @@ class FeatureProcessor extends DataProcessor {
             };
         }
         const drawModel = new LinearDrawingModel(props.viewRegion, props.width);
-        const visibleFeatures = props.data.filter(feature => drawModel.basesToXWidth(feature.getLength()) >= 1);
+        const visibleFeatures = props.data.filter(feature => drawModel.basesToXWidth(feature.getLength()) >= 0.5);
         return {
             features: visibleFeatures,
             numHidden: props.data.length - visibleFeatures.length
@@ -66,11 +65,12 @@ class AnnotationTrack extends React.Component {
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any, // If present, applies error styling
+        legend: PropTypes.node, // Override for the default legend element
 
         /**
          * Horizontal padding between annotations.  See AnnotationRenderer for details.
          */
-        getHorizontalPadding: PropTypes.oneOfType([PropTypes.number, PropTypes.func]).isRequired,
+        getHorizontalPadding: PropTypes.oneOfType([PropTypes.number, PropTypes.func]),
         /**
          * Callback for getting a single annotation to render.  Signature: (...annotationArgs): JSX.Element
          *     `annotationArgs`: arguments from AnnotationRenderer's getAnnotationElement callback
@@ -112,9 +112,10 @@ class AnnotationTrack extends React.Component {
     }
 
     render() {
+        const legend = this.props.legend || <TrackLegend height={this.getHeight()} {...this.props} />;
         return <NewTrack
             {...this.props}
-            legend={<TrackLegend height={this.getHeight()} {...this.props} />}
+            legend={legend}
             visualizer={this.renderVisualizer()}
         />;
     }

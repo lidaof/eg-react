@@ -19,7 +19,6 @@ import DataProcessor from '../../../dataSources/DataProcessor';
 
 import Feature from '../../../model/Feature';
 import ChromosomeInterval from '../../../model/interval/ChromosomeInterval';
-import LinearDrawingModel from '../../../model/LinearDrawingModel';
 
 const BedColumnIndices = {
     NAME: 3,
@@ -111,21 +110,19 @@ export class BedTrack extends React.Component {
      * 
      * @param {Feature} feature - feature to render
      * @param {OpenInterval} absInterval - location of the feature in navigation context
+     * @param {OpenInterval} xRange - x coordinates the annotation will occupy
      * @param {number} y - y coordinate to render the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
      * @return {JSX.Element} element visualizing the feature
      */
-    renderAnnotation(feature, absInterval, y, isLastRow) {
-        const {viewRegion, width, options} = this.props;
-        const drawModel = new LinearDrawingModel(viewRegion, width);
+    renderAnnotation(feature, absInterval, xRange, y, isLastRow) {
         return <BedAnnotation
             key={feature.index}
             feature={feature}
-            drawModel={drawModel}
-            absLocation={absInterval}
+            xRange={xRange}
             y={y}
             isMinimal={isLastRow}
-            color={options.color}
+            color={this.props.options.color}
             onClick={this.renderTooltip}
         />;
     }

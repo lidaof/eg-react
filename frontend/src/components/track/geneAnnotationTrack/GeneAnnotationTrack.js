@@ -80,11 +80,12 @@ class GeneAnnotationTrack extends React.Component {
      * 
      * @param {Gene} gene - gene to render
      * @param {OpenInterval} absInterval - location of the gene in navigation context
-     * @param {number} y - y coordinate to render the annotation
+     * @param {OpenInterval} xRange - x coordinates the annotation will occupy
+     * @param {number} y - y coordinate of the top of the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
      * @return {JSX.Element} element visualizing the gene
      */
-    renderAnnotation(gene, absInterval, y, isLastRow) {
+    renderAnnotation(gene, absInterval, xRange, y, isLastRow) {
         const {viewRegion, width, viewWindow, options} = this.props;
         const navContext = viewRegion.getNavigationContext();
         const drawModel = new LinearDrawingModel(viewRegion, width);

@@ -18,7 +18,7 @@ const TYPE_NAME_TO_SUBTYPE = {
     "bigbed": BigBedTrackConfig,
     "bedgraph": BedGraphTrackConfig,
     "geneannotation": GeneAnnotationTrackConfig,
-    //"repeatmasker": RepeatMaskerTrackConfig,
+    "repeatmasker": RepeatMaskerTrackConfig,
 };
 
 if (process.env.NODE_ENV !== "production") { // Check if all the subtypes are clean

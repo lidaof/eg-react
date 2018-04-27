@@ -37,12 +37,13 @@ class TrackErrorBoundary extends React.Component {
         const {trackModel, index, onContextMenu, onClick} = this.props;
         return (
         <ErrorMessage
-            className={trackModel.isSelected ? "Track-selected-border" : undefined}
+            className={trackModel.isSelected ? "Track Track-selected-border" : "Track"}
             onContextMenu={event => onContextMenu(event, index)}
             onClick={event => onClick(event, index)}
+            style={{justifyContent: "center"}}
         >
             {/* eslint-disable-line jsx-a11y/accessible-emoji */}
-            😵 Track crashed 😵
+            😵 Track crashed - reload page to attempt recovery 😵 
         </ErrorMessage>
         );
     }

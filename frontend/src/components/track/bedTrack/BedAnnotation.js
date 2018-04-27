@@ -6,7 +6,6 @@ import AnnotationArrows from '../commonComponents/annotation/AnnotationArrows';
 import BackgroundedText from '../commonComponents/BackgroundedText';
 
 import Feature from '../../../model/Feature';
-import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import OpenInterval from '../../../model/interval/OpenInterval';
 import { getContrastingColor } from '../../../util';
 
@@ -22,8 +21,7 @@ class BedAnnotation extends React.Component {
 
     static propTypes = {
         feature: PropTypes.instanceOf(Feature).isRequired, // Feature to visualize
-        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
-        absLocation: PropTypes.instanceOf(OpenInterval).isRequired, // Location of the feature in navigation context
+        xRange: PropTypes.instanceOf(OpenInterval).isRequired, // x range the annotation will occupy
         y: PropTypes.number, // Y offset
         color: PropTypes.string, // Primary color to draw
         isMinimal: PropTypes.bool, // Whether to just render a plain box
@@ -41,11 +39,10 @@ class BedAnnotation extends React.Component {
     };
 
     render() {
-        const {feature, drawModel, absLocation, y, color, isMinimal, onClick} = this.props;
-        const startX = Math.max(-1, drawModel.baseToX(absLocation.start));
-        const endX = Math.min(drawModel.baseToX(absLocation.end), drawModel.getDrawWidth() + 1);
+        const {feature, xRange, y, color, isMinimal, onClick} = this.props;
+        const [startX, endX] = xRange;
         const width = endX - startX;
-        if (width < 0) {
+        if (width <= 0) {
             return null;
         }
 

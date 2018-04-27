@@ -6,8 +6,7 @@ import HoverTooltipContext from './HoverTooltipContext';
 import ErrorMessage from '../../ErrorMessage';
 
 import DesignRenderer from '../../../art/DesignRenderer';
-import { BarRecord, NumericalFeature } from '../../../model/BarRecord';
-import BarRecordAggregator from '../../../model/BarRecordAggregator';
+import BarRecord from '../../../model/BarRecord';
 
 const RENDER_LIMIT = 30000;
 

@@ -81,7 +81,7 @@ class BarRecordAggregator {
      * @return {BarRecord[][]} mapping from x coordinate to all BarRecords overlapping that location
      */
     makeXMap(records, width) {
-        let xToRecordsMap = new Array(width);
+        let xToRecordsMap = new Array(Math.round(width));
         for (let x = 0; x < width; x++) { // Fill the array with empty arrays
             xToRecordsMap[x] = [];
         }

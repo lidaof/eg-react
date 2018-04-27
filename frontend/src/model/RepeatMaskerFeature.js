@@ -1,6 +1,5 @@
 import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
-import _ from 'lodash';
 
 const CLASS_TO_ID = {
     "SINE": 1,
@@ -67,7 +66,7 @@ const DEFAULT_CLASS_COLORS = {
  * 
  * @author Daofeng Li
  */
-class RepeatMaskerRecord extends Feature {
+class RepeatMaskerFeature extends Feature {
     static DEFAULT_CLASS_COLORS = DEFAULT_CLASS_COLORS;
 
     /*
@@ -103,6 +102,10 @@ class RepeatMaskerRecord extends Feature {
         super(rmskRecord.label, locus, rmskRecord.orientation === "+");
         this.repClass = rmskRecord.repClass;
         this.repFamily = rmskRecord.repFamily;
+        this.milliDiv = rmskRecord.milliDiv;
+        this._value = null;
+        /*
+        // Commented out since parseInt is expensive when we have tens of thousands of records.
         this.swScore = Number.parseInt(rmskRecord.swScore, 10);
         this.milliDel = Number.parseInt(rmskRecord.milliDel, 10);
         this.milliDiv = Number.parseInt(rmskRecord.milliDiv, 10);
@@ -111,14 +114,15 @@ class RepeatMaskerRecord extends Feature {
         this.divergence = _.round(this.milliDiv/1000.0, 1);
         this.deletion = _.round(this.milliDel/1000.0, 1);
         this.insertion = _.round(this.milliIns/1000.0, 1);
-        this.oneMinusDivergence =  1 - this.divergence; 
+        */
     }
 
-    /**
-     * @return {number} the 1 - divergence% value
-     */
-    getValue() {
-        return 1 - this.divergence;
+    get value() {
+        if (this._value === null) {
+            const divergence = Number.parseInt(this.milliDiv, 10)/1000.0;
+            this._value = 1 - divergence;
+        }
+        return this._value;
     }
 
     /**
@@ -136,4 +140,4 @@ class RepeatMaskerRecord extends Feature {
     }
 }
 
-export default RepeatMaskerRecord;
+export default RepeatMaskerFeature;
