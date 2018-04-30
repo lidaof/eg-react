@@ -147,7 +147,7 @@ function MenuTitle(props) {
  * @return {JSX.Element} element to render
  */
 function LabelConfig(props) {
-    return <SingleInputConfig {...props} optionName="label" label="Track label:" />;
+    return <SingleInputConfig {...props} optionName="label" label="Track label:" hasSetButton={true} />;
 }
 
 /**

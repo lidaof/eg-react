@@ -20,10 +20,11 @@ const BedColumnIndices = {
     SCORE: 4,
     STRAND: 5,
 };
-
+const ROW_VERTICAL_PADDING = 2;
+const ROW_HEIGHT = BedAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
 const DEFAULT_OPTIONS = {
     color: "blue",
-    rows: 5,
+    height: ROW_HEIGHT * 5, // = 5 rows worth of height
 };
 
 /**
@@ -114,7 +115,7 @@ export class BedTrack extends React.Component {
     render() {
         return <AnnotationTrack
             {...this.props}
-            rowHeight={BedAnnotation.HEIGHT + 2}
+            rowHeight={ROW_HEIGHT}
             getHorizontalPadding={5}
             getAnnotationElement={this.renderAnnotation}
         />;

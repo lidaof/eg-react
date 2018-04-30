@@ -18,9 +18,10 @@ import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 
 const ROW_VERTICAL_PADDING = 5;
+const ROW_HEIGHT = GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
 const DEFAULT_OPTIONS = {
     color: "blue",
-    rows: 10
+    height: ROW_HEIGHT * 10 // = 10 rows worth of height
 };
 
 /**
@@ -123,7 +124,7 @@ class GeneAnnotationTrack extends React.Component {
     render() {
         return <AnnotationTrack
             {...this.props}
-            rowHeight={GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING}
+            rowHeight={ROW_HEIGHT}
             getHorizontalPadding={this.getHorizontalPadding}
             getAnnotationElement={this.renderAnnotation}
         />;

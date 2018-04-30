@@ -381,7 +381,7 @@ class TrackContainer extends React.Component {
                 {this.renderToolSelectButtons()}
                 <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
             </div>
-            <ContextMenuManager menuElement={contextMenu} >
+            <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !isToggleSelect(event)} >
                 <DivWithBullseye style={trackDivStyle}>
                     {this.renderSubContainer()}
                 </DivWithBullseye>

@@ -20,7 +20,7 @@ class AnnotationRenderer extends React.PureComponent {
         features: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired, // Features to render
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // View region in which to render
         width: PropTypes.number.isRequired, // Width, in pixels, of the visualization
-        numRows: PropTypes.number.isRequired, // Max number of rows in which to arrange annotations
+        height: PropTypes.number.isRequired, // Height, in pixels, of the visualization
         rowHeight: PropTypes.number.isRequired, // Height of each row of annotations, in pixels
         /**
          * Callback for getting an annotation element to render.  Signature:
@@ -47,7 +47,8 @@ class AnnotationRenderer extends React.PureComponent {
     };
 
     render() {
-        const {features, viewRegion, width, numRows, rowHeight, getHorizontalPadding, getAnnotationElement} = this.props;
+        const {features, viewRegion, width, height, rowHeight, getHorizontalPadding, getAnnotationElement} = this.props;
+        const numRows = Math.floor(height / rowHeight);
         // Compute absolute intervals of all the features
         const navContext = viewRegion.getNavigationContext();
         const intervals = _.flatMap(features, feature => feature.computeNavContextCoordinates(navContext));

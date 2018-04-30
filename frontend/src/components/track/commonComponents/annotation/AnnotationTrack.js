@@ -7,6 +7,7 @@ import Track from '../Track';
 import TrackLegend from '../TrackLegend';
 import HiddenItemsMessage from '../HiddenItemsMessage';
 
+import HeightConfig from '../../contextMenu/HeightConfig';
 import { PrimaryColorConfig, BackgroundColorConfig } from '../../contextMenu/ColorConfig';
 
 import DataProcessor from '../../../../dataSources/DataProcessor';
@@ -61,7 +62,7 @@ class AnnotationTrack extends React.Component {
         }).isRequired,
         rowHeight: PropTypes.number.isRequired, // Height of each row of annotations, in pixels
         options: PropTypes.shape({ // Rendering options
-            rows: PropTypes.number.isRequired, // Number of rows of annotations
+            height: PropTypes.number.isRequired, // Height of visualizer
             backgroundColor: PropTypes.string, // Background color
             displayMode: PropTypes.any // Unused for now.
         }).isRequired,
@@ -85,23 +86,16 @@ class AnnotationTrack extends React.Component {
         this.renderVisualizer = this.renderVisualizer.bind(this);
     }
 
-    /**
-     * @return {number} the height of the track
-     */
-    getHeight() {
-        return this.props.options.rows * this.props.rowHeight;
-    }
-
     renderVisualizer() {
         const {data, viewRegion, width, rowHeight, options, getHorizontalPadding, getAnnotationElement} = this.props;
         return (
         <React.Fragment>
-            <svg width={width} height={this.getHeight()} style={SVG_STYLE} >
+            <svg width={width} height={options.height} style={SVG_STYLE} >
                 <AnnotationRenderer
                     features={data.features}
                     viewRegion={viewRegion}
                     width={width}
-                    numRows={options.rows}
+                    height={options.height}
                     rowHeight={rowHeight}
                     getHorizontalPadding={getHorizontalPadding}
                     getAnnotationElement={getAnnotationElement}
@@ -114,7 +108,7 @@ class AnnotationTrack extends React.Component {
     }
 
     render() {
-        const legend = this.props.legend || <TrackLegend height={this.getHeight()} {...this.props} />;
+        const legend = this.props.legend || <TrackLegend height={this.props.options.height} {...this.props} />;
         return <Track
             {...this.props}
             legend={legend}
@@ -123,6 +117,6 @@ class AnnotationTrack extends React.Component {
     }
 }
 
-export const SUGGESTED_MENU_ITEMS = [PrimaryColorConfig, BackgroundColorConfig];
+export const SUGGESTED_MENU_ITEMS = [HeightConfig, PrimaryColorConfig, BackgroundColorConfig];
 
 export default withDataProcessing(AnnotationTrack);
