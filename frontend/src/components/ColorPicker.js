@@ -69,16 +69,21 @@ class ColorPicker extends React.PureComponent {
         Object.assign(openerStyle, PICKER_OPENER_STYLE);
 
         const pickerOpener = <span style={openerStyle} onClick={this.openPicker} >{label || parsedColor.hex}</span>;
-        const pickerElement = (
-            <OutsideClickDetector onOutsideClick={this.closePicker}>
-                <SketchPicker color={color} onChangeComplete={onChange} disableAlpha={true} />
-            </OutsideClickDetector>
-        );
+        let pickerElement;
+        if (this.state.isOpen) {
+            pickerElement = (
+                <OutsideClickDetector onOutsideClick={this.closePicker}>
+                    <SketchPicker color={color} onChangeComplete={onChange} disableAlpha={true} />
+                </OutsideClickDetector>
+            );
+        } else {
+            pickerElement = null;
+        }
 
         return (
         <Manager>
             <Target>{pickerOpener}</Target>
-            <Popper placement="bottom" >{this.state.isOpen ? pickerElement : null}</Popper>
+            <Popper placement="bottom" >{pickerElement}</Popper>
         </Manager>
         );
     }

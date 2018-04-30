@@ -1,9 +1,8 @@
 import _ from 'lodash';
 
-import NumericalTrack from './commonComponents/NumericalTrack';
+import NumericalTrack, { SUGGESTED_MENU_ITEMS } from './commonComponents/NumericalTrack';
 import { configStaticDataSource } from './commonComponents/configDataFetch';
 import configOptionMerging from './commonComponents/configOptionMerging';
-import { PrimaryColorConfig, BackgroundColorConfig } from './contextMenu/ColorConfig';
 
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
 import { NumericalFeature } from '../../model/BarRecord';
@@ -46,7 +45,7 @@ const configure = _.flowRight([withDefaultOptions, withDataFetch]);
 
 const BigWigConfig = {
     component: configure(NumericalTrack),
-    menuItems: [PrimaryColorConfig, BackgroundColorConfig],
+    menuItems: SUGGESTED_MENU_ITEMS,
     defaultOptions: DEFAULT_OPTIONS
 };
 

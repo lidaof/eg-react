@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Manager, Target, Popper } from 'react-popper';
 
 import OutsideClickDetector from './OutsideClickDetector';
+import ErrorBoundary from './ErrorBoundary';
 import { getRelativeCoordinates } from '../util';
 
 /**
@@ -78,7 +79,7 @@ class ContextMenuManager extends React.PureComponent {
                     <Target style={{position: "absolute", left: x, top: y}} />
                     <Popper placement="bottom-start" >
                         <OutsideClickDetector onOutsideClick={this.handleOutsideClick} >
-                            {menuElement}
+                            <ErrorBoundary>{menuElement}</ErrorBoundary>
                         </OutsideClickDetector>
                     </Popper>
                 </Manager>

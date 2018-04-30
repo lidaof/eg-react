@@ -6,14 +6,11 @@ import GeneAnnotation from './GeneAnnotation';
 import GeneDetail from './GeneDetail';
 
 import Track from '../commonComponents/Track';
-import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
+import AnnotationTrack, { SUGGESTED_MENU_ITEMS } from '../commonComponents/annotation/AnnotationTrack';
 import withTooltip from '../commonComponents/tooltip/withTooltip';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
 import configOptionMerging from '../commonComponents/configOptionMerging';
 import { configStaticDataSource } from '../commonComponents/configDataFetch';
-
-import NumberConfig from '../contextMenu/NumberConfig';
-import { PrimaryColorConfig, BackgroundColorConfig } from '../contextMenu/ColorConfig';
 
 import GeneSource from '../../../dataSources/GeneSource';
 import Gene from '../../../model/Gene';
@@ -133,14 +130,9 @@ class GeneAnnotationTrack extends React.Component {
     }
 }
 
-
-function NumRowsConfig(props) {
-    return <NumberConfig {...props} optionPropName="rows" label="Rows to draw: " minValue={1} />
-}
-
 const GeneAnnotationConfig = {
     component: configure(GeneAnnotationTrack),
-    menuItems: [NumRowsConfig, PrimaryColorConfig, BackgroundColorConfig],
+    menuItems: SUGGESTED_MENU_ITEMS,
     defaultOptions: DEFAULT_OPTIONS,
 };
 

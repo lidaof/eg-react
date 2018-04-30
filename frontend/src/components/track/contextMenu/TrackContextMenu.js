@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import LabelConfig from './LabelConfig';
+import SingleInputConfig from './SingleInputConfig';
 import { getSubtypeConfig } from '../subtypeConfig';
 import TrackModel from '../../../model/TrackModel';
 
@@ -71,30 +71,28 @@ class TrackContextMenu extends React.PureComponent {
         let menuComponents = []; // Array of arrays, one for each track
         for (let trackModel of selectedTracks) {
             const menuItems = getSubtypeConfig(trackModel).menuItems;
-            if (menuItems) {
-                menuComponents.push(menuItems);
-            } else { // Intersecting anything with the empty set is the empty set, so we can stop right here.
+            if (!menuItems) { // Intersecting anything with the empty set is the empty set, so we can stop right here.
                 menuComponents = [];
                 break;
             }
+            menuComponents.push(menuItems);
         }
 
         const commonMenuComponents = _.intersection(...menuComponents);
         return commonMenuComponents.map((MenuComponent, index) =>
-            <MenuComponent key={index} tracks={selectedTracks} onChange={this.changeSelectedTracks} />
+            <MenuComponent key={index} tracks={selectedTracks} onOptionSet={this.changeSelectedTracks} />
         );
     }
 
     /**
-     * A callback for when menu items are changed.  Menu items should pass a function that replaces existing tracks with
-     * new versions.  Then, this method passes the new tracks to the parent element.
+     * A callback for when menu items are changed.  Menu items should pass an option prop name and the new value for
+     * that prop.  This function makes new tracks with the new option value, and passes them to the parent element.
      * 
-     * @param {TrackReplacer} replaceTrack - function that gets a new version of the input TrackModel
      */
-    changeSelectedTracks(replaceTrack) {
+    changeSelectedTracks(optionName, value) {
         const nextTracks = this.props.allTracks.map(track => {
             if (track.isSelected) {
-                return replaceTrack(track);
+                return track.cloneAndSetOption(optionName, value);
             } else {
                 return track;
             }
@@ -122,7 +120,7 @@ class TrackContextMenu extends React.PureComponent {
         return (
         <div className="TrackContextMenu-body">
             <MenuTitle tracks={selectedTracks} />
-            <LabelConfig tracks={selectedTracks} onChange={this.changeSelectedTracks} />
+            <LabelConfig tracks={selectedTracks} onOptionSet={this.changeSelectedTracks} />
             {this.renderTrackSpecificItems(selectedTracks)}
             <RemoveOption numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
         </div>
@@ -133,7 +131,7 @@ class TrackContextMenu extends React.PureComponent {
 /**
  * Title for the context menu.
  * 
- * @param {Object} props - props as specified by React.
+ * @param {Object} props - props as specified by React
  * @return {JSX.Element} element to render
  */
 function MenuTitle(props) {
@@ -143,10 +141,20 @@ function MenuTitle(props) {
 }
 
 /**
+ * Context menu item for setting track labels.
+ * 
+ * @param {Object} props - props as specified by React
+ * @return {JSX.Element} element to render
+ */
+function LabelConfig(props) {
+    return <SingleInputConfig {...props} optionName="label" label="Track label:" />;
+}
+
+/**
  * A menu item that displays an option for track removal.  Note that the props for this item do not follow the schema
  * for other menu items.
  * 
- * @param {Object} props - props as specified by React.
+ * @param {Object} props - props as specified by React
  * @return {JSX.Element} element to render
  */
 function RemoveOption(props) {
@@ -157,15 +165,5 @@ function RemoveOption(props) {
     </div>
     );
 }
-
-/**
- * Gets a new version of the input TrackModel, with changes shallowly merged in, which is the React way.  That is, if
- * the model has not changed at all, the function may return same object.  Otherwise, the function should return a new
- * TrackModel, and any changed props should be completely replaced.
- * 
- * @callback TrackReplacer
- * @param {TrackModel} track - TrackModel off of which to base the output
- * @return {TrackModel} version of the input track model with any changes shallowly merged in
- */
 
 export default TrackContextMenu;

@@ -7,6 +7,8 @@ import BarPlot from './BarPlot';
 import TrackLegend from './TrackLegend';
 import GenomicCoordinates from './GenomicCoordinates';
 import configDataProcessing from './configDataProcessing';
+import HeightConfig from '../contextMenu/HeightConfig';
+import {PrimaryColorConfig, BackgroundColorConfig} from '../contextMenu/ColorConfig';
 
 import { RenderTypes } from '../../../art/DesignRenderer';
 import NumericalFeatureProcessor from '../../../dataSources/NumericalFeatureProcessor';
@@ -169,5 +171,7 @@ class NumericalTrack extends React.Component {
         />;
     }
 }
+
+export const SUGGESTED_MENU_ITEMS = [HeightConfig, PrimaryColorConfig, BackgroundColorConfig]
 
 export default withDataProcessing(NumericalTrack);

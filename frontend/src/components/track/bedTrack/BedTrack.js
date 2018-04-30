@@ -3,15 +3,13 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import BedAnnotation from './BedAnnotation';
-import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 import Track from '../commonComponents/Track';
-import GeneAnnotationTrack from '../geneAnnotationTrack/GeneAnnotationTrack';
-
-import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
+import AnnotationTrack, { SUGGESTED_MENU_ITEMS } from '../commonComponents/annotation/AnnotationTrack';
+import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
+import withTooltip from '../commonComponents/tooltip/withTooltip';
 import configOptionMerging from '../commonComponents/configOptionMerging';
 import { configStaticDataSource } from '../commonComponents/configDataFetch';
-import withTooltip from '../commonComponents/tooltip/withTooltip';
 
 import BedSource from '../../../dataSources/BedSource';
 import Feature from '../../../model/Feature';
@@ -128,7 +126,7 @@ export class BedTrack extends React.Component {
 
 export const BedTrackConfig = {
     component: configure(BedTrack),
-    menuItems: GeneAnnotationTrack.menuItems,
+    menuItems: SUGGESTED_MENU_ITEMS,
     defaultOptions: DEFAULT_OPTIONS,
 };
 

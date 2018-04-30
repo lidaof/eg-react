@@ -56,8 +56,8 @@ sync with the view region.
 Specify context menu items with an array of components.  You can choose existing ones in the `contextMenu` directory, or
 make new ones.
 * Make sure you are specifying Component *classes*, not component instances.
-* All tracks have some menu items by default, such as the one modifying label and the one removing the track. You should
-should not include these default items.
+* All tracks have some menu items by default, such as the one modifying label and the one removing the track.  These are
+part of `TrackContextMenu`, and you do not need to specify them manually.
 
 ### 3.  Specify default options (optional)
 Default option objects look like the `options` prop of `TrackModel` objects.  Context menu items will read these options

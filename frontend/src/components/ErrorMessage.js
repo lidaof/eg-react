@@ -2,7 +2,10 @@ import React from 'react';
 
 const DEFAULT_STYLE = {
     color: "red",
-    textAlign: "center"
+    textAlign: "center",
+    backgroundColor: "white",
+    border: "1px solid red",
+    padding: 3
 };
 
 /**

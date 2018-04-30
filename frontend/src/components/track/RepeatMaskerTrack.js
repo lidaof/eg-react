@@ -11,6 +11,7 @@ import configOptionMerging from './commonComponents/configOptionMerging';
 import { configStaticDataSource } from './commonComponents/configDataFetch';
 import withTooltip from './commonComponents/tooltip/withTooltip';
 
+import HeightConfig from './contextMenu/HeightConfig';
 import { BackgroundColorConfig } from './contextMenu/ColorConfig';
 
 import RepeatMaskerFeature from '../../model/RepeatMaskerFeature';
@@ -153,7 +154,7 @@ class RepeatTrack extends React.Component {
 
 const RepeatMaskerConfig = {
     component: configure(RepeatTrack),
-    menuItems: [BackgroundColorConfig],
+    menuItems: [HeightConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
 };
 

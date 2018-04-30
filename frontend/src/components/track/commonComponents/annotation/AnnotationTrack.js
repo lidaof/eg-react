@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Track from '../Track';
-
-import Feature from '../../../../model/Feature';
 import AnnotationRenderer from './AnnotationRenderer';
 import configDataProcessing from '../configDataProcessing';
-import DataProcessor from '../../../../dataSources/DataProcessor';
-import LinearDrawingModel from '../../../../model/LinearDrawingModel';
-import HiddenItemsMessage from '../HiddenItemsMessage';
+import Track from '../Track';
 import TrackLegend from '../TrackLegend';
+import HiddenItemsMessage from '../HiddenItemsMessage';
+
+import { PrimaryColorConfig, BackgroundColorConfig } from '../../contextMenu/ColorConfig';
+
+import DataProcessor from '../../../../dataSources/DataProcessor';
+import Feature from '../../../../model/Feature';
+import LinearDrawingModel from '../../../../model/LinearDrawingModel';
 
 const SVG_STYLE = {
     display: "block",
@@ -120,5 +122,7 @@ class AnnotationTrack extends React.Component {
         />;
     }
 }
+
+export const SUGGESTED_MENU_ITEMS = [PrimaryColorConfig, BackgroundColorConfig];
 
 export default withDataProcessing(AnnotationTrack);
