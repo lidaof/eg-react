@@ -25,11 +25,12 @@ class AnnotationRenderer extends React.PureComponent {
         /**
          * Callback for getting an annotation element to render.  Signature:
          * (    
-         *      feature: Feature, // feature for which to get annotation element
-         *      absInterval: OpenInterval, // location of the feature in navigation context
+         *      feature: Feature, // Feature for which to get annotation element
+         *      absInterval: OpenInterval, // Location of the feature in navigation context
          *      xRange: OpenInterval, // x coordinate range the annotation should occupy
          *      y: number, // y coordinate of the top of the annotation
-         *      isLastRow: boolean // whether the annotation is assigned to the last configured row
+         *      isLastRow: boolean // Whether the annotation is assigned to the last configured row
+         *      index: number // Iteration index; could be useful as a key
          * ): JSX.Element
          */
         getAnnotationElement: PropTypes.func.isRequired,
@@ -74,7 +75,7 @@ class AnnotationRenderer extends React.PureComponent {
             const isLastRow = rowIndex < 0;
             const effectiveRowIndex = isLastRow ? numRows - 1 : rowIndex;
             const y = effectiveRowIndex * rowHeight + TOP_PADDING;
-            return getAnnotationElement(interval.feature, interval, xRange, y, isLastRow)
+            return getAnnotationElement(interval.feature, interval, xRange, y, isLastRow, i);
         });
     }
 }

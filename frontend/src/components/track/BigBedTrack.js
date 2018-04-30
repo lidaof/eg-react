@@ -29,15 +29,11 @@ DASFeature {
  * @return {Feature[]} Features made from the input
  */
 function formatDasFeatures(data) {
-    let features = data.map(record => new Feature(
+    return data.map(record => new Feature(
         record.label || "",
         new ChromosomeInterval(record.segment, record.min, record.max),
         record.orientation
     ));
-    for (let i = 0; i < features.length; i++) {
-        features[i].index = i;
-    }
-    return features;
 }
 
 const withOptionMerging = configOptionMerging(BedTrackConfig.defaultOptions);

@@ -86,9 +86,12 @@ class RepeatTrack extends React.Component {
      * @param {RepeatMaskerFeature} repeatFeature - feature to render
      * @param {OpenInterval} absInterval - location of the feature in navigation context
      * @param {OpenInterval} xRange - x coordinates the annotation will occupy
+     * @param {any} unused - unused
+     * @param {any} unused2 - unused
+     * @param {number} index - iteration index
      * @return {JSX.Element} element visualizing the feature
      */
-    renderAnnotation(repeatFeature, absInterval, xRange) {
+    renderAnnotation(repeatFeature, absInterval, xRange, unused, unused2, index) {
         if (xRange.getLength() <= 0) {
             return null;
         }
@@ -102,10 +105,9 @@ class RepeatTrack extends React.Component {
             return null;
         }
 
-        const x = xRange.start;
         return <rect
-            key={x}
-            x={x}
+            key={index}
+            x={xRange.start}
             y={y}
             width={xRange.getLength()}
             height={drawHeight}

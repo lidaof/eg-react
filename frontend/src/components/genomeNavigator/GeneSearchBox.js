@@ -21,6 +21,7 @@ const ISOFORM_POPOVER_STYLE = {
     border: "2px solid grey",
     backgroundColor: "white"
 };
+const DEBOUNCE_INTERVAL = 250;
 
 /**
  * A box that accepts gene name queries, and gives suggestions as well.
@@ -52,7 +53,7 @@ class GeneSearchBox extends React.PureComponent {
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.shouldSuggest = this.shouldSuggest.bind(this);
-        this.getSuggestions = this.getSuggestions.bind(this);
+        this.getSuggestions = _.debounce(this.getSuggestions.bind(this), DEBOUNCE_INTERVAL);
         this.showIsoforms = this.showIsoforms.bind(this);
         this.showIsoformsIfEnterPressed = this.showIsoformsIfEnterPressed.bind(this);
         this.setViewToGene = this.setViewToGene.bind(this);

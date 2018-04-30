@@ -33,16 +33,12 @@ const DEFAULT_OPTIONS = {
  * @return {Feature[]} bed records in the form of Feature
  */
 function formatBedRecords(data) {
-    let features = data.map(record => new Feature(
+    return data.map(record => new Feature(
         // "." is a placeholder that means "undefined" in the bed file.
         record[BedColumnIndices.NAME] === "." ? "" : record[BedColumnIndices.NAME],
         new ChromosomeInterval(record.chr, record.start, record.end),
         record[BedColumnIndices.STRAND]
     ));
-    for (let i = 0; i < features.length; i++) {
-        features[i].index = i; // Assign each feature an index so we can use it as a key when rendering
-    }
-    return features;
 }
 
 const withOptionMerging = configOptionMerging(DEFAULT_OPTIONS);
@@ -100,11 +96,12 @@ export class BedTrack extends React.Component {
      * @param {OpenInterval} xRange - x coordinates the annotation will occupy
      * @param {number} y - y coordinate to render the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
+     * @param {number} index - iteration index
      * @return {JSX.Element} element visualizing the feature
      */
-    renderAnnotation(feature, absInterval, xRange, y, isLastRow) {
+    renderAnnotation(feature, absInterval, xRange, y, isLastRow, index) {
         return <BedAnnotation
-            key={feature.index}
+            key={index}
             feature={feature}
             xRange={xRange}
             y={y}
