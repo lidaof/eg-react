@@ -7,27 +7,14 @@
 
 .Track-selected-border {
     background-image:
-        linear-gradient(90deg, black 50%, transparent 50%), /* Horizontal dash */
-        linear-gradient(90deg, black 50%, transparent 50%),
-        linear-gradient(0deg, black 50%, transparent 50%), /* Vertical dash */
-        linear-gradient(0deg, black 50%, transparent 50%);
+        url('/img/border-anim-h.gif'),
+        url('/img/border-anim-h.gif'),
+        url('/img/border-anim-v.gif'),
+        url('/img/border-anim-v.gif');
 
     /* Repeat horizontally for the horizontal dashes, vertically for the vertical dashes */
     background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-
-    /* Dash length: 10px.  Dash width: 1px */
-    background-size: 10px 1px, 10px 1px, 1px 10px, 1px 10px;
     
     /* top, bottom, left, right.  Corners selected in preparation for clockwise rotation. */
     background-position: left top, right bottom, left bottom, right top;
-    animation: border-dance 4s infinite linear;
-}
-
-@keyframes border-dance {
-    0% {
-        background-position: left top, right bottom, left bottom, right top;
-    }
-    100% { /* Animate from initial position to 100px away, clockwise. */
-        background-position: 100px top, calc(100% - 100px) bottom, left calc(100% - 100px), right 100px;
-    }
 }

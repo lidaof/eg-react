@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { getRelativeCoordinates } from '../util';
 
+import './DivWithBullseye.css';
+
 /**
  * Like a <div> in every way, except it has "bullseye", dotted lines that track where the mouse is.
  * 
@@ -77,27 +79,17 @@ class DivWithBullseye extends React.Component {
 function Bullseye(props) {
     const {x, y} = props.where;
     const horizontalLineStyle = {
-        position: "absolute",
-        pointerEvents: "none",
         top: y - 1,
-        left: 0,
-        width: "100%",
-        height: 0,
-        borderTop: "1px dotted grey",
+        willChange: "top",
     };
     const verticalLineStyle = {
-        position: "absolute",
-        pointerEvents: "none",
-        top: 0,
         left: x - 1,
-        width: 0,
-        height: "100%",
-        borderLeft: "1px dotted grey"
+        willChange: "left",
     };
     return (
         <React.Fragment>
-            <div style={horizontalLineStyle} />
-            <div style={verticalLineStyle} />
+            <div className="Bullseye-horizontal-line" style={horizontalLineStyle} />
+            <div className="Bullseye-vertical-line" style={verticalLineStyle} />
         </React.Fragment>
     );
 }
