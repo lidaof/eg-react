@@ -13,6 +13,7 @@ import {PrimaryColorConfig, BackgroundColorConfig} from '../contextMenu/ColorCon
 import { RenderTypes } from '../../../art/DesignRenderer';
 import NumericalFeatureProcessor from '../../../dataSources/NumericalFeatureProcessor';
 import BarRecord from '../../../model/BarRecord';
+import { NumericalDisplayModes } from '../../../model/DisplayModes';
 
 const TOP_PADDING = 5;
 const withDataProcessing = configDataProcessing(new NumericalFeatureProcessor());
@@ -43,8 +44,9 @@ class NumericalTrack extends React.Component {
             height: PropTypes.number.isRequired, // Height of the track
             color: PropTypes.string, // Color to draw bars
             scale: PropTypes.any, // Unused for now
-            displayMode: PropTypes.any // Unused for now
+            displayMode: PropTypes.oneOf(Object.values(NumericalDisplayModes))
         }).isRequired,
+        unit: PropTypes.string, // Unit to display after the number in tooltips
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any, // If present, applies error styling
         /**
@@ -127,12 +129,15 @@ class NumericalTrack extends React.Component {
      * @return {JSX.Element} tooltip to render
      */
     renderDefaultTooltip(relativeX, records) {
-        const {trackModel, viewRegion, width} = this.props;
+        const {trackModel, viewRegion, width, unit} = this.props;
         const record = records[0];
         const recordValue = record ? record.value.toFixed(2) : '(no data)';
         return (
         <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
-            <li className="Tooltip-major-text" >{recordValue}</li>
+            <li>
+                <span className="Tooltip-major-text" style={{marginRight: 3}}>{recordValue}</span>
+                <span className="Tooltip-minor-text">{unit}</span>
+            </li>
             <li className="Tooltip-minor-text" >
                 <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
             </li>
@@ -158,11 +163,12 @@ class NumericalTrack extends React.Component {
     }
 
     render() {
-        const {trackModel, options} = this.props;
+        const {trackModel, unit, options} = this.props;
         const legend = <TrackLegend
             trackModel={trackModel}
             height={options.height}
-            scaleForAxis={this.state.valueToY}
+            axisScale={this.state.valueToY}
+            axisLegend={unit}
         />;
         return <Track
             {...this.props}

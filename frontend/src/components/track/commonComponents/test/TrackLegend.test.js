@@ -11,7 +11,7 @@ it("renders the track's name", () => {
 });
 
 it("renders a svg when given a scale", () => {
-    const wrapper = shallow(<TrackLegend trackModel={TRACK_MODEL} height={1} scaleForAxis={() => undefined} />);
+    const wrapper = shallow(<TrackLegend trackModel={TRACK_MODEL} height={1} axisScale={() => undefined} />);
     const svg = wrapper.find("svg");
     expect(svg).toHaveLength(1);
     expect(svg.props().height).toBe(1);

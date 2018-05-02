@@ -34,8 +34,8 @@ class SingleInputConfig extends React.PureComponent {
         /**
          * Option value to assume if a track model doesn't contain an option AND its track type doesn't define a default
          */
-        defaultValue: PropTypes.string,
-        multiValue: PropTypes.string, // Placeholder value if track options don't match
+        defaultValue: PropTypes.any,
+        multiValue: PropTypes.any, // Placeholder value if track options don't match
         hasSetButton: PropTypes.bool, // Whether to render a button that says "Set"
         /**
          * Callback for getting an input element to render.

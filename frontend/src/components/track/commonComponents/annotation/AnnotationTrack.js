@@ -2,15 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import AnnotationRenderer from './AnnotationRenderer';
-import configDataProcessing from '../configDataProcessing';
 import Track from '../Track';
+import NumericalTrack from '../NumericalTrack';
 import TrackLegend from '../TrackLegend';
 import HiddenItemsMessage from '../HiddenItemsMessage';
 
+import { AnnotationDisplayModeConfig } from '../../contextMenu/DisplayModeConfig';
 import HeightConfig from '../../contextMenu/HeightConfig';
 import { PrimaryColorConfig, BackgroundColorConfig } from '../../contextMenu/ColorConfig';
 
-import DataProcessor from '../../../../dataSources/DataProcessor';
+import { AnnotationDisplayModes, NumericalDisplayModes } from '../../../../model/DisplayModes';
+import BarRecordAggregator from '../../../../model/BarRecordAggregator';
 import Feature from '../../../../model/Feature';
 import LinearDrawingModel from '../../../../model/LinearDrawingModel';
 
@@ -18,33 +20,6 @@ const SVG_STYLE = {
     display: "block",
     overflow: "visible",
 };
-
-/**
- * Filters out Features too small to see.
- */
-class FeatureProcessor extends DataProcessor {
-    getInputPropTypes() {
-        return {
-            data: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired
-        };
-    }
-
-    process(props) {
-        if (!props.data) {
-            return {
-                features: [],
-                numHidden: 0
-            };
-        }
-        const drawModel = new LinearDrawingModel(props.viewRegion, props.width);
-        const visibleFeatures = props.data.filter(feature => drawModel.basesToXWidth(feature.getLength()) >= 0.5);
-        return {
-            features: visibleFeatures,
-            numHidden: props.data.length - visibleFeatures.length
-        };
-    }
-}
-const withDataProcessing = configDataProcessing(new FeatureProcessor());
 
 /**
  * Some reasonable defaults for the visualization of annotations or Features.
@@ -56,15 +31,12 @@ class AnnotationTrack extends React.Component {
         /**
          * Data from FeatureProcessor.  Users of AnnotationTrack need only provide an array of Feature.
          */
-        data: PropTypes.shape({
-            features: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired, // Features to render
-            numHidden: PropTypes.number // Number of Features that FeatureProcessor hid
-        }).isRequired,
+        data: PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired, // Features to render
         rowHeight: PropTypes.number.isRequired, // Height of each row of annotations, in pixels
         options: PropTypes.shape({ // Rendering options
             height: PropTypes.number.isRequired, // Height of visualizer
             backgroundColor: PropTypes.string, // Background color
-            displayMode: PropTypes.any // Unused for now.
+            displayMode: PropTypes.oneOf(Object.values(AnnotationDisplayModes))
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any, // If present, applies error styling
@@ -88,11 +60,15 @@ class AnnotationTrack extends React.Component {
 
     renderVisualizer() {
         const {data, viewRegion, width, rowHeight, options, getHorizontalPadding, getAnnotationElement} = this.props;
+        const drawModel = new LinearDrawingModel(viewRegion, width);
+        const visibleData = data.filter(feature => drawModel.basesToXWidth(feature.getLength()) >= 0.5);
+        const numHidden = data.length - visibleData.length;
+
         return (
         <React.Fragment>
             <svg width={width} height={options.height} style={SVG_STYLE} >
                 <AnnotationRenderer
-                    features={data.features}
+                    features={visibleData}
                     viewRegion={viewRegion}
                     width={width}
                     height={options.height}
@@ -102,21 +78,28 @@ class AnnotationTrack extends React.Component {
                     options={options} // It doesn't actually use this prop, but we pass it to trigger rerenders.
                 />
             </svg>
-            <HiddenItemsMessage width={width} numHidden={data.numHidden} />
+            <HiddenItemsMessage width={width} numHidden={numHidden} />
         </React.Fragment>
         );
     }
 
     render() {
-        const legend = this.props.legend || <TrackLegend height={this.props.options.height} {...this.props} />;
-        return <Track
-            {...this.props}
-            legend={legend}
-            visualizer={this.renderVisualizer()}
-        />;
+        const options = this.props.options;
+        if (options.displayMode === AnnotationDisplayModes.DENSITY) {
+            const numericalOptions = {
+                ...options,
+                displayMode: NumericalDisplayModes.AUTO,
+                aggregateMethod: BarRecordAggregator.AggregatorTypes.COUNT
+            };
+            return <NumericalTrack {...this.props} unit="feature density" options={numericalOptions} />;
+        } else {
+            const legend = this.props.legend || <TrackLegend height={options.height} {...this.props} />;
+            return <Track {...this.props} legend={legend} visualizer={this.renderVisualizer()} />;
+        }
     }
 }
 
-export const SUGGESTED_MENU_ITEMS = [HeightConfig, PrimaryColorConfig, BackgroundColorConfig];
+export const SUGGESTED_MENU_ITEMS = [AnnotationDisplayModeConfig, HeightConfig, PrimaryColorConfig,
+    BackgroundColorConfig];
 
-export default withDataProcessing(AnnotationTrack);
+export default AnnotationTrack;

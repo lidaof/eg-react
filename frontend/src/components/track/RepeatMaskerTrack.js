@@ -22,7 +22,7 @@ import './commonComponents/tooltip/Tooltip.css';
 const TOP_PADDING = 5;
 const DEFAULT_OPTIONS = {
     height: 40,
-    rows: 1,
+    color: "blue",
     categoryColors: RepeatMaskerFeature.DEFAULT_CLASS_COLORS,
 };
 
@@ -112,6 +112,7 @@ class RepeatTrack extends React.Component {
             width={xRange.getLength()}
             height={drawHeight}
             fill={color}
+            fillOpacity={0.75}
             onClick={event => this.renderTooltip(event, repeatFeature)}
         />;
     }
@@ -120,19 +121,19 @@ class RepeatTrack extends React.Component {
      * Renders the tooltip that appears when clicking on a repeat.
      * 
      * @param {MouseEvent} event - mouse click event, used to determine tooltip coordinates
-     * @param {RepeatMaskerFeature} repeatFeature - feature containing data to show in the tooltip
+     * @param {RepeatMaskerFeature} feature - feature containing data to show in the tooltip
      */
-    renderTooltip(event, repeatFeature) {
+    renderTooltip(event, feature) {
         const {trackModel, onHideTooltip} = this.props;
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={onHideTooltip} >
                 <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
                     <li>
-                        <span className="Tooltip-major-text" style={{marginRight: 5}} >{repeatFeature.getName()}</span>
-                        <span className="Tooltip-minor-text" >{repeatFeature.getClassDetails()}</span>
+                        <span className="Tooltip-major-text" style={{marginRight: 5}} >{feature.getName()}</span>
+                        <span className="Tooltip-minor-text" >{feature.getClassDetails()}</span>
                     </li>
-                    <li>{repeatFeature.getLocus().toString()}</li>
-                    <li>{"(1 - divergence%) = " + repeatFeature.value.toFixed(2)}</li>
+                    <li>{`${feature.getLocus().toString()} (${feature.getLocus().getLength()}bp)`}</li>
+                    <li>{"(1 - divergence%) = " + feature.value.toFixed(2)}</li>
                     <li className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</li>
                 </ul>
             </Tooltip>
@@ -147,7 +148,7 @@ class RepeatTrack extends React.Component {
         const {trackModel, options} = this.props;
         return <AnnotationTrack
             {...this.props}
-            legend={<TrackLegend trackModel={trackModel} height={options.height} scaleForAxis={this.state.valueToY} />}
+            legend={<TrackLegend trackModel={trackModel} height={options.height} axisScale={this.state.valueToY} />}
             rowHeight={options.height}
             getAnnotationElement={this.renderAnnotation}
         />;

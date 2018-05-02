@@ -11,7 +11,7 @@ import ChromosomeInterval from './interval/ChromosomeInterval';
 export class /* (interface) */ NumericalFeature {
     static propType = PropTypes.shape({
         locus: PropTypes.instanceOf(ChromosomeInterval).isRequired,
-        value: PropTypes.number.isRequired
+        value: PropTypes.number
     });
 
     /**

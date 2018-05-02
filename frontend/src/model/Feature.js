@@ -15,16 +15,16 @@ class Feature {
      * @param {boolean} [isForwardStrand] - whether this feature is on the forward strand.  Default: true
      */
     constructor(name, locus, strand) {
-        this._name = name == undefined ? locus.toString() : name; // eslint-disable-line eqeqeq
-        this._locus = locus;
-        this._strand = strand;
+        this.name = name == undefined ? locus.toString() : name; // eslint-disable-line eqeqeq
+        this.locus = locus;
+        this.strand = strand;
     }
 
     serialize() {
         return {
-            name: this._name,
-            locus: this._locus.serialize(),
-            strand: this._strand
+            name: this.name,
+            locus: this.locus.serialize(),
+            strand: this.strand
         }
     }
 
@@ -36,42 +36,42 @@ class Feature {
      * @return {string} the name of this feature
      */
     getName() {
-        return this._name;
+        return this.name;
     }
 
     /**
      * @return {ChromosomeInterval} the genomic location of this feature
      */
     getLocus() {
-        return this._locus;
+        return this.locus;
     }
 
     /**
      * @return {number} the length of this feature's locus
      */
     getLength() {
-        return this._locus.getLength();
+        return this.locus.getLength();
     }
 
     /**
      * @return {string} raw strand info of this instance
      */
     getStrand() {
-        return this._strand;
+        return this.strand;
     }
 
     /**
      * @return {boolean} whether this feature is on the forward strand
      */
     getIsForwardStrand() {
-        return this._strand === "+";
+        return this.strand === "+";
     }
 
     /**
      * @return {boolean} whether this feature is on the reverse strand
      */
     getIsReverseStrand() {
-        return this._strand === "-";
+        return this.strand === "-";
     }
 
     /**
