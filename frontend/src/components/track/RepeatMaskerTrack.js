@@ -1,118 +1,164 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import { scaleLinear } from 'd3-scale';
 
-import BigWigTrack from './BigWigTrack';
-import BarPlot from './commonComponents/BarPlot';
-import HiddenItemsMessage from './commonComponents/HiddenItemsMessage';
-import { VISUALIZER_PROP_TYPES } from './Track';
+import Track from './commonComponents/Track';
+import AnnotationTrack from './commonComponents/annotation/AnnotationTrack';
+import TrackLegend from './commonComponents/TrackLegend';
+import Tooltip from './commonComponents/tooltip/Tooltip';
+import configOptionMerging from './commonComponents/configOptionMerging';
+import { configStaticDataSource } from './commonComponents/configDataFetch';
+import withTooltip from './commonComponents/tooltip/withTooltip';
+
+import HeightConfig from './contextMenu/HeightConfig';
 import { BackgroundColorConfig } from './contextMenu/ColorConfig';
 
-import RepeatMaskerRecord from '../../model/RepeatMaskerRecord';
-import LinearDrawingModel from '../../model/LinearDrawingModel';
+import RepeatMaskerFeature from '../../model/RepeatMaskerFeature';
 import BigWigOrBedSource from '../../dataSources/BigWigOrBedSource';
-import { CategoricalBarElementFactory } from '../../art/BarElementFactory';
-import { RenderTypes } from '../../art/DesignRenderer';
 
-import './commonComponents/Tooltip.css';
+import './commonComponents/tooltip/Tooltip.css';
 
 const TOP_PADDING = 5;
-const BAR_CHART_STYLE = {paddingTop: TOP_PADDING};
 const DEFAULT_OPTIONS = {
     height: 40,
-    categoryColors: RepeatMaskerRecord.DEFAULT_CLASS_COLORS,
+    color: "blue",
+    categoryColors: RepeatMaskerFeature.DEFAULT_CLASS_COLORS,
 };
 
 /**
- * From the raw data source records, filters repeats too small to see.
+ * Converter of DASFeatures to RepeatMaskerFeatures.
  * 
- * @param {Object[]} records - raw plain-object records
- * @param {Object} trackProps - props passed to Track
- * @return {Object} object with keys `repeats` and `numHidden`.  See doc above for details
+ * @param {DASFeature[]} data - DASFeatures to convert
+ * @return {RepeatMaskerFeature[]} RepeatMaskerFeatures made from the input
  */
-function processRepeats(records, trackProps) {
-    const drawModel = new LinearDrawingModel(trackProps.viewRegion, trackProps.width);
-    const visibleRecords = records.filter(record => drawModel.basesToXWidth(record.max - record.min) >= 0.25);
-    return {
-        repeats: visibleRecords.map(record => new RepeatMaskerRecord(record)),
-        numHidden: records.length - visibleRecords.length
-    };
+function formatDasFeatures(data) {
+    return data.map(feature => new RepeatMaskerFeature(feature))
 }
 
+const withOptionMerging = configOptionMerging(DEFAULT_OPTIONS);
+const withDataFetch = configStaticDataSource(props => new BigWigOrBedSource(props.trackModel.url), formatDasFeatures);
+const configure = _.flowRight([withOptionMerging, withDataFetch, withTooltip]);
+
 /**
- * Visualizer for RepeatMasker tracks. 
- * Although rmsk uses bigbed as data source, but rmsk has much more contents to be draw so was separated from basic bigbed
- * be aware of bigbed track might also need specify number of columns?
+ * RepeatMasker track.
+ * Although rmsk uses bigbed as data source, but rmsk has much more contents to be draw so was separated from basic
+ * bigbed.
  * 
  * @author Daofeng Li
+ * @author Silas Hsu
  */
-class RepeatVisualizer extends React.PureComponent {
-    static propTypes = VISUALIZER_PROP_TYPES;
+class RepeatTrack extends React.Component {
+    static propTypes = Object.assign({},
+        Track.trackContainerProps,
+        configOptionMerging.INJECTED_PROPS,
+        configStaticDataSource.INJECTED_PROPS,
+        withTooltip.INJECTED_PROPS,
+        {
+        data: PropTypes.arrayOf(PropTypes.instanceOf(RepeatMaskerFeature)).isRequired, // RepeatMaskerFeature to render
+        }
+    );
 
-    /**
-     * @inheritdoc
-     */
     constructor(props) {
         super(props);
         this.state = {
-            elementFactory: new CategoricalBarElementFactory(props.options.height, props.options),
+            valueToY: null
         };
-        this.getTooltipContents = this.getTooltipContents.bind(this);
+        this.renderAnnotation = this.renderAnnotation.bind(this);
+        this.renderTooltip = this.renderTooltip.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.props.options !== nextProps.options) {
-            this.setState({
-                elementFactory: new CategoricalBarElementFactory(nextProps.options.height, nextProps.options)
-            });
-        }
+    /**
+     * Gets the scale to use from props.
+     * 
+     * @param {Object} nextProps - next props the Track will receive
+     * @return {Object} next state to merge
+     */
+    static getDerivedStateFromProps(nextProps) {
+        return {
+            valueToY: scaleLinear().domain([1, 0]).range([TOP_PADDING, nextProps.options.height])
+        };
     }
 
-    getTooltipContents(relativeX, record) {
-        if (!record) {
+    /**
+     * Renders one bar.
+     * 
+     * @param {RepeatMaskerFeature} repeatFeature - feature to render
+     * @param {OpenInterval} absInterval - location of the feature in navigation context
+     * @param {OpenInterval} xRange - x coordinates the annotation will occupy
+     * @param {any} unused - unused
+     * @param {any} unused2 - unused
+     * @param {number} index - iteration index
+     * @return {JSX.Element} element visualizing the feature
+     */
+    renderAnnotation(repeatFeature, absInterval, xRange, unused, unused2, index) {
+        if (xRange.getLength() <= 0) {
             return null;
         }
-        return (
-        <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
-            <li>
-                <span className="Tooltip-major-text" style={{marginRight: 5}} >{record.getName()}</span>
-                <span className="Tooltip-minor-text" >{record.getClassDetails()}</span>
-            </li>
-            <li>{record.getLocus().toString()}</li>
-            <li>{"(1 - divergence%) = " + record.getValue().toFixed(2)}</li>
-            <li className="Tooltip-minor-text" >{this.props.trackModel.getDisplayLabel()}</li>
-        </ul>
+        const {categoryColors, height} = this.props.options;
+        const categoryId = repeatFeature.getCategoryId();
+        const color = categoryColors[categoryId];
+
+        const y = this.state.valueToY(repeatFeature.value);
+        const drawHeight = height - y;
+        if (drawHeight <= 0) {
+            return null;
+        }
+
+        return <rect
+            key={index}
+            x={xRange.start}
+            y={y}
+            width={xRange.getLength()}
+            height={drawHeight}
+            fill={color}
+            fillOpacity={0.75}
+            onClick={event => this.renderTooltip(event, repeatFeature)}
+        />;
+    }
+
+    /**
+     * Renders the tooltip that appears when clicking on a repeat.
+     * 
+     * @param {MouseEvent} event - mouse click event, used to determine tooltip coordinates
+     * @param {RepeatMaskerFeature} feature - feature containing data to show in the tooltip
+     */
+    renderTooltip(event, feature) {
+        const {trackModel, onHideTooltip} = this.props;
+        const tooltip = (
+            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={onHideTooltip} >
+                <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
+                    <li>
+                        <span className="Tooltip-major-text" style={{marginRight: 5}} >{feature.getName()}</span>
+                        <span className="Tooltip-minor-text" >{feature.getClassDetails()}</span>
+                    </li>
+                    <li>{`${feature.getLocus().toString()} (${feature.getLocus().getLength()}bp)`}</li>
+                    <li>{"(1 - divergence%) = " + feature.value.toFixed(2)}</li>
+                    <li className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</li>
+                </ul>
+            </Tooltip>
         );
+        this.props.onShowTooltip(tooltip);
     }
 
     /** 
      * @inheritdoc
      */
     render() {
-        const {data, viewRegion, width, options} = this.props;
-        return (
-        <React.Fragment>
-            <BarPlot
-                viewRegion={viewRegion}
-                data={data.repeats || []}
-                width={width}
-                height={options.height}
-                elementFactory={this.state.elementFactory}
-                style={BAR_CHART_STYLE}
-                type={RenderTypes.CANVAS}
-                getTooltipContents={this.getTooltipContents}
-            />
-            <HiddenItemsMessage width={width} numHidden={data.numHidden} />
-        </React.Fragment>
-        );
+        const {trackModel, options} = this.props;
+        return <AnnotationTrack
+            {...this.props}
+            legend={<TrackLegend trackModel={trackModel} height={options.height} axisScale={this.state.valueToY} />}
+            rowHeight={options.height}
+            getAnnotationElement={this.renderAnnotation}
+        />;
     }
 }
 
-const RepeatMaskerTrack = {
-    visualizer: RepeatVisualizer,
-    legend: (props) => <BigWigTrack.legend {...props} data={props.data.repeats || []} />,
-    menuItems: [BackgroundColorConfig],
+const RepeatMaskerConfig = {
+    component: configure(RepeatTrack),
+    menuItems: [HeightConfig, BackgroundColorConfig],
     defaultOptions: DEFAULT_OPTIONS,
-    getDataSource: trackModel => new BigWigOrBedSource(trackModel.url),
-    processData: processRepeats
 };
 
-export default RepeatMaskerTrack;
+export default RepeatMaskerConfig;

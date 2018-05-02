@@ -1,6 +1,6 @@
 # Server
 ## Installation
-Follow the instructions in `backend/mongo.txt`.  MongoDB must be running.
+Enter the `backend` directory.  `npm install`, and then `npm run setup`.  MongoDB must be running.
 
 ## Running
 1.  Make sure MongoDB is running.
@@ -31,51 +31,45 @@ actually entire chromosomes, then the user can effectively navigate the whole ge
 4.  `App`: the root component of the app
 5.  From `App`, descend into interested components.
 
-## Making a new track component
-Here's an overview:
-1.  Specify customizations of your new track.  Tracks are customizable in four ways:
-  * Visualizer (required)
-  * Legend (required)
-  * Context menu items
-  * Track default options
-  * Data source
-2.  Specify what track type renders your new track.
+## Making a new track type
+### 1.  Write a new track component (required)
+1.  Make a new component expecting to receive a bunch of props from `TrackContainer`.  `Track.js` documents the props
+to expect.
+2.  Your new component may `render` anything, though it is **highly** recommended you render a `<Track>` component, if
+not one of the more specialized components like `<AnnotationTrack>` or `<NumericalTrack>`.  Pass *all* track container
+props to these sub-components.
+3.  In addition to track container props, you need to provide certain props to these sub-components, all of which the
+respective files document.
+    * For example, `<Track>` requires a legend and visualizer element.  Use the track container props, which includes
+    view region and width, to render a visualizer and pass it to `<Track>`.
 
-### 1. Customizations
-These are also explained in `TrackSubtype.ts`.
-#### Visualizer (required)
-A component that visualizes your track data.  It will receive `VISUALIZER_PROP_TYPES` (defined in `Track.js`).
+#### Adding data fetch, etc.
+[Higher-order components](https://reactjs.org/docs/higher-order-components.html) manage common funtionality like data
+fetching.  The `commonComponents` directory contains track-specific HOCs; their names start with `config-` or `with-`.
 
-#### Legend (required)
-Your track legend component.  It will receive `LEGEND_PROP_TYPES` (defined in `Track.js`).
+For example, `configStaticDataSource` returns a *function* with which you can wrap your new track component.  After you
+use this function, your component will automatically receive three additional props `data`, `isLoading`, and `error`,
+whose function are self-explanatory.  In particular, if `isLoading` is false, the `data` prop is guaranteed to be in
+sync with the view region.
 
-#### Context menu items
-List of specific menu items to render.  Note that all tracks have some menu items by default, such as the one modifying
-label and the one removing the track.  You should not include these default items.
+### 2.  Specify context menu components (optional)
+Specify context menu items with an array of components.  You can choose existing ones in the `contextMenu` directory, or
+make new ones.
+* Make sure you are specifying Component *classes*, not component instances.
+* All tracks have some menu items by default, such as the one modifying label and the one removing the track.  These are
+part of `TrackContextMenu`, and you do not need to specify them manually.
 
-#### Default options
-Object that looks like the `options` prop of `TrackModel` objects.  Visualizers, legends, and context menu items will
-receive an options object which is track model's options merged into the default options for the track type.
+### 3.  Specify default options (optional)
+Default option objects look like the `options` prop of `TrackModel` objects.  Context menu items will read these options
+if the track model does not specify them.  Make sure these options are consistent with the way you are rendering your
+track component!  The `configOptionMerging` HOC should help with that.
 
-#### Data source
-If you have any non-trival data fetching needs, extend the `DataSource` class, or use one that already exists.
-Designing a new `DataSource` involves implementing the `getData()` method, which gets data for the view region passed to
-it.  You can return the data in any format desired.  This would also be the best place to implement cache, if desired.
-
-If you don't specify a data source, your legend and visualizer will receive no data.
-
-#### Data processing
-Sometimes, the data from a DataSource might need some processing or formatting before use.  If this function is
-specified, any data will first pass through this function before being going to legend and visualizer.
-
-### 2.  Using your shiny customizations
-Components use customizations via the getSubtypeConfig() method, which returns `TrackSubtype` objects.
-
-1.  Package your customizations into an object matching the schema in `track/TrackSubtype.ts`.
+### 4.  Configure when to render your shiny new component
+1.  Package your new component, menu item list, and default options into one configuration object with props
+`component`, `menuItems`, and `defaultOptions`.
 2.  Import the object from step 1 into `track/subtypeConfig.js`.
-3.  Add an entry to `TYPE_NAME_TO_SUBTYPE` in `track/subtypeConfig.js`, which maps track type name to track subtype
-objects, such as the one you created in step 1.  Alternatively, for very fine-grained control, you can modify the
-functions in the file directly.
+3.  Add an appropriate entry to `TYPE_NAME_TO_SUBTYPE` in `track/subtypeConfig.js`, which maps track type name to track
+configurations.  Alternatively, for very fine-grained control, you can modify the functions in the file directly.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.

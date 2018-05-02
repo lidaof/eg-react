@@ -1,30 +1,35 @@
-import RulerTrack from './RulerTrack';
-import BigWigTrack from './BigWigTrack';
-import BedGraphTrack from './BedGraphTrack';
-import GeneAnnotationTrack from './geneAnnotationTrack/GeneAnnotationTrack';
-import RepeatMaskerTrack from './RepeatMaskerTrack';
-import MethylCTrack from './MethylCTrack';
-import UnknownTrack from './UnknownTrack';
+import RulerTrackConfig from './RulerTrack';
+import BigWigTrackConfig from './BigWigTrack';
+import BedTrackConfig from './bedTrack/BedTrack';
+import BigBedTrackConfig from './BigBedTrack';
+import BedGraphTrackConfig from './BedGraphTrack';
+import GeneAnnotationTrackConfig from './geneAnnotationTrack/GeneAnnotationTrack';
+import RepeatMaskerTrackConfig from './RepeatMaskerTrack';
+import UnknownTrackConfig from './UnknownTrack';
 
 /**
- * Mapping from track type name to an object implementing the TrackSubtype interface.  Make sure all keys are lowercase!
+ * Mapping from track type name to an object implementing the TrackSubtype interface.  Type names may not contain
+ * uppercase letters, because we want comparisons to be case-insensitive.
  */
 const TYPE_NAME_TO_SUBTYPE = {
-    "ruler": RulerTrack,
-    "bigwig": BigWigTrack,
-    "bedgraph": BedGraphTrack,
-    "hammock": GeneAnnotationTrack,
-    "repeatmasker": RepeatMaskerTrack,
-    "methylc": MethylCTrack,
+    "ruler": RulerTrackConfig,
+    "bigwig": BigWigTrackConfig,
+    "bed": BedTrackConfig,
+    "bigbed": BigBedTrackConfig,
+    "bedgraph": BedGraphTrackConfig,
+    "geneannotation": GeneAnnotationTrackConfig,
+    "repeatmasker": RepeatMaskerTrackConfig,
 };
 
-// Check if all the subtypes are clean
-for (let subtypeName in TYPE_NAME_TO_SUBTYPE) {
-    const subtype = TYPE_NAME_TO_SUBTYPE[subtypeName];
-    if (!subtype.visualizer) {
-        throw new TypeError(`In config for type ${subtype}: a visualizer is required, but it was undefined.`);
-    } else if (!subtype.legend) {
-        throw new TypeError(`In config for type ${subtype}: a legend is required, but it was undefined.`);
+if (process.env.NODE_ENV !== "production") { // Check if all the subtypes are clean
+    for (let subtypeName in TYPE_NAME_TO_SUBTYPE) {
+        if (subtypeName.toLowerCase() !== subtypeName) {
+            throw new TypeError(`Type names may not contain uppercase letters.  Offender: "${subtypeName}"`);
+        }
+        const subtype = TYPE_NAME_TO_SUBTYPE[subtypeName];
+        if (!subtype.component) {
+            throw new TypeError(`In config for type "${subtypeName}": a component is required, but it was undefined.`);
+        }
     }
 }
 
@@ -36,7 +41,7 @@ for (let subtypeName in TYPE_NAME_TO_SUBTYPE) {
  * @return {TrackSubtype} object containing rendering config appropriate for this model
  */
 export function getSubtypeConfig(trackModel) {
-    return TYPE_NAME_TO_SUBTYPE[trackModel.type.toLowerCase()] || UnknownTrack;
+    return TYPE_NAME_TO_SUBTYPE[trackModel.type.toLowerCase()] || UnknownTrackConfig;
 }
 
 /**

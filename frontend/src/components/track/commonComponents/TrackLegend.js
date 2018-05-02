@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
 
+import TranslatableG from '../../TranslatableG';
 import TrackModel from '../../../model/TrackModel';
 
-const NUM_TICKS_SUGGESTION = 2;
+import './TrackLegend.css';
+
+const NUM_TICKS_SUGGESTION = 3;
 const AXIS_WIDTH = 30;
 
 /**
@@ -17,8 +20,7 @@ class TrackLegend extends React.PureComponent {
     static propTypes = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
         height: PropTypes.number.isRequired, // Height of the legend
-        scaleForAxis: PropTypes.func, // A d3 scale function, used for drawing axes
-        style: PropTypes.object, // CSS
+        axisScale: PropTypes.func, // A d3 scale function, used for drawing axes
     };
 
     static WIDTH = 120;
@@ -33,28 +35,36 @@ class TrackLegend extends React.PureComponent {
     }
 
     componentDidUpdate(nextProps) {
-        if (this.props.scaleForAxis !== nextProps.scaleForAxis) {
+        if (this.props.axisScale !== nextProps.axisScale) {
             this.drawAxis();
         }
     }
 
     drawAxis() {
-        if (this.gNode && this.props.scaleForAxis) {
+        if (this.gNode && this.props.axisScale) {
             while(this.gNode.hasChildNodes()) { // Believe it not, there's no function that removes all child nodes.
                 this.gNode.lastChild.remove();
             }
 
-            const axis = axisLeft(this.props.scaleForAxis);
+            const axis = axisLeft(this.props.axisScale);
             axis.ticks(NUM_TICKS_SUGGESTION);
             select(this.gNode).call(axis);
             this.gNode.lastChild.remove(); // Remove the '0' label
         }
     }
 
+    getLabelWidth() {
+        let width = TrackLegend.WIDTH;
+        if (this.props.axisScale) {
+            width -= AXIS_WIDTH;
+        }
+        return width;
+    }
+
     render() {
-        const {trackModel, height, scaleForAxis, style} = this.props;
-        if (height === 0) {
-            console.warn("Warning: rendering a 0-height track legend");
+        const {trackModel, height, axisScale, style} = this.props;
+        if (height <= 0) {
+            return null;
         }
 
         const divStyle = Object.assign({
@@ -64,26 +74,21 @@ class TrackLegend extends React.PureComponent {
             backgroundColor: trackModel.isSelected ? "yellow" : undefined,
         }, style);
         const pStyle = {
-            margin: 0,
-            width: this.scaleForAxis ? TrackLegend.WIDTH - AXIS_WIDTH : TrackLegend.WIDTH,
+            width: this.getLabelWidth(),
             maxHeight: height,
-            fontSize: "x-small",
-            lineHeight: 1,
-            wordWrap: "break-word",
-            overflow: "hidden",
         };
 
         let axis = null;
-        if (scaleForAxis) {
+        if (axisScale) {
             axis = <svg width={AXIS_WIDTH} height={height} style={{overflow: "visible"}} >
-                <g ref={node => this.gNode = node} transform={`translate(${AXIS_WIDTH}, 0)`} />
+                <TranslatableG innerRef={node => this.gNode = node} x={AXIS_WIDTH} />
             </svg>;
         }
 
         const label = trackModel.getDisplayLabel();
         return (
-        <div style={divStyle} >
-            <p style={pStyle} title={label}>{label}</p>
+        <div style={divStyle} title={label}>
+            <p className="TrackLegend-label" style={pStyle} >{label}</p>
             {axis}
         </div>
         );

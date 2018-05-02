@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import SvgJsManaged from '../SvgJsManaged';
 import GeneAnnotation from '../track/geneAnnotationTrack/GeneAnnotation';
 import Gene from '../../model/Gene';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 /**
  * A SVG containing a happy solo GeneAnnotation.
@@ -14,14 +14,15 @@ import LinearDrawingModel from '../../model/LinearDrawingModel';
 class StandaloneGeneAnnotation extends React.PureComponent {
     static propTypes = {
         gene: PropTypes.instanceOf(Gene).isRequired, // The gene to draw
-        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model 
+        navContextLocation: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Location in nav context
+        drawModel: PropTypes.instanceOf(LinearDrawingModel).isRequired, // Drawing model
     };
     
     render() {
-        const {gene, drawModel} = this.props;
+        const {gene, navContextLocation, drawModel} = this.props;
         return (
         <svg width={drawModel.getDrawWidth()} height={GeneAnnotation.HEIGHT} >
-            <SvgJsManaged><GeneAnnotation gene={gene} drawModel={drawModel} /></SvgJsManaged>
+            <GeneAnnotation gene={gene} navContextLocation={navContextLocation} drawModel={drawModel} />
         </svg>
         );
     }

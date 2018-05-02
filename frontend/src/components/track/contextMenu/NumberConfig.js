@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ITEM_PROP_TYPES, ITEM_DEFAULT_PROPS } from './TrackContextMenu';
-import { aggregateOptions } from '../subtypeConfig';
+import SingleInputConfig from './SingleInputConfig';
 
 import './TrackContextMenu.css';
-import SingleInputConfig from './SingleInputConfig';
 
 /**
  * A menu option that configures some integer-based property.
@@ -12,39 +10,74 @@ import SingleInputConfig from './SingleInputConfig';
  * @author Silas Hsu
  */
 class NumberConfig extends React.PureComponent {
-    static propTypes = Object.assign({}, ITEM_PROP_TYPES, {
-        optionPropName: PropTypes.string.isRequired, // The prop to change of a TrackModel's options object.
+    static propTypes = Object.assign({}, SingleInputConfig.menuPropTypes, {
+        optionName: PropTypes.string.isRequired, // The prop to change of a TrackModel's options object.
         label: PropTypes.string, // Label of the input
-        minValue: PropTypes.number,
+        minValue: PropTypes.number, // Minimum value of the input
+        isFloat: PropTypes.bool, // Expects a float when truthy, expects an int when falsy
+        step: PropTypes.number, // Step attribute; legal number interval
+        width: PropTypes.string, // Width of the input element.  Can use CSS units.
     });
-    static defaultProps = ITEM_DEFAULT_PROPS;
+
+    static defaultProps = {
+        label: "Number:",
+        width: "7ch" // Should be enough for values up to 9999
+    };
 
     constructor(props) {
         super(props);
-        this.handleInputChange = this.handleInputChange.bind(this);
+        this.renderInputElement = this.renderInputElement.bind(this);
+        this.handleOptionSet = this.handleOptionSet.bind(this);
     }
 
     /**
-     * Requests a change in track labels.
+     * Renders the <input> element.
+     * 
+     * @param {string} inputValue - value of the input
+     * @param {function} setNewValue - function to call when input value changes
+     * @return {JSX.Element} <input> to render
      */
-    handleInputChange(event) {
-        const intValue = Number.parseInt(event.target.value, 10);
-        if (Number.isInteger(intValue)) {
-            const trackReplacer = trackModel => trackModel.cloneAndSetOption(this.props.optionPropName, intValue);
-            this.props.onChange(trackReplacer);
+    renderInputElement(inputValue, setNewValue) {
+        const {minValue, step, width} = this.props;
+        return <input
+            type="number"
+            min={minValue}
+            step={step}
+            value={inputValue}
+            style={{width: width}}
+            onChange={event => setNewValue(event.target.value)}
+        />;
+    }
+
+    /**
+     * Parses the string containing number from the <input> element.
+     * 
+     * @param {string} optionName - track option prop name to modify
+     * @param {string} value - string containing number from <input> element
+     */
+    handleOptionSet(optionName, value) {
+        let numValue;
+        if (this.props.isFloat) {
+            numValue = Number.parseFloat(value);
+        } else {
+            numValue = Number.parseInt(value, 10);
+        }
+        if (Number.isFinite(numValue)) {
+            this.props.onOptionSet(optionName, numValue);
         }
     }
 
     render() {
-        const {tracks, optionPropName, label, minValue} = this.props;
-        const value = aggregateOptions(tracks, optionPropName, minValue, "");
-        const inputElement = <input
-            type="number"
-            style={{width: "10ch"}}
-            min={minValue} value={value}
-            onChange={this.handleInputChange}
+        const {optionName, tracks, label, minValue} = this.props;
+        return <SingleInputConfig
+            optionName={optionName}
+            tracks={tracks}
+            label={label}
+            defaultValue={minValue}
+            hasSetButton={true}
+            getInputElement={this.renderInputElement}
+            onOptionSet={this.handleOptionSet}
         />;
-        return <SingleInputConfig label={label || "Number:"} inputElement={inputElement} />;
     }
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DataHubParser from '../../DataHubParser';
+import DataHubParser from '../../model/DataHubParser';
 
 class CustomHubAdder extends React.Component {
     static propTypes = {
@@ -31,7 +31,8 @@ class CustomHubAdder extends React.Component {
                 url: this.state.inputUrl
             });
         } catch (error) {
-            this.setState({isLoading: false, error: error.toString()});
+            console.error(error);
+            this.setState({isLoading: false, error: "Error: HTTP " + error.status});
         }
 
         if (tracks) {

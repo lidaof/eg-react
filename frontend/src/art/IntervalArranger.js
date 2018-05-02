@@ -1,6 +1,6 @@
 /**
  * Arranges intervals into rows so they avoid overlap as much as possible when drawn.  Intervals MUST have props
- * `absStart` and `absEnd`.
+ * `start` and `end`.
  * 
  * @author Silas Hsu
  */
@@ -23,30 +23,27 @@ class IntervalArranger {
     }
 
     /**
-     * Sorts intervals by absolute start base.  If two intervals they have the same start position, the longer interval
-     * comes first.
+     * Sorts intervals by start.  If two intervals they have the same start, the longer interval comes first.
      * 
-     * @param {Object[]} intervals - intervals to sort
-     * @return {Object[]} sorted intervals
+     * @param {OpenInterval[]} intervals - intervals to sort
+     * @return {OpenInterval[]} sorted intervals
      */
     _sortIntervals(intervals) {
         return intervals.sort((interval1, interval2) => {
-            const absStartComparison = interval1.absStart - interval2.absStart;
-            if (absStartComparison === 0) {
-                const interval1Length = interval1.absEnd - interval1.absStart;
-                const interval2Length = interval2.absEnd - interval2.absStart;
-                return interval2Length - interval1Length;
+            const startComparison = interval1.start - interval2.start;
+            if (startComparison === 0) {
+                return interval2.getLength() - interval1.getLength();
             } else {
-                return absStartComparison;
+                return startComparison;
             }
         });
     }
 
     /**
-     * Assigns each intervals a row index, or an index equal to the maximum number of rows if the interval will not fit
-     * into this instance's maximum configured rows.  Each interval requires two props: `absStart` and `absEnd`.
+     * Assigns each interval a row index, or -1 if the interval will not fit into this instance's maximum configured
+     * rows.
      * 
-     * @param {AbsoluteInterval[]} intervals - intervals to which to assign row indicies
+     * @param {OpenInterval[]} intervals - intervals to which to assign row indicies
      * @return {number[]} assigned row index for each interval
      */
     arrange(intervals) {
@@ -59,11 +56,11 @@ class IntervalArranger {
         const sortedIntervals = this._sortIntervals(intervals);
         for (let interval of sortedIntervals) {
             const horizontalPadding = this.getPadding(interval);
-            const startX = this.drawModel.baseToX(interval.absStart) - horizontalPadding;
+            const startX = this.drawModel.baseToX(interval.start) - horizontalPadding;
             // Find the first row where the annotation won't overlap with others in the row
             let row = maxXsForRows.findIndex(maxX => maxX < startX);
             if (row !== -1) {
-                const endX = this.drawModel.baseToX(interval.absEnd);
+                const endX = this.drawModel.baseToX(interval.end);
                 maxXsForRows[row] = endX + horizontalPadding;
             }
 
@@ -75,9 +72,3 @@ class IntervalArranger {
 }
 
 export default IntervalArranger;
-
-/**
- * @typedef {Object} IntervalArranger~AbsoluteInterval
- * @property {number} absStart - start of interval
- * @property {number} absEnd - end of interval
- */

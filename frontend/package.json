@@ -46,7 +46,6 @@
     "react-table": "^6.7.4",
     "react-test-renderer": "^16.3.0",
     "script-loader": "^0.7.2",
-    "svg.js": "^2.6.3",
     "tcp-port-used": "^0.1.2",
     "underscore": "^1.8.3",
     "worker-loader": "^1.1.0",

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Manager, Target, Popper } from 'react-popper';
 import TrackModel from '../../../model/TrackModel';
 
-import './Tooltip.css';
+import './tooltip/Tooltip.css';
 
 /*
 const COLORS = [ // A long list of unique colors.  From the old browser.
@@ -166,7 +166,8 @@ class ColoredBox extends React.PureComponent {
                 onMouseLeave={this.hideTooltip}
             />
             <Popper placement="left" style={tooltipStyle} >
-                <p className="Tooltip-minor-text">{term}:</p>
+                <span className="Tooltip-minor-text">{term}:</span>
+                <br/>
                 {termValue || "(no value)"}
             </Popper>
         </Manager>

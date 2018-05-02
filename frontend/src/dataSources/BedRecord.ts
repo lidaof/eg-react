@@ -7,11 +7,7 @@ interface BedRecord {
     chr: string;
     start: number;
     end: number;
-
-    /**
-     * Free text of the 4th column of the bed file
-     */
-    details: string;
+    [column: number]: string; // The rest of the columns in the bed file, starting from [3]
 }
 
 export default BedRecord;

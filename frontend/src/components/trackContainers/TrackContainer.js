@@ -1,12 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import memoizeOne from 'memoize-one';
+import connect from 'react-redux/lib/connect/connect';
+import { ActionCreators } from '../../AppState';
 
+import TrackHandle from './TrackHandle';
 import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
+import ZoomOutTrackContainer from './ZoomOutTrackContainer';
 import MetadataHeader from './MetadataHeader';
 
-import Track from '../track/Track';
 import TrackLegend from '../track/commonComponents/TrackLegend';
 import TrackContextMenu from '../track/contextMenu/TrackContextMenu';
 import MetadataIndicator from '../track/commonComponents/MetadataIndicator';
@@ -14,21 +18,13 @@ import MetadataIndicator from '../track/commonComponents/MetadataIndicator';
 import OutsideClickDetector from '../OutsideClickDetector';
 import ContextMenuManager from '../ContextMenuManager';
 import DivWithBullseye from '../DivWithBullseye';
-import Reparentable from '../Reparentable';
-
 import withAutoDimensions from '../withAutoDimensions';
+
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import { ActionCreators } from '../../AppState';
-import connect from 'react-redux/lib/connect/connect';
-import ZoomOutTrackContainer from './ZoomOutTrackContainer';
+import RegionExpander from '../../model/RegionExpander';
 
 const Tools = {
-    CROSSHAIR: {
-        buttonContent: "✛",
-        title: "Crosshairs",
-        cursor: "crosshair",
-    },
     DRAG: {
         buttonContent: "✋",
         title: "Drag tool",
@@ -50,6 +46,10 @@ const Tools = {
         cursor: "zoom-out",
     }
 };
+const DEFAULT_CURSOR = "crosshair";
+const REGION_EXPANDER = new RegionExpander(1);
+// Simple caching for the calculateExpansion computation
+REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
 
 ///////////////////////////
 // Track selection utils //
@@ -150,16 +150,45 @@ class TrackContainer extends React.Component {
         onTracksChanged: () => undefined,
     };
 
+    static getDerivedStateFromProps(nextProps) {
+        const {viewRegion, width, metadataTerms} = nextProps;
+        const visualizationWidth = Math.max(0,
+            width - TrackLegend.WIDTH - metadataTerms.length * MetadataIndicator.WIDTH
+        );
+        return {
+            visualizerInfo: REGION_EXPANDER.calculateExpansion(visualizationWidth, viewRegion),
+        };
+    }
+
     constructor(props) {
         super(props);
         this.state = {
-            selectedTool: Tools.CROSSHAIR,
+            selectedTool: {},
+            visualizerInfo: {
+                width: 0,
+                viewRegion: null,
+                viewWindow: null,
+            },
         };
 
+        this.toggleTool = this.toggleTool.bind(this);
         this.handleTrackClicked = this.handleTrackClicked.bind(this);
         this.handleMetadataClicked = this.handleMetadataClicked.bind(this);
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.deselectAllTracks = this.deselectAllTracks.bind(this);
+    }
+
+    /**
+     * Toggles the selection of a tool, or switches tool.
+     * 
+     * @param {Tool} tool - tool to toggle or to switch to
+     */
+    toggleTool(tool) {
+        if (this.state.selectedTool === tool) {
+            this.setState({selectedTool: {}});
+        } else {
+            this.setState({selectedTool: tool});
+        }
     }
 
     /**
@@ -253,32 +282,26 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const {viewRegion, tracks, metadataTerms} = this.props;
-        return tracks.map((trackModel, index) => {
-            const id = trackModel.getId();
-            return <Reparentable key={id} uid={"track-" + id} >
-                <Track
-                    trackModel={trackModel}
-                    viewRegion={viewRegion}
-                    width={this.getVisualizationWidth()}
-                    metadataTerms={metadataTerms}
-                    index={index}
-                    onContextMenu={this.handleContextMenu}
-                    onClick={this.handleTrackClicked}
-                    onMetadataClick={this.handleMetadataClicked}
-                />
-            </Reparentable>
-        });
+        const {tracks, metadataTerms} = this.props;
+        return tracks.map((trackModel, index) => 
+            <TrackHandle
+                key={trackModel.getId()}
+                trackModel={trackModel}
+                {...this.state.visualizerInfo}
+                metadataTerms={metadataTerms}
+                index={index}
+                onContextMenu={this.handleContextMenu}
+                onClick={this.handleTrackClicked}
+                onMetadataClick={this.handleMetadataClicked}
+            />
+        );
     }
 
     /**
      * @return {number} the width, in pixels, at which tracks should render their visualizers
      */
     getVisualizationWidth() {
-        const {width, metadataTerms} = this.props;
-        return Math.max(0,
-            width - TrackLegend.WIDTH - metadataTerms.length * MetadataIndicator.WIDTH
-        );
+        return this.state.visualizerInfo.viewWindow.getLength();
     }
 
     /**
@@ -294,7 +317,7 @@ class TrackContainer extends React.Component {
                     key={toolName}
                     className={className}
                     title={tool.title}
-                    onClick={() => this.setState({selectedTool: tool})}
+                    onClick={() => this.toggleTool(tool)}
                 >
                     {tool.buttonContent}
                 </button>
@@ -339,7 +362,6 @@ class TrackContainer extends React.Component {
                     viewRegion={viewRegion}
                     onNewRegion={onNewRegion}
                 />;
-            case Tools.CROSSHAIR:
             default:
                 return trackElements;
         }
@@ -351,7 +373,7 @@ class TrackContainer extends React.Component {
     render() {
         const {tracks, metadataTerms, onTracksChanged, onMetadataTermsChanged} = this.props;
         const contextMenu = <TrackContextMenu allTracks={tracks} onTracksChanged={onTracksChanged} />;
-        const trackDivStyle = {border: "1px solid black", cursor: this.state.selectedTool.cursor};
+        const trackDivStyle = {border: "1px solid black", cursor: this.state.selectedTool.cursor || DEFAULT_CURSOR};
 
         return (
         <OutsideClickDetector onOutsideClick={this.deselectAllTracks} style={{margin: 5}} >
@@ -359,7 +381,7 @@ class TrackContainer extends React.Component {
                 {this.renderToolSelectButtons()}
                 <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
             </div>
-            <ContextMenuManager menuElement={contextMenu} >
+            <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !isToggleSelect(event)} >
                 <DivWithBullseye style={trackDivStyle}>
                     {this.renderSubContainer()}
                 </DivWithBullseye>

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { getRelativeCoordinates } from '../../util';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
-const ZOOM_AMOUNT = 1.5;
+const ZOOM_AMOUNT = 1.75;
 
 /**
  * A track container that zooms out on click.

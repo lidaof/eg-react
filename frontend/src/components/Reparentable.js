@@ -37,10 +37,7 @@ function removeMountNode(uid) {
  * 
  * Taken from https://gist.github.com/leoasis/e1d093141e5f22e4e1e346e6726dfa5b
  * 
- * (Added by Silas Hsu) - this component will also pass props to its children.
- * 
  * @author Leonardo Andrés Garcia Crespo
- * @author Silas Hsu
  */
 export default class Reparentable extends React.Component {
     static propTypes = {
@@ -65,12 +62,8 @@ export default class Reparentable extends React.Component {
     }
 
     renderChildrenIntoNode(node) {
-        const {uid, children, ...otherProps} = this.props;
-        // Merge props not specific to Reparentable into the children
-        const childrenWithProps = React.Children.map(children, child => React.cloneElement(child, otherProps));
-
         // We use `unstable_renderSubtreeIntoContainer` instead of `render` because it also handles passing the context.
-        ReactDOM.unstable_renderSubtreeIntoContainer(this, childrenWithProps, node);
+        ReactDOM.unstable_renderSubtreeIntoContainer(this, this.props.children, node);
     }
 
     render() {

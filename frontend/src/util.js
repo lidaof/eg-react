@@ -1,4 +1,9 @@
-// Utility functions that don't really fit in any particular folder.
+/**
+ * Utility functions that don't really fit in any particular folder.
+ * 
+ * @author Silas Hsu
+ */ 
+import parseColor from 'parse-color';
 
 /**
  * Button consts found in MouseEvents.  See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -51,28 +56,50 @@ export function getPageCoordinates(relativeTo, relativeX, relativeY) {
  * Debug function for the shouldComponentUpdate method of React.PureComponent.  Logs what props/state changed if there
  * is a rerender.
  * 
- * @param {Object} thisProps - current props
- * @param {Object} thisState - current state
+ * @param {React.Component} thisInstance - this component instance; current props and state
  * @param {Object} nextProps - next props component will receive
  * @param {Object} nextState - next state component will receive
  * @return {boolean} whether component should update, according to React.PureComponent
  */
-export function debugShouldComponentUpdate(thisProps, thisState, nextProps, nextState) {
+export function debugShouldComponentUpdate(thisInstance, nextProps, nextState) {
     for (let propName in nextProps) {
-        if (thisProps[propName] !== nextProps[propName]) {
+        if (thisInstance.props[propName] !== nextProps[propName]) {
             console.log(propName);
             return true;
         } 
     }
 
     for (let stateName in nextState) {
-        if (thisState[stateName] !== nextState[stateName]) {
+        if (thisInstance.state[stateName] !== nextState[stateName]) {
             console.log(stateName);
             return true;
         } 
     }
 
     return false;
+}
+
+/**
+ * Gets a color that contrasts well with the input color.  Useful for determining font color for a given background
+ * color.  If parsing fails for the input color, returns black.
+ * 
+ * Credit goes to https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
+ * 
+ * @param {string} color - color for which to find a contrasting color
+ * @return {string} a color that contrasts well with the input color
+ */
+export function getContrastingColor(color) {
+    const parsedColor = parseColor(color);
+    if (!parsedColor.rgb) {
+        return "black";
+    }
+    const [r, g, b] = parsedColor.rgb;
+    const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    if (brightness < 0.5) {
+        return "white";
+    } else {
+        return "black";
+    }
 }
 
 /**

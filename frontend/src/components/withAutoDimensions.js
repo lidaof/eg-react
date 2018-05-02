@@ -1,12 +1,18 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import getComponentName from './getComponentName';
 
 /**
- * A function that returns a component that measures its width and height automatically.  The wrapped component will
- * recieve the values as props.  Note that the parent can override these values.
+ * A function that enhances the input component's class so it measures its width and height automatically.
  * 
- * @param {React.Component} WrappedComponent - Component to wrap
- * @return {React.Component} component that measures its width and height automatically
+ * Consumed props: none
+ * 
+ * Injected props:
+ *   - {number} `width` - measured width
+ *   - {number} `height` - measured height
+ * 
+ * @param {typeof React.Component} WrappedComponent - React Component class to enhance
+ * @return {typeof React.Component} component class that measures its width and height automatically
  * @author Silas Hsu
  */
 function withAutoDimensions(WrappedComponent) {
@@ -52,5 +58,10 @@ function withAutoDimensions(WrappedComponent) {
         }
     }
 }
+
+withAutoDimensions.INJECTED_PROPS = {
+    width: PropTypes.number,
+    height: PropTypes.number,
+};
 
 export default withAutoDimensions;

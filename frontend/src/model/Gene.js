@@ -36,7 +36,7 @@ class Gene extends Feature {
      */
     constructor(refGeneRecord) {
         const locus = new ChromosomeInterval(refGeneRecord.chrom, refGeneRecord.txStart, refGeneRecord.txEnd);
-        super(refGeneRecord.name2, locus, refGeneRecord.strand === "+");
+        super(refGeneRecord.name2, locus, refGeneRecord.strand);
         this.refGeneRecord = refGeneRecord;
         this._translated = null;
         this._utrs = null;
@@ -99,39 +99,37 @@ class Gene extends Feature {
      * @return {Promise<string>} - description of the gene
      */
     async getDescription(genomeName) {
-        const response = await axios.get(`/${genomeName}/refseqDesc/${this.refGeneRecord.name}`);
-        return response.data[0] ? response.data[0].description : "";
+        try {
+            const response = await axios.get(`/${genomeName}/genes/${this.refGeneRecord.name}/description`);
+            return response.data.description || "";
+        } catch (error) {
+            return "";
+        }
     }
 
     /**
-     * Calculates absolute coordinates of the gene body and exons.  Returns shallow copies of this instance for each
-     * location in the navigation context.  The copies will contain additional props `absStart`, `absEnd`,
-     * `absTranslated`, and `absUtrs`.
+     * Gets the absolute locations of exons, given the gene body's location within the navigation context.  The
+     * navigation context location need not cover the entire gene body, but it *must* overlap with it.
      * 
-     * @param {NavigationContext} navContext - context with which to calculate absolute base numbers
-     * @return {Gene[]} shallow copies with additional props containing absolute base numbers
+     * @param {DisplayedRegionModel} navContext - location in navigation context that overlaps this instance
+     * @return {Object} object with keys `absTranslated` and `absUtrs`
      */
-    computeNavContextCoordinates(navContext) {
-        const locusStart = this.getLocus().start;
-        const absLocations = navContext.convertGenomeIntervalToBases(this.getLocus());
-        let results = [];
-        for (let absLocation of absLocations) {
-            let clone = _.clone(this);
-            clone.absStart = absLocation.start;
-            clone.absEnd = absLocation.end;
-
-            const computeInternalInterval = function(interval) {
-                const startDistFromLocus = interval.start - locusStart;
-                const endDistFromLocus = interval.end - locusStart;
-                return absLocation.getOverlap(
-                    new OpenInterval(absLocation.start + startDistFromLocus, absLocation.start + endDistFromLocus)
-                );
-            };
-            clone.absTranslated = clone.translated.map(computeInternalInterval).filter(interval => interval != null);
-            clone.absUtrs = clone.utrs.map(computeInternalInterval).filter(interval => interval != null);
-            results.push(clone);
+    getAbsExons(navContextLocation) {
+        // The absolute location's genome start base.  Directly comparable with exons' base numbers.
+        const navContext = navContextLocation.getNavigationContext();
+        const absLocation = navContextLocation.getAbsoluteRegion();
+        const absLocationGenomeBase = navContext
+            .convertBaseToFeatureCoordinate(absLocation.start)
+            .getGenomeCoordinates().start;
+        const computeExonInterval = function(exon) {
+            const distFromAbsLocation = exon.start - absLocationGenomeBase;
+            const start = absLocation.start + distFromAbsLocation;
+            return absLocation.getOverlap( new OpenInterval(start, start + exon.getLength()) );
         }
-        return results;
+        return {
+            absTranslated: this.translated.map(computeExonInterval).filter(interval => interval != null),
+            absUtrs: this.utrs.map(computeExonInterval).filter(interval => interval != null)
+        };
     }
 }
 

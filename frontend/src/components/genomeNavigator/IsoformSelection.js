@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import axios from 'axios';
 
 import StandaloneGeneAnnotation from './StandaloneGeneAnnotation';
@@ -51,8 +50,12 @@ class IsoformSelection extends React.PureComponent {
     }
 
     async getSuggestions(geneName) {
-        const genomeConfig = this.props.genomeConfig;
-        const response = await axios.get(`/${genomeConfig.genome.getName()}/refGene/${geneName}`);
+        const genomeName = this.props.genomeConfig.genome.getName();
+        const params = {
+            q: geneName,
+            isExact: true
+        };
+        const response = await axios.get(`/${genomeName}/genes/queryName`, {params: params});
         const genes = response.data.map(record => new Gene(record));
         this.setState({isLoading: false, genes: genes});
     }
@@ -67,28 +70,31 @@ class IsoformSelection extends React.PureComponent {
 
     renderSuggestions() {
         const navContext = this.props.genomeConfig.navContext;
-        const genes = _.flatMap(this.state.genes, gene => gene.computeNavContextCoordinates(navContext));
-        const leftmostStart = Math.min(...genes.map(gene => gene.absStart));
-        const rightmostEnd = Math.max(...genes.map(gene => gene.absEnd));
+        const absLocations = this.state.genes.map(gene => gene.computeNavContextCoordinates(navContext)[0]);
+        const leftmostStart = Math.min(...absLocations.map(location => location.start));
+        const rightmostEnd = Math.max(...absLocations.map(location => location.end));
         const viewRegion = new DisplayedRegionModel(navContext, leftmostStart, rightmostEnd);
         const drawModel = new LinearDrawingModel(viewRegion, DRAW_WIDTH);
 
-        const renderOneSuggestion = gene => (
+        const renderOneSuggestion = (gene, i) => {
+            const location = new DisplayedRegionModel(navContext, ...absLocations[i]);
+            return (
             <tr
                 key={gene.refGeneRecord._id}
                 className="IsoformSelection-item"
                 onClick={() => this.props.onGeneSelected(gene)}
             >
                 <td>{gene.getLocus().toString()}</td>
-                <td><StandaloneGeneAnnotation gene={gene} drawModel={drawModel} /></td>
+                <td><StandaloneGeneAnnotation gene={gene} navContextLocation={location} drawModel={drawModel} /></td>
                 <td className="IsoformSelection-description"><GeneDescription gene={gene} /></td>
             </tr>
-        );
+            );
+        };
 
         return (
         <table className="IsoformSelection">
             <tbody>
-                {genes.map(renderOneSuggestion)}
+                {this.state.genes.map(renderOneSuggestion)}
             </tbody>
         </table>
         );
