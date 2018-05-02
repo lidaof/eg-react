@@ -78,6 +78,7 @@ class CanvasDesignRenderer extends React.PureComponent {
             switch (element.type) {
                 case 'rect':
                     context.fillStyle = props.fill;
+                    context.globalAlpha = props.fillOpacity || 1;
                     context.fillRect(props.x, props.y, props.width, props.height);
                     break;
                 default:

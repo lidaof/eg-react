@@ -7,6 +7,8 @@ import BarPlot from './BarPlot';
 import TrackLegend from './TrackLegend';
 import GenomicCoordinates from './GenomicCoordinates';
 import configDataProcessing from './configDataProcessing';
+
+import { NumericalDisplayModeConfig } from '../contextMenu/DisplayModeConfig';
 import HeightConfig from '../contextMenu/HeightConfig';
 import {PrimaryColorConfig, BackgroundColorConfig} from '../contextMenu/ColorConfig';
 
@@ -16,7 +18,25 @@ import BarRecord from '../../../model/BarRecord';
 import { NumericalDisplayModes } from '../../../model/DisplayModes';
 
 const TOP_PADDING = 5;
+const AUTO_HEATMAP_THRESHOLD = 20; // If pixel height is less than this, automatically use heatmap
 const withDataProcessing = configDataProcessing(new NumericalFeatureProcessor());
+
+/**
+ * Gets the effective display mode of numerical track, taking into account the AUTO and unknown modes.
+ * 
+ * @param {string} mode - display mode from options object
+ * @param {number} height - height of the track
+ * @return {string} the effective display mode of the numerical track
+ */
+function getEffectiveDisplayMode(mode, height) {
+    if (mode === NumericalDisplayModes.BAR || mode === NumericalDisplayModes.HEATMAP) {
+        return mode;
+    } else if (height < AUTO_HEATMAP_THRESHOLD) {
+        return NumericalDisplayModes.HEATMAP;
+    } else {
+        return NumericalDisplayModes.BAR;
+    }
+}
 
 /**
  * Track specialized in showing numerical data.
@@ -74,14 +94,18 @@ class NumericalTrack extends React.Component {
         const {data, options} = nextProps;
         const {min, max} = data;
         return {
-            valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, options.height])
+            effectiveDisplayMode: getEffectiveDisplayMode(options.displayMode, options.height),
+            valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, options.height]),
+            valueToOpacity: scaleLinear().domain([min, max]).range([0, 1]),
         };
     }
 
     constructor(props) {
         super(props);
         this.state = {
-            valueToY: null
+            effectiveDisplayMode: NumericalDisplayModes.BAR,
+            valueToY: null,
+            valueToOpacity: null,
         };
         this.renderBarElement = this.renderBarElement.bind(this);
         this.renderDefaultTooltip = this.renderDefaultTooltip.bind(this);
@@ -95,15 +119,21 @@ class NumericalTrack extends React.Component {
      * @return {JSX.Element} bar element to render
      */
     renderDefaultBarElement(record) {
-        const {height, color} = this.props.options;
-        const y = this.state.valueToY(record.value);
-        const drawHeight = height - y;
-        if (drawHeight <= 0) {
-            return null;
-        }
+        const {data, height, color} = this.props.options;
         const x = record.xLocation.start;
         const width = record.xLocation.getLength();
-        return <rect key={x} x={x} y={y} width={width} height={drawHeight} fill={color} />;
+        if (this.state.effectiveDisplayMode === NumericalDisplayModes.HEATMAP) {
+            const drawHeight = height;
+            const opacity = this.state.valueToOpacity(record.value);
+            return <rect key={x} x={x} y={0} width={width} height={drawHeight} fill={color} fillOpacity={opacity} />;
+        } else { // Assume BAR
+            const y = this.state.valueToY(record.value);
+            const drawHeight = height - y;
+            if (drawHeight <= 0) {
+                return null;
+            }
+            return <rect key={x} x={x} y={y} width={width} height={drawHeight} fill={color} />;
+        }
     }
 
     /**
@@ -156,7 +186,8 @@ class NumericalTrack extends React.Component {
             width={width}
             height={options.height}
             htmlType={RenderTypes.CANVAS}
-            color={options.color} // It doesn't use the color prop, but we pass it to cue rerenders.
+            color={options.color} // Doesn't use this prop, but we pass it to cue rerenders.
+            displayMode={this.state.effectiveDisplayMode} // Doesn't use this prop, but we pass it to cue rerenders.
             getBarElement={this.renderBarElement}
             getTooltipContents={getTooltipContents || this.renderDefaultTooltip}
         />;
@@ -167,7 +198,7 @@ class NumericalTrack extends React.Component {
         const legend = <TrackLegend
             trackModel={trackModel}
             height={options.height}
-            axisScale={this.state.valueToY}
+            axisScale={this.state.effectiveDisplayMode === NumericalDisplayModes.BAR ? this.state.valueToY : undefined}
             axisLegend={unit}
         />;
         return <Track
@@ -178,6 +209,7 @@ class NumericalTrack extends React.Component {
     }
 }
 
-export const SUGGESTED_MENU_ITEMS = [HeightConfig, PrimaryColorConfig, BackgroundColorConfig]
+export const SUGGESTED_MENU_ITEMS = [NumericalDisplayModeConfig, HeightConfig, PrimaryColorConfig,
+    BackgroundColorConfig];
 
 export default withDataProcessing(NumericalTrack);
