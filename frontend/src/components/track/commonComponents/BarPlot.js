@@ -62,7 +62,7 @@ class BarPlot extends React.PureComponent {
      * @return {JSX.Element}
      */
     getTooltipContents(relativeX) {
-        const records = this.props.data[relativeX] || [];
+        const records = this.props.data[Math.round(relativeX)] || [];
         return this.props.getTooltipContents(relativeX, records);
     }
 

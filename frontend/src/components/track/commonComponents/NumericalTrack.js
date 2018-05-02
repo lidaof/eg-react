@@ -119,7 +119,7 @@ class NumericalTrack extends React.Component {
      * @return {JSX.Element} bar element to render
      */
     renderDefaultBarElement(record) {
-        const {data, height, color} = this.props.options;
+        const {height, color} = this.props.options;
         const x = record.xLocation.start;
         const width = record.xLocation.getLength();
         if (this.state.effectiveDisplayMode === NumericalDisplayModes.HEATMAP) {
