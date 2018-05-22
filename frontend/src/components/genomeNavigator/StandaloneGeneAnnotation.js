@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import GeneAnnotation from '../track/geneAnnotationTrack/GeneAnnotation';
+import GeneAnnotation from '../trackVis/geneAnnotationTrack/GeneAnnotation';
 import Gene from '../../model/Gene';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';

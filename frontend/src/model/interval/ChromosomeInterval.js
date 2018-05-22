@@ -72,11 +72,11 @@ class ChromosomeInterval {
     }
 
     serialize() {
-        return [this.chr, this.start, this.end];
+        return this;
     }
 
-    static deserialize(array) {
-        return new ChromosomeInterval(...array);
+    static deserialize(object) {
+        return new ChromosomeInterval(object.chr, object.start, object.end);
     }
 
     *[Symbol.iterator] () {

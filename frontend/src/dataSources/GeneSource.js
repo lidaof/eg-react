@@ -24,7 +24,7 @@ class GeneSource extends DataSource {
     /**
      * @inheritdoc
      */
-    async getData(region, options) {
+    async getData(region) {
         if (!this.genomeName) {
             return [];
         }

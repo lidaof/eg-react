@@ -36,7 +36,7 @@ const defaultTracks = [
     new TrackModel({
         type: "bigwig",
         name: "GSM429321.bigWig",
-        url: "http://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig",
+        url: "https://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig",
     }),
     new TrackModel({
         type: "geneAnnotation",
@@ -46,12 +46,12 @@ const defaultTracks = [
     new TrackModel({
         type: "bed",
         name: "testbed",
-        url: "http://vizhub.wustl.edu/hubSample/hg19/bed.gz",
+        url: "https://vizhub.wustl.edu/hubSample/hg19/bed.gz",
     }),
     new TrackModel({
         type: "repeatmasker",
         name: "RepeatMasker",
-        url: "http://vizhub.wustl.edu/public/hg19/rmsk16.bb"
+        url: "https://vizhub.wustl.edu/public/hg19/rmsk16.bb"
     }),
     new TrackModel({
         type: "ruler",
@@ -65,7 +65,7 @@ const HG19 = {
     cytobands: cytobands,
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
-    twoBitURL: "http://vizhub.wustl.edu/public/hg19/hg19.2bit",
+    twoBitURL: "https://vizhub.wustl.edu/public/hg19/hg19.2bit",
 };
 
 export default HG19;

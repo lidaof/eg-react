@@ -61,7 +61,7 @@ export function getPageCoordinates(relativeTo, relativeX, relativeY) {
  * @param {Object} nextState - next state component will receive
  * @return {boolean} whether component should update, according to React.PureComponent
  */
-export function debugShouldComponentUpdate(thisInstance, nextProps, nextState) {
+export function debugShouldComponentUpdate(thisInstance, nextProps, nextState={}) {
     for (let propName in nextProps) {
         if (thisInstance.props[propName] !== nextProps[propName]) {
             console.log(propName);

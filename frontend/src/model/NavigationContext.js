@@ -162,10 +162,10 @@ class NavigationContext {
      */
     convertGenomeIntervalToBases(chrInterval) {
         if (this._isGenome) {
-            return new OpenInterval(
+            return [new OpenInterval(
                 this.convertFeatureCoordinateToBase(chrInterval.chr, chrInterval.start),
                 this.convertFeatureCoordinateToBase(chrInterval.chr, chrInterval.end),
-            );
+            )];
         }
         const potentialOverlaps = this._chrToFeatures[chrInterval.chr] || [];
         let absLocations = [];
