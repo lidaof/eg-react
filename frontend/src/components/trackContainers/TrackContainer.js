@@ -8,8 +8,9 @@ import TrackHandle from './TrackHandle';
 import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
-import ZoomOutTrackContainer from './ZoomOutTrackContainer';
 import MetadataHeader from './MetadataHeader';
+import { Tools, ToolButtons } from './Tools';
+import ZoomButtons from './ZoomButtons';
 
 import TrackLegend from '../trackVis/commonComponents/TrackLegend';
 import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
@@ -22,81 +23,13 @@ import withAutoDimensions from '../withAutoDimensions';
 import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import RegionExpander from '../../model/RegionExpander';
+import TrackSelectionBehavior from '../../model/TrackSelectionBehavior';
 
-const Tools = {
-    DRAG: {
-        buttonContent: "✋",
-        title: "Drag tool",
-        cursor: "pointer",
-    },
-    REORDER: {
-        buttonContent: "🔀",
-        title: "Reorder tool",
-        cursor: "all-scroll",
-    },
-    ZOOM_IN: {
-        buttonContent: "⬚🔍+",
-        title: "Zoom-in tool",
-        cursor: "zoom-in",
-    },
-    ZOOM_OUT: {
-        buttonContent: "🔍-",
-        title: "Zoom-out tool",
-        cursor: "zoom-out",
-    }
-};
 const DEFAULT_CURSOR = "crosshair";
 const REGION_EXPANDER = new RegionExpander(1);
 // Simple caching for the calculateExpansion computation
 REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
-
-///////////////////////////
-// Track selection utils //
-///////////////////////////
-/**
- * @param {MouseEvent} event - mouse event to inspect
- * @return {boolean} whether the input event is one that requests a selection toggle
- */
-function isToggleSelect(event) {
-    return event.shiftKey;
-}
-
-/**
- * Toggles the selection status of one track in an array.  Does not mutate the track; instead, the track is
- * completely replaced.
- * 
- * @param {TrackModel[]} tracks - track array to modify
- * @param {number} index - index to toggle selection status
- */
-function toggleOneTrack(tracks, index) {
-    tracks[index] = tracks[index].clone();
-    tracks[index].isSelected = !tracks[index].isSelected;
-}
-
-/**
- * Ensures a range of tracks in the input track array has the selection status of `selectionStatus`.  An open
- * interval of indices `[startIndex, endIndex)` specifies the range.  Does not mutate any tracks; instead, tracks
- * that need modification get completely replaced.
- * 
- * @param {TrackModel[]} tracks - track array to modify
- * @param {boolean} selectionStatus - selection status of tracks to guarantee
- * @param {number} [startIndex] - inclusive index to begin modification.  Default is 0.
- * @param {number} [endIndex] - exclusive index to stop modification.  Default is the length of the array.
- */
-function changeTrackSelection(tracks, selectionStatus, startIndex=0, endIndex) {
-    if (!endIndex) {
-        endIndex = tracks.length;
-    }
-
-    for (let i = startIndex; i < endIndex; i++) {
-        const track = tracks[i];
-        if (track.isSelected !== selectionStatus) {
-            let clone = track.clone();
-            clone.isSelected = selectionStatus;
-            tracks[i] = clone;
-        }
-    }
-}
+const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 
 /////////////////////////
 // connect() functions //
@@ -160,7 +93,7 @@ class TrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedTool: {},
+            selectedTool: null,
             visualizerInfo: {
                 width: 0,
                 viewRegion: null,
@@ -183,98 +116,98 @@ class TrackContainer extends React.Component {
      */
     toggleTool(tool) {
         if (this.state.selectedTool === tool) {
-            this.setState({selectedTool: {}});
+            this.setState({selectedTool: null});
         } else {
             this.setState({selectedTool: tool});
         }
     }
 
     /**
-     * Toggles the selection of a track, if the click event calls for it.
      * 
-     * @param {MouseEvent} event - click event
-     * @param {number} index - index of the track for which to toggle selection
+     * @param {boolean[]} newSelections 
      */
-    handleTrackClicked(event, index) {
-        if (isToggleSelect(event)) {
-            const nextTracks = this.props.tracks.slice();
-            toggleOneTrack(nextTracks, index);
+    changeTrackSelection(newSelections) {
+        if (!newSelections) {
+            return;
+        }
+        const tracks = this.props.tracks;
+        if (tracks.length !== newSelections.length) {
+            console.error("Trying to apply new track selection status that is not the same length of existing tracks.");
+            console.error(newSelections);
+        }
+
+        let wasTrackChanged = false;
+        const nextTracks = tracks.map((track, i) => {
+            if (track.isSelected !== newSelections[i]) {
+                const clone = track.clone();
+                clone.isSelected = newSelections[i];
+                wasTrackChanged = true;
+                return clone;
+            } else {
+                return track;
+            }
+        });
+
+        if (wasTrackChanged) {
             this.props.onTracksChanged(nextTracks);
         }
     }
 
     /**
-     * When a metadata indicator is clicked, selects or deselects a range of tracks that have the same metadata.
+     * Handles selection behavior when a track is clicked.
      * 
      * @param {MouseEvent} event - click event
-     * @param {string} term - the metadata term to read
-     * @param {number} index - index of the track where the click event originated
+     * @param {number} index - index of the clicked track
      */
-    handleMetadataClicked(event, term, index) {
-        const tracks = this.props.tracks;
-        const termValue = tracks[index].getMetadata(term);
-        // Find all adjacent tracks that have the same term value.  The result interval is [minIndex, maxIndex).
-        // 1.  Find matching tracks before the clicked track
-        let minIndex = index - 1;
-        while (minIndex >= 0 && tracks[minIndex].getMetadata(term) === termValue) {
-            minIndex--;
-        }
-        minIndex++;
-
-        // 2.  Find matching tracks after the clicked track
-        let maxIndex = index + 1;
-        while (maxIndex < tracks.length && tracks[maxIndex].getMetadata(term) === termValue) {
-            maxIndex++;
-        }
-
-        // Handle track selection
-        const nextTracks = tracks.slice();
-        if (isToggleSelect(event)) {
-            const isAlreadyAllSelected = tracks.slice(minIndex, maxIndex).every(track => track.isSelected);
-            if (isAlreadyAllSelected) { // All selected?  Deselect the block.
-                changeTrackSelection(nextTracks, false, minIndex, maxIndex);
-            } else { // Some, or none selected?  Select the block.
-                changeTrackSelection(nextTracks, true, minIndex, maxIndex);
-            }
-        } else { // Event not a toggle-selection one: deselect the others
-            changeTrackSelection(nextTracks, false, 0, minIndex);
-            changeTrackSelection(nextTracks, true, minIndex, maxIndex);
-            changeTrackSelection(nextTracks, false, maxIndex);
-        }
-        this.props.onTracksChanged(nextTracks);
+    handleTrackClicked(event, index) {
+        this.changeTrackSelection(SELECTION_BEHAVIOR.handleClick(this.props.tracks, index, event));
     }
 
     /**
-     * If the clicked track is not selected, selects it and deselects all others.
+     * Handles selection behavior when a track's context menu is opened.
      * 
      * @param {MouseEvent} event - context menu event.  Unused.
      * @param {number} index - index of the track where the context menu event originated
      */
     handleContextMenu(event, index) {
-        if (!this.props.tracks[index].isSelected) {
-            // If the track is not selected, select it and deselect the others.
-            const nextTracks = this.props.tracks.slice();
-            changeTrackSelection(nextTracks, false);
-            toggleOneTrack(nextTracks, index);
-            this.props.onTracksChanged(nextTracks);
-        }
+        this.changeTrackSelection(SELECTION_BEHAVIOR.handleContextMenu(this.props.tracks, index));
     }
 
     /**
-     * Deselects all tracks.
+     * Handles selection behavior when a track's metadata indicator is clicked.
+     * 
+     * @param {MouseEvent} event - click event
+     * @param {string} term - the metadata term that was clicked
+     * @param {number} index - index of the clicked track
+     */
+    handleMetadataClicked(event, term, index) {
+        this.changeTrackSelection(SELECTION_BEHAVIOR.handleMetadataClick(this.props.tracks, index, term, event));
+    }
+
+    /**
+     * Requests deselection of all tracks.
      */
     deselectAllTracks() {
-        if (this.props.tracks.some(track => track.isSelected)) {
-            const nextTracks = this.props.tracks.slice();
-            changeTrackSelection(nextTracks, false);
-            this.props.onTracksChanged(nextTracks);
-        }
+        this.changeTrackSelection(Array(this.props.tracks.length).fill(false));
     }
 
     // End callback methods
     ////////////////////
     // Render methods //
     ////////////////////
+    /**
+     * @return {JSX.Element}
+     */
+    renderControls() {
+        const {viewRegion, onNewRegion, metadataTerms, onMetadataTermsChanged} = this.props;
+        return <div style={{display: "flex", alignItems: "flex-end"}} >
+            <div>
+                <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} />
+                <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} />
+            </div>
+            <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
+        </div>;
+    }
 
     /**
      * @return {JSX.Element[]} track elements to render
@@ -301,28 +234,6 @@ class TrackContainer extends React.Component {
      */
     getVisualizationWidth() {
         return this.state.visualizerInfo.viewWindow.getLength();
-    }
-
-    /**
-     * @return {JSX.Element[]} buttons that select the tool to use
-     */
-    renderToolSelectButtons() {
-        let buttons = [];
-        for (let toolName in Tools) {
-            const tool = Tools[toolName];
-            const className = tool === this.state.selectedTool ? "btn btn-primary" : "btn btn-light";
-            buttons.push(
-                <button
-                    key={toolName}
-                    className={className}
-                    title={tool.title}
-                    onClick={() => this.toggleTool(tool)}
-                >
-                    {tool.buttonContent}
-                </button>
-            );
-        }
-        return buttons;
     }
 
     /**
@@ -355,12 +266,6 @@ class TrackContainer extends React.Component {
                     viewRegion={viewRegion}
                     onNewRegion={onNewRegion}
                 />;
-            case Tools.ZOOM_OUT:
-                return <ZoomOutTrackContainer
-                    trackElements={trackElements}
-                    viewRegion={viewRegion}
-                    onNewRegion={onNewRegion}
-                />;
             default:
                 return trackElements;
         }
@@ -370,17 +275,15 @@ class TrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {tracks, metadataTerms, onTracksChanged, onMetadataTermsChanged} = this.props;
+        const {tracks, onTracksChanged} = this.props;
+        const selectedTool = this.state.selectedTool;
         const contextMenu = <TrackContextMenu tracks={tracks} onTracksChanged={onTracksChanged} />;
-        const trackDivStyle = {border: "1px solid black", cursor: this.state.selectedTool.cursor || DEFAULT_CURSOR};
+        const trackDivStyle = {border: "1px solid black", cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR};
 
         return (
         <OutsideClickDetector onOutsideClick={this.deselectAllTracks} style={{margin: 5}} >
-            <div style={{display: "flex", alignItems: "flex-end"}} >
-                {this.renderToolSelectButtons()}
-                <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
-            </div>
-            <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !isToggleSelect(event)} >
+            {this.renderControls()}
+            <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
                 <DivWithBullseye style={trackDivStyle}>
                     {this.renderSubContainer()}
                 </DivWithBullseye>
