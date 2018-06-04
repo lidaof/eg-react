@@ -9,6 +9,8 @@ import OpenInterval from '../../../model/interval/OpenInterval';
 
 import './Track.css';
 
+const ERROR_COLOR = "pink";
+
 /**
  * Displays track legends, visualizers, and metadata bars more-or-less consistently.
  * 
@@ -53,6 +55,7 @@ class Track extends React.Component {
         // Track containers do not provide the following.  Track subtypes must provide them.
         legend: PropTypes.node.isRequired, // Track legend to render
         visualizer: PropTypes.node.isRequired, // Track visualizer to render
+        message: PropTypes.node, // Track messages, notifications, etc. to display
 
         // `isLoading` and `error` can be provided by the configDataFetch HOC.
         isLoading: PropTypes.bool, // If true, applies loading styling
@@ -104,11 +107,11 @@ class Track extends React.Component {
     render() {
         const {
             trackModel, width, viewWindow, metadataTerms, xOffset, // Track container props
-            legend, visualizer, isLoading, error, options, // Track subtype props
+            legend, visualizer, message, isLoading, error, options, // Track subtype props
         } = this.props;
         return (
         <div
-            style={{backgroundColor: error ? "pink" : undefined}}
+            style={{backgroundColor: error ? ERROR_COLOR : undefined}}
             className={trackModel.isSelected ? "Track Track-selected-border" : "Track"}
             onContextMenu={this.handleContextMenu}
             onClick={this.handleClick}
@@ -122,8 +125,9 @@ class Track extends React.Component {
                     xOffset={xOffset}
                 >
                     {visualizer}
-                    {error && <ErrorMessage width={width} />}
                 </ViewWindow>
+                {message}
+                {error && <ErrorMessage />}
             </div>
             <MetadataIndicator track={trackModel} terms={metadataTerms} onClick={this.handleMetadataClick} />
         </div>
@@ -145,7 +149,7 @@ function TrackLoadingNotice(props) {
 
 function ErrorMessage(props) {
     const message = "⚠️ Data fetch failed.  Reload page or change view to retry.";
-    return <TrackMessage width={props.width} message={message} style={{backgroundColor: "pink"}} />;
+    return <TrackMessage message={message} style={{backgroundColor: ERROR_COLOR}} />;
 }
 
 /**

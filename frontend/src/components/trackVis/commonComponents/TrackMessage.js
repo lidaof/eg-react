@@ -16,12 +16,11 @@ export function HiddenItemsMessage(props) {
 
     const itemOrItems = props.numHidden === 1 ? "item" : "items";
     const message = `${props.numHidden} ${itemOrItems} too small - zoom in to view.`;
-    return <TrackMessage width={props.width} message={message} />;
+    return <TrackMessage message={message} />;
 }
 
 export class TrackMessage extends React.PureComponent {
     static propTypes = {
-        width: PropTypes.number.isRequired,
         message: PropTypes.string,
         style: PropTypes.object,
     };
@@ -43,11 +42,11 @@ export class TrackMessage extends React.PureComponent {
     }
 
     render() {
-        const {width, message, style} = this.props;
+        const {message, style} = this.props;
         if (!message || !this.state.isShowing) {
             return null;
         }
-        return <div className="Track-message" style={{width: width, ...style}} >
+        return <div className="Track-message" style={style} >
             <span style={{marginRight: 5}}> {message}</span>
             <span className="btn btn-link Track-message" onClick={() => this.setState({isShowing: false})} >
                 (Dismiss)
