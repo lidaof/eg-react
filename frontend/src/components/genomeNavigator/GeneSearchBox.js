@@ -92,9 +92,12 @@ class GeneSearchBox extends React.PureComponent {
      */
     setViewToGene(gene) {
         const interval = this.props.navContext.convertGenomeIntervalToBases(gene.getLocus())[0];
-        if (interval) { // TODO message that says "not available in this (gene set view?) context"
+        if (interval) {
             this.props.onRegionSelected(...interval);
+        } else {
+            alert("Gene not available in current region set view"); // TODO better message
         }
+        this.setState({isShowingIsoforms: false});
     }
 
     render() {
