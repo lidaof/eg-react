@@ -4,7 +4,7 @@ import memoizeOne from 'memoize-one';
 
 import Track from '../Track';
 import TrackLegend from '../TrackLegend';
-import HiddenItemsMessage from '../HiddenItemsMessage';
+import { HiddenItemsMessage } from '../TrackMessage';
 
 import IntervalArranger from '../../../../model/interval/IntervalArranger';
 import FeatureArranger from '../../../../model/FeatureArranger';
@@ -61,7 +61,10 @@ class FullDisplayMode extends React.Component {
 
     getHeight(numRows) {
         const {rowHeight, options} = this.props;
-        const rowsToDraw = Math.min(numRows, options.maxRows);
+        let rowsToDraw = Math.min(numRows, options.maxRows);
+        if (rowsToDraw < 1) {
+            rowsToDraw = 1;
+        }
         return rowsToDraw * rowHeight + TOP_PADDING;
     }
 

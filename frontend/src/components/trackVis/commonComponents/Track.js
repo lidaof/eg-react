@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import TrackLoadingNotice from './TrackLoadingNotice';
 import MetadataIndicator from './MetadataIndicator';
+import TrackMessage from './TrackMessage';
 
 import TrackModel from '../../../model/TrackModel';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
@@ -109,25 +108,44 @@ class Track extends React.Component {
         } = this.props;
         return (
         <div
-            style={{backgroundColor: error ? "pink" : "white"}}
+            style={{backgroundColor: error ? "pink" : undefined}}
             className={trackModel.isSelected ? "Track Track-selected-border" : "Track"}
             onContextMenu={this.handleContextMenu}
             onClick={this.handleClick}
         >
-            {isLoading ? <TrackLoadingNotice /> : null}
             {legend}
-            <ViewWindow
-                viewWindow={viewWindow}
-                fullWidth={width}
-                xOffset={xOffset}
-                style={{backgroundColor: options.backgroundColor}}
-            >
-                {visualizer}
-            </ViewWindow>
+            <div style={{backgroundColor: options.backgroundColor, overflowX: "hidden"}}>
+                {isLoading && <TrackLoadingNotice />}
+                <ViewWindow
+                    viewWindow={viewWindow}
+                    fullWidth={width}
+                    xOffset={xOffset}
+                >
+                    {visualizer}
+                    {error && <ErrorMessage width={width} />}
+                </ViewWindow>
+            </div>
             <MetadataIndicator track={trackModel} terms={metadataTerms} onClick={this.handleMetadataClick} />
         </div>
         );
     }
+}
+
+/**
+ * A notice that a track is loading data.
+ * 
+ * @param {Object} props - props as specified by React
+ * @return {JSX.Element}
+ */
+function TrackLoadingNotice(props) {
+    return <div className="Track-loading-notice">
+        <img className="img-fluid" alt="Loading..." src="img/loading-small.gif" />
+    </div>;
+}
+
+function ErrorMessage(props) {
+    const message = "⚠️ Data fetch failed.  Reload page or change view to retry.";
+    return <TrackMessage width={props.width} message={message} style={{backgroundColor: "pink"}} />;
 }
 
 /**
@@ -138,7 +156,7 @@ class Track extends React.Component {
  * @return {JSX.Element} element to render
  */
 function ViewWindow(props) {
-    const {viewWindow, fullWidth, style, children} = props;
+    const {viewWindow, fullWidth, children} = props;
     const xOffset = props.xOffset || 0;
     let left = 0;
     if (xOffset > 0) {
@@ -150,10 +168,10 @@ function ViewWindow(props) {
         left = Math.max(-numPixelsOnRight, xOffset);
     }
 
-    const outerStyle = Object.assign({}, style, {
+    const outerStyle = {
         overflowX: "hidden",
         width: viewWindow.getLength(),
-    });
+    };
 
     const innerStyle = {
         position: "relative",

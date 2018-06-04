@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { Manager, Target, Popper, Arrow } from 'react-popper';
 import OutsideClickDetector from '../../../OutsideClickDetector';
 
+import './Tooltip.css';
+
 const BACKGROUND_COLOR = "rgba(173, 216, 230, 0.9)"; // lightblue with opacity adjustment
 const ARROW_SIZE = 15;
 const ARROW_STYLE = { // This is for a upwards-pointing arrow; other directions will require more code.
@@ -66,9 +68,6 @@ class Tooltip extends React.PureComponent {
         }
         const {pageX, pageY, onClose, ignoreMouse, style, children} = this.props;
         const contentStyle = Object.assign({
-            zIndex: 1,
-            borderRadius: 5,
-            backgroundColor: BACKGROUND_COLOR,
             marginTop: ARROW_SIZE,
             pointerEvents: ignoreMouse ? "none" : "auto"
         }, style);
@@ -81,7 +80,7 @@ class Tooltip extends React.PureComponent {
         return ReactDOM.createPortal(
             <Manager>
                 <Target style={{position: "absolute", left: pageX, top: pageY}} />
-                <Popper placement="bottom-start" style={contentStyle} onMouseDown={stopEvent} >
+                <Popper placement="bottom-start" className="Tooltip-body" style={contentStyle} onMouseDown={stopEvent} >
                     <OutsideClickDetector onOutsideClick={onClose} >
                         {children}
                     </OutsideClickDetector>
