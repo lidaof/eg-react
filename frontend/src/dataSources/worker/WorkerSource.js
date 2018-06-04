@@ -45,16 +45,16 @@ class WorkerSource extends DataSource {
      * objects lose their prototypes when transferred from worker context.
      * 
      * @param {DisplayedRegionModel} region - region for which to fetch data
-     * @param {number} pixelsPerBase - pixels per base, or resolution of the data
+     * @param {number} basesPerPixel - bases per pixel.  Higher = more zoomed out
      * @param {Object} options - rendering options
      * @return {Promise<any>} promise for data
      * @override
      */
-    getData(region, pixelsPerBase, options={}) {
+    getData(region, basesPerPixel, options={}) {
         if (!this.messageWriter) {
             throw new Error("Cannot get data after cleanUp()");
         }
-        return this.messageWriter.sendGetDataMessage(region, pixelsPerBase, options);
+        return this.messageWriter.sendGetDataMessage(region, basesPerPixel, options);
     }
 }
 

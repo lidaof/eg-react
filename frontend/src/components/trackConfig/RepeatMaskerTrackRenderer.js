@@ -4,11 +4,10 @@ import { configStaticDataSource } from './configDataFetch';
 import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import { AnnotationDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';
 import HeightConfig from '../trackContextMenu/HeightConfig';
-import RepeatMaskerTrack, { DEFAULT_OPTIONS } from '../trackVis/RepeatMaskerTrack';
+import RepeatMaskerTrack, { DEFAULT_OPTIONS, MAX_BASES_PER_PIXEL } from '../trackVis/RepeatMaskerTrack';
 
-import BigWorker from '../../dataSources/big/Big.worker';
-import WorkerSource from '../../dataSources/worker/WorkerSource';
 import RepeatMaskerFeature from '../../model/RepeatMaskerFeature';
+import RepeatSource from '../../dataSources/RepeatSource';
 
 /**
  * Converter of DASFeatures to RepeatMaskerFeatures.
@@ -20,7 +19,7 @@ function formatDasFeatures(data) {
     return data.map(feature => new RepeatMaskerFeature(feature))
 }
 const withDataFetch = configStaticDataSource(
-    props => new WorkerSource(BigWorker, props.trackModel.url), formatDasFeatures
+    props => new RepeatSource(props.trackModel.url, MAX_BASES_PER_PIXEL), formatDasFeatures
 );
 const TrackWithData = withDataFetch(RepeatMaskerTrack);
 

@@ -20,14 +20,14 @@ export class MessageWriter {
         return this.clientIdPromise;
     }
 
-    async sendGetDataMessage(region, pixelsPerBase, options) {
+    async sendGetDataMessage(region, basesPerPixel, options) {
         const clientId = await this.clientIdPromise;
         const loci = region.getGenomeIntervals().map(locus => locus.serialize());
         return this.worker.postMessage({
             action: Actions.RUN,
             clientId: clientId,
             loci: loci,
-            pixelsPerBase: pixelsPerBase,
+            basesPerPixel: basesPerPixel,
             options: options,
         });
     }
@@ -48,7 +48,7 @@ export class MessageReader {
                 return manager.initSource(message.args);
             case Actions.RUN:
                 const loci = message.loci.map(ChromosomeInterval.deserialize);
-                return manager.runSource(message.clientId, [loci, message.pixelsPerBase, message.options]);
+                return manager.runSource(message.clientId, [loci, message.basesPerPixel, message.options]);
             case Actions.DELETE:
                 return manager.removeSource(message.clientId);
             default:
