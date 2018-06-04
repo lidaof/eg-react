@@ -11,9 +11,8 @@ import ZoomableTrackContainer from './ZoomableTrackContainer';
 import ZoomOutTrackContainer from './ZoomOutTrackContainer';
 import MetadataHeader from './MetadataHeader';
 
-import TrackLegend from '../track/commonComponents/TrackLegend';
-import TrackContextMenu from '../track/contextMenu/TrackContextMenu';
-import MetadataIndicator from '../track/commonComponents/MetadataIndicator';
+import TrackLegend from '../trackVis/commonComponents/TrackLegend';
+import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
 
 import OutsideClickDetector from '../OutsideClickDetector';
 import ContextMenuManager from '../ContextMenuManager';
@@ -151,12 +150,10 @@ class TrackContainer extends React.Component {
     };
 
     static getDerivedStateFromProps(nextProps) {
-        const {viewRegion, width, metadataTerms} = nextProps;
-        const visualizationWidth = Math.max(0,
-            width - TrackLegend.WIDTH - metadataTerms.length * MetadataIndicator.WIDTH
-        );
+        const {viewRegion, width} = nextProps;
+        const visualizationWidth = Math.max(0, width - TrackLegend.WIDTH);
         return {
-            visualizerInfo: REGION_EXPANDER.calculateExpansion(visualizationWidth, viewRegion),
+            visualizerInfo: REGION_EXPANDER.calculateExpansion(visualizationWidth, viewRegion)
         };
     }
 
@@ -169,6 +166,7 @@ class TrackContainer extends React.Component {
                 viewRegion: null,
                 viewWindow: null,
             },
+            trackRenderers: []
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -289,6 +287,7 @@ class TrackContainer extends React.Component {
                 trackModel={trackModel}
                 {...this.state.visualizerInfo}
                 metadataTerms={metadataTerms}
+                xOffset={0}
                 index={index}
                 onContextMenu={this.handleContextMenu}
                 onClick={this.handleTrackClicked}
@@ -372,7 +371,7 @@ class TrackContainer extends React.Component {
      */
     render() {
         const {tracks, metadataTerms, onTracksChanged, onMetadataTermsChanged} = this.props;
-        const contextMenu = <TrackContextMenu allTracks={tracks} onTracksChanged={onTracksChanged} />;
+        const contextMenu = <TrackContextMenu tracks={tracks} onTracksChanged={onTracksChanged} />;
         const trackDivStyle = {border: "1px solid black", cursor: this.state.selectedTool.cursor || DEFAULT_CURSOR};
 
         return (

@@ -6,9 +6,10 @@ import ChromosomeInterval from "./interval/ChromosomeInterval";
  * @implements {Serializable}
  * @author Silas Hsu
  */
-class Feature {
+export class Feature {
     /**
-     * Makes a new instance with specified name and locus.  If no name is given, it defaults to the locus as a string.
+     * Makes a new instance with specified name and locus.  Empty names are valid.  If given `undefined` or `null`, it
+     * defaults to the locus as a string.
      * 
      * @param {string} [name] - name of the feature
      * @param {ChromosomeInterval} locus - genomic location of the feature
@@ -82,16 +83,32 @@ class Feature {
     }
 
     /**
-     *
-     * @param {NavigationContext} navContext 
-     * @return {OpenInterval[]} 
+     * Shortcut for navContext.convertGenomeIntervalToBases().  Computes absolute coordinates occupied by this
+     * instance's locus.
+     * 
+     * @param {NavigationContext} navContext - the navigation context for which to compute coordinates
+     * @return {OpenInterval[]} coordinates in the navigation context
      */
     computeNavContextCoordinates(navContext) {
-        const absLocations = navContext.convertGenomeIntervalToBases(this.getLocus());
-        for (let interval of absLocations) {
-            interval.feature = this;
-        }
-        return absLocations;
+        return navContext.convertGenomeIntervalToBases(this.getLocus());
+    }
+}
+
+/**
+ * Everything a Feature is, plus a `value` prop.
+ * 
+ * @author Silas Hsu
+ */
+export class NumericalFeature extends Feature {
+    /**
+     * Sets value and returns this.
+     * 
+     * @param {number} value - value to attach to this instance.
+     * @return {this}
+     */
+    withValue(value) {
+        this.value = value;
+        return this;
     }
 }
 

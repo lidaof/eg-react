@@ -88,3 +88,17 @@ have propagation problems: https://stackoverflow.com/questions/24415631/reactjs-
 using app-unique IDs, but it can cause side effects with React's native events.  Use with care.
 * Webpack does not support circular dependencies, and while compilation may be successful, an import may resolve as
 `undefined` at runtime.
+
+## Lessons trying to refactor into WebWorkers
+1.  Data fetch and track display options are intimately related.  For example, what if someone wants HiC data and
+selects the 5KB resolution option?
+2.  Thus, for each track type, we have one object that gets the track component, default rendering options, and data
+fetch/processing.
+3.  Webpack hangs forever if it encounters a cyclic dependency involving a webworker.
+4.  The code as in (2) causes a cyclic depdendency.  This cycle is [config object] --> [data source] --> [worker] -->
+[track config deserializer] --> [config object]
+5.  We cannot have our cake and eat it too.
+
+  Unfortunately, this means we cannot
+move all expensive computation into one streamlined pipeline in worker context, while also maintaining a structure where
+track component and data source for the component are .  

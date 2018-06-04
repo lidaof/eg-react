@@ -21,57 +21,57 @@ const initialHubs = [
         collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE signal of unique reads",
         numTracks: 7729,
-        url: "http://vizhub.wustl.edu/public/hg19/hg19_mpssur.json"
+        url: "https://vizhub.wustl.edu/public/hg19/hg19_mpssur.json"
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE signal of all reads",
         numTracks: 7842,
-        url: "http://vizhub.wustl.edu/public/hg19/hg19_mpssar.json"
+        url: "https://vizhub.wustl.edu/public/hg19/hg19_mpssar.json"
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE all other types",
         numTracks: 5937,
         description: "Base overlap signal, fold change over control, genome compartments, percentage normalized signal, etc.",
-        url: "http://vizhub.wustl.edu/public/hg19/hg19_other_rmdup.json"
+        url: "https://vizhub.wustl.edu/public/hg19/hg19_other_rmdup.json"
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE legacy hub",
         numTracks: 4251,
-        url: "http://vizhub.wustl.edu/public/hg19/encode.md"
+        url: "https://vizhub.wustl.edu/public/hg19/encode.md"
     },
     {
         collection: "Long-range chromatin interaction experiments",
         name: "Long-range chromatin interaction experiments",
         numTracks: 156,
-        url: "http://vizhub.wustl.edu/public/hg19/longrange4"
+        url: "https://vizhub.wustl.edu/public/hg19/longrange4"
     },
     {
         collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
         name: "Roadmap Data from GEO",
         numTracks: 2737,
-        url: "http://vizhub.wustl.edu/public/hg19/roadmap9_methylC.md",
+        url: "https://vizhub.wustl.edu/public/hg19/roadmap9_methylC.md",
     },
     {
         collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
         name: "methylCRF tracks from Roadmap",
         numTracks: 16,
         description: "Single CpG methylation value prediction by methylCRF algorithm (PMID:23804401) using Roadmap data.",
-        url: "http://vizhub.wustl.edu/public/hg19/methylCRF.roadmap.hub"
+        url: "https://vizhub.wustl.edu/public/hg19/methylCRF.roadmap.hub"
     },
     {
         collection: "HiC interaction from Juicebox",
         name: "HiC interaction from Juicebox",
         numTracks: 193,
-        url: "http://epgg-test.wustl.edu/dli/long-range-test/hg19-juiceboxhub"
+        url: "https://epgg-test.wustl.edu/dli/long-range-test/hg19-juiceboxhub"
     },
     {
         collection: "Human 450K and 27K array data from TCGA",
         name: "Human 450K and 27K array data from TCGA",
         numTracks: 2551,
-        url: "http://vizhub.wustl.edu/public/hg19/TCGA-450k-hub2"
+        url: "https://vizhub.wustl.edu/public/hg19/TCGA-450k-hub2"
     },
 ];
 

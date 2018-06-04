@@ -104,7 +104,7 @@ export class Genome {
             const name = chr.getName();
             return new Feature(name, new ChromosomeInterval(name, 0, chr.getLength()))
         });
-        return new NavigationContext(this.getName(), features);
+        return new NavigationContext(this.getName(), features, true);
     }
 }
 

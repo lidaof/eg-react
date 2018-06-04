@@ -1,17 +1,18 @@
 /**
- * An abstract class that represents a source of data for a specific region.
+ * An abstract class that represents a source of data for a view region.
  * 
  * @author Silas Hsu
  */
 class DataSource {
     /**
-     * Gets data lying within the region.
+     * Gets data in the view region.
      * 
      * @param {DisplayedRegionModel} region - region for which to fetch data
-     * @param {any} [options] - options for fetching
+     * @param {number} pixelsPerBase - pixels per base, or resolution of the data
+     * @param {Object} options - rendering options
      * @return {Promise<any>} a Promise for the data
      */
-    getData(region, options={}) {
+    getData(region, pixelsPerBase, options) {
         throw new Error("Not implemented");
     }
 

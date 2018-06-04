@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { arrayCopy, jszlib_inflate_buffer } from './inflate';
 
 var BLOCK_HEADER_LENGTH = 18;

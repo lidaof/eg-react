@@ -16,6 +16,7 @@ const ROUTES = [
     require('./routes/geneNameSearch'),
     require('./routes/geneLocusSearch'),
     require('./routes/geneDescription'),
+    require('./routes/public')
 ];
 
 /**
