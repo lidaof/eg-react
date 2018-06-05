@@ -1,12 +1,14 @@
 import HG19 from './hg19/hg19';
 import MM10 from './mm10/mm10';
+import DAN_RER10 from './danRer10/danRer10';
 
 /**
  * All available genomes.
  */
 export const allGenomes = [
     HG19,
-    MM10
+    MM10,
+    DAN_RER10
 ];
 
 let genomeNameToConfig = {};

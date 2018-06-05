@@ -62,7 +62,7 @@ class BarPlot extends React.PureComponent {
         let barElements = [];
         for (let x = 0; x < data.length; x++) {
             const value = data[x];
-            if (!Number.isNaN(value) && value !== 0) {
+            if (value && !Number.isNaN(value)) {
                 barElements.push(getBarElement(value, x));
             }
         }
