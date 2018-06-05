@@ -47,7 +47,7 @@ export function withDataFetch(doFormat, initialData=[], WrappedComponent) {
                 isLoading: true,
                 error: null,
             };
-            this.fetchData();
+            this.fetchData(props);
         }
 
         /**
@@ -56,10 +56,10 @@ export function withDataFetch(doFormat, initialData=[], WrappedComponent) {
          * @param {object} prevProps - previous props
          * @override
          */
-        componentDidUpdate(prevProps) {
-            if (this.props.viewRegion !== prevProps.viewRegion) {
+        componentWillReceiveProps(nextProps) {
+            if (this.props.viewRegion !== nextProps.viewRegion) {
                 this.setState({isLoading: true});
-                this.fetchData();
+                this.fetchData(nextProps);
             }
         }
 
@@ -68,11 +68,11 @@ export function withDataFetch(doFormat, initialData=[], WrappedComponent) {
          * 
          * @return {Promise<void>} a promise that resolves when fetching is done, including when there is an error.
          */
-        fetchData() {
-            const requestedViewRegion = this.props.viewRegion; // Take a snapshot of this.props.viewRegion
-            const width = (this.props.width || window.innerWidth) + 1;
+        fetchData(props) {
+            const requestedViewRegion = props.viewRegion; // Take a snapshot of this.props.viewRegion
+            const width = (props.width || window.innerWidth) + 1;
             const basesPerPixel = requestedViewRegion.getWidth() / width;
-            return this.props.dataSource.getData(requestedViewRegion, basesPerPixel, this.props.options).then(data => {
+            return this.props.dataSource.getData(requestedViewRegion, basesPerPixel, props.options).then(data => {
                 // When the data finally comes in, be sure it is still what the user wants
                 if (this.props.viewRegion === requestedViewRegion) {
                     this.setState({

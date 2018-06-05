@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import getComponentName from '../../getComponentName';
 import TrackModel from '../../../model/TrackModel';
 
@@ -58,7 +59,7 @@ function withOptionMerging(toMerge, WrappedComponent) {
         }
 
         componentWillReceiveProps(nextProps) {
-            if (this.props.options !== nextProps.options) {
+            if (!_.isEqual(this.props.options, nextProps.options)) { // Deep comparison
                 this.setState({options: this.getMergedOptionsObject(nextProps)});
             }
         }

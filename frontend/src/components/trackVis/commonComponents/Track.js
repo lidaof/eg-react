@@ -119,13 +119,15 @@ class Track extends React.Component {
             {legend}
             <div style={{backgroundColor: options.backgroundColor, overflowX: "hidden"}}>
                 {isLoading && <TrackLoadingNotice />}
-                <ViewWindow
-                    viewWindow={viewWindow}
-                    fullWidth={width}
-                    xOffset={xOffset}
-                >
-                    {visualizer}
-                </ViewWindow>
+                <FreezeWhileLoading isLoading={isLoading} >
+                    <ViewWindow
+                        viewWindow={viewWindow}
+                        fullWidth={width}
+                        xOffset={xOffset}
+                    >
+                        {visualizer}
+                    </ViewWindow>
+                </FreezeWhileLoading>
                 {message}
                 {error && <ErrorMessage />}
             </div>
@@ -191,6 +193,16 @@ function ViewWindow(props) {
         </div>
     </div>
     );
+}
+
+class FreezeWhileLoading extends React.Component {
+    shouldComponentUpdate(nextProps) {
+        return !nextProps.isLoading;
+    }
+
+    render() {
+        return this.props.children;
+    }
 }
 
 export default Track;
