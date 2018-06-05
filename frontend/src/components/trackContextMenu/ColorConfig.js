@@ -57,6 +57,16 @@ export function PrimaryColorConfig(props) {
 }
 
 /**
+ * A menu item that configures `trackModel.options.color2`
+ * 
+ * @param {Object} props - object with shape ITEM_PROP_TYPES from TrackContextMenu
+ * @return {JSX.Element} element to render
+ */
+export function SecondaryColorConfig(props) {
+    return <ColorConfig {...props} optionName="color2" label="Secondary color" />;
+}
+
+/**
  * A menu item that configures `trackModel.options.backgroundColor`
  * 
  * @param {Object} props - object with shape ITEM_PROP_TYPES from TrackContextMenu

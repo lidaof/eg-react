@@ -4,7 +4,7 @@ import memoizeOne from 'memoize-one';
 
 import Track from '../Track';
 import TrackLegend from '../TrackLegend';
-import HiddenItemsMessage from '../HiddenItemsMessage';
+import { HiddenItemsMessage } from '../TrackMessage';
 
 import IntervalArranger from '../../../../model/interval/IntervalArranger';
 import FeatureArranger from '../../../../model/FeatureArranger';
@@ -61,38 +61,52 @@ class FullDisplayMode extends React.Component {
 
     getHeight(numRows) {
         const {rowHeight, options} = this.props;
-        const rowsToDraw = Math.min(numRows, options.maxRows);
+        let rowsToDraw = Math.min(numRows, options.maxRows);
+        if (rowsToDraw < 1) {
+            rowsToDraw = 1;
+        }
         return rowsToDraw * rowHeight + TOP_PADDING;
     }
 
     render() {
         const {data, intervalArranger, viewRegion, width, rowHeight, options, getAnnotationElement} = this.props;
         // Important: it is ok to arrange() every render only because we memoized the function in the constructor.
-        const arrangement = this.featureArranger.arrange(data, viewRegion, width, intervalArranger);
-        const height = this.getHeight(arrangement.numRowsAssigned);
+        const arrangeResult = this.featureArranger.arrange(data, viewRegion, width, intervalArranger);
+        const height = this.getHeight(arrangeResult.numRowsAssigned);
         const legend = this.props.legend || <TrackLegend height={height} trackModel={this.props.trackModel} />;
         const visualizer = <FullVisualizer
-            data={arrangement}
+            featureArrangement={arrangeResult.featureArrangement}
             width={width}
             height={height}
             rowHeight={rowHeight}
+            maxRows={options.maxRows}
             options={options} // FullVisualizer doesn't use options, but we pass to to cue rerenders.
             getAnnotationElement={getAnnotationElement}
         />;
-        return <Track {...this.props} legend={legend} visualizer={visualizer} />;
+        const message = <HiddenItemsMessage numHidden={arrangeResult.numHidden} />;
+        return <Track {...this.props} legend={legend} visualizer={visualizer} message={message}/>;
     }
 }
 
 class FullVisualizer extends React.PureComponent {
+    static propTypes = {
+        featureArrangement: PropTypes.array.isRequired,
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired,
+        rowHeight: PropTypes.number.isRequired,
+        maxRows: PropTypes.number,
+        getAnnotationElement: PropTypes.func.isRequired
+    };
+
     constructor(props) {
         super(props);
         this.renderAnnotation = this.renderAnnotation.bind(this);
     }
 
     renderAnnotation(placedFeature, i) {
-        const {rowHeight, options, getAnnotationElement} = this.props;
+        const {rowHeight, maxRows, getAnnotationElement} = this.props;
         const {feature, absLocation, xLocation} = placedFeature;
-        const maxRowIndex = options.maxRows - 1;
+        const maxRowIndex = (maxRows || Infinity) - 1;
         // Compute y
         const rowIndex = Math.min(placedFeature.row, maxRowIndex);
         const y = rowIndex * rowHeight + TOP_PADDING;
@@ -100,15 +114,11 @@ class FullVisualizer extends React.PureComponent {
     }
 
     render() {
-        const {data, width, height} = this.props;
-        const {featureArrangement, numHidden} = data;
+        const {featureArrangement, width, height} = this.props;
         return (
-        <React.Fragment>
-            <svg width={width} height={height} style={SVG_STYLE} >
-                {featureArrangement.map(this.renderAnnotation)}
-            </svg>
-            <HiddenItemsMessage width={width} numHidden={numHidden} />
-        </React.Fragment>
+        <svg width={width} height={height} style={SVG_STYLE} >
+            {featureArrangement.map(this.renderAnnotation)}
+        </svg>
         );
     }
 }

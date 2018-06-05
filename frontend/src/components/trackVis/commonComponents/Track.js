@@ -1,14 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import TrackLoadingNotice from './TrackLoadingNotice';
 import MetadataIndicator from './MetadataIndicator';
+import TrackMessage from './TrackMessage';
 
 import TrackModel from '../../../model/TrackModel';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 import OpenInterval from '../../../model/interval/OpenInterval';
 
+import spinner from '../../../images/loading-small.gif';
 import './Track.css';
+
+const ERROR_COLOR = "pink";
 
 /**
  * Displays track legends, visualizers, and metadata bars more-or-less consistently.
@@ -54,6 +56,7 @@ class Track extends React.Component {
         // Track containers do not provide the following.  Track subtypes must provide them.
         legend: PropTypes.node.isRequired, // Track legend to render
         visualizer: PropTypes.node.isRequired, // Track visualizer to render
+        message: PropTypes.node, // Track messages, notifications, etc. to display
 
         // `isLoading` and `error` can be provided by the configDataFetch HOC.
         isLoading: PropTypes.bool, // If true, applies loading styling
@@ -105,29 +108,51 @@ class Track extends React.Component {
     render() {
         const {
             trackModel, width, viewWindow, metadataTerms, xOffset, // Track container props
-            legend, visualizer, isLoading, error, options, // Track subtype props
+            legend, visualizer, message, isLoading, error, options, // Track subtype props
         } = this.props;
         return (
         <div
-            style={{backgroundColor: error ? "pink" : "white"}}
+            style={{backgroundColor: error ? ERROR_COLOR : undefined}}
             className={trackModel.isSelected ? "Track Track-selected-border" : "Track"}
             onContextMenu={this.handleContextMenu}
             onClick={this.handleClick}
         >
-            {isLoading ? <TrackLoadingNotice /> : null}
             {legend}
-            <ViewWindow
-                viewWindow={viewWindow}
-                fullWidth={width}
-                xOffset={xOffset}
-                style={{backgroundColor: options.backgroundColor}}
-            >
-                {visualizer}
-            </ViewWindow>
+            <div style={{backgroundColor: options.backgroundColor, overflowX: "hidden"}}>
+                {isLoading && <TrackLoadingNotice />}
+                <FreezeWhileLoading isLoading={isLoading} >
+                    <ViewWindow
+                        viewWindow={viewWindow}
+                        fullWidth={width}
+                        xOffset={xOffset}
+                    >
+                        {visualizer}
+                    </ViewWindow>
+                </FreezeWhileLoading>
+                {message}
+                {error && <ErrorMessage />}
+            </div>
             <MetadataIndicator track={trackModel} terms={metadataTerms} onClick={this.handleMetadataClick} />
         </div>
         );
     }
+}
+
+/**
+ * A notice that a track is loading data.
+ * 
+ * @param {Object} props - props as specified by React
+ * @return {JSX.Element}
+ */
+function TrackLoadingNotice(props) {
+    return <div className="Track-loading-notice">
+        <img className="img-fluid" alt="Loading..." src={spinner} />
+    </div>;
+}
+
+function ErrorMessage(props) {
+    const message = "⚠️ Data fetch failed.  Reload page or change view to retry.";
+    return <TrackMessage message={message} style={{backgroundColor: ERROR_COLOR}} />;
 }
 
 /**
@@ -138,7 +163,7 @@ class Track extends React.Component {
  * @return {JSX.Element} element to render
  */
 function ViewWindow(props) {
-    const {viewWindow, fullWidth, style, children} = props;
+    const {viewWindow, fullWidth, children} = props;
     const xOffset = props.xOffset || 0;
     let left = 0;
     if (xOffset > 0) {
@@ -150,10 +175,10 @@ function ViewWindow(props) {
         left = Math.max(-numPixelsOnRight, xOffset);
     }
 
-    const outerStyle = Object.assign({}, style, {
+    const outerStyle = {
         overflowX: "hidden",
         width: viewWindow.getLength(),
-    });
+    };
 
     const innerStyle = {
         position: "relative",
@@ -169,6 +194,16 @@ function ViewWindow(props) {
         </div>
     </div>
     );
+}
+
+class FreezeWhileLoading extends React.Component {
+    shouldComponentUpdate(nextProps) {
+        return !nextProps.isLoading;
+    }
+
+    render() {
+        return this.props.children;
+    }
 }
 
 export default Track;

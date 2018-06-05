@@ -7,14 +7,32 @@
 
 .Track-selected-border {
     background-image:
-        url('/img/border-anim-h.gif'),
-        url('/img/border-anim-h.gif'),
-        url('/img/border-anim-v.gif'),
-        url('/img/border-anim-v.gif');
+        url('../../../images/border-anim-h.gif'),
+        url('../../../images/border-anim-h.gif'),
+        url('../../../images/border-anim-v.gif'),
+        url('../../../images/border-anim-v.gif');
 
     /* Repeat horizontally for the horizontal dashes, vertically for the vertical dashes */
     background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
     
     /* top, bottom, left, right.  Corners selected in preparation for clockwise rotation. */
     background-position: left top, right bottom, left bottom, right top;
+}
+
+.Track-loading-notice {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.Track-message {
+    margin: 0;
+    padding: 0;
+    font-style: italic;
+    font-size: smaller;
+    text-align: center;
 }

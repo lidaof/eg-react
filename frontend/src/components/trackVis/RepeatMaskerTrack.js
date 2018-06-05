@@ -15,6 +15,7 @@ import { AnnotationDisplayModes } from '../../model/DisplayModes';
 
 import './commonComponents/tooltip/Tooltip.css';
 
+export const MAX_BASES_PER_PIXEL = 6000; // The higher this number, the more zooming out we support
 const TOP_PADDING = 3;
 const INTERVAL_ARRANGER = new IntervalArranger(0);
 export const DEFAULT_OPTIONS = {
@@ -124,14 +125,23 @@ class RepeatTrack extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {trackModel, options} = this.props;
-        return <AnnotationTrack
-            {...this.props}
-            legend={<TrackLegend trackModel={trackModel} height={options.height} axisScale={this.state.valueToY} />}
-            intervalArranger={INTERVAL_ARRANGER}
-            rowHeight={options.height}
-            getAnnotationElement={this.renderAnnotation}
-        />;
+        const {viewRegion, width, trackModel, options} = this.props;
+        if (viewRegion.getWidth() / width > MAX_BASES_PER_PIXEL) {
+            return <Track
+                {...this.props}
+                legend={<TrackLegend trackModel={trackModel} height={options.height} />}
+                visualizer={null}
+                message={<div style={{textAlign: "center"}}>Zoom in to view data</div>}
+            />;
+        } else {
+            return <AnnotationTrack
+                {...this.props}
+                legend={<TrackLegend trackModel={trackModel} height={options.height} axisScale={this.state.valueToY} />}
+                intervalArranger={INTERVAL_ARRANGER}
+                rowHeight={options.height}
+                getAnnotationElement={this.renderAnnotation}
+            />;
+        }
     }
 }
 

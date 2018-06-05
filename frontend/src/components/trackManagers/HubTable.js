@@ -3,6 +3,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import ReactTable from "react-table";
+import Json5Fetcher from "../../model/Json5Fetcher";
 import DataHubParser from '../../model/DataHubParser';
 
 import "react-table/react-table.css";
@@ -87,7 +88,7 @@ class HubTable extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        this.hubParser = new DataHubParser();
+        this.hubParser = new DataHubParser(1);
         this.state = {
             hubs: initialHubs.slice()
         };
@@ -139,15 +140,16 @@ class HubTable extends React.PureComponent {
      * 
      * @param {number} index - the index of the hub in this.state.hubs
      */
-    loadHub(index) {
+    async loadHub(index) {
         if (this.props.onHubLoaded) {
+            const hub = this.state.hubs[index];
             let newHubs = this._cloneHubsAndModifyOne(index, {isLoading: true});
             this.setState({hubs: newHubs});
-            this.hubParser.getTracksInHub(newHubs[index]).then(tracks => {
-                this.props.onHubLoaded(tracks);
-                let loadedHubs = this._cloneHubsAndModifyOne(index, {isLoading: false, isLoaded: true});
-                this.setState({hubs: loadedHubs});
-            });
+            const json = await new Json5Fetcher().get(hub.url);
+            const tracks = await this.hubParser.getTracksInHub(json, hub.name);
+            this.props.onHubLoaded(tracks);
+            let loadedHubs = this._cloneHubsAndModifyOne(index, {isLoading: false, isLoaded: true});
+            this.setState({hubs: loadedHubs});
         }
     }
 

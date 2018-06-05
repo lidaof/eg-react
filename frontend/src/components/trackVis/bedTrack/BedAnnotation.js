@@ -24,6 +24,7 @@ class BedAnnotation extends React.Component {
         xRange: PropTypes.instanceOf(OpenInterval).isRequired, // x range the annotation will occupy
         y: PropTypes.number, // Y offset
         color: PropTypes.string, // Primary color to draw
+        reverseStrandColor: PropTypes.string, // Color of reverse strand annotations
         isMinimal: PropTypes.bool, // Whether to just render a plain box
         /**
          * Callback for click events.  Signature: (event: MouseEvent, feature: Feature): void
@@ -35,18 +36,21 @@ class BedAnnotation extends React.Component {
 
     static defaultProps = {
         color: "blue",
+        reverseStrandColor: "red",
         onClick: (event, feature) => undefined,
     };
 
     render() {
-        const {feature, xRange, y, color, isMinimal, onClick} = this.props;
+        const {feature, xRange, y, color, reverseStrandColor, isMinimal, onClick} = this.props;
+        const colorToUse = feature.getIsReverseStrand() ? reverseStrandColor : color;
+        const contrastColor = getContrastingColor(colorToUse);
         const [startX, endX] = xRange;
         const width = endX - startX;
         if (width <= 0) {
             return null;
         }
 
-        const mainBody = <rect x={startX} y={0} width={width} height={HEIGHT} fill={color} />;
+        const mainBody = <rect x={startX} y={0} width={width} height={HEIGHT} fill={colorToUse} />;
         if (isMinimal) {
             return <TranslatableG y={y} onClick={event => onClick(event, feature)} >{mainBody}</TranslatableG>;
         }
@@ -58,7 +62,7 @@ class BedAnnotation extends React.Component {
                 endX={endX}
                 height={HEIGHT}
                 isToRight={feature.getIsForwardStrand()}
-                color="white"
+                color={contrastColor}
             />;
         }
 
@@ -71,10 +75,10 @@ class BedAnnotation extends React.Component {
                     x={centerX}
                     y={0}
                     height={HEIGHT - 1}
-                    fill={getContrastingColor(color)}
+                    fill={contrastColor}
                     alignmentBaseline="hanging"
                     textAnchor="middle"
-                    backgroundColor={color}
+                    backgroundColor={colorToUse}
                     backgroundOpacity={1}
                 >
                     {feature.getName()}

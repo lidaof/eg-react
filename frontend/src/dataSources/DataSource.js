@@ -8,11 +8,11 @@ class DataSource {
      * Gets data in the view region.
      * 
      * @param {DisplayedRegionModel} region - region for which to fetch data
-     * @param {number} pixelsPerBase - pixels per base, or resolution of the data
+     * @param {number} basesPerPixel - bases per pixel.  Higher = more zoomed out
      * @param {Object} options - rendering options
      * @return {Promise<any>} a Promise for the data
      */
-    getData(region, pixelsPerBase, options) {
+    getData(region, basesPerPixel, options) {
         throw new Error("Not implemented");
     }
 

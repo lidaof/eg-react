@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import { faSearchMinus, faSearchPlus } from '@fortawesome/fontawesome-free-solid';
 import { MIN_VIEW_REGION_SIZE } from '../../AppState';
 
 import MainPane from './MainPane';
@@ -42,9 +40,11 @@ class GenomeNavigator extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            viewRegion: new DisplayedRegionModel(this.props.selectedRegion.getNavigationContext())
+            viewRegion: new DisplayedRegionModel(this.props.selectedRegion.getNavigationContext()),
+            isShowingNavigator: false
         };
 
+        this.toggleNavigator = this.toggleNavigator.bind(this);
         this.zoom = this.zoom.bind(this);
         this.setNewView = this.setNewView.bind(this);
         this.zoomSliderDragged = this.zoomSliderDragged.bind(this);
@@ -62,6 +62,10 @@ class GenomeNavigator extends React.Component {
         if (thisNavContext !== nextNavContext) {
             this.setState({viewRegion: new DisplayedRegionModel(nextNavContext)});
         }
+    }
+
+    toggleNavigator() {
+        this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
     }
 
     /**
@@ -117,7 +121,7 @@ class GenomeNavigator extends React.Component {
      */
     render() {
         return (
-            <div className="container-fluid">
+            <div className="container-fluid" style={{borderBottom: "1px solid lightgrey"}}>
                 <nav className="navbar">
                     <div className="row">
                         <div className="col-sm">
@@ -136,50 +140,35 @@ class GenomeNavigator extends React.Component {
                                 onRegionSelected={this.props.onRegionSelected}
                             />
                         </div>
-                         <div className="col-sm">
-                            <ZoomControls
-                                viewRegion={this.state.viewRegion}
-                                onSliderDragged={this.zoomSliderDragged}
-                                onZoomIn={() => this.zoom(0.5)}
-                                onZoomOut={() => this.zoom(2)}
-                            />
+                        <div className="col-sm">
+                            <label>
+                                <span style={{marginRight: "1ch"}} >Show genome-wide navigator</span>
+                                <input type="checkbox" checked={this.state.isShowingNavigator} onChange={this.toggleNavigator} />
+                            </label>
+                            {
+                            this.state.isShowingNavigator &&
+                                <ul>
+                                    <li>Left mouse drag: select</li>
+                                    <li>Right mouse drag: pan</li>
+                                    <li>Mousewheel: zoom</li>
+                                </ul>
+                            }
                         </div>
                     </div>
                 </nav>
-                <MainPane
-                    viewRegion={this.state.viewRegion}
-                    selectedRegion={this.props.selectedRegion}
-                    onRegionSelected={this.props.onRegionSelected}
-                    onNewViewRequested={this.setNewView}
-                    onZoom={this.zoom}
-                />
+                {
+                this.state.isShowingNavigator &&
+                    <MainPane
+                        viewRegion={this.state.viewRegion}
+                        selectedRegion={this.props.selectedRegion}
+                        onRegionSelected={this.props.onRegionSelected}
+                        onNewViewRequested={this.setNewView}
+                        onZoom={this.zoom}
+                    />
+                }
             </div>
         );
     }
-}
-
-function ZoomControls(props) {
-    return (
-    <label>
-        Zoom:
-        <div className="btn-group"> 
-            <button className="btn" onClick={props.onZoomIn} >
-                <FontAwesomeIcon icon={faSearchPlus} />
-            </button>
-            <input
-                type="range"
-                min={Math.log(MIN_VIEW_REGION_SIZE)}
-                max={Math.log(props.viewRegion.getNavigationContext().getTotalBases())}
-                step="any"
-                value={Math.log(props.viewRegion.getWidth())}
-                onChange={props.onSliderDragged}
-            />
-            <button className="btn" onClick={props.onZoomOut} >
-                <FontAwesomeIcon icon={faSearchMinus} />
-            </button>
-        </div>
-    </label>
-    );
 }
 
 export default GenomeNavigator;

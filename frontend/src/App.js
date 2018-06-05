@@ -41,14 +41,13 @@ class App extends React.Component {
         this.state = {
             isShowingRegionSetUI: false
         };
-        this.addTrack = this.addTrack.bind(this);
+        this.addTracks = this.addTracks.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
     }
 
-    addTrack(track) {
-        let tracks = this.props.tracks.slice();
-        tracks.push(track);
-        this.props.onTracksChanged(tracks);
+    addTracks(tracks) {
+        const newTracks = this.props.tracks.concat(tracks);
+        this.props.onTracksChanged(newTracks);
     }
 
     removeTrack(indexToRemove) {
@@ -68,7 +67,7 @@ class App extends React.Component {
             <TrackContainer />
             <TrackManager
                 addedTracks={tracks}
-                onTrackAdded={this.addTrack}
+                onTracksAdded={this.addTracks}
                 onTrackRemoved={this.removeTrack}
             />
             <hr/>

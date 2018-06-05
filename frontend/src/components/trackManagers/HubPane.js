@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import CustomHubAdder from './CustomHubAdder';
 import HubTable from './HubTable';
 import HubTrackTable from './HubTrackTable';
+import TrackModel from '../../model/TrackModel';
 
 import './HubPane.css';
 
@@ -13,8 +14,8 @@ import './HubPane.css';
  */
 class HubPane extends React.PureComponent {
     static propTypes = {
-        addedTracks: PropTypes.arrayOf(PropTypes.object),
-        onTrackAdded: PropTypes.func
+        addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
+        onTracksAdded: PropTypes.func
     };
 
     constructor(props) {
@@ -33,9 +34,13 @@ class HubPane extends React.PureComponent {
      * Adds a list of tracks to the list of all tracks available from a hub.
      * 
      * @param {TrackModel[]} newTracks - additions to the list of all tracks available from a hub
+     * @param {boolean} makeVisible - whether to also add the tracks to the visible (added) track list
      */
-    addToAvailableTracks(newTracks) {
+    addToAvailableTracks(newTracks, makeVisible=false) {
         this.setState({availableTracks: this.state.availableTracks.concat(newTracks)});
+        if (makeVisible) {
+            this.props.onTracksAdded(newTracks)
+        }
     }
 
     /**
@@ -73,14 +78,17 @@ class HubPane extends React.PureComponent {
             </button>
 
             <button className="btn btn-light" onClick={this.toggleCustomHubInput}>Custom hub...</button>
-            {this.state.isCustomHubInputVisible ? <CustomHubAdder onTracksAdded={this.addToAvailableTracks} /> : null}
-            {this.state.isHubTableVisible ? <HubTable onHubLoaded={this.addToAvailableTracks} /> : null}
+            {
+            this.state.isCustomHubInputVisible &&
+                <CustomHubAdder onTracksAdded={tracks => this.addToAvailableTracks(tracks, true)} />
+            }
+            {this.state.isHubTableVisible && <HubTable onHubLoaded={this.addToAvailableTracks} />}
             {
             this.state.availableTracks.length > 0 ?
                 <HubTrackTable
                     tracks={this.state.availableTracks}
                     addedTracks={this.props.addedTracks}
-                    onTrackAdded={this.props.onTrackAdded}
+                    onTrackAdded={track => this.props.onTracksAdded([track])}
                 /> :
                 <p>No tracks from data hubs yet.  Load a hub first.</p>
             }
