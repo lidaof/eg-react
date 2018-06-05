@@ -7,6 +7,7 @@ import TrackModel from '../../../model/TrackModel';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 import OpenInterval from '../../../model/interval/OpenInterval';
 
+import spinner from '../../../images/loading-small.gif';
 import './Track.css';
 
 const ERROR_COLOR = "pink";
@@ -145,7 +146,7 @@ class Track extends React.Component {
  */
 function TrackLoadingNotice(props) {
     return <div className="Track-loading-notice">
-        <img className="img-fluid" alt="Loading..." src="img/loading-small.gif" />
+        <img className="img-fluid" alt="Loading..." src={spinner} />
     </div>;
 }
 

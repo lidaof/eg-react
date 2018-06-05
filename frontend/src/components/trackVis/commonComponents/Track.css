@@ -7,10 +7,10 @@
 
 .Track-selected-border {
     background-image:
-        url('~/img/border-anim-h.gif'),
-        url('~/img/border-anim-h.gif'),
-        url('~/img/border-anim-v.gif'),
-        url('~/img/border-anim-v.gif');
+        url('../../../images/border-anim-h.gif'),
+        url('../../../images/border-anim-h.gif'),
+        url('../../../images/border-anim-v.gif'),
+        url('../../../images/border-anim-v.gif');
 
     /* Repeat horizontally for the horizontal dashes, vertically for the vertical dashes */
     background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;

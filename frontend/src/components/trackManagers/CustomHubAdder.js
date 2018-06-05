@@ -4,53 +4,13 @@ import JSON5 from 'json5';
 import Json5Fetcher from '../../model/Json5Fetcher';
 import DataHubParser from '../../model/DataHubParser';
 
-class CustomHubAdder extends React.Component {
-    static propTypes = {
-        onTracksAdded: PropTypes.func,
-    };
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            inputUrl: "",
-            isLoading: false,
-            error: ""
-        };
-        this.loadHub = this.loadHub.bind(this);
-    }
-
-    async loadHub() {
-        if (!this.props.onTracksAdded) {
-            return;
-        }
-
-        const parser = new DataHubParser(0);
-        let tracks = null;
-        this.setState({isLoading: true});
-        try {
-            tracks = await parser.getTracksInHub({
-                name: "Custom hub",
-                url: this.state.inputUrl
-            });
-        } catch (error) {
-            console.error(error);
-            this.setState({isLoading: false, error: "Error: HTTP " + error.status});
-        }
-
-        if (tracks) {
-            this.props.onTracksAdded(tracks);
-            this.setState({isLoading: false, error: ""});
-        }
-    }
-
-    render() {
-        return (
-        <div>
-            <RemoteHubAdder onTracksAdded={this.props.onTracksAdded} />
-            <FileHubAdder onTracksAdded={this.props.onTracksAdded} />
-        </div>
-        );
-    }
+function CustomHubAdder(props) {
+    return (
+    <div>
+        <RemoteHubAdder onTracksAdded={props.onTracksAdded} />
+        <FileHubAdder onTracksAdded={props.onTracksAdded} />
+    </div>
+    );
 }
 
 class RemoteHubAdder extends React.Component {

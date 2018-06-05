@@ -1,19 +1,13 @@
-import axios from 'axios';
 import TrackModel from './TrackModel';
+import sampleDict from './genomes/hg19/samples.json';
+import assayDict from './genomes/hg19/assays.json';
 
 class HubParser {
     constructor(tracksStartIndex=0) {
         this.tracksStartIndex = tracksStartIndex;
-        this.samplesPromise = axios.get("/samples.json");
-        this.assaysPromise = axios.get("/assays.json");
     }
 
-    async getTracksInHub(parsedJson, hubName) {
-        let jsonPromises = Promise.all([this.samplesPromise, this.assaysPromise]);
-        let jsons = await jsonPromises;
-        let sampleDict = jsons[0].data;
-        let assayDict = jsons[1].data;
-
+    getTracksInHub(parsedJson, hubName) {
         let tracks = [];
         for (let plainObject of parsedJson.slice(this.tracksStartIndex)) {
             let newTrack = new TrackModel(plainObject);
