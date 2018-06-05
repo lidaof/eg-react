@@ -29,9 +29,8 @@ class MethylCRecord extends Feature {
      *
      */
     constructor(tabixRecord) {
-        const eles = _.split(tabixRecord, "\t");
-        const locus = new ChromosomeInterval(eles[0], Number.parseInt(eles[1], 10), Number.parseInt(eles[2], 10));
-        const meths = _.split(eles[3], '/');
+        const locus = new ChromosomeInterval(tabixRecord.chr, tabixRecord.start, tabixRecord.end);
+        const meths = _.split(tabixRecord[3], '/');
         super('', locus, meths[3] === "+");
         this.context = meths[0]; //context of the cytosine (CG, CHG, CHH, where H = A, C, or T)
         this.value = Number.parseFloat(meths[1]); // methylation value, from 0 to 1
@@ -43,10 +42,6 @@ class MethylCRecord extends Feature {
      */
     getValue() {
         return this.value;
-    }
-
-    getLocus() {
-        return this._locus;
     }
 
     getContext() {

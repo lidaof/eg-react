@@ -10,7 +10,8 @@ const AggregatorTypes = {
     SUM: 2, // Sums values of records
     MEAN: 3, // Computes averages of records
     MIN: 4, // Computes value of min record
-    MAX: 5 // Computes value of max record
+    MAX: 5, // Computes value of max record
+    METHYLC: 6,
 };
 
 const aggregateFunctions = {};
@@ -20,6 +21,14 @@ aggregateFunctions[AggregatorTypes.SUM] = records => _.sumBy(records, VALUE_PROP
 aggregateFunctions[AggregatorTypes.MEAN] = records => records.length > 0 ? _.meanBy(records, VALUE_PROP_NAME) : null;
 aggregateFunctions[AggregatorTypes.MIN] = records => _.minBy(records, VALUE_PROP_NAME) || null;
 aggregateFunctions[AggregatorTypes.MAX] = records => _.maxBy(records, VALUE_PROP_NAME) || null;
+aggregateFunctions[AggregatorTypes.METHYLC] = records => {
+    let value=0, count=0;
+    for (let record of records){
+        value += (record.value*record.count);
+        count += record.count;
+    }
+    return {value: value/count, count: count};
+};
 
 /**
  * Aggregator of features.  Includes methods to construct x-to-data maps.

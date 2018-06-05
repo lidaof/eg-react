@@ -56,7 +56,7 @@ const defaultTracks = [
     new TrackModel({
         type: "methylc",
         name: "Methylation",
-        url: "http://vizhub.wustl.edu/public/hg19/methylc2/h1.liftedtohg19.gz"
+        url: "https://vizhub.wustl.edu/public/hg19/methylc2/h1.liftedtohg19.gz"
     }),
     new TrackModel({
         type: "ruler",

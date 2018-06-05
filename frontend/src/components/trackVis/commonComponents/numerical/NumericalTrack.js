@@ -52,10 +52,10 @@ class NumericalTrack extends React.PureComponent {
         error: PropTypes.any, // If present, applies error styling
         /**
          * Callback for drawing one bar of a bar chart.
-         * Signature: (x: number, value: number, scale: function): JSX.Element
+         * Signature: (x: number, y: number, height: number): JSX.Element
          *     `x` - x coordinate to draw
-         *     `record` - data to draw
-         *     `scale` - d3 scale function, used to calculate height and y coordinates
+         *     `y` - y coordinate to draw
+         *     `height` - height of the bar
          */
         getBarElement: PropTypes.func,
         getHeatmapElement: PropTypes.func,

@@ -6,6 +6,7 @@ import BigWigTrackRenderer from './BigWigTrackRenderer';
 import GeneAnnotationTrackRenderer from './GeneAnnotationTrackRenderer';
 import RepeatMaskerTrackRenderer from './RepeatMaskerTrackRenderer';
 import RulerTrackRenderer from './RulerTrackRenderer';
+import MethylCTrackRenderer from './MethylCTrackRenderer';
 
 const TYPE_NAME_TO_RENDERER = {
     "bed": BedTrackRenderer,
@@ -14,6 +15,7 @@ const TYPE_NAME_TO_RENDERER = {
     "bigwig": BigWigTrackRenderer,
     "geneannotation": GeneAnnotationTrackRenderer,
     "repeatmasker": RepeatMaskerTrackRenderer,
+    "methylc": MethylCTrackRenderer,
     "ruler": RulerTrackRenderer,
 };
 const DefaultRenderer = TrackRenderer;

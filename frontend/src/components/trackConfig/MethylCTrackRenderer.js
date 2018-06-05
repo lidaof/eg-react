@@ -4,28 +4,28 @@ import { configStaticDataSource } from './configDataFetch';
 import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import { AnnotationDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';
 import HeightConfig from '../trackContextMenu/HeightConfig';
-import RepeatMaskerTrack, { DEFAULT_OPTIONS } from '../trackVis/RepeatMaskerTrack';
+import MethylCTrack, { DEFAULT_OPTIONS } from '../trackVis/MethylCTrack';
 
-import BigWorker from '../../dataSources/big/Big.worker';
 import WorkerSource from '../../dataSources/worker/WorkerSource';
-import RepeatMaskerFeature from '../../model/RepeatMaskerFeature';
+import BedWorker from '../../dataSources/bed/Bed.worker';
+import MethylCRecord from '../../model/MethylCRecord';
 
 /**
- * Converter of DASFeatures to RepeatMaskerFeatures.
+ * Converter of DASFeatures to MethylCRecords.
  * 
  * @param {DASFeature[]} data - DASFeatures to convert
- * @return {RepeatMaskerFeature[]} RepeatMaskerFeatures made from the input
+ * @return {MethylCRecord[]} MethylCRecords made from the input
  */
 function formatDasFeatures(data) {
     console.log(data);
-    return data.map(feature => new RepeatMaskerFeature(feature))
+    return data.map(feature => new MethylCRecord(feature))
 }
 const withDataFetch = configStaticDataSource(
-    props => new WorkerSource(BigWorker, props.trackModel.url), formatDasFeatures
+    props => new WorkerSource(BedWorker, props.trackModel.url), formatDasFeatures
 );
-const TrackWithData = withDataFetch(RepeatMaskerTrack);
+const TrackWithData = withDataFetch(MethylCTrack);
 
-class RepeatMaskerTrackRenderer extends TrackRenderer {
+class MethylCTrackRenderer extends TrackRenderer {
     constructor(props) {
         super(props);
         this.setDefaultOptions(DEFAULT_OPTIONS);
@@ -40,4 +40,4 @@ class RepeatMaskerTrackRenderer extends TrackRenderer {
     }
 }
 
-export default RepeatMaskerTrackRenderer;
+export default MethylCTrackRenderer;
