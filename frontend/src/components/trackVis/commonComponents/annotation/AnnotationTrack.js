@@ -12,6 +12,7 @@ import configOptionMerging from '../configOptionMerging';
 export const DEFAULT_OPTIONS = {
     displayMode: AnnotationDisplayModes.FULL,
     color: "blue",
+    color2: "red",
     maxRows: 20,
     height: 40, // For density display mode
 };

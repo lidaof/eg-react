@@ -2,7 +2,7 @@ import TrackRenderer from './TrackRenderer';
 import { AnnotationDisplayModes } from '../../model/DisplayModes';
 import { DEFAULT_OPTIONS } from '../trackVis/commonComponents/annotation/AnnotationTrack';
 import { AnnotationDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';
-import { PrimaryColorConfig, BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
+import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import HeightConfig from '../trackContextMenu/HeightConfig';
 import MaxRowsConfig from '../trackContextMenu/MaxRowsConfig';
 
@@ -19,7 +19,7 @@ class AnnotationTrackRenderer extends TrackRenderer {
         } else { // Assume FULL display mode
             items.push(MaxRowsConfig);
         }
-        items.push(PrimaryColorConfig, BackgroundColorConfig);
+        items.push(PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig);
         return items;
     }
 }

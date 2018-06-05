@@ -71,6 +71,7 @@ export class BedTrack extends React.Component {
             y={y}
             isMinimal={isLastRow}
             color={this.props.options.color}
+            reverseStrandColor={this.props.options.color2}
             onClick={this.renderTooltip}
         />;
     }
