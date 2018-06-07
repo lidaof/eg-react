@@ -41,7 +41,11 @@ class BigSourceWorker extends WorkerRunnableSource {
         const zoomLevel = this._getMatchingZoomLevel(bigWigObj, basesPerPixel);
         let promises = loci.map(locus => this._getDataForChromosome(locus, bigWigObj, zoomLevel));
         const dataForEachLocus = await Promise.all(promises);
-        return _.flatten(dataForEachLocus); // Combine all the data into one array
+        const combinedData = _.flatten(dataForEachLocus);
+        for (let dasFeature of combinedData) {
+            dasFeature.min -= 1; // bbi-js returns 1-indexed features; -1 to compensate.
+        }
+        return combinedData;
     }
 
     /**
@@ -75,13 +79,16 @@ class BigSourceWorker extends WorkerRunnableSource {
      * @return {Promise<DASFeature[]>} - a Promise for the data, an array of DASFeature provided by bbi-js
      */
     _getDataForChromosome(interval, bigWigObj, zoomLevel) {
+        // bbi-js assumes coordinates are 1-indexed, while our coordinates are 0-indexed.  +1 to compensate.
+        const start = interval.start + 1;
+        const end = interval.end;
         return new Promise((resolve, reject) => {
             try {
                 if (zoomLevel === -1) {
-                    bigWigObj.readWigData(interval.chr, ...interval, resolve);
+                    bigWigObj.readWigData(interval.chr, start, end, resolve);
                 } else {
                     bigWigObj.getZoomedView(zoomLevel)
-                        .readWigData(interval.chr, ...interval, resolve);
+                        .readWigData(interval.chr, start, end, resolve);
                 }
             } catch (error) {
                 reject(error);

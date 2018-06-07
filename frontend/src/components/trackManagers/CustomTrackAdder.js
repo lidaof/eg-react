@@ -12,7 +12,7 @@ const TRACK_TYPES = ['bigWig', 'bedGraph', 'bed', 'bigBed'];
  */
 class CustomTrackAdder extends React.Component {
     static propTypes = {
-        onTrackAdded: PropTypes.func,
+        onTracksAdded: PropTypes.func,
     };
 
     constructor(props) {
@@ -28,14 +28,14 @@ class CustomTrackAdder extends React.Component {
     }
 
     handleSubmitClick() {
-        if (!this.props.onTrackAdded) {
+        if (!this.props.onTracksAdded) {
             return;
         }
 
         if (!this.state.url) {
             this.setState({urlError: "Enter a URL"});
         } else {
-            this.props.onTrackAdded(new TrackModel(this.state));
+            this.props.onTracksAdded([new TrackModel(this.state)]);
             this.setState({urlError: "", trackAdded: true});
         }
     }

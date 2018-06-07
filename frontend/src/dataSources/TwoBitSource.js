@@ -49,8 +49,8 @@ class TwoBitSource extends DataSource {
     async getSequenceInInterval(interval) {
         const twoBitObj = await this.twoBitPromise;
         return new Promise((resolve, reject) => {
-            // We Math.max because the bbi-js API errors if given 0 as a start.
-            twoBitObj.fetch(interval.chr, Math.max(1, interval.start), interval.end, (data, error) => {
+            // bbi-js assumes coordinates are 1-indexed, while our coordinates are 0-indexed.  +1 to compensate.
+            twoBitObj.fetch(interval.chr, interval.start + 1, interval.end, (data, error) => {
                 if (error) {
                     reject(error);
                 } else {
