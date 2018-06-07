@@ -11,10 +11,10 @@ import configOptionMerging from '../configOptionMerging';
 
 import { RenderTypes } from '../../../../art/DesignRenderer';
 import { NumericalDisplayModes } from '../../../../model/DisplayModes';
-import FeatureAggregator from '../../../../model/FeatureAggregator';
+import FeatureAggregator, { DefaultAggregators } from '../../../../model/FeatureAggregator';
 
 export const DEFAULT_OPTIONS = {
-    aggregateMethod: FeatureAggregator.AggregatorTypes.MEAN,
+    aggregateMethod: DefaultAggregators.types.MEAN,
     displayMode: NumericalDisplayModes.AUTO,
     height: 40,
     color: "blue",
@@ -33,7 +33,7 @@ class NumericalTrack extends React.PureComponent {
     /**
      * Don't forget to look at NumericalFeatureProcessor's propTypes!
      */
-    static propTypes = Object.assign({}, Track.trackContainerProps,
+    static propTypes = Object.assign({}, Track.propsFromTrackContainer,
         {
         /**
          * NumericalFeatureProcessor provides these.  Parents should provide an array of NumericalFeature.
@@ -41,7 +41,7 @@ class NumericalTrack extends React.PureComponent {
         data: PropTypes.array.isRequired, // PropTypes.arrayOf(Feature)
         unit: PropTypes.string, // Unit to display after the number in tooltips
         options: PropTypes.shape({
-            aggregateMethod: PropTypes.oneOf(Object.values(FeatureAggregator.AggregatorTypes)).isRequired,
+            aggregateMethod: PropTypes.oneOf(Object.values(DefaultAggregators.types)),
             displayMode: PropTypes.oneOf(Object.values(NumericalDisplayModes)).isRequired,
             height: PropTypes.number.isRequired, // Height of the track
             scaleType: PropTypes.any, // Unused for now
@@ -102,7 +102,8 @@ class NumericalTrack extends React.PureComponent {
         const {data, viewRegion, width, options} = props;
         const aggregator = new FeatureAggregator();
         const xToFeatures = aggregator.makeXMap(data, viewRegion, width);
-        return aggregator.aggregate(xToFeatures, options.aggregateMethod);
+        const aggregateMethod = DefaultAggregators.fromId(options.aggregateMethod);
+        return xToFeatures.map(aggregateMethod);
     }
 
     computeScales(xToValue, props) {
@@ -138,6 +139,9 @@ class NumericalTrack extends React.PureComponent {
      * @return {JSX.Element} bar element to render
      */
     renderPixel(value, x) {
+        if (!value || Number.isNaN(value)) {
+            return null;
+        }
         if (this.getEffectiveDisplayMode() === NumericalDisplayModes.HEATMAP) {
             const opacity = this.state.valueToOpacity(value);
             const getHeatmapElement = this.props.getHeatmapElement || this.renderDefaultHeatmapElement;

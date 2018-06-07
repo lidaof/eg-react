@@ -17,7 +17,6 @@ import MethylCRecord from '../../model/MethylCRecord';
  * @return {MethylCRecord[]} MethylCRecords made from the input
  */
 function formatDasFeatures(data) {
-    console.log(data);
     return data.map(feature => new MethylCRecord(feature))
 }
 const withDataFetch = configStaticDataSource(

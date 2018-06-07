@@ -22,7 +22,7 @@ class Track extends React.Component {
      * Props that TrackContainers provide.  Track subtypes should require them in their propTypes, and use them in any
      * way they wish.  Be sure to pass them through to this component!
      */
-    static trackContainerProps = {
+    static propsFromTrackContainer = {
         trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
         width: PropTypes.number.isRequired, // Width of the track's visualizer
         /**
@@ -52,7 +52,7 @@ class Track extends React.Component {
         onMetadataClick: PropTypes.func,
     };
 
-    static propTypes = Object.assign({}, Track.trackContainerProps, {
+    static propTypes = Object.assign({}, Track.propsFromTrackContainer, {
         // Track containers do not provide the following.  Track subtypes must provide them.
         legend: PropTypes.node.isRequired, // Track legend to render
         visualizer: PropTypes.node.isRequired, // Track visualizer to render

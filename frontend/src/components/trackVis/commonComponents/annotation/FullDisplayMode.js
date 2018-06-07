@@ -22,7 +22,7 @@ const DEFAULT_INTERVAL_ARRANGER = new IntervalArranger(5);
  * @author Silas Hsu
  */
 class FullDisplayMode extends React.Component {
-    static propTypes = Object.assign({}, Track.trackContainerProps, {
+    static propTypes = Object.assign({}, Track.propsFromTrackContainer, {
         /**
          * Features to render.  Simplified since checking is expensive.
          */

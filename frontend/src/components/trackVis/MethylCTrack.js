@@ -1,24 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import { scaleLinear } from 'd3-scale';
 
 import Track from './commonComponents/Track';
-import AnnotationTrack from './commonComponents/annotation/AnnotationTrack';
 import TrackLegend from './commonComponents/TrackLegend';
-import Tooltip from './commonComponents/tooltip/Tooltip';
-import withTooltip from './commonComponents/tooltip/withTooltip';
 import configOptionMerging from './commonComponents/configOptionMerging';
+import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
+import DesignRenderer, { RenderTypes } from '../../art/DesignRenderer';
 
-import IntervalArranger from '../../model/interval/IntervalArranger';
-import { AnnotationDisplayModes } from '../../model/DisplayModes';
-
+import FeatureAggregator from '../../model/FeatureAggregator';
 import MethylCRecord from '../../model/MethylCRecord';
 
 import './commonComponents/tooltip/Tooltip.css';
 
-const TOP_PADDING = 5;
-const INTERVAL_ARRANGER = new IntervalArranger(0);
-const BAR_CHART_STYLE = {paddingTop: TOP_PADDING};
 export const DEFAULT_OPTIONS = {
     maxRows: 1,
     height: 40,
@@ -34,8 +30,7 @@ const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
  */
 class MethylCTrack extends React.PureComponent {
     static propTypes = Object.assign({},
-        Track.trackContainerProps,
-        withTooltip.INJECTED_PROPS,
+        Track.tracksFromTrackContainer,
         {
         data: PropTypes.array.isRequired, //PropTypes.arrayOf(PropTypes.instanceOf(MethylCRecord)).isRequired,
         }
@@ -43,95 +38,110 @@ class MethylCTrack extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        this.state = this.makeScale(props);
-        this.renderAnnotation = this.renderAnnotation.bind(this);
+        this.aggregateRecords = memoizeOne(this.aggregateRecords);
+        this.computeScales = memoizeOne(this.computeScales);
         this.renderTooltip = this.renderTooltip.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.props.options !== nextProps.options) {
-            this.setState(this.makeScale(nextProps))
-        }
+    aggregateRecords(data, viewRegion, width) {
+        const aggregator = new FeatureAggregator();
+        const xToRecords = aggregator.makeXMap(data, viewRegion, width);
+        window.xToRecords = xToRecords;
+        return xToRecords.map(MethylCRecord.aggregateRecords);
     }
 
-    makeScale(props) {
-        return {valueToY: scaleLinear().domain([1, 0]).range([TOP_PADDING, props.options.height])}
+    computeScales(aggregatedRecords, height) {
+        /*
+        aggregatedRecords = [
+            {
+                depth: 5 (NaN if no data),
+                contextValues: [
+                    {context: "CG", value: 0.3},
+                    {context: "CHH", value: 0.3},
+                    {context: "Your Mom", value: 0.3},
+                ]
+            }
+            ...
+        ]
+        */
+        const maxDepthRecord = _.maxBy(aggregatedRecords, 'depth') || { depth: 0 };
+        const maxDepth = maxDepthRecord.depth;
+        return {
+            methylToY: scaleLinear().domain([1, 0]).range([0, height]).clamp(true),
+            readDepthToY: scaleLinear().domain([maxDepth, 0]).range([0, height]).clamp(true)
+        };
     }
-
-        /**
-     * Renders one bar.
-     * 
-     * @param {MethylCRecord} record - feature to render
-     * @param {OpenInterval} absInterval - location of the feature in navigation context
-     * @param {OpenInterval} xRange - x coordinates the annotation will occupy
-     * @param {any} unused - unused
-     * @param {any} unused2 - unused
-     * @param {number} index - iteration index
-     * @return {JSX.Element} element visualizing the feature
-     */
-    renderAnnotation(record, absInterval, xRange, unused, unused2, index) {
-        if (xRange.getLength() <= 0) {
-            return null;
-        }
-        const {contextColors, countColor, height} = this.props.options;
-        const context = record.getContext();
-        const color = contextColors[context];
-
-        const y = this.state.valueToY(record.value);
-        const drawHeight = height - y;
-        if (drawHeight <= 0) {
-            return null;
-        }
-
-        return <rect
-            key={index}
-            x={xRange.start}
-            y={y}
-            width={xRange.getLength()}
-            height={drawHeight}
-            fill={color}
-            fillOpacity={0.75}
-            onClick={event => this.renderTooltip(event, record)}
-        />;
-    }
-
 
     /**
-     * Renders the tooltip that appears when clicking on a repeat.
+     * Renders the tooltip contents that appear when mousing over the track
      * 
-     * @param {MouseEvent} event - mouse click event, used to determine tooltip coordinates
-     * @param {MethylCRecord} record - feature containing data to show in the tooltip
+     * @param {number} x - x coordinate of the mouseover relative to the left side of the visualizer
+     * @return {JSX.Element} tooltip contents to render
      */
-    renderTooltip(event, record) {
-        const {trackModel, onHideTooltip} = this.props;
-        const tooltip = (
-            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={onHideTooltip} >
-                <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
-                    <li>
-                        <span className="Tooltip-major-text" style={{marginRight: 5}} >{record.getContext()}</span>
-                    </li>
-                    <li>{record.getLocus().toString()}</li>
-                    <li>{"Methylation level: " + record.getValue()}</li>
-                    <li className="Tooltip-minor-text" >{this.props.trackModel.getDisplayLabel()}</li>
-                </ul>
-            </Tooltip>
+    renderTooltip(x) {
+        const dataAtPoint = this.aggregatedRecords[x];
+        if (!dataAtPoint) {
+            return "(No data)";
+        }
+        const theContext = dataAtPoint.contextValues[0] || {};
+        return (
+            <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
+                <li className="Tooltip-major-text">{theContext.context}</li>
+                <li className="Tooltip-minor-text" >Value {theContext.value}</li>
+                <li className="Tooltip-minor-text" >Depth {dataAtPoint.depth}</li>
+                <li className="Tooltip-minor-text" >x={x}</li>
+            </ul>
         );
-        this.props.onShowTooltip(tooltip);
+    }
+
+    renderBarElement(dataAtX, x) {
+        /*
+        [
+            {context: "CG", value: 1, depth: 5},
+            {context: "CHH", value: 0.4, depth: 10}
+        ]
+        */
+        if (!dataAtX) {
+            return null;
+        }
+        const height = this.props.options.height;
+        let children = [<rect key={x + "bg"} x={x} y={0} width={1} height={height} fill="lightgrey" />];
+        for (let data of dataAtX.contextValues) {
+            const valueY = this.scales.methylToY(data.value);
+            const color = MethylCRecord.DEFAULT_CONTEXT_COLORS[data.context].color;
+            children.push(<rect key={x} x={x} y={valueY} width={1} height={height - valueY} fill={color} fillOpacity={0.75} />)
+        }
+        
+        return children;
+    }
+
+    renderVisualizer() {
+        const {width, options} = this.props;
+        const height = options.height;
+        return <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
+            <DesignRenderer
+                type={RenderTypes.CANVAS}
+                width={width}
+                height={height}
+            >
+                {this.aggregatedRecords.map((record, x) => this.renderBarElement(record, x))}
+            </DesignRenderer>
+        </HoverTooltipContext>
     }
 
     /** 
      * @inheritdoc
      */
     render() {
-        const {trackModel, options} = this.props;
-        return <AnnotationTrack
+        const {data, viewRegion, width, options} = this.props;
+        this.aggregatedRecords = this.aggregateRecords(data, viewRegion, width);
+        this.scales = this.computeScales(this.aggregatedRecords, options.height);
+        return <Track
             {...this.props}
-            legend={<TrackLegend trackModel={trackModel} height={options.height} axisScale={this.state.valueToY} />}
-            intervalArranger={INTERVAL_ARRANGER}
-            rowHeight={options.height}
-            getAnnotationElement={this.renderAnnotation}
-        />;
+            legend={<TrackLegend trackModel={this.props.trackModel} height={this.props.options.height} scaleForAxis={this.scales.methylToY} />}
+            visualizer={this.renderVisualizer()}
+        />
     }
 }
 
-export default withDefaultOptions(withTooltip(MethylCTrack));
+export default withDefaultOptions(MethylCTrack);

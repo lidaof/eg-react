@@ -24,7 +24,7 @@ const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
  * @author Silas Hsu
  */
 class AnnotationTrack extends React.PureComponent {
-    static propTypes = Object.assign({}, Track.trackContainerProps, {
+    static propTypes = Object.assign({}, Track.propsFromTrackContainer, {
         /**
          * Features to render.  Simplified since checking is expensive.
          */

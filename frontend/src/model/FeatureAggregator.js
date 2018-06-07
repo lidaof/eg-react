@@ -21,13 +21,16 @@ aggregateFunctions[AggregatorTypes.SUM] = records => _.sumBy(records, VALUE_PROP
 aggregateFunctions[AggregatorTypes.MEAN] = records => records.length > 0 ? _.meanBy(records, VALUE_PROP_NAME) : null;
 aggregateFunctions[AggregatorTypes.MIN] = records => _.minBy(records, VALUE_PROP_NAME) || null;
 aggregateFunctions[AggregatorTypes.MAX] = records => _.maxBy(records, VALUE_PROP_NAME) || null;
-aggregateFunctions[AggregatorTypes.METHYLC] = records => {
-    let value=0, count=0;
-    for (let record of records){
-        value += (record.value*record.count);
-        count += record.count;
+
+export const DefaultAggregators = {
+    types: AggregatorTypes,
+    fromId: function(id) {
+        const aggregator = aggregateFunctions[id];
+        if (!aggregator) {
+            throw new Error(`Unknown aggregator id "${id}"`);
+        }
+        return aggregator;
     }
-    return {value: value/count, count: count};
 };
 
 /**
@@ -36,8 +39,6 @@ aggregateFunctions[AggregatorTypes.METHYLC] = records => {
  * @author Silas Hsu
  */
 class FeatureAggregator {
-    static AggregatorTypes = AggregatorTypes;
-
     /**
      * Constructs a mapping from x coordinate to all Features overlapping that location.  The mapping will be limited
      * to the range [0, width).
@@ -70,23 +71,6 @@ class FeatureAggregator {
         }
 
         return xToFeatures;
-    }
-
-    /**
-     * Aggregates a list of lists containing objects, such as those returned by makeXMap.  Each list is individually
-     * aggregated according to `aggregatorType`.  See `AggregatorTypes` for more info on what each does and input
-     * requirements.
-     * 
-     * @param {Object[][]} records - list of lists containing objects to aggregate
-     * @param {number} aggregatorType - aggregation to run
-     * @return {number[]} aggregation results for each list
-     */
-    aggregate(records, aggregatorType) {
-        const aggregator = aggregateFunctions[aggregatorType];
-        if (!aggregator) {
-            throw new Error(`Unknown aggregator type: ${aggregatorType}`);
-        }
-        return records.map(aggregator);
     }
 }
 

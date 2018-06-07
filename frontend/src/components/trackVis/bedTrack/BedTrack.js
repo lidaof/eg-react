@@ -18,7 +18,7 @@ const ROW_HEIGHT = BedAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
  */
 export class BedTrack extends React.Component {
     static propTypes = Object.assign({}, 
-        Track.trackContainerProps,
+        Track.propsFromTrackContainer,
         withTooltip.INJECTED_PROPS,
         {
         data: PropTypes.array.isRequired // PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired

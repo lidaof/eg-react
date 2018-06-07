@@ -63,6 +63,10 @@ class CanvasDesignRenderer extends React.PureComponent {
         if (!element) {
             return; // Do nothing
         }
+        if (Array.isArray(element)) {
+            element.forEach(element => this.drawOneElement(context, element));
+            return;
+        }
         const props = element.props;
         switch (element.type) {
             case 'rect':

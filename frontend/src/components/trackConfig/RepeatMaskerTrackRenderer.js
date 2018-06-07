@@ -16,7 +16,6 @@ import RepeatSource from '../../dataSources/RepeatSource';
  * @return {RepeatMaskerFeature[]} RepeatMaskerFeatures made from the input
  */
 function formatDasFeatures(data) {
-    console.log(data);
     return data.map(feature => new RepeatMaskerFeature(feature))
 }
 const withDataFetch = configStaticDataSource(

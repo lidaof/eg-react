@@ -11,21 +11,21 @@ import DesignRenderer from '../../../../art/DesignRenderer';
  */
 class BarPlot extends React.PureComponent {
     static propTypes = {
-        data: PropTypes.arrayOf(PropTypes.number).isRequired,
+        data: PropTypes.array.isRequired,
         width: PropTypes.number.isRequired, // Graphic width
         height: PropTypes.number.isRequired, // Graphic height
         style: PropTypes.object, // CSS
         htmlType: PropTypes.number, // Actual type of HTML element to render.  See DesignRenderer.js
 
         /**
-         * Callback for getting a bar element to render.  Signature (x: number, value: number): JSX.Element
+         * Callback for getting a bar element to render.  Signature (x: number, record: any): JSX.Element
          */
         getBarElement: PropTypes.func.isRequired,
         /**
          * Called when the user mouses over the graphic.  Should return tooltip contents to render.  Signature
-         *     (relativeX: number, records: BarPlotRecord[]): JSX.Element
+         *     (relativeX: number, value: any): JSX.Element
          *         `relativeX`: the x coordinate of the mouse hover, relative to the left of the container
-         *         `records`: all records at this x location.  May be an empty array.
+         *         `value`: record at this x location
          */
         getTooltipContents: PropTypes.func,
     };
@@ -59,13 +59,7 @@ class BarPlot extends React.PureComponent {
      */
     render() {
         const {data, width, height, style, htmlType, getBarElement} = this.props;
-        let barElements = [];
-        for (let x = 0; x < data.length; x++) {
-            const value = data[x];
-            if (!Number.isNaN(value) && value !== 0) {
-                barElements.push(getBarElement(value, x));
-            }
-        }
+        let barElements = data.map(getBarElement);
 
         return (
         <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.getTooltipContents} >

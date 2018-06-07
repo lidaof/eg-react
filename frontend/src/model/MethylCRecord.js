@@ -4,12 +4,18 @@ import _ from 'lodash';
 
 
 const DEFAULT_CONTEXT_COLORS = {
-    "CG": {color: "rgb(100,139,216)", background: "#d9d9d9"},
-    "CHG": {color: "rgb(255,148,77)", background: "#ffe0cc"},
-    "CHH": {color: "rgb(255,0,255)", background: "#ffe5ff"},
+    "CG": { color: "rgb(100,139,216)", background: "#d9d9d9" },
+    "CHG": { color: "rgb(255,148,77)", background: "#ffe0cc" },
+    "CHH":  {color: "rgb(255,0,255)", background: "#ffe5ff" },
 };
 
 const DEFAULT_COUNT_COLOR = "#525252";
+const RecordInfoIndices = {
+    CONTEXT: 0,
+    VALUE: 1,
+    DEPTH: 2,
+    STRAND: 3
+};
 
 /**
  * A data container for a MethylC record.
@@ -19,6 +25,44 @@ const DEFAULT_COUNT_COLOR = "#525252";
 class MethylCRecord extends Feature {
     static DEFAULT_CONTEXT_COLORS = DEFAULT_CONTEXT_COLORS;
     static DEFAULT_COUNT_COLOR = DEFAULT_COUNT_COLOR;
+
+    /**
+     * Combines all MethylCRecords that (presumably) are in one pixel.  See schema below the function for return schema.
+     * If passed an empty array, returns an empty object.
+     * 
+     * @param {MethylCRecord[]} records 
+     * @return {Object}
+     */
+    static aggregateRecords(records) {
+        if (records.length === 0) {
+            return null;
+        }
+        const depth = _.meanBy(records, 'depth');
+        const groupedByContext = _.groupBy(records, 'context');
+        let contextValues = [];
+        for (let contextName in groupedByContext) {
+            const recordsOfThatContext = groupedByContext[contextName];
+            contextValues.push({
+                context: contextName,
+                value: _.meanBy(recordsOfThatContext, 'value'),
+            });
+        }
+        return {
+            depth: depth,
+            contextValues: contextValues
+        }
+        /*
+        {
+            depth: 5,
+            contextValues: [
+                {context: "CG", value: 0.3},
+                {context: "CHH", value: 0.3},
+                {context: "Your Mom", value: 0.3},
+            ]
+        }
+        */
+    }
+
     /*
     Input， strings like following
     chrX	2709724	2709725	CHH/0.111/9/-
@@ -28,46 +72,14 @@ class MethylCRecord extends Feature {
      * Constructs a new MethylCRecord, given a string from tabix
      *
      */
-    constructor(tabixRecord) {
-        const locus = new ChromosomeInterval(tabixRecord.chr, tabixRecord.start, tabixRecord.end);
-        const meths = _.split(tabixRecord[3], '/');
-        super('', locus, meths[3] === "+");
-        this.context = meths[0]; //context of the cytosine (CG, CHG, CHH, where H = A, C, or T)
-        this.value = Number.parseFloat(meths[1]); // methylation value, from 0 to 1
-        this.count = Number.parseInt(meths[2], 10); // read depth
-    }
-
-    /**
-     * @return {number} the 1 - divergence% value
-     */
-    getValue() {
-        return this.value;
-    }
-
-    getContext() {
-        return this.context;
+    constructor(bedRecord) {
+        const locus = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
+        const datas = _.split(bedRecord[3], '/');
+        super('', locus, datas[RecordInfoIndices.STRAND]);
+        this.context = datas[RecordInfoIndices.CONTEXT]
+        this.value = Number.parseFloat(datas[RecordInfoIndices.VALUE]); // methylation value, from 0 to 1
+        this.depth = Number.parseInt(datas[RecordInfoIndices.DEPTH], 10); // read depth
     }
 }
-
-// combineSites = (bag) => { //bag is array of methylcRecord on sites belong to one CG, CHG or CHH
-//    if (bag.length === 1) {
-//        //change end to start +2 or +3 depending on context
-//        //constructor the string?
-//    } else {
-//     //do math
-
-//    }
-// }
-
-// combineMethyCRecords = (records) => {
-//     //records need be sorted, since the records were obtained from tabix, they are already sorted
-//     let results = [];
-//     for (let record of records) {
-//         if (record._isForwardStrand) { //first base in CG
-//             //make bags
-//         }
-//     }
-//     return ;
-// }
 
 export default MethylCRecord;

@@ -13,7 +13,7 @@ export class Feature {
      * 
      * @param {string} [name] - name of the feature
      * @param {ChromosomeInterval} locus - genomic location of the feature
-     * @param {boolean} [isForwardStrand] - whether this feature is on the forward strand.  Default: true
+     * @param {string} strand - strand info
      */
     constructor(name, locus, strand) {
         this.name = name == undefined ? locus.toString() : name; // eslint-disable-line eqeqeq

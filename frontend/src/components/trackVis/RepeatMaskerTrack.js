@@ -36,7 +36,7 @@ const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
  */
 class RepeatTrack extends React.PureComponent {
     static propTypes = Object.assign({},
-        Track.trackContainerProps,
+        Track.propsFromTrackContainer,
         withTooltip.INJECTED_PROPS,
         {
         data: PropTypes.array.isRequired, //PropTypes.arrayOf(PropTypes.instanceOf(RepeatMaskerFeature)).isRequired,

@@ -26,7 +26,7 @@ const INTERVAL_ARRANGER = new IntervalArranger(
  */
 class GeneAnnotationTrack extends React.Component {
     static propTypes = Object.assign({},
-        Track.trackContainerProps,
+        Track.propsFromTrackContainer,
         withTooltip.INJECTED_PROPS,
         {
         // Genes to render

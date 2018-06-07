@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import WorkerRunnableSource from '../worker/WorkerRunnableSource';
 import bigwig from '../../vendor/bbi-js/main/bigwig';
 import bin from '../../vendor/bbi-js/utils/bin';
