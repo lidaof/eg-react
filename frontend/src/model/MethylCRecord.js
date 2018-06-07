@@ -28,7 +28,7 @@ class MethylCRecord extends Feature {
 
     /**
      * Combines all MethylCRecords that (presumably) are in one pixel.  See schema below the function for return schema.
-     * If passed an empty array, returns an empty object.
+     * If passed an empty array, returns null.
      * 
      * @param {MethylCRecord[]} records 
      * @return {Object}
@@ -51,14 +51,36 @@ class MethylCRecord extends Feature {
             depth: depth,
             contextValues: contextValues
         }
+    }
+    /*
+    {
+        depth: 5,
+        contextValues: [
+            {context: "CG", value: 0.3},
+            {context: "CHH", value: 0.3},
+            {context: "CHG", value: 0.3},
+        ]
+    }
+    */
+
+    /**
+     * Combines all MethylCRecords that (presumably) are in one pixel.  See schema below the function for return schema.
+     * 
+     * @param {MethylCRecord[]} records 
+     * @return {Object}
+     */
+    static aggregateByStrand(records) {
+        let [forwardStrandRecords, reverseStrandRecords] = _.partition(records, record => record.getIsForwardStrand());
+        return {
+            combined: MethylCRecord.aggregateRecords(records),
+            forward: MethylCRecord.aggregateRecords(forwardStrandRecords),
+            reverse: MethylCRecord.aggregateRecords(reverseStrandRecords)
+        };
         /*
         {
-            depth: 5,
-            contextValues: [
-                {context: "CG", value: 0.3},
-                {context: "CHH", value: 0.3},
-                {context: "Your Mom", value: 0.3},
-            ]
+            combined: {},
+            forward: {},
+            reverse: {}
         }
         */
     }

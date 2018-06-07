@@ -77,6 +77,13 @@ class CanvasDesignRenderer extends React.PureComponent {
             case 'g':
                 React.Children.forEach(props.children, child => this.drawOneElement(context, child));
                 break;
+            case 'line':
+                context.strokeStyle = props.stroke;
+                context.beginPath();
+                context.moveTo(props.x1, props.y1);
+                context.lineTo(props.x2, props.y2);
+                context.stroke();
+                break;
             case undefined:
                 break;
             default:

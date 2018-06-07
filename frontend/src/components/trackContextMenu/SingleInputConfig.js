@@ -20,13 +20,13 @@ class SingleInputConfig extends React.PureComponent {
         /**
          * Track option objects to configure, presumably selected ones
          */
-        optionsObjects: PropTypes.arrayOf(PropTypes.object),
+        optionsObjects: PropTypes.arrayOf(PropTypes.object).isRequired,
         /**
          * Callback for when an option is set.  Signature (optionName: string, value: any): void
          *     `optionName` - key of a track's options to set
          *     `value` - new value for the option
          */
-        onOptionSet: PropTypes.func,
+        onOptionSet: PropTypes.func.isRequired,
     };
 
     static propTypes = Object.assign({}, SingleInputConfig.menuPropTypes, {
@@ -48,9 +48,8 @@ class SingleInputConfig extends React.PureComponent {
     });
 
     static defaultProps = {
-        optionsObjects: [],
-        onOptionSet: (optionName, value) => undefined,
-
+        //optionsObjects: [],
+        //onOptionSet: (optionName, value) => undefined,
         defaultValue: "",
         multiValue: "[multiple values]",
         getInputElement: (inputValue, setNewValue) =>
