@@ -1,0 +1,19 @@
+.MethylCTrack-tooltip {
+    padding: 0 5px 5px; /* top horizontal bottom */
+}
+
+.MethylCTrack-tooltip-strand {
+    margin-bottom: 5px;
+}
+
+.MethylCTrack-tooltip-strand-title {
+    text-transform: capitalize;
+    font-weight: bold;
+}
+
+.MethylCTrack-tooltip-strand-details {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-column-gap: 20px;
+    font-size: small;
+}

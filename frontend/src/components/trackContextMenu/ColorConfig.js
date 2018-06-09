@@ -12,7 +12,7 @@ const DEFAULT_COLOR = "#FFFFFF"; // White
  * 
  * @author Silas Hsu
  */
-class ColorConfig extends React.PureComponent {
+export class ColorConfig extends React.PureComponent {
     static propTypes = Object.assign({}, SingleInputConfig.menuPropTypes, {
         optionName: PropTypes.string.isRequired, // The prop to change of a TrackModel's options object.
         label: PropTypes.string, // Label of the color picker

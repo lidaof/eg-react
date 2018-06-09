@@ -11,20 +11,16 @@ import './TrackContextMenu.css';
  */
 export const ITEM_PROP_TYPES = {
     /**
-     * Tracks to consider when rendering info that the menu item displays
+     * Track option objects to configure.
      */
-    tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
+    optionsObjects: PropTypes.arrayOf(PropTypes.object).isRequired,
 
     /**
-     * Callback for when the item requests a change.  Signature: (replaceTrack: TrackReplacer): void
-     *     TrackReplacer is defined at the bottom of this file.
+     * Callback for when an option is set.  Signature (optionName: string, value: any): void
+     *     `optionName` - key of options objects to set
+     *     `value` - new value for the option
      */
-    onChange: PropTypes.func
-};
-
-export const ITEM_DEFAULT_PROPS = {
-    tracks: [],
-    onChange: (replaceTrack) => undefined
+    onOptionSet: PropTypes.func.isRequired,
 };
 
 /**

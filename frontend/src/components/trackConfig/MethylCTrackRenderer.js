@@ -4,6 +4,7 @@ import { configStaticDataSource } from './configDataFetch';
 import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import HeightConfig from '../trackContextMenu/HeightConfig';
 import CombineStrandConfig from '../trackContextMenu/CombineStrandConfig';
+import {MethylColorConfig, ReadDepthColorConfig} from '../trackContextMenu/MethylColorConfig';
 import MethylCTrack, { DEFAULT_OPTIONS } from '../trackVis/MethylCTrack';
 
 import WorkerSource from '../../dataSources/worker/WorkerSource';
@@ -31,7 +32,8 @@ class MethylCTrackRenderer extends TrackRenderer {
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), CombineStrandConfig, HeightConfig, BackgroundColorConfig];
+        return [...super.getMenuComponents(), HeightConfig, CombineStrandConfig, MethylColorConfig,
+            ReadDepthColorConfig, BackgroundColorConfig];
     }
 
     getComponent() {

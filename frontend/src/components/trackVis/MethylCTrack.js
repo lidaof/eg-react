@@ -8,20 +8,43 @@ import Track from './commonComponents/Track';
 import TrackLegend from './commonComponents/TrackLegend';
 import configOptionMerging from './commonComponents/configOptionMerging';
 import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
+import GenomicCoordinates from './commonComponents/GenomicCoordinates';
 import DesignRenderer, { RenderTypes } from '../../art/DesignRenderer';
 
+import TrackModel from '../../model/TrackModel';
 import FeatureAggregator from '../../model/FeatureAggregator';
 import MethylCRecord from '../../model/MethylCRecord';
+import { getContrastingColor } from '../../util';
 
 import './commonComponents/tooltip/Tooltip.css';
+import './MethylCTrack.css';
+
+const VERTICAL_PADDING = 3;
+const PLOT_DOWNWARDS_STRAND = "reverse";
+const DEFAULT_COLORS_FOR_CONTEXT = {
+    CG: { color: "rgb(100,139,216)", background: "#d9d9d9" },
+    CHG: { color: "rgb(255,148,77)", background: "#ffe0cc" },
+    CHH: { color: "rgb(255,0,255)", background: "#ffe5ff" },
+};
+const OVERLAPPING_CONTEXTS_COLORS = DEFAULT_COLORS_FOR_CONTEXT.CG;
+const UNKNOWN_CONTEXT_COLORS = DEFAULT_COLORS_FOR_CONTEXT.CG;
 
 export const DEFAULT_OPTIONS = {
     height: 40,
     isCombineStrands: false,
-    contextColors: MethylCRecord.DEFAULT_CONTEXT_COLORS,
-    depthColor: MethylCRecord.DEFAULT_COUNT_COLOR,
+    colorsForContext: DEFAULT_COLORS_FOR_CONTEXT,
+    depthColor: "#525252",
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
+
+function makeBackgroundColorStyle(color) {
+    return {
+        color: getContrastingColor(color),
+        backgroundColor: color,
+        padding: "0px 3px", // 3px horizontal padding
+        borderRadius: 3,
+    };
+}
 
 /**
  * Visualizer for MethylC tracks. 
@@ -40,7 +63,7 @@ class MethylCTrack extends React.PureComponent {
         super(props);
         this.aggregateRecords = memoizeOne(this.aggregateRecords);
         this.computeScales = memoizeOne(this.computeScales);
-        this.renderTooltipByStrand = this.renderTooltipByStrand.bind(this);
+        this.renderTooltipContents = this.renderTooltipContents.bind(this);
     }
 
     aggregateRecords(data, viewRegion, width) {
@@ -73,85 +96,9 @@ class MethylCTrack extends React.PureComponent {
         const maxDepthReverse = _.maxBy(reverseRecords, 'depth') || { depth: 0 };
         const maxDepth = Math.max(maxDepthForward.depth, maxDepthReverse.depth);
         return {
-            methylToY: scaleLinear().domain([1, 0]).range([0, height]).clamp(true),
-            readDepthToY: scaleLinear().domain([maxDepth, 0]).range([0, height]).clamp(true)
+            methylToY: scaleLinear().domain([1, 0]).range([VERTICAL_PADDING, height]).clamp(true),
+            depthToY: scaleLinear().domain([maxDepth, 0]).range([VERTICAL_PADDING, height]).clamp(true)
         };
-    }
-
-    renderByStrand(dataAtX, x) {
-        /*
-        {
-            combined: {
-                depth: 5 (NaN if no data),
-                contextValues: [
-                    {context: "CG", value: 0.3},
-                    {context: "CHH", value: 0.3},
-                    {context: "CHG", value: 0.3},
-                ]
-            },
-            forward: {},
-            reverse: {}
-        }
-        */
-        if (this.props.options.isCombineStrands) {
-            return this.renderBarElement(dataAtX.combined, x);
-        } else {
-            return [...this.renderBarElement(dataAtX.forward, x), ...this.renderBarElement(dataAtX.reverse, x, true)];
-        }
-    }
-
-    renderBarElement(dataAtX, x, plotDownwards=false) {
-        if (!dataAtX) {
-            return [];
-        }
-        const options = this.props.options;
-        const height = options.height;
-        const backgroundY = plotDownwards ? height : 0;
-        let backgroundColor = options.contextColors.CG.background;
-        if (dataAtX.contextValues.length === 1) {
-            const theContext = dataAtX.contextValues[0].context;
-            backgroundColor = options.contextColors[theContext].background;
-        }
-        let children = [<rect key={x + "bg"} x={x} y={backgroundY} width={1} height={height} fill={backgroundColor} />];
-        for (let data of dataAtX.contextValues) {
-            const scaleY = this.scales.methylToY(data.value);
-            const drawY = plotDownwards ? height : scaleY;
-            const color = options.contextColors[data.context].color;
-            children.push(<rect key={x + data.context} x={x} y={drawY} width={1} height={height - scaleY} fill={color} fillOpacity={0.75} />)
-        }
-        
-        return children;
-    }
-
-    renderDepth(strand) {
-        const plotDownwards = strand === "reverse";
-        let children = [];
-        for (let x = 0; x < this.aggregatedRecords.length - 1; x++) {
-            const thisRecord = this.aggregatedRecords[x][strand];
-            const nextRecord = this.aggregatedRecords[x + 1][strand];
-            if (thisRecord && nextRecord) {
-                const scaleY1 = this.scales.readDepthToY(thisRecord.depth);
-                const scaleY2 = this.scales.readDepthToY(nextRecord.depth);
-                const y1 = plotDownwards ? this.props.options.height * 2 - scaleY1 : scaleY1;
-                const y2 = plotDownwards ? this.props.options.height * 2 - scaleY2 : scaleY2;
-                children.push(<line key={x} x1={x} y1={y1} x2={x+1} y2={y2} stroke="black" />);
-            }
-        }
-        return children;
-    }
-
-    renderTooltipByStrand(x) {
-        const dataAtPoint = this.aggregatedRecords[x];
-        if (this.props.options.isCombineStrands) {
-            return this.renderTooltip(dataAtPoint.combined);
-        } else {
-            return <div>
-                <h4>Forward</h4>
-                {this.renderTooltip(dataAtPoint.forward)}
-                <h4>Reverse</h4>
-                {this.renderTooltip(dataAtPoint.reverse)}
-            </div>
-        }
     }
 
     /**
@@ -160,53 +107,195 @@ class MethylCTrack extends React.PureComponent {
      * @param {number} x - x coordinate of the mouseover relative to the left side of the visualizer
      * @return {JSX.Element} tooltip contents to render
      */
-    renderTooltip(dataAtPoint) {
-        if (!dataAtPoint) {
-            return "(No data)";
+    renderTooltipContents(x) {
+        const {trackModel, viewRegion, width, options} = this.props;
+        const strandsAtPixel = this.aggregatedRecords[x];
+
+        return <div className="MethylCTrack-tooltip" >
+            {this.renderTooltipContentsForStrand(strandsAtPixel, options.isCombineStrands ? "combined" : "forward")}
+            {!options.isCombineStrands && this.renderTooltipContentsForStrand(strandsAtPixel, "reverse")}
+            <div className="Tooltip-minor-text">
+                <GenomicCoordinates viewRegion={viewRegion} width={width} x={x} />
+            </div>
+            <div className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</div>
+        </div>;
+    }
+
+    renderTooltipContentsForStrand(strandsAtPixel, strand) {
+        const {depthColor, colorsForContext} = this.props.options;
+        const dataAtPixel = strandsAtPixel[strand];
+        let details = null;
+        if (dataAtPixel) {
+            let dataElements = [];
+            // Sort alphabetically by context name first
+            const contextValues = _.sortBy(dataAtPixel.contextValues, 'context');
+            for (let contextData of contextValues) {
+                const contextName = contextData.context;
+                const color = (colorsForContext[contextName] || UNKNOWN_CONTEXT_COLORS).color;
+                dataElements.push(
+                    <div key={contextName + "label"} style={makeBackgroundColorStyle(color)} >{contextName}</div>,
+                    <div key={contextName + "value"} >{contextData.value.toFixed(2)}</div>
+                );
+            }
+            details = (
+                <div className="MethylCTrack-tooltip-strand-details" >
+                    <div style={makeBackgroundColorStyle(depthColor)}>Depth</div>
+                    <div>{Math.round(dataAtPixel.depth)}</div>
+                    {dataElements}
+                </div>
+            );
         }
-        return (
-            <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
-                <li className="Tooltip-minor-text" >Depth {dataAtPoint.depth}</li>
-                {dataAtPoint.contextValues.map(data => (
-                    <React.Fragment key={data.context}>
-                        <li className="Tooltip-major-text">{data.context}</li>
-                        <li className="Tooltip-minor-text" >Value {data.value}</li>
-                    </React.Fragment>
-                ))}
-            </ul>
-        );
+
+        return <div key={strand} className="MethylCTrack-tooltip-strand">
+            <span className="MethylCTrack-tooltip-strand-title">{strand}</span>
+            {details || <div className="Tooltip-minor-text">(No data)</div>}
+        </div>;
     }
 
     renderVisualizer() {
         const {width, options} = this.props;
-        const height = options.height;
-        const canvasHeight = options.isCombineStrands ? height : height * 2
-        return <HoverTooltipContext tooltipRelativeY={canvasHeight} getTooltipContents={this.renderTooltipByStrand} >
-            <DesignRenderer
-                type={RenderTypes.CANVAS}
-                width={width}
-                height={canvasHeight}
-            >
-                {this.aggregatedRecords.map((record, x) => this.renderByStrand(record, x))}
-                {this.props.options.isCombineStrands ? this.renderDepth("combined") : this.renderDepth("forward") }
-                {this.props.options.isCombineStrands ? null : this.renderDepth("reverse") }
-            </DesignRenderer>
+        const {height, colorsForContext, depthColor, isCombineStrands} = options;
+        const childProps = {
+            data: this.aggregatedRecords, scales: this.scales, htmlType: RenderTypes.CANVAS,
+            width, height, colorsForContext, depthColor
+        };
+        let strandRenderers, tooltipY;
+        if (isCombineStrands) {
+            strandRenderers = [ <StrandVisualizer key={0} {...childProps} strand="combined" /> ];
+            tooltipY = height;
+        } else {
+            strandRenderers = [
+                <StrandVisualizer key={0} {...childProps} strand="forward" />,
+                <hr key={"center"} style={{margin: 0}} />,
+                <StrandVisualizer key={1} {...childProps} strand="reverse" />,
+            ];
+            tooltipY = height * 2;
+        }
+
+        return (
+        <HoverTooltipContext tooltipRelativeY={tooltipY} getTooltipContents={this.renderTooltipContents} >
+            {strandRenderers}
         </HoverTooltipContext>
+        );
     }
 
     /** 
      * @inheritdoc
      */
     render() {
-        const {data, viewRegion, width, options} = this.props;
+        const {data, trackModel, viewRegion, width, options} = this.props;
         this.aggregatedRecords = this.aggregateRecords(data, viewRegion, width);
         this.scales = this.computeScales(this.aggregatedRecords, options.height);
         return <Track
             {...this.props}
-            legend={<TrackLegend trackModel={this.props.trackModel} height={this.props.options.height} scaleForAxis={this.scales.methylToY} />}
+            legend={
+                <div>
+                    <TrackLegend trackModel={trackModel} height={options.height} axisScale={this.scales.methylToY} />
+                    {!options.isCombineStrands && <ReverseStrandLegend trackModel={trackModel} height={options.height} />}
+                </div>
+            }
             visualizer={this.renderVisualizer()}
         />
     }
 }
 
 export default withDefaultOptions(MethylCTrack);
+
+class StrandVisualizer extends React.PureComponent {
+    static propTypes = {
+        data: PropTypes.array.isRequired,
+        strand: PropTypes.string.isRequired,
+        scales: PropTypes.object.isRequired,
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired,
+        colorsForContext: PropTypes.object.isRequired,
+        depthColor: PropTypes.string.isRequired,
+        htmlType: PropTypes.any,
+    };
+
+    getColorsForContext(contextName) {
+        return this.props.colorsForContext[contextName] || UNKNOWN_CONTEXT_COLORS;
+    }
+
+    renderBarElement(x) {
+        const {data, scales, strand, height} = this.props;
+        const pixelData = data[x][strand];
+        if (!pixelData) {
+            return null;
+        }
+
+        
+        let backgroundColor;
+        if (pixelData.contextValues.length === 1) {
+            const contextName = pixelData.contextValues[0].context;
+            backgroundColor = this.getColorsForContext(contextName).background;
+        } else {
+            backgroundColor = OVERLAPPING_CONTEXTS_COLORS.background
+        }
+
+        let elements = [
+            <rect key={x + "bg"} x={x} y={VERTICAL_PADDING} width={1} height={height} fill={backgroundColor} />
+        ];
+        for (let contextData of pixelData.contextValues) {
+            const contextName = contextData.context;
+            const drawY = scales.methylToY(contextData.value);
+            const drawHeight = height - drawY;
+            const color = this.getColorsForContext(contextName).color;
+            elements.push(<rect
+                key={x + contextName}
+                x={x}
+                y={drawY}
+                width={1}
+                height={drawHeight}
+                fill={color}
+                fillOpacity={0.75}
+            />);
+        }
+        
+        return elements;
+    }
+
+    renderDepthPlot() {
+        const {data, scales, width, strand, depthColor} = this.props;
+        let elements = [];
+        for (let x = 0; x < width - 1; x++) {
+            const currentRecord = data[x][strand];
+            const nextRecord = data[x + 1][strand];
+            if (currentRecord && nextRecord) {
+                const y1 = scales.depthToY(currentRecord.depth);
+                const y2 = scales.depthToY(nextRecord.depth);
+                elements.push(<line key={x} x1={x} y1={y1} x2={x + 1} y2={y2} stroke={depthColor} />);
+            }
+        }
+        return elements;
+    }
+
+    render() {
+        const {data, strand, width, height, htmlType} = this.props;
+        const style = strand === PLOT_DOWNWARDS_STRAND ? {transform: "scale(1, -1)"} : undefined;
+        let bars = [];
+        for (let x = 0; x < data.length; x++) {
+            bars.push(this.renderBarElement(x))
+        }
+        return (
+        <DesignRenderer
+            type={htmlType}
+            width={width}
+            height={height}
+            style={style}
+        >
+            {bars}
+            {this.renderDepthPlot()}
+        </DesignRenderer>
+        );
+    }
+}
+
+function ReverseStrandLegend(props) {
+    const mockTrackModel = new TrackModel({name: "Reverse strand", isSelected: props.trackModel.isSelected});
+    return <TrackLegend
+        trackModel={mockTrackModel}
+        height={props.height}
+        axisScale={scaleLinear().domain([0, 1]).range([0, props.height - VERTICAL_PADDING])}
+    />;
+}

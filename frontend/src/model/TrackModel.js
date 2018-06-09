@@ -40,7 +40,6 @@ class TrackModel {
         this.metadata["Track type"] = this.type;
 
         // Other misc props
-        this.isSelected = false;
         this.id = nextId;
         nextId++;
     }

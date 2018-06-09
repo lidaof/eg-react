@@ -1,0 +1,9 @@
+.MethylColorConfig-table {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    margin-bottom: 5px;
+}
+
+.MethylColorConfig-header {
+    font-weight: bold
+}

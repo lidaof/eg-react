@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import aggregateOptions from './aggregateOptions';
+import { ITEM_PROP_TYPES } from './TrackContextMenu';
 
 import './TrackContextMenu.css';
 
@@ -13,23 +14,7 @@ const DEBOUNCE_INTERVAL = 250;
  * @author Silas Hsu
  */
 class SingleInputConfig extends React.PureComponent {
-    /**
-     * Props to expect from parent context menu components
-     */
-    static menuPropTypes = {
-        /**
-         * Track option objects to configure, presumably selected ones
-         */
-        optionsObjects: PropTypes.arrayOf(PropTypes.object).isRequired,
-        /**
-         * Callback for when an option is set.  Signature (optionName: string, value: any): void
-         *     `optionName` - key of a track's options to set
-         *     `value` - new value for the option
-         */
-        onOptionSet: PropTypes.func.isRequired,
-    };
-
-    static propTypes = Object.assign({}, SingleInputConfig.menuPropTypes, {
+    static propTypes = Object.assign({}, ITEM_PROP_TYPES, {
         optionName: PropTypes.string.isRequired, // Option prop name to read from/write to track models
         label: PropTypes.string.isRequired, // Label for the input
         /**

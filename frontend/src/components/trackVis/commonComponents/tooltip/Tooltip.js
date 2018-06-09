@@ -80,7 +80,13 @@ class Tooltip extends React.PureComponent {
         return ReactDOM.createPortal(
             <Manager>
                 <Target style={{position: "absolute", left: pageX, top: pageY}} />
-                <Popper placement="bottom-start" className="Tooltip-body" style={contentStyle} onMouseDown={stopEvent} >
+                <Popper
+                    placement="bottom-start"
+                    modifiers={{flip: {enabled: false}}}
+                    className="Tooltip-body"
+                    style={contentStyle}
+                    onMouseDown={stopEvent}
+                >
                     <OutsideClickDetector onOutsideClick={onClose} >
                         {children}
                     </OutsideClickDetector>

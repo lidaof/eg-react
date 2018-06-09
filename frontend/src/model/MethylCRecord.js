@@ -2,14 +2,6 @@ import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import _ from 'lodash';
 
-
-const DEFAULT_CONTEXT_COLORS = {
-    "CG": { color: "rgb(100,139,216)", background: "#d9d9d9" },
-    "CHG": { color: "rgb(255,148,77)", background: "#ffe0cc" },
-    "CHH":  {color: "rgb(255,0,255)", background: "#ffe5ff" },
-};
-
-const DEFAULT_COUNT_COLOR = "#525252";
 const RecordInfoIndices = {
     CONTEXT: 0,
     VALUE: 1,
@@ -23,14 +15,11 @@ const RecordInfoIndices = {
  * @author Daofeng Li
  */
 class MethylCRecord extends Feature {
-    static DEFAULT_CONTEXT_COLORS = DEFAULT_CONTEXT_COLORS;
-    static DEFAULT_COUNT_COLOR = DEFAULT_COUNT_COLOR;
-
     /**
      * Combines all MethylCRecords that (presumably) are in one pixel.  See schema below the function for return schema.
      * If passed an empty array, returns null.
      * 
-     * @param {MethylCRecord[]} records 
+     * @param {MethylCRecord[]} records
      * @return {Object}
      */
     static aggregateRecords(records) {
