@@ -32,44 +32,58 @@ actually entire chromosomes, then the user can effectively navigate the whole ge
 5.  From `App`, descend into interested components.
 
 ## Making a new track type
-### 1.  Write a new track component (required)
+### Make a new TrackRenderer
+Make a new class that extends `TrackRenderer`, or one of its subclasses.  This class packages many essential track
+characteristics:
+
+* `getComponent()` - gets the component that renders the main visualizer and legend of the track.
+* `getMenuComponents()` - specifies context menu items in an array of components.  You can choose existing ones
+in the `contextMenu` directory, or make new ones.
+* `getOptions()` - the visualizer probably renders with default options, like a color.  This method returns a plain
+object containing those options.
+
+You do not have to implement these methods immediately, as the base `TrackRenderer` class provides minimal defaults.
+Just work on making the browser render *some* temporary placeholder at first.
+
+### Specify when to use the TrackRenderer
+1.  Import your new TrackRenderer into `trackConfig/getTrackRenderer.js`.
+2.  Add an appropriate entry to `TYPE_NAME_TO_SUBTYPE`, which maps track type name to track renderer.
+
+### Write a new track visualizer component (implement `getComponent()`)
 1.  Make a new component expecting to receive a bunch of props from `TrackContainer`.  `Track.js` documents the props
 to expect.
-2.  Your new component may `render` anything, though it is **highly** recommended you render a `<Track>` component, if
+2.  If you need data, assume it will come through the `data` prop.  We will add data fetch in the next step.
+3.  Your new component may `render` anything, though it is **highly** recommended you render a `<Track>` component, if
 not one of the more specialized components like `<AnnotationTrack>` or `<NumericalTrack>`.  Pass *all* track container
 props to these sub-components.
-3.  In addition to track container props, you need to provide certain props to these sub-components, all of which the
+4.  In addition to track container props, you need to provide certain props to these sub-components, all of which the
 respective files document.
     * For example, `<Track>` requires a legend and visualizer element.  Use the track container props, which includes
     view region and width, to render a visualizer and pass it to `<Track>`.
 
-#### Adding data fetch, etc.
-[Higher-order components](https://reactjs.org/docs/higher-order-components.html) manage common funtionality like data
-fetching.  The `commonComponents` directory contains track-specific HOCs; their names start with `config-` or `with-`.
+### Add data fetch
+Available data sources are in the `dataSources` folder.  If none of them fulfill your needs, write a new class that
+fulfills the interface of `DataSource.js`.  More can be found in that file.
 
-For example, `configStaticDataSource` returns a *function* with which you can wrap your new track component.  After you
-use this function, your component will automatically receive three additional props `data`, `isLoading`, and `error`,
-whose function are self-explanatory.  In particular, if `isLoading` is false, the `data` prop is guaranteed to be in
-sync with the view region.
+How do we give your visualizer data?  [Higher-order components](https://reactjs.org/docs/higher-order-components.html)!
+`track/commonComponents` contains track-specific HOCs; their names start with `config-` or `with-`.
 
-### 2.  Specify context menu components (optional)
+`configStaticDataSource` requests a callback that returns a `DataSource` and then returns a *function* that wraps React
+components.  After you use this function, a component will automatically receive three props `data`, `isLoading`, and
+`error`.  These update with the browser's current view region.  In particular, the HOC guarantees synchronization of the
+`data` prop with the current view region if `isLoading` is false.
+
+### 2.  Specify context menu components (implement `getMenuComponents()`)
 Specify context menu items with an array of components.  You can choose existing ones in the `contextMenu` directory, or
 make new ones.
-* Make sure you are specifying Component *classes*, not component instances.
-* All tracks have some menu items by default, such as the one modifying label and the one removing the track.  These are
-part of `TrackContextMenu`, and you do not need to specify them manually.
+* Make sure the method returns Component *classes*, not component instances.
 
-### 3.  Specify default options (optional)
+### 3.  Specify default options
 Default option objects look like the `options` prop of `TrackModel` objects.  Context menu items will read these options
 if the track model does not specify them.  Make sure these options are consistent with the way you are rendering your
 track component!  The `configOptionMerging` HOC should help with that.
 
-### 4.  Configure when to render your shiny new component
-1.  Package your new component, menu item list, and default options into one configuration object with props
-`component`, `menuItems`, and `defaultOptions`.
-2.  Import the object from step 1 into `track/subtypeConfig.js`.
-3.  Add an appropriate entry to `TYPE_NAME_TO_SUBTYPE` in `track/subtypeConfig.js`, which maps track type name to track
-configurations.  Alternatively, for very fine-grained control, you can modify the functions in the file directly.
+Once you have a default options object, call `setDefaultOptions()` in the constructor of `TrackRenderer` to use them.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.
@@ -99,6 +113,5 @@ fetch/processing.
 [track config deserializer] --> [config object]
 5.  We cannot have our cake and eat it too.
 
-  Unfortunately, this means we cannot
-move all expensive computation into one streamlined pipeline in worker context, while also maintaining a structure where
-track component and data source for the component are .  
+Unfortunately, this means we cannot pipeline all expensive computation in worker context, while also ensuring track
+component and data source live in the same place.
