@@ -1,19 +1,27 @@
 /**
+ * Something with props `start` and `end` which represent a 0-indexed open interval
+ */
+export interface IOpenInterval {
+    start: number;
+    end: number;
+}
+
+/**
  * A 0-indexed open interval.  Intervals are iterable, so code can take advantage of the spread operator:
  *     `myFunction(...interval)` is equivalent to `myFunction(interval.start, interval.end)`
  * 
  * @implements {Serializable}
  * @author Silas Hsu
  */
-class OpenInterval {
+export default class OpenInterval implements IOpenInterval {
     /**
-     * Makes a new instance.  The input should be a 0-indexed open one.
+     * Makes a new instance.  The input should represent a 0-indexed open interval.
      * 
      * @param {number} start - start of the interval, inclusive
      * @param {number} end - end of the interval, exclusive
      * @throws {RangeError} if the end is less than the start
      */
-    constructor(start, end) {
+    constructor(public start: number, public end: number) {
         if (end < start) {
             throw new RangeError("End cannot be less than start");
         }
@@ -21,14 +29,26 @@ class OpenInterval {
         this.end = end;
     }
 
-    serialize() {
-        return [...this];
+    /**
+     * @returns {IOpenInterval}
+     */
+    serialize(): IOpenInterval {
+        return this;
     }
 
-    static deserialize(object) {
-        return new OpenInterval(...object);
+    /**
+     * Creates an OpenInterval from an object.
+     *
+     * @param {IOpenInterval} object - object to use
+     * @return {OpenInterval} OpenInterval created from the object
+     */
+    static deserialize(object: IOpenInterval): OpenInterval {
+        return new OpenInterval(object.start, object.end);
     }
 
+    /**
+     * Enables the spread operator for OpenIntervals.
+     */
     *[Symbol.iterator] () {
         yield this.start;
         yield this.end;
@@ -41,7 +61,7 @@ class OpenInterval {
      * @param {OpenInterval} other - other OpenInterval to intersect
      * @return {OpenInterval} intersection of this and the other interval
      */
-    getOverlap(other) {
+    getOverlap(other: OpenInterval): OpenInterval {
         const intersectionStart = Math.max(this.start, other.start);
         const intersectionEnd = Math.min(this.end, other.end);
         if (intersectionStart < intersectionEnd) {
@@ -54,16 +74,14 @@ class OpenInterval {
     /**
      * @return {number} the length of this interval
      */
-    getLength() {
+    getLength(): number {
         return this.end - this.start;
     }
 
     /**
      * @return {string} human-readable representation of this instance
      */
-    toString() {
+    toString(): string {
         return `[${this.start}, ${this.end})`;
     }
 }
-
-export default OpenInterval;

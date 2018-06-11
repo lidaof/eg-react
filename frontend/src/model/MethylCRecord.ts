@@ -1,6 +1,7 @@
 import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import _ from 'lodash';
+import BedRecord from '../dataSources/bed/BedRecord';
 
 const RecordInfoIndices = {
     CONTEXT: 3,
@@ -8,6 +9,20 @@ const RecordInfoIndices = {
     DEPTH: 5,
     STRAND: 6
 };
+
+interface AggregationByRecordsResult {
+    depth: number; // mean of depth
+    contextValues: Array<{
+        context: string;
+        value: number; // mean of context value
+    }>
+}
+
+interface AggregationByStrandResult {
+    combined: AggregationByRecordsResult;
+    forward: AggregationByRecordsResult;
+    reverse: AggregationByRecordsResult
+}
 
 /**
  * A data container for a MethylC record.
@@ -20,16 +35,16 @@ class MethylCRecord extends Feature {
      * If passed an empty array, returns null.
      * 
      * @param {MethylCRecord[]} records
-     * @return {Object}
+     * @return {AggregationResult}
      */
-    static aggregateRecords(records) {
+    static aggregateRecords(records: MethylCRecord[]): AggregationByRecordsResult {
         if (records.length === 0) {
             return null;
         }
         const depth = _.meanBy(records, 'depth');
         const groupedByContext = _.groupBy(records, 'context');
-        let contextValues = [];
-        for (let contextName in groupedByContext) {
+        const contextValues = [];
+        for (const contextName in groupedByContext) {
             const recordsOfThatContext = groupedByContext[contextName];
             contextValues.push({
                 context: contextName,
@@ -37,8 +52,8 @@ class MethylCRecord extends Feature {
             });
         }
         return {
-            depth: depth,
-            contextValues: contextValues
+            depth,
+            contextValues
         }
     }
     /*
@@ -58,8 +73,8 @@ class MethylCRecord extends Feature {
      * @param {MethylCRecord[]} records 
      * @return {Object}
      */
-    static aggregateByStrand(records) {
-        let [forwardStrandRecords, reverseStrandRecords] = _.partition(records, record => record.getIsForwardStrand());
+    static aggregateByStrand(records: MethylCRecord[]): AggregationByStrandResult {
+        const [forwardStrandRecords, reverseStrandRecords] = _.partition(records, record => record.getIsForwardStrand());
         return {
             combined: MethylCRecord.aggregateRecords(records),
             forward: MethylCRecord.aggregateRecords(forwardStrandRecords),
@@ -83,7 +98,10 @@ class MethylCRecord extends Feature {
      * Constructs a new MethylCRecord, given a string from tabix
      *
      */
-    constructor(bedRecord) {
+    context: any;
+    value: number;
+    depth: number;
+    constructor(bedRecord: BedRecord) {
         const locus = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
         super('', locus,bedRecord[RecordInfoIndices.STRAND]);
         this.context = bedRecord[RecordInfoIndices.CONTEXT]

@@ -64,7 +64,7 @@ class CanvasDesignRenderer extends React.PureComponent {
             return; // Do nothing
         }
         if (Array.isArray(element)) {
-            element.forEach(element => this.drawOneElement(context, element));
+            element.forEach(e => this.drawOneElement(context, e));
             return;
         }
         const props = element.props;

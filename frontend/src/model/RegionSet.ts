@@ -1,8 +1,19 @@
 import _ from 'lodash';
-import Feature from './Feature';
+import Feature, { IFeature } from './Feature';
 import NavigationContext from './NavigationContext';
-import FlankingStrategy from './FlankingStrategy';
+import FlankingStrategy, { IFlankingStrategy } from './FlankingStrategy';
 import { getGenomeConfig } from './genomes/allGenomes';
+import { Genome } from './genomes/Genome';
+
+/**
+ * A RegionSet without methods.
+ */
+interface IRegionSet {
+    name: string;
+    features: IFeature[];
+    genomeName: string;
+    flankingStrategy: IFlankingStrategy;
+}
 
 /**
  * A set of features that undergoes some configuration before being exported to a navigation context.
@@ -22,14 +33,16 @@ class RegionSet {
      * @param {Genome} genome - genome to which the features belong
      * @param {FlankingStrategy} flankingStrategy - feature modifier
      */
-    constructor(name="", features=[], genome, flankingStrategy) {
+    constructor(public name="", public features: Feature[]=[], public genome: Genome,
+        public flankingStrategy: FlankingStrategy)
+    {
         this.name = name;
         this.features = features;
         this.genome = genome;
         this.flankingStrategy = flankingStrategy;
     }
 
-    serialize() {
+    serialize(): IRegionSet {
         return {
             name: this.name,
             features: this.features.map(feature => feature.serialize()),
@@ -38,7 +51,7 @@ class RegionSet {
         }
     }
 
-    static deserialize(object) {
+    static deserialize(object: IRegionSet): RegionSet {
         const genomeName = object.genomeName;
         const genomeConfig = getGenomeConfig(genomeName);
         if (!genomeConfig) {
@@ -59,8 +72,8 @@ class RegionSet {
      * @param {any} value - the value to set
      * @return {RegionSet} cloned and modified version of this
      */
-    cloneAndSet(propName, value) {
-        let newSet = _.clone(this);
+    cloneAndSet(propName: string, value: any): RegionSet {
+        const newSet = _.clone(this);
         newSet[propName] = value;
         return newSet;
     }
@@ -73,7 +86,7 @@ class RegionSet {
      * @return {RegionSet} cloned and modified version of this
      * @throws {RangeError} if the input feature is invalid in some way
      */
-    cloneAndAddFeature(feature) {
+    cloneAndAddFeature(feature: Feature): RegionSet {
         if (!feature.getName()) {
             throw new RangeError("Feature must have a name");
         }
@@ -87,7 +100,7 @@ class RegionSet {
             throw new RangeError("Feature not in genome or is too short");
         }
 
-        let newFeatures = this.features.slice();
+        const newFeatures = this.features.slice();
         newFeatures.push(feature);
         return this.cloneAndSet("features", newFeatures);
     }
@@ -98,8 +111,8 @@ class RegionSet {
      * @param {number} index - index of the feature to delete
      * @return {RegionSet} cloned and modified version of this
      */
-    cloneAndDeleteFeature(index) {
-        let newFeatures = this.features.slice();
+    cloneAndDeleteFeature(index: number): RegionSet {
+        const newFeatures = this.features.slice();
         newFeatures.splice(index, 1);
         return this.cloneAndSet("features", newFeatures);
     }
@@ -109,7 +122,7 @@ class RegionSet {
      * 
      * @return {Feature[]} list of flanked features
      */
-    makeFlankedFeatures() {
+    makeFlankedFeatures(): Feature[] {
         return this.features.map(feature => this.flankingStrategy.makeFlankedFeature(feature, this.genome));
     }
 
@@ -118,7 +131,7 @@ class RegionSet {
      * 
      * @return {NavigationContext} - navigation context from flanked features
      */
-    makeNavContext() {
+    makeNavContext(): NavigationContext {
         const flankedFeatures = this.makeFlankedFeatures();
         if (flankedFeatures.some(feature => feature === null)) {
             throw new Error("Cannot make nav context out of null features.  Double check the flanking strategy.");

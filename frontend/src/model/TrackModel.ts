@@ -1,5 +1,24 @@
 import _ from 'lodash';
 
+interface ITrackModelOptions {
+    label?: string;
+    [k: string]: any;
+}
+
+interface ITrackModelMetadata {
+    'Track Type'?: string;
+    [k: string]: any;
+}
+
+interface ITrackModel {
+    name: string;
+    type?: string;
+    filetype?: string;
+    options: ITrackModelOptions;
+    url: string;
+    metadata: ITrackModelMetadata;
+}
+
 /*
 const SCHEMA = { // Schema for the plain object argument to the constructor.
     type: "object",
@@ -26,11 +45,22 @@ class TrackModel {
      * Makes a new TrackModel based off the input plain object.  Bascially does a shallow copy of the object and sets
      * sets reasonable defaults for certain properties.
      * 
-     * @param {Object} plainObject - data that will form the basis of the new instance
+     * @param {ITrackModel} plainObject - data that will form the basis of the new instance
      */
-    constructor(plainObject) {
+    name: string;
+    type: string;
+    label: string;
+    filetype?: string;
+    options: ITrackModelOptions;
+    url: string;
+    metadata: ITrackModelMetadata;
+    id: number;
+    isSelected: boolean;
+
+    constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
         this.name = this.label || this.name || "";
+        this.isSelected = this.isSelected || false;
         this.type = this.type || this.filetype || "";
         this.type = this.type.toLowerCase();
         this.options = this.options || {}; // `options` stores dynamically-configurable options.
@@ -50,7 +80,7 @@ class TrackModel {
      * 
      * @return {number} this object's id
      */
-    getId() {
+    getId(): number {
         return this.id;
     }
 
@@ -59,11 +89,18 @@ class TrackModel {
      * 
      * @return {string} the display label of the track
      */
-    getDisplayLabel() {
+    getDisplayLabel(): string {
         return this.options.label || "(unnamed track)";
     }
 
-    getMetadata(term) {
+    /**
+     * TODO: Document this.
+     *
+     * @param {string} term
+     * @returns {string}
+     * @memberof TrackModel
+     */
+    getMetadata(term: string): string {
         const value = this.metadata[term];
         if (Array.isArray(value)) {
             return value[value.length - 1];
@@ -77,7 +114,7 @@ class TrackModel {
      * 
      * @return {TrackModel} a shallow copy of this
      */
-    clone() {
+    clone(): TrackModel {
         return _.clone(this);
     }
 
@@ -89,8 +126,8 @@ class TrackModel {
      * @param {any} optionValue - the value of the option
      * @return {TrackModel} shallow clone of this, with the option set
      */
-    cloneAndSetOption(name, optionValue) {
-        let clone = this._cloneThisAndProp("options");
+    cloneAndSetOption(name: string, optionValue: any): TrackModel {
+        const clone = this._cloneThisAndProp("options");
         clone.options[name] = optionValue;
         return clone;
     }
@@ -101,8 +138,8 @@ class TrackModel {
      * @param {string} prop - property name to also clone
      * @return {TrackModel} shallow clone of this
      */
-    _cloneThisAndProp(prop) {
-        let clone = _.clone(this);
+    _cloneThisAndProp(prop: string): TrackModel {
+        const clone = _.clone(this);
         clone[prop] = _.clone(this[prop]);
         return clone;
     }

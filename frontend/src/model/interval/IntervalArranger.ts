@@ -1,3 +1,7 @@
+import { IOpenInterval } from './OpenInterval';
+
+type PaddingFunc = (interval: IOpenInterval) => number;
+
 /**
  * Arranges intervals into rows so they avoid overlap as much as possible when drawn.  Intervals MUST have props
  * `start`, `end`, and `getLength()`.
@@ -5,6 +9,10 @@
  * @author Silas Hsu
  */
 class IntervalArranger {
+    isConstPadding: boolean;
+    rowsRecentlyAssigned: number;
+    padding: number | PaddingFunc;
+
     /**
      * Makes a new instance configured with horizontal padding for intervals:
      * * If it is a number, all intervals will have that constant padding.
@@ -24,11 +32,12 @@ class IntervalArranger {
      * @param {OpenInterval[]} intervals - intervals to which to assign row indicies
      * @return {number[]} assigned row index for each interval
      */
-    arrange(intervals) {
-        let maxXsForRows = [];
-        let rowAssignments = [];
-        for (let interval of intervals) {
-            const horizontalPadding = this.isConstPadding ? this.padding : this.padding(interval);
+    arrange(intervals: IOpenInterval[]): number[] {
+        const maxXsForRows: number[] = [];
+        const rowAssignments: number[] = [];
+        for (const interval of intervals) {
+            const horizontalPadding = this.isConstPadding ?
+                (this.padding as number) : (this.padding as PaddingFunc)(interval);
             const startX = interval.start - horizontalPadding;
             const endX = interval.end + horizontalPadding;
             // Find the first row where the interval won't overlap with others in the row
@@ -49,7 +58,7 @@ class IntervalArranger {
     /**
      * @return {number} the number of rows assigned in the most recent call to arrange()
      */
-    getNumRowsAssigned() {
+    getNumRowsAssigned(): number {
         return this.rowsRecentlyAssigned;
     }
 }

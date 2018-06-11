@@ -1,37 +1,17 @@
 import Feature from '../Feature';
 import NavigationContext from '../NavigationContext';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
+import OpenInterval from '../interval/OpenInterval';
+import TrackModel from '../TrackModel';
+import Chromosome from '../genomes/Chromosome';
 
-/**
- * Simple container for chromosome info.
- * 
- * @author Silas Hsu
- */
-export class Chromosome {
-    /**
-     * Makes a new instance with specified name and length in bases.
-     * 
-     * @param {string} name - name of the chromosome
-     * @param {number} length - length of the chromosome in bases
-     */
-    constructor(name, length) {
-        this._name = name;
-        this._length = length; 
-    }
-
-    /**
-     * @return {string} this chromosome's name
-     */
-    getName() {
-        return this._name;
-    }
-
-    /**
-     * @return {number} this chromosome's length in bases
-     */
-    getLength() {
-        return this._length;
-    }
+export interface GenomeConfig {
+    genome: Genome;
+    navContext: NavigationContext;
+    cytobands: any;
+    defaultRegion: OpenInterval;
+    defaultTracks: TrackModel[];
+    twoBitUrl: string;
 }
 
 /**
@@ -40,17 +20,21 @@ export class Chromosome {
  * @author Silas Hsu
  */
 export class Genome {
+    private _name: string;
+    private _chromosomes: Chromosome[];
+    private _nameToChromosome: {[chrName: string]: Chromosome};
+
     /**
      * Makes a new instance, with name and list of chromosomes.  For best results, chromosomes should have unique names.
      * 
      * @param {string} name - name of the genome
      * @param {Chromosome[]} chromosomes - list of chromosomes in the genome
      */
-    constructor(name, chromosomes) {
+    constructor(name: string, chromosomes: Chromosome[]) {
         this._name = name;
         this._chromosomes = chromosomes;
         this._nameToChromosome = {};
-        for (let chromosome of chromosomes) {
+        for (const chromosome of chromosomes) {
             const chrName = chromosome.getName();
             if (this._nameToChromosome[chrName] !== undefined) {
                 console.warn(`Duplicate chromosome name "${chrName}" in genome "${name}"`);
@@ -62,7 +46,7 @@ export class Genome {
     /**
      * @return {string} this genome's name
      */
-    getName() {
+    getName(): string {
         return this._name;
     }
 
@@ -72,7 +56,7 @@ export class Genome {
      * @param {string} name - chromosome name to look up
      * @return {Chromosome} chromosome with the query name, or null if not found
      */
-    getChromosome(name) {
+    getChromosome(name: string): Chromosome {
         return this._nameToChromosome[name] || null;
     }
 
@@ -84,7 +68,7 @@ export class Genome {
      * @param {ChromosomeInterval} chrInterval - genomic location to intersect with the genome
      * @return {ChromosomeInterval} intersection result, or null if there is no overlap at all
      */
-    intersectInterval(chrInterval) {
+    intersectInterval(chrInterval: ChromosomeInterval): ChromosomeInterval {
         const chrName = chrInterval.chr;
         const matchingChr = this.getChromosome(chrName);
         if (!matchingChr) {
@@ -99,7 +83,7 @@ export class Genome {
      * 
      * @return {NavigationContext} NavigationContext representing this genome
      */
-    makeNavContext() {
+    makeNavContext(): NavigationContext {
         const features = this._chromosomes.map(chr => {
             const name = chr.getName();
             return new Feature(name, new ChromosomeInterval(name, 0, chr.getLength()))

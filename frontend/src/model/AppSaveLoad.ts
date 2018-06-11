@@ -2,6 +2,7 @@ import TrackModel from './TrackModel';
 import RegionSet from './RegionSet';
 import DisplayedRegionModel from './DisplayedRegionModel';
 import { getGenomeConfig } from './genomes/allGenomes';
+import { AppState } from '../AppState';
 
 /**
  * Converter of app state to plain objects and JSON.  In other words, app state serializer.
@@ -14,7 +15,7 @@ export class AppStateSaver {
      * @param {Object} appState - app state tree
      * @return {string} - JSON representing app state
      */
-    toJSON(appState) {
+    toJSON(appState: AppState) {
         return JSON.stringify(this.toObject(appState));
     }
 
@@ -22,15 +23,15 @@ export class AppStateSaver {
      * @param {Object} appState - app state tree
      * @return {Object} plain object representing app state
      */
-    toObject(appState) {
-        const regionSetViewIndex = appState.regionSets.findIndex(set => appState.regionSetView);
+    toObject(appState: AppState) {
+        const regionSetViewIndex = appState.regionSets.findIndex(set => set === appState.regionSetView);
         const object = {
             genomeName: appState.genomeName,
             viewInterval: appState.viewRegion ? appState.viewRegion.getAbsoluteRegion().serialize() : null,
             tracks: appState.tracks,
             metadataTerms: appState.metadataTerms,
             regionSets: appState.regionSets.map(set => set.serialize()),
-            regionSetViewIndex: regionSetViewIndex,
+            regionSetViewIndex,
         };
         return object;
     }
@@ -47,25 +48,25 @@ export class AppStateLoader {
      * @param {string} blob - JSON representing app state
      * @return {Object} app state tree parsed from JSON
      */
-    fromJSON(blob) {
+    fromJSON(blob: string) {
         return this.fromObject(JSON.parse(blob));
     }
 
     /**
-     * @param {Object} object - plain object representing app state
+     * @param {AppState} object - plain object representing app state
      * @return {Object} app state tree inferred from the object
      * @throws {Error} on deserialization errors
      */
-    fromObject(object) {
+    fromObject(object: any) {
         const regionSets = object.regionSets.map(RegionSet.deserialize);
         const regionSetView = regionSets[object.regionSetViewIndex] || null;
         const appState = {
             genomeName: object.genomeName,
             viewRegion: this._restoreViewRegion(object, regionSetView),
-            tracks: object.tracks.map(data => new TrackModel(data)),
+            tracks: object.tracks.map((data: any) => new TrackModel(data)),
             metadataTerms: object.metadataTerms,
-            regionSets: regionSets,
-            regionSetView: regionSetView,
+            regionSets,
+            regionSetView,
         };
         return appState;
     }
@@ -79,7 +80,7 @@ export class AppStateLoader {
      * @param {RegionSet} [regionSetView] - (optional) already-deserialized RegionSet from the object
      * @return {DisplayedRegionModel} - inferred view region
      */
-    _restoreViewRegion(object, regionSetView) {
+    _restoreViewRegion(object: any, regionSetView: RegionSet) {
         const genomeConfig = getGenomeConfig(object.genomeName);
         if (!genomeConfig) {
             return null;
