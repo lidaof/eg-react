@@ -12,9 +12,9 @@ import BedWorker from '../../dataSources/bed/Bed.worker';
 import MethylCRecord from '../../model/MethylCRecord';
 
 /**
- * Converter of DASFeatures to MethylCRecords.
+ * Converter of BedRecords to MethylCRecords.
  * 
- * @param {DASFeature[]} data - DASFeatures to convert
+ * @param {BedRecord[]} data - BedRecords to convert
  * @return {MethylCRecord[]} MethylCRecords made from the input
  */
 function formatDasFeatures(data) {

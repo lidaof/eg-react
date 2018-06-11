@@ -5,7 +5,7 @@ import FullDisplayMode from './FullDisplayMode';
 import Track from '../Track';
 import NumericalTrack from '../numerical/NumericalTrack';
 
-import FeatureAggregator from '../../../../model/FeatureAggregator';
+import FeatureAggregator, { DefaultAggregators } from '../../../../model/FeatureAggregator';
 import { AnnotationDisplayModes, NumericalDisplayModes } from '../../../../model/DisplayModes';
 import configOptionMerging from '../configOptionMerging';
 
@@ -40,7 +40,7 @@ class AnnotationTrack extends React.PureComponent {
             const numericalOptions = {
                 ...this.props.options,
                 displayMode: NumericalDisplayModes.AUTO,
-                aggregateMethod: FeatureAggregator.AggregatorTypes.COUNT
+                aggregateMethod: DefaultAggregators.types.COUNT
             };
             return <NumericalTrack
                 {...this.props}

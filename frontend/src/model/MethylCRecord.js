@@ -3,10 +3,10 @@ import ChromosomeInterval from './interval/ChromosomeInterval';
 import _ from 'lodash';
 
 const RecordInfoIndices = {
-    CONTEXT: 0,
-    VALUE: 1,
-    DEPTH: 2,
-    STRAND: 3
+    CONTEXT: 3,
+    VALUE: 4,
+    DEPTH: 5,
+    STRAND: 6
 };
 
 /**
@@ -76,20 +76,19 @@ class MethylCRecord extends Feature {
 
     /*
     Input， strings like following
-    chrX	2709724	2709725	CHH/0.111/9/-
-    chrX	2709728	2709729	CG/0.875/8/-
-    chrX	2709767	2709768	CHG/0.059/17/-
+    chrX	2709724	2709725	CHH	0.111	9	-
+    chrX	2709728	2709729	CG	0.875	8	-
+    chrX	2709767	2709768	CHG	0.059	17	-
     /**
      * Constructs a new MethylCRecord, given a string from tabix
      *
      */
     constructor(bedRecord) {
         const locus = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
-        const datas = _.split(bedRecord[3], '/');
-        super('', locus, datas[RecordInfoIndices.STRAND]);
-        this.context = datas[RecordInfoIndices.CONTEXT]
-        this.value = Number.parseFloat(datas[RecordInfoIndices.VALUE]); // methylation value, from 0 to 1
-        this.depth = Number.parseInt(datas[RecordInfoIndices.DEPTH], 10); // read depth
+        super('', locus,bedRecord[RecordInfoIndices.STRAND]);
+        this.context = bedRecord[RecordInfoIndices.CONTEXT]
+        this.value = Number.parseFloat(bedRecord[RecordInfoIndices.VALUE]); // methylation value, from 0 to 1
+        this.depth = Number.parseInt(bedRecord[RecordInfoIndices.DEPTH], 10); // read depth
     }
 }
 
