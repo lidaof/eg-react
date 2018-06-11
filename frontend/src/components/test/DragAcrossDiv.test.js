@@ -11,9 +11,7 @@ class MockEvent {
         Object.assign(this, obj);
     }
 
-    persist() {
-
-    }
+    persist() {}
 }
 
 it('should render children', () => {

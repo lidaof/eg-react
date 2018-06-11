@@ -58,7 +58,7 @@ class MainPane extends React.Component {
          * Called when the view should be zoomed.  Has the signature
          *     (amount: number, focusPoint: number)
          *         `amount`: amount to zoom
-        *          `focusPoint`: focal point of the zoom, which is where the mouse was as % of the width of the SVG.
+         *          `focusPoint`: focal point of the zoom, which is where the mouse was as % of the width of the SVG.
          */
         onZoom: PropTypes.func.isRequired,
     };

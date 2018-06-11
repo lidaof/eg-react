@@ -16,7 +16,7 @@ export class Feature {
      * @param {string} strand - strand info
      */
     constructor(name, locus, strand) {
-        this.name = name == undefined ? locus.toString() : name; // eslint-disable-line eqeqeq
+        this.name = name === undefined ? locus.toString() : name; // eslint-disable-line eqeqeq
         this.locus = locus;
         this.strand = strand;
     }

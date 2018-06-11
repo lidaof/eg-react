@@ -12,12 +12,12 @@ class ChromosomeInterval {
      * Parses a string representing a ChromosomeInterval, such as those produced by the toString() method.  Throws an
      * error if parsing fails.
      * 
-     * @param {string} string - interval to parse
+     * @param {string} str - interval to parse
      * @return {ChromosomeInterval} parsed instance
      * @throws {RangeError} if parsing fails
      */
-    static parse(string) {
-        const regexMatch = string.match(/([\w:]+):(\d+)-(\d+)/);
+    static parse(str) {
+        const regexMatch = str.match(/([\w:]+):(\d+)-(\d+)/);
         if (regexMatch) {
             const chr = regexMatch[1];
             const start = Number.parseInt(regexMatch[2], 10);

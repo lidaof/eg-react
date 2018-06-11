@@ -187,21 +187,23 @@ class NavigationContext {
      * 
      * Returns an open interval of absolute coordinates.  Throws RangeError on parse failure.
      *
-     * @param {string} string - the string to parse
+     * @param {string} str - the string to parse
      * @return {OpenInterval} the parsed absolute interval
      * @throws {RangeError} when parsing an interval outside of the context or something otherwise nonsensical
      */
-    parse(string) {
+    parse(str) {
         let startName, endName, startBase, endBase;
         let singleFeatureMatch, multiFeatureMatch;
         // eslint-disable-next-line no-cond-assign
-        if ((singleFeatureMatch = string.match(/([\w:]+):(\d+)-(\d+)/)) !== null) {
+        singleFeatureMatch = str.match(/([\w:]+):(\d+)-(\d+)/);
+        multiFeatureMatch = str.match(/([\w:]+):(\d+)-([\w:]+):(\d+)/);
+        if ((singleFeatureMatch) !== null) {
             startName = singleFeatureMatch[1];
             endName = startName;
             startBase = Number.parseInt(singleFeatureMatch[2], 10);
             endBase = Number.parseInt(singleFeatureMatch[3], 10);
         // eslint-disable-next-line no-cond-assign
-        } else if ((multiFeatureMatch = string.match(/([\w:]+):(\d+)-([\w:]+):(\d+)/)) !== null) {
+        } else if ((multiFeatureMatch) !== null) {
             startName = multiFeatureMatch[1];
             endName = multiFeatureMatch[3];
             startBase = Number.parseInt(multiFeatureMatch[2], 10);

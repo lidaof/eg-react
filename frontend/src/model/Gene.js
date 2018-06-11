@@ -63,7 +63,7 @@ class Gene extends Feature {
         const {cdsStart, cdsEnd, exonStarts, exonEnds} = this.refGeneRecord;
         this._translated = [];
         this._utrs = [];
-        if ([cdsStart, cdsEnd, exonStarts, exonEnds].some(value => value == undefined)) { // eslint-disable-line eqeqeq
+        if ([cdsStart, cdsEnd, exonStarts, exonEnds].some(value => value === undefined)) { // eslint-disable-line eqeqeq
             return;
         }
 

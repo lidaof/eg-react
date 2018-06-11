@@ -8,16 +8,16 @@ interface Serializable<T> {
     /**
      * Serializes this instance into a plain object, ready for JSON.
      * 
-     * @return {Object} plain object version of this instance
+     * @return {any} plain object version of this instance
      */
-    serialize(): Object;
+    serialize(): {};
 
     /**
      * Deserializes a previously serialized object, restoring its methods.  Deserializing an object that didn't come
      * from the serialize() method causes undefined behavior.
      * 
-     * @param {Object} object - plain object
+     * @param {any} object - plain object
      * @return {T} instance of this type
      */
-    /*static*/deserialize(object: Object): T;
+    /*static*/deserialize(object: {}): T;
 }
