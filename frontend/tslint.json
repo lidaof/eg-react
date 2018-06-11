@@ -3,7 +3,19 @@
   "rules": {
     "no-console": false,
     "interface-name": false,
-    "ordered-imports": false
+    "ordered-imports": false,
+    "member-access": false,
+    "object-literal-sort-keys": false,
+    "one-variable-per-declaration": false,
+    "no-empty": false,
+    "forin": false,
+    "no-bitwise": false,
+    "iterface-name": false,
+    "jsdoc-format": false,
+    "no-shadowed-variable": false,
+    "public-before-private": false,
+    "static-before-instance": false,
+    "member-ordering": false
   },
   "jsRules": {
     "object-literal-sort-keys": false,
