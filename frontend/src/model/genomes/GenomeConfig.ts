@@ -4,7 +4,7 @@ import CytobandMap from './CytobandTypes';
 import OpenInterval from '../interval/OpenInterval';
 import TrackModel from '../TrackModel';
 
-interface GenomeConfig {
+export interface GenomeConfig {
     genome: Genome;
     navContext: NavigationContext;
     cytobands: CytobandMap;

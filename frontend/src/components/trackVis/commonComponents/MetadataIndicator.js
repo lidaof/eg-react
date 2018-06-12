@@ -31,13 +31,13 @@ const COLORS = [ // From https://stackoverflow.com/questions/1168260/algorithm-f
 /**
  * Port of Java's String `hashCode()` function.  Consistently returns the same integer for equal strings.
  * 
- * @param {string} string - string to hash
+ * @param {string} str - string to hash
  * @return {number} integer hash code value of the string
  */
-function hashCode(string) {
+function hashCode(str) {
     let hash = 0;
-    for (let i = 0; i < string.length; i++) {
-        const char = string.charCodeAt(i);
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
         hash = (hash << 5) - hash + char;
         hash = hash & hash; // Convert to 32-bit integer
     }

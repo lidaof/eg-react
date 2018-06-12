@@ -3,11 +3,13 @@ import { BamFlags } from "../vendor/bbi-js/main/bam";
 import ChromosomeInterval from "./interval/ChromosomeInterval";
 
 /**
+ * Gets the number of reference bases in the alignment. How many bases of the 
+ * reference sequence that this feature occupies
  * 
  * @param {string} cigarString 
  * @return {number} The number of bases the record spans in the reference genome
  */
-function getNumReferenceBases(cigarString) {
+function getNumReferenceBases(cigarString: string): number {
     /*
     let cigarString = '1S22M98N25M';
     let operations = cigarString.split(/\d+/).slice(1) --> ['S', 'M', 'N', 'M']
@@ -29,8 +31,22 @@ function getNumReferenceBases(cigarString) {
     return referenceBases;
 }
 
+interface IBamRecord {
+  MD: string;
+  NM: number;
+  XA: number;
+  cigar: string;
+  flag: number;
+  mq: number;
+  pos: number;
+  quals: string;
+  readName: string;
+  segment: string;
+  seq: string;
+}
+
 class BamRecord extends Feature {
-    static makeBamRecords(rawObjects) {
+    static makeBamRecords(rawObjects: IBamRecord[]) {
         /*
         Expected raw object from bbi-js
         BamRecord {
@@ -57,7 +73,11 @@ class BamRecord extends Feature {
         return results;
     }
 
-    constructor(rawObject) {
+    MD: string;
+    cigar: string;
+    seq: string;
+
+    constructor(rawObject: IBamRecord) {
         const start = rawObject.pos;
         const end = start + getNumReferenceBases(rawObject.cigar);
         super(
@@ -98,6 +118,53 @@ class BamRecord extends Feature {
             1 insertion, 5 match), then a valid MD string is MD="10".  10 bases align to the reference, and the MD
             string does not mention the insertion at all.
         */
+       // First do an MD pass marking Deletions for indel
+       const CIGAR_REGEX = /(\d+)([A-Z]|\^[A-Z]+)/g;
+       /**
+        * MD_REGEX can parse the following
+        * 1G0^T4C1
+        ^T4C1`
+        6G4C20G1A5C5A1^C3A15G1G15
+        10A5^AC6`
+        */
+       const MD_REGEX = /(\d+)([A-Z]|\^[A-Z]+)*/g;
+       let result;
+       let reference = '';
+       let lines = '';
+       let read = '';
+
+        // read start and the reference start are different due to insertions
+       let start = 0;
+       let refStart = 0;
+       while((result = CIGAR_REGEX.exec(this.cigar)) !== null) {
+            const [fullOp, countStr, operation] = result;
+            const count = Number(countStr);
+            switch(operation) {
+                case 'M':
+                    reference += this.seq.slice(refStart, refStart + count);
+                    read += this.seq.slice(start, start + count);
+                    lines += '|'.repeat(count);
+                    break;
+                case 'I':
+                    read += this.seq.slice(start, start + count);
+                    reference += '-'.repeat(count);
+                    lines += ' '.repeat(count);
+                    refStart += count;
+                    break;
+                case 'D':
+                    reference += 'D'.repeat(count);
+                    read += '-'.repeat(count);
+                    lines += ' '.repeat(count);
+                    break;
+            }
+            start += count;
+            refStart += count;
+       }
+       // Next do an MD pass. Replacing deletions
+       start = 0;
+       refStart = 0;
+       result = null;
+       while((result = MD_REGEX.exec(this.cigar)))
     }
 }
 

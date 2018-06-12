@@ -1,6 +1,27 @@
 import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 
+interface DASFeature {
+  genoLeft: string;
+  label: string;
+  max: number;
+  milliDel: string;
+  milliDiv: string;
+  milliIns: string;
+  min: number;
+  orientation: string;
+  repClass: string;
+  repEnd: string;
+  repFamily: string;
+  repLeft: string;
+  repStart: string;
+  score: number;
+  segment: string;
+  swScore: string;
+  type: string;
+  _chromId: number;
+}
+
 const CLASS_TO_ID = {
     "SINE": 1,
     "SINE?": 1,
@@ -69,26 +90,31 @@ const DEFAULT_CLASS_COLORS = {
 class RepeatMaskerFeature extends Feature {
     static DEFAULT_CLASS_COLORS = DEFAULT_CLASS_COLORS;
 
+    repClass: string;
+    repFamily: string;
+    milliDiv: string;
+    _value: number;
+
     /*
     Input DASFeature schema
     {
-        genoLeft: "-132404898"
-        label: "AT_rich"
-        max: 26733765
-        milliDel: "0"
-        milliDiv: "71"
-        milliIns: "0"
-        min: 26733724
-        orientation: "+"
-        repClass: "Low_complexity"
-        repEnd: "42"
-        repFamily: "Low_complexity"
-        repLeft: "0"
-        repStart: "1"
-        score: 0
-        segment: "chr7"
-        swScore: "21"
-        type: "bigbed"
+        genoLeft: "-132404898",
+        label: "AT_rich",
+        max: 26733765,
+        milliDel: "0",
+        milliDiv: "71",
+        milliIns: "0",
+        min: 26733724,
+        orientation: "+",
+        repClass: "Low_complexity",
+        repEnd: "42",
+        repFamily: "Low_complexity",
+        repLeft: "0",
+        repStart: "1",
+        score: 0,
+        segment: "chr7",
+        swScore: "21",
+        type: "bigbed",
         _chromId: 41
     }
     */
@@ -97,9 +123,9 @@ class RepeatMaskerFeature extends Feature {
      *
      * @param {DASFeature} record - DASFeature to use
      */
-    constructor(rmskRecord) {
+    constructor(rmskRecord: DASFeature) {
         const locus = new ChromosomeInterval(rmskRecord.segment, rmskRecord.min, rmskRecord.max);
-        super(rmskRecord.label, locus, rmskRecord.orientation === "+");
+        super(rmskRecord.label, locus, rmskRecord.orientation);
         this.repClass = rmskRecord.repClass;
         this.repFamily = rmskRecord.repFamily;
         this.milliDiv = rmskRecord.milliDiv;
@@ -128,14 +154,14 @@ class RepeatMaskerFeature extends Feature {
     /**
      * @return {number} the repeat class ID
      */
-    getCategoryId() {
+    getCategoryId(): number {
         return CLASS_TO_ID[this.repClass];
     }
 
     /**
      * @return {string} human-readable description of the repeat class
      */
-    getClassDetails() {
+    getClassDetails(): string {
         return CLASS_ID_TO_DETAILS[this.getCategoryId()] || "???";
     }
 }

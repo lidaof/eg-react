@@ -1,5 +1,14 @@
 import OpenInterval from './OpenInterval';
-import _ from 'lodash';
+import * as _ from 'lodash';
+
+/**
+ * The plain-object version of ChromosomeInterval, without any methods.
+ */
+export interface IChromosomeInterval {
+    chr: string; // Name of the chromosome
+    start: number; // Start base number, inclusive
+    end: number; // End base number, exclusive
+}
 
 /**
  * Basically an OpenInterval with a chromosome's name.  Expresses genomic coordinates.
@@ -7,17 +16,17 @@ import _ from 'lodash';
  * @implements {Serializable}
  * @author Silas Hsu
  */
-class ChromosomeInterval {
+class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
     /**
      * Parses a string representing a ChromosomeInterval, such as those produced by the toString() method.  Throws an
      * error if parsing fails.
      * 
-     * @param {string} string - interval to parse
+     * @param {string} str - interval to parse
      * @return {ChromosomeInterval} parsed instance
      * @throws {RangeError} if parsing fails
      */
-    static parse(string) {
-        const regexMatch = string.match(/([\w:]+):(\d+)-(\d+)/);
+    static parse(str: string): ChromosomeInterval {
+        const regexMatch = str.match(/([\w:]+):(\d+)-(\d+)/);
         if (regexMatch) {
             const chr = regexMatch[1];
             const start = Number.parseInt(regexMatch[2], 10);
@@ -34,12 +43,12 @@ class ChromosomeInterval {
      * @param {ChromosomeInterval[]} intervals - interval list to inspect for overlaps
      * @return {ChromosomeInterval[]} - version of input list with overlapping intervals merged
      */
-    static mergeOverlaps(intervals) {
+    static mergeOverlaps(intervals: ChromosomeInterval[]) {
         const groupedByChr = _.groupBy(intervals, 'chr');
-        let allMerged = [];
-        for (let chr in groupedByChr) { // Merge intervals by chromosome
+        const allMerged = [];
+        for (const chr in groupedByChr) { // Merge intervals by chromosome
             const sorted = groupedByChr[chr].sort((a, b) => a.start - b.start); // Sorted by smallest start first
-            let merged = [ sorted[0] ]; // Init with the first interval
+            const merged = [ sorted[0] ]; // Init with the first interval
             for (let i = 1; i < sorted.length; i++) {
                 const prevInterval = merged[merged.length - 1];
                 const currInterval = sorted[i];
@@ -51,7 +60,7 @@ class ChromosomeInterval {
                 }
             }
 
-            for (let interval of merged) {
+            for (const interval of merged) {
                 allMerged.push(interval);
             }
         }
@@ -65,20 +74,21 @@ class ChromosomeInterval {
      * @param {number} start - start of the interval, inclusive
      * @param {number} end - end of the interval, exclusive
      */
-    constructor(chr, start, end) {
-        this.chr = chr;
-        this.start = start;
-        this.end = end;
+    constructor(public chr: string, public start: number, public end: number) {
+        super(start, end);
     }
 
-    serialize() {
+    serialize(): IChromosomeInterval {
         return this;
     }
 
-    static deserialize(object) {
+    static deserialize(object: IChromosomeInterval): ChromosomeInterval {
         return new ChromosomeInterval(object.chr, object.start, object.end);
     }
 
+    /**
+     * Enables the spread operator for ChromosomeIntervals.
+     */
     *[Symbol.iterator] () {
         yield this.start;
         yield this.end;
@@ -87,7 +97,7 @@ class ChromosomeInterval {
     /**
      * @return {number} the length of this interval in base pairs
      */
-    getLength() {
+    getLength(): number {
         return this.end - this.start;
     }
 
@@ -98,20 +108,28 @@ class ChromosomeInterval {
      * @param {ChromosomeInterval} other - other ChromosomeInterval to intersect
      * @return {ChromosomeInterval} intersection of this and the other interval, or null if none exists
      */
-    getOverlap(other) {
+    getOverlap(other: ChromosomeInterval): ChromosomeInterval {
         if (this.chr !== other.chr) {
             return null
         } else {
-            const overlap = new OpenInterval(...this).getOverlap(new OpenInterval(...other));
-            return overlap ? new ChromosomeInterval(this.chr, ...overlap) : null;
+            const overlap = this.toOpenInterval().getOverlap(other);
+            return overlap ? new ChromosomeInterval(this.chr, overlap.start, overlap.end) : null;
         }
     }
 
     /**
      * @return {string} human-readable representation of this interval
      */
-    toString() {
+    toString(): string {
         return `${this.chr}:${this.start}-${this.end}`;
+    }
+
+
+    /**
+     * @return {OpenInterval} an OpenInterval version of this instance.
+     */
+    toOpenInterval(): OpenInterval {
+        return new OpenInterval(this.start, this.end);
     }
 
     /**
@@ -121,7 +139,7 @@ class ChromosomeInterval {
      * @param {ChromosomeInterval} other - the "end" of the multi-chromosome interval
      * @return {string} a human-readable representation of a multi-chromosome interval
      */
-    toStringWithOther(other) {
+    toStringWithOther(other: ChromosomeInterval): string {
         return `${this.chr}:${this.start}-${other.chr}:${other.end}`;
     }
 }

@@ -7,15 +7,45 @@ import { createStore } from 'redux';
 import { getGenomeConfig } from './model/genomes/allGenomes';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
+import TrackModel from './model/TrackModel';
+import RegionSet from './model/RegionSet';
 
-let STORAGE = window.sessionStorage;
+let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
-    STORAGE = {setItem: () => null, getItem: () => null};
+    const storage = {};
+
+    STORAGE = {
+      setItem(key: string, value: any) {
+        storage[key] = value || '';
+      },
+      getItem(key: string) {
+        return key in storage ? storage[key] : null;
+      },
+      removeItem(key: string) {
+        delete storage[key];
+      },
+      get length() {
+        return Object.keys(storage).length;
+      },
+      key(i: number) {
+        const keys = Object.keys(storage);
+        return keys[i] || null;
+      }
+    };    
 }
 const SESSION_KEY = "eg-react-session";
 export const MIN_VIEW_REGION_SIZE = 5;
 
-const initialState = {
+export interface AppState {
+    genomeName: string;
+    viewRegion: DisplayedRegionModel;
+    tracks: TrackModel[];
+    metadataTerms: string[];
+    regionSets: RegionSet[];
+    regionSetView: RegionSet;
+}
+
+const initialState: AppState = {
     genomeName: "",
     viewRegion: null,
     tracks: [],
@@ -23,6 +53,8 @@ const initialState = {
     regionSets: [], // Available region sets, to be used for region set view
     regionSetView: null, // Region set backing current region set view, if applicable
 };
+
+type AppActionType = 0 | 1 | 2 | 3 | 4 | 5;
 
 const ActionTypes = {
     SET_GENOME: 0,
@@ -32,6 +64,11 @@ const ActionTypes = {
     SET_REGION_SET_LIST: 4,
     SET_REGION_SET_VIEW: 5,
 };
+
+interface AppAction {
+    type: AppActionType;
+    [k: string]: any;
+}
 
 /**
  * All action creators.  Components don't need to know this, though.  They can think of them as callbacks that modify
@@ -43,19 +80,19 @@ export const ActionCreators = {
      * 
      * @param {string} genomeName - name of the genome
      */
-    setGenome: genomeName => {
-        return {type: ActionTypes.SET_GENOME, genomeName: genomeName};
+    setGenome: (genomeName: string) => {
+        return {type: ActionTypes.SET_GENOME, genomeName};
     },
 
-    setViewRegion: (newStart, newEnd) => {
+    setViewRegion: (newStart: number, newEnd: number) => {
         return {type: ActionTypes.SET_VIEW_REGION, start: newStart, end: newEnd};
     },
 
-    setTracks: newTracks => {
+    setTracks: (newTracks: TrackModel[]) => {
         return {type: ActionTypes.SET_TRACKS, tracks: newTracks};
     },
 
-    setMetadataTerms: newTerms => {
+    setMetadataTerms: (newTerms: string[]) => {
         return {type: ActionTypes.SET_METADATA_TERMS, terms: newTerms}
     },
 
@@ -64,8 +101,8 @@ export const ActionCreators = {
      * 
      * @param {RegionSet[]} list - new region set list
      */
-    setRegionSetList: list => {
-        return {type: ActionTypes.SET_REGION_SET_LIST, list: list};
+    setRegionSetList: (list: RegionSet[]) => {
+        return {type: ActionTypes.SET_REGION_SET_LIST, list};
     },
 
     /**
@@ -73,8 +110,8 @@ export const ActionCreators = {
      * 
      * @param {RegionSet} [set] - set with which to enter region set view, or null to exit region set view
      */
-    setRegionSetView: set => {
-        return {type: ActionTypes.SET_REGION_SET_VIEW, set: set};
+    setRegionSetView: (set: RegionSet) => {
+        return {type: ActionTypes.SET_REGION_SET_VIEW, set};
     }
 };
 
@@ -93,7 +130,7 @@ function getInitialState() {
     return state;
 }
 
-function getNextState(prevState, action) {
+function getNextState(prevState: AppState, action: AppAction) {
     if (!prevState) {
         return getInitialState();
     }
@@ -101,10 +138,10 @@ function getNextState(prevState, action) {
     switch (action.type) {
         case ActionTypes.SET_GENOME: // Setting genome resets state.
             let nextViewRegion = null;
-            let nextTracks = [];
+            let nextTracks: TrackModel[] = [];
             const genomeConfig = getGenomeConfig(action.genomeName);
             if (genomeConfig) {
-                nextViewRegion = new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion);
+                nextViewRegion = new DisplayedRegionModel(genomeConfig.navContext, genomeConfig.defaultRegion.start, genomeConfig.defaultRegion.end);
                 nextTracks = genomeConfig.defaultTracks;
             }
             return {
@@ -143,7 +180,7 @@ function getNextState(prevState, action) {
  * @param {RegionSet} [nextSet] - region set to back region set view in the next state
  * @return {Object} next redux store
  */
-function handleRegionSetViewChange(prevState, nextSet) {
+function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
     if (nextSet) {
         return {
             ...prevState,
@@ -153,7 +190,7 @@ function handleRegionSetViewChange(prevState, nextSet) {
     } else {
         const genomeConfig = getGenomeConfig(prevState.genomeName);
         const nextViewRegion = genomeConfig ? 
-            new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion) : null;
+            new DisplayedRegionModel(genomeConfig.navContext, genomeConfig.defaultRegion.start, genomeConfig.defaultRegion.end) : null;
         return {
             ...prevState,
             regionSetView: null,
@@ -165,7 +202,7 @@ function handleRegionSetViewChange(prevState, nextSet) {
 // OK, so it's really an AppStore, but then that would mean something completely different 😛
 export const AppState = createStore(
     getNextState,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__()
 );
 
 window.addEventListener("beforeunload", () => {
