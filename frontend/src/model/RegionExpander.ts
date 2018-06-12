@@ -1,4 +1,5 @@
 import OpenInterval from "./interval/OpenInterval";
+import DisplayedRegionModel from "./DisplayedRegionModel";
 
 /**
  * Utility class that does calculations related to expanding view regions for the purposes of scrolling.
@@ -11,14 +12,16 @@ class RegionExpander {
     /**
      * @return a RegionExpander which does not do any expansion at all.
      */
-    static makeIdentityExpander() {
+    static makeIdentityExpander(): RegionExpander {
         return new RegionExpander(0);
     }
+
+    public zoomRatio: number;
 
     /**
      * @param {number} multipleOnEachSide - magnitude of expansion on each side, as a multiple of region width.
      */
-    constructor(multipleOnEachSide=RegionExpander.DEFAULT_EXPANSION) {
+    constructor(public multipleOnEachSide: number=RegionExpander.DEFAULT_EXPANSION) {
         this.multipleOnEachSide = multipleOnEachSide;
         this.zoomRatio = 2 * multipleOnEachSide + 1;
     }
@@ -29,8 +32,8 @@ class RegionExpander {
      * @param {DisplayedRegionModel} region - region to expand
      * @return {DisplayedRegionModel} expanded region
      */
-    makeExpandedRegion(region) {
-        let expandedModel = region.clone();
+    makeExpandedRegion(region: DisplayedRegionModel): DisplayedRegionModel {
+        const expandedModel = region.clone();
         expandedModel.zoom(this.zoomRatio);
         return expandedModel;
     }
@@ -54,7 +57,7 @@ class RegionExpander {
      * @param {DisplayedRegionModel} region - the region that the unexpanded view will show
      * @return {RegionExpander~ExpansionData} - data representing aspects of an expanded region
      */
-    calculateExpansion(width, region) {
+    calculateExpansion(width: number, region: DisplayedRegionModel) {
         const pixelsPerBase = width / region.getWidth();
         const expandedRegion = this.makeExpandedRegion(region);
         const expandedWidth = expandedRegion.getWidth() * pixelsPerBase;

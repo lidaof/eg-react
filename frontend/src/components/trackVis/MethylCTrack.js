@@ -48,7 +48,7 @@ function makeBackgroundColorStyle(color) {
 
 /**
  * Visualizer for MethylC tracks. 
-  * 
+ * 
  * @author Daofeng Li
  */
 class MethylCTrack extends React.PureComponent {

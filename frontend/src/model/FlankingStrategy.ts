@@ -1,5 +1,14 @@
 import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
+import { Genome } from './genomes/Genome';
+
+type FlankingStrategyType = 0 | 1 | 2;
+
+export interface IFlankingStrategy {
+    type: FlankingStrategyType;
+    upstream: number;
+    downstream: number;
+}
 
 /**
  * An algorithm that modifies feature coordinates.
@@ -8,29 +17,45 @@ import ChromosomeInterval from './interval/ChromosomeInterval';
  * @author Silas Hsu
  */
 class FlankingStrategy {
-    static SURROUND_ALL = 0;
-    static SURROUND_START = 1;
-    static SURROUND_END = 2;
+    static SURROUND_ALL: FlankingStrategyType = 0;
+    static SURROUND_START: FlankingStrategyType = 1;
+    static SURROUND_END: FlankingStrategyType = 2;
 
     /**
      * Makes a new instance.  Does not do any sanity checks; nonsense parameters will cause `makeFlankedFeature` to
      * return null.
      * 
-     * @param {number} [type] - type of strategy; see static variables for a selection
+     * @param {FlankingStrategyType} [type] - type of strategy; see static variables for a selection
      * @param {number} [upstream] - number of bases upstream to expand input features
      * @param {number} [downstream] - number of bases downstream to expand input features
      */
-    constructor(type=FlankingStrategy.SURROUND_ALL, upstream=0, downstream=0) {
+    constructor(public type: FlankingStrategyType = FlankingStrategy.SURROUND_ALL, public upstream: number = 0, public downstream: number =0) {
         this.type = type;
         this.upstream = Math.round(Number(upstream));
         this.downstream = Math.round(Number(downstream));
     }
 
+
+    /**
+     * TODO: Document This
+     *
+     * @returns
+     * @memberof FlankingStrategy
+     */
     serialize() {
         return this;
     }
 
-    static deserialize(object) {
+
+    /**
+     * TODO: Document This
+     * 
+     * @static
+     * @param {*} object
+     * @returns
+     * @memberof FlankingStrategy
+     */
+    static deserialize(object: IFlankingStrategy) {
         return new FlankingStrategy(object.type, object.upstream, object.downstream);
     }
 
@@ -41,8 +66,8 @@ class FlankingStrategy {
      * @param {any} value - the value to set
      * @return {FlankingStrategy} cloned and modified version of this
      */
-    cloneAndSetProp(prop, value) {
-        let newStrategy = new FlankingStrategy(this.type, this.upstream, this.downstream);
+    cloneAndSetProp(prop: string, value: any) {
+        const newStrategy = new FlankingStrategy(this.type, this.upstream, this.downstream);
         newStrategy[prop] = value;
         return newStrategy;
     }
@@ -56,7 +81,7 @@ class FlankingStrategy {
      * @param {Genome} genome - the genome in which this feature is located
      * @return {Feature} new Feature whose locus is based off the input Feature
      */
-    makeFlankedFeature(feature, genome) {
+    makeFlankedFeature(feature: Feature, genome: Genome) {
         const unsafeInterval = this._makeFlankedCoordinates(feature.getLocus(), feature.getIsForwardStrand());
         const safeInterval = genome.intersectInterval(unsafeInterval);
         if (!safeInterval) {
@@ -73,18 +98,18 @@ class FlankingStrategy {
      * @param {boolean} isForwardStrand - strand of the input; affects what is upstream and downstream
      * @return {ChromosomeInterval} flanked location
      */
-    _makeFlankedCoordinates(locus, isForwardStrand) {
+    _makeFlankedCoordinates(locus: ChromosomeInterval, isForwardStrand: boolean): ChromosomeInterval {
         let transcriptionStart, transcriptionEnd, moveUpstream, moveDownstream;
         if (isForwardStrand) {
             transcriptionStart = locus.start;
             transcriptionEnd = locus.end;
-            moveUpstream = base => base - this.upstream;
-            moveDownstream = base => base + this.downstream;
+            moveUpstream = (base: number) => base - this.upstream;
+            moveDownstream = (base: number) => base + this.downstream;
         } else {
             transcriptionStart = locus.end;
             transcriptionEnd = locus.start;
-            moveUpstream = base => base + this.upstream;
-            moveDownstream = base => base - this.downstream;
+            moveUpstream = (base: number) => base + this.upstream;
+            moveDownstream = (base: number) => base - this.downstream;
         }
 
         let newInterval;

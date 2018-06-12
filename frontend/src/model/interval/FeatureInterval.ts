@@ -1,4 +1,5 @@
 import ChromosomeInterval from './ChromosomeInterval';
+import { Feature } from '../Feature';
 
 /**
  * A 0-indexed open interval within a Feature.  Or, put another way, attaches an interval to a Feature.
@@ -7,6 +8,11 @@ import ChromosomeInterval from './ChromosomeInterval';
  * @see Feature
  */
 class FeatureInterval {
+    // start base of the interval, relative to the feature's start
+    public relativeStart: number;
+    // end base of the interval, relative to the feature's start
+    public relativeEnd: number;
+
     /**
      * Makes a new instance, attaching a interval to a Feature.  If start and end are not provided, the interval
      * defaults to the entire length of the feature.  The start and end parameters should express a *0-indexed open
@@ -17,7 +23,7 @@ class FeatureInterval {
      * @param {number} [end] - end base of the interval, relative to the feature's start
      * @throws {RangeError} if end is before start or the interval lies outside the feature
      */
-    constructor(feature, start=0, end) {
+    constructor(public feature: Feature, start=0, end?: number) {
         if (end === undefined) {
             end = feature.getLength();
         }
@@ -52,21 +58,21 @@ class FeatureInterval {
      * @param {number} base - base number relative to the feature's start
      * @return {boolean} whether the base lies within this interval's feature.
      */
-    isValidBase(base) {
+    isValidBase(base: number): boolean {
         return 0 <= base && base <= this.feature.getLength();
     }
 
     /**
      * @return {string} the attached feature's name
      */
-    getName() {
+    getName(): string {
         return this.feature.getName();
     }
 
     /**
      * @return {number} this interval's length
      */
-    getLength() {
+    getLength(): number {
         return this.relativeEnd - this.relativeStart;
     }
 
@@ -75,7 +81,7 @@ class FeatureInterval {
      * 
      * @return {ChromosomeInterval} genomic location of this interval
      */
-    getGenomeCoordinates() {
+    getGenomeCoordinates(): ChromosomeInterval {
         const featureLocus = this.feature.getLocus();
         return new ChromosomeInterval(
             featureLocus.chr,
@@ -91,7 +97,7 @@ class FeatureInterval {
      * @param {ChromosomeInterval} chrInterval - input genome location
      * @return {FeatureInterval} intersection of this and the input genomic location
      */
-    getOverlap(chrInterval) {
+    getOverlap(chrInterval: ChromosomeInterval): FeatureInterval {
         const featureLocus = this.feature.getLocus();
         const genomeLocation = this.getGenomeCoordinates();
         const overlap = genomeLocation.getOverlap(chrInterval);
@@ -106,7 +112,7 @@ class FeatureInterval {
     /**
      * @return {string} human-readable representation of this interval
      */
-    toString() {
+    toString(): string {
         return `${this.getName()}:${this.relativeStart}-${this.relativeEnd}`;
     }
 
@@ -117,7 +123,7 @@ class FeatureInterval {
      * @param {FeatureInterval} other - the end of the multi-feature interval
      * @return {string} a human-readable representation of a multi-feature interval
      */
-    toStringWithOther(other) {
+    toStringWithOther(other: FeatureInterval): string {
         return `${this.getName()}:${this.relativeStart}-${other.getName()}:${other.relativeEnd}`;
     }
 }

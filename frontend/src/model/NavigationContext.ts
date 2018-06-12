@@ -2,6 +2,7 @@ import _ from 'lodash';
 import OpenInterval from './interval/OpenInterval';
 import FeatureInterval from './interval/FeatureInterval';
 import ChromosomeInterval from './interval/ChromosomeInterval';
+import { Feature } from './Feature';
 
 /**
  * An object that represents everywhere that a user could potentially navigate and view.  A context is actually an
@@ -14,6 +15,14 @@ import ChromosomeInterval from './interval/ChromosomeInterval';
  * @author Silas Hsu
  */
 class NavigationContext {
+    private _name: string;
+    private _features: Feature[];
+    private _isGenome: boolean;
+    private _featureStarts: any[];
+    private _featureNameToIndex: {};
+    private _chrToFeatures: {[chr: string]: Feature[]};
+    private _totalBases: number;
+
     /**
      * Makes a new instance.  Features must have non-empty, unique names.  The `isGenome` parameter does not change any
      * of the instance's functionality, but if it is true, it optimizes mapping functions.
@@ -23,7 +32,7 @@ class NavigationContext {
      * @param {boolean} isGenome - whether the context covers the entire genome
      * @throws {Error} if the feature list has a problem
      */
-    constructor(name, features, isGenome=false) {
+    constructor(name: string, features: Feature[], isGenome=false) {
         this._name = name;
         this._features = features;
         this._isGenome = isGenome;
@@ -33,7 +42,7 @@ class NavigationContext {
         this._totalBases = 0;
 
         let i = 0;
-        for (let feature of features) {
+        for (const feature of features) {
             // Make sure names are unique
             const name = feature.getName();
             if (!name) {
@@ -85,7 +94,7 @@ class NavigationContext {
      * @param {number} base - absolute coordinate
      * @return {boolean} whether the base is navigable
      */
-    getIsValidBase(base) {
+    getIsValidBase(base: number): boolean {
         return 0 <= base && base < this._totalBases;
     }
 
@@ -97,7 +106,7 @@ class NavigationContext {
      * @return {number} the absolute coordinate of the feature's start
      * @throws {RangeError} if the feature's name is not in this context
      */
-    getFeatureStart(name) {
+    getFeatureStart(name: string): number {
         const index = this._featureNameToIndex[name];
         if (index === undefined) {
             throw new RangeError(`Cannot find feature with name '${name}'`);
@@ -113,7 +122,7 @@ class NavigationContext {
      * @return {FeatureInterval} corresponding feature coordinate
      * @throws {RangeError} if the absolute base is not in this context
      */
-    convertBaseToFeatureCoordinate(base) {
+    convertBaseToFeatureCoordinate(base: number): FeatureInterval {
         if (!this.getIsValidBase(base)) {
             throw new RangeError("Invalid base number");
         }
@@ -138,7 +147,7 @@ class NavigationContext {
      * @return {number} the absolute base in this context
      * @throws {RangeError} if the feature name or its relative base is not in this context
      */
-    convertFeatureCoordinateToBase(queryName, base) {
+    convertFeatureCoordinateToBase(queryName: string, base: number): number {
         const index = this._featureNameToIndex[queryName];
         if (index === undefined) {
             throw new RangeError(`Cannot find feature with name '${queryName}'`);
@@ -160,7 +169,7 @@ class NavigationContext {
      * @param {ChromosomeInterval} chrInterval - genome interval
      * @return {OpenInterval[]} intervals of absolute base numbers in this context
      */
-    convertGenomeIntervalToBases(chrInterval) {
+    convertGenomeIntervalToBases(chrInterval: ChromosomeInterval): OpenInterval[] {
         if (this._isGenome) {
             return [new OpenInterval(
                 this.convertFeatureCoordinateToBase(chrInterval.chr, chrInterval.start),
@@ -168,8 +177,8 @@ class NavigationContext {
             )];
         }
         const potentialOverlaps = this._chrToFeatures[chrInterval.chr] || [];
-        let absLocations = [];
-        for (let feature of potentialOverlaps) {
+        const absLocations = [];
+        for (const feature of potentialOverlaps) {
             const overlap = new FeatureInterval(feature).getOverlap(chrInterval);
             if (overlap) {
                 const absStart = this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeStart);
@@ -187,21 +196,23 @@ class NavigationContext {
      * 
      * Returns an open interval of absolute coordinates.  Throws RangeError on parse failure.
      *
-     * @param {string} string - the string to parse
+     * @param {string} str - the string to parse
      * @return {OpenInterval} the parsed absolute interval
      * @throws {RangeError} when parsing an interval outside of the context or something otherwise nonsensical
      */
-    parse(string) {
+    parse(str: string): OpenInterval {
         let startName, endName, startBase, endBase;
         let singleFeatureMatch, multiFeatureMatch;
         // eslint-disable-next-line no-cond-assign
-        if ((singleFeatureMatch = string.match(/([\w:]+):(\d+)-(\d+)/)) !== null) {
+        singleFeatureMatch = str.match(/([\w:]+):(\d+)-(\d+)/);
+        multiFeatureMatch = str.match(/([\w:]+):(\d+)-([\w:]+):(\d+)/);
+        if ((singleFeatureMatch) !== null) {
             startName = singleFeatureMatch[1];
             endName = startName;
             startBase = Number.parseInt(singleFeatureMatch[2], 10);
             endBase = Number.parseInt(singleFeatureMatch[3], 10);
         // eslint-disable-next-line no-cond-assign
-        } else if ((multiFeatureMatch = string.match(/([\w:]+):(\d+)-([\w:]+):(\d+)/)) !== null) {
+        } else if ((multiFeatureMatch) !== null) {
             startName = multiFeatureMatch[1];
             endName = multiFeatureMatch[3];
             startBase = Number.parseInt(multiFeatureMatch[2], 10);
@@ -210,8 +221,8 @@ class NavigationContext {
             throw new RangeError("Wrong coordinates");
         }
 
-        let startAbsBase = this.convertFeatureCoordinateToBase(startName, startBase, true);
-        let endAbsBase = this.convertFeatureCoordinateToBase(endName, endBase, true);
+        const startAbsBase = this.convertFeatureCoordinateToBase(startName, startBase);
+        const endAbsBase = this.convertFeatureCoordinateToBase(endName, endBase);
         if (startAbsBase < endAbsBase) {
             return new OpenInterval(startAbsBase, endAbsBase);
         } else {
@@ -226,9 +237,9 @@ class NavigationContext {
      * @param {number} queryEnd - (exclusive) end of interval, as an absolute coordinate
      * @return {FeatureInterval[]} list of feature intervals
      */
-    getFeaturesInInterval(queryStart, queryEnd) {
+    getFeaturesInInterval(queryStart: number, queryEnd: number): FeatureInterval[] {
         const queryInterval = new OpenInterval(queryStart, queryEnd);
-        let results = []
+        const results = []
         for (let i = 0; i < this._features.length; i++) { // Check each feature for overlap with the query interval
             const feature = this._features[i];
             const absStart = this._featureStarts[i];
@@ -256,7 +267,7 @@ class NavigationContext {
      * @param {number} queryEnd - (exclusive) end of interval, as an absolute coordinate
      * @return {ChromosomeInterval[]} list of genomic locations
      */
-    getLociInInterval(queryStart, queryEnd) {
+    getLociInInterval(queryStart: number, queryEnd: number) {
         const featureIntervals = this.getFeaturesInInterval(queryStart, queryEnd);
         const genomeIntervals = featureIntervals.map(interval => interval.getGenomeCoordinates());
         return ChromosomeInterval.mergeOverlaps(genomeIntervals);

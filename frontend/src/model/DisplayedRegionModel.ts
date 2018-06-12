@@ -1,4 +1,7 @@
 import OpenInterval from './interval/OpenInterval';
+import NavigationContext from './NavigationContext';
+import FeatureInterval from './interval/FeatureInterval';
+import ChromosomeInterval from './interval/ChromosomeInterval';
 
 const MIN_ABS_BASE = 0; // Index absolute bases from this number.  Take caution in modifying this!
 
@@ -9,6 +12,9 @@ const MIN_ABS_BASE = 0; // Index absolute bases from this number.  Take caution 
  * @author Silas Hsu
  */
 class DisplayedRegionModel {
+    private _navContext: NavigationContext;
+    private _startBase: number;
+    private _endBase: number;
     /**
      * Makes a new instance with specified navigation context, and optionally, initial view region.  If not specified,
      * the view region will be the entire navigation context.
@@ -17,7 +23,7 @@ class DisplayedRegionModel {
      * @param {number} [start] - initial start of the view region
      * @param {number} [end] - initial end of the view region
      */
-    constructor(navContext, start=MIN_ABS_BASE, end) {
+    constructor(navContext: NavigationContext, start=MIN_ABS_BASE, end?: number) {
         this._navContext = navContext;
         if (end === undefined) {
             end = navContext.getTotalBases();
@@ -30,21 +36,21 @@ class DisplayedRegionModel {
      * 
      * @return {DisplayedRegionModel} a copy of this object
      */
-    clone() {
+    clone(): DisplayedRegionModel {
         return new DisplayedRegionModel(this._navContext, this._startBase, this._endBase);
     }
 
     /**
      * @return {NavigationContext} the navigation context with which this object was created
      */
-    getNavigationContext() {
+    getNavigationContext(): NavigationContext {
         return this._navContext;
     }
 
     /**
      * @return {number} the current width of the view, in base pairs
      */
-    getWidth() {
+    getWidth(): number {
         return this._endBase - this._startBase;
     }
 
@@ -59,7 +65,7 @@ class DisplayedRegionModel {
      *
      * @return {OpenInterval} copy of the internally stored region
      */
-    getAbsoluteRegion() {
+    getAbsoluteRegion(): OpenInterval {
         return new OpenInterval(this._startBase, this._endBase);
     }
 
@@ -68,7 +74,7 @@ class DisplayedRegionModel {
      * 
      * @return {FeatureInterval[]} list of feature intervals that overlap this view region
      */
-    getFeatureIntervals() {
+    getFeatureIntervals(): FeatureInterval[] {
         return this._navContext.getFeaturesInInterval(this._startBase, this._endBase);
     }
 
@@ -77,7 +83,7 @@ class DisplayedRegionModel {
      * 
      * @return {ChromosomeInterval[]} list of genomic locations that overlap this view region.
      */
-    getGenomeIntervals() {
+    getGenomeIntervals(): ChromosomeInterval[] {
         return this._navContext.getLociInInterval(this._startBase, this._endBase);
     }
 
@@ -95,7 +101,7 @@ class DisplayedRegionModel {
      * @return {this}
      * @throws {RangeError} if end is less than start, or the inputs are undefined/infinite
      */
-    setRegion(start, end) {
+    setRegion(start: number, end: number) {
         if (!Number.isFinite(start) || !Number.isFinite(end)) {
             throw new RangeError("Start and end must be well-defined");
         }
@@ -103,8 +109,8 @@ class DisplayedRegionModel {
             throw new RangeError("Start must be less than or equal to end");
         }
 
-        let newLength = end - start;
-        let navigableLength = this._navContext.getTotalBases();
+        const newLength = end - start;
+        const navigableLength = this._navContext.getTotalBases();
         if (start < MIN_ABS_BASE) { // Left cut off; we need to extend right side
             end = MIN_ABS_BASE + newLength;
         } else if (end > navigableLength) { // Ditto for right
@@ -126,7 +132,7 @@ class DisplayedRegionModel {
      * @param {number} numBases - number of base pairs to pan
      * @return {this}
      */
-    pan(numBases) {
+    pan(numBases: number) {
         this.setRegion(this._startBase + numBases, this._endBase + numBases);
         return this;
     }
@@ -146,19 +152,19 @@ class DisplayedRegionModel {
      * @param {number} [focalPoint] - (optional) measured as number of region widths from the left edge.  Default: 0.5
      * @return {this}
      */
-    zoom(factor, focalPoint=0.5) {
+    zoom(factor: number, focalPoint=0.5) {
         if (factor <= 0) {
             throw new RangeError("Zoom factor must be greater than 0");
         }
 
-        let newWidth = this.getWidth() * factor;
-        let absFocalPoint = this.getWidth() * focalPoint + this._startBase;
-        let newAbsFocalPoint = newWidth * focalPoint + this._startBase;
-        let panAmount = absFocalPoint - newAbsFocalPoint;
+        const newWidth = this.getWidth() * factor;
+        const absFocalPoint = this.getWidth() * focalPoint + this._startBase;
+        const newAbsFocalPoint = newWidth * focalPoint + this._startBase;
+        const panAmount = absFocalPoint - newAbsFocalPoint;
 
         // Raw start and end: not rounded or checked to be within the genome
-        let rawStart = this._startBase + panAmount;
-        let rawEnd = this._startBase + newWidth + panAmount;
+        const rawStart = this._startBase + panAmount;
+        const rawEnd = this._startBase + newWidth + panAmount;
 
         this.setRegion(rawStart, rawEnd);
         return this;

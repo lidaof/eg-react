@@ -3,14 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "react-app-rewired build",
+    "build": "react-app-rewired build --scripts-version react-scripts-ts",
     "build-storybook": "build-storybook -s public",
-    "eject": "react-scripts eject",
-    "start": "react-app-rewired start",
+    "eject": "react-scripts-ts eject",
+    "start": "react-app-rewired start --scripts-version react-scripts-ts",
     "storybook": "start-storybook -p 9009 -s public",
-    "test": "react-app-rewired test --env=jsdom"
+    "test": "react-app-rewired test --env=jsdom --scripts-version react-scripts-ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@types/react-redux": "^6.0.2",
+    "react-scripts-ts": "^2.16.0"
+  },
   "devDependencies": {
     "@fortawesome/fontawesome": "^1.1.4",
     "@fortawesome/fontawesome-free-solid": "^5.0.8",
@@ -19,6 +22,13 @@
     "@storybook/addon-links": "^3.3.15",
     "@storybook/addons": "^3.3.15",
     "@storybook/react": "^3.3.15",
+    "@types/jest": "^23.0.0",
+    "@types/jquery": "^3.3.2",
+    "@types/json5": "^0.0.29",
+    "@types/lodash": "^4.14.109",
+    "@types/node": "^10.3.2",
+    "@types/react": "^16.3.17",
+    "@types/react-dom": "^16.0.6",
     "axios": "^0.16.2",
     "d3": "^4.12.0",
     "enzyme": "^3.3.0",
@@ -42,11 +52,11 @@
     "react-dom": "^16.3.0",
     "react-popper": "^0.8.2",
     "react-redux": "^5.0.7",
-    "react-scripts": "^1.1.1",
     "react-table": "^6.7.4",
     "react-test-renderer": "^16.3.0",
     "script-loader": "^0.7.2",
     "tcp-port-used": "^0.1.2",
+    "typescript": "^2.9.1",
     "underscore": "^1.8.3",
     "worker-loader": "^1.1.0",
     "zlib": "^1.0.5"

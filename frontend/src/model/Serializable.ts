@@ -4,20 +4,20 @@
  * 
  * @author Silas Hsu
  */
-interface Serializable<T> {
+interface Serializable<T extends new (...args: any[]) => any> {
     /**
      * Serializes this instance into a plain object, ready for JSON.
      * 
-     * @return {Object} plain object version of this instance
+     * @return {any} plain object version of this instance
      */
-    serialize(): Object;
-
+    serialize(): {};
+    constructor: T;
     /**
-     * Deserializes a previously serialized object, restoring its methods.  Deserializing an object that didn't come
-     * from the serialize() method causes undefined behavior.
-     * 
-     * @param {Object} object - plain object
-     * @return {T} instance of this type
-     */
-    /*static*/deserialize(object: Object): T;
+ * Deserializes a previously serialized object, restoring its methods.  Deserializing an object that didn't come
+ * from the serialize() method causes undefined behavior.
+ * 
+ * @param {any} object - plain object
+ * @return {T} instance of this type
+ */
+    deserialize(object: any): Serializable<T>
 }

@@ -20,8 +20,14 @@ function* xrange(start, stop, step){
     }
 }
 
+ 
  /**
-  * convert region to bin
+  *convert region to bin
+  *
+  * @export
+  * @param {*} beg
+  * @param {*} end
+  * @returns
   */
  export function reg2bin(beg, end){
     end -= 1;
@@ -33,8 +39,14 @@ function* xrange(start, stop, step){
     return 0;
  }
 
-  /**
-  * convert region to bins
+ 
+ /**
+  *convert region to bins
+  *
+  * @export
+  * @param {*} beg
+  * @param {*} end
+  * @returns
   */
  export function reg2bins(beg, end){
     let lst = [];

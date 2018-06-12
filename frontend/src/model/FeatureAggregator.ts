@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import LinearDrawingModel from './LinearDrawingModel';
+import { Feature } from './Feature';
+import DisplayedRegionModel from './DisplayedRegionModel';
 
 const VALUE_PROP_NAME = 'value';
 /**
@@ -15,16 +17,16 @@ const AggregatorTypes = {
 };
 
 const aggregateFunctions = {};
-aggregateFunctions[AggregatorTypes.COUNT] = records => records.length;
-aggregateFunctions[AggregatorTypes.SUM] = records => _.sumBy(records, VALUE_PROP_NAME);
+aggregateFunctions[AggregatorTypes.COUNT] = (records: any[]) => records.length;
+aggregateFunctions[AggregatorTypes.SUM] = (records: any[]) => _.sumBy(records, VALUE_PROP_NAME);
 // For mean, min, and max; if passed an empty array, returns null
-aggregateFunctions[AggregatorTypes.MEAN] = records => records.length > 0 ? _.meanBy(records, VALUE_PROP_NAME) : null;
-aggregateFunctions[AggregatorTypes.MIN] = records => _.minBy(records, VALUE_PROP_NAME) || null;
-aggregateFunctions[AggregatorTypes.MAX] = records => _.maxBy(records, VALUE_PROP_NAME) || null;
+aggregateFunctions[AggregatorTypes.MEAN] = (records: any[]) => records.length > 0 ? _.meanBy(records, VALUE_PROP_NAME) : null;
+aggregateFunctions[AggregatorTypes.MIN] = (records: any[]) => _.minBy(records, VALUE_PROP_NAME) || null;
+aggregateFunctions[AggregatorTypes.MAX] = (records: any[]) => _.maxBy(records, VALUE_PROP_NAME) || null;
 
 export const DefaultAggregators = {
     types: AggregatorTypes,
-    fromId: function(id) {
+    fromId(id: number) {
         const aggregator = aggregateFunctions[id];
         if (!aggregator) {
             throw new Error(`Unknown aggregator id "${id}"`);
@@ -47,19 +49,19 @@ class FeatureAggregator {
      * @param {number} width - maximum x coordinate to allow
      * @return {Feature[][]} mapping from x coordinate to all Features overlapping that location
      */
-    makeXMap(features, viewRegion, width) {
+    makeXMap(features: Feature[], viewRegion: DisplayedRegionModel, width: number): Feature[][] {
         width = Math.round(width); // Sometimes it's juuust a little bit off from being an int
 
-        let xToFeatures = Array(width).fill(null);
+        const xToFeatures = Array(width).fill(null);
         for (let x = 0; x < width; x++) { // Fill the array with empty arrays
             xToFeatures[x] = [];
         }
 
         const drawModel = new LinearDrawingModel(viewRegion, width);
         const navContext = viewRegion.getNavigationContext();
-        for (let feature of features) {
+        for (const feature of features) {
             const absLocations = navContext.convertGenomeIntervalToBases(feature.locus);
-            for (let location of absLocations) {
+            for (const location of absLocations) {
                 let startX = Math.floor(drawModel.baseToX(location.start));
                 startX = Math.max(0, startX);
                 let endX = Math.ceil(drawModel.baseToX(location.end));

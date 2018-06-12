@@ -1,15 +1,31 @@
 import _ from 'lodash';
+import TrackModel from './TrackModel';
 
+
+/**
+ * 
+ *
+ * @class TrackSelectionBehavior
+ */
 class TrackSelectionBehavior {
     /**
      * @param {MouseEvent} event - mouse event to inspect
      * @return {boolean} whether the input event is one that requests a selection toggle
      */
-    isToggleEvent(event) {
+    isToggleEvent(event: MouseEvent): boolean {
         return event.shiftKey;
     }
 
-    handleClick(tracks, index, event) {
+    /**
+     *
+     *
+     * @param {TrackModel[]} tracks
+     * @param {number} index
+     * @param {MouseEvent} event
+     * @returns
+     * @memberof TrackSelectionBehavior
+     */
+    handleClick(tracks: TrackModel[], index: number, event: MouseEvent) {
         if (this.isToggleEvent(event)) {
             const nextSelections = tracks.map(track => track.isSelected);
             nextSelections[index] = !nextSelections[index];
@@ -19,7 +35,16 @@ class TrackSelectionBehavior {
         }
     }
 
-    handleContextMenu(tracks, index) {
+
+    /**
+     *
+     *
+     * @param {TrackModel[]} tracks
+     * @param {number} index
+     * @returns
+     * @memberof TrackSelectionBehavior
+     */
+    handleContextMenu(tracks: TrackModel[], index: number) {
         if (tracks[index].isSelected) {
             return null;
         } else {
@@ -29,7 +54,7 @@ class TrackSelectionBehavior {
         }
     }
 
-    handleMetadataClick(tracks, index, term, event) {
+    handleMetadataClick(tracks: TrackModel[], index: number, term: string, event: MouseEvent) {
         const termValue = tracks[index].getMetadata(term);
         // Find all adjacent tracks that have the same term value.  The result interval is [minIndex, maxIndex).
         // 1.  Find matching tracks before the clicked track

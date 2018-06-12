@@ -1,0 +1,41 @@
+{
+  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "rules": {
+    "no-console": false,
+    "interface-name": false,
+    "ordered-imports": false,
+    "member-access": false,
+    "object-literal-sort-keys": false,
+    "one-variable-per-declaration": false,
+    "no-empty": false,
+    "forin": false,
+    "no-bitwise": false,
+    "iterface-name": false,
+    "jsdoc-format": false,
+    "no-shadowed-variable": false,
+    "public-before-private": false,
+    "static-before-instance": false,
+    "member-ordering": false,
+    "variable-name": false,
+    "max-classes-per-file": [true, 5]
+  },
+  "jsRules": {
+    "object-literal-sort-keys": false,
+    "one-variable-per-declaration": false,
+    "no-console": false,
+    "no-empty": false,
+    "forin": false,
+    "no-bitwise": false,
+    "iterface-name": false,
+    "jsdoc-format": false,
+    "no-shadowed-variable": false
+  },
+  "linterOptions": {
+    "exclude": [
+      "public/**/*.js",
+      "src/vendor/**/*.js",
+      "config/**/*.js",
+      "node_modules/**/*.ts"
+    ]
+  }
+}
