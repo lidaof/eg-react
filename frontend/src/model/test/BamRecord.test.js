@@ -1,6 +1,5 @@
 import BamRecord from '../BamRecord';
 import { BamFlags } from "../../vendor/bbi-js/main/bam";
-import ChromosomeInterval from '../interval/ChromosomeInterval';
 
 describe('constructor', () => {
     const BASIC_OBJECT = {
@@ -102,7 +101,7 @@ describe('getAlignment()', () => {
         object.MD = "1G0^T4C1";
         const record = new BamRecord(object);
         expect(record.getAlignment()).toEqual({
-            reference: "AG-TGAC-CCC",
+            reference: "AG-TGCA-CCC",
             lines:     "|   ||| | |",
             read:      "ATC-GCATCGC"
         });
