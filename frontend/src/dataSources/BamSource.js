@@ -5,17 +5,17 @@ import bin from '../vendor/bbi-js/utils/bin';
 
 /*
 BamRecord {
-MD: "27",
-NM: 0,
-XA: 0,
-cigar: "27M",
-flag: 0,
-mq: 255,
-pos: 18360643,
-quals: "IIIIIIIIIIIIIIIIIIIIIIIIIII",
-readName: "Sti_22947383",
-segment: "chr7",
-seq: "ATCGCCATTTTTGTAGGCTACGTATTT"
+    MD: "27",
+    NM: 0,
+    XA: 0,
+    cigar: "27M",
+    flag: 0,
+    mq: 255,
+    pos: 18360643,
+    quals: "IIIIIIIIIIIIIIIIIIIIIIIIIII",
+    readName: "Sti_22947383",
+    segment: "chr7",
+    seq: "ATCGCCATTTTTGTAGGCTACGTATTT"
 }
 */
 
@@ -40,7 +40,7 @@ class BamSource extends DataSource {
         const dataForEachSegment = await Promise.all(promises);
         const combinedData = _.flatten(dataForEachSegment);
         for (let bamRecord of combinedData) {
-            bamRecord.pos -= 1; // bbi-js returns 1-indexed features; -1 to compensate.
+            bamRecord.pos -= 1; // bam positions are 1-indexed; -1 to compensate.
         }
         return combinedData;
     }

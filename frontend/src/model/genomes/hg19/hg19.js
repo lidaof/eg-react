@@ -59,6 +59,11 @@ const defaultTracks = [
         url: "https://vizhub.wustl.edu/public/hg19/methylc2/h1.liftedtohg19.gz"
     }),
     new TrackModel({
+        type: "bam",
+        name: "Test bam",
+        url: "https://wangftp.wustl.edu/~dli/test/a.bam"
+    }),
+    new TrackModel({
         type: "ruler",
         name: "Ruler",
     })

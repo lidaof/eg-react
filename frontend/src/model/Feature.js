@@ -1,5 +1,8 @@
 import ChromosomeInterval from "./interval/ChromosomeInterval";
 
+export const FORWARD_STRAND_CHAR = "+";
+export const REVERSE_STRAND_CHAR = "-";
+
 /**
  * A feature, or annotation, in the genome.
  * 
@@ -65,14 +68,14 @@ export class Feature {
      * @return {boolean} whether this feature is on the forward strand
      */
     getIsForwardStrand() {
-        return this.strand === "+";
+        return this.strand === FORWARD_STRAND_CHAR;
     }
 
     /**
      * @return {boolean} whether this feature is on the reverse strand
      */
     getIsReverseStrand() {
-        return this.strand === "-";
+        return this.strand === REVERSE_STRAND_CHAR;
     }
 
     /**
