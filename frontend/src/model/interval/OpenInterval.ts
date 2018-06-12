@@ -3,6 +3,7 @@ interface IOpenInterval {
     end: number;
 }
 
+
 /**
  * A 0-indexed open interval.  Intervals are iterable, so code can take advantage of the spread operator:
  *     `myFunction(...interval)` is equivalent to `myFunction(interval.start, interval.end)`
@@ -50,7 +51,7 @@ export default class OpenInterval implements IOpenInterval {
      * @returns
      * @memberof OpenInterval
      */
-    static deserialize(object: number[] | IOpenInterval) {
+    static deserialize(object: number[] | IOpenInterval): OpenInterval {
         if (Array.isArray(object)) {
             return new OpenInterval(object[0], object[1]);
         }

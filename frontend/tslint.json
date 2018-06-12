@@ -15,7 +15,9 @@
     "no-shadowed-variable": false,
     "public-before-private": false,
     "static-before-instance": false,
-    "member-ordering": false
+    "member-ordering": false,
+    "variable-name": false,
+    "max-classes-per-file": [true, 5]
   },
   "jsRules": {
     "object-literal-sort-keys": false,

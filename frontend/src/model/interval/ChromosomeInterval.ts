@@ -1,7 +1,7 @@
 import OpenInterval from './OpenInterval';
 import * as _ from 'lodash';
 
-interface IChromosomeInterval {
+export interface IChromosomeInterval {
     chr: string; // name of the chromosome
     start: number; // start of the interval, inclusive
     end: number; // end of the interval, exclusive
