@@ -31,6 +31,13 @@ function getNumReferenceBases(cigarString: string): number {
     return referenceBases;
 }
 
+
+/**
+ * Bam record interface.
+ * https://github.com/vsbuffalo/devnotes/wiki/The-MD-Tag-in-BAM-Files
+ *
+ * @interface IBamRecord
+ */
 interface IBamRecord {
     MD: string;
     NM: number;
@@ -45,6 +52,12 @@ interface IBamRecord {
     seq: string;
 }
 
+
+/**
+ * Struct returned by the getAlignment function
+ *
+ * @interface AlignmentResult
+ */
 interface AlignmentResult {
     reference: string;
     read: string;
@@ -86,10 +99,15 @@ class BamRecord extends Feature {
     constructor(rawObject: IBamRecord) {
         const start = rawObject.pos;
         const end = start + getNumReferenceBases(rawObject.cigar);
+        // Test don't pass without assigning this to a variable.
+        // I know it's weird but what can you do? ¯\_(ツ)_/¯
+        const ci = new ChromosomeInterval(rawObject.segment, start, end);
+        const rsc = REVERSE_STRAND_CHAR;
+        const fsc = FORWARD_STRAND_CHAR;
         super(
             rawObject.readName,
-            new ChromosomeInterval(rawObject.segment, start, end),
-            rawObject.flag & BamFlags.REVERSE_COMPLEMENT ? REVERSE_STRAND_CHAR : FORWARD_STRAND_CHAR
+            ci,
+            rawObject.flag & BamFlags.REVERSE_COMPLEMENT ? rsc : fsc
         );
         this.MD = rawObject.MD;
         this.cigar = rawObject.cigar;
@@ -107,9 +125,9 @@ class BamRecord extends Feature {
     read:      "ATC-GCATCGC"
 }
 ```
-     * @return {Object} human-readable alignment of this record to the reference genome
+     * @return {AlignmentResult} human-readable alignment of this record to the reference genome
      */
-    getAlignment() {
+    getAlignment(): AlignmentResult {
         // const MD_REGEX = /\d+(([A-Z]|\^[A-Z]+)\d+)*/; // From the SAM specification.
         /*
         From https://samtools.github.io/hts-specs/SAMtags.pdf:
@@ -144,85 +162,78 @@ class BamRecord extends Feature {
         /**
          * MD_REGEX can parse the following
          * 1G0^T4C1
-         ^T4C1`
-         6G4C20G1A5C5A1^C3A15G1G15
-         10A5^AC6`
+         * 6G4C20G1A5C5A1^C3A15G1G15
+         * 10A5^AC6`
          */
         const MD_REGEX = /(\d+)([A-Z]|\^[A-Z]+)*/g;
         let result;
         let reference = '';
-        let lines = '';
         let read = '';
 
-        // read start and the reference start are different due to insertions
+        // Do a cigar pass and add insertions/deletions
         let start = 0;
         let refStart = 0;
-        while ((result = CIGAR_REGEX.exec(this.cigar)) !== null) {
+        while ((result = CIGAR_REGEX.exec(this.cigar))) {
             const [fullOp, countStr, operation] = result;
-            const count = Number(countStr);
+            let count = Number(countStr);
             switch (operation) {
                 case 'M':
                     reference += this.seq.slice(refStart, refStart + count);
                     read += this.seq.slice(start, start + count);
-                    lines += '|'.repeat(count);
                     break;
                 case 'I':
                     read += this.seq.slice(start, start + count);
                     reference += '-'.repeat(count);
-                    lines += ' '.repeat(count);
-                    refStart += count;
                     break;
                 case 'D':
                     reference += 'D'.repeat(count);
                     read += '-'.repeat(count);
-                    lines += ' '.repeat(count);
+                    count = 0;
                     break;
             }
             start += count;
             refStart += count;
-        }
-        // Next do an MD pass. Replacing deletions
 
+        }
+        // Next do an MD pass. Replacing deletions with actual value
         start = 0;
         refStart = 0;
         result = null;
-        while ((result = MD_REGEX.exec(this.cigar)) !== null) {
+        while ((result = MD_REGEX.exec(this.MD))) {
             const [fullOp, countStr, operation] = result;
             /**
-             * Handle various operations there are a couple of cases
-             * ['1', undefined, index: 4] This comes at the end. This means there was 1 match
-             * ['6G', '6', 'G'] 6 matches followed by a G sub
-             * ['1^C, '1', '^C'] 1 match followed by a C sub
+             * For every md that passes, you have one of the following cases
+             * 1: ['1', undefined, index: 4] This comes at the end. This means there was 1 match
+             * 2: ['6G', '6', 'G'] 6 matches followed by a G sub
+             * 3: ['1^C, '1', '^C'] 1 match followed by a C sub
              */
-            // Handle case where MD is at the end of the string such as MD = 10;
-            if (!operation[1]) {
-                // do nothing
-                const count = Number(operation[0]);
-                start += count;
+            if (!operation) {
+                // Case 1: MD = 10 or we are at the end. skip to the end;
+                const count = Number(countStr);
                 refStart += seek(reference, refStart, count);
                 continue;
 
-            } else if (operation[2] === '^') {
+            } else if (operation[0] === '^') {
+                // Case 3: Deletion
                 // Handle case of deletion. The previous pass should have made the character a D
                 const count = Number(countStr); // how many to skip ahead.
-                start += count;
                 refStart += seek(reference, refStart, count);
-                const replacement = (operation[2] as string).slice(1);
+                const replacement = (operation as string).slice(1);
                 if (reference[refStart] !== 'D') { throw new Error('Implementation Error'); }
                 reference = reference.substr(0, refStart) + replacement + reference.substr(refStart + replacement.length);
-
+                refStart += seek(reference, refStart, replacement.length);
             } else {
+                // Case 2: Some amount of matches with a substitution 
                 const count = Number(countStr);
-                start += count;
                 refStart += seek(reference, refStart, count);
-                reference = reference.substr(0, refStart) + operation[2] + reference.substr(refStart + 1);
+                reference = reference.substr(0, refStart) + operation + reference.substr(refStart + operation.length);
+                refStart += seek(reference, refStart, operation.length);
             }
-
         }
 
         return {
             reference,
-            lines,
+            lines: reference.split('').map((c, i) => (c === read[i]) ? '|' : ' ').join(''),
             read
         }
 
@@ -240,12 +251,13 @@ class BamRecord extends Feature {
         function seek(str: string, start: number, amount: number): number {
             let seen = 0;
             let valid = 0;
-            while (valid !== amount) {
-                do {
-                    seen += 1;
-                } while (str[start + seen] === '-');
+            if (amount == 0) return 0;
+            for (let i = start + 1; i < str.length && valid != amount; i++) {
+                seen += 1;
+                if (str[i] == '-') continue;
                 valid += 1;
             }
+
             return seen;
         }
     }

@@ -1,5 +1,6 @@
 import BamRecord from '../BamRecord';
 import { BamFlags } from "../../vendor/bbi-js/main/bam";
+import ChromosomeInterval from '../interval/ChromosomeInterval';
 
 describe('constructor', () => {
     const BASIC_OBJECT = {
@@ -77,7 +78,7 @@ describe('getAlignment()', () => {
         object.cigar = "4M1I2M1I2M"; // 4 match, 1 insertion, 2 match, 1 insertion, 2 match
         const record = new BamRecord(object);
         expect(record.getAlignment()).toEqual({
-            reference: "ATCG-AT-CG",
+            reference: "ATCG-AT-GC",
             lines:     "|||| || ||",
             read:      "ATCGCATCGC"
         });
@@ -105,5 +106,18 @@ describe('getAlignment()', () => {
             lines:     "|   ||| | |",
             read:      "ATC-GCATCGC"
         });
+    });
+
+    it('understands the alignment with combinations of everything and multiple subs', () => {
+        const object = {...BASIC_OBJECT};
+        object.cigar = "2M1I1D3M1I3M"; // 2 match, 1 insertion, 1 deletion, 3 match, 1 insertion, 3 match
+        object.MD = "1G0^TT3C1";
+        const record = new BamRecord(object);
+        expect(record.getAlignment()).toEqual({
+            reference: "AG-TTCA-CCC",
+            lines:     "|    || | |",
+            read:      "ATC-GCATCGC"
+        });
     })
+
 });
