@@ -155,34 +155,49 @@ class BamRecord extends Feature {
                 AG-DGCA-CGC
                 ATC-GCATCGC
         */
+        let [reference, read] = this.cigarPass(this.cigar, this.seq);
+        [reference, read] = this.mdPass(reference, read);
 
+        return {
+            reference,
+            lines: reference.split('').map((c, i) => (c === read[i]) ? '|' : ' ').join(''),
+            read
+        }
+    }
 
+    /**
+     *
+     *
+     * @param {string} reference
+     * @param {string} read
+     * @returns {[string, string]}
+     * @memberof BamRecord
+     */
+    cigarPass(cigar: string, seq: string): [string, string] {
         // First do an MD pass marking Deletions for indel
-        const CIGAR_REGEX = /(\d+)([A-Z]|\^[A-Z]+)/g;
+        const CIGAR_REGEX = /(\d+)([A-Z]|=)/g;
         /**
          * MD_REGEX can parse the following
          * 1G0^T4C1
          * 6G4C20G1A5C5A1^C3A15G1G15
          * 10A5^AC6`
          */
-        const MD_REGEX = /(\d+)([A-Z]|\^[A-Z]+)*/g;
         let result;
         let reference = '';
         let read = '';
-
         // Do a cigar pass and add insertions/deletions
         let start = 0;
         let refStart = 0;
-        while ((result = CIGAR_REGEX.exec(this.cigar))) {
+        while ((result = CIGAR_REGEX.exec(cigar))) {
             const [fullOp, countStr, operation] = result;
             let count = Number(countStr);
             switch (operation) {
                 case 'M':
-                    reference += this.seq.slice(refStart, refStart + count);
-                    read += this.seq.slice(start, start + count);
+                    reference += seq.slice(refStart, refStart + count);
+                    read += seq.slice(start, start + count);
                     break;
                 case 'I':
-                    read += this.seq.slice(start, start + count);
+                    read += seq.slice(start, start + count);
                     reference += '-'.repeat(count);
                     break;
                 case 'D':
@@ -195,10 +210,26 @@ class BamRecord extends Feature {
             refStart += count;
 
         }
+        return [reference, read];
+    }
+
+
+    /**
+     * Takes a reference and read that was processed by a cigar pass, and applies the 
+     * BedRecords MD to it.
+     *
+     * @param {string} reference
+     * @param {string} read
+     * @returns {[string, string]}
+     * @memberof BamRecord
+     */
+    mdPass(reference: string, read: string): [string, string] {
+        const MD_REGEX = /(\d+)([A-Z]|\^[A-Z]+)*/g;
+
         // Next do an MD pass. Replacing deletions with actual value
-        start = 0;
-        refStart = 0;
-        result = null;
+        let start = 0;
+        let refStart = 0;
+        let result = null;
         while ((result = MD_REGEX.exec(this.MD))) {
             const [fullOp, countStr, operation] = result;
             /**
@@ -210,45 +241,41 @@ class BamRecord extends Feature {
             if (!operation) {
                 // Case 1: MD = 10 or we are at the end. skip to the end;
                 const count = Number(countStr);
-                refStart += seek(reference, refStart, count);
+                refStart += countKnownBases(reference, refStart, count);
                 continue;
 
             } else if (operation[0] === '^') {
                 // Case 3: Deletion
                 // Handle case of deletion. The previous pass should have made the character a D
                 const count = Number(countStr); // how many to skip ahead.
-                refStart += seek(reference, refStart, count);
+                refStart += countKnownBases(reference, refStart, count);
                 const replacement = (operation as string).slice(1);
-                if (reference[refStart] !== 'D') { throw new Error('Implementation Error'); }
+                if (reference[refStart] !== 'D') {
+                    throw new Error('Implementation Error');
+                }
                 reference = reference.substr(0, refStart) + replacement + reference.substr(refStart + replacement.length);
-                refStart += seek(reference, refStart, replacement.length);
+                refStart += countKnownBases(reference, refStart, replacement.length);
             } else {
                 // Case 2: Some amount of matches with a substitution 
                 const count = Number(countStr);
-                refStart += seek(reference, refStart, count);
+                refStart += countKnownBases(reference, refStart, count);
                 reference = reference.substr(0, refStart) + operation + reference.substr(refStart + operation.length);
-                refStart += seek(reference, refStart, operation.length);
+                refStart += countKnownBases(reference, refStart, operation.length);
             }
         }
-
-        return {
-            reference,
-            lines: reference.split('').map((c, i) => (c === read[i]) ? '|' : ' ').join(''),
-            read
-        }
-
+        return [reference, read];
 
         /**
-         * seek returns the number of elements between [start, start + amount] where 
+         * countKnownBases returns the number of elements between [start, start + amount] where 
          * amount ignores -
-         * seek('a-b', 0, 1) returns 2
+         * countKnownBases('a-b', 0, 1) returns 2
          *
          * @param {string} str
          * @param {number} start
          * @param {number} amount
          * @returns {number}
          */
-        function seek(str: string, start: number, amount: number): number {
+        function countKnownBases(str: string, start: number, amount: number): number {
             let seen = 0;
             let valid = 0;
             if (amount == 0) return 0;
@@ -261,6 +288,7 @@ class BamRecord extends Feature {
             return seen;
         }
     }
+
 }
 
 export default BamRecord;

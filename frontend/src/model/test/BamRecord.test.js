@@ -110,13 +110,13 @@ describe('getAlignment()', () => {
 
     it('understands the alignment with combinations of everything and multiple subs', () => {
         const object = {...BASIC_OBJECT};
-        object.cigar = "2M1I1D3M1I3M"; // 2 match, 1 insertion, 1 deletion, 3 match, 1 insertion, 3 match
-        object.MD = "1G0^TT3C1";
+        object.cigar = "2M1I2D2M1I4M"; // 2 match, 1 insertion, 1 deletion, 3 match, 1 insertion, 3 match
+        object.MD = "1G0^TT4C1";
         const record = new BamRecord(object);
         expect(record.getAlignment()).toEqual({
-            reference: "AG-TTCA-CCC",
-            lines:     "|    || | |",
-            read:      "ATC-GCATCGC"
+            reference: "AG-TTGC-TCCC",
+            lines:     "|    || || |",
+            read:      "ATC--GCATCGC"
         });
     })
 
