@@ -7,6 +7,15 @@
             "request": "launch",
             "url": "http://localhost:3000",
             "webRoot": "${workspaceRoot}/frontend/src"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Jest All",
+            "program": "frontend/node_modules/react-app-rewired/bin/index.js test --env=jsdom --script-version react-scripts-ts",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/frontend"
+
         }
     ]
 }

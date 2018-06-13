@@ -9,7 +9,7 @@
 //
 
 if (typeof(require) !== 'undefined') {
-    var jszlib = require('../utils/jszlib');
+    var jszlib = require('./jszlib');
     var jszlib_inflate_buffer = jszlib.inflateBuffer;
     var arrayCopy = jszlib.arrayCopy;
 }

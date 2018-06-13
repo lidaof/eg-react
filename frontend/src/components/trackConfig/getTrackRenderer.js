@@ -1,4 +1,5 @@
 import TrackRenderer from './TrackRenderer';
+import BamTrackRenderer from './BamTrackRenderer';
 import BedTrackRenderer from './BedTrackRenderer';
 import BigBedTrackRenderer from './BigBedTrackRenderer';
 import BedGraphTrackRenderer from './BedGraphTrackRenderer';
@@ -9,6 +10,7 @@ import RulerTrackRenderer from './RulerTrackRenderer';
 import MethylCTrackRenderer from './MethylCTrackRenderer';
 
 const TYPE_NAME_TO_RENDERER = {
+    "bam": BamTrackRenderer,
     "bed": BedTrackRenderer,
     "bedgraph": BedGraphTrackRenderer,
     "bigbed": BigBedTrackRenderer,

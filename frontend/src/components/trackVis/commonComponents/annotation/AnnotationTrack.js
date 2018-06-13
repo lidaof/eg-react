@@ -5,7 +5,7 @@ import FullDisplayMode from './FullDisplayMode';
 import Track from '../Track';
 import NumericalTrack from '../numerical/NumericalTrack';
 
-import FeatureAggregator, { DefaultAggregators } from '../../../../model/FeatureAggregator';
+import { DefaultAggregators } from '../../../../model/FeatureAggregator';
 import { AnnotationDisplayModes, NumericalDisplayModes } from '../../../../model/DisplayModes';
 import configOptionMerging from '../configOptionMerging';
 
