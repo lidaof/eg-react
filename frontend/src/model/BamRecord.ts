@@ -99,15 +99,12 @@ class BamRecord extends Feature {
     constructor(rawObject: IBamRecord) {
         const start = rawObject.pos;
         const end = start + getNumReferenceBases(rawObject.cigar);
-        // Test don't pass without assigning this to a variable.
-        // I know it's weird but what can you do? ¯\_(ツ)_/¯
         const ci = new ChromosomeInterval(rawObject.segment, start, end);
-        const rsc = REVERSE_STRAND_CHAR;
-        const fsc = FORWARD_STRAND_CHAR;
+        const flag = rawObject.flag & BamFlags.REVERSE_COMPLEMENT ? REVERSE_STRAND_CHAR : FORWARD_STRAND_CHAR;
         super(
             rawObject.readName,
             ci,
-            rawObject.flag & BamFlags.REVERSE_COMPLEMENT ? rsc : fsc
+            flag
         );
         this.MD = rawObject.MD;
         this.cigar = rawObject.cigar;
