@@ -224,7 +224,7 @@ class BamRecord extends Feature {
         const MD_REGEX = /(\d+)([A-Z]|\^[A-Z]+)*/g;
 
         // Next do an MD pass. Replacing deletions with actual value
-        let start = 0;
+        const start = 0;
         let refStart = 0;
         let result = null;
         while ((result = MD_REGEX.exec(this.MD))) {
@@ -275,10 +275,10 @@ class BamRecord extends Feature {
         function countKnownBases(str: string, start: number, amount: number): number {
             let seen = 0;
             let valid = 0;
-            if (amount == 0) return 0;
-            for (let i = start + 1; i < str.length && valid != amount; i++) {
+            if (amount === 0) { return 0; }
+            for (let i = start + 1; i < str.length && valid !== amount; i++) {
                 seen += 1;
-                if (str[i] == '-') continue;
+                if (str[i] === '-') { continue; }
                 valid += 1;
             }
 
