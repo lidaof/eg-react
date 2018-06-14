@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import LinearDrawingModel from './LinearDrawingModel';
 import { Feature } from './Feature';
 import DisplayedRegionModel from './DisplayedRegionModel';
+import { FeaturePlacer } from './FeaturePlacer';
 
 const VALUE_PROP_NAME = 'value';
 /**
@@ -57,21 +57,15 @@ class FeatureAggregator {
             xToFeatures[x] = [];
         }
 
-        const drawModel = new LinearDrawingModel(viewRegion, width);
-        const navContext = viewRegion.getNavigationContext();
-        for (const feature of features) {
-            const absLocations = navContext.convertGenomeIntervalToBases(feature.locus);
-            for (const location of absLocations) {
-                let startX = Math.floor(drawModel.baseToX(location.start));
-                startX = Math.max(0, startX);
-                let endX = Math.ceil(drawModel.baseToX(location.end));
-                endX = Math.min(endX, width - 1);
-                for (let x = startX; x <= endX; x++) {
-                    xToFeatures[x].push(feature);
-                }
+        const placer = new FeaturePlacer();
+        const placement = placer.placeFeatures(features, viewRegion, width);
+        for (const placedFeature of placement) {
+            const startX = Math.floor(placedFeature.xLocation.start);
+            const endX = Math.ceil(placedFeature.xLocation.end);
+            for (let x = startX; x <= endX; x++) {
+                xToFeatures[x].push(placedFeature.feature);
             }
         }
-
         return xToFeatures;
     }
 }

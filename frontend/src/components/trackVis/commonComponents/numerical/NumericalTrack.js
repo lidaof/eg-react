@@ -2,14 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { scaleLinear } from 'd3-scale';
+import memoizeOne from 'memoize-one';
 
-import BarPlot from './BarPlot';
 import Track from '../Track';
 import TrackLegend from '../TrackLegend';
 import GenomicCoordinates from '../GenomicCoordinates';
+import HoverTooltipContext from '../tooltip/HoverTooltipContext';
 import configOptionMerging from '../configOptionMerging';
 
-import { RenderTypes } from '../../../../art/DesignRenderer';
+import { RenderTypes, DesignRenderer } from '../../../../art/DesignRenderer';
 import { NumericalDisplayModes } from '../../../../model/DisplayModes';
 import FeatureAggregator, { DefaultAggregators } from '../../../../model/FeatureAggregator';
 
@@ -29,7 +30,7 @@ const TOP_PADDING = 3;
  * 
  * @author Silas Hsu
  */
-class NumericalTrack extends React.PureComponent {
+class NumericalTrack extends React.Component {
     /**
      * Don't forget to look at NumericalFeatureProcessor's propTypes!
      */
@@ -50,67 +51,29 @@ class NumericalTrack extends React.PureComponent {
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any, // If present, applies error styling
-        /**
-         * Callback for drawing one bar of a bar chart.
-         * Signature: (x: number, y: number, height: number): JSX.Element
-         *     `x` - x coordinate to draw
-         *     `y` - y coordinate to draw
-         *     `height` - height of the bar
-         */
-        getBarElement: PropTypes.func,
-        getHeatmapElement: PropTypes.func,
-        /**
-         * Callback for getting tooltip contents to render whenever a user hovers over the visualization.
-         * Signature: (relativeX: number, value: number): JSX.Element
-         *     `relativeX` - coordinate of hover relative to the visualizer
-         *     `records` - all data that overlap the x location
-         */
-        getTooltipContents: PropTypes.func,
     });
-
-    static defaultProps = DEFAULT_OPTIONS;
 
     constructor(props) {
         super(props);
-        const xToValue = this.aggregateFeatures(props);
-        this.state = {
-            xToValue: xToValue,
-            ...this.computeScales(xToValue, props)
-        };
-        this.renderPixel = this.renderPixel.bind(this);
-        this.renderDefaultBarElement = this.renderDefaultBarElement.bind(this);
-        this.renderDefaultHeatmapElement = this.renderDefaultHeatmapElement.bind(this);
-        this.renderDefaultTooltip = this.renderDefaultTooltip.bind(this);
+        this.xToValue = null;
+        this.scales = null;
+
+        this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
+        this.computeScales = memoizeOne(this.computeScales);
+        this.renderTooltip = this.renderTooltip.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
-        let didUpdateData = false;
-        if (this.props.data !== nextProps.data ||
-            this.props.viewRegion !== nextProps.viewRegion ||
-            this.props.options.aggregateMethod !== nextProps.options.aggregateMethod
-        ) {
-            this.setState({xToValue: this.aggregateFeatures(nextProps)});
-            didUpdateData = true;
-        }
-
-        if (didUpdateData || this.props.options !== nextProps.options) {
-            this.setState(prevState => this.computeScales(prevState.xToValue, nextProps));
-        }
-    }
-
-    aggregateFeatures(props) {
-        const {data, viewRegion, width, options} = props;
+    aggregateFeatures(data, viewRegion, width, aggregatorId) {
         const aggregator = new FeatureAggregator();
         const xToFeatures = aggregator.makeXMap(data, viewRegion, width);
-        const aggregateMethod = DefaultAggregators.fromId(options.aggregateMethod);
-        return xToFeatures.map(aggregateMethod);
+        return xToFeatures.map( DefaultAggregators.fromId(aggregatorId) );
     }
 
-    computeScales(xToValue, props) {
+    computeScales(xToValue, height) {
         const min = _.min(xToValue); // Returns undefined if no data.  This will cause scales to return NaN.
         const max = _.max(xToValue);
         return {
-            valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, props.options.height]).clamp(true),
+            valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
             valueToOpacity: scaleLinear().domain([min, max]).range([0, 1]).clamp(true),
         };
     }
@@ -124,39 +87,6 @@ class NumericalTrack extends React.PureComponent {
         }
     }
 
-    renderDefaultBarElement(x, y, height) {
-        return <rect key={x} x={x} y={y} width={1} height={height} fill={this.props.options.color} />;
-    }
-
-    renderDefaultHeatmapElement(x, opacity) {
-        const {height, color} = this.props.options;
-        return <rect key={x} x={x} y={0} width={1} height={height} fill={color} fillOpacity={opacity} />;
-    }
-
-    /**
-     * Gets an element to draw for a data record.
-     * 
-     * @return {JSX.Element} bar element to render
-     */
-    renderPixel(value, x) {
-        if (!value || Number.isNaN(value)) {
-            return null;
-        }
-        if (this.getEffectiveDisplayMode() === NumericalDisplayModes.HEATMAP) {
-            const opacity = this.state.valueToOpacity(value);
-            const getHeatmapElement = this.props.getHeatmapElement || this.renderDefaultHeatmapElement;
-            return getHeatmapElement(x, opacity);
-        } else { // Assume BAR
-            const y = this.state.valueToY(value);
-            const height = this.props.options.height - y;
-            if (height <= 0) {
-                return null;
-            }
-            const getBarElement = this.props.getBarElement || this.renderDefaultBarElement;
-            return getBarElement(x, y, height);
-        }
-    }
-
     /**
      * Renders the default tooltip that is displayed on hover.
      * 
@@ -164,8 +94,9 @@ class NumericalTrack extends React.PureComponent {
      * @param {number} value - 
      * @return {JSX.Element} tooltip to render
      */
-    renderDefaultTooltip(relativeX, value) {
+    renderTooltip(relativeX) {
         const {trackModel, viewRegion, width, unit} = this.props;
+        const value = this.xToValue[relativeX];
         const stringValue = typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : '(no data)';
         return (
         <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
@@ -182,27 +113,82 @@ class NumericalTrack extends React.PureComponent {
     }
 
     render() {
-        const {width, trackModel, unit, options, getTooltipContents} = this.props;
+        const {data, viewRegion, width, trackModel, unit, options} = this.props;
+        const {height, color, aggregateMethod} = options;
+        const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
+        this.xToValue = this.aggregateFeatures(data, viewRegion, width, aggregateMethod);
+        this.scales = this.computeScales(this.xToValue, height);
+        
         const legend = <TrackLegend
             trackModel={trackModel}
-            height={options.height}
-            axisScale={this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR ? this.state.valueToY : undefined}
+            height={height}
+            axisScale={isDrawingBars ? this.scales.valueToY : undefined}
             axisLegend={unit}
         />;
-        const visualizer = <BarPlot
-            data={this.state.xToValue}
-            width={width}
-            height={options.height}
-            htmlType={RenderTypes.CANVAS}
-            options={options} // BarPlot doesn't use options, but we pass it to cue rerenders.
-            getBarElement={this.renderPixel}
-            getTooltipContents={getTooltipContents || this.renderDefaultTooltip}
-        />;
+        const visualizer = (
+            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
+                <ValuePlot
+                    xToValue={this.xToValue}
+                    scales={this.scales}
+                    height={height}
+                    color={color}
+                    isDrawingBars={isDrawingBars}
+                />
+            </HoverTooltipContext>
+        );
         return <Track
             {...this.props}
             legend={legend}
             visualizer={visualizer}
         />;
+    }
+}
+
+class ValuePlot extends React.PureComponent {
+    static propTypes = {
+        xToValue: PropTypes.array.isRequired,
+        scales: PropTypes.object.isRequired,
+        height: PropTypes.number.isRequired,
+        color: PropTypes.string,
+        isDrawingBars: PropTypes.bool,
+    }
+
+    constructor(props) {
+        super(props);
+        this.renderPixel = this.renderPixel.bind(this);
+    }
+
+    /**
+     * Gets an element to draw for a data record.
+     * 
+     * @param {number} value
+     * @param {number} x
+     * @return {JSX.Element} bar element to render
+     */
+    renderPixel(value, x) {
+        if (!value || Number.isNaN(value)) {
+            return null;
+        }
+
+        const {isDrawingBars, scales, height, color} = this.props;
+        if (isDrawingBars) {
+            const y = scales.valueToY(value);
+            const drawHeight = height - y;
+            if (drawHeight <= 0) {
+                return null;
+            }
+            return <rect key={x} x={x} y={y} width={1} height={drawHeight} fill={color} />;
+        } else { // Assume HEATMAP
+            const opacity = scales.valueToOpacity(value);
+            return <rect key={x} x={x} y={0} width={1} height={height} fill={color} fillOpacity={opacity} />;
+        }
+    }
+
+    render() {
+        const {xToValue, height} = this.props;
+        return <DesignRenderer type={RenderTypes.CANVAS} width={xToValue.length} height={height}>
+            {this.props.xToValue.map(this.renderPixel)}
+        </DesignRenderer>
     }
 }
 
