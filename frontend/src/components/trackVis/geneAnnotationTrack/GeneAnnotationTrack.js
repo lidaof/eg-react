@@ -11,13 +11,10 @@ import Tooltip from '../commonComponents/tooltip/Tooltip';
 
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
-import IntervalArranger from '../../../model/interval/IntervalArranger';
 
 const ROW_VERTICAL_PADDING = 5;
 const ROW_HEIGHT = GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
-const INTERVAL_ARRANGER = new IntervalArranger(
-    drawLocation => drawLocation.feature.getName().length * GeneAnnotation.HEIGHT
-);
+const getGenePadding = gene => gene.getName().length * GeneAnnotation.HEIGHT;
 
 /**
  * Track that displays gene annotations.
@@ -49,21 +46,20 @@ class GeneAnnotationTrack extends React.Component {
     /**
      * Renders one gene annotation.
      * 
-     * @param {Gene} gene - gene to render
-     * @param {OpenInterval} absInterval - location of the gene in navigation context
-     * @param {OpenInterval} xRange - x coordinates the annotation will occupy
+     * @param {PlacedFeature} - gene and draw coordinates
      * @param {number} y - y coordinate of the top of the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
      * @return {JSX.Element} element visualizing the gene
      */
-    renderAnnotation(gene, absInterval, xRange, y, isLastRow) {
+    renderAnnotation(placedFeature, y, isLastRow) {
+        const {feature, contextLocation} = placedFeature;
         const {viewRegion, width, viewWindow, options} = this.props;
         const navContext = viewRegion.getNavigationContext();
         const drawModel = new LinearDrawingModel(viewRegion, width);
         return <GeneAnnotation
-            key={gene.refGeneRecord._id}
-            gene={gene}
-            navContextLocation={new DisplayedRegionModel(navContext, ...absInterval)}
+            key={feature.refGeneRecord._id}
+            gene={feature}
+            navContextLocation={new DisplayedRegionModel(navContext, ...contextLocation)}
             drawModel={drawModel}
             y={y}
             viewWindow={viewWindow}
@@ -92,7 +88,7 @@ class GeneAnnotationTrack extends React.Component {
         return <AnnotationTrack
             {...this.props}
             rowHeight={ROW_HEIGHT}
-            intervalArranger={INTERVAL_ARRANGER}
+            featurePadding={getGenePadding}
             getAnnotationElement={this.renderAnnotation}
         />;
     }

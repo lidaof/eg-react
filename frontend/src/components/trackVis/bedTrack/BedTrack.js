@@ -55,19 +55,18 @@ export class BedTrack extends React.Component {
     /**
      * Renders one annotation.
      * 
-     * @param {Feature} feature - feature to render
-     * @param {OpenInterval} absInterval - location of the feature in navigation context
-     * @param {OpenInterval} xRange - x coordinates the annotation will occupy
+     * @param {PlacedFeature} - feature and drawing info
      * @param {number} y - y coordinate to render the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
      * @param {number} index - iteration index
      * @return {JSX.Element} element visualizing the feature
      */
-    renderAnnotation(feature, absInterval, xRange, y, isLastRow, index) {
+    renderAnnotation(placedFeature, y, isLastRow, index) {
+        const {feature, xLocation} = placedFeature
         return <BedAnnotation
             key={index}
             feature={feature}
-            xRange={xRange}
+            xRange={xLocation}
             y={y}
             isMinimal={isLastRow}
             color={this.props.options.color}

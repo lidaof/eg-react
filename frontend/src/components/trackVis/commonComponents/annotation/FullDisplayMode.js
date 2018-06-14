@@ -6,15 +6,13 @@ import Track from '../Track';
 import TrackLegend from '../TrackLegend';
 import { HiddenItemsMessage } from '../TrackMessage';
 
-import IntervalArranger from '../../../../model/interval/IntervalArranger';
-import FeatureArranger from '../../../../model/FeatureArranger';
+import { FeatureArranger, PlacedFeatureWithRow } from '../../../../model/FeatureArranger';
 
 const SVG_STYLE = {
     display: "block",
     overflow: "visible",
 };
 const TOP_PADDING = 5;
-const DEFAULT_INTERVAL_ARRANGER = new IntervalArranger(5);
 
 /**
  * An arranger and renderer of features, or annotations.
@@ -27,7 +25,7 @@ class FullDisplayMode extends React.Component {
          * Features to render.  Simplified since checking is expensive.
          */
         data: PropTypes.array.isRequired, // PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired,
-        intervalArranger: PropTypes.instanceOf(IntervalArranger), // Used to arrange features
+        featurePadding: PropTypes.oneOfType([PropTypes.number, PropTypes.func]), // Horizontal padding for features
         rowHeight: PropTypes.number.isRequired, // Height of each row of annotations, in pixels
         options: PropTypes.shape({
             maxRows: PropTypes.number.isRequired, // Max number of rows of annotations to render
@@ -50,7 +48,7 @@ class FullDisplayMode extends React.Component {
     });
 
     static defaultProps = {
-        intervalArranger: DEFAULT_INTERVAL_ARRANGER
+        featurePadding: 5,
     };
 
     constructor(props) {
@@ -69,13 +67,13 @@ class FullDisplayMode extends React.Component {
     }
 
     render() {
-        const {data, intervalArranger, viewRegion, width, rowHeight, options, getAnnotationElement} = this.props;
+        const {data, featurePadding, viewRegion, width, rowHeight, options, getAnnotationElement} = this.props;
         // Important: it is ok to arrange() every render only because we memoized the function in the constructor.
-        const arrangeResult = this.featureArranger.arrange(data, viewRegion, width, intervalArranger);
+        const arrangeResult = this.featureArranger.arrange(data, viewRegion, width, featurePadding);
         const height = this.getHeight(arrangeResult.numRowsAssigned);
         const legend = this.props.legend || <TrackLegend height={height} trackModel={this.props.trackModel} />;
         const visualizer = <FullVisualizer
-            featureArrangement={arrangeResult.featureArrangement}
+            placements={arrangeResult.placements}
             width={width}
             height={height}
             rowHeight={rowHeight}
@@ -90,7 +88,7 @@ class FullDisplayMode extends React.Component {
 
 class FullVisualizer extends React.PureComponent {
     static propTypes = {
-        featureArrangement: PropTypes.array.isRequired,
+        placements: PropTypes.array.isRequired,
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
         rowHeight: PropTypes.number.isRequired,
@@ -103,21 +101,25 @@ class FullVisualizer extends React.PureComponent {
         this.renderAnnotation = this.renderAnnotation.bind(this);
     }
 
+    /**
+     * 
+     * @param {PlacedFeatureWithRow} placedFeature 
+     * @param {number} i 
+     */
     renderAnnotation(placedFeature, i) {
         const {rowHeight, maxRows, getAnnotationElement} = this.props;
-        const {feature, absLocation, xLocation} = placedFeature;
         const maxRowIndex = (maxRows || Infinity) - 1;
         // Compute y
         const rowIndex = Math.min(placedFeature.row, maxRowIndex);
         const y = rowIndex * rowHeight + TOP_PADDING;
-        return getAnnotationElement(feature, absLocation, xLocation, y, rowIndex === maxRowIndex, i);
+        return getAnnotationElement(placedFeature, y, rowIndex === maxRowIndex, i);
     }
 
     render() {
-        const {featureArrangement, width, height} = this.props;
+        const {placements, width, height} = this.props;
         return (
         <svg width={width} height={height} style={SVG_STYLE} >
-            {featureArrangement.map(this.renderAnnotation)}
+            {placements.map(this.renderAnnotation)}
         </svg>
         );
     }
