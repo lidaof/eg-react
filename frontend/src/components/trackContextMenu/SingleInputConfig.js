@@ -43,8 +43,9 @@ class SingleInputConfig extends React.PureComponent {
 
     constructor(props) {
         super(props);
+        const {optionsObjects, optionName, defaultValue, multiValue} = props;
         this.state = {
-            inputValue: props.defaultValue
+            inputValue: aggregateOptions(optionsObjects, optionName, defaultValue, multiValue)
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.makeOptionSetRequest = _.debounce(this.makeOptionSetRequest.bind(this), DEBOUNCE_INTERVAL);
@@ -54,13 +55,12 @@ class SingleInputConfig extends React.PureComponent {
      * Re-initalize the input field on prop changes
      * 
      * @param {Object} nextProps - next props as specified by React
-     * @return {Object}
      */
-    static getDerivedStateFromProps(nextProps) {
-        const {optionsObjects, optionName, defaultValue, multiValue} = nextProps;
-        return {
-            inputValue: aggregateOptions(optionsObjects, optionName, defaultValue, multiValue)
-        };
+    componentWillReceiveProps(nextProps) {
+        if (this.props.optionsObjects !== nextProps.optionsObjects) {
+            const {optionsObjects, optionName, defaultValue, multiValue} = nextProps;
+            this.setState({ inputValue: aggregateOptions(optionsObjects, optionName, defaultValue, multiValue) });
+        }
     }
 
     /**

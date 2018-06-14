@@ -3,6 +3,7 @@ import RegionSet from './RegionSet';
 import DisplayedRegionModel from './DisplayedRegionModel';
 import { getGenomeConfig } from './genomes/allGenomes';
 import { AppState } from '../AppState';
+import OpenInterval from './interval/OpenInterval';
 
 /**
  * Converter of app state to plain objects and JSON.  In other words, app state serializer.
@@ -86,10 +87,11 @@ export class AppStateLoader {
             return null;
         }
 
+        const viewInterval = OpenInterval.deserialize(object.viewInterval);
         if (regionSetView) {
-            return new DisplayedRegionModel(regionSetView.makeNavContext(), ...object.viewInterval);
+            return new DisplayedRegionModel(regionSetView.makeNavContext(), ...viewInterval);
         } else {
-            return new DisplayedRegionModel(genomeConfig.navContext, ...object.viewInterval);
+            return new DisplayedRegionModel(genomeConfig.navContext, ...viewInterval);
         }
     }
 }
