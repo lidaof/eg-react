@@ -30,7 +30,7 @@ it('constructs correctly', () => {
     expect(instance.getName()).toBe("My Gene");
     expect(instance.getLocus()).toEqual(new ChromosomeInterval("chr1", 0, 1000));
     expect(instance.getIsReverseStrand()).toBe(true);
-    expect(instance.refGeneRecord).toBe(RECORD);
+    expect(instance.dbRecord).toBe(RECORD);
 });
 
 it('gets exons and utrs correctly', () => {

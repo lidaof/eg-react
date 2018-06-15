@@ -22,7 +22,7 @@ class StandaloneGeneAnnotation extends React.PureComponent {
         const {gene, navContextLocation, drawModel} = this.props;
         return (
         <svg width={drawModel.getDrawWidth()} height={GeneAnnotation.HEIGHT} >
-            <GeneAnnotation gene={gene} navContextLocation={navContextLocation} drawModel={drawModel} />
+            <GeneAnnotation gene={gene} navContextLocation={navContextLocation} drawModel={drawModel} isRenderLabel={false}/>
         </svg>
         );
     }

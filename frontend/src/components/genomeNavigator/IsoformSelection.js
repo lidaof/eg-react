@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 
 import StandaloneGeneAnnotation from './StandaloneGeneAnnotation';
-import GeneDescription from '../GeneDescription';
 import withCurrentGenome from '../withCurrentGenome';
 
 import Gene from '../../model/Gene';
@@ -44,7 +43,7 @@ class IsoformSelection extends React.PureComponent {
         super(props);
         this.state = {
             isLoading: true,
-            genes: []
+            genes: [],
         };
         this.getSuggestions(props.geneName);
     }
@@ -56,7 +55,8 @@ class IsoformSelection extends React.PureComponent {
             isExact: true
         };
         const response = await axios.get(`/${genomeName}/genes/queryName`, {params: params});
-        const genes = response.data.map(record => new Gene(record));
+        console.log(response.data);
+        const genes  = response.data.map(record => new Gene(record));
         this.setState({isLoading: false, genes: genes});
     }
 
@@ -79,24 +79,24 @@ class IsoformSelection extends React.PureComponent {
         const renderOneSuggestion = (gene, i) => {
             const location = new DisplayedRegionModel(navContext, ...absLocations[i]);
             return (
-            <tr
-                key={gene.refGeneRecord._id}
+            <div
+                key={gene.dbRecord._id}
                 className="IsoformSelection-item"
                 onClick={() => this.props.onGeneSelected(gene)}
             >
-                <td>{gene.getLocus().toString()}</td>
-                <td><StandaloneGeneAnnotation gene={gene} navContextLocation={location} drawModel={drawModel} /></td>
-                <td className="IsoformSelection-description"><GeneDescription gene={gene} /></td>
-            </tr>
+                <div>{gene.collection}</div>
+                <div>{gene.getLocus().toString()}</div>
+                <div><StandaloneGeneAnnotation gene={gene} navContextLocation={location} drawModel={drawModel} /></div>
+                <div className="IsoformSelection-description">{gene.description}</div>
+            </div>
             );
         };
 
+
         return (
-        <table className="IsoformSelection">
-            <tbody>
-                {this.state.genes.map(renderOneSuggestion)}
-            </tbody>
-        </table>
+        <div className="IsoformSelection">
+            {this.state.genes.map(renderOneSuggestion)}
+        </div>
         );
     }
 

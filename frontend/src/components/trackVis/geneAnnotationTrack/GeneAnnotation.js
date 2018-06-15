@@ -50,6 +50,7 @@ class GeneAnnotation extends React.Component {
         y: 0,
         viewWindow: new OpenInterval(-Infinity, Infinity),
         isMinimal: false,
+        isRenderLabel: true,
         options: {},
         onClick: (event, gene) => undefined
     };
@@ -184,7 +185,7 @@ class GeneAnnotation extends React.Component {
             {exonArrows}
             {utrArrowCover}
             {utrs}
-            {label}
+            {this.props.isRenderLabel && label}
         </TranslatableG>
         );
     }
