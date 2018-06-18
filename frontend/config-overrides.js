@@ -1,6 +1,9 @@
 var paths = require('react-scripts-ts/config/paths')
 
 module.exports = (config, env) => {
+    // This should help with typescript source-maps
+    config.devtool = 'source-map';
+
     if (!config.module) {
         config.module = {};
     }
