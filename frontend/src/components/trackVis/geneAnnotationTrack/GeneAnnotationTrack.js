@@ -59,10 +59,11 @@ class GeneAnnotationTrack extends React.Component {
         return <GeneAnnotation
             key={feature.refGeneRecord._id}
             gene={feature}
-            navContextLocation={new DisplayedRegionModel(navContext, ...contextLocation)}
+            navContext={navContext}
+            contextLocation={contextLocation}
             drawModel={drawModel}
-            y={y}
             viewWindow={viewWindow}
+            y={y}
             isMinimal={isLastRow}
             options={options}
             onClick={this.renderTooltip}

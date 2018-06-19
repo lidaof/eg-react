@@ -45,21 +45,3 @@ it('gets exons and utrs correctly', () => {
         new OpenInterval(800, 1000),
     ]);
 });
-
-it('getAbsExons() works correctly', () => {
-    const navContext = new NavigationContext("toy context", [
-        new Feature("feature1", new ChromosomeInterval("chr1", 500, 1000))
-    ]);
-    // The gene's location in this navigation context should be the entire context, so we don't specify start and end
-    const navContextLocation = new DisplayedRegionModel(navContext); 
-
-    const instance = new Gene(RECORD);
-    const result = instance.getAbsExons(navContextLocation);
-    expect(result.absTranslated).toEqual([
-        new OpenInterval(0, 100), // = chr1:500-600
-        new OpenInterval(200, 300) // = chr1:700-800
-    ]);
-    expect(result.absUtrs).toEqual([
-        new OpenInterval(300, 500) // = chr1:800-1000
-    ]);
-});

@@ -4,6 +4,7 @@ import _ from 'lodash';
 import axios from 'axios';
 import OpenInterval from './interval/OpenInterval';
 import DisplayedRegionModel from './DisplayedRegionModel';
+import FeatureInterval from './interval/FeatureInterval';
 
 
 /**
@@ -47,14 +48,6 @@ interface ReferenceGeneRecord {
     cdsStartStat: string;
     cdsEndStat: string;
     exonFrames: string;
-}
-
-/**
- * Locations of exons in navigation context coordinates
- */
-interface AbsExons {
-    absTranslated: OpenInterval[],
-    absUtrs: OpenInterval[]
 }
 
 /**
@@ -165,27 +158,17 @@ class Gene extends Feature {
     }
 
     /**
-     * Gets the absolute locations of exons, given the gene body's location within the navigation context.  The
-     * navigation context location need not cover the entire gene body, but it *must* overlap with it.
-     * 
-     * @param {DisplayedRegionModel} navContext - location in navigation context that overlaps this instance
-     * @return {AbsExons} locations of exons in navigation context coordinates
+     * @return {object} exons as lists of FeatureInterval
      */
-    getAbsExons(navContextLocation: DisplayedRegionModel): AbsExons {
-        // The absolute location's genome start base.  Directly comparable with exons' base numbers.
-        const navContext = navContextLocation.getNavigationContext();
-        const absLocation = navContextLocation.getAbsoluteRegion();
-        const absLocationGenomeBase = navContext
-            .convertBaseToFeatureCoordinate(absLocation.start)
-            .getGenomeCoordinates().start;
-        const computeExonInterval = (exon: OpenInterval) => {
-            const distFromAbsLocation = exon.start - absLocationGenomeBase;
-            const start = absLocation.start + distFromAbsLocation;
-            return absLocation.getOverlap( new OpenInterval(start, start + exon.getLength()) );
+    getExonsAsFeatureIntervals() {
+        const convertOneExon = (exon: OpenInterval) => {
+            const relativeStart = exon.start - this.locus.start;
+            const relativeEnd = exon.end - this.locus.start;
+            return new FeatureInterval(this, relativeStart, relativeEnd)
         }
         return {
-            absTranslated: this.translated.map(computeExonInterval).filter(interval => interval != null),
-            absUtrs: this.utrs.map(computeExonInterval).filter(interval => interval != null)
+            translated: this.translated.map(convertOneExon),
+            utrs: this.utrs.map(convertOneExon)
         };
     }
 }
