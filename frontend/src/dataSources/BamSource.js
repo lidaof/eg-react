@@ -38,11 +38,7 @@ class BamSource extends DataSource {
         const bamObj = await this.bamPromise;
         let promises = region.getGenomeIntervals().map(locus => this._getDataInLocus(locus, bamObj));
         const dataForEachSegment = await Promise.all(promises);
-        const combinedData = _.flatten(dataForEachSegment);
-        for (let bamRecord of combinedData) {
-            bamRecord.pos -= 1; // bam positions are 1-indexed; -1 to compensate.
-        }
-        return combinedData;
+        return _.flatten(dataForEachSegment);
     }
 
     _getDataInLocus(locus, bamObj) {

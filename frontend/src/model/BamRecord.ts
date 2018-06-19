@@ -1,41 +1,10 @@
-import { Feature, REVERSE_STRAND_CHAR, FORWARD_STRAND_CHAR } from "./Feature";
-import { BamFlags } from "../vendor/bbi-js/main/bam";
-import ChromosomeInterval from "./interval/ChromosomeInterval";
+import { Feature, REVERSE_STRAND_CHAR, FORWARD_STRAND_CHAR } from './Feature';
+import { BamFlags } from '../vendor/bbi-js/main/bam';
+import ChromosomeInterval from './interval/ChromosomeInterval';
+import FeatureInterval from './interval/FeatureInterval';
 
 /**
- * Gets the number of reference bases in the alignment. How many bases of the 
- * reference sequence that this feature occupies
- * 
- * @param {string} cigarString 
- * @return {number} The number of bases the record spans in the reference genome
- */
-function getNumReferenceBases(cigarString: string): number {
-    /*
-    let cigarString = '1S22M98N25M';
-    let operations = cigarString.split(/\d+/).slice(1) --> ['S', 'M', 'N', 'M']
-    let opCounts = cigarString.split(/\D+/); --> ['1', '22', '98', '25', '']
-    */
-    const operations = cigarString.split(/\d+/).slice(1)
-    const opCounts = cigarString.split(/\D+/);
-    opCounts.pop();
-    let referenceBases = 0; // The number of bases the record spans in the reference genome
-    for (let i = 0; i < operations.length; i++) {
-        const operation = operations[i];
-        if (operation !== 'I' && operation !== 'S') {
-            const count = Number.parseInt(opCounts[i], 10);
-            if (Number.isSafeInteger(count)) {
-                referenceBases += count;
-            }
-        }
-    }
-    return referenceBases;
-}
-
-/**
- * Bam record interface.
- * https://github.com/vsbuffalo/devnotes/wiki/The-MD-Tag-in-BAM-Files
- *
- * @interface IBamRecord
+ * Shape of objects from bbi-js.
  */
 interface IBamRecord {
     MD: string;
@@ -50,37 +19,76 @@ interface IBamRecord {
     segment: string;
     seq: string;
 }
+/*
+BamRecord {
+    MD: "27",
+    NM: 0,
+    XA: 0,
+    cigar: "27M",
+    flag: 0,
+    mq: 255,
+    pos: 18360643,
+    quals: "IIIIIIIIIIIIIIIIIIIIIIIIIII",
+    readName: "Sti_22947383",
+    segment: "chr7",
+    seq: "ATCGCCATTTTTGTAGGCTACGTATTT"
+}
+*/
 
-
+interface CigarOperation {
+    opName: string,
+    count: number
+}
+const CIGAR_REGEX = /\d+[MIDNSHP=X]/g;
 /**
- * Struct returned by the getAlignment function
+ * Parses a CIGAR string, which contains read alignment info.  See page 6 of
+ * https://samtools.github.io/hts-specs/SAMv1.pdf
  *
- * @interface AlignmentResult
+ * @param {string} cigarString - CIGAR string to parse
+ * @return {CigarOperation[]} parsed CIGAR operations
  */
-interface AlignmentResult {
-    reference: string;
-    read: string;
-    lines: string;
+function parseCigar(cigarString: string): CigarOperation[] {
+    const matches = cigarString.match(CIGAR_REGEX);
+    return matches.map(match => {
+        return {
+            opName: match.charAt(match.length - 1),
+            count: Number.parseInt(match, 10)
+        }
+    });
 }
 
-class BamRecord extends Feature {
-    static makeBamRecords(rawObjects: IBamRecord[]) {
-        /*
-        Expected raw object from bbi-js
-        BamRecord {
-            MD: "27",
-            NM: 0,
-            XA: 0,
-            cigar: "27M",
-            flag: 0,
-            mq: 255,
-            pos: 18360643,
-            quals: "IIIIIIIIIIIIIIIIIIIIIIIIIII",
-            readName: "Sti_22947383",
-            segment: "chr7",
-            seq: "ATCGCCATTTTTGTAGGCTACGTATTT"
+const REFERENCE_SEQ_ADVANCING_OPS = new Set(['M', 'D', 'N', '=', 'x']);
+/**
+ * Gets the number of reference bases in an alignment.
+ * 
+ * @param {CigarOperation[]} cigar - parsed CIGAR operations
+ * @return {number} The number of bases the alignment spans in the reference genome
+ */
+function getNumReferenceBases(cigar: CigarOperation[]): number {
+    let bases = 0;
+    for (const cigarOp of cigar) {
+        if (REFERENCE_SEQ_ADVANCING_OPS.has(cigarOp.opName)) {
+            bases += cigarOp.count;
         }
-        */
+    }
+    return bases;
+}
+
+/**
+ * A record 
+ * 
+ * @author Silas Hsu
+ * @author David Ayeke
+ */
+export class BamRecord extends Feature {
+    /**
+     * Makes BAM records out of an array of raw objects.  Skips those objects which have BAM flags UNMAPPED and
+     * SUPPLEMENTARY set.
+     * 
+     * @param {object} rawObjects - plain objects that contain BAM info
+     * @return {BamRecord[]} BAM records from the objects
+     */
+    static makeBamRecords(rawObjects: IBamRecord[]) {
         const results = [];
         for (const rawObject of rawObjects) {
             if (rawObject.flag & BamFlags.SEGMENT_UNMAPPED || rawObject.flag & BamFlags.SUPPLEMENTARY) {
@@ -92,12 +100,13 @@ class BamRecord extends Feature {
     }
 
     MD: string;
-    cigar: string;
+    cigar: CigarOperation[];
     seq: string;
 
     constructor(rawObject: IBamRecord) {
         const start = rawObject.pos;
-        const end = start + getNumReferenceBases(rawObject.cigar);
+        const parsedCigar = parseCigar(rawObject.cigar);
+        const end = start + getNumReferenceBases(parsedCigar);
         const ci = new ChromosomeInterval(rawObject.segment, start, end);
         const strand = rawObject.flag & BamFlags.REVERSE_COMPLEMENT ? REVERSE_STRAND_CHAR : FORWARD_STRAND_CHAR;
         super(
@@ -106,25 +115,57 @@ class BamRecord extends Feature {
             strand
         );
         this.MD = rawObject.MD;
-        this.cigar = rawObject.cigar;
+        this.cigar = parsedCigar;
         this.seq = rawObject.seq;
     }
 
     /**
+     * Gets segments of the this instance that are aligned and skipped.  Returns an object with keys `aligned` and
+     * `skipped`, which contain those segments as a list of FeatureInterval.
+     * 
+     * @return {object}
+     */
+    getSegments() {
+        const aligned: FeatureInterval[] = [];
+        const skipped: FeatureInterval[] = [];
+
+        // Compare op types, differentiating only between ops that skip and ops that don't.
+        const opEquals = (op1: string, op2: string) => op1 === 'N' ? op2 === 'N' : op2 !== 'N';
+
+        // Only consider cigar ops that advance the reference sequence
+        const cigar = this.cigar.filter(op => REFERENCE_SEQ_ADVANCING_OPS.has(op.opName));
+        let i = 0, currentOffset = 0;
+        while (i < cigar.length) {
+            const currentSegmentOp = cigar[i].opName;
+            let currentSegmentLength = cigar[i].count;
+            let j = i + 1; // Find the "end" of the current segment
+            while (j < cigar.length && opEquals(currentSegmentOp, cigar[j].opName)) {
+                currentSegmentLength += cigar[j].count;
+                j++;
+            }
+            i = j;
+            const listToPush = currentSegmentOp === 'N' ? skipped : aligned;
+            listToPush.push(new FeatureInterval(this, currentOffset, currentOffset + currentSegmentLength));
+            currentOffset += currentSegmentLength;
+        }
+
+        return {aligned, skipped};
+    }
+
+    /**
      * Gets a human-readable alignment of this record to the reference genome.  Returns an object with keys `reference`,
-     * which contains the reference sequence, potentially with gaps; `lines`, which contains those bases that match; and
-     * `read`, the aligned sequence, potentially with gaps.  Example return object:
-```
-{
-    reference: "AG-TGAC-CCC",
-    lines:     "|   ||| | |",
-    read:      "ATC-GCATCGC"
-}
-```
+     * the reference sequence; `lines`, those bases that match; and `read`, the aligned sequence.  Sequences may have
+     * gaps due to alignment; dashes represent these gaps.
+     * 
+     * @example {
+     *     reference: "AG-TGAC-CCC",
+     *     lines:     "|   ||| | |",
+     *     read:      "ATC-GCATCGC"
+     * }
      * @return {AlignmentResult} human-readable alignment of this record to the reference genome
+     * @author David Ayeke
      */
     getAlignment(): AlignmentResult {
-        // const MD_REGEX = /\d+(([A-Z]|\^[A-Z]+)\d+)*/; // From the SAM specification.
         /*
         From https://samtools.github.io/hts-specs/SAMtags.pdf:
             The MD field aims to achieve SNP/indel calling without looking at the reference. For example, a string
@@ -137,150 +178,183 @@ class BamRecord extends Feature {
             The MD string contains no information about insertions in the read.  An example: if cigar="5M1I5M" (5 match,
             1 insertion, 5 match), then a valid MD string is MD="10".  10 bases align to the reference, and the MD
             string does not mention the insertion at all.
+            See also: https://github.com/vsbuffalo/devnotes/wiki/The-MD-Tag-in-BAM-Files
         
         From David:
-            This works by doing a Cigar pass followd by an MD pass.  Example:
-                cigar = "4M2D6M";
-                MD = "4^AC6";
-                ATCGCATCGC
-                // Cigar
-                AT-DGCA-CGC
-                ATC-GCATCGC
-                // MD
-                AG-DGCA-CGC
-                ATC-GCATCGC
+            This works by doing a CIGAR pass followd by an MD pass.  See the respective methods for details.
         */
-        let [reference, read] = this.cigarPass(this.cigar, this.seq);
-        [reference, read] = this.mdPass(reference, read);
+        const [alignedReference, read] = this._cigarPass();
+        const reference = this._mdPass(alignedReference);
 
         return {
             reference,
-            lines: reference.split('').map((c, i) => (c === read[i]) ? '|' : ' ').join(''),
+            lines: reference.split('').map((char, i) => (char === read[i]) ? '|' : ' ').join(''),
             read
         };
     }
 
     /**
-     *
-     *
-     * @param {string} reference
-     * @param {string} read
-     * @returns {[string, string]}
+     * Uses this instance's CIGAR to produce an alignment.  Insertions and deletions will be expressed as dashes in the
+     * reference and read sequences respectively.  This method only handles ALIGNMENT; the reference sequence may be
+     * incorrect and should be corrected by the `mdPass()` method.
+     * 
+     * @example returnValue = [
+     *     "AT--CGDDCG",
+     *     "ATCGCG--CG"
+     * ]
+     * 
+     * @return {[string, string]} aligned reference and read sequence
      */
-    cigarPass(cigar: string, seq: string): [string, string] {
-        // First do an MD pass marking Deletions for indel
-        const CIGAR_REGEX = /(\d+)([A-Z]|=)/g;
-        /**
-         * MD_REGEX can parse the following
-         * 1G0^T4C1
-         * 6G4C20G1A5C5A1^C3A15G1G15
-         * 10A5^AC6`
-         */
-        let result;
+    _cigarPass() {
         let reference = '';
         let read = '';
-        // Do a cigar pass and add insertions/deletions
-        let start = 0;
-        let refStart = 0;
-        while ((result = CIGAR_REGEX.exec(cigar))) {
-            const [fullOp, countStr, operation] = result;
-            let count = Number(countStr);
-            switch (operation) {
-                case 'M':
-                    reference += seq.slice(refStart, refStart + count);
-                    read += seq.slice(start, start + count);
+        let seqIndex = 0;
+        for (const cigarOp of this.cigar) {
+            const count = cigarOp.count;
+            switch (cigarOp.opName) {
+                case 'M': // Alignment (but not necessarily sequence) matches
+                case '=':
+                case 'X':
+                    reference += this.seq.slice(seqIndex, seqIndex + count);
+                    read += this.seq.slice(seqIndex, seqIndex + count);
+                    seqIndex += count;
                     break;
-                case 'I':
-                    read += seq.slice(start, start + count);
+                case 'I': // Insertion
                     reference += '-'.repeat(count);
+                    read += this.seq.slice(seqIndex, seqIndex + count);
+                    seqIndex += count;
                     break;
-                case 'D':
+                case 'D': // Deletion
                     reference += 'D'.repeat(count);
                     read += '-'.repeat(count);
-                    count = 0;
-                    break;
+                    break; // Note that deletions don't advance the seq index
+                default:
+                    ; // Do nothing
             }
-            start += count;
-            refStart += count;
-
         }
         return [reference, read];
     }
-
 
     /**
-     * Takes a reference and read that was processed by a cigar pass, and applies the 
-     * BedRecords MD to it.
-     *
-     * @param {string} reference
-     * @param {string} read
-     * @returns {[string, string]}
+     * Using this instance's MD string, corrects the reference sequence from `cigarPass()`.
+     * 
+     * @example mdPass("AT--CGDDCG"); // returns "AA--CGCGCG"
+     * @param {string} reference - reference sequence from `cigarPass()`
+     * @return {string} - reference sequence with bases corrected
      */
-    mdPass(reference: string, read: string): [string, string] {
-        const MD_REGEX = /(\d+)([A-Z]|\^[A-Z]+)*/g;
+    _mdPass(reference: string): string {
+        // const MD_REGEX = /\d+(([A-Z]|\^[A-Z]+)\d+)*/;
+        /*
+         * The MD regex is from the SAM specification at https://samtools.github.io/hts-specs/SAMtags.pdf
+         * It only tells us if a MD string is valid, which is why it isn't used in the code.  But from it, we know MD
+         * strings must start and end with a number.
+         * 
+         * Example MD strings:
+         *     1G0^T4C1
+         *     6G4C20G1A5C5A1^C3A15G1G15
+         *     10A5^AC6
+         */
+        const MD_REGEX = /(\d+)([A-Z]|\^[A-Z]+)/g;
 
-        // Next do an MD pass. Replacing deletions with actual value
-        const start = 0;
-        let refStart = 0;
-        let result = null;
-        while ((result = MD_REGEX.exec(this.MD))) {
-            const [fullOp, countStr, operation] = result;
-            /**
-             * For every md that passes, you have one of the following cases
-             * 1: ['1', undefined, index: 4] This comes at the end. This means there was 1 match
-             * 2: ['6G', '6', 'G'] 6 matches followed by a G sub
-             * 3: ['1^C, '1', '^C'] 1 match followed by a C sub
-             */
-            if (!operation) {
-                // Case 1: MD = 10 or we are at the end. skip to the end;
-                const count = Number(countStr);
-                refStart += countKnownBases(reference, refStart, count);
-                continue;
+        const referenceIter = new AlignmentIterator(reference);
+        let matchResult = null;
+        while ((matchResult = MD_REGEX.exec(this.MD))) {
+            const numMatchingBases = Number.parseInt(matchResult[1], 10);
+            let unmatchingBases = matchResult[2];
+            referenceIter.advanceN(numMatchingBases); // Skip matching sequence.  Nothing to do there.
 
-            } else if (operation[0] === '^') {
-                // Case 3: Deletion
-                // Handle case of deletion. The previous pass should have made the character a D
-                const count = Number(countStr); // how many to skip ahead.
-                refStart += countKnownBases(reference, refStart, count);
-                const replacement = (operation as string).slice(1);
-                if (reference[refStart] !== 'D') {
-                    throw new Error('Implementation Error');
-                }
-                reference = reference.substr(0, refStart) + replacement + reference.substr(refStart + replacement.length);
-                refStart += countKnownBases(reference, refStart, replacement.length);
-            } else {
-                // Case 2: Some amount of matches with a substitution 
-                const count = Number(countStr);
-                refStart += countKnownBases(reference, refStart, count);
-                reference = reference.substr(0, refStart) + operation + reference.substr(refStart + operation.length);
-                refStart += countKnownBases(reference, refStart, operation.length);
+            if (unmatchingBases.charAt(0) === '^') { // Deletion
+                unmatchingBases = unmatchingBases.slice(1); // Ignore the caret
+            }
+            for (let i = 0; i < unmatchingBases.length; i++) {
+                // If a deletion, we should only be replacing 'D' chars.  For simplicity, this assertion is omitted.
+                reference = replacePortionOfString(
+                    reference, referenceIter.getIndexOfNextBase(), unmatchingBases.charAt(i)
+                );
             }
         }
-        return [reference, read];
 
-        /**
-         * countKnownBases returns the number of elements between [start, start + amount] while ignoring "-" characters.
-         * Example: countKnownBases('a-b', 0, 1) returns 2
-         *
-         * @param {string} str
-         * @param {number} start
-         * @param {number} amount
-         * @returns {number}
-         */
-        function countKnownBases(str: string, start: number, amount: number): number {
-            let seen = 0;
-            let valid = 0;
-            if (amount === 0) { return 0; }
-            for (let i = start + 1; i < str.length && valid !== amount; i++) {
-                seen += 1;
-                if (str[i] === '-') { continue; }
-                valid += 1;
-            }
+        return reference;
 
-            return seen;
+        function replacePortionOfString(str: string, index: number, substitution: string) {
+            return str.substring(0, index) + substitution + str.substring(index + substitution.length);
         }
     }
-
 }
 
-export default BamRecord;
+/**
+ * Struct returned by the getAlignment() method
+ */
+interface AlignmentResult {
+    reference: string;
+    lines: string;
+    read: string;
+}
+
+/**
+ * An iterator that steps along a string, skipping '-' characters.  Instances start at index -1.
+ * 
+ * @author Silas Hsu
+ */
+export class AlignmentIterator {
+    public sequence: string;
+    private _currentIndex: number;
+
+    /**
+     * Constructs a new instance that iterates through the specified string.
+     * 
+     * @param {string} sequence - the string through which to iterate
+     */
+    constructor(sequence: string) {
+        this.sequence = sequence;
+        this._currentIndex = -1;
+    }
+
+    /**
+     * Resets this instance's index pointer to the beginning of the string
+     */
+    reset(): void {
+        this._currentIndex = -1;
+    }
+
+    /**
+     * @return {number} the current index pointer
+     */
+    getCurrentIndex(): number {
+        return this._currentIndex;
+    }
+
+    /**
+     * Advances the index pointer and returns it.  If there is no valid base, the return value will be past the end of
+     * the string.
+     * 
+     * @return {number} the index of the next valid base
+     */
+    getIndexOfNextBase(): number {
+        do {
+            this._currentIndex++;
+        } while (this._currentIndex < this.sequence.length && this.sequence.charAt(this._currentIndex) === '-');
+        return this._currentIndex;
+    }
+
+    /**
+     * @return {boolean} whether there is a next valid base
+     */
+    hasNextBase(): boolean {
+        return this._currentIndex < this.sequence.length - 1;
+    }
+
+    /**
+     * Equivalent to calling getIndexOfNextBase() n times.  Returns the last result.  A negative n will have no effect.
+     * 
+     * @param {number} n - the number of bases to advance
+     * @return {number} the index pointer after advancement
+     */
+    advanceN(n: number): number {
+        let value = this._currentIndex;
+        for (let i = 0; i < n; i++) {
+            value = this.getIndexOfNextBase();
+        }
+        return value;
+    }
+}

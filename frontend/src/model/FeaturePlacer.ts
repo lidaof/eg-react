@@ -3,6 +3,7 @@ import { Feature } from './Feature';
 import OpenInterval from './interval/OpenInterval';
 import LinearDrawingModel from './LinearDrawingModel';
 import NavigationContext from './NavigationContext';
+import FeatureInterval from './interval/FeatureInterval';
 
 /**
  * Draw information for a Feature
@@ -12,11 +13,20 @@ export interface PlacedFeature {
     /**
      * The location of the feature in navigation context coordinates.  The programmer should not assume that this
      * interval's length is equal to the feature's length, because some parts of the feature might not exist in the
-     * navigation context.   (suppose that the context only contains chr1:50-100 but the feature is chr1:0-200).
+     * navigation context (suppose that the context only contains chr1:50-100 but the feature is chr1:0-200).
      */
     contextLocation: OpenInterval;
-    offsetOfLocation: number; // The location of `contextLocation` in the feature.  
     xLocation: OpenInterval; // Horizontal location the feature should occupy
+}
+
+export interface PlacedSegment {
+    segment: FeatureInterval; // The segment
+    /**
+     * Location of the segment in nav context coordiantes.  See note for contextLocation in PlacedFeature for important
+     * details.
+     */
+    contextLocation: OpenInterval;
+    offsetRelativeToFeature: number; // Location of the context location relative to the feature's start
 }
 
 export class FeaturePlacer {
@@ -43,7 +53,6 @@ export class FeaturePlacer {
                     placements.push({
                         feature,
                         contextLocation: location,
-                        offsetOfLocation: this._locateContextInterval(feature, navContext, location),
                         xLocation: new OpenInterval(startX, endX)
                     });
                 }
@@ -54,24 +63,44 @@ export class FeaturePlacer {
     }
 
     /**
+     * Gets the context location for feature segments, assuming that all segments are part of the same feature.  To
+     * disambiguate when a segment maps to multiple context locations, this method also requires the context location of
+     * the parent feature, which can be obtained from `placeFeatures()`.  This effectively puts a limit on where
+     * segments may map; there may be fewer placed segments than input segments.
      * 
-     * @param {Feature} feature 
-     * @param {NavigationContext} navContext 
-     * @param {OpenInterval} mappedLocation 
-     * @return {number}
+     * @param {FeatureInterval[]} segments - segments for which to get context locations
+     * @param {NavigationContext} navContext - navigation context to map to
+     * @param {OpenInterval} contextLocationOfFeature - context location of the feature from which the segments came
+     * @return {PlacedSegment[]} placed segments
      */
-    _locateContextInterval(feature: Feature, navContext: NavigationContext, mappedLocation: OpenInterval): number {
+    placeFeatureSegments(segments: FeatureInterval[], navContext: NavigationContext,
+        contextLocationOfFeature: OpenInterval): PlacedSegment[]
+    {
         /**
-         * Convert mapped context location to genomic coordinates, so we can directly compare it to the feature's locus.
+         * Convert mapped context location to genomic coordinates, so we can directly compare it to the segment's locus.
          * This expression assumes the mapped location only spans one chromosome, which it should, because the feature
          * should only span one chromosome as well.
          */
-        const mappedLocus = navContext
-            .convertBaseToFeatureCoordinate(mappedLocation.start) 
+        const locusOfContextLocation = navContext
+            .convertBaseToFeatureCoordinate(contextLocationOfFeature.start) 
             .getGenomeCoordinates();
-        const offset = mappedLocus.start - feature.getLocus().start;
-        return offset;
+        const results = [];
+        for (const segment of segments) {
+            // Distance of the segment's start from the mapped locus's start.  A positive value means the context
+            // location of the segment starts after the context location of the feature.
+            const distFromParentLocation = segment.getGenomeCoordinates().start - locusOfContextLocation.start;
+            // Context location of the start of the segment
+            const contextStart = contextLocationOfFeature.start + distFromParentLocation;
+            const unsafeContextLocation = new OpenInterval(contextStart, contextStart + segment.getLength());
+            const contextLocation = unsafeContextLocation.getOverlap(contextLocationOfFeature);
+            if (contextLocation) {
+                results.push({
+                    segment,
+                    contextLocation,
+                    offsetRelativeToFeature: segment.relativeStart + Math.max(0, distFromParentLocation)
+                });
+            }
+        }
+        return results;
     }
-
-
 }

@@ -32,11 +32,10 @@ class FeatureInterval {
         this.relativeStart = start;
         this.relativeEnd = end;
 
-        if (!this.isValidBase(start)) {
-            throw new RangeError(`Start base ${start} not in feature ${feature.getName()}`);
-        }
-        if (!this.isValidBase(end)) {
-            throw new RangeError(`End base ${end} not in feature ${feature.getName()}`);
+        if (start < 0) {
+            throw new RangeError(`Start base ${start} must be at least 0`);
+        } else if (end > feature.getLength()) {
+            throw new RangeError(`End base ${end} specifies a base past the end of the feature`);
         }
     }
 
@@ -48,16 +47,6 @@ class FeatureInterval {
     get end() {
         console.error("FeatureInterval has no prop `end`.  Use `relativeEnd` instead.");
         return this.relativeEnd;
-    }
-
-    /**
-     * Gets whether a relative base lies within this interval's feature.
-     * 
-     * @param {number} base - base number relative to the feature's start
-     * @return {boolean} whether the base lies within this interval's feature.
-     */
-    isValidBase(base: number): boolean {
-        return 0 <= base && base <= this.feature.getLength();
     }
 
     /**

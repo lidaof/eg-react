@@ -1,4 +1,4 @@
-import BamRecord from '../BamRecord';
+import { BamRecord } from '../BamRecord';
 import { BamFlags } from "../../vendor/bbi-js/main/bam";
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 
@@ -19,7 +19,7 @@ describe('constructor', () => {
         expect(record.getName()).toEqual("My bam record");
         expect(record.getIsForwardStrand()).toBe(true);
         expect(record.MD).toBe(BASIC_OBJECT.MD);
-        expect(record.cigar).toBe(BASIC_OBJECT.cigar);
+        expect(record.cigar).toEqual([{count: 5, opName: "M"}]);
         expect(record.seq).toBe(BASIC_OBJECT.seq);
     });
 
