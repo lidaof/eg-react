@@ -149,11 +149,8 @@ class ColoredBox extends React.PureComponent {
             borderLeft: '1px solid lightgrey'
         };
         const tooltipStyle = {
-            backgroundColor: "rgba(173, 216, 230, 0.9)", // lightblue with opacity adjustment
             zIndex: 1,
-            borderRadius: 5,
             marginRight: 5,
-            padding: '0px 5px 5px',
             display: this.state.isShowingTooltip ? undefined : "none"
         };
 
@@ -165,10 +162,9 @@ class ColoredBox extends React.PureComponent {
                 onMouseEnter={this.showTooltip}
                 onMouseLeave={this.hideTooltip}
             />
-            <Popper placement="left" style={tooltipStyle} >
-                <span className="Tooltip-minor-text">{term}:</span>
-                <br/>
-                {termValue || "(no value)"}
+            <Popper placement="left" className="Tooltip" style={tooltipStyle} >
+                <div className="Tooltip-minor-text">{term}:</div>
+                <div>{termValue || "(no value)"}</div>
             </Popper>
         </Manager>
         );

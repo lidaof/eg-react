@@ -18,7 +18,7 @@ class GeneDetail extends React.PureComponent {
 
     render() {
         const gene = this.props.gene;
-        return <div style={{padding: 5, maxWidth: 400}}>
+        return <div style={{maxWidth: 400}}>
             <FeatureDetail feature={gene} />
             <i><GeneDescription gene={gene} /></i>
         </div>;

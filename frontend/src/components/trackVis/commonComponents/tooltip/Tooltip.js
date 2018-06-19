@@ -83,7 +83,7 @@ class Tooltip extends React.PureComponent {
                 <Popper
                     placement="bottom-start"
                     modifiers={{flip: {enabled: false}}}
-                    className="Tooltip-body"
+                    className="Tooltip"
                     style={contentStyle}
                     onMouseDown={stopEvent}
                 >

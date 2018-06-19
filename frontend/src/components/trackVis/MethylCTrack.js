@@ -111,7 +111,7 @@ class MethylCTrack extends React.PureComponent {
         const {trackModel, viewRegion, width, options} = this.props;
         const strandsAtPixel = this.aggregatedRecords[x];
 
-        return <div className="MethylCTrack-tooltip" >
+        return <div>
             {this.renderTooltipContentsForStrand(strandsAtPixel, options.isCombineStrands ? "combined" : "forward")}
             {!options.isCombineStrands && this.renderTooltipContentsForStrand(strandsAtPixel, "reverse")}
             <div className="Tooltip-minor-text">
@@ -256,9 +256,9 @@ class StrandVisualizer extends React.PureComponent {
     }
 
     renderDepthPlot() {
-        const {data, scales, width, strand, depthColor} = this.props;
+        const {data, scales, strand, depthColor} = this.props;
         let elements = [];
-        for (let x = 0; x < width - 1; x++) {
+        for (let x = 0; x < data.length - 1; x++) {
             const currentRecord = data[x][strand];
             const nextRecord = data[x + 1][strand];
             if (currentRecord && nextRecord) {

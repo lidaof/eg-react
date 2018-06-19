@@ -99,16 +99,16 @@ class NumericalTrack extends React.Component {
         const value = this.xToValue[relativeX];
         const stringValue = typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : '(no data)';
         return (
-        <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
-            <li>
+        <div>
+            <div>
                 <span className="Tooltip-major-text" style={{marginRight: 3}}>{stringValue}</span>
-                <span className="Tooltip-minor-text">{unit}</span>
-            </li>
-            <li className="Tooltip-minor-text" >
+                {unit && <span className="Tooltip-minor-text">{unit}</span>}
+            </div>
+            <div className="Tooltip-minor-text" >
                 <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
-            </li>
-            <li className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</li>
-        </ul>
+            </div>
+            <div className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</div>
+        </div>
         );
     }
 

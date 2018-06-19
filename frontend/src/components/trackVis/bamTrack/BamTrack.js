@@ -58,16 +58,14 @@ class BamTrack extends React.Component {
      */
     renderTooltip(event, record) {
         const alignment = record.getAlignment();
-        const alignmentDetails = (
-            <ul style={{margin: 0, padding: 0, listStyleType: 'none', fontFamily: 'monospace', whiteSpace: 'pre'}} >
-                <li>Ref  {alignment.reference}</li>
-                <li>     {alignment.lines}</li>
-                <li>Read {alignment.read}</li>
-            </ul>
-        );
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} >
-                <FeatureDetail feature={record} extraDetails={alignmentDetails} />
+                <FeatureDetail feature={record} />
+                <div style={{fontFamily: 'monospace', whiteSpace: 'pre'}} >
+                    <div>Ref  {alignment.reference}</div>
+                    <div>     {alignment.lines}</div>
+                    <div>Read {alignment.read}</div>
+                </div>
             </Tooltip>
         );
         this.props.onShowTooltip(tooltip);

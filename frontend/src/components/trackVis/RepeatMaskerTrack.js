@@ -104,15 +104,15 @@ class RepeatTrack extends React.PureComponent {
         const {trackModel, onHideTooltip} = this.props;
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={onHideTooltip} >
-                <ul style={{margin: 0, padding: '0px 5px 5px', listStyleType: 'none'}} >
-                    <li>
+                <div>
+                    <div>
                         <span className="Tooltip-major-text" style={{marginRight: 5}} >{feature.getName()}</span>
                         <span className="Tooltip-minor-text" >{feature.getClassDetails()}</span>
-                    </li>
-                    <li>{`${feature.getLocus().toString()} (${feature.getLocus().getLength()}bp)`}</li>
-                    <li>{"(1 - divergence%) = " + feature.value.toFixed(2)}</li>
-                    <li className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</li>
-                </ul>
+                    </div>
+                    <div>{feature.getLocus().toString()} ({feature.getLocus().getLength()}bp)</div>
+                    <div>(1 - divergence%) = {feature.value.toFixed(2)}</div>
+                    <div className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</div>
+                </div>
             </Tooltip>
         );
         this.props.onShowTooltip(tooltip);

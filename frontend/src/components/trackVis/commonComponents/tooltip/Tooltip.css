@@ -1,6 +1,10 @@
-.Tooltip-body {
+.Tooltip {
     border-radius: 5px;
     background-color: rgba(173, 216, 230, 0.95);
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
 }
 
 .Tooltip-major-text {
