@@ -19,7 +19,9 @@ const aggregateFunctions = {};
 aggregateFunctions[AggregatorTypes.COUNT] = (records: any[]) => records.length;
 aggregateFunctions[AggregatorTypes.SUM] = (records: any[]) => _.sumBy(records, VALUE_PROP_NAME);
 // For mean, min, and max; if passed an empty array, returns null
-aggregateFunctions[AggregatorTypes.MEAN] = (records: any[]) => records.length > 0 ? _.meanBy(records, VALUE_PROP_NAME) : null;
+aggregateFunctions[AggregatorTypes.MEAN] = (
+    (records: any[]) => records.length > 0 ? _.meanBy(records, VALUE_PROP_NAME) : null
+);
 aggregateFunctions[AggregatorTypes.MIN] = (records: any[]) => _.minBy(records, VALUE_PROP_NAME) || null;
 aggregateFunctions[AggregatorTypes.MAX] = (records: any[]) => _.maxBy(records, VALUE_PROP_NAME) || null;
 

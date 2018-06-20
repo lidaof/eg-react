@@ -141,7 +141,7 @@ function getNextState(prevState: AppState, action: AppAction) {
             let nextTracks: TrackModel[] = [];
             const genomeConfig = getGenomeConfig(action.genomeName);
             if (genomeConfig) {
-                nextViewRegion = new DisplayedRegionModel(genomeConfig.navContext, genomeConfig.defaultRegion.start, genomeConfig.defaultRegion.end);
+                nextViewRegion = new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion);
                 nextTracks = genomeConfig.defaultTracks;
             }
             return {
@@ -190,7 +190,7 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
     } else {
         const genomeConfig = getGenomeConfig(prevState.genomeName);
         const nextViewRegion = genomeConfig ? 
-            new DisplayedRegionModel(genomeConfig.navContext, genomeConfig.defaultRegion.start, genomeConfig.defaultRegion.end) : null;
+            new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion) : null;
         return {
             ...prevState,
             regionSetView: null,

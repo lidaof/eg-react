@@ -74,7 +74,8 @@ class MethylCRecord extends Feature {
      * @return {Object}
      */
     static aggregateByStrand(records: MethylCRecord[]): AggregationByStrandResult {
-        const [forwardStrandRecords, reverseStrandRecords] = _.partition(records, record => record.getIsForwardStrand());
+        const [forwardStrandRecords, reverseStrandRecords] =
+            _.partition(records, record => record.getIsForwardStrand());
         return {
             combined: MethylCRecord.aggregateRecords(records),
             forward: MethylCRecord.aggregateRecords(forwardStrandRecords),
