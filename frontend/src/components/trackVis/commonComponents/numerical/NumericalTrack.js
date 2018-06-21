@@ -12,7 +12,7 @@ import configOptionMerging from '../configOptionMerging';
 
 import { RenderTypes, DesignRenderer } from '../../../../art/DesignRenderer';
 import { NumericalDisplayModes } from '../../../../model/DisplayModes';
-import FeatureAggregator, { DefaultAggregators } from '../../../../model/FeatureAggregator';
+import { FeatureAggregator, DefaultAggregators } from '../../../../model/FeatureAggregator';
 
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN,

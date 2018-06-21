@@ -41,7 +41,7 @@ export const DefaultAggregators = {
  * 
  * @author Silas Hsu
  */
-class FeatureAggregator {
+export class FeatureAggregator {
     /**
      * Constructs a mapping from x coordinate to all Features overlapping that location.  The mapping will be limited
      * to the range [0, width).
@@ -71,5 +71,3 @@ class FeatureAggregator {
         return xToFeatures;
     }
 }
-
-export default FeatureAggregator;
