@@ -1,18 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
+
 import VrRuler from './VrRuler';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import TrackModel from '../../model/TrackModel';
+import { NumericalTrack3D } from './NumericalTrack3D';
+import { InteractionTrack3D } from './InteractionTrack3D';
 
 import { withDataFetch } from '../trackConfig/BigWigTrackRenderer';
-import { NumericalTrack3D } from './NumericalTrack3D';
-import { Ribbon } from './Ribbon';
+import { configStaticDataSource } from '../trackConfig/configDataFetch';
+import { HicSource } from '../../dataSources/HicSource';
+
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import TrackModel from '../../model/TrackModel';
 import RegionExpander from '../../model/RegionExpander';
 
 const COMPONENT_FOR_TRACK_TYPE = {
-    bigwig: withDataFetch(NumericalTrack3D)
-}
+    bigwig: withDataFetch(NumericalTrack3D),
+};
+const InteractionTrack = configStaticDataSource(props => new HicSource(props.trackModel.url))(InteractionTrack3D);
 
 const TRACK_SEPARATION = 1; // In meters
 const TRACK_WIDTH = 100;
@@ -47,20 +52,33 @@ export class BrowserScene extends React.Component {
                 continue;
             }
             tracksAndRulers.push(
-                <Component3D
-                    key={trackModel.getId()}
-                    trackModel={trackModel}
-                    viewRegion={expandedRegion}
-                    width={TRACK_WIDTH}
-                    height={TRACK_HEIGHT}
-                    z={z}
-                    options={trackModel.options}
-                />
-            );
-            tracksAndRulers.push(
-                <VrRuler key={trackModel.getId() + "ruler"} viewRegion={expandedRegion} width={TRACK_WIDTH} z={z} />
+                <React.Fragment key={trackModel.getId()}>
+                    <Component3D
+                        trackModel={trackModel}
+                        viewRegion={expandedRegion}
+                        width={TRACK_WIDTH}
+                        height={TRACK_HEIGHT}
+                        z={z}
+                        options={trackModel.options}
+                    />
+                    <VrRuler viewRegion={expandedRegion} width={TRACK_WIDTH} z={z} />
+                </React.Fragment>
             );
             z -= TRACK_SEPARATION;
+        }
+
+        const numNormalTracks = tracksAndRulers.length;
+        for (let trackModel of tracks) {
+            if (trackModel.type === 'hic') {
+                tracksAndRulers.push(<InteractionTrack
+                    key={trackModel.getId()}
+                    trackModel={trackModel}
+                    options={{}}
+                    viewRegion={viewRegion}
+                    width={TRACK_WIDTH}
+                    depth={numNormalTracks * TRACK_SEPARATION}
+                />);
+            }
         }
 
         return (
@@ -69,7 +87,6 @@ export class BrowserScene extends React.Component {
             <a-entity camera="" position={`${TRACK_WIDTH/2} 1.6 2`} look-controls="" wasd-controls="fly: true" />
             {children}
             {tracksAndRulers}
-            <Ribbon />
         </a-scene>
         );
     }

@@ -72,7 +72,8 @@ export function withDataFetch(doFormat, initialData=[], WrappedComponent) {
             const requestedViewRegion = props.viewRegion; // Take a snapshot of this.props.viewRegion
             const width = (props.width || window.innerWidth) + 1;
             const basesPerPixel = requestedViewRegion.getWidth() / width;
-            return this.props.dataSource.getData(requestedViewRegion, basesPerPixel, props.options).then(data => {
+            const options = props.options || {}
+            return this.props.dataSource.getData(requestedViewRegion, basesPerPixel, options).then(data => {
                 // When the data finally comes in, be sure it is still what the user wants
                 if (this.props.viewRegion === requestedViewRegion) {
                     this.setState({
