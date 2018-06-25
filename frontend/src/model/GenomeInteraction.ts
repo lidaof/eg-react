@@ -6,4 +6,8 @@ export class GenomeInteraction {
         this.locus2 = locus2;
         this.score = score;
     }
+
+    getDistance() {
+        return Math.round(Math.abs(this.locus1.start - this.locus2.start))
+    }
 }

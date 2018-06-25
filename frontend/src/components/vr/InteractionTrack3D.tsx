@@ -7,9 +7,10 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { scaleLinear, ScaleLinear, scaleLog, ScaleLogarithmic } from 'd3-scale';
 import { Arc } from './Arc';
 
-const HEIGHT_FACTOR = 0.5; // Max height of ribbons as a multiple of track width
+const HEIGHT_FACTOR = 0.35; // Max height of ribbons as a multiple of track width
 const MIN_HEIGHT = 2;
-const ARCS_TO_DRAW = 100;
+const OPACITY = 0.3;
+const SCORE_THRESHOLD = 4.2;
 
 interface InteractionTrack3DProps {
     data: GenomeInteraction[];
@@ -35,7 +36,7 @@ function isNonAdjacentBin(interaction: GenomeInteraction) {
 export class InteractionTrack3D extends React.Component<InteractionTrack3DProps, {}> {
     public featurePlacer: FeaturePlacer;
     public arcWidthToHeight: ScaleLinear<number, number>;
-    public scoreToOpacity: ScaleLogarithmic<number, number>;
+    public standardizers: {[distance: number]: (x: number) => number};
 
     constructor(props: InteractionTrack3DProps) {
         super(props);
@@ -52,18 +53,22 @@ export class InteractionTrack3D extends React.Component<InteractionTrack3DProps,
         if (endX - startX <= 0) {
             return null;
         }
+        const distance = placement.interaction.getDistance();
+        const score = this.standardizers[distance] ? this.standardizers[distance](placement.interaction.score) : 0;
+        if (Number.isNaN(score) || score < SCORE_THRESHOLD) {
+            return null;
+        }
         const height = this.arcWidthToHeight(placement.getWidth());
         const depth = this.props.depth;
-        const opacity = this.scoreToOpacity(placement.interaction.score + 1);
         const planeProps = {
             rotation: '-90 0 0',
             height: depth,
             color: '#B8008A',
             transparent: true,
-            opacity,
+            opacity: OPACITY,
         };
         return <React.Fragment key={i}>
-            <Arc startX={startX} endX={endX} height={height} depth={depth} z={-depth - 1} opacity={opacity} />;
+            <Arc startX={startX} endX={endX} height={height} depth={depth} z={-depth - 1} opacity={OPACITY} />;
             <a-plane
                 position={`${startX} 0 ${-depth/2 - 1}`}
                 width={placement.xLocation1.getLength()}
@@ -83,11 +88,31 @@ export class InteractionTrack3D extends React.Component<InteractionTrack3DProps,
             return null;
         }
         const nonAdjacentData = data.filter(isNonAdjacentBin);
-        const sampledData = _.sampleSize(nonAdjacentData, ARCS_TO_DRAW);
-        const placedInteractions = this.featurePlacer.placeInteractions(sampledData, viewRegion, width);
-        const dataMax = _.maxBy(placedInteractions, placement => placement.interaction.score).interaction.score;
+        const placedInteractions = this.featurePlacer.placeInteractions(nonAdjacentData, viewRegion, width);
         this.arcWidthToHeight = scaleLinear().domain([0, width]).range([MIN_HEIGHT, width * HEIGHT_FACTOR]);
-        this.scoreToOpacity = scaleLog().domain([1, dataMax + 1]).range([0, 0.9]);
+        this.standardizers = new InteractionStatistics().makeStandardizersForDistances(nonAdjacentData);
         return placedInteractions.map(this.renderOneInteraction);
+    }
+}
+
+class InteractionStatistics {
+    makeStandardizer(mean: number, standardDev: number) {
+        return (x: number) => (x - mean) / standardDev;
+    } 
+
+    makeStandardizersForDistances(interactions: GenomeInteraction[]) {
+        const groupedByDistance = _.groupBy(interactions, interaction => interaction.getDistance());
+
+        const standardizers: {[distance: number]: (x: number) => number} = {};
+        for (const distance in groupedByDistance) {
+            const interactionsForDistance = groupedByDistance[distance];
+            const mean = _.meanBy(interactionsForDistance, 'score');
+            const totalVariance = _.sum(interactionsForDistance.map(
+                interaction => (interaction.score - mean) * (interaction.score - mean)
+            ));
+            const standardDev = Math.sqrt(totalVariance / (interactionsForDistance.length - 1));
+            standardizers[Number(distance)] = this.makeStandardizer(mean, standardDev);
+        }
+        return standardizers;
     }
 }

@@ -27,7 +27,7 @@ window.hic.Dataset.prototype.getChrIndexFromName = function(name) {
     return found !== -1 ? found : undefined;
 }
 
-const MIN_BINS_PER_REGION = 75;
+const MIN_BINS_PER_REGION = 50;
 const BIN_SIZES = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000];
 
 export class HicSource extends DataSource {
@@ -44,7 +44,6 @@ export class HicSource extends DataSource {
     * @returns {number} the index of the recommended bin size for the region
     */
     getAutoBinSize(regionLength) {
-        return 10000;
         for (let binSize of BIN_SIZES) { // BIN_SIZES must be sorted from largest to smallest!
             if (MIN_BINS_PER_REGION * binSize < regionLength) {
                 return binSize;
