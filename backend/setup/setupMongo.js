@@ -1,29 +1,31 @@
 'use strict';
 
 const fs = require('fs');
-const child_process = require('child_process');
+// const child_process = require('child_process');
 const yesno = require('yesno');
-const ALL_IMPORTERS = require('./mongoImporters');
+//const ALL_IMPORTERS = require('./mongoImporters');
+const MongoImporter = require('./mongoImporters');
 const mongoUtils = require('../mongoUtils');
+const genomeConfig = require('./genomeConfig');
 
 const MONGO_URL = 'mongodb://localhost:27017';
 const DATA_DIR = 'genomeData';
 const ExitCodes = {
     DATA_DIR_MISSING_ERROR: 1,
     MONGO_CONNECT_ERROR: 2,
-    IMPORT_ERROR: 3,
+    IMPORT_ERROR: 3
 };
 
 /**
  * Asks a boolean question to the user on stdin.
- * 
+ *
  * @param {string} question - question to ask
  * @param {boolean} defaultValue - default value for blank response
  * @return {Promise<boolean>} whether the user said yes
  */
 function askUser(question, defaultValue) {
     return new Promise((resolve, reject) => {
-        yesno.ask(question, defaultValue, (answer) => {
+        yesno.ask(question, defaultValue, answer => {
             process.stdin.end(); // yesno fails to close stdin, so we do it here.
             resolve(answer);
         });
@@ -35,17 +37,17 @@ function askUser(question, defaultValue) {
  * Notes:
  *  - Ignores directories starting with a "."
  *  - Calls the methods of each object in `ALL_IMPORTERS`.
- * 
+ *
  * @return {Promise<number>} exit code
  */
 async function main() {
     // Get directories to import
     let genomes;
     try {
-        genomes = fs.readdirSync(DATA_DIR).filter(dir => !dir.startsWith("."));
+        genomes = fs.readdirSync(DATA_DIR).filter(dir => !dir.startsWith('.'));
     } catch (error) {
         console.error(error.toString());
-        console.error("Could not open data directory; aborting...");
+        console.error('Could not open data directory; aborting...');
         return ExitCodes.DATA_DIR_MISSING_ERROR;
     }
 
@@ -61,22 +63,31 @@ async function main() {
 
     // Get permission
     const permission = await askUser(
-        "This will modify the following databases in MongoDB:\n" +
-        `    ${genomes.join('\n    ')}\n` +
-        "Continue (y/n)?",
+        'This will modify the following databases in MongoDB:\n' +
+            `    ${genomes.join('\n    ')}\n` +
+            'Continue (y/n)?',
         false
     );
     if (!permission) {
-        console.log("Aborting.");
+        console.log('Aborting.');
         return 0;
     }
 
-    // Import
     for (let genome of genomes) {
         try {
+            console.log(`Loading genome ${genome}`);
             const db = mongoClient.db(genome);
-            for (let importer of ALL_IMPORTERS) {
-                await importer.import(DATA_DIR, genome, db);
+            for (let config of genomeConfig[genome]) {
+                const importer = new MongoImporter(
+                    DATA_DIR,
+                    genome,
+                    db,
+                    config.name,
+                    config.file,
+                    config.fieldsConfig.fields,
+                    config.fieldsConfig.indexFields
+                );
+                await importer.importAndIndex();
             }
         } catch (error) {
             console.error(error.toString());
@@ -88,10 +99,11 @@ async function main() {
         console.log();
     }
 
-    console.log("All done");
+    console.log('All done');
     return 0;
 }
 
-if (require.main === module) { // Called directly
-    main().then(process.exit)
+if (require.main === module) {
+    // Called directly
+    main().then(process.exit);
 } // else required as a module

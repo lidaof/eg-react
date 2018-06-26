@@ -23,7 +23,7 @@ class StandaloneGeneAnnotation extends React.PureComponent {
     render() {
         return (
         <svg width={this.props.drawModel.getDrawWidth()} height={GeneAnnotation.HEIGHT} >
-            <GeneAnnotation {...this.props} />
+            <GeneAnnotation {...this.props} isRenderLabel={false} />
         </svg>
         );
     }

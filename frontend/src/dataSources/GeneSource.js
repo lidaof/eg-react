@@ -4,28 +4,28 @@ import DataSource from './DataSource';
 
 /**
  * A DataSource that calls our backend API for gene annotations.
- *  
+ *
  * @author Daofeng Li
  */
 class GeneSource extends DataSource {
     /**
      * Makes a new instance, specialized to fetch data from a specific genome.
-     * 
-     * @param {string} genomeName - genome for which to fetch data
+     *
+     * @param {object} trackModel - genome for which to fetch data
      */
-    constructor(genomeName) {
+    constructor(trackModel) {
         super();
-        if (!genomeName) {
-            console.warn("No genome name specified.  This data source will fetch no data!");
+        if (!trackModel) {
+            console.warn('No track model specified.  This data source will fetch no data!');
         }
-        this.genomeName = genomeName;
+        this.trackModel = trackModel;
     }
 
     /**
      * @inheritdoc
      */
     async getData(region) {
-        if (!this.genomeName) {
+        if (!this.trackModel) {
             return [];
         }
 
@@ -38,7 +38,9 @@ class GeneSource extends DataSource {
             /**
              * Gets an object that looks like {data: []}
              */
-            return axios.get(`/${this.genomeName}/genes/queryRegion`, {params: params});
+            return axios.get(`/${this.trackModel.genome}/genes/${this.trackModel.name}/queryRegion`, {
+                params: params
+            });
         });
 
         const dataForEachSegment = await Promise.all(promises);

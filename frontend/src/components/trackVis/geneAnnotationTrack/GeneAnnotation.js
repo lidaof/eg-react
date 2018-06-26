@@ -12,11 +12,18 @@ import OpenInterval from '../../../model/interval/OpenInterval';
 import NavigationContext from '../../../model/NavigationContext';
 import { FeaturePlacer } from '../../../model/FeaturePlacer';
 
+const FEATURE_PLACER = new FeaturePlacer();
 const HEIGHT = 9;
 const UTR_HEIGHT = 5;
 const DEFAULT_COLOR = "blue";
 const DEFAULT_BACKGROUND_COLOR = "white";
-const FEATURE_PLACER = new FeaturePlacer();
+export const DEFAULT_CATEGORY_COLORS = {
+    coding: 'rgb(0,60,179)',
+    nonCoding: 'rgb(0,128,0)',
+    pseudogene: 'rgb(230,0,172)',
+    problem: 'rgb(255,0,0)',
+    polyA: 'rgb(0,0,51)'
+};
 
 /**
  * A visualization of Gene objects.  Renders SVG elements.
@@ -53,6 +60,7 @@ class GeneAnnotation extends React.Component {
         y: 0,
         viewWindow: new OpenInterval(-Infinity, Infinity),
         isMinimal: false,
+        isRenderLabel: true,
         options: {},
         onClick: (event, gene) => undefined
     };
@@ -90,7 +98,8 @@ class GeneAnnotation extends React.Component {
     render() {
         const {gene, navContext, contextLocation, drawModel, y, viewWindow, isMinimal, options, onClick} = this.props;
         const exonClipId = this.state.exonClipId;
-        const color = options.color || DEFAULT_COLOR;
+        const categoryColors = options.categoryColors || DEFAULT_CATEGORY_COLORS;
+        const color = categoryColors[gene.transcriptionClass] || options.color || DEFAULT_COLOR;
         const backgroundColor = options.backgroundColor || DEFAULT_BACKGROUND_COLOR;
         const startX = Math.max(-1, drawModel.baseToX(contextLocation.start));
         const endX = Math.min(drawModel.baseToX(contextLocation.end), drawModel.getDrawWidth() + 1);
@@ -191,7 +200,7 @@ class GeneAnnotation extends React.Component {
             {exonArrows}
             {utrArrowCover}
             {utrRects}
-            {label}
+            {this.props.isRenderLabel && label}
         </TranslatableG>
         );
     }

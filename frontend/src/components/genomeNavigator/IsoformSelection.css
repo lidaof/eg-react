@@ -3,10 +3,16 @@
     margin: 0;
     font-size: smaller;
     border-collapse: collapse;
+    display: grid;
+    grid-template-columns: auto;
 }
 
 .IsoformSelection-item {
     border: 1px solid lightgrey;
+    display: grid;
+    grid-template-columns: 80px auto auto auto;
+    grid-gap: 5px;
+    align-items: center;
 }
 
 .IsoformSelection-item:hover {
