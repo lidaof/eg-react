@@ -55,7 +55,6 @@ class IsoformSelection extends React.PureComponent {
             isExact: true
         };
         const response = await axios.get(`/${genomeName}/genes/queryName`, {params: params});
-        console.log(response.data);
         const genes  = response.data.map(record => new Gene(record));
         this.setState({isLoading: false, genes: genes});
     }

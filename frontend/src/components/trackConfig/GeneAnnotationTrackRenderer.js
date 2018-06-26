@@ -1,8 +1,8 @@
-import AnnotationTrackRenderer from "./AnnotationTrackRenderer";
-import { configStaticDataSource } from "./configDataFetch";
-import GeneAnnotationTrack from "../trackVis/geneAnnotationTrack/GeneAnnotationTrack";
-import GeneSource from "../../dataSources/GeneSource";
-import Gene from "../../model/Gene";
+import AnnotationTrackRenderer from './AnnotationTrackRenderer';
+import { configStaticDataSource } from './configDataFetch';
+import GeneAnnotationTrack, { DEFAULT_OPTIONS } from '../trackVis/geneAnnotationTrack/GeneAnnotationTrack';
+import GeneSource from '../../dataSources/GeneSource';
+import Gene from '../../model/Gene';
 
 /**
  * Converts gene data objects from the server to Gene objects.
@@ -11,18 +11,20 @@ import Gene from "../../model/Gene";
  * @return {Gene[]} genes made from raw data
  */
 function formatDatabaseRecords(data) {
-  return data.map(record => new Gene(record));
+    return data.map(record => new Gene(record));
 }
-const withDataFetch = configStaticDataSource(
-  props => new GeneSource(props.trackModel),
-  formatDatabaseRecords
-);
+const withDataFetch = configStaticDataSource(props => new GeneSource(props.trackModel), formatDatabaseRecords);
 const TrackWithData = withDataFetch(GeneAnnotationTrack);
 
 class GeneAnnotationTrackRenderer extends AnnotationTrackRenderer {
-  getComponent() {
-    return TrackWithData;
-  }
+    constructor(trackModel) {
+        super(trackModel);
+        this.setDefaultOptions(DEFAULT_OPTIONS);
+    }
+
+    getComponent() {
+        return TrackWithData;
+    }
 }
 
 export default GeneAnnotationTrackRenderer;

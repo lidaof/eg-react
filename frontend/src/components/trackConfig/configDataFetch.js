@@ -77,7 +77,7 @@ export function withDataFetch(doFormat, initialData=[], WrappedComponent) {
                 if (this.props.viewRegion === requestedViewRegion) {
                     this.setState({
                         isLoading: false,
-                        data: doFormat ? doFormat(data, props) : data,
+                        data: doFormat ? doFormat(data) : data,
                         error: null,
                     });
                 }

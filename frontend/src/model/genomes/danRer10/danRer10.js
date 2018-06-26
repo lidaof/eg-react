@@ -39,8 +39,12 @@ const defaultRegion = navContext.parse("chr19:18966019-19564024");
 const defaultTracks = [
     new TrackModel({
         type: "geneAnnotation",
-        name: "refGene",
+        name: "ncbiRefSeq",
         genome: GENOME_NAME,
+    }),
+    new TrackModel({
+        type: "ruler",
+        name: "Ruler",
     }),
 ];
 

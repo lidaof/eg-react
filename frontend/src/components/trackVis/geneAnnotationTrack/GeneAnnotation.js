@@ -15,6 +15,13 @@ const HEIGHT = 9;
 const UTR_HEIGHT = 5;
 const DEFAULT_COLOR = "blue";
 const DEFAULT_BACKGROUND_COLOR = "white";
+export const DEFAULT_CATEGORY_COLORS = {
+    coding: 'rgb(0,60,179)',
+    nonCoding: 'rgb(0,128,0)',
+    pseudogene: 'rgb(230,0,172)',
+    problem: 'rgb(255,0,0)',
+    polyA: 'rgb(0,0,51)'
+};
 
 /**
  * A visualization of Gene objects.  Renders SVG elements.
@@ -88,7 +95,8 @@ class GeneAnnotation extends React.Component {
         const {gene, navContextLocation, drawModel, y, viewWindow, isMinimal, options, onClick} = this.props;
         const absLocation = navContextLocation.getAbsoluteRegion();
         const exonClipId = this.state.exonClipId;
-        const color = gene.transcriptionClass ? options[gene.transcriptionClass] : DEFAULT_COLOR;
+        const categoryColors = options.categoryColors || DEFAULT_CATEGORY_COLORS;
+        const color = categoryColors[gene.transcriptionClass] || options.color || DEFAULT_COLOR;
         const backgroundColor = options.backgroundColor || DEFAULT_BACKGROUND_COLOR;
         const startX = Math.max(-1, drawModel.baseToX(absLocation.start));
         const endX = Math.min(drawModel.baseToX(absLocation.end), drawModel.getDrawWidth() + 1);

@@ -1,29 +1,29 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import GeneAnnotation from "./GeneAnnotation";
-import GeneDetail from "./GeneDetail";
+import GeneAnnotation, { DEFAULT_CATEGORY_COLORS } from './GeneAnnotation';
+import GeneDetail from './GeneDetail';
 
-import Track from "../commonComponents/Track";
-import AnnotationTrack from "../commonComponents/annotation/AnnotationTrack";
-import withTooltip from "../commonComponents/tooltip/withTooltip";
-import Tooltip from "../commonComponents/tooltip/Tooltip";
+import Track from '../commonComponents/Track';
+import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
+import withTooltip from '../commonComponents/tooltip/withTooltip';
+import Tooltip from '../commonComponents/tooltip/Tooltip';
 
-import LinearDrawingModel from "../../../model/LinearDrawingModel";
-import DisplayedRegionModel from "../../../model/DisplayedRegionModel";
-import IntervalArranger from "../../../model/interval/IntervalArranger";
+import LinearDrawingModel from '../../../model/LinearDrawingModel';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
+import IntervalArranger from '../../../model/interval/IntervalArranger';
+import configOptionMerging from '../commonComponents/configOptionMerging';
 
 const ROW_VERTICAL_PADDING = 5;
 const ROW_HEIGHT = GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
 const INTERVAL_ARRANGER = new IntervalArranger(
-  drawLocation => drawLocation.feature.getName().length * GeneAnnotation.HEIGHT
+    drawLocation => drawLocation.feature.getName().length * GeneAnnotation.HEIGHT
 );
 
-
-const DEFAULT_COLOR = {
-  'coding':'rgb(0,60,179)', 'nonCoding':'rgb(0,128,0)', 'pseudogene':'rgb(230,0,172)', 'problem':'rgb(255,0,0)', 'polyA':'rgb(0,0,51)'
-}
-
+export const DEFAULT_OPTIONS = {
+    categoryColors: DEFAULT_CATEGORY_COLORS
+};
+const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 /**
  * Track that displays gene annotations.
@@ -31,88 +31,77 @@ const DEFAULT_COLOR = {
  * @author Silas Hsu
  */
 class GeneAnnotationTrack extends React.Component {
-  static propTypes = Object.assign(
-    {},
-    Track.trackContainerProps,
-    withTooltip.INJECTED_PROPS,
-    {
-      // Genes to render
-      data: PropTypes.array.isRequired //PropTypes.arrayOf(PropTypes.instanceOf(Gene)).isRequired,
+    static propTypes = Object.assign({}, Track.trackContainerProps, withTooltip.INJECTED_PROPS, {
+        // Genes to render
+        data: PropTypes.array.isRequired //PropTypes.arrayOf(PropTypes.instanceOf(Gene)).isRequired,
+    });
+
+    static defaultProps = {
+        options: {},
+        onShowTooltip: element => undefined,
+        onHideTooltip: () => undefined
+    };
+
+    constructor(props) {
+        super(props);
+        this.renderAnnotation = this.renderAnnotation.bind(this);
+        this.renderTooltip = this.renderTooltip.bind(this);
     }
-  );
 
-  static defaultProps = {
-    options: {},
-    onShowTooltip: element => undefined,
-    onHideTooltip: () => undefined
-  };
+    /**
+     * Renders one gene annotation.
+     *
+     * @param {Gene} gene - gene to render
+     * @param {OpenInterval} absInterval - location of the gene in navigation context
+     * @param {OpenInterval} xRange - x coordinates the annotation will occupy
+     * @param {number} y - y coordinate of the top of the annotation
+     * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
+     * @return {JSX.Element} element visualizing the gene
+     */
+    renderAnnotation(gene, absInterval, xRange, y, isLastRow) {
+        const { viewRegion, width, viewWindow, options } = this.props;
+        const navContext = viewRegion.getNavigationContext();
+        const drawModel = new LinearDrawingModel(viewRegion, width);
+        return (
+            <GeneAnnotation
+                key={gene.dbRecord._id}
+                gene={gene}
+                navContextLocation={new DisplayedRegionModel(navContext, ...absInterval)}
+                drawModel={drawModel}
+                y={y}
+                viewWindow={viewWindow}
+                isMinimal={isLastRow}
+                options={options}
+                onClick={this.renderTooltip}
+            />
+        );
+    }
 
-  constructor(props) {
-    super(props);
-    this.renderAnnotation = this.renderAnnotation.bind(this);
-    this.renderTooltip = this.renderTooltip.bind(this);
-  }
+    /**
+     * Renders the tooltip for a gene.
+     *
+     * @param {MouseEvent} event - mouse event that triggered the tooltip request
+     * @param {Gene} gene - gene for which to display details
+     */
+    renderTooltip(event, gene) {
+        const tooltip = (
+            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip}>
+                <GeneDetail gene={gene} collectionName={this.props.trackModel.name} />
+            </Tooltip>
+        );
+        this.props.onShowTooltip(tooltip);
+    }
 
-  /**
-   * Renders one gene annotation.
-   *
-   * @param {Gene} gene - gene to render
-   * @param {OpenInterval} absInterval - location of the gene in navigation context
-   * @param {OpenInterval} xRange - x coordinates the annotation will occupy
-   * @param {number} y - y coordinate of the top of the annotation
-   * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
-   * @return {JSX.Element} element visualizing the gene
-   */
-  renderAnnotation(gene, absInterval, xRange, y, isLastRow) {
-    const { viewRegion, width, viewWindow, options } = this.props;
-    const navContext = viewRegion.getNavigationContext();
-    const drawModel = new LinearDrawingModel(viewRegion, width);
-    return (
-      <GeneAnnotation
-        key={gene.dbRecord._id}
-        gene={gene}
-        navContextLocation={
-          new DisplayedRegionModel(navContext, ...absInterval)
-        }
-        drawModel={drawModel}
-        y={y}
-        viewWindow={viewWindow}
-        isMinimal={isLastRow}
-        options={{...options, ...DEFAULT_COLOR}}
-        onClick={this.renderTooltip}
-      />
-    );
-  }
-
-  /**
-   * Renders the tooltip for a gene.
-   *
-   * @param {MouseEvent} event - mouse event that triggered the tooltip request
-   * @param {Gene} gene - gene for which to display details
-   */
-  renderTooltip(event, gene) {
-    const tooltip = (
-      <Tooltip
-        pageX={event.pageX}
-        pageY={event.pageY}
-        onClose={this.props.onHideTooltip}
-      >
-        <GeneDetail gene={gene} collectionName={this.props.trackModel.name} />
-      </Tooltip>
-    );
-    this.props.onShowTooltip(tooltip);
-  }
-
-  render() {
-    return (
-      <AnnotationTrack
-        {...this.props}
-        rowHeight={ROW_HEIGHT}
-        intervalArranger={INTERVAL_ARRANGER}
-        getAnnotationElement={this.renderAnnotation}
-      />
-    );
-  }
+    render() {
+        return (
+            <AnnotationTrack
+                {...this.props}
+                rowHeight={ROW_HEIGHT}
+                intervalArranger={INTERVAL_ARRANGER}
+                getAnnotationElement={this.renderAnnotation}
+            />
+        );
+    }
 }
 
-export default withTooltip(GeneAnnotationTrack);
+export default withDefaultOptions(withTooltip(GeneAnnotationTrack));
