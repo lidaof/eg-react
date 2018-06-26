@@ -3,6 +3,9 @@
 const child_process = require("child_process");
 const fs = require("fs");
 
+const isWin = process.platform === "win32";
+const MONGO_IMPORT = isWin ? '"c:\\Program Files\\MongoDB\\Server\\3.6\\bin\\mongoimport.exe"' : 'mongoimport';
+
 /**
  * An importer of data for MongoDB
  */
@@ -33,7 +36,7 @@ class MongoImporter {
   async importAndIndex() {
     if (fs.existsSync(this.sourceFile)) {
       child_process.execSync(
-        `mongoimport -d ${this.genomeName} -c ${this.name} --drop ` +
+        `${MONGO_IMPORT} -d ${this.genomeName} -c ${this.name} --drop ` +
           `--file ${this.sourceFile} --type tsv ` +
           `-f ${this.fields} ` +
           "--numInsertionWorkers 4"

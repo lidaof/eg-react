@@ -88,7 +88,7 @@ class GeneAnnotation extends React.Component {
         const {gene, navContextLocation, drawModel, y, viewWindow, isMinimal, options, onClick} = this.props;
         const absLocation = navContextLocation.getAbsoluteRegion();
         const exonClipId = this.state.exonClipId;
-        const color = options.color || DEFAULT_COLOR;
+        const color = gene.transcriptionClass ? options[gene.transcriptionClass] : DEFAULT_COLOR;
         const backgroundColor = options.backgroundColor || DEFAULT_BACKGROUND_COLOR;
         const startX = Math.max(-1, drawModel.baseToX(absLocation.start));
         const endX = Math.min(drawModel.baseToX(absLocation.end), drawModel.getDrawWidth() + 1);

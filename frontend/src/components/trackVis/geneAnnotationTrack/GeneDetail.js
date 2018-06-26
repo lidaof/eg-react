@@ -23,6 +23,7 @@ class GeneDetail extends React.PureComponent {
         <i>
           {gene.description}
         </i>
+        <div>{gene.transcriptionClass ? `Transcription class: ${gene.transcriptionClass}`: ''}</div>
       </div>
     );
   }

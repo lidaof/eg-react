@@ -20,9 +20,10 @@ const INTERVAL_ARRANGER = new IntervalArranger(
 );
 
 
-const DEFAULT_OPTIOS = {
+const DEFAULT_COLOR = {
   'coding':'rgb(0,60,179)', 'nonCoding':'rgb(0,128,0)', 'pseudogene':'rgb(230,0,172)', 'problem':'rgb(255,0,0)', 'polyA':'rgb(0,0,51)'
 }
+
 
 /**
  * Track that displays gene annotations.
@@ -77,7 +78,7 @@ class GeneAnnotationTrack extends React.Component {
         y={y}
         viewWindow={viewWindow}
         isMinimal={isLastRow}
-        options={options}
+        options={{...options, ...DEFAULT_COLOR}}
         onClick={this.renderTooltip}
       />
     );
