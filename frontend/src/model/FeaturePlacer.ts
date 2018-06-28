@@ -57,6 +57,10 @@ export class PlacedInteraction {
         const end = Math.max(this.xLocation1.end, this.xLocation2.end);
         return end - start;
     }
+
+    generateKey(): string {
+        return "" + this.xLocation1.start + this.xLocation1.end + this.xLocation2.start + this.xLocation2.end;
+    }
 }
 
 export class FeaturePlacer {

@@ -42,7 +42,7 @@ class App extends React.Component {
         super(props);
         this.state = {
             isShowingRegionSetUI: false,
-            isShowing3D: true
+            isShowing3D: false
         };
         this.addTracks = this.addTracks.bind(this);
         this.removeTrack = this.removeTrack.bind(this);

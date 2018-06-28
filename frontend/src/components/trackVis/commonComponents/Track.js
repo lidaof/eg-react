@@ -164,15 +164,15 @@ function ErrorMessage(props) {
  */
 function ViewWindow(props) {
     const {viewWindow, fullWidth, children} = props;
-    const xOffset = props.xOffset || 0;
-    let left = 0;
-    if (xOffset > 0) {
+    // Actually, props.xOffset stores the dragged amount and draggedAmount stores the actual amount we will xOffset.
+    let draggedAmount = props.xOffset || 0;
+    if (draggedAmount > 0) {
         // Dragging stuff on the left into view.  So, we limit to how many pixels exist on the left.
-        left = Math.min(xOffset, viewWindow.start);
+        draggedAmount = Math.min(draggedAmount, viewWindow.start);
     } else {
         // Ditto for dragging stuff on the right into view.
         const numPixelsOnRight = fullWidth - viewWindow.end;
-        left = Math.max(-numPixelsOnRight, xOffset);
+        draggedAmount = Math.max(-numPixelsOnRight, draggedAmount);
     }
 
     const outerStyle = {
@@ -182,9 +182,9 @@ function ViewWindow(props) {
 
     const innerStyle = {
         position: "relative",
-        // This centers the view window, rather than it starting at the leftmost part of the inner element.
-        marginLeft: -viewWindow.start,
-        left: left
+        // -viewWindow.start centers the view, rather than it starting at the leftmost part of the inner element.
+        transform: `translateX(${-viewWindow.start + draggedAmount}px)`,
+        willChange: 'transform'
     };
 
     return (

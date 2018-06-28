@@ -13,11 +13,13 @@ import { HicSource } from '../../dataSources/HicSource';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import TrackModel from '../../model/TrackModel';
 import RegionExpander from '../../model/RegionExpander';
+import withCurrentGenome from '../withCurrentGenome';
 
 const COMPONENT_FOR_TRACK_TYPE = {
     bigwig: withDataFetch(NumericalTrack3D),
 };
-const InteractionTrack = configStaticDataSource(props => new HicSource(props.trackModel.url))(InteractionTrack3D);
+const withHicData = configStaticDataSource(props => new HicSource(props.trackModel.url, props.genomeConfig.genome));
+const InteractionTrack = withCurrentGenome(withHicData(InteractionTrack3D));
 
 const TRACK_SEPARATION = 1; // In meters
 const TRACK_WIDTH = 100;

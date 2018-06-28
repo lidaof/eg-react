@@ -31,9 +31,10 @@ const MIN_BINS_PER_REGION = 50;
 const BIN_SIZES = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000];
 
 export class HicSource extends DataSource {
-    constructor(url) {
+    constructor(url, genome) {
         super();
         this.straw = new window.hic.Straw({ url: url });
+        this.genome = genome;
     }
 
     /**
@@ -53,23 +54,33 @@ export class HicSource extends DataSource {
     }
 
     /**
+     * FIXME this doesn't do well in region set view.  Errors abound from Juicebox.
      * 
-     * @param {hic.ContactRecord} contactRecord 
-     * @param {string} chrName
-     * @param {number} binSize - bin size, in base pairs
+     * @param {ChromosomeInterval} queryLocus1 
+     * @param {ChromosomeInterval} queryLocus2 
+     * @param {number} binSize 
      */
-    makeRecord(contactRecord, chrName1, chrName2, binSize) {
-        const locus1 = new ChromosomeInterval(
-            chrName1, contactRecord.bin1 * binSize, (contactRecord.bin1 + 1) * binSize
-        );
-        const locus2 = new ChromosomeInterval(
-            chrName2, contactRecord.bin2 * binSize, (contactRecord.bin2 + 1) * binSize
-        );
-        return new GenomeInteraction(locus1, locus2, contactRecord.counts);
+    async getInteractionsBetweenLoci(queryLocus1, queryLocus2, binSize) {
+        const records = await this.straw.getContactRecords('NONE', queryLocus1, queryLocus2, 'BP', binSize);
+        const interactions = [];
+        for (const record of records) {
+            let recordLocus1 = new ChromosomeInterval(
+                queryLocus1.chr, record.bin1 * binSize, (record.bin1 + 1) * binSize
+            );
+            let recordLocus2 = new ChromosomeInterval(
+                queryLocus2.chr, record.bin2 * binSize, (record.bin2 + 1) * binSize
+            );
+            recordLocus1 = this.genome.intersectInterval(recordLocus1);
+            recordLocus2 = this.genome.intersectInterval(recordLocus2);
+            if (recordLocus1 && recordLocus2) {
+                interactions.push(new GenomeInteraction(recordLocus1, recordLocus2, record.counts));
+            }
+        }
+        return interactions;
     }
 
     /**
-     * Gets data in the view region.
+     * Gets HiC data in the view region.  Note that only a triangular portion of the contact matrix is returned.
      * 
      * @param {DisplayedRegionModel} region - region for which to fetch data
      * @param {number} basesPerPixel - bases per pixel.  Higher = more zoomed out
@@ -78,11 +89,13 @@ export class HicSource extends DataSource {
      */
     async getData(region, basesPerPixel, options) {
         const binSize = options.binSize || this.getAutoBinSize(region.getWidth());
-        let promises = region.getGenomeIntervals().map(async locus => {
-            const records = await this.straw.getContactRecords('NONE', locus, locus, 'BP', binSize);
-            // Example of a record: {bin1: 2706, bin2: 2706, counts: 3979}
-            return records.map(record => this.makeRecord(record, locus.chr, locus.chr, binSize));
-        });
+        const promises = [];
+        const loci = region.getGenomeIntervals();
+        for (const locus1 of loci) {
+            for (const locus2 of loci) {
+                promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
+            }
+        }
         const dataForEachSegment = await Promise.all(promises);
         return _.flatMap(dataForEachSegment);
     }

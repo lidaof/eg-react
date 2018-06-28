@@ -1,6 +1,6 @@
 import React from 'react';
 import SelectConfig from './SelectConfig';
-import { AnnotationDisplayModes, NumericalDisplayModes } from '../../model/DisplayModes';
+import { AnnotationDisplayModes, NumericalDisplayModes, InteractionDisplayMode } from '../../model/DisplayModes';
 
 /**
  * A menu item for configuring display modes of annotation tracks.
@@ -31,5 +31,15 @@ export function NumericalDisplayModeConfig(props) {
         label="Display mode:"
         defaultValue={NumericalDisplayModes.AUTO}
         choices={NumericalDisplayModes}
+    />;
+}
+
+export function InteractionDisplayModeConfig(props) {
+    return <SelectConfig
+        {...props}
+        optionName="displayMode"
+        label="Display mode:"
+        defaultValue={InteractionDisplayMode.HEATMAP}
+        choices={InteractionDisplayMode}
     />;
 }

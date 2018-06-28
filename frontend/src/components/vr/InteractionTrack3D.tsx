@@ -1,11 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import { scaleLinear, ScaleLinear } from 'd3-scale';
+import { Arc } from './Arc';
+
 import { FeaturePlacer, PlacedInteraction } from '../../model/FeaturePlacer';
 import { GenomeInteraction } from '../../model/GenomeInteraction';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import { scaleLinear, ScaleLinear, scaleLog, ScaleLogarithmic } from 'd3-scale';
-import { Arc } from './Arc';
 
 const HEIGHT_FACTOR = 0.35; // Max height of ribbons as a multiple of track width
 const MIN_HEIGHT = 2;
