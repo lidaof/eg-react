@@ -1,5 +1,6 @@
 import DisplayedRegionModel from "./DisplayedRegionModel";
 import ChromosomeInterval from "./interval/ChromosomeInterval";
+import OpenInterval from "./interval/OpenInterval";
 
 /**
  * Utility class for converting between pixels and base numbers.
@@ -71,6 +72,29 @@ class LinearDrawingModel {
      */
     xToBase(pixel: number): number {
         return pixel * this._basesPerPixel + this._viewRegion.getAbsoluteRegion().start;
+    }
+
+    /**
+     * Converts an interval of bases to an interval of X coordinates.  The `clamp` parameter ensures that the return
+     * values lie between 0 and the draw width, but it might also this method to return `null` if both ends of the
+     * interval fall out of range.
+     * 
+     * @param {OpenInterval} baseInterval - interval of bases to convert
+     * @param {boolean} [clamp] - whether to ensure return values lie between 0 and the draw width
+     * @return {OpenInterval} x draw interval
+     */
+    baseSpanToXSpan(baseInterval: OpenInterval, clamp=false): OpenInterval {
+        let startX = this.baseToX(baseInterval.start);
+        let endX = this.baseToX(baseInterval.end);
+        if (clamp) {
+            startX = Math.max(0, startX);
+            endX = Math.min(endX, this._drawWidth - 1);
+        }
+        if (startX < endX) {
+            return new OpenInterval(startX, endX);
+        } else {
+            return null;
+        }
     }
 
     /**

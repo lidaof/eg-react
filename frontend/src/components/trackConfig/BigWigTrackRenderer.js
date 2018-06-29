@@ -32,7 +32,7 @@ function formatDasFeatures(data) {
     );
 }
 
-const withDataFetch = configStaticDataSource(
+export const withDataFetch = configStaticDataSource(
     props => new WorkerSource(BigWorker, props.trackModel.url), formatDasFeatures
 );
 const BigWigTrack = withDataFetch(NumericalTrack);

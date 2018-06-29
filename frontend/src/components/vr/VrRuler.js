@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Custom3DObject from './Custom3DObject';
+import { Custom3DObject } from './Custom3DObject';
 import RulerDesigner from '../../art/RulerDesigner';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import mergeGeometries from './mergeGeometries';
+import { mergeGeometries } from './mergeGeometries';
 
 const FONT_SIZE = 0.2;
 const FONT_URL = "https://raw.githubusercontent.com/rollup/three-jsnext/master/examples/fonts/helvetiker_regular.typeface.json";
@@ -70,12 +70,12 @@ class VrRuler extends React.Component {
 
         const lines = this._makeLines();
         const text = this._makeText();
-        const commonProps = {rotation: "-90 0 0", position: `${-this.props.width / 2} 0 ${this.props.z}`}
+        const commonProps = {rotation: "-90 0 0", position: `0 0 ${this.props.z}`}
 
-        return [
-        <Custom3DObject key={"lines"} object3D={lines} {...commonProps} />,
-        <Custom3DObject key={"text"} object3D={text} {...commonProps} />,
-        ];
+        return <React.Fragment>
+            <Custom3DObject object={lines} {...commonProps} />,
+            <Custom3DObject object={text} {...commonProps} />,
+        </React.Fragment>;
     }
 }
 

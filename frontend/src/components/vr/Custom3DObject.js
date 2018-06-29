@@ -6,9 +6,9 @@ import React from 'react';
  * 
  * @author Silas Hsu
  */
-class Custom3DObject extends React.Component {
+export class Custom3DObject extends React.Component {
     static propTypes = {
-        //object3D: PropTypes.instanceof(window.THREE.Object3D).isRequired
+        //object: PropTypes.instanceof(window.THREE.Object3D).isRequired
     };
 
     constructor(props) {
@@ -16,20 +16,28 @@ class Custom3DObject extends React.Component {
         this.entityRef = null;
     }
 
+    setObject3D(object) {
+        if (object) {
+            this.entityRef.setObject3D('theObject', object);
+        }
+    }
+
     componentDidMount() {
-        this.entityRef.setObject3D('theObject', this.props.object3D);
+        this.setObject3D(this.props.object);
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.object3D !== this.props.object3D) {
-            this.entityRef.setObject3D('theObject', this.props.object3D);
+        if (prevProps.object !== this.props.object) {
+            this.setObject3D(this.props.object);
         }
     }
 
     render() {
-        let {object3D, ...otherProps} = this.props;
-        return <a-entity ref={(node) => this.entityRef = node} {...otherProps} />;
+        const {object, ...otherProps} = this.props;
+        if (!object) {
+            return null;
+        } else {
+            return <a-entity ref={(node) => this.entityRef = node} {...otherProps} />;
+        }
     }
 }
-
-export default Custom3DObject;

@@ -12,7 +12,7 @@ import GenomicCoordinates from './commonComponents/GenomicCoordinates';
 import DesignRenderer, { RenderTypes } from '../../art/DesignRenderer';
 
 import TrackModel from '../../model/TrackModel';
-import FeatureAggregator from '../../model/FeatureAggregator';
+import { FeatureAggregator } from '../../model/FeatureAggregator';
 import MethylCRecord from '../../model/MethylCRecord';
 import { getContrastingColor } from '../../util';
 

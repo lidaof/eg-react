@@ -27,18 +27,6 @@ class RegionExpander {
     }
 
     /**
-     * Expands a region according to the parameters set in the constructor.  Does not modify the input.
-     * 
-     * @param {DisplayedRegionModel} region - region to expand
-     * @return {DisplayedRegionModel} expanded region
-     */
-    makeExpandedRegion(region: DisplayedRegionModel): DisplayedRegionModel {
-        const expandedModel = region.clone();
-        expandedModel.zoom(this.zoomRatio);
-        return expandedModel;
-    }
-
-    /**
      * Return object of calculateExpansion.  Note that the length of `viewWindow` equals the original width provided to
      * the method.
      * 
@@ -59,7 +47,7 @@ class RegionExpander {
      */
     calculateExpansion(width: number, region: DisplayedRegionModel) {
         const pixelsPerBase = width / region.getWidth();
-        const expandedRegion = this.makeExpandedRegion(region);
+        const expandedRegion = region.clone().zoom(this.zoomRatio);
         const expandedWidth = expandedRegion.getWidth() * pixelsPerBase;
 
         const originalAbsRegion = region.getAbsoluteRegion();

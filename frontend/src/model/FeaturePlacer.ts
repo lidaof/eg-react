@@ -4,6 +4,7 @@ import OpenInterval from './interval/OpenInterval';
 import LinearDrawingModel from './LinearDrawingModel';
 import NavigationContext from './NavigationContext';
 import FeatureInterval from './interval/FeatureInterval';
+import { GenomeInteraction } from './GenomeInteraction';
 
 /**
  * Draw information for a Feature
@@ -29,6 +30,39 @@ export interface PlacedSegment {
     offsetRelativeToFeature: number; // Location of the context location relative to the feature's start
 }
 
+export class PlacedInteraction {
+    interaction: GenomeInteraction; // The interaction
+    /**
+     * x span to draw the first region of the interaction.  Guaranteed to have the lower start of both the two spans.
+     */
+    xLocation1: OpenInterval;
+    xLocation2: OpenInterval; // x span to draw the second region of the interaction
+
+    constructor(interaction: GenomeInteraction, xLocation1: OpenInterval, xLocation2: OpenInterval) {
+        this.interaction = interaction;
+        if (xLocation1.start <= xLocation2.start) { // Ensure the x spans are ordered
+            this.xLocation1 = xLocation1;
+            this.xLocation2 = xLocation2;
+        } else {
+            this.xLocation1 = xLocation2;
+            this.xLocation2 = xLocation1;
+        }
+    }
+
+    /**
+     * @return {number} the length of the interaction in draw coordinates
+     */
+    getWidth(): number {
+        const start = this.xLocation1.start; // Guaranteed to have to lower start
+        const end = Math.max(this.xLocation1.end, this.xLocation2.end);
+        return end - start;
+    }
+
+    generateKey(): string {
+        return "" + this.xLocation1.start + this.xLocation1.end + this.xLocation2.start + this.xLocation2.end;
+    }
+}
+
 export class FeaturePlacer {
     /**
      * Computes context and draw locations for a list of features.  There may be a different number of placed features
@@ -46,15 +80,10 @@ export class FeaturePlacer {
 
         const placements = [];
         for (const feature of features) {
-            for (const location of feature.computeNavContextCoordinates(navContext)) {
-                const startX = Math.max(0, drawModel.baseToX(location.start));
-                const endX = Math.min(drawModel.baseToX(location.end), width - 1);
-                if (startX < endX) {
-                    placements.push({
-                        feature,
-                        contextLocation: location,
-                        xLocation: new OpenInterval(startX, endX)
-                    });
+            for (const contextLocation of feature.computeNavContextCoordinates(navContext)) {
+                const xLocation = drawModel.baseSpanToXSpan(contextLocation, true);
+                if (xLocation) {
+                    placements.push({ feature, contextLocation, xLocation });
                 }
             }
         }
@@ -102,5 +131,29 @@ export class FeaturePlacer {
             }
         }
         return results;
+    }
+
+    placeInteractions(interactions: GenomeInteraction[], viewRegion: DisplayedRegionModel,
+        width: number): PlacedInteraction[]
+    {
+        const drawModel = new LinearDrawingModel(viewRegion, width);
+        const navContext = viewRegion.getNavigationContext();
+
+        const mappedInteractions = [];
+        for (const interaction of interactions) {
+            const contextLocations1 = navContext.convertGenomeIntervalToBases(interaction.locus1);
+            const contextLocations2 = navContext.convertGenomeIntervalToBases(interaction.locus2);
+            for (const location1 of contextLocations1) {
+                for (const location2 of contextLocations2) {
+                    const xLocation1 = drawModel.baseSpanToXSpan(location1, true);
+                    const xLocation2 = drawModel.baseSpanToXSpan(location2, true);
+                    if (xLocation1 && xLocation2) {
+                        mappedInteractions.push(new PlacedInteraction(interaction, xLocation1, xLocation2));
+                    }
+                }
+            }
+        };
+
+        return mappedInteractions;
     }
 }

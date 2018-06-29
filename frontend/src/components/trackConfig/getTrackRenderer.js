@@ -8,6 +8,7 @@ import GeneAnnotationTrackRenderer from './GeneAnnotationTrackRenderer';
 import RepeatMaskerTrackRenderer from './RepeatMaskerTrackRenderer';
 import RulerTrackRenderer from './RulerTrackRenderer';
 import MethylCTrackRenderer from './MethylCTrackRenderer';
+import HicTrackRenderer from './HicTrackRenderer';
 
 const TYPE_NAME_TO_RENDERER = {
     "bam": BamTrackRenderer,
@@ -18,6 +19,7 @@ const TYPE_NAME_TO_RENDERER = {
     "geneannotation": GeneAnnotationTrackRenderer,
     "repeatmasker": RepeatMaskerTrackRenderer,
     "methylc": MethylCTrackRenderer,
+    "hic": HicTrackRenderer,
     "ruler": RulerTrackRenderer,
 };
 const DefaultRenderer = TrackRenderer;

@@ -9,6 +9,8 @@ import TrackContainer from './components/trackContainers/TrackContainer';
 import TrackManager from './components/trackManagers/TrackManager';
 import RegionSetSelector from './components/RegionSetSelector';
 import withCurrentGenome from './components/withCurrentGenome';
+import { BrowserScene } from './components/vr/BrowserScene';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import TrackModel from './model/TrackModel';
@@ -39,10 +41,13 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isShowingRegionSetUI: false
+            isShowingRegionSetUI: false,
+            isShowing3D: false
         };
         this.addTracks = this.addTracks.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
+        this.toggleRegionSetUI = this.toggleRegionSetUI.bind(this);
+        this.toggle3DScene = this.toggle3DScene.bind(this);
     }
 
     addTracks(tracks) {
@@ -53,6 +58,14 @@ class App extends React.Component {
     removeTrack(indexToRemove) {
         let newTracks = this.props.tracks.filter((track, index) => index !== indexToRemove);
         this.props.onTracksChanged(newTracks);
+    }
+
+    toggleRegionSetUI() {
+        this.setState(prevState => {return {isShowingRegionSetUI: !prevState.isShowingRegionSetUI}});
+    }
+
+    toggle3DScene() {
+        this.setState(prevState => {return {isShowing3D: !prevState.isShowing3D}});
     }
 
     render() {
@@ -71,10 +84,19 @@ class App extends React.Component {
                 onTrackRemoved={this.removeTrack}
             />
             <hr/>
-            <button onClick={() => this.setState({isShowingRegionSetUI: !this.state.isShowingRegionSetUI})}>
-                Show/hide region set config
-            </button>
+            <div>
+                <span style={{marginRight: "1ch"}} >Show region set config</span>
+                <input type="checkbox" checked={this.state.isShowingRegionSetUI} onChange={this.toggleRegionSetUI} />
+            </div>
+            <div>
+                <span style={{marginRight: "1ch"}} >Show 3D scene</span>
+                <input type="checkbox" checked={this.state.isShowing3D} onChange={this.toggle3DScene} />
+            </div>
             {this.state.isShowingRegionSetUI ? <RegionSetSelector genome={genomeConfig.genome} /> : null}
+            {
+            this.state.isShowing3D &&
+                <ErrorBoundary><BrowserScene viewRegion={viewRegion} tracks={tracks} /></ErrorBoundary>
+            }
         </div>
         );
     }
