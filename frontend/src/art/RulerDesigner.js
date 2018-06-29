@@ -75,16 +75,16 @@ export class RulerDesigner {
         const pixelsPerMinorTick = pixelsPerMajorTick / MINOR_TICKS;
         const unit = this._getMajorUnit(log10BasesPerMajorTick);
 
-        let children = [];
+        const children = [];
         // The horizontal line spanning the width of the ruler
         children.push(this._elementFactory.mainLine(this._drawModel.getDrawWidth()));
 
-        const intervals = this._viewRegion.getFeatureIntervals();
-        for (let interval of intervals) {
-            const featureAbsStart = this._viewRegion.getNavigationContext().getFeatureStart(interval.getName());
-            const majorTickEndX = this._drawModel.baseToX(featureAbsStart + interval.relativeEnd);
+        const segments = this._viewRegion.getFeatureSegments();
+        for (const segment of segments) {
+            const featureAbsStart = this._viewRegion.getNavigationContext().getFeatureStart(segment.getName());
+            const majorTickEndX = this._drawModel.baseToX(featureAbsStart + segment.relativeEnd);
             // relativeBase = round down to the nearest major tick base for this region, to find where to start drawing
-            let relativeBase = Math.floor(interval.relativeStart / basesPerMajorTick) * basesPerMajorTick;
+            const relativeBase = Math.floor(segment.relativeStart / basesPerMajorTick) * basesPerMajorTick;
             let majorX = this._drawModel.baseToX(featureAbsStart + relativeBase);
 
             // This loop updates relativeBase and majorX every iteration

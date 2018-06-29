@@ -34,12 +34,12 @@ class TrackRegionController extends React.Component {
      * @return {string} the currently displayed region in human-readable form
      */
     _currentRegionAsString() {
-        let intervals = this.props.selectedRegion.getFeatureIntervals();
-        if (intervals.length === 1) {
-            return intervals[0].toString();
+        let segments = this.props.selectedRegion.getFeatureSegments();
+        if (segments.length === 1) {
+            return segments[0].toString();
         } else {
-            let first = intervals[0];
-            let last = intervals[intervals.length - 1];
+            let first = segments[0];
+            let last = segments[segments.length - 1];
             return first.toStringWithOther(last);
         }
     }

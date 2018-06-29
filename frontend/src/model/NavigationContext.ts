@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import OpenInterval from './interval/OpenInterval';
-import FeatureInterval from './interval/FeatureInterval';
+import { FeatureSegment } from './interval/FeatureSegment';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import { Feature } from './Feature';
 
@@ -115,14 +115,14 @@ class NavigationContext {
     }
 
     /**
-     * Given a context coordinate, gets the feature in which it is located.  Returns a FeatureInterval that expresses
+     * Given a context coordinate, gets the feature in which it is located.  Returns a FeatureSegment that expresses
      * a base number relative to the feature's start.
      *
      * @param {number} base - the context coordinate to look up
-     * @return {FeatureInterval} corresponding feature coordinate
+     * @return {FeatureSegment} corresponding feature coordinate
      * @throws {RangeError} if the base is not in this context
      */
-    convertBaseToFeatureCoordinate(base: number): FeatureInterval {
+    convertBaseToFeatureCoordinate(base: number): FeatureSegment {
         if (!this.getIsValidBase(base)) {
             throw new RangeError("Invalid base number");
         }
@@ -135,7 +135,7 @@ class NavigationContext {
         }
         const feature = this._features[index];
         const coordinate = base - this._featureStarts[index];
-        return new FeatureInterval(feature, coordinate, coordinate);
+        return new FeatureSegment(feature, coordinate, coordinate);
     }
 
     /**
@@ -179,7 +179,7 @@ class NavigationContext {
         const potentialOverlaps = this._chrToFeatures[chrInterval.chr] || [];
         const absLocations = [];
         for (const feature of potentialOverlaps) {
-            const overlap = new FeatureInterval(feature).getOverlap(chrInterval);
+            const overlap = new FeatureSegment(feature).getOverlap(chrInterval);
             if (overlap) {
                 const absStart = this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeStart);
                 const absEnd = this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeEnd);
@@ -231,13 +231,13 @@ class NavigationContext {
     }
 
     /**
-     * Queries features that overlap an open interval of context coordinates.  Returns a list of FeatureInterval.
+     * Queries features that overlap an open interval of context coordinates.  Returns a list of FeatureSegment.
      * 
      * @param {number} queryStart - (inclusive) start of interval, as an context coordinate
      * @param {number} queryEnd - (exclusive) end of interval, as an context coordinate
-     * @return {FeatureInterval[]} list of feature intervals
+     * @return {FeatureSegment[]} list of feature intervals
      */
-    getFeaturesInInterval(queryStart: number, queryEnd: number): FeatureInterval[] {
+    getFeaturesInInterval(queryStart: number, queryEnd: number): FeatureSegment[] {
         const queryInterval = new OpenInterval(queryStart, queryEnd);
         const results = []
         for (let i = 0; i < this._features.length; i++) { // Check each feature for overlap with the query interval
@@ -249,7 +249,7 @@ class NavigationContext {
             if (overlap) {
                 const relativeStart = overlap.start - absStart;
                 const relativeEnd = overlap.end - absStart
-                results.push(new FeatureInterval(feature, relativeStart, relativeEnd));
+                results.push(new FeatureSegment(feature, relativeStart, relativeEnd));
             } else if (results.length > 0) { // No overlap
                 // Since features are sorted by absolute start, we can be confident that there will be no more overlaps
                 // if we have seen some before.
@@ -268,8 +268,8 @@ class NavigationContext {
      * @return {ChromosomeInterval[]} list of genomic locations
      */
     getLociInInterval(queryStart: number, queryEnd: number) {
-        const featureIntervals = this.getFeaturesInInterval(queryStart, queryEnd);
-        const genomeIntervals = featureIntervals.map(interval => interval.getGenomeCoordinates());
+        const featureSegments = this.getFeaturesInInterval(queryStart, queryEnd);
+        const genomeIntervals = featureSegments.map(interval => interval.getGenomeCoordinates());
         return ChromosomeInterval.mergeOverlaps(genomeIntervals);
     }
 }

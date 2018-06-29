@@ -2,9 +2,9 @@ import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import _ from 'lodash';
 import OpenInterval from './interval/OpenInterval';
-import FeatureInterval from './interval/FeatureInterval';
+import { FeatureSegment } from './interval/FeatureSegment';
 
-/**
+/**FeatureSegment
  * A data container for gene annotations.
  *
  * @author Daofeng Li and Silas Hsu
@@ -109,13 +109,13 @@ class Gene extends Feature {
     }
 
     /**
-     * @return {object} exons as lists of FeatureInterval
+     * @return {object} exons as lists of FeatureSegment
      */
-    getExonsAsFeatureIntervals() {
+    getExonsAsFeatureSegments() {
         const convertOneExon = (exon: OpenInterval) => {
             const relativeStart = exon.start - this.locus.start;
             const relativeEnd = exon.end - this.locus.start;
-            return new FeatureInterval(this, relativeStart, relativeEnd)
+            return new FeatureSegment(this, relativeStart, relativeEnd)
         }
         return {
             translated: this.translated.map(convertOneExon),

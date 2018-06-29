@@ -252,8 +252,8 @@ class Chromosomes extends React.PureComponent {
 
         let children = [];
         let x = 0;
-        for (let interval of viewRegion.getFeatureIntervals()) {
-            const drawWidth = drawModel.basesToXWidth(interval.getLength());
+        for (const segment of viewRegion.getFeatureSegments()) {
+            const drawWidth = drawModel.basesToXWidth(segment.getLength());
             children.push(<rect // Box for feature
                 key={"rect" + x}
                 x={x}
@@ -276,7 +276,7 @@ class Chromosomes extends React.PureComponent {
                 />);
             }
 
-            const labelSize = this.getSizeForFeatureLabel(interval.getName(), drawWidth); 
+            const labelSize = this.getSizeForFeatureLabel(segment.getName(), drawWidth); 
             if (labelSize) { // Label for feature, if it fits
                 children.push(
                     <text
@@ -285,7 +285,7 @@ class Chromosomes extends React.PureComponent {
                         y={labelOffset || DEFAULT_LABEL_OFFSET}
                         style={{textAnchor: "middle", fontWeight: "bold", fontSize: labelSize}}
                     >
-                        {interval.getName()}
+                        {segment.getName()}
                     </text>
                 );
             }

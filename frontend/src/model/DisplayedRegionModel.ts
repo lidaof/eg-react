@@ -1,6 +1,6 @@
 import OpenInterval from './interval/OpenInterval';
 import NavigationContext from './NavigationContext';
-import FeatureInterval from './interval/FeatureInterval';
+import { FeatureSegment } from './interval/FeatureSegment';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 
 /**
@@ -71,9 +71,9 @@ class DisplayedRegionModel {
     /**
      * Gets the features that overlap this view region in the navigation context.
      * 
-     * @return {FeatureInterval[]} list of feature intervals that overlap this view region
+     * @return {FeatureSegment[]} list of feature intervals that overlap this view region
      */
-    getFeatureIntervals(): FeatureInterval[] {
+    getFeatureSegments(): FeatureSegment[] {
         return this._navContext.getFeaturesInInterval(this._startBase, this._endBase);
     }
 

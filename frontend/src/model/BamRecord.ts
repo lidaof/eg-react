@@ -1,7 +1,7 @@
 import { Feature, REVERSE_STRAND_CHAR, FORWARD_STRAND_CHAR } from './Feature';
 import { BamFlags } from '../vendor/bbi-js/main/bam';
 import ChromosomeInterval from './interval/ChromosomeInterval';
-import FeatureInterval from './interval/FeatureInterval';
+import { FeatureSegment } from './interval/FeatureSegment';
 
 /**
  * Shape of objects from bbi-js.
@@ -121,13 +121,13 @@ export class BamRecord extends Feature {
 
     /**
      * Gets segments of the this instance that are aligned and skipped.  Returns an object with keys `aligned` and
-     * `skipped`, which contain those segments as a list of FeatureInterval.
+     * `skipped`, which contain those segments as a list of FeatureSegment.
      * 
      * @return {object}
      */
     getSegments() {
-        const aligned: FeatureInterval[] = [];
-        const skipped: FeatureInterval[] = [];
+        const aligned: FeatureSegment[] = [];
+        const skipped: FeatureSegment[] = [];
 
         // Compare op types, differentiating only between ops that skip and ops that don't.
         const opEquals = (op1: string, op2: string) => op1 === 'N' ? op2 === 'N' : op2 !== 'N';
@@ -145,7 +145,7 @@ export class BamRecord extends Feature {
             }
             i = j;
             const listToPush = currentSegmentOp === 'N' ? skipped : aligned;
-            listToPush.push(new FeatureInterval(this, currentOffset, currentOffset + currentSegmentLength));
+            listToPush.push(new FeatureSegment(this, currentOffset, currentOffset + currentSegmentLength));
             currentOffset += currentSegmentLength;
         }
 

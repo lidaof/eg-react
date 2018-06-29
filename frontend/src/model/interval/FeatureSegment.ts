@@ -7,7 +7,7 @@ import { Feature } from '../Feature';
  * @author Silas Hsu
  * @see Feature
  */
-class FeatureInterval {
+export class FeatureSegment {
     public relativeStart: number; // Start base of the interval, relative to the feature's start
     public relativeEnd: number; // End base of the interval, relative to the feature's start
 
@@ -40,12 +40,12 @@ class FeatureInterval {
     }
 
     get start() {
-        console.error("FeatureInterval has no prop `start`.  Use `relativeStart` instead.");
+        console.error("FeatureSegment has no prop `start`.  Use `relativeStart` instead.");
         return this.relativeStart;
     }
 
     get end() {
-        console.error("FeatureInterval has no prop `end`.  Use `relativeEnd` instead.");
+        console.error("FeatureSegment has no prop `end`.  Use `relativeEnd` instead.");
         return this.relativeEnd;
     }
 
@@ -78,13 +78,13 @@ class FeatureInterval {
     }
 
     /**
-     * Intersects this and a genome location, and returns the result as a new FeatureInterval using the same Feature
+     * Intersects this and a genome location, and returns the result as a new FeatureSegment using the same Feature
      * that is attached to this.  Returns null if the genome location does not intersect with this location at all.
      * 
      * @param {ChromosomeInterval} chrInterval - input genome location
-     * @return {FeatureInterval} intersection of this and the input genomic location
+     * @return {FeatureSegment} intersection of this and the input genomic location
      */
-    getOverlap(chrInterval: ChromosomeInterval): FeatureInterval {
+    getOverlap(chrInterval: ChromosomeInterval): FeatureSegment {
         const featureLocus = this.feature.getLocus();
         const genomeLocation = this.getGenomeCoordinates();
         const overlap = genomeLocation.getOverlap(chrInterval);
@@ -93,7 +93,7 @@ class FeatureInterval {
         }
         const relativeStart = overlap.start - featureLocus.start;
         const relativeEnd = overlap.end - featureLocus.start;
-        return new FeatureInterval(this.feature, relativeStart, relativeEnd);
+        return new FeatureSegment(this.feature, relativeStart, relativeEnd);
     }
 
     /**
@@ -107,12 +107,10 @@ class FeatureInterval {
      * Interprets this and another interval as a multi-feature interval, with this being the start and the other being
      * the end.  Returns a human-readable representation of that interpretation.
      * 
-     * @param {FeatureInterval} other - the end of the multi-feature interval
+     * @param {FeatureSegment} other - the end of the multi-feature interval
      * @return {string} a human-readable representation of a multi-feature interval
      */
-    toStringWithOther(other: FeatureInterval): string {
+    toStringWithOther(other: FeatureSegment): string {
         return `${this.getName()}:${this.relativeStart}-${other.getName()}:${other.relativeEnd}`;
     }
 }
-
-export default FeatureInterval;

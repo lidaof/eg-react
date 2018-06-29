@@ -3,7 +3,7 @@ import { Feature } from './Feature';
 import OpenInterval from './interval/OpenInterval';
 import LinearDrawingModel from './LinearDrawingModel';
 import NavigationContext from './NavigationContext';
-import FeatureInterval from './interval/FeatureInterval';
+import { FeatureSegment } from './interval/FeatureSegment';
 import { GenomeInteraction } from './GenomeInteraction';
 
 /**
@@ -21,7 +21,7 @@ export interface PlacedFeature {
 }
 
 export interface PlacedSegment {
-    segment: FeatureInterval; // The segment
+    segment: FeatureSegment; // The segment
     /**
      * Location of the segment in nav context coordiantes.  See note for contextLocation in PlacedFeature for important
      * details.
@@ -97,12 +97,12 @@ export class FeaturePlacer {
      * the parent feature, which can be obtained from `placeFeatures()`.  This effectively puts a limit on where
      * segments may map; there may be fewer placed segments than input segments.
      * 
-     * @param {FeatureInterval[]} segments - segments for which to get context locations
+     * @param {FeatureSegment[]} segments - segments for which to get context locations
      * @param {NavigationContext} navContext - navigation context to map to
      * @param {OpenInterval} contextLocationOfFeature - context location of the feature from which the segments came
      * @return {PlacedSegment[]} placed segments
      */
-    placeFeatureSegments(segments: FeatureInterval[], navContext: NavigationContext,
+    placeFeatureSegments(segments: FeatureSegment[], navContext: NavigationContext,
         contextLocationOfFeature: OpenInterval): PlacedSegment[]
     {
         /**

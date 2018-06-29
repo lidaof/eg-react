@@ -127,7 +127,7 @@ class GeneAnnotation extends React.Component {
         const centerLine = <line x1={startX} y1={centerY} x2={endX} y2={centerY} stroke={color} strokeWidth={2} />;
 
         // Exons, which are split into translated and non-translated ones (i.e. utrs)
-        const {translated, utrs} = gene.getExonsAsFeatureIntervals();
+        const {translated, utrs} = gene.getExonsAsFeatureSegments();
         const placedTranslated = FEATURE_PLACER.placeFeatureSegments(translated, navContext, contextLocation);
         const placedUtrs = FEATURE_PLACER.placeFeatureSegments(utrs, navContext, contextLocation);
 

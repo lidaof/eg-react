@@ -38,20 +38,20 @@ export class Gene extends Feature {
      * 
      * @param {BedRecord} record - BedRecord-like object to use
      * @param {NavigationContext} navContext - used to calculate absolute coordinates
-     * @param {FeatureInterval} featureInterval - a feature which overlaps this 
+     * @param {FeatureSegment} featureSegment - a feature which overlaps this 
      */
-    constructor(bedRecord, navContext, featureInterval) {
+    constructor(bedRecord, navContext, featureSegment) {
         const location = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
         super(null, location);
 
-        const absInterval = navContext.convertGenomeIntervalToBases(location, featureInterval);
+        const absInterval = navContext.convertGenomeIntervalToBases(location, featureSegment);
         if (!absInterval) {
             throw new RangeError("Cannot map this gene to the navigation context");
         }
 
         [this.absStart, this.absEnd] = absInterval;
         this._navContext = navContext;
-        this._featureInterval = featureInterval;
+        this._featureSegment = featureSegment;
         this._unparsedDetails = bedRecord.details;
     }
 
@@ -96,7 +96,7 @@ export class Gene extends Feature {
             details.absExons = [];
             for (let exon of details.exons) {
                 const exonLocation = new ChromosomeInterval(this.getLocus().chr, ...exon);
-                const exonInterval = this._navContext.convertGenomeIntervalToBases(exonLocation, this._featureInterval);
+                const exonInterval = this._navContext.convertGenomeIntervalToBases(exonLocation, this._featureSegment);
                 if (exonInterval) {
                     details.absExons.push(exonInterval)
                 }
@@ -120,7 +120,7 @@ export class GeneFormatter {
      * 
      * @param {BedRecord[]} bedRecords - the records to convert
      * @param {DisplayedRegionModel} region - object containing navigation context and view region
-     * @param {FeatureInterval} feature - feature in navigation context to map to
+     * @param {FeatureSegment} feature - feature in navigation context to map to
      * @return {Gene[]} array of Gene
      */
     format(records, region, feature) {

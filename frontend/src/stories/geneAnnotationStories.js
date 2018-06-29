@@ -9,7 +9,7 @@ import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import NavigationContext from '../model/NavigationContext';
 import Gene from '../model/Gene';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
-import FeatureInterval from '../model/interval/FeatureInterval';
+import { FeatureSegment } from '../model/interval/FeatureSegment';
 import RegionExpander from '../model/RegionExpander';
 import LinearDrawingModel from '../model/LinearDrawingModel';
 
