@@ -1,4 +1,4 @@
-import AnnotationTrackRenderer from './AnnotationTrackRenderer';
+import { AnnotationTrackConfig } from './AnnotationTrackConfig';
 import { configStaticDataSource } from './configDataFetch';
 import BedTrack from '../trackVis/bedTrack/BedTrack';
 
@@ -38,10 +38,8 @@ const withDataFetch = configStaticDataSource(
 );
 const BedTrackWithData = withDataFetch(BedTrack);
 
-class BigBedTrackRenderer extends AnnotationTrackRenderer {
+export class BigBedTrackConfig extends AnnotationTrackConfig {
     getComponent() {
         return BedTrackWithData;
     }
 }
-
-export default BigBedTrackRenderer;

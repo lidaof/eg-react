@@ -19,7 +19,9 @@
     "member-ordering": false,
     "variable-name": false,
     "max-classes-per-file": [true, 5],
-    "no-conditional-assignment": false
+    "no-conditional-assignment": false,
+    "no-unused-variable": { "severity": "warning" },
+    "jsx-no-lambda": { "severity": "warning" }
   },
   "jsRules": {
     "object-literal-sort-keys": false,

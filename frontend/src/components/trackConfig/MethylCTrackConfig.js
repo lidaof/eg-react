@@ -1,14 +1,17 @@
-import TrackRenderer from './TrackRenderer';
+import { TrackConfig } from './TrackConfig';
 import { configStaticDataSource } from './configDataFetch';
+
+import MethylCTrack, { DEFAULT_OPTIONS } from '../trackVis/MethylCTrack';
 
 import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import HeightConfig from '../trackContextMenu/HeightConfig';
 import CombineStrandConfig from '../trackContextMenu/CombineStrandConfig';
-import {MethylColorConfig, ReadDepthColorConfig} from '../trackContextMenu/MethylColorConfig';
-import MethylCTrack, { DEFAULT_OPTIONS } from '../trackVis/MethylCTrack';
+import { MethylColorConfig, ReadDepthColorConfig } from '../trackContextMenu/MethylColorConfig';
 
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 import BedWorker from '../../dataSources/bed/Bed.worker';
+import BedRecord from '../../dataSources/bed/BedRecord';
+
 import MethylCRecord from '../../model/MethylCRecord';
 
 /**
@@ -25,9 +28,9 @@ const withDataFetch = configStaticDataSource(
 );
 const TrackWithData = withDataFetch(MethylCTrack);
 
-class MethylCTrackRenderer extends TrackRenderer {
-    constructor(props) {
-        super(props);
+export class MethylCTrackConfig extends TrackConfig {
+    constructor(trackModel) {
+        super(trackModel);
         this.setDefaultOptions(DEFAULT_OPTIONS);
     }
 
@@ -40,5 +43,3 @@ class MethylCTrackRenderer extends TrackRenderer {
         return TrackWithData;
     }
 }
-
-export default MethylCTrackRenderer;

@@ -9,7 +9,7 @@ import Tooltip from './commonComponents/tooltip/Tooltip';
 import withTooltip from './commonComponents/tooltip/withTooltip';
 import configOptionMerging from './commonComponents/configOptionMerging';
 
-import RepeatMaskerFeature from '../../model/RepeatMaskerFeature';
+import { RepeatMaskerFeature } from '../../model/RepeatMaskerFeature';
 import { AnnotationDisplayModes } from '../../model/DisplayModes';
 
 import './commonComponents/tooltip/Tooltip.css';

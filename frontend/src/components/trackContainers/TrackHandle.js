@@ -1,7 +1,7 @@
 import React from 'react';
 import Reparentable from '../Reparentable';
 import TrackErrorBoundary from './TrackErrorBoundary';
-import getTrackRenderer from '../trackConfig/getTrackRenderer';
+import { getTrackConfig } from '../trackConfig/getTrackConfig';
 
 /**
  * Renders a track subtype wrapped in necessary components, such as an error boundary.  All props passed to this
@@ -22,7 +22,7 @@ class TrackHandle extends React.Component {
     }
 
     getTrackSpecialization(props) {
-        const renderer = getTrackRenderer(props.trackModel);
+        const renderer = getTrackConfig(props.trackModel);
         return {
             component: renderer.getComponent(),
             options: renderer.getOptions()

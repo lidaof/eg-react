@@ -1,25 +1,25 @@
 import Feature from './Feature';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 
-interface DASFeature {
-  genoLeft: string;
-  label: string;
-  max: number;
-  milliDel: string;
-  milliDiv: string;
-  milliIns: string;
-  min: number;
-  orientation: string;
-  repClass: string;
-  repEnd: string;
-  repFamily: string;
-  repLeft: string;
-  repStart: string;
-  score: number;
-  segment: string;
-  swScore: string;
-  type: string;
-  _chromId: number;
+export interface RepeatDASFeature {
+    genoLeft: string;
+    label: string;
+    max: number;
+    milliDel: string;
+    milliDiv: string;
+    milliIns: string;
+    min: number;
+    orientation: string;
+    repClass: string;
+    repEnd: string;
+    repFamily: string;
+    repLeft: string;
+    repStart: string;
+    score: number;
+    segment: string;
+    swScore: string;
+    type: string;
+    _chromId: number;
 }
 
 const CLASS_TO_ID = {
@@ -87,7 +87,7 @@ const DEFAULT_CLASS_COLORS = {
  * 
  * @author Daofeng Li
  */
-class RepeatMaskerFeature extends Feature {
+export class RepeatMaskerFeature extends Feature {
     static DEFAULT_CLASS_COLORS = DEFAULT_CLASS_COLORS;
 
     repClass: string;
@@ -121,9 +121,9 @@ class RepeatMaskerFeature extends Feature {
     /**
      * Constructs a new rmskRecord, given a properly-structured DASFeature
      *
-     * @param {DASFeature} record - DASFeature to use
+     * @param {RepeatDASFeature} record - DASFeature to use
      */
-    constructor(rmskRecord: DASFeature) {
+    constructor(rmskRecord: RepeatDASFeature) {
         const locus = new ChromosomeInterval(rmskRecord.segment, rmskRecord.min, rmskRecord.max);
         super(rmskRecord.label, locus, rmskRecord.orientation);
         this.repClass = rmskRecord.repClass;
@@ -165,5 +165,3 @@ class RepeatMaskerFeature extends Feature {
         return CLASS_ID_TO_DETAILS[this.getCategoryId()] || "???";
     }
 }
-
-export default RepeatMaskerFeature;

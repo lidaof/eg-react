@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-interface ITrackModelOptions {
+export interface TrackOptions {
     label?: string;
     [k: string]: any;
 }
@@ -14,7 +14,7 @@ interface ITrackModel {
     name: string;
     type?: string;
     filetype?: string;
-    options: ITrackModelOptions;
+    options: TrackOptions;
     url: string;
     metadata: ITrackModelMetadata;
 }
@@ -40,7 +40,7 @@ let nextId = 0;
  * 
  * @author Silas Hsu
  */
-class TrackModel {
+export class TrackModel {
     /**
      * Makes a new TrackModel based off the input plain object.  Bascially does a shallow copy of the object and sets
      * sets reasonable defaults for certain properties.
@@ -51,7 +51,7 @@ class TrackModel {
     type: string;
     label: string;
     filetype?: string;
-    options: ITrackModelOptions;
+    options: TrackOptions;
     url: string;
     metadata: ITrackModelMetadata;
     id: number;

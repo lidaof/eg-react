@@ -1,4 +1,4 @@
-import AnnotationTrackRenderer from './AnnotationTrackRenderer';
+import { AnnotationTrackConfig } from './AnnotationTrackConfig';
 import { configStaticDataSource } from './configDataFetch';
 import GeneAnnotationTrack, { DEFAULT_OPTIONS } from '../trackVis/geneAnnotationTrack/GeneAnnotationTrack';
 import GeneSource from '../../dataSources/GeneSource';
@@ -16,7 +16,7 @@ function formatDatabaseRecords(data) {
 const withDataFetch = configStaticDataSource(props => new GeneSource(props.trackModel), formatDatabaseRecords);
 const TrackWithData = withDataFetch(GeneAnnotationTrack);
 
-class GeneAnnotationTrackRenderer extends AnnotationTrackRenderer {
+export class GeneAnnotationTrackConfig extends AnnotationTrackConfig {
     constructor(trackModel) {
         super(trackModel);
         this.setDefaultOptions(DEFAULT_OPTIONS);
@@ -26,5 +26,3 @@ class GeneAnnotationTrackRenderer extends AnnotationTrackRenderer {
         return TrackWithData;
     }
 }
-
-export default GeneAnnotationTrackRenderer;

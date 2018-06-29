@@ -1,5 +1,5 @@
 import React from 'react';
-import AnnotationTrackRenderer from './AnnotationTrackRenderer';
+import { AnnotationTrackConfig } from './AnnotationTrackConfig';
 import { configStaticDataSource } from './configDataFetch';
 import BamTrack from '../trackVis/bamTrack/BamTrack';
 import BamSource from '../../dataSources/BamSource';
@@ -10,7 +10,7 @@ const withDataFetch = configStaticDataSource(props => new BamSource(props.trackM
 const BamTrackWithData = withDataFetch(BamTrack);
 // TODO move bam source to webworker and stop renderer bam track for excessively large regions
 
-class BamTrackRenderer extends AnnotationTrackRenderer {
+export class BamTrackConfig extends AnnotationTrackConfig {
     constructor(trackModel) {
         super(trackModel);
         this.setDefaultOptions({
@@ -34,5 +34,3 @@ class BamTrackRenderer extends AnnotationTrackRenderer {
 function MismatchColorConfig(props) {
     return <ColorConfig {...props} optionName="mismatchColor" label="Mismatched base color" />;
 }
-
-export default BamTrackRenderer;

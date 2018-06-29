@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import TrackModel from '../../model/TrackModel';
-import getTrackRenderer from '../trackConfig/getTrackRenderer';
+import { getTrackConfig } from '../trackConfig/getTrackConfig';
 
 import './TrackContextMenu.css';
 
@@ -63,16 +63,16 @@ class TrackContextMenu extends React.PureComponent {
      */
     renderTrackSpecificItems() {
         const selectedTracks = this.props.tracks.filter(track => track.isSelected);
-        const trackRenderers = selectedTracks.map(getTrackRenderer);
+        const trackConfigs = selectedTracks.map(getTrackConfig);
         let menuComponents = []; // Array of arrays, one for each track
         let optionsObjects = [];
-        for (let renderer of trackRenderers) {
-            const menuItems = renderer.getMenuComponents();
+        for (const config of trackConfigs) {
+            const menuItems = config.getMenuComponents();
             if (!menuItems) { // Intersecting anything with the empty set is the empty set, so we can stop right here.
                 return [];
             }
             menuComponents.push(menuItems);
-            optionsObjects.push(renderer.getOptions());
+            optionsObjects.push(config.getOptions());
         }
 
         const commonMenuComponents = _.intersection(...menuComponents);

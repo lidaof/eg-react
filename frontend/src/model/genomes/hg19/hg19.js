@@ -50,6 +50,11 @@ const defaultTracks = [
         genome: 'hg19'
     }),
     new TrackModel({
+        type: 'repeatmasker',
+        name: 'RepeatMasker',
+        url: 'https://vizhub.wustl.edu/public/hg19/rmsk16.bb'
+    }),
+    new TrackModel({
         type: 'bed',
         name: 'testbed',
         url: 'https://vizhub.wustl.edu/hubSample/hg19/bed.gz'

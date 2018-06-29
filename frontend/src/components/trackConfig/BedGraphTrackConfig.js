@@ -1,4 +1,4 @@
-import NumericalTrackRenderer from './NumericalTrackRenderer';
+import { NumericalTrackConfig } from './NumericalTrackConfig';
 import { configStaticDataSource } from './configDataFetch';
 import NumericalTrack from '../trackVis/commonComponents/numerical/NumericalTrack';
 
@@ -28,10 +28,8 @@ const withDataFetch = configStaticDataSource(props =>
 );
 const BedGraphTrack = withDataFetch(NumericalTrack);
 
-class BedGraphTrackRenderer extends NumericalTrackRenderer {
+export class BedGraphTrackConfig extends NumericalTrackConfig {
     getComponent() {
         return BedGraphTrack;
     }
 }
-
-export default BedGraphTrackRenderer;

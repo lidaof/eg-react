@@ -32,8 +32,8 @@ actually entire chromosomes, then the user can effectively navigate the whole ge
 5.  From `App`, descend into interested components.
 
 ## Making a new track type
-### Make a new TrackRenderer
-Make a new class that extends `TrackRenderer`, or one of its subclasses.  This class packages many essential track
+### Make a new TrackConfig
+Make a new class that extends `TrackConfig`, or one of its subclasses.  This class packages many essential track
 characteristics:
 
 * `getComponent()` - gets the component that renders the main visualizer and legend of the track.
@@ -42,11 +42,11 @@ in the `contextMenu` directory, or make new ones.
 * `getOptions()` - the visualizer probably renders with default options, like a color.  This method returns a plain
 object containing those options.
 
-You do not have to implement these methods immediately, as the base `TrackRenderer` class provides minimal defaults.
+You do not have to implement these methods immediately, as the base `TrackConfig` class provides minimal defaults.
 Just work on making the browser render *some* temporary placeholder at first.
 
-### Specify when to use the TrackRenderer
-1.  Import your new TrackRenderer into `trackConfig/getTrackRenderer.js`.
+### Specify when to use the TrackConfig
+1.  Import your new TrackConfig into `trackConfig/getTrackConfig.js`.
 2.  Add an appropriate entry to `TYPE_NAME_TO_SUBTYPE`, which maps track type name to track renderer.
 
 ### Write a new track visualizer component (implement `getComponent()`)
@@ -83,7 +83,7 @@ Default option objects look like the `options` prop of `TrackModel` objects.  Co
 if the track model does not specify them.  Make sure these options are consistent with the way you are rendering your
 track component!  The `configOptionMerging` HOC should help with that.
 
-Once you have a default options object, call `setDefaultOptions()` in the constructor of `TrackRenderer` to use them.
+Once you have a default options object, call `setDefaultOptions()` in the constructor of `TrackConfig` to use them.
 
 ## Performance tips
 Querying the width or height of any element, for example through `clientWidth` or `getBoundingClientRect()`, is slow.

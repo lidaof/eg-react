@@ -6,7 +6,7 @@ import VrRuler from './VrRuler';
 import { NumericalTrack3D } from './NumericalTrack3D';
 import { InteractionTrack3D } from './InteractionTrack3D';
 
-import { withDataFetch } from '../trackConfig/BigWigTrackRenderer';
+import { withDataFetch } from '../trackConfig/BigWigTrackConfig';
 import { configStaticDataSource } from '../trackConfig/configDataFetch';
 import { HicSource } from '../../dataSources/HicSource';
 

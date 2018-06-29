@@ -98,8 +98,7 @@ class TrackContainer extends React.Component {
                 width: 0,
                 viewRegion: null,
                 viewWindow: null,
-            },
-            trackRenderers: []
+            }
         };
 
         this.toggleTool = this.toggleTool.bind(this);
