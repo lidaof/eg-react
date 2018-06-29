@@ -62,8 +62,8 @@ export class FeatureAggregator {
         const placer = new FeaturePlacer();
         const placement = placer.placeFeatures(features, viewRegion, width);
         for (const placedFeature of placement) {
-            const startX = Math.floor(placedFeature.xLocation.start);
-            const endX = Math.ceil(placedFeature.xLocation.end);
+            const startX = Math.floor(placedFeature.xSpan.start);
+            const endX = Math.ceil(placedFeature.xSpan.end);
             for (let x = startX; x <= endX; x++) {
                 xToFeatures[x].push(placedFeature.feature);
             }

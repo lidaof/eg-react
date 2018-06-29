@@ -34,8 +34,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 continue;
             }
 
-            const xSpan1 = placedInteraction.xLocation1;
-            const xSpan2 = placedInteraction.xLocation2;
+            const {xSpan1, xSpan2} = placedInteraction;
             const xSpan1Center = 0.5 * (xSpan1.start + xSpan1.end);
             const xSpan2Center = 0.5 * (xSpan2.start + xSpan2.end);
             const spanCenter = 0.5 * (xSpan1Center + xSpan2Center);

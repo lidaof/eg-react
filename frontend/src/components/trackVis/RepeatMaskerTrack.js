@@ -68,8 +68,8 @@ class RepeatTrack extends React.PureComponent {
      * @return {JSX.Element} element visualizing the feature
      */
     renderAnnotation(placedFeature, unused, unused2, index) {
-        const {feature, xLocation} = placedFeature;
-        if (xLocation.getLength() <= 0) {
+        const {feature, xSpan} = placedFeature;
+        if (xSpan.getLength() <= 0) {
             return null;
         }
         const {categoryColors, height} = this.props.options;
@@ -84,9 +84,9 @@ class RepeatTrack extends React.PureComponent {
 
         return <rect
             key={index}
-            x={xLocation.start}
+            x={xSpan.start}
             y={y}
-            width={xLocation.getLength()}
+            width={xSpan.getLength()}
             height={drawHeight}
             fill={color}
             fillOpacity={0.75}

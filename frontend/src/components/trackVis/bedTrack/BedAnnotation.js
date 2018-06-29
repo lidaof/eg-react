@@ -21,7 +21,7 @@ class BedAnnotation extends React.Component {
 
     static propTypes = {
         feature: PropTypes.instanceOf(Feature).isRequired, // Feature to visualize
-        xRange: PropTypes.instanceOf(OpenInterval).isRequired, // x range the annotation will occupy
+        xSpan: PropTypes.instanceOf(OpenInterval).isRequired, // x span the annotation will occupy
         y: PropTypes.number, // Y offset
         color: PropTypes.string, // Primary color to draw
         reverseStrandColor: PropTypes.string, // Color of reverse strand annotations
@@ -41,10 +41,10 @@ class BedAnnotation extends React.Component {
     };
 
     render() {
-        const {feature, xRange, y, color, reverseStrandColor, isMinimal, onClick} = this.props;
+        const {feature, xSpan, y, color, reverseStrandColor, isMinimal, onClick} = this.props;
         const colorToUse = feature.getIsReverseStrand() ? reverseStrandColor : color;
         const contrastColor = getContrastingColor(colorToUse);
-        const [startX, endX] = xRange;
+        const [startX, endX] = xSpan;
         const width = endX - startX;
         if (width <= 0) {
             return null;

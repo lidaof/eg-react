@@ -62,11 +62,11 @@ export class BedTrack extends React.Component {
      * @return {JSX.Element} element visualizing the feature
      */
     renderAnnotation(placedFeature, y, isLastRow, index) {
-        const {feature, xLocation} = placedFeature
+        const {feature, xSpan} = placedFeature
         return <BedAnnotation
             key={index}
             feature={feature}
-            xRange={xLocation}
+            xSpan={xSpan}
             y={y}
             isMinimal={isLastRow}
             color={this.props.options.color}

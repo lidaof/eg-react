@@ -26,8 +26,7 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
                 continue;
             }
 
-            const xSpan1 = placedInteraction.xLocation1;
-            const xSpan2 = placedInteraction.xLocation2;
+            const {xSpan1, xSpan2} = placedInteraction;
             const gapCenter = (xSpan1.end + xSpan2.start) / 2;
             const gapLength = xSpan2.start - xSpan1.end;
             const topX = gapCenter;

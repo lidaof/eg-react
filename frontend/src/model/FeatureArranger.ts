@@ -34,8 +34,8 @@ export class FeatureArranger {
         for (const placedFeature of placements) {
             const horizontalPadding = isConstPadding ?
                 (padding as number) : (padding as PaddingFunc)(placedFeature.feature);
-            const startX = placedFeature.xLocation.start - horizontalPadding;
-            const endX = placedFeature.xLocation.end + horizontalPadding;
+            const startX = placedFeature.xSpan.start - horizontalPadding;
+            const endX = placedFeature.xSpan.end + horizontalPadding;
             // Find the first row where the interval won't overlap with others in the row
             let row = maxXsForRows.findIndex(maxX => maxX < startX);
             if (row === -1) { // Couldn't find a row -- make a new one

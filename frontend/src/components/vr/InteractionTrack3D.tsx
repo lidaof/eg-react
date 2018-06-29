@@ -49,8 +49,8 @@ export class InteractionTrack3D extends React.Component<InteractionTrack3DProps,
 
     renderOneInteraction(placement: PlacedInteraction, i: number): JSX.Element {
         // Center of the spans
-        const startX = (placement.xLocation1.start + placement.xLocation1.end) / 2;
-        const endX = (placement.xLocation2.start + placement.xLocation2.end) / 2;
+        const startX = (placement.xSpan1.start + placement.xSpan1.end) / 2;
+        const endX = (placement.xSpan2.start + placement.xSpan2.end) / 2;
         if (endX - startX <= 0) {
             return null;
         }
@@ -72,12 +72,12 @@ export class InteractionTrack3D extends React.Component<InteractionTrack3DProps,
             <Arc startX={startX} endX={endX} height={height} depth={depth} z={-depth - 1} opacity={OPACITY} />;
             <a-plane
                 position={`${startX} 0 ${-depth/2 - 1}`}
-                width={placement.xLocation1.getLength()}
+                width={placement.xSpan1.getLength()}
                 {...planeProps}
             />
             <a-plane
                 position={`${endX} 0 ${-depth/2 - 1}`}
-                width={placement.xLocation2.getLength()}
+                width={placement.xSpan2.getLength()}
                 {...planeProps}
             />
         </React.Fragment>

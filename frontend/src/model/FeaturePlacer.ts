@@ -17,7 +17,7 @@ export interface PlacedFeature {
      * navigation context (suppose that the context only contains chr1:50-100 but the feature is chr1:0-200).
      */
     contextLocation: OpenInterval;
-    xLocation: OpenInterval; // Horizontal location the feature should occupy
+    xSpan: OpenInterval; // Horizontal location the feature should occupy
 }
 
 export interface PlacedSegment {
@@ -35,17 +35,17 @@ export class PlacedInteraction {
     /**
      * x span to draw the first region of the interaction.  Guaranteed to have the lower start of both the two spans.
      */
-    xLocation1: OpenInterval;
-    xLocation2: OpenInterval; // x span to draw the second region of the interaction
+    xSpan1: OpenInterval;
+    xSpan2: OpenInterval; // x span to draw the second region of the interaction
 
-    constructor(interaction: GenomeInteraction, xLocation1: OpenInterval, xLocation2: OpenInterval) {
+    constructor(interaction: GenomeInteraction, xSpan1: OpenInterval, xSpan2: OpenInterval) {
         this.interaction = interaction;
-        if (xLocation1.start <= xLocation2.start) { // Ensure the x spans are ordered
-            this.xLocation1 = xLocation1;
-            this.xLocation2 = xLocation2;
+        if (xSpan1.start <= xSpan2.start) { // Ensure the x spans are ordered
+            this.xSpan1 = xSpan1;
+            this.xSpan2 = xSpan2;
         } else {
-            this.xLocation1 = xLocation2;
-            this.xLocation2 = xLocation1;
+            this.xSpan1 = xSpan2;
+            this.xSpan2 = xSpan1;
         }
     }
 
@@ -53,13 +53,13 @@ export class PlacedInteraction {
      * @return {number} the length of the interaction in draw coordinates
      */
     getWidth(): number {
-        const start = this.xLocation1.start; // Guaranteed to have to lower start
-        const end = Math.max(this.xLocation1.end, this.xLocation2.end);
+        const start = this.xSpan1.start; // Guaranteed to have to lower start
+        const end = Math.max(this.xSpan1.end, this.xSpan2.end);
         return end - start;
     }
 
     generateKey(): string {
-        return "" + this.xLocation1.start + this.xLocation1.end + this.xLocation2.start + this.xLocation2.end;
+        return "" + this.xSpan1.start + this.xSpan1.end + this.xSpan2.start + this.xSpan2.end;
     }
 }
 
@@ -81,9 +81,9 @@ export class FeaturePlacer {
         const placements = [];
         for (const feature of features) {
             for (const contextLocation of feature.computeNavContextCoordinates(navContext)) {
-                const xLocation = drawModel.baseSpanToXSpan(contextLocation, true);
-                if (xLocation) {
-                    placements.push({ feature, contextLocation, xLocation });
+                const xSpan = drawModel.baseSpanToXSpan(contextLocation, true);
+                if (xSpan) {
+                    placements.push({ feature, contextLocation, xSpan });
                 }
             }
         }
@@ -145,10 +145,10 @@ export class FeaturePlacer {
             const contextLocations2 = navContext.convertGenomeIntervalToBases(interaction.locus2);
             for (const location1 of contextLocations1) {
                 for (const location2 of contextLocations2) {
-                    const xLocation1 = drawModel.baseSpanToXSpan(location1, true);
-                    const xLocation2 = drawModel.baseSpanToXSpan(location2, true);
-                    if (xLocation1 && xLocation2) {
-                        mappedInteractions.push(new PlacedInteraction(interaction, xLocation1, xLocation2));
+                    const xSpan1 = drawModel.baseSpanToXSpan(location1, true);
+                    const xSpan2 = drawModel.baseSpanToXSpan(location2, true);
+                    if (xSpan1 && xSpan2) {
+                        mappedInteractions.push(new PlacedInteraction(interaction, xSpan1, xSpan2));
                     }
                 }
             }
