@@ -4,10 +4,10 @@ import { FeatureSegment } from './interval/FeatureSegment';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 
 /**
- * Index nav context coordinates from this number.  You should not modify this, as pretty much all the code assumes
+ * Index bases starting from 0.  Changing this will probably break a lot of things, as a lot of the code assumes
  * 0-indexing.
  */
-const MIN_ABS_BASE = 0;
+const MIN_BASE = 0;
 
 /**
  * Model that stores the view window/region in a larger navigation context (e.g. a genome).  Internally stores the
@@ -28,7 +28,7 @@ class DisplayedRegionModel {
      * @param {number} [start] - initial start of the view region
      * @param {number} [end] - initial end of the view region
      */
-    constructor(navContext: NavigationContext, start=MIN_ABS_BASE, end?: number) {
+    constructor(navContext: NavigationContext, start=MIN_BASE, end?: number) {
         this._navContext = navContext;
         if (end === undefined) {
             end = navContext.getTotalBases();
@@ -64,7 +64,7 @@ class DisplayedRegionModel {
      *
      * @return {OpenInterval} copy of the internally stored region
      */
-    getAbsoluteRegion(): OpenInterval {
+    getContextCoordinates(): OpenInterval {
         return new OpenInterval(this._startBase, this._endBase);
     }
 
@@ -110,13 +110,13 @@ class DisplayedRegionModel {
 
         const newLength = end - start;
         const navigableLength = this._navContext.getTotalBases();
-        if (start < MIN_ABS_BASE) { // Left cut off; we need to extend right side
-            end = MIN_ABS_BASE + newLength;
+        if (start < MIN_BASE) { // Left cut off; we need to extend right side
+            end = MIN_BASE + newLength;
         } else if (end > navigableLength) { // Ditto for right
             start = navigableLength - newLength;
         }
 
-        this._startBase = Math.round(Math.max(MIN_ABS_BASE, start));
+        this._startBase = Math.round(Math.max(MIN_BASE, start));
         this._endBase = Math.round(Math.min(end, navigableLength));
         return this;
     }
@@ -157,9 +157,9 @@ class DisplayedRegionModel {
         }
 
         const newWidth = this.getWidth() * factor;
-        const absFocalPoint = this.getWidth() * focalPoint + this._startBase;
-        const newAbsFocalPoint = newWidth * focalPoint + this._startBase;
-        const panAmount = absFocalPoint - newAbsFocalPoint;
+        const focalBase = this.getWidth() * focalPoint + this._startBase;
+        const newFocalBase = newWidth * focalPoint + this._startBase;
+        const panAmount = focalBase - newFocalBase;
 
         // Raw start and end: not rounded or checked to be within the genome
         const rawStart = this._startBase + panAmount;

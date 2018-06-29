@@ -16,8 +16,8 @@ class TrackRegionController extends React.Component {
         /**
          * Called when the user types a region to go to and it is successfully parsed.  Has the signature
          *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the interval
-         *         `newEnd`: the absolute base number of the end of the interval
+         *         `newStart`: the nav context coordinate of the start of the interval
+         *         `newEnd`: the nav context coordinate of the end of the interval
          */
         onRegionSelected: PropTypes.func.isRequired,
     }

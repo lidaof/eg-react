@@ -38,8 +38,8 @@ class GeneSearchBox extends React.PureComponent {
         /**
          * Called when the user chooses a gene and wants to go to it in the nav context.  Signature:
          *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the view interval
-         *         `newEnd`: the absolute base number of the end of the view interval
+         *         `newStart`: the nav context coordinate of the start of the view interval
+         *         `newEnd`: the nav context coordinate of the end of the view interval
          */
         onRegionSelected: PropTypes.func.isRequired,
     };

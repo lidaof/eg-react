@@ -24,8 +24,8 @@ class GenomeNavigator extends React.Component {
         /**
          * Called when the user selects a new region to display.  Has the signature
          *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the selected interval
-         *         `newEnd`: the absolute base number of the end of the selected interval
+         *         `newStart`: the nav context coordinate of the start of the selected interval
+         *         `newEnd`: the nav context coordinate of the end of the selected interval
          */
         onRegionSelected: PropTypes.func
     };
@@ -97,8 +97,8 @@ class GenomeNavigator extends React.Component {
     /**
      * Wrapper for calling setRegion() on the view model
      * 
-     * @param {number} newStart - start absolute base number
-     * @param {number} newEnd - end absolute base number
+     * @param {number} newStart - start nav context coordinate
+     * @param {number} newEnd - end nav context coordinate
      * @see DisplayedRegionModel#setRegion
      */
     setNewView(newStart, newEnd) {

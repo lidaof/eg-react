@@ -69,9 +69,9 @@ class IsoformSelection extends React.PureComponent {
 
     renderSuggestions() {
         const navContext = this.props.genomeConfig.navContext;
-        const absLocations = this.state.genes.map(gene => gene.computeNavContextCoordinates(navContext)[0]);
-        const leftmostStart = Math.min(...absLocations.map(location => location.start));
-        const rightmostEnd = Math.max(...absLocations.map(location => location.end));
+        const contextIntervals = this.state.genes.map(gene => gene.computeNavContextCoordinates(navContext)[0]);
+        const leftmostStart = Math.min(...contextIntervals.map(location => location.start));
+        const rightmostEnd = Math.max(...contextIntervals.map(location => location.end));
         const viewRegion = new DisplayedRegionModel(navContext, leftmostStart, rightmostEnd);
         const drawModel = new LinearDrawingModel(viewRegion, DRAW_WIDTH);
 
@@ -88,7 +88,7 @@ class IsoformSelection extends React.PureComponent {
                     <StandaloneGeneAnnotation
                         gene={gene}
                         navContext={navContext}
-                        contextLocation={absLocations[i]}
+                        contextLocation={contextIntervals[i]}
                         drawModel={drawModel}
                     />
                 </div>

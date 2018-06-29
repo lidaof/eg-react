@@ -5,7 +5,7 @@ import NavigationContext from '../NavigationContext';
 function expectRegion(instance, start, end) {
     // For a less flaky test, I would want to manually compare just the `start` and `end` props, but done this way,
     // failure messages are more readable.
-    expect(instance.getAbsoluteRegion()).toEqual({start: start, end: end});
+    expect(instance.getContextCoordinates()).toEqual({start: start, end: end});
 }
 
 const NAV_CONTEXT = new NavigationContext("Gee, gnome!", CHROMOSOMES);

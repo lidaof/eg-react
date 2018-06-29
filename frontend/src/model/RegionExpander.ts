@@ -50,10 +50,10 @@ class RegionExpander {
         const expandedRegion = region.clone().zoom(this.zoomRatio);
         const expandedWidth = expandedRegion.getWidth() * pixelsPerBase;
 
-        const originalAbsRegion = region.getAbsoluteRegion();
-        const expandedAbsRegion = expandedRegion.getAbsoluteRegion();
-        const leftBaseDiff = originalAbsRegion.start - expandedAbsRegion.start;
-        const rightBaseDiff = expandedAbsRegion.end - originalAbsRegion.end;
+        const originalContextInterval = region.getContextCoordinates();
+        const expandedContextInterval = expandedRegion.getContextCoordinates();
+        const leftBaseDiff = originalContextInterval.start - expandedContextInterval.start;
+        const rightBaseDiff = expandedContextInterval.end - originalContextInterval.end;
 
         const leftExtraPixels = leftBaseDiff * pixelsPerBase;
         const rightExtraPixels = rightBaseDiff * pixelsPerBase;

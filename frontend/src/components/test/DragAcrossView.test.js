@@ -48,17 +48,17 @@ it("calls the onViewDragStart callback and w/ the right args", () => {
 const testDrag = function(functionName, mockCallback) {
     const event = {};
     let coordinateDiff = { dx: 0, dy: 0 };
-    let absRegion = viewRegion.getAbsoluteRegion();
+    let contextInterval = viewRegion.getContextCoordinates();
     instance[functionName](event, coordinateDiff);
     expect(mockCallback).toHaveBeenCalledTimes(1);
-    expect(mockCallback).toHaveBeenCalledWith(absRegion.start, absRegion.end, event, coordinateDiff);
+    expect(mockCallback).toHaveBeenCalledWith(contextInterval.start, contextInterval.end, event, coordinateDiff);
 
     mockCallback.mockClear();
 
     const coordinateDiff2 = { dx: VIEW_WIDTH, dy: 0 };
     // Dragged to the right, and therefore the view region should move one whole width to the LEFT.
-    const expectedStart = absRegion.start - viewRegion.getWidth();
-    const expectedEnd = absRegion.end - viewRegion.getWidth();
+    const expectedStart = contextInterval.start - viewRegion.getWidth();
+    const expectedEnd = contextInterval.end - viewRegion.getWidth();
     instance[functionName](event, coordinateDiff2);
     expect(mockCallback).toHaveBeenCalledTimes(1);
     expect(mockCallback).toHaveBeenCalledWith(expectedStart, expectedEnd, event, coordinateDiff2);

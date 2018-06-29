@@ -45,7 +45,7 @@ xdescribe('Main pane', () => {
             .then((newRegion) => { // Assert that the correct region was selected
                 expect(newRegion).toBeTruthy();
                 expect(newRegion.start).toBeCloseTo(0);
-                expect(newRegion.end).toBeCloseTo(story.viewRegion.getAbsoluteRegion().end, -2); // -2 means "within 50."
+                expect(newRegion.end).toBeCloseTo(story.viewRegion.getContextCoordinates().end, -2); // -2 means "within 50."
                 return nightmare.end();
             });
     }, 10000);

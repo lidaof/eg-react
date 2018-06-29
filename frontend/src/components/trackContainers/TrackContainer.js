@@ -62,8 +62,8 @@ class TrackContainer extends React.Component {
         /**
          * Callback for when a new region is selected.  Signature:
          *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the new view interval
-         *         `newEnd`: the absolute base number of the end of the new view interval
+         *         `newStart`: the nav context coordinate of the start of the new view interval
+         *         `newEnd`: the nav context coordinate of the end of the new view interval
          */
         onNewRegion: PropTypes.func,
         /**

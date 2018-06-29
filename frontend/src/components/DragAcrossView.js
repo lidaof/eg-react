@@ -34,8 +34,8 @@ class DragAcrossView extends React.Component {
         /**
          * Called during dragging, when the user has not let go of the mouse and is moving it around.  Has the signature
          *     (newStart: number, newEnd: number, event: MouseEvent, coordinateDiff: {dx: number, dy: number}): void
-         *         `newStart`: the absolute base number of the start of the view region if it were centered on the mouse
-         *         `newEnd`: the absolute base number of the end of the view region if it were centered on the mouse
+         *         `newStart`: nav context coordinate of the start of the view region if it were centered on the mouse
+         *         `newEnd`: nav context coordinate of the end of the view region if it were centered on the mouse
          *         `event`: the MouseEvent that triggered this event
          *         `coordinateDiff`: the location of the mouse relative to where the drag started
          */
@@ -97,11 +97,11 @@ class DragAcrossView extends React.Component {
     }
 
     /**
-     * Calculates the absolute displayed region panned by some number of pixels.  Does not modify any of the inputs.
+     * Calculates the displayed region panned by some number of pixels.  Does not modify any of the inputs.
      * 
      * @param {DisplayedRegionModel} viewRegion - drawing model used to convert from pixels to bases
      * @param {number} xDiff - number of pixels to pan the region
-     * @return {object} - absolute region resulting from panning the input region
+     * @return {object} - region resulting from panning the input region
      */
     _getRegionOffsetByX(viewRegion, event, xDiff) {
         const drawModel = new LinearDrawingModel(
@@ -109,7 +109,7 @@ class DragAcrossView extends React.Component {
             this.props.widthOverride || event.currentTarget.clientWidth
         );
         let baseDiff = drawModel.xWidthToBases(xDiff);
-        let startRegion = viewRegion.getAbsoluteRegion();
+        let startRegion = viewRegion.getContextCoordinates();
         return {
             start: startRegion.start + baseDiff,
             end: startRegion.end + baseDiff,

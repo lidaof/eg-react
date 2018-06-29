@@ -81,11 +81,12 @@ export class RulerDesigner {
 
         const segments = this._viewRegion.getFeatureSegments();
         for (const segment of segments) {
-            const featureAbsStart = this._viewRegion.getNavigationContext().getFeatureStart(segment.getName());
-            const majorTickEndX = this._drawModel.baseToX(featureAbsStart + segment.relativeEnd);
+            // Start of segment's feature, in context coordinates
+            const featureContextCoordinate = this._viewRegion.getNavigationContext().getFeatureStart(segment.getName());
+            const majorTickEndX = this._drawModel.baseToX(featureContextCoordinate + segment.relativeEnd);
             // relativeBase = round down to the nearest major tick base for this region, to find where to start drawing
             const relativeBase = Math.floor(segment.relativeStart / basesPerMajorTick) * basesPerMajorTick;
-            let majorX = this._drawModel.baseToX(featureAbsStart + relativeBase);
+            let majorX = this._drawModel.baseToX(featureContextCoordinate + relativeBase);
 
             // This loop updates relativeBase and majorX every iteration
             // Draw major and minor ticks for this region (chromosome)

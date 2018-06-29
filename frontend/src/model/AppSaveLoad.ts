@@ -28,7 +28,7 @@ export class AppStateSaver {
         const regionSetViewIndex = appState.regionSets.findIndex(set => set === appState.regionSetView);
         const object = {
             genomeName: appState.genomeName,
-            viewInterval: appState.viewRegion ? appState.viewRegion.getAbsoluteRegion().serialize() : null,
+            viewInterval: appState.viewRegion ? appState.viewRegion.getContextCoordinates().serialize() : null,
             tracks: appState.tracks,
             metadataTerms: appState.metadataTerms,
             regionSets: appState.regionSets.map(set => set.serialize()),

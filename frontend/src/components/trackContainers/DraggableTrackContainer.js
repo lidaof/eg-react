@@ -21,8 +21,8 @@ class DraggableTrackContainer extends React.Component {
         /**
          * Callback for when a new region is selected.  Signature:
          *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the new view interval
-         *         `newEnd`: the absolute base number of the end of the new view interval
+         *         `newStart`: the nav context coordinate of the start of the new view interval
+         *         `newEnd`: the nav context coordinate of the end of the new view interval
          */
         onNewRegion: PropTypes.func,
     };
@@ -67,8 +67,8 @@ class DraggableTrackContainer extends React.Component {
     /**
      * Called when the user finishes dragging the track, signaling a new track display region.
      * 
-     * @param {number} newStart - absolute start base pair of the new display region
-     * @param {number} newEnd - absolute end base number of the new display region
+     * @param {number} newStart - start of the new display region in nav context coordinates
+     * @param {number} newEnd - end of the new display region in nav context coordinates
      * @param {React.SyntheticEvent} [unusedEvent] - unused
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */

@@ -41,16 +41,16 @@ class MainPane extends React.Component {
         /**
          * Called when the user selects a new region to display.  Has the signature
          *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the selected interval
-         *         `newEnd`: the absolute base number of the end of the selected interval
+         *         `newStart`: the nav context coordinate of the start of the selected interval
+         *         `newEnd`: the nav context coordinate of the end of the selected interval
          */
         onRegionSelected: PropTypes.func,
 
         /**
          * Called when the user wants to view a new region.
          *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the interval for the pane to display next
-         *         `newEnd`: the absolute base number of the end of the interval for the pane to display next
+         *         `newStart`: the nav context coordinate of the start of the interval for the pane to display next
+         *         `newEnd`: the nav context coordinate of the end of the interval for the pane to display next
          */
         onNewViewRequested: PropTypes.func,
 

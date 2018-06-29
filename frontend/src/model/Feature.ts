@@ -99,7 +99,7 @@ export class Feature {
     }
 
     /**
-     * Shortcut for navContext.convertGenomeIntervalToBases().  Computes absolute coordinates occupied by this
+     * Shortcut for navContext.convertGenomeIntervalToBases().  Computes nav context coordinates occupied by this
      * instance's locus.
      * 
      * @param {NavigationContext} navContext - the navigation context for which to compute coordinates

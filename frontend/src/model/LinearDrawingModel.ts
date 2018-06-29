@@ -55,23 +55,23 @@ class LinearDrawingModel {
     }
 
     /**
-     * Given an absolute base number, gets the X coordinate that represents that base.
+     * Given an nav context coordinate, gets the X coordinate that represents that base.
      * 
-     * @param {number} base - absolute base coordinate
+     * @param {number} base - nav context coordinate
      * @return {number} X coordinate that represents the input base
      */
     baseToX(base: number): number {
-        return (base - this._viewRegion.getAbsoluteRegion().start) * this._pixelsPerBase;
+        return (base - this._viewRegion.getContextCoordinates().start) * this._pixelsPerBase;
     }
 
     /**
-     * Given an X coordinate representing a base, gets the absolute base number.
+     * Given an X coordinate representing a base, gets the nav context coordinate.
      * 
      * @param {number} pixel - X coordinate that represents a base
-     * @return {number} absolute base coordinate
+     * @return {number} nav context coordinate
      */
     xToBase(pixel: number): number {
-        return pixel * this._basesPerPixel + this._viewRegion.getAbsoluteRegion().start;
+        return pixel * this._basesPerPixel + this._viewRegion.getContextCoordinates().start;
     }
 
     /**
@@ -104,8 +104,8 @@ class LinearDrawingModel {
      * @return {ChromosomeInterval} genomic coordinate that the pixel represents
      */
     xToGenomeCoordinate(pixel: number): ChromosomeInterval {
-        const absBase = this.xToBase(pixel);
-        const featureCoord = this._viewRegion.getNavigationContext().convertBaseToFeatureCoordinate(absBase);
+        const contextBase = this.xToBase(pixel);
+        const featureCoord = this._viewRegion.getNavigationContext().convertBaseToFeatureCoordinate(contextBase);
         return featureCoord.getGenomeCoordinates();
     }
 }

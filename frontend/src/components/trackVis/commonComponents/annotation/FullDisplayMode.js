@@ -36,10 +36,8 @@ class FullDisplayMode extends React.Component {
         /**
          * Callback for getting an annotation element to render.  Signature:
          * (    
-         *      feature: Feature, // Feature for which to get annotation element
-         *      absLocation: OpenInterval, // Location of the feature in navigation context
-         *      xLocation: OpenInterval, // x coordinate range the annotation should occupy
-         *      y: number, // y coordinate of the top of the annotation
+         *      placedFeature: PlacedFeature, // The feature to draw, and drawing info
+         *      y: number, // Suggested y coordinate of the top of the annotation
          *      isLastRow: boolean // Whether the annotation is assigned to the last configured row
          *      index: number // Iteration index; could be useful as a key
          * ): JSX.Element

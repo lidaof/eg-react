@@ -19,8 +19,7 @@ class Gene extends Feature {
     _utrs: OpenInterval[];
 
     /**
-     * Constructs a new Gene, given an entry from MongoDB.  The other parameters calculate absolute
-     * coordinates.
+     * Constructs a new Gene, given an entry from MongoDB.  The other parameters calculate nav context coordinates.
     @example
     {
         "_id": "5a6a4edfc019c4d5b606c0e8",

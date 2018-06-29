@@ -96,8 +96,8 @@ class Chromosomes extends React.PureComponent {
         if (this.props.viewRegion !== nextProps.viewRegion) {
             const drawModel = new LinearDrawingModel(nextProps.viewRegion, nextProps.width);
             if (drawModel.basesToXWidth(1) > MIN_DRAW_WIDTH) {
-                const thisInterval = this.props.viewRegion.getAbsoluteRegion();
-                const nextInterval = nextProps.viewRegion.getAbsoluteRegion();
+                const thisInterval = this.props.viewRegion.getContextCoordinates();
+                const nextInterval = nextProps.viewRegion.getContextCoordinates();
                 const diff = nextInterval.start - thisInterval.start;
                 const padding = Math.min(Math.abs(diff), nextInterval.getLength());
                 if (diff > 0) {
@@ -117,11 +117,12 @@ class Chromosomes extends React.PureComponent {
      * @param {LinearDrawingModel} drawModel 
      */
     renderOneCytoband(cytoband, cytobandLocus, drawModel) {
-        const absIntervals = this.props.viewRegion.getNavigationContext().convertGenomeIntervalToBases(cytobandLocus);
-        let children = [];
-        for (let absInterval of absIntervals) {
-            const startX = Math.max(0, drawModel.baseToX(absInterval.start));
-            const endX = Math.min(drawModel.baseToX(absInterval.end), drawModel.getDrawWidth());
+        const contextIntervals = this.props.viewRegion.getNavigationContext()
+            .convertGenomeIntervalToBases(cytobandLocus);
+        const children = [];
+        for (const contextInterval of contextIntervals) {
+            const startX = Math.max(0, drawModel.baseToX(contextInterval.start));
+            const endX = Math.min(drawModel.baseToX(contextInterval.end), drawModel.getDrawWidth());
             const drawWidth = endX - startX;
             const colors = CYTOBAND_COLORS[cytoband.gieStain];
             const name = cytoband.name;

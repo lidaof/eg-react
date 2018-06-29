@@ -39,8 +39,8 @@ class SelectedRegionBox extends React.Component {
         /**
          * Called when the user presses the "GOTO" button to quicky scroll the view to the selected track region.
          *     (newStart: number, newEnd: number): void
-         *         `newStart`: the absolute base number of the start of the interval to scroll to
-         *         `newEnd`: the absolute base number of the end of the interval to scroll to
+         *         `newStart`: the nav context coordinate of the start of the interval to scroll to
+         *         `newEnd`: the nav context coordinate of the end of the interval to scroll to
          */
         onNewViewRequested: PropTypes.func.isRequired, // Function that takes arguments [number, number]
     }
@@ -56,14 +56,14 @@ class SelectedRegionBox extends React.Component {
      * @param {React.SyntheticEvent} event - event fired from the GOTO button
      */
     gotoPressed(event) {
-        let selectedAbsRegion = this.props.selectedRegion.getAbsoluteRegion();
+        let selectedRegion = this.props.selectedRegion.getContextCoordinates();
         let halfWidth = 0;
         if (this.props.selectedRegion.getWidth() < this.props.viewRegion.getWidth()) {
             halfWidth = this.props.viewRegion.getWidth() * 0.5;
         } else {
             halfWidth = this.props.selectedRegion.getWidth() * 3;
         }
-        let regionCenter = (selectedAbsRegion.end + selectedAbsRegion.start) * 0.5;
+        let regionCenter = (selectedRegion.end + selectedRegion.start) * 0.5;
         this.props.onNewViewRequested(regionCenter - halfWidth, regionCenter + halfWidth);
     }
 
@@ -76,11 +76,11 @@ class SelectedRegionBox extends React.Component {
         const {viewRegion, selectedRegion, x, y} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, this.props.width);
         let drawWidth = drawModel.getDrawWidth();
-        let absRegion = selectedRegion.getAbsoluteRegion();
+        let region = selectedRegion.getContextCoordinates();
 
         // We limit the box's start and end X because SVGs don't like to be billions of pixels wide.
-        let xStart = Math.max(-10, drawModel.baseToX(absRegion.start));
-        let xEnd = Math.min(drawWidth + 10, drawModel.baseToX(absRegion.end));
+        let xStart = Math.max(-10, drawModel.baseToX(region.start));
+        let xEnd = Math.min(drawWidth + 10, drawModel.baseToX(region.end));
         let width = Math.max(0, xEnd - xStart);
         const box = <rect x={xStart} y={0} width={width} height={BOX_HEIGHT} style={BOX_STYLE} />;
 

@@ -59,7 +59,7 @@ it('sets the right view region when zooming', () => {
     instance.zoom(0.5, 0.5);
     rendered.update();
     const model = getViewModelFromMainPane();
-    expect(model.getAbsoluteRegion()).toEqual({start: 750, end: 2250});
+    expect(model.getContextCoordinates()).toEqual({start: 750, end: 2250});
 });
 
 it('prohibits zooming in too far', () => {
@@ -72,7 +72,7 @@ it('setNewView() actually sets a new view', () => {
     instance.setNewView(1000, 2000);
     rendered.update();
     const model = getViewModelFromMainPane();
-    expect(model.getAbsoluteRegion()).toEqual({start: 1000, end: 2000});
+    expect(model.getContextCoordinates()).toEqual({start: 1000, end: 2000});
 });
 
 it('zoomSliderDragged() zooms properly', () => {
@@ -80,5 +80,5 @@ it('zoomSliderDragged() zooms properly', () => {
         target: {value: Math.log(500)} // Target region size of 500
     });
     const model = getViewModelFromMainPane();
-    expect(model.getAbsoluteRegion()).toEqual({start: 1250, end: 1750});
+    expect(model.getContextCoordinates()).toEqual({start: 1250, end: 1750});
 });

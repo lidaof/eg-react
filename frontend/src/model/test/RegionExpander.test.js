@@ -10,7 +10,7 @@ beforeEach(() => {
 it('expands a region in the middle of the genome correctly', () => {
     let region = makeToyRegion(10, 15);
     let expansion = instance.calculateExpansion(region.getWidth(), region); // 1 base per pixel
-    expect(expansion.viewRegion.getAbsoluteRegion()).toEqual({
+    expect(expansion.viewRegion.getContextCoordinates()).toEqual({
         start: 5,
         end: 20
     });
@@ -23,7 +23,7 @@ it('expands a region in the middle of the genome correctly', () => {
 it('expands a region on the edge of the genome correctly', () => {
     let region = makeToyRegion(0, 5);
     let expansion = instance.calculateExpansion(region.getWidth(), region); // 1 base per pixel
-    expect(expansion.viewRegion.getAbsoluteRegion()).toEqual({
+    expect(expansion.viewRegion.getContextCoordinates()).toEqual({
         start: 0,
         end: 15
     });
@@ -35,7 +35,7 @@ it('expands a region on the edge of the genome correctly', () => {
 it('does not modify a region that already spans the entire genome', () => {
     let region = makeToyRegion(0, 30);
     let expansion = instance.calculateExpansion(region.getWidth(), region); // 1 base per pixel
-    expect(expansion.viewRegion.getAbsoluteRegion()).toEqual({
+    expect(expansion.viewRegion.getContextCoordinates()).toEqual({
         start: 0,
         end: 30
     });
