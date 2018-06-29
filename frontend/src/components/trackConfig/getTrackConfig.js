@@ -8,6 +8,7 @@ import { GeneAnnotationTrackConfig } from './GeneAnnotationTrackConfig';
 import { HicTrackConfig } from './HicTrackConfig';
 import { MethylCTrackConfig } from './MethylCTrackConfig';
 import { RepeatMaskerTrackConfig } from './RepeatMaskerTrackConfig';
+import { GenomeAlignTrackConfig } from './GenomeAlignTrackConfig';
 import { RulerTrackConfig } from './RulerTrackConfig';
 
 const TYPE_NAME_TO_CONFIG = {
@@ -20,6 +21,7 @@ const TYPE_NAME_TO_CONFIG = {
     "geneannotation": GeneAnnotationTrackConfig,
     "methylc": MethylCTrackConfig,
     "repeatmasker": RepeatMaskerTrackConfig,
+    "genomealign": GenomeAlignTrackConfig,
     "ruler": RulerTrackConfig,
 };
 const DefaultConfig = TrackConfig;

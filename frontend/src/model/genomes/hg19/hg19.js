@@ -70,6 +70,11 @@ const defaultTracks = [
         url: "https://wangftp.wustl.edu/~dli/test/a.bam"
     }),
     new TrackModel({
+        type: "genomealign",
+        name: "mm10 to hg19 blatz",
+        url: "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm10_axt.gz"
+    }),
+    new TrackModel({
         type: "ruler",
         name: "Ruler",
     })
