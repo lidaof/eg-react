@@ -71,7 +71,7 @@ const defaultTracks = [
     }),
     new TrackModel({
         type: "genomealign",
-        name: "mm10 to hg19 blatz",
+        name: "mm10 to hg19 blastz",
         url: "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm10_axt.gz"
     }),
     new TrackModel({
