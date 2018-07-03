@@ -15,15 +15,15 @@ import './TrackManager.css';
  */
 const SUBMENUS = [
     {
-        buttonText: "Annotation tracks...",
+        buttonText: "Annotation tracks",
         component: AnnotationTrackSelector,
     },
     {
-        buttonText: "Data hubs...",
+        buttonText: "Data hubs",
         component: HubPane,
     },
     {
-        buttonText: "Custom track...",
+        buttonText: "Custom track",
         component: CustomTrackAdder,
     },
 ];
@@ -80,7 +80,7 @@ class TrackManager extends React.Component {
         const currentTrackList = addedTracks.map((track, index) => (
             <li key={index}>
                 {track.getDisplayLabel()}
-                <button className="btn btn-danger" onClick={() => onTrackRemoved(index)} >Remove</button>
+                <span className="btn btn-link TrackManager-remove-track-button" onClick={() => onTrackRemoved(index)} >✘</span>
             </li>
             )
         );
@@ -88,7 +88,7 @@ class TrackManager extends React.Component {
         const submenuButtons = SUBMENUS.map((submenu, index) =>
             <button
                 key={index}
-                className={activeSubmenu === submenu ? "btn btn-primary" : "btn btn-light"}
+                className={activeSubmenu === submenu ? "btn btn-primary" : "btn btn-success"}
                 onClick={() => this.submenuButtonClicked(submenu)}
             >
                 {submenu.buttonText}
@@ -105,9 +105,9 @@ class TrackManager extends React.Component {
         <div className="TrackManager-parent">
             <div className="TrackManager-sidebar">
                 <h3>Current tracks</h3>
-                <ul>{currentTrackList}</ul>
+                <ul className="TrackManager-tracklist">{currentTrackList}</ul>
                 <h3>Add tracks</h3>
-                <div className="btn-group-vertical">
+                <div className="btn-group">
                     {submenuButtons}
                 </div>
             </div>

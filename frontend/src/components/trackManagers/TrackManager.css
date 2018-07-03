@@ -24,4 +24,25 @@
 }
 
 .TrackManager-submenu {
+    /* position: fixed;
+    top: 2px;
+    left: 302px;
+    background-color: #F9F9F9;
+    box-shadow: rgba(0, 0, 0, 0.188235) 0px 10px 20px, rgba(0, 0, 0, 0.227451) 0px 6px 6px;
+    width: 100vw;
+    height: 100vh */
+}
+
+.TrackManager-tracklist {
+    display: flex;
+    justify-items: flex-start;
+    list-style-type: none;
+}
+
+.TrackManager-remove-track-button {
+    color: red;
+    padding-left: 3px;
+}
+.TrackManager-remove-track-button:hover {
+    color: darkred;
 }

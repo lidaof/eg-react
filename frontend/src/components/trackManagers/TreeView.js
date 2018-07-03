@@ -14,7 +14,7 @@ function DefaultExpandButton(props) {
         return <span style={{marginRight: 5}} onClick={props.onClick} >▾</span>;
     } else {
         return (
-        <span style={{display: "inline-block", transform: "rotate(-90deg)", marginRight: 5}} onClick={props.onClick} >
+        <span style={{display: "inline-block", transform: "rotate(-90deg)", marginRight: 5, cursor: "pointer"}} onClick={props.onClick} >
             ▾
         </span>
         );
@@ -76,7 +76,7 @@ class TreeView extends React.Component {
         return (
         <div style={{marginLeft: this.props.indent, borderLeft: "1px solid grey"}} >
             <DefaultExpandButton isExpanded={this.props.data.isExpanded} onClick={onClick} />
-            <span onClick={onClick}> { this.props.data.label }</span>
+            <span style={{cursor: "pointer"}} onClick={onClick}> { this.props.data.label }</span>
             { this.props.data.isExpanded ? this.props.data.children.map(this.renderSubtree) : null }
         </div>
         )
