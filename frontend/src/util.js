@@ -53,33 +53,6 @@ export function getPageCoordinates(relativeTo, relativeX, relativeY) {
 }
 
 /**
- * Debug function for the shouldComponentUpdate method of React.PureComponent.  Logs what props/state changed if there
- * is a rerender.
- * 
- * @param {React.Component} thisInstance - this component instance; current props and state
- * @param {Object} nextProps - next props component will receive
- * @param {Object} nextState - next state component will receive
- * @return {boolean} whether component should update, according to React.PureComponent
- */
-export function debugShouldComponentUpdate(thisInstance, nextProps, nextState={}) {
-    for (let propName in nextProps) {
-        if (thisInstance.props[propName] !== nextProps[propName]) {
-            console.log(propName);
-            return true;
-        } 
-    }
-
-    for (let stateName in nextState) {
-        if (thisInstance.state[stateName] !== nextState[stateName]) {
-            console.log(stateName);
-            return true;
-        } 
-    }
-
-    return false;
-}
-
-/**
  * Gets a color that contrasts well with the input color.  Useful for determining font color for a given background
  * color.  If parsing fails for the input color, returns black.
  * 
