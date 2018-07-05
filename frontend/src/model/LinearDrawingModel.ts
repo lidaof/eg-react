@@ -76,7 +76,7 @@ class LinearDrawingModel {
 
     /**
      * Converts an interval of bases to an interval of X coordinates.  The `clamp` parameter ensures that the return
-     * values lie between 0 and the draw width, but it might also this method to return `null` if both ends of the
+     * values lie between 0 and the draw width, but it might also cause `null` return values if both ends of the
      * interval fall out of range.
      * 
      * @param {OpenInterval} baseInterval - interval of bases to convert

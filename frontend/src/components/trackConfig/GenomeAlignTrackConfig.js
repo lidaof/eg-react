@@ -1,13 +1,13 @@
 import { TrackConfig } from './TrackConfig';
 import { configStaticDataSource } from './configDataFetch';
 
+import { GenomeAlignTrack } from '../trackVis/GenomeAlignTrack';
 import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import HeightConfig from '../trackContextMenu/HeightConfig';
-import GenomeAlignTrack from '../trackVis/GenomeAlignTrack';
+
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 import GenomeAlignWorker from '../../dataSources/bed/GenomeAlign.worker';
 import AlignmentRecord from '../../model/AlignmentRecord';
-
 
 /**
  * Converter of records to AlignmentRecords.
@@ -36,4 +36,3 @@ export class GenomeAlignTrackConfig extends TrackConfig {
         return TrackWithData;
     }
 }
-

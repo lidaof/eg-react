@@ -1,5 +1,5 @@
 import OpenInterval from './OpenInterval';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 /**
  * The plain-object version of ChromosomeInterval, without any methods.
@@ -8,6 +8,16 @@ export interface IChromosomeInterval {
     chr: string; // Name of the chromosome
     start: number; // Start base number, inclusive
     end: number; // End base number, exclusive
+}
+
+/**
+ * Return result from ChromsomeInterval.mergeAdvanced().
+ * 
+ * @template T - an object that can be converted into a ChromosomeInterval
+ */
+interface MergedLocus<T> {
+    locus: ChromosomeInterval; // Merged locus that contains many smaller loci
+    sources: T[]; // The objects that contributed to the locus
 }
 
 /**
@@ -38,33 +48,70 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
     }
 
     /**
-     * Merges all intervals that overlap.  Does not mutate any inputs.
+     * Merges chromosome intervals based on proximity and chromosome name.  Does not mutate any inputs.
      * 
-     * @param {ChromosomeInterval[]} intervals - interval list to inspect for overlaps
-     * @return {ChromosomeInterval[]} - version of input list with overlapping intervals merged
+     * This function accepts a list of objects of arbitrary type, as long a ChromosomeInterval can be extracted through
+     * the `iteratee` callback.  The `mergeDistance` parameter expresses a distance in bases at which two loci are close
+     * enough to warrant merging.
+     * 
+     * @param {T[]} objects - objects from which ChromosomeIntervals can be extracted
+     * @param {number} mergeDistance - distance in bases at which two intervals are close enough to merge
+     * @param {(object: T) => ChromosomeInterval} iteratee - callback that accepts an object and returns a locus
+     * @return {object[]}
      */
-    static mergeOverlaps(intervals: ChromosomeInterval[]) {
-        const groupedByChr = _.groupBy(intervals, 'chr');
-        const allMerged = [];
-        for (const chr in groupedByChr) { // Merge intervals by chromosome
-            const sorted = groupedByChr[chr].sort((a, b) => a.start - b.start); // Sorted by smallest start first
-            const merged = [ sorted[0] ]; // Init with the first interval
-            for (let i = 1; i < sorted.length; i++) {
-                const prevInterval = merged[merged.length - 1];
-                const currInterval = sorted[i];
-                if (prevInterval.end < currInterval.start) { // No overlap
-                    merged.push(currInterval);
-                } else if (prevInterval.end < currInterval.end) { // Overlap, and ends after the previous interval's end
-                    // Replace prevInterval with an extended version
-                    merged[merged.length - 1] = new ChromosomeInterval(chr, prevInterval.start, currInterval.end);
-                }
-            }
+    static mergeAdvanced<T>(objects: T[], mergeDistance: number,
+        iteratee: (object: T) => ChromosomeInterval): Array<MergedLocus<T>>
+    {
+        const groupedByChromosome = _.groupBy(objects, obj => iteratee(obj).chr);
+        const merged = [];
+        for (const chrName in groupedByChromosome) {
+            const objectsForChromosome = groupedByChromosome[chrName];
+            objectsForChromosome.sort((a, b) => iteratee(a).start - iteratee(b).start);
+            const loci = objectsForChromosome.map(iteratee);
 
-            for (const interval of merged) {
-                allMerged.push(interval);
+            // Merge loci for this chromosome
+            let mergeStartIndex = 0;
+            while (mergeStartIndex < loci.length) {
+                // Initialize a new merged locus
+                const mergedStart = loci[mergeStartIndex].start;
+                let mergedEnd = loci[mergeStartIndex].end;
+                let mergeEndIndex = mergeStartIndex + 1;
+
+                // Find the end of the merged locus
+                while (mergeEndIndex < loci.length) {
+                    const [start, end] = loci[mergeEndIndex];
+                    // Found the end: this locus is far enough from the current merged locus
+                    if (start - mergedEnd > mergeDistance) {
+                        break;
+                    // else this record should be merged into the current locus
+                    } else if (end > mergedEnd) { // Update the end of the merged locus if necessary
+                        mergedEnd = end;
+                    }
+                    mergeEndIndex++;
+                }
+
+                // Push a new merged locus
+                merged.push({
+                    locus: new ChromosomeInterval(chrName, mergedStart, mergedEnd),
+                    sources: objectsForChromosome.slice(mergeStartIndex, mergeEndIndex)
+                });
+                mergeStartIndex = mergeEndIndex;
             }
         }
-        return allMerged;
+
+        return merged;
+    }
+
+    /**
+     * Merges chromosome intervals based on proximity.  Does not mutate any inputs.
+     * 
+     * @param {ChromosomeInterval[]} intervals - interval list to inspect for overlaps
+     * @param {number} [mergeDistance] - distance in bases at which two intervals are close enough to merge
+     * @return {ChromosomeInterval[]} - version of input list with intervals merged
+     */
+    static mergeOverlaps(intervals: ChromosomeInterval[], mergeDistance=2000): ChromosomeInterval[] {
+        const mergeInfos = ChromosomeInterval.mergeAdvanced(intervals, mergeDistance, _.identity);
+        return mergeInfos.map(info => info.locus);
     }
 
     /**

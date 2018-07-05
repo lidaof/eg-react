@@ -24,12 +24,19 @@ import TrackModel from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import RegionExpander from '../../model/RegionExpander';
 import TrackSelectionBehavior from '../../model/TrackSelectionBehavior';
+import { GenomeAlignTrackConfig } from '../trackConfig/GenomeAlignTrackConfig';
 
 const DEFAULT_CURSOR = "crosshair";
 const REGION_EXPANDER = new RegionExpander(1);
 // Simple caching for the calculateExpansion computation
 REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
+
+const GENOME_ALIGN_TRACK_MODEL = new TrackModel({
+    type: "genomealign",
+    name: "mm10 to hg19 blastz",
+    url: "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm10_axt.gz"
+});
 
 /////////////////////////
 // connect() functions //
@@ -213,7 +220,7 @@ class TrackContainer extends React.Component {
      */
     makeTrackElements() {
         const {tracks, metadataTerms} = this.props;
-        return tracks.map((trackModel, index) => 
+        const trackElements = tracks.map((trackModel, index) => 
             <TrackHandle
                 key={trackModel.getId()}
                 trackModel={trackModel}
@@ -226,6 +233,17 @@ class TrackContainer extends React.Component {
                 onMetadataClick={this.handleMetadataClicked}
             />
         );
+        const genomeAlignConfig = new GenomeAlignTrackConfig(GENOME_ALIGN_TRACK_MODEL);
+        const GenomeAlignTrack = genomeAlignConfig.getComponent(genomeAlignConfig);
+        trackElements.push(<GenomeAlignTrack
+            key={GENOME_ALIGN_TRACK_MODEL.getId()}
+            trackModel={GENOME_ALIGN_TRACK_MODEL}
+            width={this.getVisualizationWidth()}
+            viewRegion={this.props.viewRegion}
+            metadataTerms={metadataTerms}
+            xOffset={0}
+        />);
+        return trackElements;
     }
 
     /**

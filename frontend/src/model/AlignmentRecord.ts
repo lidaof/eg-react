@@ -11,18 +11,20 @@ enum QueryStrand {
  * 
  * @author Daofeng Li
  */
-class AlignmentRecord extends Feature {
+export class AlignmentRecord extends Feature {
     /**
      * Constructs a new AlignmentRecord, given a record from genomealignment source
      *
      */
-    queryLocus: any;
+    queryLocus: ChromosomeInterval;
     targetSeq: string;
     querySeq: string;
-    queryStrand: QueryStrand
+    queryStrand: QueryStrand;
+
     constructor(record: any) {
         const locus = new ChromosomeInterval(record.chr, record.start, record.end);
-        super(record.id, locus, record.strand);
+        super(record[3].id, locus, record.strand);
+
         const {chr, start, stop, strand, targetseq, queryseq} = record[3].genomealign;
         this.queryLocus = new ChromosomeInterval(chr, start, stop);
         this.querySeq = queryseq || '';
