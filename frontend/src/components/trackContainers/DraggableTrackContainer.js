@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { MouseButtons } from '../../util';
+import { MouseButton } from '../../util';
 import DragAcrossView from '../DragAcrossView';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
@@ -100,7 +100,7 @@ class DraggableTrackContainer extends React.Component {
 
         return (
         <DragAcrossView
-            button={MouseButtons.LEFT}
+            button={MouseButton.LEFT}
             onViewDragStart={this.viewDragStart}
             onViewDrag={this.viewDrag}
             onViewDragEnd={this.viewDragEnd}

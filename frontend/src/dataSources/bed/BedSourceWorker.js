@@ -1,6 +1,7 @@
 import axios from 'axios';
 import _ from 'lodash';
 import WorkerRunnableSource from '../worker/WorkerRunnableSource';
+import { ensureMaxListLength } from '../../util';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import makeBamIndex from '../../vendor/igv/BamIndex'; // This dependency is from IGV
 import unbgzf from '../../vendor/igv/bgzf';
@@ -98,27 +99,6 @@ class BedSourceWorker extends WorkerRunnableSource {
     }
 
     /**
-     * Ensures that the input list's length is at most `this.dataLimit`.  If the list is too long, shortens the list by
-     * selecting equally-spaced elements.
-     * 
-     * @param {any[]} list - list for which to ensure a max length
-     * @return {any[]} list with max length ensured
-     */
-    ensureDataLimit(list) {
-        if (list.length <= this.dataLimit) {
-            return list;
-        }
-
-        let selectedItems = [];
-        for (let i = 0; i < this.dataLimit; i++) {
-            const fractionIterated = i/this.dataLimit;
-            const selectedIndex = Math.ceil(fractionIterated * list.length);
-            selectedItems.push(list[selectedIndex]);
-        }
-        return selectedItems;
-    }
-
-    /**
      * The data initially comes in as a large, binary blob.  This decodes the blob into text, parses the features, and
      * filters out those features outside of the interval we want.
      * 
@@ -129,7 +109,7 @@ class BedSourceWorker extends WorkerRunnableSource {
      */
     _parseAndFilterFeatures(buffer, chromosome, start, end) {
         const text = new TextDecoder('utf-8').decode(buffer);
-        const lines = this.ensureDataLimit(text.split('\n'));
+        const lines = ensureMaxListLength(text.split('\n'), this.dataLimit);
 
         let features = [];
         for (let line of lines) {

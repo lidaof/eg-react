@@ -5,13 +5,18 @@
  */ 
 import parseColor from 'parse-color';
 
+interface Coordinate {
+    x: number;
+    y: number;
+}
+
 /**
  * Button consts found in MouseEvents.  See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
  */
-export const MouseButtons = {
-    LEFT: 0,
-    MIDDLE: 1,
-    RIGHT: 2
+export enum MouseButton {
+    LEFT = 0,
+    MIDDLE = 1,
+    RIGHT = 2
 };
 
 /**
@@ -25,9 +30,9 @@ export const MouseButtons = {
  * @param {Element} [relativeTo] - calculate coordinates relative to this element.  Default is event.currentTarget.
  * @return {Coordinate} object with props x and y that contain the relative coordinates
  */
-export function getRelativeCoordinates(event, relativeTo) {
+export function getRelativeCoordinates(event: MouseEvent, relativeTo: Element): Coordinate {
     if (!relativeTo) {
-        relativeTo = event.currentTarget;
+        relativeTo = event.currentTarget as Element;
     }
     const targetBoundingRect = relativeTo.getBoundingClientRect();
     return {
@@ -44,7 +49,7 @@ export function getRelativeCoordinates(event, relativeTo) {
  * @param {number} relativeY - y coordinates inside an element
  * @return {Coordinate} the page coordinates
  */
-export function getPageCoordinates(relativeTo, relativeX, relativeY) {
+export function getPageCoordinates(relativeTo: Element, relativeX: number, relativeY: number): Coordinate {
     const targetBoundingRect = relativeTo.getBoundingClientRect();
     return {
         x: window.scrollX + targetBoundingRect.left + relativeX,
@@ -61,7 +66,7 @@ export function getPageCoordinates(relativeTo, relativeX, relativeY) {
  * @param {string} color - color for which to find a contrasting color
  * @return {string} a color that contrasts well with the input color
  */
-export function getContrastingColor(color) {
+export function getContrastingColor(color: string): string {
     const parsedColor = parseColor(color);
     if (!parsedColor.rgb) {
         return "black";
@@ -76,9 +81,23 @@ export function getContrastingColor(color) {
 }
 
 /**
- * A (x, y) coordinate pair.
+ * Returns a copy of the input list, ensuring its length is below `limit`.  If the list is too long, selects
+ * equally-spaced elements from the original list.  Note that if the input is sorted, the output will be sorted as well.
  * 
- * @typedef {Object} Coordinate
- * @property {number} x - the x component
- * @property {number} y - the y component
+ * @param {T[]} list - list for which to ensure a max length
+ * @param {number} limit - maximum length of the result list
+ * @return {T[]} copy of list with max length ensured
  */
+export function ensureMaxListLength<T>(list: T[], limit: number): T[] {
+    if (list.length <= limit) {
+        return list;
+    }
+
+    const selectedItems: T[] = [];
+    for (let i = 0; i < limit; i++) {
+        const fractionIterated = i / limit;
+        const selectedIndex = Math.ceil(fractionIterated * list.length);
+        selectedItems.push(list[selectedIndex]);
+    }
+    return selectedItems;
+}

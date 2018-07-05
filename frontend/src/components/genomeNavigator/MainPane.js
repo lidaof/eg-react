@@ -11,7 +11,7 @@ import withAutoDimensions from '../withAutoDimensions';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
-import { MouseButtons } from '../../util';
+import { MouseButton } from '../../util';
 
 const WHEEL_ZOOM_SPEED = 0.2;
 const SVG_HEIGHT = 100;
@@ -118,7 +118,7 @@ class MainPane extends React.Component {
 
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView button={MouseButtons.RIGHT} onViewDrag={onNewViewRequested} viewRegion={viewRegion} >
+        <DragAcrossView button={MouseButton.RIGHT} onViewDrag={onNewViewRequested} viewRegion={viewRegion} >
             <SelectableGenomeArea
                 drawModel={new LinearDrawingModel(viewRegion, width)}
                 y={SELECT_BOX_Y}

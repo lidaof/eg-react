@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DragAcrossDiv from './DragAcrossDiv';
-import { MouseButtons, getRelativeCoordinates } from '../util';
+import { MouseButton, getRelativeCoordinates } from '../util';
 import './SelectableArea.css';
 
 const CANCEL_KEY = 27;
@@ -38,7 +38,7 @@ class SelectableArea extends React.Component {
     };
 
     static defaultProps = {
-        button: MouseButtons.LEFT,
+        button: MouseButton.LEFT,
         y: "0px",
         height: "100%",
         getInnerElement: width => null,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import DragAcrossDiv from '../DragAcrossDiv';
-import { MouseButtons } from '../../util';
+import { MouseButton } from '../../util';
 
 /**
  * An object that looks like React.MouseEvent.
@@ -15,7 +15,7 @@ class MockEvent {
 }
 
 it('should render children', () => {
-    let component = <DragAcrossDiv button={MouseButtons.LEFT} ><p/></DragAcrossDiv>
+    let component = <DragAcrossDiv button={MouseButton.LEFT} ><p/></DragAcrossDiv>
     let wrapper = shallow(component);
     expect(wrapper.find('p')).toHaveLength(1);
 });
@@ -25,14 +25,14 @@ it('should dispatch drag events correctly', () => {
     let fakeDrag = jest.fn();
     let fakeDragEnd = jest.fn();
     let wrapper = shallow(<DragAcrossDiv
-        button={MouseButtons.LEFT}
+        button={MouseButton.LEFT}
         onDragStart={fakeDragStart}
         onDrag={fakeDrag}
         onDragEnd={fakeDragEnd}
     />);
-    const mousedown = new MockEvent({button: MouseButtons.LEFT, clientX: 0, clientY: 0});
-    const mousemove = new MockEvent({button: MouseButtons.LEFT, clientX: 10, clientY: 10});
-    const mouseup = new MockEvent({button: MouseButtons.LEFT, clientX: 20, clientY: 20})
+    const mousedown = new MockEvent({button: MouseButton.LEFT, clientX: 0, clientY: 0});
+    const mousemove = new MockEvent({button: MouseButton.LEFT, clientX: 10, clientY: 10});
+    const mouseup = new MockEvent({button: MouseButton.LEFT, clientX: 20, clientY: 20})
     wrapper.simulate('mousedown', mousedown);
     wrapper.simulate('mousemove', mousemove);
     wrapper.simulate('mouseup', mouseup);
@@ -48,10 +48,10 @@ it('should dispatch drag events correctly', () => {
 it('should only dispatch drag events for the requested button', () => {
     let fakeDragStart = jest.fn();
     let wrapper = shallow(<DragAcrossDiv
-        button={MouseButtons.LEFT}
+        button={MouseButton.LEFT}
         onDragStart={fakeDragStart}
     />);
-    const mousedown = new MockEvent({button: MouseButtons.RIGHT});
+    const mousedown = new MockEvent({button: MouseButton.RIGHT});
     wrapper.simulate('mousedown', mousedown);
     expect(fakeDragStart).not.toHaveBeenCalled();
 });
@@ -59,9 +59,9 @@ it('should only dispatch drag events for the requested button', () => {
 it('should only dispatch drag events if dragging has started', () => {
     let fakeDrag = jest.fn();
     let wrapper = shallow(<DragAcrossDiv
-        button={MouseButtons.LEFT}
+        button={MouseButton.LEFT}
         onDrag={fakeDrag}
     />);
-    wrapper.simulate('mousemove', new MockEvent({button: MouseButtons.LEFT}));
+    wrapper.simulate('mousemove', new MockEvent({button: MouseButton.LEFT}));
     expect(fakeDrag).not.toHaveBeenCalled();
 });

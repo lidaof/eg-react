@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { MouseButtons } from '../util';
+import { MouseButton } from '../util';
 
 /**
  * A <div> that listens for drag-across events, where a user drags the cursor across the div.
@@ -12,7 +12,7 @@ class DragAcrossDiv extends React.Component {
         /**
          *  The mouse button to listen to
          */
-        button: PropTypes.oneOf([MouseButtons.LEFT, MouseButtons.MIDDLE, MouseButtons.RIGHT]),
+        button: PropTypes.oneOf([MouseButton.LEFT, MouseButton.MIDDLE, MouseButton.RIGHT]),
 
         /**
          * Called when dragging starts.  Signature: (event: React.SyntheticEvent): void

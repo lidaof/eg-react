@@ -8,10 +8,12 @@ import TrackLegend from './commonComponents/TrackLegend';
 // import { GenomeAlignDisplayModes } from '../../model/DisplayModes';
 import { AlignmentProcessor } from '../../model/AlignmentProcessor';
 import OpenInterval from '../../model/interval/OpenInterval';
+import { ensureMaxListLength } from '../../util';
 
 const HEIGHT = 60;
 const QUERY_GENOME_RECT_HEIGHT = 10;
 const COLOR = '#B8008A';
+const MAX_POLYGONS = 500;
 
 /**
  * 
@@ -43,12 +45,12 @@ export class GenomeAlignTrack extends React.Component {
             fill={COLOR}
             onClick={() => alert("You clicked on " + queryLocus)}
         />;
-        const segmentPolygons = segments.map((segment, i) => {
+        let segmentPolygons = segments.map((segment, i) => {
             const points = [
-                [segment.targetXSpan.start, 0],
-                [segment.queryXSpan.start, queryRectTopY],
-                [segment.queryXSpan.end, queryRectTopY],
-                [segment.targetXSpan.end, 0],
+                [Math.floor(segment.targetXSpan.start), 0],
+                [Math.floor(segment.queryXSpan.start), queryRectTopY],
+                [Math.ceil(segment.queryXSpan.end), queryRectTopY],
+                [Math.ceil(segment.targetXSpan.end), 0],
             ];
             return <polygon
                 key={i}
@@ -58,6 +60,7 @@ export class GenomeAlignTrack extends React.Component {
                 onClick={() => alert("You clicked on " + segment.record.getLocus())}
             />;
         });
+        segmentPolygons = ensureMaxListLength(segmentPolygons, MAX_POLYGONS);
         return <React.Fragment key={queryLocus.toString()} >
             {queryGenomeRect}
             {segmentPolygons}
@@ -70,7 +73,7 @@ export class GenomeAlignTrack extends React.Component {
     render() {
         const {viewRegion, width, viewWindow, trackModel, options, data} = this.props;
         const placements = this.alignmentProcessor.mergeAndPlaceAlignments(data, viewRegion, width);
-        const visualizer = <svg width={width} height={HEIGHT}>{placements.map(this.renderMergedAlignment)}</svg>
+        const visualizer = <svg width={width} height={HEIGHT} style={{display: "block"}} >{placements.map(this.renderMergedAlignment)}</svg>
         return <Track
             {...this.props}
             viewWindow={new OpenInterval(0, width)}
