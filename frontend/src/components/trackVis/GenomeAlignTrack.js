@@ -10,7 +10,7 @@ import { AlignmentProcessor } from '../../model/AlignmentProcessor';
 import OpenInterval from '../../model/interval/OpenInterval';
 import { ensureMaxListLength } from '../../util';
 
-const HEIGHT = 60;
+const HEIGHT = 80;
 const QUERY_GENOME_RECT_HEIGHT = 10;
 const COLOR = '#B8008A';
 const MAX_POLYGONS = 500;

@@ -94,6 +94,10 @@ export class AlignmentProcessor {
 
         return placements;
     }
+
+    makeQueryGenomeNavContext(placedAlignments: PlacedMergedAlignment[]): null {
+        return null;
+    }
 }
 
 class IntervalPlacer {

@@ -15,23 +15,23 @@ if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  
     const storage = {};
 
     STORAGE = {
-      setItem(key: string, value: any) {
-        storage[key] = value || '';
-      },
-      getItem(key: string) {
-        return key in storage ? storage[key] : null;
-      },
-      removeItem(key: string) {
-        delete storage[key];
-      },
-      get length() {
-        return Object.keys(storage).length;
-      },
-      key(i: number) {
-        const keys = Object.keys(storage);
-        return keys[i] || null;
-      }
-    };    
+        setItem(key: string, value: any) {
+            storage[key] = value || '';
+        },
+        getItem(key: string) {
+            return key in storage ? storage[key] : null;
+        },
+        removeItem(key: string) {
+            delete storage[key];
+        },
+        get length() {
+            return Object.keys(storage).length;
+        },
+        key(i: number) {
+            const keys = Object.keys(storage);
+            return keys[i] || null;
+        }
+    };
 }
 const SESSION_KEY = "eg-react-session";
 export const MIN_VIEW_REGION_SIZE = 5;

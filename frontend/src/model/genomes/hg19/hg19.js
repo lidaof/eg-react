@@ -2,6 +2,7 @@ import Chromosome from '../Chromosome';
 import Genome from '../Genome';
 import TrackModel from '../../../model/TrackModel';
 import cytobands from './cytoband.json';
+import annotationTracks from './annotationTracks.json';
 
 const genome = new Genome('hg19', [
     new Chromosome('chr1', 249250621),
@@ -35,11 +36,6 @@ const navContext = genome.makeNavContext();
 const defaultRegion = navContext.parse('chr7:27053397-27373765');
 const defaultTracks = [
     new TrackModel({
-        type: 'bigwig',
-        name: 'GSM429321.bigWig',
-        url: 'https://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig'
-    }),
-    new TrackModel({
         type: 'geneAnnotation',
         name: 'refGene',
         genome: 'hg19'
@@ -50,37 +46,25 @@ const defaultTracks = [
         genome: 'hg19'
     }),
     new TrackModel({
-        type: 'repeatmasker',
-        name: 'RepeatMasker',
-        url: 'https://vizhub.wustl.edu/public/hg19/rmsk16.bb'
-    }),
-    new TrackModel({
-        type: 'bed',
-        name: 'testbed',
-        url: 'https://vizhub.wustl.edu/hubSample/hg19/bed.gz'
-    }),
-    new TrackModel({
-        type: "methylc",
-        name: "Methylation",
-        url: "https://vizhub.wustl.edu/public/hg19/methylc2/h1.liftedtohg19.gz"
-    }),
-    new TrackModel({
-        type: "bam",
-        name: "Test bam",
-        url: "https://wangftp.wustl.edu/~dli/test/a.bam"
-    }),
-    new TrackModel({
         type: "ruler",
         name: "Ruler",
+    }),
+    new TrackModel({
+        type: "bigwig",
+        url: "https://epgg-test.wustl.edu/d/mm10/ENCFF577HVF.bigWig",
+        metadata: {
+            genome: 'mm10'
+        }
     })
 ];
 
 const HG19 = {
-    genome: genome,
-    navContext: navContext,
-    cytobands: cytobands,
-    defaultRegion: defaultRegion,
-    defaultTracks: defaultTracks,
+    genome,
+    navContext,
+    cytobands,
+    defaultRegion,
+    defaultTracks,
+    annotationTracks,
     twoBitURL: 'https://vizhub.wustl.edu/public/hg19/hg19.2bit'
 };
 

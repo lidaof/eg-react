@@ -1,5 +1,4 @@
 import NavigationContext from '../NavigationContext';
-import { CHROMOSOMES } from './toyRegion';
 import Feature from '../Feature';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 import OpenInterval from '../interval/OpenInterval';
@@ -8,14 +7,10 @@ const NAME = "Wow very genome";
 const instance = new NavigationContext(NAME, [
     new Feature("f1", new ChromosomeInterval("chr1", 0, 10)),
     new Feature("f2", new ChromosomeInterval("chr2", 0, 10)),
-    new Feature("f3", new ChromosomeInterval("chr2", 5, 15)), // Note overlap with feature 2!
+    new Feature("f3", new ChromosomeInterval("chr2", 5, 15)), // Note genomic overlap with feature 2!
 ]);
 
 describe("constructor", () => {
-    it("errors if not given any features", () => {
-        expect( () => new NavigationContext("Bad", []) ).toThrow(Error);
-    });
-
     it("errors if given non-features", () => {
         expect( () => new NavigationContext("Bad", [{cat: "meow"}]) ).toThrow(Error);
     });
@@ -92,7 +87,6 @@ describe("parse() and convertFeatureCoordinateToBase()", () => {
 
 describe("convertGenomeIntervalToBases()", () => {
     it("is correct for 0 mappings", () => {
-        const feature = instance.getFeatures()[0];
         const chrInterval = new ChromosomeInterval("chr1", -1, -1);
         expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([]);
 
@@ -101,7 +95,6 @@ describe("convertGenomeIntervalToBases()", () => {
     });
 
     it("is correct for one mapping", () => {
-        const feature = instance.getFeatures()[0];
         const chrInterval = new ChromosomeInterval("chr1", 5, 10);
         expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([new OpenInterval(5, 10)]);
     });

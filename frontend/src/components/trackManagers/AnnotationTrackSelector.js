@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import annotationTracks from './AnnotationTracks';
 import TrackModel from '../../model/TrackModel';
 import TreeView from './TreeView';
+import withCurrentGenome from '../withCurrentGenome';
 
 /**
  * 
@@ -11,6 +11,14 @@ import TreeView from './TreeView';
  * @param {string} nodeLabel - what to 
  */
 function convertOldBrowserSchema(schemaNode, nodeLabel) {
+    if (!schemaNode) {
+        return {
+            isExpanded: false,
+            label: nodeLabel,
+            children: []
+        };
+    }
+
     const isLeaf = schemaNode.hasOwnProperty("name");
     if (isLeaf) {
         // TreeView will pass this object to our custom leaf renderer.
@@ -38,6 +46,7 @@ function convertOldBrowserSchema(schemaNode, nodeLabel) {
  */
 class AnnotationTrackSelector extends React.Component {
     static propTypes = {
+        genomeConfig: PropTypes.object.isRequired,
         addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
         onTrackAdded: PropTypes.func,
     }
@@ -48,7 +57,8 @@ class AnnotationTrackSelector extends React.Component {
 
     constructor(props) {
         super(props);
-        this.data = convertOldBrowserSchema(annotationTracks, "hg19");
+        const {genome, annotationTracks} = props.genomeConfig;
+        this.data = convertOldBrowserSchema(annotationTracks, genome.getName());
         this.nodeToggled = this.nodeToggled.bind(this);
         this.renderLeaf = this.renderLeaf.bind(this);
     }
@@ -68,10 +78,8 @@ class AnnotationTrackSelector extends React.Component {
 
     render() {
         this.addedTrackSet = new Set(this.props.addedTracks);
-        return (
-        <TreeView data={this.data} onNodeToggled={this.nodeToggled} leafRenderer={this.renderLeaf} />
-        );
+        return <TreeView data={this.data} onNodeToggled={this.nodeToggled} leafRenderer={this.renderLeaf} />;
     }
 }
 
-export default AnnotationTrackSelector;
+export default withCurrentGenome(AnnotationTrackSelector);

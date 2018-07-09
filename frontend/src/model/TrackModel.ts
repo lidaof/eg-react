@@ -7,6 +7,7 @@ export interface TrackOptions {
 
 interface ITrackModelMetadata {
     'Track Type'?: string;
+    genome?: string;
     [k: string]: any;
 }
 
