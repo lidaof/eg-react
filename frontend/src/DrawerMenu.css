@@ -1,0 +1,17 @@
+.DrawerMenu-open-button {
+    display: inline-block;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.DrawerMenu-close-button {
+    color: darkred;
+    font-size: 2rem;
+    padding-left: 20px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.DrawerMenu-close-button:hover {
+    color: red;
+}

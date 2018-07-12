@@ -22,17 +22,3 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-
-
-.menu-close {
-  color: darkred;
-  font-size: 2rem;
-  padding-left: 20px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-}
-
-.menu-close:hover {
-  color: red;
-}

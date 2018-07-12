@@ -10,9 +10,7 @@
     "storybook": "start-storybook -p 9009 -s public",
     "test": "react-app-rewired test --env=jsdom --scripts-version react-scripts-ts"
   },
-  "dependencies": {
-    "react-motion-drawer": "^3.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@storybook/addon-actions": "^3.3.15",
     "@storybook/addon-links": "^3.3.15",
@@ -49,6 +47,7 @@
     "react-beautiful-dnd": "^3.0.0",
     "react-color": "^2.14.0",
     "react-dom": "^16.3.0",
+    "react-motion-drawer": "^3.1.0",
     "react-popper": "^0.8.2",
     "react-redux": "^5.0.7",
     "react-scripts-ts": "^2.16.0",
