@@ -101,7 +101,7 @@ export class TrackModel {
      * @returns {string}
      * @memberof TrackModel
      */
-    getMetadata(term: string): string {
+    getMetadata(term: string): string | undefined {
         const value = this.metadata[term];
         if (Array.isArray(value)) {
             return value[value.length - 1];

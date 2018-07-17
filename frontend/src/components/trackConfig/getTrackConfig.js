@@ -12,15 +12,15 @@ import { GenomeAlignTrackConfig } from './GenomeAlignTrackConfig';
 import { RulerTrackConfig } from './RulerTrackConfig';
 
 const TYPE_NAME_TO_CONFIG = {
-    "bam": BamTrackConfig,
-    "bed": BedTrackConfig,
-    "bedgraph": BedGraphTrackConfig,
-    "bigbed": BigBedTrackConfig,
+    //"bam": BamTrackConfig,
+    //"bed": BedTrackConfig,
+    //"bedgraph": BedGraphTrackConfig,
+    //"bigbed": BigBedTrackConfig,
     "bigwig": BigWigTrackConfig,
-    "hic": HicTrackConfig,
+    //"hic": HicTrackConfig,
     "geneannotation": GeneAnnotationTrackConfig,
-    "methylc": MethylCTrackConfig,
-    "repeatmasker": RepeatMaskerTrackConfig,
+    //"methylc": MethylCTrackConfig,
+    //"repeatmasker": RepeatMaskerTrackConfig,
     "genomealign": GenomeAlignTrackConfig,
     "ruler": RulerTrackConfig,
 };

@@ -4,6 +4,8 @@ import DisplayedRegionModel from './DisplayedRegionModel';
 import LinearDrawingModel from './LinearDrawingModel';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import OpenInterval from './interval/OpenInterval';
+import NavigationContext from './NavigationContext';
+import { Feature } from './Feature';
 
 interface PlacedAlignment {
     record: AlignmentRecord;
@@ -21,7 +23,7 @@ const MIN_DRAW_WIDTH = 5;
 const MARGIN = 5;
 const MERGE_PIXEL_DISTANCE = 200;
 
-export class AlignmentProcessor {
+export class AlignmentPlacer {
     /**
      * Groups and merges alignment records based on their proximity in the query (secondary) genome.  Then, calculates
      * draw positions for all records.
@@ -58,6 +60,7 @@ export class AlignmentProcessor {
             const mergeLocus = merge.locus; // This is a locus in the query/secondary genome!
             const recordsInMerge = merge.sources; // Records that made the merged locus
             const drawWidth = drawModel.basesToXWidth(mergeLocus.getLength()); // Draw width of the query locus
+            const halfDrawWidth = 0.5 * drawWidth;
             if (drawWidth < MIN_DRAW_WIDTH) {
                 continue;
             }
@@ -77,8 +80,16 @@ export class AlignmentProcessor {
 
             // Step 2: using the centroid of the segments from step 1, place the merged query locus.
             const drawCenter = computeCentroid(segments.map(segment => segment.targetXSpan));
-            const preferredQueryXSpan = new OpenInterval(drawCenter - 0.5 * drawWidth, drawCenter + 0.5 * drawWidth);
-            const queryXSpan = intervalPlacer.place(preferredQueryXSpan);
+            let preferredStart = drawCenter - halfDrawWidth;
+            let preferredEnd = drawCenter + halfDrawWidth;
+            if (preferredStart < 0) {
+                preferredStart = MARGIN;
+                preferredEnd = drawWidth + MARGIN;
+            } else if (preferredEnd > width) {
+                preferredEnd = width - MARGIN;
+                preferredStart = preferredEnd - drawWidth;
+            }
+            const queryXSpan = intervalPlacer.place(new OpenInterval(preferredStart, preferredEnd));
 
             // Step 3: using the placed query locus from step 2, place secondary/query genome segments
             for (const segment of segments) {
@@ -95,8 +106,23 @@ export class AlignmentProcessor {
         return placements;
     }
 
-    makeQueryGenomeNavContext(placedAlignments: PlacedMergedAlignment[]): null {
-        return null;
+    makeQueryGenomeNavContext(placedAlignments: PlacedMergedAlignment[], width: number,
+            basesPerPixel: number): NavigationContext {
+        const features = [];
+        let x = 0;
+        for (const placedAlignment of placedAlignments) {
+            const basesFromPrevFeature = basesPerPixel * (placedAlignment.queryXSpan.start - x);
+            if (basesFromPrevFeature > 0) {
+                features.push(NavigationContext.makeGap(Math.ceil(basesFromPrevFeature)));
+            }
+            features.push(new Feature(undefined, placedAlignment.queryLocus));
+            x = placedAlignment.queryXSpan.end;
+        }
+        const finalGapLength = width - x;
+        if (finalGapLength > 0) {
+            features.push(NavigationContext.makeGap(Math.ceil(finalGapLength)));
+        }
+        return new NavigationContext('', features);
     }
 }
 

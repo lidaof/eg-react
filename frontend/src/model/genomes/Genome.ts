@@ -3,7 +3,7 @@ import NavigationContext from '../NavigationContext';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 import OpenInterval from '../interval/OpenInterval';
 import TrackModel from '../TrackModel';
-import Chromosome from '../genomes/Chromosome';
+import Chromosome from './Chromosome';
 
 export interface GenomeConfig {
     genome: Genome;

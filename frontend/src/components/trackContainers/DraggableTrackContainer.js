@@ -16,8 +16,11 @@ class DraggableTrackContainer extends React.Component {
 
     static propTypes = {
         trackElements: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // View region of the tracks
-        visualizationWidth: PropTypes.number.isRequired, // Width of the visible portion of tracks
+        /**
+         * View region of visible portion of tracks
+         */
+        viewWindowRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        viewWindowWidth: PropTypes.number.isRequired, // Width of the visible portion of tracks
         /**
          * Callback for when a new region is selected.  Signature:
          *     (newStart: number, newEnd: number): void
@@ -82,7 +85,7 @@ class DraggableTrackContainer extends React.Component {
      * Resets the draw offset for the tracks when getting a new region.
      */
     componentWillReceiveProps(newProps) {
-        if (this.props.viewRegion !== newProps.viewRegion) {
+        if (this.props.viewWindowRegion !== newProps.viewWindowRegion) {
             this.setState({xOffset: 0});
         }
     }
@@ -91,11 +94,9 @@ class DraggableTrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const propsToMerge = {
-            xOffset: this.state.xOffset
-        };
-        const tracksWithXOffset = this.props.trackElements.map(
-            trackElement => React.cloneElement(trackElement, propsToMerge)
+        const {trackElements, viewWindowRegion, viewWindowWidth} = this.props;
+        const tracksWithXOffset = trackElements.map(
+            trackElement => React.cloneElement(trackElement, { xOffset: this.state.xOffset }) // Give xOffset to tracks
         );
 
         return (
@@ -104,8 +105,8 @@ class DraggableTrackContainer extends React.Component {
             onViewDragStart={this.viewDragStart}
             onViewDrag={this.viewDrag}
             onViewDragEnd={this.viewDragEnd}
-            viewRegion={this.props.viewRegion}
-            widthOverride={this.props.visualizationWidth}
+            viewRegion={viewWindowRegion}
+            widthOverride={viewWindowWidth}
         >
             {tracksWithXOffset}
         </DragAcrossView>

@@ -11,11 +11,10 @@ import LinearDrawingModel from '../../model/LinearDrawingModel';
  */
 class ZoomableTrackContainer extends React.Component {
     static propTypes = {
-        visualizationStartX: PropTypes.number.isRequired, // Relative X of the left edge of track visualizers
-        visualizationWidth: PropTypes.number.isRequired, // Width of the track visualizers
         trackElements: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // View region of the tracks
-
+        viewWindowRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // View region of the tracks
+        viewWindowWidth: PropTypes.number.isRequired, // Width of the visible portion of tracks
+        leftBoundaryX: PropTypes.number.isRequired, // Relative X of the left edge of track visualizers
         /**
          * Callback for when a new region is selected.  Signature:
          *     (newStart: number, newEnd: number): void
@@ -42,10 +41,10 @@ class ZoomableTrackContainer extends React.Component {
      * @param {React.SyntheticEvent} event - the final mouse event that triggered the selection
      */
     areaSelected(startX, endX, event) {
-        const {visualizationStartX, visualizationWidth, viewRegion} = this.props;
-        const drawModel = new LinearDrawingModel(viewRegion, visualizationWidth);
-        const correctedStart = startX - visualizationStartX;
-        const correctedEnd = endX - visualizationStartX;
+        const {leftBoundaryX, viewWindowWidth, viewWindowRegion} = this.props;
+        const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindowWidth);
+        const correctedStart = startX - leftBoundaryX;
+        const correctedEnd = endX - leftBoundaryX;
         this.props.onNewRegion(drawModel.xToBase(correctedStart), drawModel.xToBase(correctedEnd));
     }
 
@@ -55,7 +54,7 @@ class ZoomableTrackContainer extends React.Component {
     render() {
         return (
         <SelectableGenomeArea
-            drawModel={new LinearDrawingModel(this.props.viewRegion, this.props.visualizationWidth)}
+            drawModel={new LinearDrawingModel(this.props.viewWindowRegion, this.props.viewWindowWidth)}
             onAreaSelected={this.areaSelected}
         >
             {this.props.trackElements}

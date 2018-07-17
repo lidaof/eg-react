@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import memoizeOne from 'memoize-one';
 import connect from 'react-redux/lib/connect/connect';
 import { ActionCreators } from '../../AppState';
 
+import { withTrackData } from './TrackDataManager';
+import { withTrackView } from './TrackViewManager';
 import TrackHandle from './TrackHandle';
 import DraggableTrackContainer from './DraggableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
@@ -12,37 +13,25 @@ import MetadataHeader from './MetadataHeader';
 import { Tools, ToolButtons } from './Tools';
 import ZoomButtons from './ZoomButtons';
 
-import TrackLegend from '../trackVis/commonComponents/TrackLegend';
-import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
-
 import OutsideClickDetector from '../OutsideClickDetector';
 import ContextMenuManager from '../ContextMenuManager';
 import DivWithBullseye from '../DivWithBullseye';
 import withAutoDimensions from '../withAutoDimensions';
+import TrackLegend from '../trackVis/commonComponents/TrackLegend';
+import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
 
 import TrackModel from '../../model/TrackModel';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import RegionExpander from '../../model/RegionExpander';
 import TrackSelectionBehavior from '../../model/TrackSelectionBehavior';
-import { GenomeAlignTrackConfig } from '../trackConfig/GenomeAlignTrackConfig';
 
-const DEFAULT_CURSOR = "crosshair";
-const REGION_EXPANDER = new RegionExpander(1);
-// Simple caching for the calculateExpansion computation
-REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
+const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 
-const GENOME_ALIGN_TRACK_MODEL = new TrackModel({
-    type: "genomealign",
-    name: "mm10 to hg19 blastz",
-    url: "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm10_axt.gz"
-});
-
-/////////////////////////
-// connect() functions //
-/////////////////////////
+///////////
+// HOC's //
+///////////
 function mapStateToProps(state) {
     return {
+        genome: state.genomeName,
         viewRegion: state.viewRegion,
         tracks: state.tracks,
         metadataTerms: state.metadataTerms
@@ -55,6 +44,9 @@ const callbacks = {
     onMetadataTermsChanged: ActionCreators.setMetadataTerms,
 };
 
+const withAppState = connect(mapStateToProps, callbacks);
+const withEnhancements = _.flowRight(withAppState, withAutoDimensions, withTrackView, withTrackData);
+
 /**
  * Container for holding all the tracks, and an avenue for manipulating state common to all tracks.
  * 
@@ -62,9 +54,9 @@ const callbacks = {
  */
 class TrackContainer extends React.Component {
     static propTypes = {
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region for tracks to display
-        width: PropTypes.number.isRequired, // Width of the tracks, including legends
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired, // Tracks to render
+        primaryView: PropTypes.object.isRequired,
+        trackData: PropTypes.object.isRequired,
         metadataTerms: PropTypes.arrayOf(PropTypes.string).isRequired, // Metadata terms
         /**
          * Callback for when a new region is selected.  Signature:
@@ -89,23 +81,10 @@ class TrackContainer extends React.Component {
         onTracksChanged: () => undefined,
     };
 
-    static getDerivedStateFromProps(nextProps) {
-        const {viewRegion, width} = nextProps;
-        const visualizationWidth = Math.max(0, width - TrackLegend.WIDTH);
-        return {
-            visualizerInfo: REGION_EXPANDER.calculateExpansion(visualizationWidth, viewRegion)
-        };
-    }
-
     constructor(props) {
         super(props);
         this.state = {
             selectedTool: null,
-            visualizerInfo: {
-                width: 0,
-                viewRegion: null,
-                viewWindow: null,
-            }
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -138,7 +117,7 @@ class TrackContainer extends React.Component {
         }
         const tracks = this.props.tracks;
         if (tracks.length !== newSelections.length) {
-            console.error("Trying to apply new track selection status that is not the same length of existing tracks.");
+            console.error('Cannot apply track selection array with different length than existing tracks.');
             console.error(newSelections);
         }
 
@@ -219,12 +198,17 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const {tracks, metadataTerms} = this.props;
-        const trackElements = tracks.map((trackModel, index) => 
-            <TrackHandle
+        const {tracks, trackData, primaryView, metadataTerms} = this.props;
+        const trackElements = tracks.map((trackModel, index) => {
+            const id = trackModel.getId();
+            const data = trackData[id];
+            return <TrackHandle
                 key={trackModel.getId()}
                 trackModel={trackModel}
-                {...this.state.visualizerInfo}
+                {...data}
+                viewRegion={data.visRegion}
+                width={primaryView.visWidth}
+                viewWindow={primaryView.viewWindow}
                 metadataTerms={metadataTerms}
                 xOffset={0}
                 index={index}
@@ -232,25 +216,8 @@ class TrackContainer extends React.Component {
                 onClick={this.handleTrackClicked}
                 onMetadataClick={this.handleMetadataClicked}
             />
-        );
-        const genomeAlignConfig = new GenomeAlignTrackConfig(GENOME_ALIGN_TRACK_MODEL);
-        const GenomeAlignTrack = genomeAlignConfig.getComponent(genomeAlignConfig);
-        trackElements.push(<GenomeAlignTrack
-            key={GENOME_ALIGN_TRACK_MODEL.getId()}
-            trackModel={GENOME_ALIGN_TRACK_MODEL}
-            width={this.getVisualizationWidth()}
-            viewRegion={this.props.viewRegion}
-            metadataTerms={metadataTerms}
-            xOffset={0}
-        />);
+        });
         return trackElements;
-    }
-
-    /**
-     * @return {number} the width, in pixels, at which tracks should render their visualizers
-     */
-    getVisualizationWidth() {
-        return this.state.visualizerInfo.viewWindow.getLength();
     }
 
     /**
@@ -259,7 +226,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element} - subcontainer that renders tracks
      */
     renderSubContainer() {
-        const {tracks, viewRegion, onNewRegion, onTracksChanged} = this.props;
+        const {tracks, primaryView, onNewRegion, onTracksChanged} = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
@@ -270,17 +237,17 @@ class TrackContainer extends React.Component {
                 />;
             case Tools.ZOOM_IN:
                 return <ZoomableTrackContainer
-                    visualizationStartX={TrackLegend.WIDTH}
-                    visualizationWidth={this.getVisualizationWidth()}
                     trackElements={trackElements}
-                    viewRegion={viewRegion}
+                    viewWindowRegion={primaryView.viewWindowRegion}
+                    viewWindowWidth={primaryView.viewWindow.getLength()}
+                    leftBoundaryX={TrackLegend.WIDTH}
                     onNewRegion={onNewRegion}
                 />;
             case Tools.DRAG:
                 return <DraggableTrackContainer
-                    visualizationWidth={this.getVisualizationWidth()}
                     trackElements={trackElements}
-                    viewRegion={viewRegion}
+                    viewWindowRegion={primaryView.viewWindowRegion}
+                    viewWindowWidth={primaryView.viewWindow.getLength()}
                     onNewRegion={onNewRegion}
                 />;
             default:
@@ -310,4 +277,4 @@ class TrackContainer extends React.Component {
     }
 }
 
-export default connect(mapStateToProps, callbacks)(withAutoDimensions(TrackContainer));
+export default withEnhancements(TrackContainer);

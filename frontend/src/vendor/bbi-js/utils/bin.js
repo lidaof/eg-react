@@ -14,7 +14,7 @@
 
 // Copied from utils.js so that utils.js is no longer a requirement. Can replace with $.extend() or _.extend()
 
-const sha1 = require('../utils/sha1');
+const sha1 = require('./sha1');
 
 const b64_sha1 = sha1.b64_sha1;
 

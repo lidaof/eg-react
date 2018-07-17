@@ -1,4 +1,4 @@
-import { GenomeAlignmentWorker } from './GenomeAlignmentWorker';
+import { AlignSourceWorker } from './AlignSourceWorker';
 import registerWorkerRunnableSource from '../worker/registerWorkerRunnableSource';
 
-registerWorkerRunnableSource(GenomeAlignmentWorker);
+registerWorkerRunnableSource(AlignSourceWorker);

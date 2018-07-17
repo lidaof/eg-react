@@ -1,6 +1,6 @@
 import Chromosome from '../Chromosome';
 import Genome from '../Genome';
-import TrackModel from '../../../model/TrackModel';
+import TrackModel from '../../TrackModel';
 import cytobands from './cytoband.json';
 
 const genome = new Genome("mm10", [

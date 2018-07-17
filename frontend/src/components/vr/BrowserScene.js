@@ -6,17 +6,16 @@ import VrRuler from './VrRuler';
 import { NumericalTrack3D } from './NumericalTrack3D';
 import { InteractionTrack3D } from './InteractionTrack3D';
 
-import { withDataFetch } from '../trackConfig/BigWigTrackConfig';
 import { configStaticDataSource } from '../trackConfig/configDataFetch';
 import { HicSource } from '../../dataSources/HicSource';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import TrackModel from '../../model/TrackModel';
-import RegionExpander from '../../model/RegionExpander';
+import { RegionExpander } from '../../model/RegionExpander';
 import withCurrentGenome from '../withCurrentGenome';
 
 const COMPONENT_FOR_TRACK_TYPE = {
-    bigwig: withDataFetch(NumericalTrack3D),
+    bigwig: NumericalTrack3D,
 };
 const withHicData = configStaticDataSource(props => new HicSource(props.trackModel.url, props.genomeConfig.genome));
 const InteractionTrack = withCurrentGenome(withHicData(InteractionTrack3D));

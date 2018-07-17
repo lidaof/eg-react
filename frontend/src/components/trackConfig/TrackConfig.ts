@@ -1,6 +1,7 @@
 import UnknownTrack from '../trackVis/UnknownTrack';
 import LabelConfig from '../trackContextMenu/LabelConfig';
 import { TrackModel, TrackOptions } from '../../model/TrackModel';
+import DataSource from '../../dataSources/DataSource';
 
 export class TrackConfig {
     public defaultOptions: TrackOptions
@@ -19,6 +20,14 @@ export class TrackConfig {
      */
     setDefaultOptions(defaults: TrackOptions): TrackOptions {
         return Object.assign(this.defaultOptions, defaults);
+    }
+
+    initDataSource(): DataSource {
+        return new DataSource();
+    }
+
+    formatData(data: any): any {
+        return data;
     }
 
     getOptions(): TrackOptions {

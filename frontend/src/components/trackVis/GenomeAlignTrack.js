@@ -1,14 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import memoizeOne from 'memoize-one';
 
 import Track from './commonComponents/Track';
 import TrackLegend from './commonComponents/TrackLegend';
 
 // import { GenomeAlignDisplayModes } from '../../model/DisplayModes';
-import { AlignmentProcessor } from '../../model/AlignmentProcessor';
 import OpenInterval from '../../model/interval/OpenInterval';
-import { ensureMaxListLength } from '../../util';
 
 const HEIGHT = 80;
 const QUERY_GENOME_RECT_HEIGHT = 10;
@@ -24,15 +21,9 @@ export class GenomeAlignTrack extends React.Component {
     static propTypes = Object.assign({},
         Track.propsFromTrackContainer,
         {
-        data: PropTypes.array.isRequired, 
+            placedAlignments: PropTypes.array.isRequired, // array of PlacedAlignment
         }
     );
-
-    constructor(props) {
-        super(props);
-        this.alignmentProcessor = new AlignmentProcessor();
-        this.alignmentProcessor.mergeAndPlaceAlignments = memoizeOne(this.alignmentProcessor.mergeAndPlaceAlignments);
-    }
 
     renderMergedAlignment(placement) {
         const {queryLocus, queryXSpan, segments} = placement;
@@ -71,9 +62,11 @@ export class GenomeAlignTrack extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {viewRegion, width, viewWindow, trackModel, options, data} = this.props;
-        const placements = this.alignmentProcessor.mergeAndPlaceAlignments(data, viewRegion, width);
-        const visualizer = <svg width={width} height={HEIGHT} style={{display: "block"}} >{placements.map(this.renderMergedAlignment)}</svg>
+        const {width, trackModel, placedAlignments} = this.props;
+        console.log(placedAlignments);
+        const visualizer = <svg width={width} height={HEIGHT} style={{display: "block"}} >
+            {placedAlignments.map(this.renderMergedAlignment)}
+        </svg>;
         return <Track
             {...this.props}
             viewWindow={new OpenInterval(0, width)}

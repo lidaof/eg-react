@@ -1,10 +1,10 @@
-import WorkerRunnableSource from "../worker/WorkerRunnableSource";
-import BedSourceWorker from "./BedSourceWorker";
 import JSON5 from 'json5';
+import BedSourceWorker from './BedSourceWorker';
+import WorkerRunnableSource from '../worker/WorkerRunnableSource';
 
 const ROUGH_MODE_LENGTH = 10;
 
-export class GenomeAlignmentWorker extends WorkerRunnableSource {
+export class AlignSourceWorker extends WorkerRunnableSource {
     constructor(url) {
         super();
         this.bedSourceWorker = new BedSourceWorker(url, Infinity);

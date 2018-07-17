@@ -1,7 +1,7 @@
 import SCAFFOLDS from './scaffolds';
 import Chromosome from '../Chromosome';
 import { Genome } from '../Genome';
-import TrackModel from '../../../model/TrackModel';
+import TrackModel from '../../TrackModel';
 
 const GENOME_NAME = "danRer10";
 

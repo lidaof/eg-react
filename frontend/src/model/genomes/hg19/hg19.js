@@ -1,6 +1,6 @@
 import Chromosome from '../Chromosome';
 import Genome from '../Genome';
-import TrackModel from '../../../model/TrackModel';
+import TrackModel from '../../TrackModel';
 import cytobands from './cytoband.json';
 import annotationTracks from './annotationTracks.json';
 
@@ -36,6 +36,10 @@ const navContext = genome.makeNavContext();
 const defaultRegion = navContext.parse('chr7:27053397-27373765');
 const defaultTracks = [
     new TrackModel({
+        type: "bigwig",
+        url: "https://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig",
+    }),
+    new TrackModel({
         type: 'geneAnnotation',
         name: 'refGene',
         genome: 'hg19'
@@ -49,13 +53,28 @@ const defaultTracks = [
         type: "ruler",
         name: "Ruler",
     }),
+    /*
+    new TrackModel({
+        type: "genomealign",
+        metadata: {
+            genome: 'mm10'
+        }
+    }),
     new TrackModel({
         type: "bigwig",
         url: "https://epgg-test.wustl.edu/d/mm10/ENCFF577HVF.bigWig",
         metadata: {
             genome: 'mm10'
         }
-    })
+    }),
+    new TrackModel({
+        type: "ruler",
+        name: "Ruler",
+        metadata: {
+            genome: 'mm10'
+        }
+    }),
+    */
 ];
 
 const HG19 = {
