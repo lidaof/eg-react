@@ -53,14 +53,15 @@ const defaultTracks = [
         type: "ruler",
         name: "Ruler",
     }),
-    /*
     new TrackModel({
+        name: 'hg19 to mm10 alignment',
         type: "genomealign",
         metadata: {
             genome: 'mm10'
         }
     }),
     new TrackModel({
+        name: 'mm10 bigwig',
         type: "bigwig",
         url: "https://epgg-test.wustl.edu/d/mm10/ENCFF577HVF.bigWig",
         metadata: {
@@ -69,12 +70,12 @@ const defaultTracks = [
     }),
     new TrackModel({
         type: "ruler",
-        name: "Ruler",
+        name: "mm10 Ruler",
         metadata: {
             genome: 'mm10'
         }
     }),
-    */
+
 ];
 
 const HG19 = {

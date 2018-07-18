@@ -13,7 +13,7 @@ interface DataManagerProps {
     genome: string; // The primary genome
     tracks: TrackModel[]; // Tracks
     viewRegion: DisplayedRegionModel; // Region that the user requests to view
-    width: number;
+    containerWidth: number;
 }
 
 interface DataManagerState {
@@ -56,7 +56,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
         }
 
         getVisualizationWidth() {
-            return Math.max(1, this.props.width - TrackLegend.WIDTH);
+            return Math.max(1, this.props.containerWidth - TrackLegend.WIDTH);
         }
 
         getSecondaryGenomes(tracks: TrackModel[]) {
@@ -91,7 +91,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             const alignmentForGenome: AlignmentPromises = {};
             for (const genome of secondaryGenomes) {
                 alignmentForGenome[genome] = this._alignmentCalculator.computeSecondaryRegion(
-                    viewRegion, expansion.visRegion, expansion.visWidth, genome
+                    viewRegion, expansion, genome
                 );
             }
             return alignmentForGenome;

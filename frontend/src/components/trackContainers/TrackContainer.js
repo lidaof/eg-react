@@ -265,7 +265,7 @@ class TrackContainer extends React.Component {
         const trackDivStyle = {border: "1px solid black", cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR};
 
         return (
-        <OutsideClickDetector onOutsideClick={this.deselectAllTracks} style={{margin: 5}} >
+        <OutsideClickDetector onOutsideClick={this.deselectAllTracks} >
             {this.renderControls()}
             <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
                 <DivWithBullseye style={trackDivStyle}>

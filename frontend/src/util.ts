@@ -30,7 +30,7 @@ export enum MouseButton {
  * @param {Element} [relativeTo] - calculate coordinates relative to this element.  Default is event.currentTarget.
  * @return {Coordinate} object with props x and y that contain the relative coordinates
  */
-export function getRelativeCoordinates(event: MouseEvent, relativeTo: Element): Coordinate {
+export function getRelativeCoordinates(event: MouseEvent, relativeTo?: Element): Coordinate {
     if (!relativeTo) {
         relativeTo = event.currentTarget as Element;
     }

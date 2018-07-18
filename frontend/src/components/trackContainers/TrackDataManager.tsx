@@ -9,6 +9,7 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { TrackModel } from '../../model/TrackModel';
 import NavigationContext from '../../model/NavigationContext';
 import { GuaranteeMap } from '../../model/GuaranteeMap';
+import { Alignment } from '../../model/AlignmentViewCalculator';
 
 interface TrackDataMap {
     [id: number]: TrackData
@@ -24,14 +25,14 @@ interface DataManagerProps {
 }
 
 interface TrackData {
-    alignment: any;
+    alignment: Alignment;
     visRegion: DisplayedRegionModel;
     data: any[];
     isLoading: boolean;
     error?: any;
 }
 const INITIAL_TRACK_DATA: TrackData = {
-    alignment: [],
+    alignment: null,
     visRegion: new DisplayedRegionModel(new NavigationContext('', [])),
     data: [],
     isLoading: true,

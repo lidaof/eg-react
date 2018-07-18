@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import { AlignmentRecord } from './AlignmentRecord';
-import DisplayedRegionModel from './DisplayedRegionModel';
 import LinearDrawingModel from './LinearDrawingModel';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import OpenInterval from './interval/OpenInterval';
 import NavigationContext from './NavigationContext';
 import { Feature } from './Feature';
+import { ViewExpansion } from './RegionExpander';
 
 interface PlacedAlignment {
     record: AlignmentRecord;
@@ -33,15 +33,14 @@ export class AlignmentPlacer {
      * @param {number} width - view width of the primary genome
      * @return {PlacedMergedAlignment[]} placed merged alignments
      */
-    mergeAndPlaceAlignments(alignmentRecords: AlignmentRecord[], viewRegion: DisplayedRegionModel,
-        width: number): PlacedMergedAlignment[]
-    {
+    mergeAndPlaceAlignments(alignmentRecords: AlignmentRecord[], visData: ViewExpansion): PlacedMergedAlignment[] {
         if (alignmentRecords.length === 0) {
             return [];
         }
 
-        const navContext = viewRegion.getNavigationContext();
-        const drawModel = new LinearDrawingModel(viewRegion, width);
+        const {visRegion, visWidth, viewWindow} = visData;
+        const navContext = visRegion.getNavigationContext();
+        const drawModel = new LinearDrawingModel(visRegion, visWidth);
         const basesPerPixel = drawModel.xWidthToBases(1);
         // In other words, MERGE_PIXEL_DISTANCE px worth of bases.
         const mergeDistance = MERGE_PIXEL_DISTANCE * basesPerPixel;
@@ -82,11 +81,11 @@ export class AlignmentPlacer {
             const drawCenter = computeCentroid(segments.map(segment => segment.targetXSpan));
             let preferredStart = drawCenter - halfDrawWidth;
             let preferredEnd = drawCenter + halfDrawWidth;
-            if (preferredStart < 0) {
+            if (preferredStart < viewWindow.start) {
                 preferredStart = MARGIN;
                 preferredEnd = drawWidth + MARGIN;
-            } else if (preferredEnd > width) {
-                preferredEnd = width - MARGIN;
+            } else if (preferredEnd > viewWindow.end) {
+                preferredEnd = viewWindow.end - MARGIN;
                 preferredStart = preferredEnd - drawWidth;
             }
             const queryXSpan = intervalPlacer.place(new OpenInterval(preferredStart, preferredEnd));
@@ -106,11 +105,13 @@ export class AlignmentPlacer {
         return placements;
     }
 
-    makeQueryGenomeNavContext(placedAlignments: PlacedMergedAlignment[], width: number,
+    makeQueryGenomeNavContext(placedAlignments: PlacedMergedAlignment[], visWidth: number,
             basesPerPixel: number): NavigationContext {
+        // Sort by start
+        const sortedAlignments = placedAlignments.slice().sort((a, b) => a.queryXSpan.start - b.queryXSpan.start);
         const features = [];
         let x = 0;
-        for (const placedAlignment of placedAlignments) {
+        for (const placedAlignment of sortedAlignments) {
             const basesFromPrevFeature = basesPerPixel * (placedAlignment.queryXSpan.start - x);
             if (basesFromPrevFeature > 0) {
                 features.push(NavigationContext.makeGap(Math.ceil(basesFromPrevFeature)));
@@ -118,9 +119,9 @@ export class AlignmentPlacer {
             features.push(new Feature(undefined, placedAlignment.queryLocus));
             x = placedAlignment.queryXSpan.end;
         }
-        const finalGapLength = width - x;
-        if (finalGapLength > 0) {
-            features.push(NavigationContext.makeGap(Math.ceil(finalGapLength)));
+        const finalGapXWidth = visWidth - x;
+        if (finalGapXWidth > 0) {
+            features.push(NavigationContext.makeGap(Math.ceil(basesPerPixel * finalGapXWidth)));
         }
         return new NavigationContext('', features);
     }

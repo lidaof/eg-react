@@ -4,6 +4,7 @@ import { PlacedMergedAlignment, AlignmentPlacer } from './AlignmentPlacer';
 import { AlignmentRecord } from './AlignmentRecord';
 import { GuaranteeMap } from './GuaranteeMap';
 import DisplayedRegionModel from './DisplayedRegionModel';
+import { ViewExpansion } from './RegionExpander';
 import { getGenomeConfig } from './genomes/allGenomes';
 
 import DataSource from '../dataSources/DataSource';
@@ -36,11 +37,11 @@ export class AlignmentViewCalculator {
         return Promise.resolve(viewRegion);
     }
 
-    computeSecondaryRegion(fetchRegion: DisplayedRegionModel, drawRegion: DisplayedRegionModel, drawPaneWidth: number,
+    computeSecondaryRegion(fetchRegion: DisplayedRegionModel, visData: ViewExpansion,
         queryGenome: string): Promise<Alignment>
     {
         const fetcher = this._alignmentFetcherForGenome.get(queryGenome);
-        return fetcher.fetchAlignment(fetchRegion, drawRegion, drawPaneWidth);
+        return fetcher.fetchAlignment(fetchRegion, visData);
     }
 }
 
@@ -81,29 +82,15 @@ class AlignmentFetcher {
         return new WorkerSource(GenomeAlignWorker, url);
     }
 
-    processAlignment(rawRecords: any[], viewRegion: DisplayedRegionModel, width: number) {
-        const alignmentRecords = rawRecords.map(record => new AlignmentRecord(record));
-        const placedAlignments = ALIGNMENT_PLACER.mergeAndPlaceAlignments(alignmentRecords, viewRegion, width);
-        const navContext = ALIGNMENT_PLACER.makeQueryGenomeNavContext(
-            placedAlignments, width, viewRegion.getWidth() / width
-        );
-        return {
-            viewRegion: new DisplayedRegionModel(navContext),
-            drawData: placedAlignments,
-            isAggregated: true
-        };
-    }
-
     /**
      * 
      * @param {DisplayedRegionModel} viewRegion - view region in the primary genome
      * @param {number} width 
      */
-    async fetchAlignment(fetchRegion: DisplayedRegionModel, drawRegion: DisplayedRegionModel,
-        drawPaneWidth: number): Promise<Alignment>
-    {
+    async fetchAlignment(fetchRegion: DisplayedRegionModel, visData: ViewExpansion): Promise<Alignment> {
+        const {visRegion, visWidth} = visData;
         this._viewBeingFetched = fetchRegion;
-        const basesPerPixel = drawRegion.getWidth() / drawPaneWidth;
+        const basesPerPixel = visRegion.getWidth() / visWidth;
         const rawRecords: any[] = await this._dataSource.getData(fetchRegion, basesPerPixel);
 
         if (this._viewBeingFetched !== fetchRegion) { // Another view is being fetched; cancel processing.
@@ -111,8 +98,8 @@ class AlignmentFetcher {
         }
 
         const alignmentRecords = rawRecords.map(record => new AlignmentRecord(record));
-        const placedAlignments = ALIGNMENT_PLACER.mergeAndPlaceAlignments(alignmentRecords, drawRegion, drawPaneWidth);
-        const navContext = ALIGNMENT_PLACER.makeQueryGenomeNavContext(placedAlignments, drawPaneWidth, basesPerPixel);
+        const placedAlignments = ALIGNMENT_PLACER.mergeAndPlaceAlignments(alignmentRecords, visData);
+        const navContext = ALIGNMENT_PLACER.makeQueryGenomeNavContext(placedAlignments, visWidth, basesPerPixel);
         return {
             viewRegion: new DisplayedRegionModel(navContext),
             drawData: placedAlignments,

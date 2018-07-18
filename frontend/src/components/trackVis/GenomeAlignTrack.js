@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import Track from './commonComponents/Track';
 import TrackLegend from './commonComponents/TrackLegend';
 
-// import { GenomeAlignDisplayModes } from '../../model/DisplayModes';
-import OpenInterval from '../../model/interval/OpenInterval';
+import { ensureMaxListLength } from '../../util';
 
 const HEIGHT = 80;
 const QUERY_GENOME_RECT_HEIGHT = 10;
@@ -18,12 +17,7 @@ const MAX_POLYGONS = 500;
  * @author Silas Hsu
  */
 export class GenomeAlignTrack extends React.Component {
-    static propTypes = Object.assign({},
-        Track.propsFromTrackContainer,
-        {
-            placedAlignments: PropTypes.array.isRequired, // array of PlacedAlignment
-        }
-    );
+    static propTypes = Track.propsFromTrackContainer;
 
     renderMergedAlignment(placement) {
         const {queryLocus, queryXSpan, segments} = placement;
@@ -62,14 +56,12 @@ export class GenomeAlignTrack extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {width, trackModel, placedAlignments} = this.props;
-        console.log(placedAlignments);
+        const {width, trackModel, alignment} = this.props;
         const visualizer = <svg width={width} height={HEIGHT} style={{display: "block"}} >
-            {placedAlignments.map(this.renderMergedAlignment)}
+            {alignment && alignment.drawData.map(this.renderMergedAlignment)}
         </svg>;
         return <Track
             {...this.props}
-            viewWindow={new OpenInterval(0, width)}
             visualizer={visualizer}
             legend={<TrackLegend trackModel={trackModel} height={HEIGHT} />}
         />

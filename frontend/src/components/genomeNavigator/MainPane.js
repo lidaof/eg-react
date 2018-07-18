@@ -30,7 +30,7 @@ const SELECT_BOX_HEIGHT = "60px";
  */
 class MainPane extends React.Component {
     static propTypes = {
-        width: PropTypes.number.isRequired, // The width of the pane
+        containerWidth: PropTypes.number.isRequired, // The width of the pane
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view
 
         /**
@@ -98,7 +98,7 @@ class MainPane extends React.Component {
      * @param {React.SyntheticEvent} event - the final mouse event that triggered the selection
      */
     areaSelected(startX, endX, event) {
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
+        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.containerWidth);
         this.props.onRegionSelected(drawModel.xToBase(startX), drawModel.xToBase(endX));
     }
 
@@ -108,8 +108,8 @@ class MainPane extends React.Component {
      * @override
      */
     render() {
-        const {width, viewRegion, selectedRegion, onNewViewRequested} = this.props;
-        if (width === 0) {
+        const {containerWidth, viewRegion, selectedRegion, onNewViewRequested} = this.props;
+        if (containerWidth === 0) {
             if (process.env.NODE_ENV !== "test") {
                 console.warn("Cannot render with a width of 0");
             }
@@ -120,22 +120,22 @@ class MainPane extends React.Component {
         return (
         <DragAcrossView button={MouseButton.RIGHT} onViewDrag={onNewViewRequested} viewRegion={viewRegion} >
             <SelectableGenomeArea
-                drawModel={new LinearDrawingModel(viewRegion, width)}
+                drawModel={new LinearDrawingModel(viewRegion, containerWidth)}
                 y={SELECT_BOX_Y}
                 height={SELECT_BOX_HEIGHT}
                 onAreaSelected={this.areaSelected}
             >
                 <svg
-                    width={width}
+                    width={containerWidth}
                     height={SVG_HEIGHT}
                     onContextMenu={event => event.preventDefault()}
                     onWheel={this.mousewheel}
                     style={{border: "2px solid black"}}
                 >
-                    <Chromosomes viewRegion={viewRegion} width={width} y={CHROMOSOME_Y} />
-                    <Ruler viewRegion={viewRegion} width={width} y={RULER_Y} />
+                    <Chromosomes viewRegion={viewRegion} width={containerWidth} y={CHROMOSOME_Y} />
+                    <Ruler viewRegion={viewRegion} width={containerWidth} y={RULER_Y} />
                     <SelectedRegionBox
-                        width={width}
+                        width={containerWidth}
                         viewRegion={viewRegion}
                         selectedRegion={selectedRegion}
                         onNewViewRequested={onNewViewRequested}
