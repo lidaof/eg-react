@@ -103,7 +103,7 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
     }
 
     /**
-     * Merges chromosome intervals based on proximity.  Does not mutate any inputs.
+     * Merges chromosome intervals based on proximity, by default 2000 bp.  Does not mutate any inputs.
      * 
      * @param {ChromosomeInterval[]} intervals - interval list to inspect for overlaps
      * @param {number} [mergeDistance] - distance in bases at which two intervals are close enough to merge

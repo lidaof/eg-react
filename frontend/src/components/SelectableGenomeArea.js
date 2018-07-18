@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import SelectableArea from './SelectableArea';
 import { MIN_VIEW_REGION_SIZE } from '../AppState';
 import LinearDrawingModel from '../model/LinearDrawingModel';
+import { niceBpCount } from '../util';
 import './SelectableArea.css';
 
 /**
@@ -21,27 +22,12 @@ class SelectableGenomeArea extends React.PureComponent {
         onAreaSelected: PropTypes.func, // See SelectableArea docs
     };
 
-    /**
-     * @param {number} bases - number of bases
-     * @return {string} human-readable string representing that number of bases
-     */
-    numBasesToString(bases) {
-        const rounded = Math.floor(bases);
-        if (rounded >= 750000) {
-            return `${(rounded/1000000).toFixed(1)}Mb`;
-        } else if (rounded >= 10000) {
-            return `${(rounded/1000).toFixed(1)}kb`;
-        } else {
-            return `${rounded}bp`;
-        }
-    }
-
     render() {
         const {y, height, drawModel, onAreaSelected, children} = this.props;
         const getIsWidthSelectable = width => drawModel.xWidthToBases(width) >= MIN_VIEW_REGION_SIZE;
         const getInnerElement = width => (
             <div className="SelectableArea-box-text-container" >
-                <h4 style={{margin: 0}} >{this.numBasesToString(drawModel.xWidthToBases(width))}</h4>
+                <h4 style={{margin: 0}} >{niceBpCount(drawModel.xWidthToBases(width))}</h4>
                 <p className="SelectableArea-box-secondary-text" >
                     {getIsWidthSelectable(width) ? "Esc to cancel" : "Too small"}
                 </p>

@@ -1,6 +1,6 @@
-import DisplayedRegionModel from "./DisplayedRegionModel";
-import ChromosomeInterval from "./interval/ChromosomeInterval";
-import OpenInterval from "./interval/OpenInterval";
+import DisplayedRegionModel from './DisplayedRegionModel';
+import OpenInterval from './interval/OpenInterval';
+import { FeatureSegment } from './interval/FeatureSegment';
 
 /**
  * Utility class for converting between pixels and base numbers.
@@ -103,10 +103,9 @@ class LinearDrawingModel {
      * @param {number} pixel - pixel coordinate that represents a base
      * @return {ChromosomeInterval} genomic coordinate that the pixel represents
      */
-    xToGenomeCoordinate(pixel: number): ChromosomeInterval {
+    xToSegmentCoordinate(pixel: number): FeatureSegment {
         const contextBase = this.xToBase(pixel);
-        const featureCoord = this._viewRegion.getNavigationContext().convertBaseToFeatureCoordinate(contextBase);
-        return featureCoord.getGenomeCoordinates();
+        return this._viewRegion.getNavigationContext().convertBaseToFeatureCoordinate(contextBase);
     }
 }
 
