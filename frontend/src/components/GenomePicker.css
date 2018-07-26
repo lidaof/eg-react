@@ -1,0 +1,45 @@
+.GenomePicker-main {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    height: 60vh;
+    grid-gap: 20px;
+    width: 50%;
+    margin: auto;
+}
+
+.GenomePicker-species {
+    display: grid;
+    grid-template-columns: auto;
+    grid-gap: 10px;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.GenomePicker-one-species {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    border: 2px solid orange;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.GenomePicker-one-species:hover, .GenomePicker-assembly > div:hover {
+    transform: translateX(5%);
+    transition: transform 0.5s;
+}
+
+.GenomePicker-assembly > div {
+    padding: 3px;
+    border-bottom: 1px solid orangered;
+    cursor: pointer;
+    font-style: italic;
+}
+
+.GenomePicker-holder {
+    display: grid;
+    grid-template-columns: auto auto;
+}

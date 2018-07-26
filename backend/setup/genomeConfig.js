@@ -37,6 +37,19 @@ const hg19 = [
     }
 ];
 
+const hg38 = [
+    {
+        name: 'refGene',
+        file: 'refGene_load',
+        fieldsConfig: geneFieldsAndIndex
+    },
+    {
+        name: 'gencodeV28',
+        file: 'gencodeV28_load',
+        fieldsConfig: geneFieldsAndIndex
+    }
+];
+
 const mm10 = [
     {
         name: 'refGene',
@@ -53,6 +66,6 @@ const danRer10 = [
     }
 ];
 
-const genomeConfig = { hg19, mm10, danRer10 };
+const genomeConfig = { hg19, mm10, danRer10, hg38 };
 
 module.exports = genomeConfig;

@@ -86,7 +86,12 @@ function makeCytobandObject(rawRecord) {
 function convertTextToCytobandMap(text) {
     let result = {};
     const rawRecords = text.split(RECORD_DELIMITER);
-    for (let rawRecord of rawRecords) {
+    for (let i = 0; i < rawRecords.length; i++) {
+        const rawRecord = rawRecords[i].trim();
+        if (!rawRecord) {
+            continue;
+        }
+
         const cytobandObject = makeCytobandObject(rawRecord);
         if (cytobandObject) {
             const chrom = cytobandObject.chrom;
@@ -95,7 +100,7 @@ function convertTextToCytobandMap(text) {
             }
             result[chrom].push(cytobandObject);
         } else {
-            console.warn("Could not parse cytoband from data: " + rawRecord);
+            console.warn(`Could not parse cytoband data on line ${i}; skipping...`);
         }
     }
     return result;

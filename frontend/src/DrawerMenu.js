@@ -54,6 +54,7 @@ export class DrawerMenu extends React.Component {
                 overlayColor="rgba(255,255,255,0.6)"
                 drawerStyle={DRAWER_STYLE} 
                 fadeOut={true}
+                zIndex={1}
             >
                 <div
                     title="Close menu"

@@ -1,7 +1,7 @@
 import Chromosome from '../Chromosome';
 import Genome from '../Genome';
 import TrackModel from '../../../model/TrackModel';
-import cytobands from './cytoband.json';
+import cytobands from './cytoBand.json';
 
 const genome = new Genome("mm10", [
     new Chromosome("chr1", 195471971),

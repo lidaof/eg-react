@@ -22,18 +22,21 @@ const initialHubs = [
         collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE signal of unique reads",
         numTracks: 7729,
+        oldHubFormat: true,
         url: "https://vizhub.wustl.edu/public/hg19/hg19_mpssur.json"
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE signal of all reads",
         numTracks: 7842,
+        oldHubFormat: true,
         url: "https://vizhub.wustl.edu/public/hg19/hg19_mpssar.json"
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE all other types",
         numTracks: 5937,
+        oldHubFormat: true,
         description: "Base overlap signal, fold change over control, genome compartments, percentage normalized signal, etc.",
         url: "https://vizhub.wustl.edu/public/hg19/hg19_other_rmdup.json"
     },
@@ -41,24 +44,28 @@ const initialHubs = [
         collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE legacy hub",
         numTracks: 4251,
+        oldHubFormat: true,
         url: "https://vizhub.wustl.edu/public/hg19/encode.md"
     },
     {
         collection: "Long-range chromatin interaction experiments",
         name: "Long-range chromatin interaction experiments",
         numTracks: 156,
+        oldHubFormat: true,
         url: "https://vizhub.wustl.edu/public/hg19/longrange4"
     },
     {
         collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
         name: "Roadmap Data from GEO",
         numTracks: 2737,
-        url: "https://vizhub.wustl.edu/public/hg19/roadmap9_methylC.md",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~dli/tmp/roadmap9",
     },
     {
         collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
         name: "methylCRF tracks from Roadmap",
         numTracks: 16,
+        oldHubFormat: true,
         description: "Single CpG methylation value prediction by methylCRF algorithm (PMID:23804401) using Roadmap data.",
         url: "https://vizhub.wustl.edu/public/hg19/methylCRF.roadmap.hub"
     },
@@ -66,12 +73,14 @@ const initialHubs = [
         collection: "HiC interaction from Juicebox",
         name: "HiC interaction from Juicebox",
         numTracks: 193,
+        oldHubFormat: true,
         url: "https://epgg-test.wustl.edu/dli/long-range-test/hg19-juiceboxhub"
     },
     {
         collection: "Human 450K and 27K array data from TCGA",
         name: "Human 450K and 27K array data from TCGA",
         numTracks: 2551,
+        oldHubFormat: true,
         url: "https://vizhub.wustl.edu/public/hg19/TCGA-450k-hub2"
     },
 ];
@@ -146,7 +155,7 @@ class HubTable extends React.PureComponent {
             let newHubs = this._cloneHubsAndModifyOne(index, {isLoading: true});
             this.setState({hubs: newHubs});
             const json = await new Json5Fetcher().get(hub.url);
-            const tracks = await this.hubParser.getTracksInHub(json, hub.name);
+            const tracks = await this.hubParser.getTracksInHub(json, hub.name, hub.oldHubFormat);
             this.props.onHubLoaded(tracks);
             let loadedHubs = this._cloneHubsAndModifyOne(index, {isLoading: false, isLoaded: true});
             this.setState({hubs: loadedHubs});

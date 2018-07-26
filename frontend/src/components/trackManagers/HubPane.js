@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CustomHubAdder from './CustomHubAdder';
 import HubTable from './HubTable';
-import HubTrackTable from './HubTrackTable';
 import TrackModel from '../../model/TrackModel';
+import FacetTable from './FacetTable';
 
 import './HubPane.css';
 
@@ -85,10 +85,10 @@ class HubPane extends React.PureComponent {
             {this.state.isHubTableVisible && <HubTable onHubLoaded={this.addToAvailableTracks} />}
             {
             this.state.availableTracks.length > 0 ?
-                <HubTrackTable
+                <FacetTable
                     tracks={this.state.availableTracks}
                     addedTracks={this.props.addedTracks}
-                    onTrackAdded={track => this.props.onTracksAdded([track])}
+                    onTracksAdded={this.props.onTracksAdded}
                 /> :
                 <p>No tracks from data hubs yet.  Load a hub first.</p>
             }

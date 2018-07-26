@@ -1,4 +1,5 @@
 import HG19 from './hg19/hg19';
+import HG38 from './hg38/hg38';
 import MM10 from './mm10/mm10';
 import DAN_RER10 from './danRer10/danRer10';
 import { GenomeConfig } from './GenomeConfig';
@@ -8,6 +9,7 @@ import { GenomeConfig } from './GenomeConfig';
  */
 export const allGenomes = [
     HG19,
+    HG38,
     MM10,
     DAN_RER10
 ];

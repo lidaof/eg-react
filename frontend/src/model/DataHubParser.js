@@ -7,20 +7,21 @@ class HubParser {
         this.tracksStartIndex = tracksStartIndex;
     }
 
-    getTracksInHub(parsedJson, hubName) {
+    getTracksInHub(parsedJson, hubName, oldHubFormat) {
         let tracks = [];
         for (let plainObject of parsedJson.slice(this.tracksStartIndex)) {
             let newTrack = new TrackModel(plainObject);
-            let assay = assayDict[newTrack.metadata.Assay] || ["unknown"];
-            let sample = sampleDict[newTrack.metadata.Sample] || ["unknown"];
             newTrack.datahub = hubName;
-            newTrack.metadata.Assay = assay.slice(0, -1);
-            newTrack.metadata.assayDetails = assay[assay.length - 1];
-            newTrack.metadata.Sample = sample.slice(0, -1);
-            newTrack.sampleDetails = sample[sample.length - 1];
+            if (oldHubFormat) {
+                let assay = assayDict[newTrack.metadata.Assay] || ["unknown"];
+                let sample = sampleDict[newTrack.metadata.Sample] || ["unknown"];
+                newTrack.metadata.Assay = assay.slice(0, -1);
+                newTrack.metadata.assayDetails = assay[assay.length - 1];
+                newTrack.metadata.Sample = sample.slice(0, -1);
+                newTrack.sampleDetails = sample[sample.length - 1];
+            }
             tracks.push(newTrack);
         }
-
         return tracks;
     }
 }
