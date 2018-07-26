@@ -19,6 +19,28 @@ const MAX_POLYGONS = 500;
 export class GenomeAlignTrack extends React.Component {
     static propTypes = Track.propsFromTrackContainer;
 
+    constructor(props) {
+        super(props);
+        this.renderFineAlignment = this.renderFineAlignment.bind(this);
+    }
+
+    renderFineAlignment(placement, i) {
+        const {targetXSpan, targetSegments, querySegments} = placement;
+        const [xStart, xEnd] = targetXSpan;
+        const targetRects = targetSegments.filter(segment => !segment.isGap).map((segment, i) =>
+            <rect key={i} x={segment.xSpan.start} y={0} width={segment.xSpan.getLength()} height={10} fill="darkblue" />
+        );
+        const queryRects = querySegments.filter(segment => !segment.isGap).map((segment, i) =>
+            <rect key={i} x={segment.xSpan.start} y={70} width={segment.xSpan.getLength()} height={10} fill={COLOR} />
+        );
+        return <React.Fragment key={i} >
+            <line x1={xStart} y1={5} x2={xEnd} y2={5} stroke="darkblue" />
+            <line x1={xStart} y1={75} x2={xEnd} y2={75} stroke={COLOR} />
+            {targetRects}
+            {queryRects}
+        </React.Fragment>;
+    }
+
     renderMergedAlignment(placement) {
         const {queryLocus, queryXSpan, segments} = placement;
         const queryRectTopY = HEIGHT - QUERY_GENOME_RECT_HEIGHT;
@@ -57,12 +79,15 @@ export class GenomeAlignTrack extends React.Component {
      */
     render() {
         const {width, trackModel, alignment} = this.props;
-        const visualizer = <svg width={width} height={HEIGHT} style={{display: "block"}} >
-            {alignment && alignment.drawData.map(this.renderMergedAlignment)}
-        </svg>;
+        let svgElements = null;
+        if (alignment) {
+            const drawFunction = alignment.isFineMode ? this.renderFineAlignment : this.renderMergedAlignment;
+            svgElements = alignment.drawData.map(drawFunction);
+        }
+
         return <Track
             {...this.props}
-            visualizer={visualizer}
+            visualizer={<svg width={width} height={HEIGHT} style={{display: "block"}} >{svgElements}</svg>}
             legend={<TrackLegend trackModel={trackModel} height={HEIGHT} />}
         />
     }

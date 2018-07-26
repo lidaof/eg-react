@@ -76,13 +76,15 @@ export class FeaturePlacer {
      */
     placeFeatures(features: Feature[], viewRegion: DisplayedRegionModel, width: number): PlacedFeature[] {
         const drawModel = new LinearDrawingModel(viewRegion, width);
+        const viewRegionBounds = viewRegion.getContextCoordinates();
         const navContext = viewRegion.getNavigationContext();
 
         const placements = [];
         for (const feature of features) {
-            for (const contextLocation of feature.computeNavContextCoordinates(navContext)) {
-                const xSpan = drawModel.baseSpanToXSpan(contextLocation, true);
-                if (xSpan) {
+            for (let contextLocation of feature.computeNavContextCoordinates(navContext)) {
+                contextLocation = contextLocation.getOverlap(viewRegionBounds); // Clamp the location to view region
+                if (contextLocation) {
+                    const xSpan = drawModel.baseSpanToXSpan(contextLocation);
                     placements.push({ feature, contextLocation, xSpan });
                 }
             }
@@ -137,17 +139,21 @@ export class FeaturePlacer {
         width: number): PlacedInteraction[]
     {
         const drawModel = new LinearDrawingModel(viewRegion, width);
+        const viewRegionBounds = viewRegion.getContextCoordinates();
         const navContext = viewRegion.getNavigationContext();
 
         const mappedInteractions = [];
         for (const interaction of interactions) {
-            const contextLocations1 = navContext.convertGenomeIntervalToBases(interaction.locus1);
-            const contextLocations2 = navContext.convertGenomeIntervalToBases(interaction.locus2);
+            let contextLocations1 = navContext.convertGenomeIntervalToBases(interaction.locus1);
+            let contextLocations2 = navContext.convertGenomeIntervalToBases(interaction.locus2);
+            // Clamp the locations to the view region
+            contextLocations1 = contextLocations1.map(location => location.getOverlap(viewRegionBounds));
+            contextLocations2 = contextLocations2.map(location => location.getOverlap(viewRegionBounds));
             for (const location1 of contextLocations1) {
                 for (const location2 of contextLocations2) {
-                    const xSpan1 = drawModel.baseSpanToXSpan(location1, true);
-                    const xSpan2 = drawModel.baseSpanToXSpan(location2, true);
-                    if (xSpan1 && xSpan2) {
+                    if (location1 && location2) {
+                        const xSpan1 = drawModel.baseSpanToXSpan(location1);
+                        const xSpan2 = drawModel.baseSpanToXSpan(location2);
                         mappedInteractions.push(new PlacedInteraction(interaction, xSpan1, xSpan2));
                     }
                 }

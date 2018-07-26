@@ -75,26 +75,15 @@ class LinearDrawingModel {
     }
 
     /**
-     * Converts an interval of bases to an interval of X coordinates.  The `clamp` parameter ensures that the return
-     * values lie between 0 and the draw width, but it might also cause `null` return values if both ends of the
-     * interval fall out of range.
+     * Converts an interval of bases to an interval of X coordinates.
      * 
      * @param {OpenInterval} baseInterval - interval of bases to convert
-     * @param {boolean} [clamp] - whether to ensure return values lie between 0 and the draw width
      * @return {OpenInterval} x draw interval
      */
-    baseSpanToXSpan(baseInterval: OpenInterval, clamp=false): OpenInterval {
-        let startX = this.baseToX(baseInterval.start);
-        let endX = this.baseToX(baseInterval.end);
-        if (clamp) {
-            startX = Math.max(0, startX);
-            endX = Math.min(endX, this._drawWidth - 1);
-        }
-        if (startX < endX) {
-            return new OpenInterval(startX, endX);
-        } else {
-            return null;
-        }
+    baseSpanToXSpan(baseInterval: OpenInterval): OpenInterval {
+        const startX = this.baseToX(baseInterval.start);
+        const endX = this.baseToX(baseInterval.end);
+        return new OpenInterval(startX, endX);
     }
 
     /**

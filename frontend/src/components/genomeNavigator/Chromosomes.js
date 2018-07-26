@@ -6,6 +6,7 @@ import _ from 'lodash';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
+import NavigationContext from '../../model/NavigationContext';
 import TwoBitSource from '../../dataSources/TwoBitSource';
 
 const HEIGHT = 15;
@@ -278,8 +279,8 @@ class Chromosomes extends React.PureComponent {
             }
 
             const labelSize = this.getSizeForFeatureLabel(segment.getName(), drawWidth); 
-            if (labelSize) { // Label for feature, if it fits
-                children.push(
+            if (labelSize && !NavigationContext.isGapFeature(segment.feature)) {
+                children.push( // Label for feature, if it fits
                     <text
                         key={"text" + x}
                         x={x + drawWidth/2}

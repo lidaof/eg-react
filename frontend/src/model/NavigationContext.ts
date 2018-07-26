@@ -32,7 +32,7 @@ class NavigationContext {
      * @return {Feature} a special "feature" representing a gap in the genome.
      */
     static makeGap(length: number) {
-        return new Feature('Gap', new ChromosomeInterval(GAP_CHR, 0, length));
+        return new Feature('Gap', new ChromosomeInterval(GAP_CHR, 0, Math.round(length)));
     }
 
     /**
@@ -52,7 +52,7 @@ class NavigationContext {
      * @param {boolean} isGenome - whether the context covers the entire genome
      * @throws {Error} if the feature list has a problem
      */
-    constructor(name: string, features: Feature[], isGenome=false) {
+    constructor(name: string, features: Feature[]) {
         this._name = name;
         this._features = features;
         this._startCoordinateForFeature = new Map();
@@ -121,8 +121,8 @@ class NavigationContext {
     }
 
     /**
-     * Given a context coordinate, gets the feature in which it is located.  Returns a FeatureSegment that expresses
-     * a base number relative to the feature's start.
+     * Given a context coordinate, gets the feature in which it is located.  Returns a FeatureSegment that has 0 length,
+     * representing a single base number relative to the feature's start.
      *
      * @param {number} base - the context coordinate to look up
      * @return {FeatureSegment} corresponding feature coordinate
@@ -135,12 +135,8 @@ class NavigationContext {
             );
         }
 
-        let index = this._features.length - 1; // We want the index of the feature that contains the context coordinate.
-        // It's ok to subtract 1 since there must be at least one feature, guaranteed by this.getIsValidBase()
-        // Last feature (highest base #) to first (lowest base #)
-        while (index > 0 && base < this._sortedFeatureStarts[index]) {
-            index--;
-        }
+        // Index of the feature that contains the context coordinate
+        const index = _.sortedLastIndex(this._sortedFeatureStarts, base) - 1;
         const feature = this._features[index];
         const coordinate = base - this._sortedFeatureStarts[index];
         return new FeatureSegment(feature, coordinate, coordinate);

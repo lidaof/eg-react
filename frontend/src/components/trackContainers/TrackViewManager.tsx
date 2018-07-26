@@ -2,12 +2,12 @@ import React from 'react';
 import memoizeOne from 'memoize-one';
 
 import TrackLegend from '../trackVis/commonComponents/TrackLegend';
-import ErrorMessage from '../ErrorMessage';
 
 import { TrackModel } from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import { AlignmentViewCalculator, Alignment } from '../../model/AlignmentViewCalculator';
 import { RegionExpander, ViewExpansion } from '../../model/RegionExpander';
+import { GuaranteeMap } from '../../model/GuaranteeMap';
+import { AlignmentViewCalculator, Alignment } from '../../model/alignment/AlignmentViewCalculator';
 
 interface DataManagerProps {
     genome: string; // The primary genome
@@ -17,12 +17,7 @@ interface DataManagerProps {
 }
 
 interface DataManagerState {
-    error: any;
-    primaryView: PrimaryView;
-}
-
-export interface PrimaryView extends ViewExpansion {
-    viewWindowRegion: DisplayedRegionModel;
+    primaryView: ViewExpansion;
 }
 
 export interface AlignmentPromises {
@@ -32,8 +27,8 @@ export interface AlignmentPromises {
 interface WrappedComponentProps {
     alignments: AlignmentPromises;
     basesPerPixel: number;
-    primaryViewPromise: Promise<PrimaryView>;
-    primaryView: PrimaryView;
+    primaryViewPromise: Promise<ViewExpansion>;
+    primaryView: ViewExpansion;
 }
 
 const REGION_EXPANDER = new RegionExpander(1);
@@ -41,14 +36,15 @@ const REGION_EXPANDER = new RegionExpander(1);
 export function withTrackView(WrappedComponent: React.ComponentType<WrappedComponentProps>) {
     return class TrackViewManager extends React.Component<DataManagerProps, DataManagerState> {
         private _primaryGenome: string;
-        private _alignmentCalculator: AlignmentViewCalculator;
+        private _alignmentCalculatorForGenome: GuaranteeMap<string, AlignmentViewCalculator>
 
         constructor(props: DataManagerProps) {
             super(props);
             this._primaryGenome = props.genome;
-            this._alignmentCalculator = new AlignmentViewCalculator(props.genome);
+            this._alignmentCalculatorForGenome = new GuaranteeMap(
+                queryGenome => new AlignmentViewCalculator(this._primaryGenome, queryGenome)
+            );
             this.state = {
-                error: null,
                 primaryView: null,
             };
             this.fetchPrimaryView = memoizeOne(this.fetchPrimaryView);
@@ -66,42 +62,40 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             return Array.from(genomeSet);
         }
 
-        async fetchPrimaryView(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<PrimaryView> {
-            const secondaryGenomes = this.getSecondaryGenomes(tracks);
-            const expansion = REGION_EXPANDER.calculateExpansion(viewRegion, this.getVisualizationWidth());
-            try {
-                const primaryRegion = await this._alignmentCalculator.computePrimaryRegion(
-                    expansion.visRegion, expansion.visWidth, secondaryGenomes[0]
-                );
+        async fetchPrimaryView(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<ViewExpansion> {
+            const visData = REGION_EXPANDER.calculateExpansion(viewRegion, this.getVisualizationWidth());
+            const secondaryGenome = this.getSecondaryGenomes(tracks)[0]; // Just the first one
+            if (!secondaryGenome) {
+                return visData;
+            }
 
-                const primaryView = expansion as PrimaryView;
-                primaryView.visRegion = primaryRegion;
-                primaryView.viewWindowRegion = viewRegion;
-                this.setState({ primaryView, error: null });
-                return primaryView;
+            const alignmentCalculator = this._alignmentCalculatorForGenome.get(secondaryGenome);
+            try {
+                const alignment = await alignmentCalculator.align(visData);
+                this.setState({ primaryView: alignment.primaryVisData });
+                return alignment.primaryVisData;
             } catch (error) {
-                this.setState({ error });
-                throw error;
+                console.error(error);
+                console.error("Falling back to nonaligned primary view");
+                this.setState({ primaryView: visData });
+                return visData;
             }
         }
 
         fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): AlignmentPromises {
             const secondaryGenomes = this.getSecondaryGenomes(tracks);
-            const expansion = REGION_EXPANDER.calculateExpansion(viewRegion, this.getVisualizationWidth());
+            const visData = REGION_EXPANDER.calculateExpansion(viewRegion, this.getVisualizationWidth());
             const alignmentForGenome: AlignmentPromises = {};
             for (const genome of secondaryGenomes) {
-                alignmentForGenome[genome] = this._alignmentCalculator.computeSecondaryRegion(
-                    viewRegion, expansion, genome
-                );
+                const alignmentCalculator = this._alignmentCalculatorForGenome.get(genome);
+                alignmentForGenome[genome] = alignmentCalculator.align(visData);
             }
             return alignmentForGenome;
         }
 
         render() {
-            if (this.state.error) {
-                return <ErrorMessage>Cannot display: primary alignment failed.</ErrorMessage>;
-            } else if (!this.state.primaryView) {
-                return null;
+            if (!this.state.primaryView) {
+                return <div style={{textAlign: 'center'}} >Loading alignment...</div>;
             }
 
             /*

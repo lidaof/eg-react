@@ -1,10 +1,11 @@
 import React from 'react';
 import TranslatableG from '../../TranslatableG';
 import { FeaturePlacer, PlacedSegment } from '../../../model/FeaturePlacer';
-import { AlignmentIterator, BamRecord } from '../../../model/BamRecord';
+import { BamRecord } from '../../../model/BamRecord';
 import NavigationContext from '../../../model/NavigationContext';
 import LinearDrawingModel from '../../../model/LinearDrawingModel';
 import OpenInterval from '../../../model/interval/OpenInterval';
+import { AlignmentIterator } from '../../../model/alignment/AlignmentStringUtils';
 
 const HEIGHT = 10;
 const MIN_DRAW_WIDTH = 0.5 // Pixels

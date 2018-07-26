@@ -8,8 +8,8 @@ import { Feature } from '../Feature';
  * @see Feature
  */
 export class FeatureSegment {
-    public relativeStart: number; // Start base of the interval, relative to the feature's start
-    public relativeEnd: number; // End base of the interval, relative to the feature's start
+    public readonly relativeStart: number; // Start base of the interval, relative to the feature's start
+    public readonly relativeEnd: number; // End base of the interval, relative to the feature's start
 
     /**
      * Makes a new instance, attaching a interval to a Feature.  If start and end are not provided, the interval
@@ -21,7 +21,7 @@ export class FeatureSegment {
      * @param {number} [end] - end base of the interval, relative to the feature's start
      * @throws {RangeError} if end is before start or the interval lies outside the feature
      */
-    constructor(public feature: Feature, start=0, end?: number) {
+    constructor(public readonly feature: Feature, start=0, end?: number) {
         if (end === undefined) {
             end = feature.getLength();
         }

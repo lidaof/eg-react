@@ -20,6 +20,11 @@ export interface ViewExpansion {
      * The X range of pixels that would display the unexpanded region
      */
     viewWindow: OpenInterval;
+
+    /**
+     * Unexpanded region; the region displayed in the viewWindow
+     */
+    viewWindowRegion: DisplayedRegionModel;
 }
 
 /**
@@ -74,6 +79,7 @@ export class RegionExpander {
             visWidth: expandedWidth,
             visRegion: expandedRegion,
             viewWindow: new OpenInterval(leftExtraPixels, expandedWidth - rightExtraPixels),
+            viewWindowRegion: region,
         };
     }
 }

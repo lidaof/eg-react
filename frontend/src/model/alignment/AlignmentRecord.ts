@@ -1,5 +1,5 @@
-import Feature from './Feature';
-import ChromosomeInterval from './interval/ChromosomeInterval';
+import Feature from '../Feature';
+import ChromosomeInterval from '../interval/ChromosomeInterval';
 
 enum QueryStrand {
     FORWARD = '+',
