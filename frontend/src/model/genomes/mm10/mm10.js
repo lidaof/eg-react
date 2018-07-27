@@ -42,13 +42,34 @@ const defaultTracks = [
     })
 ];
 
+const publicHubData = {
+    "4D Nucleome Network": "The 4D Nucleome Network aims to understand the principles underlying nuclear organization " + 
+    "in space and time, the role nuclear organization plays in gene expression and cellular function, and how changes " 
+    + "in nuclear organization affect normal development as well as various diseases. The program is developing novel " 
+    + "tools to explore the dynamic nuclear architecture and its role in gene expression programs, " + 
+    "models to examine the relationship between nuclear organization and function, " + 
+    "and reference maps of nuclear architecture in a variety of cells and tissues as a community resource.",
+}
+
+const publicHubList = [
+    {
+        collection: "4D Nucleome Network",
+        name: "4DN HiC datasets",
+        numTracks: 23,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~dli/test/4dn_mm10.json"
+    },
+]
+
 const MM10 = {
     genome: genome,
     navContext: navContext,
     cytobands: cytobands,
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
-    twoBitURL: "https://vizhub.wustl.edu/public/mm10/mm10.2bit"
+    twoBitURL: "https://vizhub.wustl.edu/public/mm10/mm10.2bit",
+    publicHubData,
+    publicHubList,
 };
 
 export default MM10;

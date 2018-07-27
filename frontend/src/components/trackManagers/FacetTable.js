@@ -140,8 +140,8 @@ class FacetTable extends Component {
             parent2children,
             child2ancestor,
             metaKeys,
-            // rowHeader: metaKeys[1],
-            // columnHeader: metaKeys[2],
+            rowHeader: metaKeys.includes(DEFAULT_ROW) ? DEFAULT_ROW : metaKeys[1],
+            columnHeader: metaKeys.includes(DEFAULT_COLUMN) ? DEFAULT_COLUMN : metaKeys[2],
         });
     }
 

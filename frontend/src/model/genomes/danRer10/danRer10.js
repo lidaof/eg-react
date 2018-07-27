@@ -50,11 +50,12 @@ const defaultTracks = [
 ];
 
 const DAN_RER10 = {
-    genome: genome,
-    navContext: navContext,
-    cytobands: {}, // There is no meaningful cytoband data for this genome
-    defaultRegion: defaultRegion,
-    defaultTracks: defaultTracks,
+    genome,
+    navContext,
+    cytobands: {}, // the cytoBandIdeo from UCSC is basically empty
+    defaultRegion,
+    defaultTracks,
+    twoBitURL: 'https://vizhub.wustl.edu/public/danRer10/danRer10.2bit',
 };
 
 export default DAN_RER10;

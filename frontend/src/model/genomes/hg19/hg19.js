@@ -75,13 +75,93 @@ const defaultTracks = [
     })
 ];
 
+const publicHubData = {
+    "Encyclopedia of DNA Elements (ENCODE)": "The Encyclopedia of DNA Elements (ENCODE) Consortium is an " +
+        "international collaboration of research groups funded by the National Human Genome Research Institute " +
+        "(NHGRI). The goal of ENCODE is to build a comprehensive parts list of functional elements in the human " +
+        "genome, including elements that act at the protein and RNA levels, and regulatory elements that control " +
+        "cells and circumstances in which a gene is active.",
+    "Reference human epigenomes from Roadmap Epigenomics Consortium": "The NIH Roadmap Epigenomics Mapping Consortium was launched with the goal of producing a public resource of human epigenomic data to catalyze basic biology and disease-oriented research. The Consortium leverages experimental pipelines built around next-generation sequencing technologies to map DNA methylation, histone modifications, chromatin accessibility and small RNA transcripts in stem cells and primary ex vivo tissues selected to represent the normal counterparts of tissues and organ systems frequently involved in human disease (quoted from Roadmap website)."
+}
+
+const publicHubList = [
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE signal of unique reads",
+        numTracks: 7729,
+        oldHubFormat: true,
+        url: "https://vizhub.wustl.edu/public/hg19/hg19_mpssur.json"
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE signal of all reads",
+        numTracks: 7842,
+        oldHubFormat: true,
+        url: "https://vizhub.wustl.edu/public/hg19/hg19_mpssar.json"
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE all other types",
+        numTracks: 5937,
+        oldHubFormat: true,
+        description: "Base overlap signal, fold change over control, genome compartments, percentage normalized signal, etc.",
+        url: "https://vizhub.wustl.edu/public/hg19/hg19_other_rmdup.json"
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE legacy hub",
+        numTracks: 4251,
+        oldHubFormat: true,
+        url: "https://vizhub.wustl.edu/public/hg19/encode.md"
+    },
+    {
+        collection: "Long-range chromatin interaction experiments",
+        name: "Long-range chromatin interaction experiments",
+        numTracks: 156,
+        oldHubFormat: true,
+        url: "https://vizhub.wustl.edu/public/hg19/longrange4"
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Roadmap Data from GEO",
+        numTracks: 2737,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~dli/tmp/roadmap9",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "methylCRF tracks from Roadmap",
+        numTracks: 16,
+        oldHubFormat: true,
+        description: "Single CpG methylation value prediction by methylCRF algorithm (PMID:23804401) using Roadmap data.",
+        url: "https://vizhub.wustl.edu/public/hg19/methylCRF.roadmap.hub"
+    },
+    {
+        collection: "HiC interaction from Juicebox",
+        name: "HiC interaction from Juicebox",
+        numTracks: 193,
+        oldHubFormat: true,
+        url: "https://epgg-test.wustl.edu/dli/long-range-test/hg19-juiceboxhub"
+    },
+    {
+        collection: "Human 450K and 27K array data from TCGA",
+        name: "Human 450K and 27K array data from TCGA",
+        numTracks: 2551,
+        oldHubFormat: true,
+        url: "https://vizhub.wustl.edu/public/hg19/TCGA-450k-hub2"
+    },
+];
+
+
 const HG19 = {
-    genome: genome,
-    navContext: navContext,
-    cytobands: cytobands,
-    defaultRegion: defaultRegion,
-    defaultTracks: defaultTracks,
-    twoBitURL: 'https://vizhub.wustl.edu/public/hg19/hg19.2bit'
+    genome,
+    navContext,
+    cytobands,
+    defaultRegion,
+    defaultTracks,
+    twoBitURL: 'https://vizhub.wustl.edu/public/hg19/hg19.2bit',
+    publicHubList,
+    publicHubData,
 };
 
 export default HG19;

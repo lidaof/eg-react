@@ -10,4 +10,6 @@ export interface GenomeConfig {
     cytobands: CytobandMap;
     defaultRegion: OpenInterval;
     defaultTracks: TrackModel[];
+    publicHubData: any;
+    publicHubList: any[];
 }
