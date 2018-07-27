@@ -165,25 +165,15 @@ function ErrorMessage(props) {
 function ViewWindow(props) {
     const {viewWindow, fullWidth, children} = props;
     // Actually, props.xOffset stores the dragged amount and draggedAmount stores the actual amount we will xOffset.
-    let draggedAmount = props.xOffset || 0;
-    if (draggedAmount > 0) {
-        // Dragging stuff on the left into view.  So, we limit to how many pixels exist on the left.
-        draggedAmount = Math.min(draggedAmount, viewWindow.start);
-    } else {
-        // Ditto for dragging stuff on the right into view.
-        const numPixelsOnRight = fullWidth - viewWindow.end;
-        draggedAmount = Math.max(-numPixelsOnRight, draggedAmount);
-    }
-
+    const xOffset = props.xOffset || 0;
     const outerStyle = {
         overflowX: "hidden",
         width: viewWindow.getLength(),
     };
-
     const innerStyle = {
         position: "relative",
         // -viewWindow.start centers the view, rather than it starting at the leftmost part of the inner element.
-        transform: `translateX(${-viewWindow.start + draggedAmount}px)`,
+        transform: `translateX(${-viewWindow.start + xOffset}px)`,
         willChange: 'transform'
     };
 
@@ -196,6 +186,9 @@ function ViewWindow(props) {
     );
 }
 
+/**
+ * A component that stops updating its children if passed a truthy `isLoading` prop.
+ */
 class FreezeWhileLoading extends React.Component {
     shouldComponentUpdate(nextProps) {
         return !nextProps.isLoading;

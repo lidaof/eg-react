@@ -129,3 +129,24 @@ describe("getLociInInterval()", () => {
         ]);
     });
 });
+
+describe("Gap-related things", () => {
+    it("makeGap() makes features of the right length", () => {
+        expect(NavigationContext.makeGap(10).getLength()).toBe(10);
+    });
+
+    it("isGapFeature() detects gap features", () => {
+        const gap = NavigationContext.makeGap(10);
+        const nonGap = FEATURES[0];
+        expect(NavigationContext.isGapFeature(gap)).toBe(true);
+        expect(NavigationContext.isGapFeature(nonGap)).toBe(false);
+    });
+
+    it("toGaplessCoordinate() converts coordinates correctly", () => {
+        const features = [FEATURES[0], NavigationContext.makeGap(10), FEATURES[2]];
+        const instanceWithGaps = new NavigationContext("I have gaps", features);
+        expect(instanceWithGaps.toGaplessCoordinate(5)).toBe(5);
+        expect(instanceWithGaps.toGaplessCoordinate(15)).toBe(10);
+        expect(instanceWithGaps.toGaplessCoordinate(25)).toBe(15);
+    });
+});

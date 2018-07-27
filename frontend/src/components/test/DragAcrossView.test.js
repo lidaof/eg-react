@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import DragAcrossView from '../DragAcrossView';
+import { RegionPanTracker } from '../RegionPanTracker';
 import { MouseButton } from '../../util';
 import makeToyRegion from '../../model/test/toyRegion';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
@@ -14,8 +14,8 @@ let viewDragStartCallback = jest.fn();
 let viewDragCallback = jest.fn();
 let viewDragEndCallback = jest.fn();
 let wrapper = shallow(
-    <DragAcrossView
-        button={MouseButton.LEFT}
+    <RegionPanTracker
+        mouseButton={MouseButton.LEFT}
         viewRegion={viewRegion}
         drawModel={drawModel}
         onViewDragStart={viewDragStartCallback}

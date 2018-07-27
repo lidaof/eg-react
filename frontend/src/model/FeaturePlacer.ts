@@ -12,12 +12,12 @@ import { GenomeInteraction } from './GenomeInteraction';
 export interface PlacedFeature {
     feature: Feature; // The feature
     /**
-     * The location of the feature in navigation context coordinates.  The programmer should not assume that this
-     * interval's length is equal to the feature's length, because some parts of the feature might not exist in the
-     * navigation context (suppose that the context only contains chr1:50-100 but the feature is chr1:0-200).
+     * The feature's *visible* part.  "Visible" means the parts of the feature that lie inside the nav context, as some
+     * parts might fall outside.  For example, the feature is chr1:0-200 but the context only contains chr1:50-100.
      */
-    contextLocation: OpenInterval;
-    xSpan: OpenInterval; // Horizontal location the feature should occupy
+    visiblePart: FeatureSegment;
+    contextLocation: OpenInterval; // The feature's *visible* part in navigation context coordinates
+    xSpan: OpenInterval; // Horizontal location of the feature's *visible* part
 }
 
 export interface PlacedSegment {
@@ -85,12 +85,28 @@ export class FeaturePlacer {
                 contextLocation = contextLocation.getOverlap(viewRegionBounds); // Clamp the location to view region
                 if (contextLocation) {
                     const xSpan = drawModel.baseSpanToXSpan(contextLocation);
-                    placements.push({ feature, contextLocation, xSpan });
+                    const visiblePart = this._getVisibleSegment(feature, navContext, contextLocation);
+                    placements.push({ feature, visiblePart, contextLocation, xSpan });
                 }
             }
         }
 
         return placements;
+    }
+
+    /**
+     * Gets the visible part of a feature after it has been placed in a navigation context.
+     * 
+     * @param {Feature} feature - feature placed in a navigation context
+     * @param {NavigationContext} contextLocation - navigation context in which the feature was placed
+     * @param {OpenInterval} navContext - the feature's visible part in navigation context coordinates
+     * @return {FeatureSegment} - the visible part of the feature
+     */
+    _getVisibleSegment(feature: Feature, navContext: NavigationContext, contextLocation: OpenInterval): FeatureSegment {
+        const placedLocus = navContext.convertBaseToFeatureCoordinate(contextLocation.start).getGenomeCoordinates();
+        const distFromFeatureLocus = placedLocus.start - feature.getLocus().start;
+        const relativeStart = Math.max(0, distFromFeatureLocus);
+        return new FeatureSegment(feature, relativeStart, relativeStart + contextLocation.getLength());
     }
 
     /**

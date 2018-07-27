@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import DragAcrossDiv from '../DragAcrossDiv';
+import { DragAcrossDiv } from '../DragAcrossDiv';
 import { MouseButton } from '../../util';
 
 /**

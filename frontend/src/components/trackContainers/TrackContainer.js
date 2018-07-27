@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import connect from 'react-redux/lib/connect/connect';
 import { ActionCreators } from '../../AppState';
 
 import { withTrackData } from './TrackDataManager';
 import { withTrackView } from './TrackViewManager';
 import TrackHandle from './TrackHandle';
-import DraggableTrackContainer from './DraggableTrackContainer';
+import { PannableTrackContainer } from './PannableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
 import MetadataHeader from './MetadataHeader';
@@ -244,10 +245,9 @@ class TrackContainer extends React.Component {
                     onNewRegion={onNewRegion}
                 />;
             case Tools.DRAG:
-                return <DraggableTrackContainer
+                return <PannableTrackContainer
                     trackElements={trackElements}
-                    viewWindowRegion={primaryView.viewWindowRegion}
-                    viewWindowWidth={primaryView.viewWindow.getLength()}
+                    visData={primaryView}
                     onNewRegion={onNewRegion}
                 />;
             default:

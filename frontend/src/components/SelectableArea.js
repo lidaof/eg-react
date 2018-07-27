@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DragAcrossDiv from './DragAcrossDiv';
+import { DragAcrossDiv } from './DragAcrossDiv';
 import { MouseButton, getRelativeCoordinates } from '../util';
 import './SelectableArea.css';
 
@@ -13,7 +13,7 @@ const CANCEL_KEY = 27;
  */
 class SelectableArea extends React.Component {
     static propTypes = {
-        button: PropTypes.number, // The button that must be pressed during dragging.  See DragAcrossDiv for options.
+        mouseButton: PropTypes.number, // The button that must be pressed during dragging.  See DragAcrossDiv for options.
         y: PropTypes.string, // The y coordinate of the selection box; how far from the top of this container
         height: PropTypes.string, // The height of the selection box
         /**
@@ -38,7 +38,7 @@ class SelectableArea extends React.Component {
     };
 
     static defaultProps = {
-        button: MouseButton.LEFT,
+        mouseButton: MouseButton.LEFT,
         y: "0px",
         height: "100%",
         getInnerElement: width => null,
@@ -127,7 +127,7 @@ class SelectableArea extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {button, height, y, getInnerElement, getIsWidthSelectable, children} = this.props;
+        const {mouseButton, height, y, getInnerElement, getIsWidthSelectable, children} = this.props;
         let theBox = null;
         const width = Math.abs(this.state.dragStartX - this.state.currentDragX);
         if (this.state.isDragging) {
@@ -153,7 +153,7 @@ class SelectableArea extends React.Component {
 
         return (
         <DragAcrossDiv
-            button={button}
+            mouseButton={mouseButton}
             onDragStart={this.dragStart}
             onDrag={this.drag}
             onDragEnd={this.dragEnd}

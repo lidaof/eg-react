@@ -6,7 +6,7 @@ import Ruler from './Ruler';
 import SelectedRegionBox from './SelectedRegionBox';
 
 import SelectableGenomeArea from '../SelectableGenomeArea';
-import DragAcrossView from '../DragAcrossView';
+import { RegionPanTracker } from '../RegionPanTracker';
 import withAutoDimensions from '../withAutoDimensions';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
@@ -118,7 +118,7 @@ class MainPane extends React.Component {
 
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView button={MouseButton.RIGHT} onViewDrag={onNewViewRequested} viewRegion={viewRegion} >
+        <RegionPanTracker mouseButton={MouseButton.RIGHT} onViewDrag={onNewViewRequested} panRegion={viewRegion} >
             <SelectableGenomeArea
                 drawModel={new LinearDrawingModel(viewRegion, containerWidth)}
                 y={SELECT_BOX_Y}
@@ -143,7 +143,7 @@ class MainPane extends React.Component {
                     />
                 </svg>
             </SelectableGenomeArea>
-        </DragAcrossView>
+        </RegionPanTracker>
         );
     }
 }

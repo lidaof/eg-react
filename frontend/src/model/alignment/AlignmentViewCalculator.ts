@@ -9,7 +9,6 @@ import { NavContextBuilder, Gap } from './NavContextBuilder';
 
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 import OpenInterval from '../interval/OpenInterval';
-import { FeatureSegment } from '../interval/FeatureSegment';
 import NavigationContext from '../NavigationContext';
 import LinearDrawingModel from '../LinearDrawingModel';
 import { Feature } from '../Feature';
@@ -72,7 +71,7 @@ export class AlignmentViewCalculator {
 
     async align(visData: ViewExpansion): Promise<Alignment> {
         this._viewBeingFetched = visData;
-        const records = await this._alignmentFetcher.fetchAlignment(visData.viewWindowRegion, visData);
+        const records = await this._alignmentFetcher.fetchAlignment(visData.visRegion, visData);
         if (this._viewBeingFetched !== visData) {
             return Promise.reject(new Error('Alignment canceled due to another call to align()'));
         }
@@ -81,13 +80,13 @@ export class AlignmentViewCalculator {
 
     alignFine(records: AlignmentRecord[], visData: ViewExpansion): Alignment {
         // There's a lot of steps, so bear with me...
-        const {visRegion, visWidth, viewWindowRegion} = visData;
+        const {visRegion, visWidth, viewWindow, viewWindowRegion} = visData;
         const oldNavContext = visRegion.getNavigationContext();
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
+        const minGapLength = drawModel.xWidthToBases(MIN_GAP_DRAW_WIDTH);
 
         // Calculate context coordinates of the records and gaps within.
         const placements = this._computeContextLocations(records, visData);
-        const minGapLength = drawModel.xWidthToBases(MIN_GAP_DRAW_WIDTH);
         const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
 
         // Build a new primary navigation context using the gaps
@@ -98,7 +97,10 @@ export class AlignmentViewCalculator {
         // Calculate new DisplayedRegionModel and LinearDrawingModel from the new nav context
         const newVisRegion = convertOldVisRegion(visRegion);
         const newViewWindowRegion = convertOldVisRegion(viewWindowRegion);
-        const newDrawModel = new LinearDrawingModel(newVisRegion, visData.visWidth);
+        const newPixelsPerBase = viewWindow.getLength() / newViewWindowRegion.getWidth();
+        const newVisWidth = newVisRegion.getWidth() * newPixelsPerBase;
+        const newDrawModel = new LinearDrawingModel(newVisRegion, newVisWidth);
+        const newViewWindow = newDrawModel.baseSpanToXSpan(newViewWindowRegion.getContextCoordinates());
 
         // With the draw model, we can set x spans for each placed alignment
         for (const placement of placements) {
@@ -121,14 +123,15 @@ export class AlignmentViewCalculator {
 
         // Finally, using the x coordinates, construct the query nav context
         const queryPieces = this._getQueryPieces(placements);
-        const queryRegion = this._makeQueryGenomeRegion(queryPieces, visWidth, newDrawModel);
+        const queryRegion = this._makeQueryGenomeRegion(queryPieces, newVisWidth, newDrawModel);
+
         return {
             isFineMode: true,
             primaryVisData: {
                 visRegion: newVisRegion,
-                visWidth,
+                visWidth: newVisWidth,
                 viewWindowRegion: newViewWindowRegion,
-                viewWindow: newDrawModel.baseSpanToXSpan(newViewWindowRegion.getContextCoordinates()),
+                viewWindow: newViewWindow,
             },
             queryRegion,
             drawData: placements
@@ -221,26 +224,15 @@ export class AlignmentViewCalculator {
      */
     _computeContextLocations(records: AlignmentRecord[], visData: ViewExpansion): PlacedAlignment[] {
         const {visRegion, visWidth} = visData;
-        const featurePlacerResult = FEATURE_PLACER.placeFeatures(records, visRegion, visWidth);
-
-        const result: PlacedAlignment[] = [];
-        for (const placement of featurePlacerResult) {
-            const record = placement.feature as AlignmentRecord;
-            const placementDetails = FEATURE_PLACER.placeFeatureSegments(
-                [new FeatureSegment(record)], visRegion.getNavigationContext(), placement.contextLocation
-            )[0]; // Place a segment that is the total length of the record to get the part that is visible
-            const segmentStart = placementDetails.offsetRelativeToFeature;
-            const segmentLength = placement.contextLocation.getOverlap(visRegion.getContextCoordinates()).getLength();
-            result.push({
-                record,
-                visiblePart: new AlignmentSegment(record, segmentStart, segmentStart + segmentLength),
+        return FEATURE_PLACER.placeFeatures(records, visRegion, visWidth).map(placement => {
+            return {
+                record: placement.feature as AlignmentRecord,
+                visiblePart: AlignmentSegment.fromFeatureSegment(placement.visiblePart),
                 contextSpan: placement.contextLocation,
                 targetXSpan: null,
                 queryXSpan: null,
-            });
-        }
-
-        return result;
+            };
+        });
     }
 
     /**

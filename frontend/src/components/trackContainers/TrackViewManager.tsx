@@ -45,10 +45,9 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
                 queryGenome => new AlignmentViewCalculator(this._primaryGenome, queryGenome)
             );
             this.state = {
-                primaryView: null,
+                primaryView: REGION_EXPANDER.calculateExpansion(props.viewRegion, this.getVisualizationWidth())
             };
             this.fetchPrimaryView = memoizeOne(this.fetchPrimaryView);
-            this.fetchPrimaryView(props.viewRegion, props.tracks);
         }
 
         getVisualizationWidth() {
@@ -66,6 +65,9 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             const visData = REGION_EXPANDER.calculateExpansion(viewRegion, this.getVisualizationWidth());
             const secondaryGenome = this.getSecondaryGenomes(tracks)[0]; // Just the first one
             if (!secondaryGenome) {
+                if (this.state.primaryView !== visData) {
+                    this.setState({ primaryView: visData });
+                }
                 return visData;
             }
 
@@ -94,10 +96,6 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
         }
 
         render() {
-            if (!this.state.primaryView) {
-                return <div style={{textAlign: 'center'}} >Loading alignment...</div>;
-            }
-
             /*
             We can get away with calling these functions every render because of clever use of memoizeOne.
             In fact, since this.getPrimaryViewPromise() asynchronously sets state, we MUST use memoizeOne to prevent

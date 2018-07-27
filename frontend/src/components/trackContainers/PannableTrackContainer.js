@@ -2,25 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { MouseButton } from '../../util';
-import DragAcrossView from '../DragAcrossView';
-
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import { RegionPanTracker } from '../RegionPanTracker';
 
 /**
  * Track container where dragging across scrolls the view region.
  * 
  * @author Silas Hsu
  */
-class DraggableTrackContainer extends React.Component {
+export class PannableTrackContainer extends React.Component {
     static MIN_DRAG_DISTANCE_FOR_REFRESH = 20;
 
     static propTypes = {
         trackElements: PropTypes.arrayOf(PropTypes.object).isRequired, // Track components to render
-        /**
-         * View region of visible portion of tracks
-         */
-        viewWindowRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-        viewWindowWidth: PropTypes.number.isRequired, // Width of the visible portion of tracks
+        visData: PropTypes.object.isRequired,
         /**
          * Callback for when a new region is selected.  Signature:
          *     (newStart: number, newEnd: number): void
@@ -64,7 +58,19 @@ class DraggableTrackContainer extends React.Component {
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
     viewDrag(unused, unused2, unusedEvent, coordinateDiff) {
-        this.setState({xOffset: this.offsetOnDragStart + coordinateDiff.dx});
+        const {visWidth, viewWindow} = this.props.visData;
+        const numPixelsOnLeft = viewWindow.start;
+        const numPixelsOnRight = visWidth - viewWindow.end;
+        const newXOffset = this.offsetOnDragStart + coordinateDiff.dx;
+        /*
+        Dragging LEFT, or NEGATIVE xOffset, puts pixels on the right into view.  Limit drag to the number of pixels on
+        the right.
+        Dragging RIGHT, or POSITIVE xOffset, puts pixels on the left into view.  Limit drag to the number of pixels on
+        the left.
+        */
+        if (-numPixelsOnRight < newXOffset && newXOffset < numPixelsOnLeft) {
+            this.setState({xOffset: newXOffset});
+        }
     }
 
     /**
@@ -76,7 +82,7 @@ class DraggableTrackContainer extends React.Component {
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
     viewDragEnd(newStart, newEnd, unusedEvent, coordinateDiff) {
-        if (Math.abs(coordinateDiff.dx) >= DraggableTrackContainer.MIN_DRAG_DISTANCE_FOR_REFRESH) {
+        if (Math.abs(coordinateDiff.dx) >= PannableTrackContainer.MIN_DRAG_DISTANCE_FOR_REFRESH) {
             this.props.onNewRegion(newStart, newEnd);
         }
     }
@@ -85,7 +91,7 @@ class DraggableTrackContainer extends React.Component {
      * Resets the draw offset for the tracks when getting a new region.
      */
     componentWillReceiveProps(newProps) {
-        if (this.props.viewWindowRegion !== newProps.viewWindowRegion) {
+        if (this.props.visData !== newProps.visData) {
             this.setState({xOffset: 0});
         }
     }
@@ -94,24 +100,23 @@ class DraggableTrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {trackElements, viewWindowRegion, viewWindowWidth} = this.props;
-        const tracksWithXOffset = trackElements.map(
-            trackElement => React.cloneElement(trackElement, { xOffset: this.state.xOffset }) // Give xOffset to tracks
+        const {trackElements, visData} = this.props;
+        const {visRegion, visWidth, viewWindowRegion} = visData;
+        const tracksWithXOffset = trackElements.map( // Give xOffset to tracks
+            trackElement => React.cloneElement(trackElement, { xOffset: this.state.xOffset }) 
         );
 
         return (
-        <DragAcrossView
-            button={MouseButton.LEFT}
+        <RegionPanTracker
+            mouseButton={MouseButton.LEFT}
             onViewDragStart={this.viewDragStart}
             onViewDrag={this.viewDrag}
             onViewDragEnd={this.viewDragEnd}
-            viewRegion={viewWindowRegion}
-            widthOverride={viewWindowWidth}
+            panRegion={viewWindowRegion}
+            basesPerPixel={visRegion.getWidth() / visWidth}
         >
             {tracksWithXOffset}
-        </DragAcrossView>
+        </RegionPanTracker>
         );
     }
 }
-
-export default DraggableTrackContainer;

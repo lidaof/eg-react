@@ -173,6 +173,30 @@ class NavigationContext {
     }
 
     /**
+     * Converts a context coordinate to one that ignores gaps in this instance.  Or, put another way, if we removed all
+     * gaps in this instance, what would be the context coordinate of `base` be?
+     * 
+     * @example
+     * navContext = [10bp feature, 10bp gap, 10bp feature]
+     * navContext.toGaplessCoordinate(5); // Returns 5
+     * navContext.toGaplessCoordinate(15); // Returns 10
+     * navContext.toGaplessCoordinate(25); // Returns 15
+     * 
+     * @param {number} base - the context coordinate to convert
+     * @return {number} context coordinate if gaps didn't exist
+     */
+    toGaplessCoordinate(base: number): number {
+        const featureCoordinate = this.convertBaseToFeatureCoordinate(base);
+        const featureIndex = this._features.findIndex(feature => feature === featureCoordinate.feature);
+        const gapFeaturesBefore = this._features.slice(0, featureIndex).filter(NavigationContext.isGapFeature);
+        let gapBasesBefore = _.sumBy(gapFeaturesBefore, feature => feature.getLength());
+        if (NavigationContext.isGapFeature(featureCoordinate.feature)) {
+            gapBasesBefore += featureCoordinate.relativeStart;
+        }
+        return base - gapBasesBefore;
+    }
+
+    /**
      * Parses an location in this navigation context.  Should be formatted like "$chrName:$startBase-$endBase" OR
      * "$featureName".  We expect 0-indexed intervals.
      * 
