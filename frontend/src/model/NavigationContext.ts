@@ -164,7 +164,7 @@ class NavigationContext {
         const potentialOverlaps = this._featuresForChr[chrInterval.chr] || [];
         const contextIntervals = [];
         for (const feature of potentialOverlaps) {
-            const overlap = new FeatureSegment(feature).getOverlap(chrInterval);
+            const overlap = new FeatureSegment(feature).getGenomeOverlap(chrInterval);
             if (overlap) {
                 contextIntervals.push(this.convertFeatureSegmentToContextCoordinates(overlap));
             }
@@ -267,7 +267,7 @@ class NavigationContext {
      */
     getLociInInterval(queryStart: number, queryEnd: number) {
         const featureSegments = this.getFeaturesInInterval(queryStart, queryEnd, false);
-        const loci = featureSegments.map(interval => interval.getGenomeCoordinates());
+        const loci = featureSegments.map(interval => interval.getLocus());
         return ChromosomeInterval.mergeOverlaps(loci);
     }
 }

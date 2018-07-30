@@ -87,7 +87,7 @@ export class RulerDesigner {
 
         const segments = viewRegion.getFeatureSegments(false);
         for (const segment of segments) {
-            const segmentLocus = segment.getGenomeCoordinates();
+            const segmentLocus = segment.getLocus();
             const segmentContextSpan = navContext.convertFeatureSegmentToContextCoordinates(segment);
             addTicks(segmentLocus, segmentContextSpan, true); // Major
             if (basesPerMinorTick >= 1) {

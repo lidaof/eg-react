@@ -38,7 +38,7 @@ class TabixSource extends DataSource {
      */
     async getData(region) {
         const promises = region.getFeatureSegments().map(segment =>
-            this.getFeaturesInInterval(segment.getGenomeCoordinates())
+            this.getFeaturesInInterval(segment.getLocus())
         );
         const features = await Promise.all(promises);
         const results = _.flatten(features).map(feature => new MethylCRecord(feature));

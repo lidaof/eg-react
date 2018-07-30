@@ -23,7 +23,7 @@ test('xToBase()', () => {
 
 test('xToSegmentCoordinate()', () => {
     const result = INSTANCE.xToSegmentCoordinate(50);
-    const locus = result.getGenomeCoordinates();
+    const locus = result.getLocus();
     expect(locus.chr).toBe('chr1');
     expect(locus.start).toBeCloseTo(5);
 });

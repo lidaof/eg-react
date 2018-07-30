@@ -28,7 +28,7 @@ class GenomicCoordinates extends React.Component {
         if (NavigationContext.isGapFeature(segment.feature)) {
             return `${niceBpCount(segment.feature.getLength())} gap`;
         } else {
-            const locus = segment.getGenomeCoordinates();
+            const locus = segment.getLocus();
             return `${locus.chr}:${Math.floor(locus.start)}`;
         }
     }

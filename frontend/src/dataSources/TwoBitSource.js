@@ -34,7 +34,7 @@ class TwoBitSource extends DataSource {
      */
     async getData(region) {
         const promises = region.getFeatureSegments().map(segment =>
-            this.getSequenceInInterval(segment.getGenomeCoordinates())
+            this.getSequenceInInterval(segment.getLocus())
         );
         const sequences = await Promise.all(promises);
         return sequences.join("");

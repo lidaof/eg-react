@@ -103,7 +103,7 @@ export class FeaturePlacer {
      * @return {FeatureSegment} - the visible part of the feature
      */
     _getVisibleSegment(feature: Feature, navContext: NavigationContext, contextLocation: OpenInterval): FeatureSegment {
-        const placedLocus = navContext.convertBaseToFeatureCoordinate(contextLocation.start).getGenomeCoordinates();
+        const placedLocus = navContext.convertBaseToFeatureCoordinate(contextLocation.start).getLocus();
         const distFromFeatureLocus = placedLocus.start - feature.getLocus().start;
         const relativeStart = Math.max(0, distFromFeatureLocus);
         return new FeatureSegment(feature, relativeStart, relativeStart + contextLocation.getLength());
@@ -130,12 +130,12 @@ export class FeaturePlacer {
          */
         const locusOfContextLocation = navContext
             .convertBaseToFeatureCoordinate(contextLocationOfFeature.start) 
-            .getGenomeCoordinates();
+            .getLocus();
         const results = [];
         for (const segment of segments) {
             // Distance of the segment's start from the mapped locus's start.  A positive value means the context
             // location of the segment starts after the context location of the feature.
-            const distFromParentLocation = segment.getGenomeCoordinates().start - locusOfContextLocation.start;
+            const distFromParentLocation = segment.getLocus().start - locusOfContextLocation.start;
             // Context location of the start of the segment
             const contextStart = contextLocationOfFeature.start + distFromParentLocation;
             const unsafeContextLocation = new OpenInterval(contextStart, contextStart + segment.getLength());

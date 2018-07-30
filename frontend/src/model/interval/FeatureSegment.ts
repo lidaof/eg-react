@@ -1,3 +1,4 @@
+import OpenInterval from './OpenInterval';
 import ChromosomeInterval from './ChromosomeInterval';
 import { Feature } from '../Feature';
 
@@ -49,6 +50,10 @@ export class FeatureSegment {
         return this.relativeEnd;
     }
 
+    toOpenInterval(): OpenInterval {
+        return new OpenInterval(this.relativeStart, this.relativeEnd);
+    }
+
     /**
      * @return {string} the attached feature's name
      */
@@ -68,7 +73,7 @@ export class FeatureSegment {
      * 
      * @return {ChromosomeInterval} genomic location of this interval
      */
-    getGenomeCoordinates(): ChromosomeInterval {
+    getLocus(): ChromosomeInterval {
         const featureLocus = this.feature.getLocus();
         return new ChromosomeInterval(
             featureLocus.chr,
@@ -78,15 +83,31 @@ export class FeatureSegment {
     }
 
     /**
+     * Intersects this and another FeatureSegment, and returns the result as a new FeatureSegment.  Returns `null` if
+     * the *segments' features are different* or if there is no overlap.
+     * 
+     * @param {FeatureSegment} other - other FeatureSegment to intersect
+     * @return {FeatureSegment} intersection of this segment and the other one, or null if none exists
+     */
+    getOverlap(other: FeatureSegment): FeatureSegment {
+        if (this.feature !== other.feature) {
+            return null;
+        }
+
+        const overlap = this.toOpenInterval().getOverlap(other.toOpenInterval());
+        return overlap ? new FeatureSegment(this.feature, overlap.start, overlap.end) : null;
+    }
+
+    /**
      * Intersects this and a genome location, and returns the result as a new FeatureSegment using the same Feature
      * that is attached to this.  Returns null if the genome location does not intersect with this location at all.
      * 
      * @param {ChromosomeInterval} chrInterval - input genome location
      * @return {FeatureSegment} intersection of this and the input genomic location
      */
-    getOverlap(chrInterval: ChromosomeInterval): FeatureSegment {
+    getGenomeOverlap(chrInterval: ChromosomeInterval): FeatureSegment {
         const featureLocus = this.feature.getLocus();
-        const genomeLocation = this.getGenomeCoordinates();
+        const genomeLocation = this.getLocus();
         const overlap = genomeLocation.getOverlap(chrInterval);
         if (!overlap) {
             return null;
