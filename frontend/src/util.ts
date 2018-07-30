@@ -26,11 +26,11 @@ export enum MouseButton {
  * For example, if the top left corner of the element is at screen coordinates (10, 10) and the event's screen
  * coordinates are (11, 12), then this function will return `{x: 1, y: 2}`.
  * 
- * @param {MouseEvent} event - the event for which to get relative coordinates
+ * @param {React.MouseEvent} event - the event for which to get relative coordinates
  * @param {Element} [relativeTo] - calculate coordinates relative to this element.  Default is event.currentTarget.
  * @return {Coordinate} object with props x and y that contain the relative coordinates
  */
-export function getRelativeCoordinates(event: MouseEvent, relativeTo?: Element): Coordinate {
+export function getRelativeCoordinates(event: React.MouseEvent, relativeTo?: Element): Coordinate {
     if (!relativeTo) {
         relativeTo = event.currentTarget as Element;
     }

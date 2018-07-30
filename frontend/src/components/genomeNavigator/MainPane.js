@@ -5,13 +5,14 @@ import Chromosomes from './Chromosomes';
 import Ruler from './Ruler';
 import SelectedRegionBox from './SelectedRegionBox';
 
-import SelectableGenomeArea from '../SelectableGenomeArea';
+import { SelectableGenomeArea } from '../SelectableGenomeArea';
 import { RegionPanTracker } from '../RegionPanTracker';
 import withAutoDimensions from '../withAutoDimensions';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 import { MouseButton } from '../../util';
+import OpenInterval from '../../model/interval/OpenInterval';
 
 const WHEEL_ZOOM_SPEED = 0.2;
 const SVG_HEIGHT = 100;
@@ -71,7 +72,6 @@ class MainPane extends React.Component {
     constructor(props) {
         super(props);
         this.mousewheel = this.mousewheel.bind(this);
-        this.areaSelected = this.areaSelected.bind(this);
     }
 
     /**
@@ -91,24 +91,12 @@ class MainPane extends React.Component {
     }
 
     /**
-     * Fires the callback signaling a new region has been selected.
-     * 
-     * @param {number} startX - the left X coordinate of the selected area
-     * @param {number} endX - the right X coordinate of the selected area
-     * @param {React.SyntheticEvent} event - the final mouse event that triggered the selection
-     */
-    areaSelected(startX, endX, event) {
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.containerWidth);
-        this.props.onRegionSelected(drawModel.xToBase(startX), drawModel.xToBase(endX));
-    }
-
-    /**
      * Places a <svg> and children that draw things.
      * 
      * @override
      */
     render() {
-        const {containerWidth, viewRegion, selectedRegion, onNewViewRequested} = this.props;
+        const {containerWidth, viewRegion, selectedRegion, onNewViewRequested, onRegionSelected} = this.props;
         if (containerWidth === 0) {
             if (process.env.NODE_ENV !== "test") {
                 console.warn("Cannot render with a width of 0");
@@ -120,10 +108,11 @@ class MainPane extends React.Component {
         return (
         <RegionPanTracker mouseButton={MouseButton.RIGHT} onViewDrag={onNewViewRequested} panRegion={viewRegion} >
             <SelectableGenomeArea
-                drawModel={new LinearDrawingModel(viewRegion, containerWidth)}
+                selectableRegion={viewRegion}
+                dragLimits={new OpenInterval(0, containerWidth)}
                 y={SELECT_BOX_Y}
                 height={SELECT_BOX_HEIGHT}
-                onAreaSelected={this.areaSelected}
+                onRegionSelected={onRegionSelected}
             >
                 <svg
                     width={containerWidth}

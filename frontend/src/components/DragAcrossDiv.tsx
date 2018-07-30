@@ -8,6 +8,7 @@ export interface CoordinateDiff {
 
 interface DragAcrossDivProps {
     mouseButton: MouseButton; // The mouse button to respond to
+    style?: object; // Any style desired
 
     /**
      * Callback for when dragging starts.

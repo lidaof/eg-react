@@ -9,7 +9,7 @@ import { withTrackView } from './TrackViewManager';
 import TrackHandle from './TrackHandle';
 import { PannableTrackContainer } from './PannableTrackContainer';
 import ReorderableTrackContainer from './ReorderableTrackContainer';
-import ZoomableTrackContainer from './ZoomableTrackContainer';
+import { ZoomableTrackContainer } from './ZoomableTrackContainer';
 import MetadataHeader from './MetadataHeader';
 import { Tools, ToolButtons } from './Tools';
 import ZoomButtons from './ZoomButtons';
@@ -18,11 +18,11 @@ import OutsideClickDetector from '../OutsideClickDetector';
 import ContextMenuManager from '../ContextMenuManager';
 import DivWithBullseye from '../DivWithBullseye';
 import withAutoDimensions from '../withAutoDimensions';
-import TrackLegend from '../trackVis/commonComponents/TrackLegend';
 import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
 
 import TrackModel from '../../model/TrackModel';
 import TrackSelectionBehavior from '../../model/TrackSelectionBehavior';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
@@ -56,6 +56,7 @@ const withEnhancements = _.flowRight(withAppState, withAutoDimensions, withTrack
 class TrackContainer extends React.Component {
     static propTypes = {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired, // Tracks to render
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
         primaryView: PropTypes.object.isRequired,
         trackData: PropTypes.object.isRequired,
         metadataTerms: PropTypes.arrayOf(PropTypes.string).isRequired, // Metadata terms
@@ -239,9 +240,7 @@ class TrackContainer extends React.Component {
             case Tools.ZOOM_IN:
                 return <ZoomableTrackContainer
                     trackElements={trackElements}
-                    viewWindowRegion={primaryView.viewWindowRegion}
-                    viewWindowWidth={primaryView.viewWindow.getLength()}
-                    leftBoundaryX={TrackLegend.WIDTH}
+                    visData={primaryView}
                     onNewRegion={onNewRegion}
                 />;
             case Tools.DRAG:
