@@ -115,7 +115,7 @@ class GeneSearchBox extends React.PureComponent {
 
         return (
         <div>
-            <label>Gene search</label>
+            <label style={{marginBottom: 0}}>Gene search</label>
             <Manager>
                 <Target>
                     <Autosuggest

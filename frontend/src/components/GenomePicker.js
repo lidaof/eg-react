@@ -47,7 +47,7 @@ class GenomePicker extends React.PureComponent {
         let divList = []
         for (const [species, details] of Object.entries(treeOfLife) ) {
             divList.push( <div className="GenomePicker-one-species" key={species}>
-                <label for={species}>
+                <label htmlFor={species}>
                     <input type="radio" id={species} value={species} 
                         checked={this.state.species === species} 
                         onChange={this.chooseSpecies} />
@@ -65,7 +65,7 @@ class GenomePicker extends React.PureComponent {
         const assemblies = treeOfLife[this.state.species].assemblies;
         for (const assembly of assemblies) {
             divList.push(
-                <label for={assembly}>
+                <label htmlFor={assembly} key={assembly}>
                     <input type="radio" id={assembly} value={assembly} 
                         checked={this.state.assembly === assembly} 
                         onChange={this.chooseAssembly} />
@@ -91,7 +91,7 @@ class GenomePicker extends React.PureComponent {
             </div>
             <div className="GenomePicker-go">
                 {
-                    this.state.assembly && <button onClick={() => this.props.onGenomeSelected(this.state.assembly)} >Go  &#8658;</button>
+                    this.state.assembly && <button className="btn btn-primary btn-lg btn-block" onClick={() => this.props.onGenomeSelected(this.state.assembly)} >Go  &#8658;</button>
                 }  
             </div>
         </div>

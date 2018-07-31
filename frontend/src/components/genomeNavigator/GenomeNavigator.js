@@ -41,7 +41,7 @@ class GenomeNavigator extends React.Component {
         super(props);
         this.state = {
             viewRegion: new DisplayedRegionModel(this.props.selectedRegion.getNavigationContext()),
-            isShowingNavigator: false
+            isShowingNavigator: true,
         };
 
         this.toggleNavigator = this.toggleNavigator.bind(this);
@@ -121,7 +121,7 @@ class GenomeNavigator extends React.Component {
      */
     render() {
         return (
-            <div className="container-fluid" style={{borderBottom: "1px solid lightgrey"}}>
+            <div style={{borderBottom: "1px solid lightgrey"}}>
                 <nav className="navbar">
                     <div className="row">
                         <div className="col-sm">
@@ -141,13 +141,13 @@ class GenomeNavigator extends React.Component {
                             />
                         </div>
                         <div className="col-sm">
-                            <label>
+                            <label style={{marginBottom: 0}}>
                                 <span style={{marginRight: "1ch"}} >Show genome-wide navigator</span>
                                 <input type="checkbox" checked={this.state.isShowingNavigator} onChange={this.toggleNavigator} />
                             </label>
                             {
                             this.state.isShowingNavigator &&
-                                <ul>
+                                <ul style={{lineHeight: "1.1em"}}>
                                     <li>Left mouse drag: select</li>
                                     <li>Right mouse drag: pan</li>
                                     <li>Mousewheel: zoom</li>

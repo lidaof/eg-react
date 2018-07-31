@@ -79,7 +79,7 @@ class TrackRegionController extends React.Component {
             
                 
                 <input type="text" ref={(input) => this.input = input} />
-                <button onClick={this.parseRegion.bind(this)}>Set new region</button>
+                <button className="btn btn-secondary btn-sm" style={{marginLeft: "2px"}} onClick={this.parseRegion.bind(this)}>Go</button>
                 {
                     this.state.badInputMessage.length > 0 ? <span className="alert-danger">{this.state.badInputMessage}</span> : null
                 }

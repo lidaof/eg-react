@@ -80,7 +80,8 @@ class HubTable extends React.PureComponent {
             let newHubs = this._cloneHubsAndModifyOne(index, {isLoading: true});
             this.setState({hubs: newHubs});
             const json = await new Json5Fetcher().get(hub.url);
-            const tracks = await this.hubParser.getTracksInHub(json, hub.name, hub.oldHubFormat);
+            const tracksStartIndex = hub.oldHubFormat ? 1 : 0;
+            const tracks = await this.hubParser.getTracksInHub(json, hub.name, hub.oldHubFormat, tracksStartIndex);
             this.props.onHubLoaded(tracks);
             let loadedHubs = this._cloneHubsAndModifyOne(index, {isLoading: false, isLoaded: true});
             this.setState({hubs: loadedHubs});
@@ -117,6 +118,7 @@ class HubTable extends React.PureComponent {
             defaultPageSize={10}
             data={this.state.hubs}
             columns={this.columns}
+            minRows={Math.min(this.state.hubs.length, 10)}
             SubComponent={row => {
                 let collectionDetails = publicHubData[row.original.collection] || <i>No data available.</i>;
                 let hubDetails = row.original.description || <i>No data available.</i>

@@ -11,7 +11,7 @@ class Json5Fetcher {
     get(url: string): Promise<any> {
         return new Promise((resolve, reject) => {
             $.ajax({ // We use jQuery because axios INSISTS on dataType = "json", making parsing with JSON5 impossible
-                url,
+                url, // https://github.com/axios/axios/issues/907
                 dataType: "text", // Expected type of data from server
             })
             .done((data: any) => {

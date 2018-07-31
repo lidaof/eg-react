@@ -3,13 +3,9 @@ import sampleDict from './genomes/hg19/samples.json';
 import assayDict from './genomes/hg19/assays.json';
 
 class HubParser {
-    constructor(tracksStartIndex=0) {
-        this.tracksStartIndex = tracksStartIndex;
-    }
-
-    getTracksInHub(parsedJson, hubName, oldHubFormat) {
+    getTracksInHub(parsedJson, hubName, oldHubFormat, tracksStartIndex=0) {
         let tracks = [];
-        for (let plainObject of parsedJson.slice(this.tracksStartIndex)) {
+        for (let plainObject of parsedJson.slice(tracksStartIndex)) {
             let newTrack = new TrackModel(plainObject);
             newTrack.datahub = hubName;
             if (oldHubFormat) {
