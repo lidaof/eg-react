@@ -40,7 +40,7 @@ class GenomeNavigator extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            viewRegion: new DisplayedRegionModel(this.props.selectedRegion.getNavigationContext()),
+            viewRegion: this._setInitialView(props.selectedRegion),
             isShowingNavigator: true,
         };
 
@@ -48,6 +48,24 @@ class GenomeNavigator extends React.Component {
         this.zoom = this.zoom.bind(this);
         this.setNewView = this.setNewView.bind(this);
         this.zoomSliderDragged = this.zoomSliderDragged.bind(this);
+    }
+
+    /**
+     * Sets the default region for MainPane to cover whole chromosomes/features that are in `selectedRegion`
+     * 
+     * @param {DisplayedRegionModel} selectedRegion - the currently selected region
+     * @return {DisplayedRegionModel} the default view region for the genome navigator
+     */
+    _setInitialView(selectedRegion) {
+        const navContext = selectedRegion.getNavigationContext();
+        const features = selectedRegion.getFeatureSegments().map(segment => segment.feature);
+
+        const firstFeature = features[0];
+        const lastFeature = features[features.length - 1];
+
+        const startBase = navContext.getFeatureStart(firstFeature.getName());
+        const endBase = navContext.getFeatureStart(lastFeature.getName()) + lastFeature.getLength();
+        return new DisplayedRegionModel(navContext, startBase, endBase);
     }
 
     /**
