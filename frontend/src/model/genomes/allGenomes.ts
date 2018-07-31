@@ -7,7 +7,7 @@ import { GenomeConfig } from './GenomeConfig';
 /**
  * All available genomes.
  */
-export const allGenomes = [
+const allGenomes = [
     HG19,
     HG38,
     MM10,
@@ -24,6 +24,21 @@ for (const config of allGenomes) {
     genomeNameToConfig[genomeName] = config;
 }
 
+export const treeOfLife = {
+    human: {
+        logo: 'http://epigenomegateway.wustl.edu/browser/images/Human.png',
+        assemblies: [HG19.genome.getName(), HG38.genome.getName()]
+    },
+    mouse: {
+        logo: 'http://epigenomegateway.wustl.edu/browser/images/Mouse.png',
+        assemblies: [MM10.genome.getName()]
+    },
+    zebrafish: {
+        logo: 'http://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
+        assemblies: [DAN_RER10.genome.getName()]
+    },
+};
+
 /**
  * @param {string} genomeName - name of a genome
  * @return {GenomeConfig} the genome's configuration object, or null if no such genome exists.
@@ -31,5 +46,3 @@ for (const config of allGenomes) {
 export function getGenomeConfig(genomeName: string): GenomeConfig {
     return genomeNameToConfig[genomeName] || null;
 }
-
-export default allGenomes;

@@ -23,7 +23,8 @@ class GeneDetail extends React.PureComponent {
             <FeatureDetail feature={gene} />
             <i>{gene.description}</i>
             <div>
-                { gene.transcriptionClass && 
+                {
+                gene.transcriptionClass && 
                     <span>
                         Transcription class: <span style={{color:DEFAULT_CATEGORY_COLORS[gene.transcriptionClass]}} >
                         {gene.transcriptionClass}</span>

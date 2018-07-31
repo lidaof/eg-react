@@ -1,3 +1,5 @@
+# this script formats raw ncbi refseq data so mongoimport can read it.
+
 desc = {}
 with open('ncbiRefSeqLink.txt') as fin:
     # "id,status,name,product,mrnaAcc,protAcc,locusLinkId,omimId,hgnc,genbank,pseudo,gbkey,source,gene_biotype,gene_synonym,ncrna_class,note,description,externalId",

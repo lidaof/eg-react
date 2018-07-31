@@ -1,18 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import allGenomes from '../model/genomes/allGenomes';
 import { ActionCreators } from '../AppState';
+import { treeOfLife } from '../model/genomes/allGenomes';
 
 import './GenomePicker.css';
 
 const callbacks = { onGenomeSelected: ActionCreators.setGenome };
-
-const treeOfLife = {
-    human: {logo: 'http://epigenomegateway.wustl.edu/browser/images/Human.png', assemblies: ['hg19', 'hg38']},
-    mouse: {logo: 'http://epigenomegateway.wustl.edu/browser/images/Mouse.png', assemblies: ['mm10']},
-    zebrafish: {logo: 'http://epigenomegateway.wustl.edu/browser/images/Zebrafish.png', assemblies: ['danRer10']},
-};
 
 class GenomePicker extends React.PureComponent {
     static propTypes = {
@@ -45,17 +39,18 @@ class GenomePicker extends React.PureComponent {
 
     renderTree() {
         let divList = []
-        for (const [species, details] of Object.entries(treeOfLife) ) {
-            divList.push( <div className="GenomePicker-one-species" key={species}>
-                <label htmlFor={species}>
-                    <input type="radio" id={species} value={species} 
-                        checked={this.state.species === species} 
-                        onChange={this.chooseSpecies} />
-                    <div>{species}</div>
-                    <div><img src={details.logo} alt={species}/></div>
-                </label>
-            </div>
-            )
+        for (const [species, details] of Object.entries(treeOfLife)) {
+            divList.push(
+                <div className="GenomePicker-one-species" key={species}>
+                    <label htmlFor={species}>
+                        <input type="radio" id={species} value={species} 
+                            checked={this.state.species === species} 
+                            onChange={this.chooseSpecies} />
+                        <div>{species}</div>
+                        <div><img src={details.logo} alt={species}/></div>
+                    </label>
+                </div>
+            );
         }
         return divList;
     }
@@ -66,22 +61,22 @@ class GenomePicker extends React.PureComponent {
         for (const assembly of assemblies) {
             divList.push(
                 <label htmlFor={assembly} key={assembly}>
-                    <input type="radio" id={assembly} value={assembly} 
+                    <input
+                        type="radio"
+                        id={assembly}
+                        value={assembly} 
                         checked={this.state.assembly === assembly} 
-                        onChange={this.chooseAssembly} />
+                        onChange={this.chooseAssembly}
+                    />
                     {assembly}
                 </label>
-            )
+            );
         }
         return divList;
     }
 
     render() {
         return (
-        // <div style={{display: "flex", flexDirection: "column", alignItems: "flex-start"}}>
-        //     <h1>Select a genome</h1>
-        //     {allGenomes.map(this.renderGenomeOption)}
-        // </div>
         <div className="GenomePicker-main">
             <div className="GenomePicker-species capitalize">
                 {this.renderTree()}
@@ -91,8 +86,14 @@ class GenomePicker extends React.PureComponent {
             </div>
             <div className="GenomePicker-go">
                 {
-                    this.state.assembly && <button className="btn btn-primary btn-lg btn-block" onClick={() => this.props.onGenomeSelected(this.state.assembly)} >Go  &#8658;</button>
-                }  
+                this.state.assembly &&
+                    <button
+                        className="btn btn-primary btn-lg btn-block"
+                        onClick={() => this.props.onGenomeSelected(this.state.assembly)}
+                    >
+                        Go ⇒
+                    </button>
+                }
             </div>
         </div>
         );

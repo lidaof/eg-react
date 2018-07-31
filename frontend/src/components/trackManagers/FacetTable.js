@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import ReactModal from 'react-modal';
-import PropTypes from 'prop-types';
-import TrackModel from '../../model/TrackModel';
+
 import HubTrackTable from './HubTrackTable';
+import TrackModel from '../../model/TrackModel';
 
 import './FacetTable.css';
 

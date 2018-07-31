@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # programmer : Daofeng
-# usage:
+# usage: adds an additional column that contains transcript class to gencode raw data files
 
 import sys
 
@@ -19,5 +19,3 @@ def main():
 
 if __name__=="__main__":
     main()
-
-
