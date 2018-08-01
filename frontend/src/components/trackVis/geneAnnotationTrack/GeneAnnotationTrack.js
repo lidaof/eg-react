@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import GeneAnnotation, { DEFAULT_CATEGORY_COLORS } from './GeneAnnotation';
+import { GeneAnnotation, DEFAULT_OPTIONS } from './GeneAnnotation';
 import GeneDetail from './GeneDetail';
 
 import Track from '../commonComponents/Track';
@@ -10,15 +10,12 @@ import withTooltip from '../commonComponents/tooltip/withTooltip';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
 import configOptionMerging from '../commonComponents/configOptionMerging';
 
-import LinearDrawingModel from '../../../model/LinearDrawingModel';
+import { GeneAnnotationScaffold } from './GeneAnnotationScaffold';
 
 const ROW_VERTICAL_PADDING = 5;
 const ROW_HEIGHT = GeneAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
 const getGenePadding = gene => gene.getName().length * GeneAnnotation.HEIGHT;
 
-export const DEFAULT_OPTIONS = {
-    categoryColors: DEFAULT_CATEGORY_COLORS
-};
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 /**
@@ -47,28 +44,35 @@ class GeneAnnotationTrack extends React.Component {
     /**
      * Renders one gene annotation.
      * 
-     * @param {PlacedFeature} - gene and draw coordinates
+     * @param {PlacedFeatureGroup} placedGroup - gene and draw coordinates
      * @param {number} y - y coordinate of the top of the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
      * @return {JSX.Element} element visualizing the gene
      */
-    renderAnnotation(placedFeature, y, isLastRow) {
-        const {feature, contextLocation} = placedFeature;
-        const {viewRegion, width, viewWindow, options} = this.props;
-        const navContext = viewRegion.getNavigationContext();
-        const drawModel = new LinearDrawingModel(viewRegion, width);
-        return <GeneAnnotation
-            key={feature.id}
-            gene={feature}
-            navContext={navContext}
-            contextLocation={contextLocation}
-            drawModel={drawModel}
+    renderAnnotation(placedGroup, y, isLastRow) {
+        const gene = placedGroup.feature;
+        const {viewWindow, options} = this.props;
+        return <GeneAnnotationScaffold
+            key={gene.id}
+            gene={gene}
+            xSpan={placedGroup.xSpan}
             viewWindow={viewWindow}
             y={y}
             isMinimal={isLastRow}
             options={options}
             onClick={this.renderTooltip}
-        />;
+        >
+            {
+            placedGroup.placedFeatures.map((placedGene, i) => 
+                <GeneAnnotation
+                    key={i}
+                    placedGene={placedGene}
+                    y={y}
+                    options={options}
+                />
+            )
+            }
+        </GeneAnnotationScaffold>;
     }
 
     /**

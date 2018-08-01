@@ -1,81 +1,92 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { PositionProperty } from 'csstype';
+
 import MetadataIndicator from './MetadataIndicator';
 import TrackMessage from './TrackMessage';
 
-import TrackModel from '../../../model/TrackModel';
+import TrackModel, { TrackOptions } from '../../../model/TrackModel';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 import OpenInterval from '../../../model/interval/OpenInterval';
 
 import spinner from '../../../images/loading-small.gif';
 import './Track.css';
 
-const ERROR_COLOR = "pink";
+const ERROR_COLOR = 'pink';
+
+/**
+ * Props that TrackContainers provide.  Track subtypes may read and use them in any way they wish.  Be sure to pass them
+ * through to this component!
+ */
+export interface PropsFromTrackContainer {
+    trackModel: TrackModel; // Track metadata
+    width: number; // Width of the visualizer
+
+    /**
+     * Region to display.  This component doesn't use it, but most visualizers would probably be interested.
+     */
+    viewRegion: DisplayedRegionModel;
+    viewWindow: OpenInterval; // Visible portion of the visualizer
+    metadataTerms?: string[]; // Terms for which to render metadata handles
+    xOffset?: number; // The horizontal amount to translate visualizations
+    index?: number; // Number to pass in the callbacks
+    isLoading?: boolean; // If true, applies loading styling and user feedback
+    error?: any; // If present, applies error styling and user feedback
+    options?: TrackOptions; // Track options
+
+    /**
+     * Callback for context menu events.
+     * 
+     * @param {React.MouseEvent} event - the event that triggered the callback
+     * @param {number} index - this component's `index` prop
+     */
+    onContextMenu?(event: React.MouseEvent, index: number): void;
+
+    /**
+     * Callback for click events EXCEPT those on the metadata indicators.
+     * 
+     * @param {React.MouseEvent} event - the event that triggered the callback
+     * @param {number} index - this component's `index` prop
+     */
+    onClick?(event: React.MouseEvent, index: number): void;
+
+    /**
+     * Callback for clicks on the metadata indicators
+     * 
+     * @param {React.MouseEvent} event - the event that triggered the callback
+     * @param {string} term - the metadata term that was clicked
+     * @param {number} index - this component's `index` prop
+     */
+    onMetadataClick?(event: React.MouseEvent, term: string, index: number): void;
+}
+
+/**
+ * Track containers do not provide the following.  Track subtypes must provide them.
+ */
+interface CustomizationProps {
+    legend: JSX.Element; // Track legend to render
+    visualizer: JSX.Element; // Track visualizer to render
+    message?: JSX.Element; // Track messages, notifications, etc. to display
+}
+
+type TrackProps = PropsFromTrackContainer & CustomizationProps;
 
 /**
  * Displays track legends, visualizers, and metadata bars more-or-less consistently.
  * 
  * @author Silas Hsu
  */
-class Track extends React.Component {
-    /**
-     * Props that TrackContainers provide.  Track subtypes should require them in their propTypes, and use them in any
-     * way they wish.  Be sure to pass them through to this component!
-     */
-    static propsFromTrackContainer = {
-        trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
-        width: PropTypes.number.isRequired, // Width of the track's visualizer
-        /**
-         * The region of the nav context to display.  This component doesn't use it, but most visualizers would
-         * probably be interested.
-         */
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, 
-        viewWindow: PropTypes.instanceOf(OpenInterval).isRequired, // Visible portion of the visualizer
-        metadataTerms: PropTypes.arrayOf(PropTypes.string), // Terms for which to render metadata handles
-        xOffset: PropTypes.number, // The horizontal amount to translate visualizations
-        index: PropTypes.number, // Number to use as the last parameter in the following callbacks
-        /**
-         * Called on context menu events.  Signature: (event: MouseEvent, index: number): void
-         */
-        onContextMenu: PropTypes.func,
-        /**
-         * Called on click events, except those clicks that happen on the metadata indicator.
-         * Signature: (event: MouseEvent, index: number): void
-         */
-        onClick: PropTypes.func,
-        /**
-         * Called when user clicks on a metadata box.  Signature: (event: MouseEvent, term: string, index: number)
-         *     `event` - the click event
-         *     `term` - the metadata term associated with the box
-         *     `index` - the index prop passed to the track
-         */
-        onMetadataClick: PropTypes.func,
-    };
-
-    static propTypes = Object.assign({}, Track.propsFromTrackContainer, {
-        // Track containers do not provide the following.  Track subtypes must provide them.
-        legend: PropTypes.node.isRequired, // Track legend to render
-        visualizer: PropTypes.node.isRequired, // Track visualizer to render
-        message: PropTypes.node, // Track messages, notifications, etc. to display
-
-        // `isLoading` and `error` can be provided by the configDataFetch HOC.
-        isLoading: PropTypes.bool, // If true, applies loading styling
-        error: PropTypes.any, // If present, applies error styling
-
-        options: PropTypes.shape({ // Track options object
-            backgroundColor: PropTypes.string // Visualizer background color
-        })
-    });
-
-    static defaultProps = {
+class Track extends React.Component<TrackProps> {
+    static defaultProps: Partial<TrackProps> = {
         xOffset: 0,
-        onContextMenu: (event, index) => undefined,
-        onClick: (event, index) => undefined,
-        onMetadataClick: (event, term, index) => undefined,
+        onContextMenu: () => undefined,
+        onClick: () => undefined,
+        onMetadataClick: () => undefined,
         options: {}
     };
 
-    constructor(props) {
+    private ignoreNextClick: boolean;
+
+    constructor(props: TrackProps) {
         super(props);
         this.ignoreNextClick = false;
         this.handleContextMenu = this.handleContextMenu.bind(this);
@@ -83,18 +94,18 @@ class Track extends React.Component {
         this.handleMetadataClick = this.handleMetadataClick.bind(this);
     }
 
-    handleContextMenu(event) {
+    handleContextMenu(event: React.MouseEvent) {
         this.props.onContextMenu(event, this.props.index);
     }
 
-    handleClick(event) {
+    handleClick(event: React.MouseEvent) {
         if (!this.ignoreNextClick) {
             this.props.onClick(event, this.props.index);
         }
         this.ignoreNextClick = false;
     }
 
-    handleMetadataClick(event, term) {
+    handleMetadataClick(event: React.MouseEvent, term: string) {
         this.ignoreNextClick = true; // Since the onClick event will be called right after this
         this.props.onMetadataClick(event, term, this.props.index);
     }
@@ -141,20 +152,26 @@ class Track extends React.Component {
 /**
  * A notice that a track is loading data.
  * 
- * @param {Object} props - props as specified by React
+ * @param {object} props - props as specified by React
  * @return {JSX.Element}
  */
-function TrackLoadingNotice(props) {
+function TrackLoadingNotice(props: {}): JSX.Element {
     return <div className="Track-loading-notice">
         <img className="img-fluid" alt="Loading..." src={spinner} />
     </div>;
 }
 
-function ErrorMessage(props) {
+function ErrorMessage(props: {}): JSX.Element {
     const message = "⚠️ Data fetch failed.  Reload page or change view to retry.";
     return <TrackMessage message={message} style={{backgroundColor: ERROR_COLOR}} />;
 }
 
+interface ViewWindowProps {
+    viewWindow: OpenInterval;
+    fullWidth: number;
+    children: JSX.Element;
+    xOffset?: number;
+}
 /**
  * A component that has a "window" that displays only a portion of its (presumably) wider children.  The window can be
  * horizontally scrolled via the `xOffset` prop.  By default the view window is horizontally centered on the children.
@@ -162,16 +179,17 @@ function ErrorMessage(props) {
  * @param {Object} props - props as specified by React
  * @return {JSX.Element} element to render
  */
-function ViewWindow(props) {
+function ViewWindow(props: ViewWindowProps): JSX.Element {
     const {viewWindow, fullWidth, children} = props;
     // Actually, props.xOffset stores the dragged amount and draggedAmount stores the actual amount we will xOffset.
     const xOffset = props.xOffset || 0;
     const outerStyle = {
-        overflowX: "hidden",
+        overflow: "hidden",
         width: viewWindow.getLength(),
     };
     const innerStyle = {
-        position: "relative",
+        width: fullWidth,
+        position: "relative" as PositionProperty,
         // -viewWindow.start centers the view, rather than it starting at the leftmost part of the inner element.
         transform: `translateX(${-viewWindow.start + xOffset}px)`,
         willChange: 'transform'
@@ -179,18 +197,19 @@ function ViewWindow(props) {
 
     return (
     <div style={outerStyle}>
-        <div width={fullWidth} style={innerStyle} >
-            {children}
-        </div>
+        <div style={innerStyle} >{children}</div>
     </div>
     );
 }
 
+interface FreezeWhileLoadingProps {
+    isLoading?: boolean;
+}
 /**
  * A component that stops updating its children if passed a truthy `isLoading` prop.
  */
-class FreezeWhileLoading extends React.Component {
-    shouldComponentUpdate(nextProps) {
+class FreezeWhileLoading extends React.Component<FreezeWhileLoadingProps> {
+    shouldComponentUpdate(nextProps: FreezeWhileLoadingProps) {
         return !nextProps.isLoading;
     }
 

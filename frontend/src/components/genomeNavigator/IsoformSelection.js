@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
-import StandaloneGeneAnnotation from './StandaloneGeneAnnotation';
+import { StandaloneGeneAnnotation } from './StandaloneGeneAnnotation';
 import withCurrentGenome from '../withCurrentGenome';
 
 import Gene from '../../model/Gene';
@@ -87,9 +87,9 @@ class IsoformSelection extends React.PureComponent {
                 <div>
                     <StandaloneGeneAnnotation
                         gene={gene}
-                        navContext={navContext}
                         contextLocation={contextIntervals[i]}
-                        drawModel={drawModel}
+                        xSpan={drawModel.baseSpanToXSpan(contextIntervals[i])}
+                        elementWidth={DRAW_WIDTH}
                     />
                 </div>
                 <div className="IsoformSelection-description">{gene.description}</div>

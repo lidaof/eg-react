@@ -1,5 +1,6 @@
 import { AnnotationTrackConfig } from './AnnotationTrackConfig';
-import GeneAnnotationTrack, { DEFAULT_OPTIONS } from '../trackVis/geneAnnotationTrack/GeneAnnotationTrack';
+import GeneAnnotationTrack from '../trackVis/geneAnnotationTrack/GeneAnnotationTrack';
+import { DEFAULT_OPTIONS } from '../trackVis/geneAnnotationTrack/GeneAnnotation';
 import GeneSource from '../../dataSources/GeneSource';
 import Gene from '../../model/Gene';
 import { TrackModel } from '../../model/TrackModel';

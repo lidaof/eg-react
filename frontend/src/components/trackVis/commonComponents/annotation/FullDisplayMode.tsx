@@ -1,12 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 
-import Track from '../Track';
+import Track, { PropsFromTrackContainer } from '../Track';
 import TrackLegend from '../TrackLegend';
 import { HiddenItemsMessage } from '../TrackMessage';
 
-import { FeatureArranger, PlacedFeatureWithRow } from '../../../../model/FeatureArranger';
+import { FeatureArranger, PlacedFeatureGroup, PaddingFunc } from '../../../../model/FeatureArranger';
+import { Feature } from '../../../../model/Feature';
 
 const SVG_STYLE = {
     display: "block",
@@ -15,47 +15,47 @@ const SVG_STYLE = {
 const TOP_PADDING = 5;
 
 /**
+ * Callback for getting an annotation to render
+ * 
+ * @param {PlacedFeatureGroup} placedGroup - the feature to draw, and drawing info
+ * @param {number} y - suggested y coordinate of the top of the annotation
+ * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
+ * @param {number} index - iteration index; could be useful as a key
+ * @return {JSX.Element} the annotation element to render
+ */
+type AnnotationCallback = (placedGroup: PlacedFeatureGroup, y: number, isLastRow: boolean, index: number) => JSX.Element
+
+interface FullDisplayModeProps extends PropsFromTrackContainer {
+    data: Feature[]; // Features to render
+    rowHeight: number; // Height of each row of annotations, in pixels
+    options: {
+        maxRows: number; // Max number of rows of annotations to render
+    };
+
+    legend?: JSX.Element; // Override for the default legend element
+    featurePadding?: number | PaddingFunc; // Horizontal padding for features
+    getAnnotationElement?: AnnotationCallback
+}
+
+/**
  * An arranger and renderer of features, or annotations.
  * 
  * @author Silas Hsu
  */
-class FullDisplayMode extends React.Component {
-    static propTypes = Object.assign({}, Track.propsFromTrackContainer, {
-        /**
-         * Features to render.  Simplified since checking is expensive.
-         */
-        data: PropTypes.array.isRequired, // PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired,
-        featurePadding: PropTypes.oneOfType([PropTypes.number, PropTypes.func]), // Horizontal padding for features
-        rowHeight: PropTypes.number.isRequired, // Height of each row of annotations, in pixels
-        options: PropTypes.shape({
-            maxRows: PropTypes.number.isRequired, // Max number of rows of annotations to render
-        }).isRequired,
-        isLoading: PropTypes.bool, // If true, applies loading styling
-        error: PropTypes.any, // If present, applies error styling
-        legend: PropTypes.node, // Override for the default legend element
-        /**
-         * Callback for getting an annotation element to render.  Signature:
-         * (    
-         *      placedFeature: PlacedFeature, // The feature to draw, and drawing info
-         *      y: number, // Suggested y coordinate of the top of the annotation
-         *      isLastRow: boolean // Whether the annotation is assigned to the last configured row
-         *      index: number // Iteration index; could be useful as a key
-         * ): JSX.Element
-         */
-        getAnnotationElement: PropTypes.func.isRequired,
-    });
-
+class FullDisplayMode extends React.Component<FullDisplayModeProps> {
     static defaultProps = {
         featurePadding: 5,
     };
 
-    constructor(props) {
+    private featureArranger: FeatureArranger;
+
+    constructor(props: FullDisplayModeProps) {
         super(props);
         this.featureArranger = new FeatureArranger();
         this.featureArranger.arrange = memoizeOne(this.featureArranger.arrange);
     }
 
-    getHeight(numRows) {
+    getHeight(numRows: number): number {
         const {rowHeight, options} = this.props;
         let rowsToDraw = Math.min(numRows, options.maxRows);
         if (rowsToDraw < 1) {
@@ -84,33 +84,34 @@ class FullDisplayMode extends React.Component {
     }
 }
 
-class FullVisualizer extends React.PureComponent {
-    static propTypes = {
-        placements: PropTypes.array.isRequired,
-        width: PropTypes.number.isRequired,
-        height: PropTypes.number.isRequired,
-        rowHeight: PropTypes.number.isRequired,
-        maxRows: PropTypes.number,
-        getAnnotationElement: PropTypes.func.isRequired
-    };
+interface FullVisualizerProps {
+    placements: PlacedFeatureGroup[];
+    width: number;
+    height: number;
+    rowHeight: number;
+    maxRows: number;
+    getAnnotationElement: AnnotationCallback;
+    options?: any;
+}
 
-    constructor(props) {
+class FullVisualizer extends React.PureComponent<FullVisualizerProps> {
+    constructor(props: FullVisualizerProps) {
         super(props);
         this.renderAnnotation = this.renderAnnotation.bind(this);
     }
 
     /**
      * 
-     * @param {PlacedFeatureWithRow} placedFeature 
+     * @param {PlacedFeatureGroup} placedGroup 
      * @param {number} i 
      */
-    renderAnnotation(placedFeature, i) {
+    renderAnnotation(placedGroup: PlacedFeatureGroup, i: number) {
         const {rowHeight, maxRows, getAnnotationElement} = this.props;
         const maxRowIndex = (maxRows || Infinity) - 1;
         // Compute y
-        const rowIndex = Math.min(placedFeature.row, maxRowIndex);
+        const rowIndex = Math.min(placedGroup.row, maxRowIndex);
         const y = rowIndex * rowHeight + TOP_PADDING;
-        return getAnnotationElement(placedFeature, y, rowIndex === maxRowIndex, i);
+        return getAnnotationElement(placedGroup, y, rowIndex === maxRowIndex, i);
     }
 
     render() {

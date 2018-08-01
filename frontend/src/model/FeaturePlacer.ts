@@ -21,13 +21,8 @@ export interface PlacedFeature {
 }
 
 export interface PlacedSegment {
-    segment: FeatureSegment; // The segment
-    /**
-     * Location of the segment in nav context coordiantes.  See note for contextLocation in PlacedFeature for important
-     * details.
-     */
-    contextLocation: OpenInterval;
-    offsetRelativeToFeature: number; // Location of the context location relative to the feature's start
+    segment: FeatureSegment; // The segment, truncated to the visible part
+    xSpan: OpenInterval; // The x span of the segment
 }
 
 export class PlacedInteraction {
@@ -110,45 +105,30 @@ export class FeaturePlacer {
     }
 
     /**
-     * Gets the context location for feature segments, assuming that all segments are part of the same feature.  To
-     * disambiguate when a segment maps to multiple context locations, this method also requires the context location of
-     * the parent feature, which can be obtained from `placeFeatures()`.  This effectively puts a limit on where
-     * segments may map; there may be fewer placed segments than input segments.
+     * Gets draw spans for feature segments, given a parent feature that has already been placed.
      * 
-     * @param {FeatureSegment[]} segments - segments for which to get context locations
-     * @param {NavigationContext} navContext - navigation context to map to
-     * @param {OpenInterval} contextLocationOfFeature - context location of the feature from which the segments came
-     * @return {PlacedSegment[]} placed segments
+     * @param {PlacedFeature} placedFeature 
+     * @param {FeatureSegment[]} segments 
+     * @return {PlacedSegment[]}
      */
-    placeFeatureSegments(segments: FeatureSegment[], navContext: NavigationContext,
-        contextLocationOfFeature: OpenInterval): PlacedSegment[]
-    {
-        /**
-         * Convert mapped context location to genomic coordinates, so we can directly compare it to the segment's locus.
-         * This expression assumes the mapped location only spans one chromosome, which it should, because the feature
-         * should only span one chromosome as well.
-         */
-        const locusOfContextLocation = navContext
-            .convertBaseToFeatureCoordinate(contextLocationOfFeature.start) 
-            .getLocus();
-        const results = [];
+    placeFeatureSegments(placedFeature: PlacedFeature, segments: FeatureSegment[]): PlacedSegment[] {
+        const pixelsPerBase = placedFeature.xSpan.getLength() / placedFeature.contextLocation.getLength();
+        const placements = [];
         for (const segment of segments) {
-            // Distance of the segment's start from the mapped locus's start.  A positive value means the context
-            // location of the segment starts after the context location of the feature.
-            const distFromParentLocation = segment.getLocus().start - locusOfContextLocation.start;
-            // Context location of the start of the segment
-            const contextStart = contextLocationOfFeature.start + distFromParentLocation;
-            const unsafeContextLocation = new OpenInterval(contextStart, contextStart + segment.getLength());
-            const contextLocation = unsafeContextLocation.getOverlap(contextLocationOfFeature);
-            if (contextLocation) {
-                results.push({
-                    segment,
-                    contextLocation,
-                    offsetRelativeToFeature: segment.relativeStart + Math.max(0, distFromParentLocation)
+            const visibleSegment = segment.getOverlap(placedFeature.visiblePart);
+            if (visibleSegment) {
+                const basesFromVisiblePart = visibleSegment.relativeStart - placedFeature.visiblePart.relativeStart;
+                const distanceFromXSpan = basesFromVisiblePart * pixelsPerBase;
+                const xSpanStart = placedFeature.xSpan.start + distanceFromXSpan;
+                const xSpanLength = visibleSegment.getLength() * pixelsPerBase;
+                placements.push({
+                    segment: visibleSegment,
+                    xSpan: new OpenInterval(xSpanStart, xSpanStart + xSpanLength)
                 });
             }
         }
-        return results;
+
+        return placements;
     }
 
     placeInteractions(interactions: GenomeInteraction[], viewRegion: DisplayedRegionModel,

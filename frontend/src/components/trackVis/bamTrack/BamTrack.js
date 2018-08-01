@@ -1,5 +1,5 @@
 import React from 'react';
-import { BamAnnotation } from './BamAnnotation';
+// import { BamAnnotation } from './BamAnnotation';
 
 import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
@@ -7,7 +7,6 @@ import withTooltip from '../commonComponents/tooltip/withTooltip';
 import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 
 import { PlacedFeature } from '../../../model/FeaturePlacer';
-import LinearDrawingModel from '../../../model/LinearDrawingModel';
 
 const ROW_PADDING = 2;
 
@@ -38,6 +37,8 @@ class BamTrack extends React.Component {
         }
 
         const {viewRegion, width, options} = this.props;
+        return null;
+        /*
         return <BamAnnotation
             key={index}
             record={placedRecord.feature}
@@ -48,6 +49,7 @@ class BamTrack extends React.Component {
             options={options}
             onClick={this.renderTooltip}
         />;
+        */
     }
 
     /**
@@ -75,7 +77,7 @@ class BamTrack extends React.Component {
         return <AnnotationTrack
             {...this.props}
             data={this.props.data}
-            rowHeight={BamAnnotation.HEIGHT + ROW_PADDING}
+            // rowHeight={BamAnnotation.HEIGHT + ROW_PADDING}
             getAnnotationElement={this.renderAnnotation}
         />;
     }
