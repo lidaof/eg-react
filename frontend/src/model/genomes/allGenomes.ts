@@ -27,15 +27,18 @@ for (const config of allGenomes) {
 export const treeOfLife = {
     human: {
         logo: 'http://epigenomegateway.wustl.edu/browser/images/Human.png',
-        assemblies: [HG19.genome.getName(), HG38.genome.getName()]
+        assemblies: [HG19.genome.getName(), HG38.genome.getName()],
+        color: 'white',
     },
     mouse: {
         logo: 'http://epigenomegateway.wustl.edu/browser/images/Mouse.png',
-        assemblies: [MM10.genome.getName()]
+        assemblies: [MM10.genome.getName()],
+        color: 'white',
     },
     zebrafish: {
         logo: 'http://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
-        assemblies: [DAN_RER10.genome.getName()]
+        assemblies: [DAN_RER10.genome.getName()],
+        color: 'white',
     },
 };
 
@@ -45,4 +48,13 @@ export const treeOfLife = {
  */
 export function getGenomeConfig(genomeName: string): GenomeConfig {
     return genomeNameToConfig[genomeName] || null;
+}
+
+export function getGenomeInfo(genomeName: string): any {
+    for (const [species, details] of Object.entries(treeOfLife) ) {
+        if (details.assemblies.includes(genomeName)) {
+            return {name: species, logo: details.logo, color: details.color}
+        }
+        return {name: '', logo: '', color: ''};
+    }
 }

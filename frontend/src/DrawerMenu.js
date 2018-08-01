@@ -55,6 +55,8 @@ export class DrawerMenu extends React.Component {
                 drawerStyle={DRAWER_STYLE} 
                 fadeOut={true}
                 zIndex={1}
+                noTouchOpen={true}
+                noTouchClose={true}
             >
                 <div
                     title="Close menu"

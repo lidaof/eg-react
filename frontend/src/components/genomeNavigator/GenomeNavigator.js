@@ -7,7 +7,8 @@ import TrackRegionController from './TrackRegionController';
 import GeneSearchBox from './GeneSearchBox';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import eglogo from '../../images/eglogo.jpg';
+
+import './GenomeNavigator.css';
 
 /**
  * A navigator that allows users to scroll around the genome and select what region for tracks to display.
@@ -143,34 +144,20 @@ class GenomeNavigator extends React.Component {
                 <nav className="navbar">
                     <div className="row">
                         <div className="col-sm">
-                            <img src={eglogo} width="400px" alt="eg logo"/>
-                        </div>
-                       
-                        <div className="col-md">
-                            <TrackRegionController
-                                selectedRegion={this.props.selectedRegion}
-                                onRegionSelected={this.props.onRegionSelected}
-                            />
-                        </div>
-                        <div className="col-md">
-                            <GeneSearchBox
-                                navContext={this.props.selectedRegion.getNavigationContext()}
-                                onRegionSelected={this.props.onRegionSelected}
-                            />
-                        </div>
-                        <div className="col-sm">
                             <label style={{marginBottom: 0}}>
                                 <span style={{marginRight: "1ch"}} >Show genome-wide navigator</span>
                                 <input type="checkbox" checked={this.state.isShowingNavigator} onChange={this.toggleNavigator} />
+                                
                             </label>
-                            {
-                            this.state.isShowingNavigator &&
-                                <ul style={{lineHeight: "1.1em"}}>
-                                    <li>Left mouse drag: select</li>
-                                    <li>Right mouse drag: pan</li>
-                                    <li>Mousewheel: zoom</li>
-                                </ul>
-                            }
+                            <div className="GenomeNavigator-tooltip">❓
+                                <div className="GenomeNavigator-tooltiptext">
+                                    <ul style={{lineHeight: "1.2em", marginBottom: 0}}>
+                                        <li>Left mouse drag: select</li>
+                                        <li>Right mouse drag: pan</li>
+                                        <li>Mousewheel: zoom</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </nav>

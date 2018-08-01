@@ -1,0 +1,30 @@
+.Nav-container {
+    display: grid;
+    /* grid-auto-flow: column;
+    grid-auto-columns: auto; */
+    grid-template-columns: repeat(7, auto) 1fr;
+    justify-items: start;
+    /* grid-template-columns: min-content; */
+}
+
+.Nav-container > div {
+    padding: 0 5px;
+}
+
+.Nav-genome {
+    opacity: 0.3;
+    text-align: center;
+    cursor: pointer;
+    width: 243px;
+}
+
+.Nav-genome:hover {
+    opacity: 0.8;
+}
+
+.Nav-center {
+    display: grid;
+    grid-template-columns: auto;
+    justify-items: center;
+    align-items: center;
+}

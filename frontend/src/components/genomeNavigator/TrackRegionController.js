@@ -1,7 +1,7 @@
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import GeneSearchBox from './GeneSearchBox';
 
 /**
  * The display that is above the main pane of the genome navigator, which shows the current track region and a text
@@ -67,6 +67,10 @@ class TrackRegionController extends React.Component {
         this.props.onRegionSelected(parsedRegion.start, parsedRegion.end);
     }
 
+    handleClick(event) {
+        event.currentTarget.select();
+    }
+
     /**
      * @inheritdoc
      */
@@ -74,16 +78,47 @@ class TrackRegionController extends React.Component {
         let region = this._currentRegionAsString();
         return (
         <div>
-            <label>
+            {/* <label>
             Current region: {region} 
-            
+            </label> */}
                 
-                <input type="text" ref={(input) => this.input = input} />
-                <button className="btn btn-secondary btn-sm" style={{marginLeft: "2px"}} onClick={this.parseRegion.bind(this)}>Go</button>
+                {/* <input type="text" ref={(input) => this.input = input} defaultValue={region} size="30" onClick={this.handleClick}/>
+                <button 
+                    className="btn btn-secondary btn-sm" 
+                    style={{marginLeft: "2px"}} onClick={this.parseRegion.bind(this)}
+                    
+                >
+                    Go
+                </button> */}
+            <button className="btn btn-secondary dropdown-toggle" 
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {region}
+            </button>
+            <div className="dropdown-menu">
+                <h6 className="dropdown-header">Region search</h6>
+                <GeneSearchBox
+                    navContext={this.props.selectedRegion.getNavigationContext()}
+                    onRegionSelected={this.props.onRegionSelected}
+                />
+                <div className="dropdown-divider"></div>
+                <div>
+                    <h6 className="dropdown-header">Gene search</h6>
+                    <input type="text" ref={(input) => this.input = input} size="30" 
+                        placeholder="Coordinate"
+                        onClick={this.handleClick}/>
+                    <button 
+                        className="btn btn-secondary btn-sm" 
+                        style={{marginLeft: "2px"}} onClick={this.parseRegion.bind(this)}
+                    >
+                        Go
+                    </button>
+                </div>
+                
+             </div>
                 {
                     this.state.badInputMessage.length > 0 ? <span className="alert-danger">{this.state.badInputMessage}</span> : null
                 }
-            </label>
+            
             
         </div>
         );

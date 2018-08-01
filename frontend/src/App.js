@@ -15,6 +15,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import TrackModel from './model/TrackModel';
 
+import Nav from './components/Nav';
+
 import './App.css';
 
 function mapStateToProps(state) {
@@ -70,6 +72,7 @@ class App extends React.Component {
 
         return (
         <div className="container-fluid">
+            <Nav selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
             <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
             <DrawerMenu
                 tracks={tracks}

@@ -39,7 +39,12 @@ const defaultTracks = [
     new TrackModel({
         type: "ruler",
         name: "Ruler",
-    })
+    }),
+    new TrackModel({
+        type: 'repeatmasker',
+        name: 'RepeatMasker',
+        url: 'https://vizhub.wustl.edu/public/mm10/rmsk16.bb'
+    }),
 ];
 
 const publicHubData = {

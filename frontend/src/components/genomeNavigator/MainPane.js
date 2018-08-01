@@ -13,6 +13,8 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 import { MouseButtons } from '../../util';
 
+import './MainPane.css';
+
 const WHEEL_ZOOM_SPEED = 0.2;
 const SVG_HEIGHT = 100;
 
@@ -118,7 +120,7 @@ class MainPane extends React.Component {
 
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView button={MouseButtons.RIGHT} onViewDrag={onNewViewRequested} viewRegion={viewRegion} >
+        <DragAcrossView button={MouseButtons.RIGHT} onViewDrag={onNewViewRequested} viewRegion={viewRegion} className="Mainpane-opaque" >
             <SelectableGenomeArea
                 drawModel={new LinearDrawingModel(viewRegion, width)}
                 y={SELECT_BOX_Y}
@@ -130,7 +132,7 @@ class MainPane extends React.Component {
                     height={SVG_HEIGHT}
                     onContextMenu={event => event.preventDefault()}
                     onWheel={this.mousewheel}
-                    style={{border: "2px solid black"}}
+                    style={{border: "1px solid black"}}
                 >
                     <Chromosomes viewRegion={viewRegion} width={width} y={CHROMOSOME_Y} />
                     <Ruler viewRegion={viewRegion} width={width} y={RULER_Y} />

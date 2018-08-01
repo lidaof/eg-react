@@ -1,0 +1,7 @@
+.Mainpane-opaque {
+    opacity: 0.5;
+}
+
+.Mainpane-opaque:hover {
+    opacity: 1;
+}

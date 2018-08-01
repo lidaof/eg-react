@@ -161,14 +161,13 @@ class MethylCTrack extends React.PureComponent {
         };
         let strandRenderers, tooltipY;
         if (isCombineStrands) {
-            strandRenderers = [ <StrandVisualizer key={0} {...childProps} strand="combined" /> ];
+            strandRenderers = <StrandVisualizer {...childProps} strand="combined" />;
             tooltipY = height;
         } else {
-            strandRenderers = [
-                <StrandVisualizer key={0} {...childProps} strand="forward" />,
-                <hr key={"center"} style={{margin: 0}} />,
-                <StrandVisualizer key={1} {...childProps} strand="reverse" />,
-            ];
+            strandRenderers = <React.Fragment>
+                <StrandVisualizer {...childProps} strand="forward" />
+                <StrandVisualizer {...childProps} strand="reverse" />
+            </React.Fragment>;
             tooltipY = height * 2;
         }
 
@@ -272,7 +271,8 @@ class StrandVisualizer extends React.PureComponent {
 
     render() {
         const {data, strand, width, height, htmlType} = this.props;
-        const style = strand === PLOT_DOWNWARDS_STRAND ? {transform: "scale(1, -1)"} : undefined;
+        const style = strand === PLOT_DOWNWARDS_STRAND ?
+            {transform: "scale(1, -1)", borderBottom: "1px solid lightgrey"} : undefined;
         let bars = [];
         for (let x = 0; x < data.length; x++) {
             bars.push(this.renderBarElement(x))

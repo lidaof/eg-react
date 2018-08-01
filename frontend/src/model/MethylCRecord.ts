@@ -6,8 +6,8 @@ import BedRecord from '../dataSources/bed/BedRecord';
 const RecordInfoIndices = {
     CONTEXT: 3,
     VALUE: 4,
-    DEPTH: 5,
-    STRAND: 6
+    DEPTH: 6,
+    STRAND: 5
 };
 
 interface AggregationByRecordsResult {
@@ -92,9 +92,9 @@ class MethylCRecord extends Feature {
 
     /*
     Input， strings like following
-    chrX	2709724	2709725	CHH	0.111	9	-
-    chrX	2709728	2709729	CG	0.875	8	-
-    chrX	2709767	2709768	CHG	0.059	17	-
+    chrX	2709724	2709725	CHH	0.111	-	9
+    chrX	2709728	2709729	CG	0.875	+	8
+    chrX	2709767	2709768	CHG	0.059	-	17
     /**
      * Constructs a new MethylCRecord, given a string from tabix
      *

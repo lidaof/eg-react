@@ -6,7 +6,7 @@
     "module": "esnext",
     "target": "es5",
     "downlevelIteration": true,
-    "lib": ["es6", "dom"],
+    "lib": ["es2017", "dom"],
     "sourceMap": true,
     "allowJs": true,
     "jsx": "react",
