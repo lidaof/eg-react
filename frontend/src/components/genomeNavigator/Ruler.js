@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TranslatableG from '../TranslatableG';
+import { TranslatableG } from '../TranslatableG';
 import RulerDesigner from '../../art/RulerDesigner';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 

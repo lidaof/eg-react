@@ -16,7 +16,7 @@ import { ViewExpansion } from '../RegionExpander';
 import { FeaturePlacer } from '../FeaturePlacer';
 import DisplayedRegionModel from '../DisplayedRegionModel';
 
-interface PlacedAlignment {
+export interface PlacedAlignment {
     record: AlignmentRecord;
     visiblePart: AlignmentSegment;
     contextSpan: OpenInterval;
@@ -26,7 +26,7 @@ interface PlacedAlignment {
     querySegments?: PlacedSequenceSegment[];
 }
 
-interface PlacedSequenceSegment extends SequenceSegment {
+export interface PlacedSequenceSegment extends SequenceSegment {
     xSpan: OpenInterval;
 }
 
@@ -35,7 +35,7 @@ interface QueryGenomePiece {
     queryXSpan: OpenInterval;
 }
 
-interface PlacedMergedAlignment extends QueryGenomePiece {
+export interface PlacedMergedAlignment extends QueryGenomePiece {
     segments: PlacedAlignment[];
 }
 

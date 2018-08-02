@@ -1,5 +1,5 @@
 import React from 'react';
-import TranslatableG from '../../TranslatableG';
+import { TranslatableG } from '../../TranslatableG';
 import { FeaturePlacer, PlacedSegment } from '../../../model/FeaturePlacer';
 import { BamRecord } from '../../../model/BamRecord';
 import NavigationContext from '../../../model/NavigationContext';

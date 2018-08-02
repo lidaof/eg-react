@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import TranslatableG from '../TranslatableG';
+import { TranslatableG } from '../TranslatableG';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
 

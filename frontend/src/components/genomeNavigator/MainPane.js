@@ -8,9 +8,9 @@ import SelectedRegionBox from './SelectedRegionBox';
 import { SelectableGenomeArea } from '../SelectableGenomeArea';
 import { RegionPanTracker } from '../RegionPanTracker';
 import withAutoDimensions from '../withAutoDimensions';
+import withCurrentGenome from '../withCurrentGenome';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import LinearDrawingModel from '../../model/LinearDrawingModel';
 import { MouseButton } from '../../util';
 import OpenInterval from '../../model/interval/OpenInterval';
 
@@ -23,6 +23,8 @@ const RULER_Y = CHROMOSOME_Y + 30;
 
 const SELECT_BOX_Y = "5px";
 const SELECT_BOX_HEIGHT = "60px";
+
+const PrimaryGenomeChromosomes = withCurrentGenome(Chromosomes);
 
 /**
  * The main pane of the genome navigator.  Manages child components and listens for events that modify the view region.
@@ -121,7 +123,7 @@ class MainPane extends React.Component {
                     onWheel={this.mousewheel}
                     style={{border: "2px solid black"}}
                 >
-                    <Chromosomes viewRegion={viewRegion} width={containerWidth} y={CHROMOSOME_Y} />
+                    <PrimaryGenomeChromosomes viewRegion={viewRegion} width={containerWidth} y={CHROMOSOME_Y} />
                     <Ruler viewRegion={viewRegion} width={containerWidth} y={RULER_Y} />
                     <SelectedRegionBox
                         width={containerWidth}

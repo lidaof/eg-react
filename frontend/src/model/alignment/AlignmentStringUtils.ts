@@ -18,8 +18,19 @@ export function countBases(sequence: string): number {
 }
 
 export interface SequenceSegment {
+    /**
+     * Whether the segment represents a gap
+     */
     isGap: boolean;
+
+    /**
+     * The character index in the original sequence string
+     */
     index: number;
+    
+    /**
+     * The length of the segment in characters
+     */
     length: number;
 }
 

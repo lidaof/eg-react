@@ -26,7 +26,7 @@ interface ZoomableTrackContainerProps {
  */
 export function ZoomableTrackContainer(props: ZoomableTrackContainerProps): JSX.Element {
     const {trackElements, visData, onNewRegion} = props;
-    const {viewWindowRegion, viewWindow} = visData;console.log(viewWindowRegion.getGenomeIntervals()[0])
+    const {viewWindowRegion, viewWindow} = visData;
     return (
     <SelectableGenomeArea
         selectableRegion={viewWindowRegion}

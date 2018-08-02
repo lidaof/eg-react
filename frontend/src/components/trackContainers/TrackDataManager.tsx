@@ -25,7 +25,7 @@ interface DataManagerProps {
     primaryViewPromise: Promise<ViewExpansion>;
 }
 
-interface TrackData {
+export interface TrackData {
     alignment: Alignment;
     visRegion: DisplayedRegionModel;
     data: any[];
@@ -34,7 +34,7 @@ interface TrackData {
 }
 const INITIAL_TRACK_DATA: TrackData = {
     alignment: null,
-    visRegion: new DisplayedRegionModel(new NavigationContext('', [])),
+    visRegion: new DisplayedRegionModel(new NavigationContext('', [NavigationContext.makeGap(1000)])),
     data: [],
     isLoading: true,
     error: null

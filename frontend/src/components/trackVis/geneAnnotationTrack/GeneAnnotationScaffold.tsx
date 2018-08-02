@@ -2,7 +2,7 @@ import React from 'react';
 import OpenInterval from '../../../model/interval/OpenInterval';
 import Gene from '../../../model/Gene';
 import { GeneAnnotation } from './GeneAnnotation';
-import TranslatableG from '../../TranslatableG';
+import { TranslatableG } from '../../TranslatableG';
 import BackgroundedText from '../commonComponents/BackgroundedText';
 
 interface GeneAnnotationScaffoldProps {

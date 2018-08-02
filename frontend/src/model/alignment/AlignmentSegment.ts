@@ -15,7 +15,8 @@ export class AlignmentSegment extends FeatureSegment {
     constructor(record: AlignmentRecord, start?: number, end?: number) {
         super(record, start, end);
         const alignIter = new AlignmentIterator(record.targetSeq);
-        const substringStart = alignIter.advanceN(this.relativeStart);
+        // +1 because AlignmentIterator starts on string index -1.
+        const substringStart = alignIter.advanceN(this.relativeStart + 1);
         const substringEnd = alignIter.advanceN(this.getLength());
         this.sequenceInterval = new OpenInterval(substringStart, substringEnd);
     }

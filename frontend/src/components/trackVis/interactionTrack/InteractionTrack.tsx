@@ -6,25 +6,18 @@ import { scaleLinear } from 'd3-scale';
 import { Heatmap } from './Heatmap';
 import { ArcDisplay } from './ArcDisplay';
 
-import Track from '../commonComponents/Track';
+import Track, { PropsFromTrackContainer } from '../commonComponents/Track';
 import TrackLegend from '../commonComponents/TrackLegend';
 import configOptionMerging from '../commonComponents/configOptionMerging';
 import withTooltip from '../commonComponents/tooltip/withTooltip';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
 
-import TrackModel from '../../../model/TrackModel';
 import { InteractionDisplayMode } from '../../../model/DisplayModes';
 import { FeaturePlacer } from '../../../model/FeaturePlacer';
 import { GenomeInteraction } from '../../../model/GenomeInteraction';
-import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
-import OpenInterval from '../../../model/interval/OpenInterval';
 
-interface InteractionTrackProps {
+interface InteractionTrackProps extends PropsFromTrackContainer {
     data: GenomeInteraction[];
-    trackModel: TrackModel;
-    viewRegion: DisplayedRegionModel;
-    viewWindow: OpenInterval;
-    width: number;
     options: {
         color: string;
         color2: string;
@@ -74,9 +67,9 @@ class InteractionTrack extends React.Component<InteractionTrackProps, {}> {
     }
 
     render(): JSX.Element {
-        const {data, trackModel, viewRegion, width, viewWindow, options} = this.props;
+        const {data, trackModel, visRegion, width, viewWindow, options} = this.props;
         const visualizerProps = {
-            placedInteractions: this.featurePlacer.placeInteractions(data, viewRegion, width),
+            placedInteractions: this.featurePlacer.placeInteractions(data, visRegion, width),
             viewWindow,
             width,
             opacityScale: this.makeOpacityScale(data),

@@ -65,9 +65,9 @@ class FullDisplayMode extends React.Component<FullDisplayModeProps> {
     }
 
     render() {
-        const {data, featurePadding, viewRegion, width, rowHeight, options, getAnnotationElement} = this.props;
+        const {data, featurePadding, visRegion, width, rowHeight, options, getAnnotationElement} = this.props;
         // Important: it is ok to arrange() every render only because we memoized the function in the constructor.
-        const arrangeResult = this.featureArranger.arrange(data, viewRegion, width, featurePadding);
+        const arrangeResult = this.featureArranger.arrange(data, visRegion, width, featurePadding);
         const height = this.getHeight(arrangeResult.numRowsAssigned);
         const legend = this.props.legend || <TrackLegend height={height} trackModel={this.props.trackModel} />;
         const visualizer = <FullVisualizer

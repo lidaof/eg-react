@@ -4,8 +4,8 @@ import { PositionProperty } from 'csstype';
 import MetadataIndicator from './MetadataIndicator';
 import TrackMessage from './TrackMessage';
 
+import { TrackData } from '../../trackContainers/TrackDataManager';
 import TrackModel, { TrackOptions } from '../../../model/TrackModel';
-import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 import OpenInterval from '../../../model/interval/OpenInterval';
 
 import spinner from '../../../images/loading-small.gif';
@@ -17,20 +17,13 @@ const ERROR_COLOR = 'pink';
  * Props that TrackContainers provide.  Track subtypes may read and use them in any way they wish.  Be sure to pass them
  * through to this component!
  */
-export interface PropsFromTrackContainer {
+export interface PropsFromTrackContainer extends TrackData {
     trackModel: TrackModel; // Track metadata
     width: number; // Width of the visualizer
-
-    /**
-     * Region to display.  This component doesn't use it, but most visualizers would probably be interested.
-     */
-    viewRegion: DisplayedRegionModel;
     viewWindow: OpenInterval; // Visible portion of the visualizer
     metadataTerms?: string[]; // Terms for which to render metadata handles
     xOffset?: number; // The horizontal amount to translate visualizations
     index?: number; // Number to pass in the callbacks
-    isLoading?: boolean; // If true, applies loading styling and user feedback
-    error?: any; // If present, applies error styling and user feedback
     options?: TrackOptions; // Track options
 
     /**

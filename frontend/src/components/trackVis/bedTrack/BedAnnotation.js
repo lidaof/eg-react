@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import TranslatableG from '../../TranslatableG';
+import { TranslatableG } from '../../TranslatableG';
 import AnnotationArrows from '../commonComponents/annotation/AnnotationArrows';
 import BackgroundedText from '../commonComponents/BackgroundedText';
 
