@@ -15,6 +15,7 @@ import { Feature } from '../Feature';
 import { ViewExpansion } from '../RegionExpander';
 import { FeaturePlacer } from '../FeaturePlacer';
 import DisplayedRegionModel from '../DisplayedRegionModel';
+import { niceBpCount } from '../../util';
 
 export interface PlacedAlignment {
     record: AlignmentRecord;
@@ -279,9 +280,10 @@ export class AlignmentViewCalculator {
         const queryPieces: QueryGenomePiece[] = [];
         for (const placement of placements) {
             const {record, visiblePart} = placement;
-            const querySeq = visiblePart.getQuerySequence()
+            const querySeq = visiblePart.getQuerySequence();
             const baseLookup = makeBaseNumberLookup(querySeq, visiblePart.getQueryLocus().start);
             const queryChr = record.queryLocus.chr;
+
             for (const segment of placement.querySegments) {
                 const {isGap, index, length, xSpan} = segment;
                 if (isGap) {
@@ -303,15 +305,24 @@ export class AlignmentViewCalculator {
         // Sort by start
         const sortedPieces = genomePieces.slice().sort((a, b) => a.queryXSpan.start - b.queryXSpan.start);
         const features = [];
+
         let x = 0;
         for (const piece of sortedPieces) {
-            const basesFromPrevFeature = Math.round(drawModel.xWidthToBases(piece.queryXSpan.start - x));
-            if (basesFromPrevFeature > 0) {
-                features.push(NavigationContext.makeGap(basesFromPrevFeature));
+            const {queryXSpan, queryLocus} = piece;
+
+            const gapPixels = queryXSpan.start - x; // Compute potential gap
+            const gapBases = Math.round(drawModel.xWidthToBases(gapPixels));
+            if (gapBases >= 1) {
+                const prevLocus = features[features.length - 1].getLocus();
+                const doPiecesTouchInGenome = queryLocus.chr === prevLocus.chr && queryLocus.start === prevLocus.end;
+                const specialName = doPiecesTouchInGenome ? `${niceBpCount(gapBases)} gap` : undefined;
+                features.push(NavigationContext.makeGap(gapBases, specialName));
             }
-            features.push(new Feature(undefined, piece.queryLocus));
-            x = piece.queryXSpan.end;
+
+            features.push(new Feature(undefined, queryLocus));
+            x = queryXSpan.end;
         }
+
         const finalGapBases = Math.round(drawModel.xWidthToBases(visWidth - x));
         if (finalGapBases > 0) {
             features.push(NavigationContext.makeGap(finalGapBases));

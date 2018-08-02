@@ -2,6 +2,7 @@ import _ from 'lodash';
 import NavigationContext from '../NavigationContext';
 import { Feature } from '../Feature';
 import { FeatureSegment } from '../interval/FeatureSegment';
+import { niceBpCount } from '../../util';
 
 export interface Gap {
     contextBase: number;
@@ -60,7 +61,7 @@ export class NavContextBuilder {
             if (leftLocus.getLength() > 0) {
                 resultFeatures.push(new Feature(featureToSplit.getName(), leftLocus, featureToSplit.getStrand()));
             }
-            resultFeatures.push(NavigationContext.makeGap(gap.length));
+            resultFeatures.push(NavigationContext.makeGap(gap.length, `${niceBpCount(gap.length)} gap`));
             if (rightLocus.getLength() > 0) {
                 resultFeatures.push(new Feature(featureToSplit.getName(), rightLocus, featureToSplit.getStrand()));
             }

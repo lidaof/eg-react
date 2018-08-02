@@ -29,10 +29,11 @@ class NavigationContext {
      * during NavigationContext construction.
      * 
      * @param {number} length - length of the gap in bases
+     * @param {string} [name] - custom name of the gap feature
      * @return {Feature} a special "feature" representing a gap in the genome.
      */
-    static makeGap(length: number) {
-        return new Feature('Gap', new ChromosomeInterval(GAP_CHR, 0, Math.round(length)));
+    static makeGap(length: number, name='Gap'): Feature {
+        return new Feature(name, new ChromosomeInterval(GAP_CHR, 0, Math.round(length)));
     }
 
     /**
