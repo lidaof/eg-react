@@ -11,6 +11,7 @@ import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment }
 const FINE_MODE_HEIGHT = 45;
 const ROUGH_MODE_HEIGHT = 80;
 const RECT_HEIGHT = 15;
+const FONT_SIZE = 10;
 const PRIMARY_COLOR = 'darkblue';
 const QUERY_COLOR = '#B8008A';
 const MAX_POLYGONS = 500;
@@ -101,6 +102,21 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             onClick={() => alert("You clicked on " + queryLocus)}
         />;
 
+        const estimatedLabelWidth = queryLocus.toString().length * FONT_SIZE;
+        let label = null;
+        if (estimatedLabelWidth < queryXSpan.getLength()) {
+            label = <text
+                x={0.5 * (queryXSpan.start + queryXSpan.end)}
+                y={queryRectTopY + 0.5 * RECT_HEIGHT}
+                alignmentBaseline="middle"
+                textAnchor="middle"
+                fill="white"
+                fontSize={12}
+            >
+                {queryLocus.toString()}
+            </text>;
+        }
+
         const segmentPolygons = segments.map((segment, i) => {
             const points = [
                 [Math.floor(segment.targetXSpan.start), 0],
@@ -108,7 +124,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 [Math.ceil(segment.queryXSpan.end), queryRectTopY],
                 [Math.ceil(segment.targetXSpan.end), 0],
             ];
-            if (segment.record.getIsReverseStrand()) {
+            if (segment.record.queryStrand === '-') {
                 swap(points, 1, 2);
             }
 
@@ -124,6 +140,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
 
         return <React.Fragment key={queryLocus.toString()} >
             {queryGenomeRect}
+            {label}
             {ensureMaxListLength(segmentPolygons, MAX_POLYGONS)}
         </React.Fragment>
     }

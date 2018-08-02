@@ -1,11 +1,6 @@
 import Feature from '../Feature';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 
-enum QueryStrand {
-    FORWARD = '+',
-    REVERSE = '-'
-}
-
 /**
  * A data container for a GenomeAlign record.
  * 
@@ -19,7 +14,7 @@ export class AlignmentRecord extends Feature {
     queryLocus: ChromosomeInterval;
     targetSeq: string;
     querySeq: string;
-    queryStrand: QueryStrand;
+    queryStrand: string;
 
     constructor(record: any) {
         const locus = new ChromosomeInterval(record.chr, record.start, record.end);

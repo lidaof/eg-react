@@ -50,6 +50,7 @@ export interface Alignment {
     drawData: PlacedAlignment[] | PlacedMergedAlignment[];
 }
 
+const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
 const MARGIN = 5;
 const MIN_GAP_DRAW_WIDTH = 3;
 const MERGE_PIXEL_DISTANCE = 200;
@@ -71,12 +72,23 @@ export class AlignmentViewCalculator {
     }
 
     async align(visData: ViewExpansion): Promise<Alignment> {
+        const {visRegion, visWidth, viewWindowRegion} = visData;
         this._viewBeingFetched = visData;
-        const records = await this._alignmentFetcher.fetchAlignment(visData.visRegion, visData);
+
+        const drawModel = new LinearDrawingModel(visRegion, visWidth);
+        const isFineMode = drawModel.xWidthToBases(1) < MAX_FINE_MODE_BASES_PER_PIXEL
+        let records;
+        if (isFineMode) {
+            records = await this._alignmentFetcher.fetchAlignment(visRegion, visData, false);
+        } else {
+            records = await this._alignmentFetcher.fetchAlignment(viewWindowRegion, visData, true);
+        }
+
         if (this._viewBeingFetched !== visData) {
             return Promise.reject(new Error('Alignment canceled due to another call to align()'));
         }
-        return this.alignFine(records, visData);
+
+        return isFineMode ? this.alignFine(records, visData) : this.alignRough(records, visData);
     }
 
     alignFine(records: AlignmentRecord[], visData: ViewExpansion): Alignment {
@@ -307,13 +319,13 @@ export class AlignmentViewCalculator {
         const features = [];
 
         let x = 0;
+        let prevLocus = new ChromosomeInterval('', -1, -1); // A placeholder
         for (const piece of sortedPieces) {
             const {queryXSpan, queryLocus} = piece;
 
             const gapPixels = queryXSpan.start - x; // Compute potential gap
             const gapBases = Math.round(drawModel.xWidthToBases(gapPixels));
             if (gapBases >= 1) {
-                const prevLocus = features[features.length - 1].getLocus();
                 const doPiecesTouchInGenome = queryLocus.chr === prevLocus.chr && queryLocus.start === prevLocus.end;
                 const specialName = doPiecesTouchInGenome ? `${niceBpCount(gapBases)} gap` : undefined;
                 features.push(NavigationContext.makeGap(gapBases, specialName));
@@ -321,6 +333,7 @@ export class AlignmentViewCalculator {
 
             features.push(new Feature(undefined, queryLocus));
             x = queryXSpan.end;
+            prevLocus = piece.queryLocus;
         }
 
         const finalGapBases = Math.round(drawModel.xWidthToBases(visWidth - x));

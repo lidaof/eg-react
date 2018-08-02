@@ -48,10 +48,12 @@ export class AlignmentFetcher {
      * @param {DisplayedRegionModel} viewRegion - view region in the primary genome
      * @param {number} width 
      */
-    async fetchAlignment(fetchRegion: DisplayedRegionModel, visData: ViewExpansion): Promise<AlignmentRecord[]> {
+    async fetchAlignment(fetchRegion: DisplayedRegionModel, visData: ViewExpansion,
+        isRoughMode=true): Promise<AlignmentRecord[]>
+    {
         const {visRegion, visWidth} = visData;
         const basesPerPixel = visRegion.getWidth() / visWidth;
-        const rawRecords: any[] = await this._dataSource.getData(fetchRegion, basesPerPixel);
+        const rawRecords: any[] = await this._dataSource.getData(fetchRegion, basesPerPixel, {isRoughMode});
         return rawRecords.map(record => new AlignmentRecord(record));
     }
 }
