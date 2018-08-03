@@ -1,5 +1,4 @@
 import { TrackConfig } from './TrackConfig';
-import { configStaticDataSource } from './configDataFetch';
 
 import MethylCTrack, { DEFAULT_OPTIONS } from '../trackVis/MethylCTrack';
 
@@ -9,29 +8,30 @@ import CombineStrandConfig from '../trackContextMenu/CombineStrandConfig';
 import { MethylColorConfig, ReadDepthColorConfig } from '../trackContextMenu/MethylColorConfig';
 
 import WorkerSource from '../../dataSources/worker/WorkerSource';
-import BedWorker from '../../dataSources/bed/Bed.worker';
+import { BedWorker } from '../../dataSources/WorkerTSHook';
 import BedRecord from '../../dataSources/bed/BedRecord';
 
 import MethylCRecord from '../../model/MethylCRecord';
-
-/**
- * Converter of BedRecords to MethylCRecords.
- * 
- * @param {BedRecord[]} data - BedRecords to convert
- * @return {MethylCRecord[]} MethylCRecords made from the input
- */
-function formatDasFeatures(data) {
-    return data.map(feature => new MethylCRecord(feature))
-}
-const withDataFetch = configStaticDataSource(
-    props => new WorkerSource(BedWorker, props.trackModel.url), formatDasFeatures
-);
-const TrackWithData = withDataFetch(MethylCTrack);
+import { TrackModel } from '../../model/TrackModel';
 
 export class MethylCTrackConfig extends TrackConfig {
-    constructor(trackModel) {
+    constructor(trackModel: TrackModel) {
         super(trackModel);
         this.setDefaultOptions(DEFAULT_OPTIONS);
+    }
+
+    initDataSource() {
+        return new WorkerSource(BedWorker, this.trackModel.url);
+    }
+
+    /**
+     * Converts BedRecords to MethylCRecords.
+     * 
+     * @param {BedRecord[]} data - BedRecords to convert
+     * @return {MethylCRecord[]} MethylCRecords made from the input
+     */
+    formatData(data: BedRecord[]) {
+        return data.map(feature => new MethylCRecord(feature));
     }
 
     getMenuComponents() {
@@ -40,6 +40,6 @@ export class MethylCTrackConfig extends TrackConfig {
     }
 
     getComponent() {
-        return TrackWithData;
+        return MethylCTrack;
     }
 }

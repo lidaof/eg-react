@@ -59,6 +59,11 @@ const defaultTracks = [
         url: 'https://vizhub.wustl.edu/hubSample/hg19/bigBed1'
     }),
     new TrackModel({
+        type: "methylc",
+        name: "Methylation",
+        url: "https://vizhub.wustl.edu/public/hg19/methylc2/h1.liftedtohg19.gz"
+    }),
+    new TrackModel({
         type: "ruler",
         name: "Ruler",
     }),
@@ -84,7 +89,6 @@ const defaultTracks = [
             genome: 'mm10'
         }
     }),
-
 ];
 
 const HG19 = {
