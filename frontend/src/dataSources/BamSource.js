@@ -34,7 +34,7 @@ class BamSource extends DataSource {
         });
     }
 
-    async getData(region, options={}) {
+    async getData(region, basesPerPixel, options={}) {
         const bamObj = await this.bamPromise;
         let promises = region.getGenomeIntervals().map(locus => this._getDataInLocus(locus, bamObj));
         const dataForEachSegment = await Promise.all(promises);

@@ -17,16 +17,17 @@ interface Measurements {
  * 
  * Consumed props: none
  * 
- * Injected props:
- *   - {number} `containerWidth` - measured width
- *   - {number} `containerHeight` - measured height
+ * Injected props: {@link Measurements}
  * 
  * @param {typeof React.Component} WrappedComponent - React Component class to enhance
  * @return {typeof React.Component} component class that measures its width and height automatically
  * @author Silas Hsu
  */
-function withAutoDimensions(WrappedComponent: React.ComponentType<Measurements>) {
-    return class extends React.Component<{}, MeasurerState> {
+function withAutoDimensions<P extends object>(
+        WrappedComponent: React.ComponentType<Measurements>
+    ): React.ComponentType<P>
+{
+    return class extends React.Component<P, MeasurerState> {
         static displayName = `WithAutoDimensions(${getComponentName(WrappedComponent)})`;
 
         private _node: Element;
@@ -36,7 +37,7 @@ function withAutoDimensions(WrappedComponent: React.ComponentType<Measurements>)
          * 
          * @param {Object} props - props as specified by React
          */
-        constructor(props: {}) {
+        constructor(props: P) {
             super(props);
             this.state = {
                 isMounted: false,

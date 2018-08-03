@@ -6,7 +6,7 @@ import GeneDetail from './GeneDetail';
 
 import Track from '../commonComponents/Track';
 import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
-import withTooltip from '../commonComponents/tooltip/withTooltip';
+import { withTooltip } from '../commonComponents/tooltip/withTooltip';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
 import configOptionMerging from '../commonComponents/configOptionMerging';
 
@@ -24,7 +24,7 @@ const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
  * @author Silas Hsu
  */
 class GeneAnnotationTrack extends React.Component {
-    static propTypes = Object.assign({}, Track.trackContainerProps, withTooltip.INJECTED_PROPS, {
+    static propTypes = Object.assign({}, Track.trackContainerProps, {
         // Genes to render
         data: PropTypes.array.isRequired //PropTypes.arrayOf(PropTypes.instanceOf(Gene)).isRequired,
     });

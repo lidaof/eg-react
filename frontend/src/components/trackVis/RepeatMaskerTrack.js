@@ -6,7 +6,7 @@ import Track from './commonComponents/Track';
 import AnnotationTrack from './commonComponents/annotation/AnnotationTrack';
 import TrackLegend from './commonComponents/TrackLegend';
 import Tooltip from './commonComponents/tooltip/Tooltip';
-import withTooltip from './commonComponents/tooltip/withTooltip';
+import { withTooltip } from './commonComponents/tooltip/withTooltip';
 import configOptionMerging from './commonComponents/configOptionMerging';
 
 import { RepeatMaskerFeature } from '../../model/RepeatMaskerFeature';
@@ -35,7 +35,6 @@ const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 class RepeatTrack extends React.PureComponent {
     static propTypes = Object.assign({},
         Track.propsFromTrackContainer,
-        withTooltip.INJECTED_PROPS,
         {
         data: PropTypes.array.isRequired, //PropTypes.arrayOf(PropTypes.instanceOf(RepeatMaskerFeature)).isRequired,
         }

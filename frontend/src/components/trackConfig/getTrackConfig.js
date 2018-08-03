@@ -12,7 +12,7 @@ import { GenomeAlignTrackConfig } from './GenomeAlignTrackConfig';
 import { RulerTrackConfig } from './RulerTrackConfig';
 
 const TYPE_NAME_TO_CONFIG = {
-    //"bam": BamTrackConfig,
+    "bam": BamTrackConfig,
     //"bed": BedTrackConfig,
     //"bedgraph": BedGraphTrackConfig,
     //"bigbed": BigBedTrackConfig,

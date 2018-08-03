@@ -6,7 +6,7 @@ import Track from '../commonComponents/Track';
 import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
 import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
-import withTooltip from '../commonComponents/tooltip/withTooltip';
+import { withTooltip } from '../commonComponents/tooltip/withTooltip';
 
 const ROW_VERTICAL_PADDING = 2;
 const ROW_HEIGHT = BedAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
@@ -19,7 +19,6 @@ const ROW_HEIGHT = BedAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
 export class BedTrack extends React.Component {
     static propTypes = Object.assign({}, 
         Track.propsFromTrackContainer,
-        withTooltip.INJECTED_PROPS,
         {
         data: PropTypes.array.isRequired // PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired
         }

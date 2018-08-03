@@ -9,7 +9,7 @@ import { ArcDisplay } from './ArcDisplay';
 import Track, { PropsFromTrackContainer } from '../commonComponents/Track';
 import TrackLegend from '../commonComponents/TrackLegend';
 import configOptionMerging from '../commonComponents/configOptionMerging';
-import withTooltip from '../commonComponents/tooltip/withTooltip';
+import { withTooltip } from '../commonComponents/tooltip/withTooltip';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
 
 import { InteractionDisplayMode } from '../../../model/DisplayModes';

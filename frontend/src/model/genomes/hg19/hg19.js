@@ -41,13 +41,13 @@ const defaultTracks = [
     }),
     new TrackModel({
         type: 'geneAnnotation',
-        name: 'refGene',
+        name: 'gencodeV28',
         genome: 'hg19'
     }),
     new TrackModel({
-        type: 'geneAnnotation',
-        name: 'gencodeV28',
-        genome: 'hg19'
+        type: "bam",
+        name: "Test bam",
+        url: "https://wangftp.wustl.edu/~dli/test/a.bam"
     }),
     new TrackModel({
         type: "ruler",

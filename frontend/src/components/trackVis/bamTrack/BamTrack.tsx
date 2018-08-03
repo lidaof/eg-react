@@ -1,22 +1,29 @@
 import React from 'react';
-// import { BamAnnotation } from './BamAnnotation';
+import { BamAnnotation, BamAnnotationOptions } from './BamAnnotation';
 
 import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
-import withTooltip from '../commonComponents/tooltip/withTooltip';
+import { withTooltip, TooltipCallbacks } from '../commonComponents/tooltip/withTooltip';
 import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 
-import { PlacedFeature } from '../../../model/FeaturePlacer';
+import { PropsFromTrackContainer } from '../commonComponents/Track';
+import { BamRecord } from '../../../model/BamRecord';
+import { PlacedFeatureGroup } from '../../../model/FeatureArranger';
 
 const ROW_PADDING = 2;
+
+interface BamTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
+    data: BamRecord[];
+    options: BamAnnotationOptions
+}
 
 /**
  * Bam visualizer specification.
  * 
  * @author Silas Hsu
  */
-class BamTrack extends React.Component {
-    constructor(props) {
+class BamTrack extends React.Component<BamTrackProps> {
+    constructor(props: BamTrackProps) {
         super(props);
         this.renderTooltip = this.renderTooltip.bind(this);
         this.renderAnnotation = this.renderAnnotation.bind(this);
@@ -31,25 +38,20 @@ class BamTrack extends React.Component {
      * @param {number} index - iteration index
      * @return {JSX.Element} element visualizing the BAM record
      */
-    renderAnnotation(placedRecord, y, isLastRow, index) {
+    renderAnnotation(placedGroup: PlacedFeatureGroup, y: number, isLastRow: boolean, index: number) {
         if (isLastRow) {
             return null;
         }
 
-        const {viewRegion, width, options} = this.props;
-        return null;
-        /*
-        return <BamAnnotation
-            key={index}
-            record={placedRecord.feature}
-            navContext={viewRegion.getNavigationContext()}
-            contextLocation={placedRecord.contextLocation}
-            drawModel={new LinearDrawingModel(viewRegion, width)}
-            y={y}
-            options={options}
-            onClick={this.renderTooltip}
-        />;
-        */
+        return placedGroup.placedFeatures.map((placement, i) => 
+            <BamAnnotation
+                key={i}
+                placedRecord={placement}
+                options={this.props.options}
+                y={y}
+                onClick={this.renderTooltip}
+            />
+        );
     }
 
     /**
@@ -58,7 +60,7 @@ class BamTrack extends React.Component {
      * @param {MouseEvent} event - mouse event that triggered the tooltip request
      * @param {BamRecord} feature - BAM record for which to display details
      */
-    renderTooltip(event, record) {
+    renderTooltip(event: React.MouseEvent, record: BamRecord) {
         const alignment = record.getAlignment();
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} >
@@ -76,8 +78,7 @@ class BamTrack extends React.Component {
     render() {
         return <AnnotationTrack
             {...this.props}
-            data={this.props.data}
-            // rowHeight={BamAnnotation.HEIGHT + ROW_PADDING}
+            rowHeight={BamAnnotation.HEIGHT + ROW_PADDING}
             getAnnotationElement={this.renderAnnotation}
         />;
     }

@@ -1,17 +1,15 @@
 import React from 'react';
 import { AnnotationTrackConfig } from './AnnotationTrackConfig';
-import { configStaticDataSource } from './configDataFetch';
-import BamTrack from '../trackVis/bamTrack/BamTrack';
+
 import BamSource from '../../dataSources/BamSource';
 import { BamRecord } from '../../model/BamRecord';
+import { TrackModel } from '../../model/TrackModel';
+
+import BamTrack from '../trackVis/bamTrack/BamTrack';
 import { ColorConfig, BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 
-const withDataFetch = configStaticDataSource(props => new BamSource(props.trackModel.url), BamRecord.makeBamRecords);
-const BamTrackWithData = withDataFetch(BamTrack);
-// TODO move bam source to webworker and stop renderer bam track for excessively large regions
-
 export class BamTrackConfig extends AnnotationTrackConfig {
-    constructor(trackModel) {
+    constructor(trackModel: TrackModel) {
         super(trackModel);
         this.setDefaultOptions({
             mismatchColor: 'yellow',
@@ -20,8 +18,16 @@ export class BamTrackConfig extends AnnotationTrackConfig {
         });
     }
 
+    initDataSource() {
+        return new BamSource(this.trackModel.url);
+    }
+
+    formatData(data: any[]) {
+        return BamRecord.makeBamRecords(data);
+    }
+
     getComponent() {
-        return BamTrackWithData;
+        return BamTrack;
     }
 
     getMenuComponents() {
@@ -31,6 +37,6 @@ export class BamTrackConfig extends AnnotationTrackConfig {
     }
 }
 
-function MismatchColorConfig(props) {
+function MismatchColorConfig(props: any) {
     return <ColorConfig {...props} optionName="mismatchColor" label="Mismatched base color" />;
 }

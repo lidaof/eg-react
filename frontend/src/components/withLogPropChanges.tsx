@@ -14,7 +14,7 @@ import React from 'react';
  * @return {React.ComponentType} component that logs prop changes
  * @author Silas Hsu
  */
-export function withLogPropChanges<P>(WrappedComponent: React.ComponentType<P>): React.ComponentType<P> {
+export function withLogPropChanges<P extends object>(WrappedComponent: React.ComponentType<P>): React.ComponentType<P> {
     return class extends React.Component<P> {
         shouldComponentUpdate(nextProps: P) {
             for (const propName in nextProps) {
