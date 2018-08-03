@@ -13,9 +13,9 @@ import { RulerTrackConfig } from './RulerTrackConfig';
 
 const TYPE_NAME_TO_CONFIG = {
     "bam": BamTrackConfig,
-    //"bed": BedTrackConfig,
+    "bed": BedTrackConfig,
     //"bedgraph": BedGraphTrackConfig,
-    //"bigbed": BigBedTrackConfig,
+    "bigbed": BigBedTrackConfig,
     "bigwig": BigWigTrackConfig,
     //"hic": HicTrackConfig,
     "geneannotation": GeneAnnotationTrackConfig,

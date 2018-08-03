@@ -37,17 +37,26 @@ const defaultRegion = navContext.parse('chr7:27053397-27373765');
 const defaultTracks = [
     new TrackModel({
         type: "bigwig",
+        name: "test bigwig",
         url: "https://vizhub.wustl.edu/hubSample/hg19/GSM429321.bigWig",
     }),
     new TrackModel({
         type: 'geneAnnotation',
         name: 'gencodeV28',
-        genome: 'hg19'
+        genome: 'hg19',
+        options: {
+            maxRows: 10
+        }
     }),
     new TrackModel({
         type: "bam",
         name: "Test bam",
         url: "https://wangftp.wustl.edu/~dli/test/a.bam"
+    }),
+    new TrackModel({
+        type: 'bigbed',
+        name: 'test bigbed',
+        url: 'https://vizhub.wustl.edu/hubSample/hg19/bigBed1'
     }),
     new TrackModel({
         type: "ruler",

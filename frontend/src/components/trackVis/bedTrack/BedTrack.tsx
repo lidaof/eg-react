@@ -1,36 +1,34 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import BedAnnotation from './BedAnnotation';
-import Track from '../commonComponents/Track';
+import { PropsFromTrackContainer } from '../commonComponents/Track';
 import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
 import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
-import { withTooltip } from '../commonComponents/tooltip/withTooltip';
+import { withTooltip, TooltipCallbacks } from '../commonComponents/tooltip/withTooltip';
+import { Feature } from '../../../model/Feature';
+import { PlacedFeatureGroup } from '../../../model/FeatureArranger';
 
 const ROW_VERTICAL_PADDING = 2;
 const ROW_HEIGHT = BedAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
+
+interface BedTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
+    data: Feature[];
+    options: {
+        color?: string;
+        color2?: string;
+    }
+}
 
 /**
  * Track component for BED annotations.
  * 
  * @author Silas Hsu
  */
-export class BedTrack extends React.Component {
-    static propTypes = Object.assign({}, 
-        Track.propsFromTrackContainer,
-        {
-        data: PropTypes.array.isRequired // PropTypes.arrayOf(PropTypes.instanceOf(Feature)).isRequired
-        }
-    );
+class BedTrackNoTooltip extends React.Component<BedTrackProps> {
+    static displayName = 'BedTrack';
 
-    static defaultProps = {
-        options: {},
-        onShowTooltip: element => undefined,
-        onHideTooltip: () => undefined,
-    };
-
-    constructor(props) {
+    constructor(props: BedTrackProps) {
         super(props);
         this.renderTooltip = this.renderTooltip.bind(this);
         this.renderAnnotation = this.renderAnnotation.bind(this);
@@ -39,10 +37,10 @@ export class BedTrack extends React.Component {
     /**
      * Renders the tooltip for a feature.
      * 
-     * @param {MouseEvent} event - mouse event that triggered the tooltip request
+     * @param {React.MouseEvent} event - mouse event that triggered the tooltip request
      * @param {Feature} feature - Feature for which to display details
      */
-    renderTooltip(event, feature) {
+    renderTooltip(event: React.MouseEvent, feature: Feature) {
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} >
                 <FeatureDetail feature={feature} />
@@ -60,18 +58,19 @@ export class BedTrack extends React.Component {
      * @param {number} index - iteration index
      * @return {JSX.Element} element visualizing the feature
      */
-    renderAnnotation(placedFeature, y, isLastRow, index) {
-        const {feature, xSpan} = placedFeature
-        return <BedAnnotation
-            key={index}
-            feature={feature}
-            xSpan={xSpan}
-            y={y}
-            isMinimal={isLastRow}
-            color={this.props.options.color}
-            reverseStrandColor={this.props.options.color2}
-            onClick={this.renderTooltip}
-        />;
+    renderAnnotation(placedGroup: PlacedFeatureGroup, y: number, isLastRow: boolean, index: number) {
+        return placedGroup.placedFeatures.map((placement, i) =>
+            <BedAnnotation
+                key={i}
+                feature={placement.feature}
+                xSpan={placement.xSpan}
+                y={y}
+                isMinimal={isLastRow}
+                color={this.props.options.color}
+                reverseStrandColor={this.props.options.color2}
+                onClick={this.renderTooltip}
+            />
+        );
     }
 
     render() {
@@ -83,4 +82,4 @@ export class BedTrack extends React.Component {
     }
 }
 
-export default withTooltip(BedTrack);
+export const BedTrack = withTooltip(BedTrackNoTooltip);
