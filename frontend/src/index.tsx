@@ -11,12 +11,18 @@ import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { BrowserScene } from './components/vr/BrowserScene';
 import { Custom3DObject } from './components/vr/Custom3DObject';
 import { mergeGeometries } from './components/vr/mergeGeometries';
+import { AppSettings } from './components/Settings';
 
 import './index.css';
 
 const root = document.getElementById('root');
 if (root) {
-    ReactDOM.render(<Provider store={AppState} ><App /></Provider>, root);
+    ReactDOM.render(<Provider store={AppState} >
+                        <AppSettings>
+                            <App />
+                        </AppSettings>
+                    </Provider>, 
+                root);
     registerServiceWorker();
 } else {
     (window as any).React = React;

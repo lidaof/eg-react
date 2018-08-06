@@ -7,7 +7,8 @@ ButtonGroup.propTypes = {
 };
 function ButtonGroup(props) {
     return <div style={{display: "flex", alignItems: "center"}}>
-        <span style={{marginRight: "1ch"}}>{props.label}</span> {props.buttons}
+        { props.label && <span style={{marginRight: "1ch"}}>{props.label}</span> }
+        {props.buttons}
     </div>;
 }
 

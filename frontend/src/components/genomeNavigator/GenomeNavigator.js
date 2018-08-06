@@ -1,11 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MIN_VIEW_REGION_SIZE } from '../../AppState';
-
 import MainPane from './MainPane';
-import TrackRegionController from './TrackRegionController';
-import GeneSearchBox from './GeneSearchBox';
-
+import { withSettings } from '../Settings';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 import './GenomeNavigator.css';
@@ -42,10 +39,10 @@ class GenomeNavigator extends React.Component {
         super(props);
         this.state = {
             viewRegion: this._setInitialView(props.selectedRegion),
-            isShowingNavigator: true,
+            //isShowingNavigator: true,
         };
 
-        this.toggleNavigator = this.toggleNavigator.bind(this);
+        // this.toggleNavigator = this.toggleNavigator.bind(this);
         this.zoom = this.zoom.bind(this);
         this.setNewView = this.setNewView.bind(this);
         this.zoomSliderDragged = this.zoomSliderDragged.bind(this);
@@ -83,9 +80,9 @@ class GenomeNavigator extends React.Component {
         }
     }
 
-    toggleNavigator() {
-        this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
-    }
+    // toggleNavigator() {
+    //     this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
+    // }
 
     /**
      * Copies this.state.viewRegion, mutates it by calling `methodName` with `args`, and then calls this.setState().
@@ -141,12 +138,12 @@ class GenomeNavigator extends React.Component {
     render() {
         return (
             <div style={{borderBottom: "1px solid lightgrey"}}>
-                <nav className="navbar">
+                {/* <nav className="navbar">
                     <div className="row">
                         <div className="col-sm">
                             <label style={{marginBottom: 0}}>
                                 <span style={{marginRight: "1ch"}} >Show genome-wide navigator</span>
-                                <input type="checkbox" checked={this.state.isShowingNavigator} onChange={this.toggleNavigator} />
+                                <input type="checkbox" checked={this.props.settings.isShowingNavigator} onChange={this.props.settings.toggleNavigator} />
                                 
                             </label>
                             <div className="GenomeNavigator-tooltip">❓
@@ -160,9 +157,9 @@ class GenomeNavigator extends React.Component {
                             </div>
                         </div>
                     </div>
-                </nav>
+                </nav> */}
                 {
-                this.state.isShowingNavigator &&
+                this.props.settings.isShowingNavigator &&
                     <MainPane
                         viewRegion={this.state.viewRegion}
                         selectedRegion={this.props.selectedRegion}
@@ -176,4 +173,4 @@ class GenomeNavigator extends React.Component {
     }
 }
 
-export default GenomeNavigator;
+export default withSettings(GenomeNavigator);

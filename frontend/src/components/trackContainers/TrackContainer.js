@@ -201,7 +201,7 @@ class TrackContainer extends React.Component {
         const {viewRegion, onNewRegion, metadataTerms, onMetadataTermsChanged} = this.props;
         return <div style={{display: "flex", alignItems: "flex-end"}} >
             <div>
-                <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} />
+                {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
                 <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} />
             </div>
             <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />

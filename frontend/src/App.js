@@ -17,6 +17,8 @@ import TrackModel from './model/TrackModel';
 
 import Nav from './components/Nav';
 
+import { withSettings } from './components/Settings';
+
 import './App.css';
 
 function mapStateToProps(state) {
@@ -42,12 +44,12 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            isShowing3D: false,
-        };
+        // this.state = {
+        //     isShowing3D: false,
+        //     isShowingNavigator: true,
+        // };
         this.addTracks = this.addTracks.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
-        this.toggle3DScene = this.toggle3DScene.bind(this);
     }
 
     addTracks(tracks) {
@@ -60,10 +62,6 @@ class App extends React.Component {
         this.props.onTracksChanged(newTracks);
     }
 
-    toggle3DScene() {
-        this.setState(prevState => {return {isShowing3D: !prevState.isShowing3D}});
-    }
-
     render() {
         const {genomeConfig, viewRegion, tracks, onNewViewRegion} = this.props;
         if (!genomeConfig) {
@@ -72,18 +70,23 @@ class App extends React.Component {
 
         return (
         <div className="container-fluid">
-            <Nav selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
-            <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
-            <DrawerMenu
+            <Nav 
+                selectedRegion={viewRegion} 
+                onRegionSelected={onNewViewRegion} 
                 tracks={tracks}
-                isShowing3D={this.state.isShowing3D}
                 genomeConfig={genomeConfig}
                 onTracksAdded={this.addTracks}
                 onTrackRemoved={this.removeTrack}
-                on3DToggle={this.toggle3DScene}
+            />
+            <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
+            <DrawerMenu
+                tracks={tracks}
+                genomeConfig={genomeConfig}
+                onTracksAdded={this.addTracks}
+                onTrackRemoved={this.removeTrack}
             />
             {
-            this.state.isShowing3D &&
+            this.props.settings.isShowing3D &&
                 <ErrorBoundary><BrowserScene viewRegion={viewRegion} tracks={tracks} /></ErrorBoundary>
             }
             <TrackContainer />
@@ -92,4 +95,4 @@ class App extends React.Component {
     }
 }
 
-export default connect(mapStateToProps, callbacks)(withCurrentGenome(App));
+export default connect(mapStateToProps, callbacks)(withCurrentGenome(withSettings(App)));

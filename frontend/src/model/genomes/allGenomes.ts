@@ -38,7 +38,7 @@ export const treeOfLife = {
     zebrafish: {
         logo: 'http://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
         assemblies: [DAN_RER10.genome.getName()],
-        color: 'white',
+        color: 'yellow',
     },
 };
 
@@ -55,6 +55,6 @@ export function getGenomeInfo(genomeName: string): any {
         if (details.assemblies.includes(genomeName)) {
             return {name: species, logo: details.logo, color: details.color}
         }
-        return {name: '', logo: '', color: ''};
     }
+    return {name: '', logo: '', color: ''};
 }

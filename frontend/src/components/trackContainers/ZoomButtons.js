@@ -22,6 +22,7 @@ function ZoomButtons(props) {
         <button
             key={index}
             className="btn btn-outline-dark"
+            title={zoom.title}
             style={{fontFamily: "monospace"}}
             onClick={() => zoomOut(zoom.factor)}
         >
@@ -29,7 +30,7 @@ function ZoomButtons(props) {
         </button>
     );
 
-    return <ButtonGroup label="Zoom view:" buttons={buttons} />;
+    return <ButtonGroup buttons={buttons} />;
 }
 
 export default ZoomButtons;

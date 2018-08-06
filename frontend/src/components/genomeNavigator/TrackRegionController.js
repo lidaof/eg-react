@@ -1,7 +1,9 @@
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import React from 'react';
 import PropTypes from 'prop-types';
+import ReactModal from 'react-modal';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import GeneSearchBox from './GeneSearchBox';
+
 
 /**
  * The display that is above the main pane of the genome navigator, which shows the current track region and a text
@@ -27,7 +29,18 @@ class TrackRegionController extends React.Component {
         this.input = null;
         this.state = {
             badInputMessage: "",
+            showModal: false,
         };
+        this.handleOpenModal = this.handleOpenModal.bind(this);
+        this.handleCloseModal = this.handleCloseModal.bind(this);
+    }
+
+    handleOpenModal () {
+        this.setState({ showModal: true });
+    }
+      
+    handleCloseModal () {
+        this.setState({ showModal: false });
     }
 
     /**
@@ -65,6 +78,7 @@ class TrackRegionController extends React.Component {
             this.setState({badInputMessage: ""});
         }
         this.props.onRegionSelected(parsedRegion.start, parsedRegion.end);
+        this.handleCloseModal();
     }
 
     handleClick(event) {
@@ -90,20 +104,38 @@ class TrackRegionController extends React.Component {
                 >
                     Go
                 </button> */}
-            <button className="btn btn-secondary dropdown-toggle" 
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button className="btn btn-secondary" onClick={this.handleOpenModal}>
                 {region}
             </button>
-            <div className="dropdown-menu">
-                <h6 className="dropdown-header">Region search</h6>
+            <ReactModal 
+                isOpen={this.state.showModal}
+                contentLabel="Gene & Region search"
+                ariaHideApp={false}
+                onRequestClose={this.handleCloseModal}
+                shouldCloseOnOverlayClick={true}
+                style={{
+                    content: {
+                      top: "40px",
+                      left: "543px",
+                      right: "unset",
+                      bottom: "unset",
+                      overflow: "visible",
+                      padding: "5px",
+                      color: "black",
+                    }
+                }}
+            >
+                <span className="text-right" 
+                    style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
+                    onClick={this.handleCloseModal}>&times;</span>
+                <h6>Gene search</h6>
                 <GeneSearchBox
                     navContext={this.props.selectedRegion.getNavigationContext()}
                     onRegionSelected={this.props.onRegionSelected}
+                    handleCloseModal = {this.handleCloseModal}
                 />
-                <div className="dropdown-divider"></div>
-                <div>
-                    <h6 className="dropdown-header">Gene search</h6>
-                    <input type="text" ref={(input) => this.input = input} size="30" 
+                <h6>Region search, current region {region}</h6>
+                <input type="text" ref={(input) => this.input = input} size="30" 
                         placeholder="Coordinate"
                         onClick={this.handleClick}/>
                     <button 
@@ -112,14 +144,10 @@ class TrackRegionController extends React.Component {
                     >
                         Go
                     </button>
-                </div>
-                
-             </div>
                 {
                     this.state.badInputMessage.length > 0 ? <span className="alert-danger">{this.state.badInputMessage}</span> : null
                 }
-            
-            
+            </ReactModal>
         </div>
         );
     }

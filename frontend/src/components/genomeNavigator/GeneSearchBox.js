@@ -42,6 +42,7 @@ class GeneSearchBox extends React.PureComponent {
          *         `newEnd`: the nav context coordinate of the end of the view interval
          */
         onRegionSelected: PropTypes.func.isRequired,
+        handleCloseModal: PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -94,6 +95,7 @@ class GeneSearchBox extends React.PureComponent {
         const interval = this.props.navContext.convertGenomeIntervalToBases(gene.getLocus())[0];
         if (interval) {
             this.props.onRegionSelected(...interval);
+            this.props.handleCloseModal();
         } else {
             alert("Gene not available in current region set view"); // TODO better message
         }

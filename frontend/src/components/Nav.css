@@ -2,7 +2,7 @@
     display: grid;
     /* grid-auto-flow: column;
     grid-auto-columns: auto; */
-    grid-template-columns: repeat(7, auto) 1fr;
+    grid-template-columns: repeat(8, auto) 1fr;
     justify-items: start;
     /* grid-template-columns: min-content; */
 }
@@ -27,4 +27,12 @@
     grid-template-columns: auto;
     justify-items: center;
     align-items: center;
+}
+
+.dropdown-item {
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #aac5f7;
 }
