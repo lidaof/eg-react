@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { ActionCreators } from './AppState';
 
 import GenomePicker from './components/GenomePicker';
+import Nav from './components/Nav';
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import TrackContainer from './components/trackContainers/TrackContainer';
 import withCurrentGenome from './components/withCurrentGenome';
@@ -13,10 +14,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import TrackModel from './model/TrackModel';
-
-import Nav from './components/Nav';
-
-import { withSettings } from './components/Settings';
 
 import './App.css';
 
@@ -33,7 +30,7 @@ const callbacks = {
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
-const withEnhancements = _.flowRight(withAppState, withCurrentGenome, withSettings);
+const withEnhancements = _.flowRight(withAppState, withCurrentGenome);
 
 class App extends React.Component {
     static propTypes = {
@@ -46,10 +43,10 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        // this.state = {
-        //     isShowing3D: false,
-        //     isShowingNavigator: true,
-        // };
+        this.state = {
+            isShowing3D: false,
+            isShowingNavigator: true,
+        };
         this.addTracks = this.addTracks.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
     }
@@ -64,6 +61,14 @@ class App extends React.Component {
         this.props.onTracksChanged(newTracks);
     }
 
+    toggleNavigator = () => {
+        this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
+    };
+
+    toggle3DScene = () => {
+        this.setState(prevState => {return {isShowing3D: !prevState.isShowing3D}});
+    };
+
     render() {
         const {genomeConfig, viewRegion, tracks, onNewViewRegion} = this.props;
         if (!genomeConfig) {
@@ -72,17 +77,22 @@ class App extends React.Component {
 
         return (
         <div className="container-fluid">
-            <Nav 
-                selectedRegion={viewRegion} 
+            <Nav
+                {...this.state}
+                onToggleNavigator={this.toggleNavigator}
+                onToggle3DScene={this.toggle3DScene}
+                selectedRegion={viewRegion}
                 onRegionSelected={onNewViewRegion} 
                 tracks={tracks}
                 genomeConfig={genomeConfig}
                 onTracksAdded={this.addTracks}
                 onTrackRemoved={this.removeTrack}
             />
-            <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
+            {this.state.isShowingNavigator &&
+                <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
+            }
             {
-            this.props.settings.isShowing3D &&
+            this.state.isShowing3D &&
                 <ErrorBoundary><BrowserScene viewRegion={viewRegion} tracks={tracks} /></ErrorBoundary>
             }
             <TrackContainer />

@@ -1,12 +1,15 @@
 import React from 'react';
+
+import { withTrackLegendWidth } from '../withTrackLegendWidth';
 import { SelectableGenomeArea } from '../SelectableGenomeArea';
-import TrackLegend from '../trackVis/commonComponents/TrackLegend';
+
 import { ViewExpansion } from '../../model/RegionExpander';
 import OpenInterval from '../../model/interval/OpenInterval';
 
 interface ZoomableTrackContainerProps {
     trackElements: JSX.Element[]; // Track elements to render
     visData: ViewExpansion; // Track visualization config
+    legendWidth: number;
 
     /**
      * Callback for when a region is selected.
@@ -24,16 +27,18 @@ interface ZoomableTrackContainerProps {
  * @return {JSX.Element} the element to render
  * @author Silas Hsu
  */
-export function ZoomableTrackContainer(props: ZoomableTrackContainerProps): JSX.Element {
-    const {trackElements, visData, onNewRegion} = props;
+function UnconnectedZoomableTrackContainer(props: ZoomableTrackContainerProps): JSX.Element {
+    const {trackElements, visData, legendWidth, onNewRegion} = props;
     const {viewWindowRegion, viewWindow} = visData;
     return (
     <SelectableGenomeArea
         selectableRegion={viewWindowRegion}
-        dragLimits={new OpenInterval(TrackLegend.WIDTH, TrackLegend.WIDTH + viewWindow.getLength())}
+        dragLimits={new OpenInterval(legendWidth, legendWidth + viewWindow.getLength())}
         onRegionSelected={onNewRegion}
     >
         {trackElements}
     </SelectableGenomeArea>
     );
 }
+
+export const ZoomableTrackContainer = withTrackLegendWidth(UnconnectedZoomableTrackContainer);

@@ -35,6 +35,7 @@ if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  
 }
 const SESSION_KEY = "eg-react-session";
 export const MIN_VIEW_REGION_SIZE = 5;
+export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
 export interface AppState {
     genomeName: string;
@@ -43,6 +44,7 @@ export interface AppState {
     metadataTerms: string[];
     regionSets: RegionSet[];
     regionSetView: RegionSet;
+    trackLegendWidth: number;
 }
 
 const initialState: AppState = {
@@ -52,22 +54,22 @@ const initialState: AppState = {
     metadataTerms: [],
     regionSets: [], // Available region sets, to be used for region set view
     regionSetView: null, // Region set backing current region set view, if applicable
+    trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
 };
 
-type AppActionType = 0 | 1 | 2 | 3 | 4 | 5;
-
-const ActionTypes = {
-    SET_GENOME: 0,
-    SET_VIEW_REGION: 1,
-    SET_TRACKS: 2,
-    SET_METADATA_TERMS: 3,
-    SET_REGION_SET_LIST: 4,
-    SET_REGION_SET_VIEW: 5,
-};
+enum ActionType {
+    SET_GENOME = "SET_GENOME",
+    SET_VIEW_REGION = "SET_VIEW_REGION",
+    SET_TRACKS = "SET_TRACKS",
+    SET_METADATA_TERMS = "SET_METADATA_TERMS",
+    SET_REGION_SET_LIST = "SET_REGION_SET_LIST",
+    SET_REGION_SET_VIEW = "SET_REGION_SET_VIEW",
+    SET_TRACK_LEGEND_WIDTH = "SET_TRACK_LEGEND_WIDTH",
+}
 
 interface AppAction {
-    type: AppActionType;
-    [k: string]: any;
+    type: ActionType;
+    [actionArgs: string]: any;
 }
 
 /**
@@ -81,19 +83,19 @@ export const ActionCreators = {
      * @param {string} genomeName - name of the genome
      */
     setGenome: (genomeName: string) => {
-        return {type: ActionTypes.SET_GENOME, genomeName};
+        return {type: ActionType.SET_GENOME, genomeName};
     },
 
     setViewRegion: (newStart: number, newEnd: number) => {
-        return {type: ActionTypes.SET_VIEW_REGION, start: newStart, end: newEnd};
+        return {type: ActionType.SET_VIEW_REGION, start: newStart, end: newEnd};
     },
 
     setTracks: (newTracks: TrackModel[]) => {
-        return {type: ActionTypes.SET_TRACKS, tracks: newTracks};
+        return {type: ActionType.SET_TRACKS, tracks: newTracks};
     },
 
     setMetadataTerms: (newTerms: string[]) => {
-        return {type: ActionTypes.SET_METADATA_TERMS, terms: newTerms}
+        return {type: ActionType.SET_METADATA_TERMS, terms: newTerms};
     },
 
     /**
@@ -102,7 +104,7 @@ export const ActionCreators = {
      * @param {RegionSet[]} list - new region set list
      */
     setRegionSetList: (list: RegionSet[]) => {
-        return {type: ActionTypes.SET_REGION_SET_LIST, list};
+        return {type: ActionType.SET_REGION_SET_LIST, list};
     },
 
     /**
@@ -111,8 +113,12 @@ export const ActionCreators = {
      * @param {RegionSet} [set] - set with which to enter region set view, or null to exit region set view
      */
     setRegionSetView: (set: RegionSet) => {
-        return {type: ActionTypes.SET_REGION_SET_VIEW, set};
-    }
+        return {type: ActionType.SET_REGION_SET_VIEW, set};
+    },
+
+    setTrackLegendWidth: (width: number) => {
+        return {type: ActionType.SET_TRACK_LEGEND_WIDTH, width};
+    },
 };
 
 function getInitialState() {
@@ -130,13 +136,13 @@ function getInitialState() {
     return state;
 }
 
-function getNextState(prevState: AppState, action: AppAction) {
+function getNextState(prevState: AppState, action: AppAction): AppState {
     if (!prevState) {
         return getInitialState();
     }
 
     switch (action.type) {
-        case ActionTypes.SET_GENOME: // Setting genome resets state.
+        case ActionType.SET_GENOME: // Setting genome resets state.
             let nextViewRegion = null;
             let nextTracks: TrackModel[] = [];
             const genomeConfig = getGenomeConfig(action.genomeName);
@@ -150,7 +156,7 @@ function getNextState(prevState: AppState, action: AppAction) {
                 viewRegion: nextViewRegion,
                 tracks: nextTracks
             };
-        case ActionTypes.SET_VIEW_REGION:
+        case ActionType.SET_VIEW_REGION:
             if (!prevState.viewRegion) {
                 return prevState;
             }
@@ -165,21 +171,22 @@ function getNextState(prevState: AppState, action: AppAction) {
 
             const newRegion = prevState.viewRegion.clone().setRegion(start, end);
             return { ...prevState, viewRegion: newRegion };
-        case ActionTypes.SET_TRACKS:
+        case ActionType.SET_TRACKS:
             return { ...prevState, tracks: action.tracks };
-        case ActionTypes.SET_METADATA_TERMS:
+        case ActionType.SET_METADATA_TERMS:
             return { ...prevState, metadataTerms: action.terms };
-        case ActionTypes.SET_REGION_SET_LIST:
+        case ActionType.SET_REGION_SET_LIST:
             return { ...prevState, regionSets: action.list };
-        case ActionTypes.SET_REGION_SET_VIEW:
+        case ActionType.SET_REGION_SET_VIEW:
             return handleRegionSetViewChange(prevState, action.set);
+        case ActionType.SET_TRACK_LEGEND_WIDTH:
+            return { ...prevState, trackLegendWidth: action.width };
         default:
             console.warn("Unknown change state action; ignoring.");
             console.warn(action);
             return prevState;
     }
 }
-
 
 /**
  * Handles a change in region set view.  Causes a change in the displayed region as well as region set.

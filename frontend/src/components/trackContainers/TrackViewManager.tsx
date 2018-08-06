@@ -1,7 +1,7 @@
 import React from 'react';
 import memoizeOne from 'memoize-one';
 
-import TrackLegend from '../trackVis/commonComponents/TrackLegend';
+import { withTrackLegendWidth } from '../withTrackLegendWidth';
 
 import { TrackModel } from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
@@ -13,6 +13,7 @@ interface DataManagerProps {
     genome: string; // The primary genome
     tracks: TrackModel[]; // Tracks
     viewRegion: DisplayedRegionModel; // Region that the user requests to view
+    legendWidth: number;
     containerWidth: number;
 }
 
@@ -34,7 +35,7 @@ interface WrappedComponentProps {
 const REGION_EXPANDER = new RegionExpander(1);
 
 export function withTrackView(WrappedComponent: React.ComponentType<WrappedComponentProps>) {
-    return class TrackViewManager extends React.Component<DataManagerProps, DataManagerState> {
+    class TrackViewManager extends React.Component<DataManagerProps, DataManagerState> {
         private _primaryGenome: string;
         private _alignmentCalculatorForGenome: GuaranteeMap<string, AlignmentViewCalculator>
 
@@ -51,7 +52,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
         }
 
         getVisualizationWidth() {
-            return Math.max(1, this.props.containerWidth - TrackLegend.WIDTH);
+            return Math.max(1, this.props.containerWidth - this.props.legendWidth);
         }
 
         getSecondaryGenomes(tracks: TrackModel[]) {
@@ -110,4 +111,6 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             />;
         }
     }
+
+    return withTrackLegendWidth(TrackViewManager);
 }

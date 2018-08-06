@@ -5,7 +5,6 @@ import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from './genomeNavigator/TrackRegionController';
 import ZoomButtons from './trackContainers/ZoomButtons';
-import { withSettings } from './Settings';
 import RegionSetSelector from './RegionSetSelector';
 import TrackList from "./trackManagers/TrackList";
 import { TrackModel } from '../model/TrackModel';
@@ -32,8 +31,10 @@ class Nav extends React.Component {
     };
     
     render() {
-        const {isShowingNavigator, toggleNavigator, isShowing3D, on3DToggle} = this.props.settings;
-        const {tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected} = this.props;
+        const {
+            tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
+            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene
+        } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
         return (
@@ -102,7 +103,7 @@ class Nav extends React.Component {
                                 id="switchNavigator"
                                 type="checkbox"
                                 checked={isShowingNavigator}
-                                onChange={toggleNavigator}
+                                onChange={onToggleNavigator}
                             />
                             <span style={{marginLeft: "1ch"}} >Show genome-wide navigator</span>
                             <span className="GenomeNavigator-tooltip">❓
@@ -116,7 +117,7 @@ class Nav extends React.Component {
                             </span>
                         </label>
                         <label className="dropdown-item" htmlFor="switch3D">
-                            <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={on3DToggle} />
+                            <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={onToggle3DScene} />
                             <span style={{marginLeft: "1ch"}} >Show 3D scene</span>
                         </label>
                     </div>
@@ -129,7 +130,7 @@ class Nav extends React.Component {
     }
 }
 
-export default withSettings(Nav);
+export default Nav;
 
 function DropdownOpener(props) {
     const {extraClassName, label} = props;

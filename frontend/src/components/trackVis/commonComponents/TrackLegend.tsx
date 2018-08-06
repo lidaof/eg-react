@@ -1,83 +1,94 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { ScaleLinear } from 'd3-scale';
 import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
 
+import { AppState } from '../../../AppState';
 import { TranslatableG } from '../../TranslatableG';
 import TrackModel from '../../../model/TrackModel';
 
 import './TrackLegend.css';
 
+interface TrackLegendProps {
+    trackModel: TrackModel; // Track metadata
+    width: number; // Legend width
+    height: number; // Legend height
+    axisScale?: ScaleLinear<number, number>; // A d3 scale function, used for drawing axes
+    style?: object;
+}
+
 const NUM_TICKS_SUGGESTION = 3;
 const AXIS_WIDTH = 30;
 
-export const DEFAULT_WIDTH = 120;
+const mapStateToProps = (state: AppState) => {
+    return {
+        width: state.trackLegendWidth
+    };
+}
 
 /**
  * A box displaying labels, axes, and other important track info.
  * 
  * @author Silas Hsu
  */
-class TrackLegend extends React.PureComponent {
-    static propTypes = {
-        trackModel: PropTypes.instanceOf(TrackModel).isRequired, // Track metadata
-        height: PropTypes.number.isRequired, // Height of the legend
-        axisScale: PropTypes.func, // A d3 scale function, used for drawing axes
+class TrackLegend extends React.PureComponent<TrackLegendProps> {
+    static defaultProps = {
+        width: 100
     };
 
-    static WIDTH = 120;
+    private gNode: SVGGElement;
 
-    constructor(props) {
+    constructor(props: TrackLegendProps) {
         super(props);
         this.gNode = null;
+        this.handleRef = this.handleRef.bind(this);
     }
 
     componentDidMount() {
         this.drawAxis();
     }
 
-    componentDidUpdate(nextProps) {
+    componentDidUpdate(nextProps: TrackLegendProps) {
         if (this.props.axisScale !== nextProps.axisScale) {
             this.drawAxis();
         }
     }
 
+    handleRef(node: SVGGElement) {
+        this.gNode = node;
+    }
+
     drawAxis() {
         if (this.gNode && this.props.axisScale) {
             while(this.gNode.hasChildNodes()) { // Believe it not, there's no function that removes all child nodes.
-                this.gNode.lastChild.remove();
+                (this.gNode.lastChild as Element).remove();
             }
 
             const axis = axisLeft(this.props.axisScale);
             axis.ticks(NUM_TICKS_SUGGESTION);
             select(this.gNode).call(axis);
-            this.gNode.lastChild.remove(); // Remove the '0' label
         }
     }
 
     getLabelWidth() {
-        let width = TrackLegend.WIDTH;
-        //const width = this.props.settings.trackLabelWidth;
-        let newWidth;
         if (this.props.axisScale) {
-            newWidth = width - AXIS_WIDTH;
+            return this.props.width - AXIS_WIDTH;
+        } else {
+            return undefined;
         }
-        return newWidth;
     }
 
     render() {
-        const {trackModel, height, axisScale, style} = this.props;
-        //console.log(this.props.settings);
-        //const width = this.props.settings.trackLabelWidth;
-        const width = TrackLegend.WIDTH;
+        const {trackModel, width, height, axisScale, style} = this.props;
         if (height <= 0) {
             return null;
         }
 
         const divStyle = Object.assign({
             display: "flex",
-            width: width,
-            height: height,
+            width,
+            height,
             backgroundColor: trackModel.isSelected ? "yellow" : undefined,
         }, style);
         const pStyle = {
@@ -88,7 +99,7 @@ class TrackLegend extends React.PureComponent {
         let axis = null;
         if (axisScale) {
             axis = <svg width={AXIS_WIDTH} height={height} style={{overflow: "visible"}} >
-                <TranslatableG innerRef={node => this.gNode = node} x={AXIS_WIDTH} />
+                <TranslatableG innerRef={this.handleRef} x={AXIS_WIDTH} />
             </svg>;
         }
 
@@ -102,4 +113,4 @@ class TrackLegend extends React.PureComponent {
     }
 }
 
-export default TrackLegend;
+export default connect(mapStateToProps)(TrackLegend);

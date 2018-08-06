@@ -2,7 +2,7 @@ import TrackModel from './TrackModel';
 import RegionSet from './RegionSet';
 import DisplayedRegionModel from './DisplayedRegionModel';
 import { getGenomeConfig } from './genomes/allGenomes';
-import { AppState } from '../AppState';
+import { AppState, DEFAULT_TRACK_LEGEND_WIDTH } from '../AppState';
 import OpenInterval from './interval/OpenInterval';
 
 /**
@@ -33,6 +33,7 @@ export class AppStateSaver {
             metadataTerms: appState.metadataTerms,
             regionSets: appState.regionSets.map(set => set.serialize()),
             regionSetViewIndex,
+            trackLegendWidth: appState.trackLegendWidth,
         };
         return object;
     }
@@ -58,18 +59,18 @@ export class AppStateLoader {
      * @return {Object} app state tree inferred from the object
      * @throws {Error} on deserialization errors
      */
-    fromObject(object: any) {
+    fromObject(object: any): AppState {
         const regionSets = object.regionSets.map(RegionSet.deserialize);
         const regionSetView = regionSets[object.regionSetViewIndex] || null;
-        const appState = {
+        return {
             genomeName: object.genomeName,
             viewRegion: this._restoreViewRegion(object, regionSetView),
             tracks: object.tracks.map((data: any) => new TrackModel(data)),
             metadataTerms: object.metadataTerms,
             regionSets,
             regionSetView,
+            trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
         };
-        return appState;
     }
 
     /**

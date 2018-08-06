@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { MIN_VIEW_REGION_SIZE } from '../../AppState';
 import MainPane from './MainPane';
-import { withSettings } from '../Settings';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 //import './GenomeNavigator.css';
@@ -39,10 +38,8 @@ class GenomeNavigator extends React.Component {
         super(props);
         this.state = {
             viewRegion: this._setInitialView(props.selectedRegion),
-            //isShowingNavigator: true,
         };
 
-        // this.toggleNavigator = this.toggleNavigator.bind(this);
         this.zoom = this.zoom.bind(this);
         this.setNewView = this.setNewView.bind(this);
         this.zoomSliderDragged = this.zoomSliderDragged.bind(this);
@@ -79,10 +76,6 @@ class GenomeNavigator extends React.Component {
             this.setState({viewRegion: new DisplayedRegionModel(nextNavContext)});
         }
     }
-
-    // toggleNavigator() {
-    //     this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
-    // }
 
     /**
      * Copies this.state.viewRegion, mutates it by calling `methodName` with `args`, and then calls this.setState().
@@ -138,19 +131,16 @@ class GenomeNavigator extends React.Component {
     render() {
         return (
             <div style={{margin: "5px"}}>
-                {
-                this.props.settings.isShowingNavigator &&
-                    <MainPane
-                        viewRegion={this.state.viewRegion}
-                        selectedRegion={this.props.selectedRegion}
-                        onRegionSelected={this.props.onRegionSelected}
-                        onNewViewRequested={this.setNewView}
-                        onZoom={this.zoom}
-                    />
-                }
+                <MainPane
+                    viewRegion={this.state.viewRegion}
+                    selectedRegion={this.props.selectedRegion}
+                    onRegionSelected={this.props.onRegionSelected}
+                    onNewViewRequested={this.setNewView}
+                    onZoom={this.zoom}
+                />
             </div>
         );
     }
 }
 
-export default withSettings(GenomeNavigator);
+export default GenomeNavigator;
