@@ -5,11 +5,14 @@ import { axisLeft } from 'd3-axis';
 
 import TranslatableG from '../../TranslatableG';
 import TrackModel from '../../../model/TrackModel';
+import { withSettings } from "../../Settings";
 
 import './TrackLegend.css';
 
 const NUM_TICKS_SUGGESTION = 3;
 const AXIS_WIDTH = 30;
+
+export const DEFAULT_WIDTH = 120;
 
 /**
  * A box displaying labels, axes, and other important track info.
@@ -55,21 +58,26 @@ class TrackLegend extends React.PureComponent {
 
     getLabelWidth() {
         let width = TrackLegend.WIDTH;
+        //const width = this.props.settings.trackLabelWidth;
+        let newWidth;
         if (this.props.axisScale) {
-            width -= AXIS_WIDTH;
+            newWidth = width - AXIS_WIDTH;
         }
-        return width;
+        return newWidth;
     }
 
     render() {
         const {trackModel, height, axisScale, style} = this.props;
+        //console.log(this.props.settings);
+        //const width = this.props.settings.trackLabelWidth;
+        const width = TrackLegend.WIDTH;
         if (height <= 0) {
             return null;
         }
 
         const divStyle = Object.assign({
             display: "flex",
-            width: TrackLegend.WIDTH,
+            width: width,
             height: height,
             backgroundColor: trackModel.isSelected ? "yellow" : undefined,
         }, style);
@@ -95,4 +103,4 @@ class TrackLegend extends React.PureComponent {
     }
 }
 
-export default TrackLegend;
+export default withSettings(TrackLegend);

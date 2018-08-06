@@ -11,7 +11,7 @@ import ZoomableTrackContainer from './ZoomableTrackContainer';
 import MetadataHeader from './MetadataHeader';
 import { Tools, ToolButtons } from './Tools';
 
-import TrackLegend from '../trackVis/commonComponents/TrackLegend';
+import { DEFAULT_WIDTH as LEGEND_WIDTH } from '../trackVis/commonComponents/TrackLegend';
 import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
 
 import OutsideClickDetector from '../OutsideClickDetector';
@@ -83,7 +83,7 @@ class TrackContainer extends React.Component {
 
     static getDerivedStateFromProps(nextProps) {
         const {viewRegion, width} = nextProps;
-        const visualizationWidth = Math.max(0, width - TrackLegend.WIDTH);
+        const visualizationWidth = Math.max(0, width - LEGEND_WIDTH);
         return {
             visualizerInfo: REGION_EXPANDER.calculateExpansion(visualizationWidth, viewRegion)
         };
@@ -251,7 +251,7 @@ class TrackContainer extends React.Component {
                 />;
             case Tools.ZOOM_IN:
                 return <ZoomableTrackContainer
-                    visualizationStartX={TrackLegend.WIDTH}
+                    visualizationStartX={LEGEND_WIDTH}
                     visualizationWidth={this.getVisualizationWidth()}
                     trackElements={trackElements}
                     viewRegion={viewRegion}

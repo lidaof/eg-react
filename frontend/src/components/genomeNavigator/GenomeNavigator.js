@@ -5,7 +5,7 @@ import MainPane from './MainPane';
 import { withSettings } from '../Settings';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
-import './GenomeNavigator.css';
+//import './GenomeNavigator.css';
 
 /**
  * A navigator that allows users to scroll around the genome and select what region for tracks to display.
@@ -137,27 +137,7 @@ class GenomeNavigator extends React.Component {
      */
     render() {
         return (
-            <div style={{borderBottom: "1px solid lightgrey"}}>
-                {/* <nav className="navbar">
-                    <div className="row">
-                        <div className="col-sm">
-                            <label style={{marginBottom: 0}}>
-                                <span style={{marginRight: "1ch"}} >Show genome-wide navigator</span>
-                                <input type="checkbox" checked={this.props.settings.isShowingNavigator} onChange={this.props.settings.toggleNavigator} />
-                                
-                            </label>
-                            <div className="GenomeNavigator-tooltip">❓
-                                <div className="GenomeNavigator-tooltiptext">
-                                    <ul style={{lineHeight: "1.2em", marginBottom: 0}}>
-                                        <li>Left mouse drag: select</li>
-                                        <li>Right mouse drag: pan</li>
-                                        <li>Mousewheel: zoom</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </nav> */}
+            <div style={{margin: "5px"}}>
                 {
                 this.props.settings.isShowingNavigator &&
                     <MainPane

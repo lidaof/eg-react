@@ -190,6 +190,15 @@ class Nav extends React.Component {
                         <label className="dropdown-item" htmlFor="switchNavigator">
                             <input id="switchNavigator" type="checkbox" checked={isShowingNavigator} onChange={toggleNavigator} />
                             <span style={{marginLeft: "1ch"}} >Show genome-wide navigator</span>
+                            <span className="genomeNavigator-tooltip">❓
+                                <div className="genomeNavigator-tooltiptext">
+                                    <ul style={{lineHeight: "1.2em", marginBottom: 0}}>
+                                        <li>Left mouse drag: select</li>
+                                        <li>Right mouse drag: pan</li>
+                                        <li>Mousewheel: zoom</li>
+                                    </ul>
+                                </div>
+                            </span>
                         </label>
                         <label className="dropdown-item" htmlFor="switch3D">
                             <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={on3DToggle} />

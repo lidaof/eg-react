@@ -8,7 +8,7 @@ import React from 'react';
 export const AppContext = React.createContext();
 
 export function withSettings(Component) {
-    return function ConnectedComponent(props) {
+   return function ConnectedComponent(props) {
         return (
             <AppContext.Consumer>
                 { settings => <Component {...props} settings={settings} /> }
@@ -21,6 +21,7 @@ export class AppSettings extends React.Component {
     state = {
         isShowing3D: false,
         isShowingNavigator: true,
+        trackLabelWidth: 120,
     };
 
     toggleNavigator = () => {
@@ -32,6 +33,25 @@ export class AppSettings extends React.Component {
         this.setState(prevState => {return {isShowing3D: !prevState.isShowing3D}});
     };
 
+    changeLabelWidth = (type) => {
+        const { trackLabelWidth } = this.state;
+        let newLabelWidth;
+        switch (type) {
+            case 'INCREASE':
+                newLabelWidth = trackLabelWidth + 5;
+                break;
+            case 'DECREASE':
+                if( trackLabelWidth <= 60){
+                    break;
+                }
+                newLabelWidth = trackLableWidth - 5;
+                break;
+            default:
+                break;
+        }
+        this.setState({trackLableWidth: newLabelWidth});
+    };
+
     render() {
         return (
             <AppContext.Provider value={
@@ -39,6 +59,7 @@ export class AppSettings extends React.Component {
                     ...this.state, 
                     toggleNavigator: this.toggleNavigator,
                     on3DToggle: this.toggle3DScene,
+                    changeLabelWidth: this.changeLabelWidth,
                 }
             }>
                 {this.props.children}
