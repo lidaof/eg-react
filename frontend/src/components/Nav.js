@@ -9,6 +9,9 @@ import { withSettings } from './Settings';
 import RegionSetSelector from './RegionSetSelector';
 import TrackList from "./trackManagers/TrackList";
 import { TrackModel } from '../model/TrackModel';
+import AnnotationTrackSelector from './trackManagers/AnnotationTrackSelector';
+import HubPane from './trackManagers/HubPane'
+import CustomTrackAdder from './trackManagers/CustomTrackAdder';
 
 import eglogo from '../images/eglogo.jpg';
 
@@ -32,6 +35,9 @@ class Nav extends React.Component {
     state = { 
         showRegionset: false,
         showList: false,
+        showAnnotation: false,
+        showHub: false,
+        showCustom: false,
     };
 
     handleRegionsetOpen = () => {
@@ -50,6 +56,30 @@ class Nav extends React.Component {
         this.setState({ showList: false });
     };
 
+    handleAnnotationOpen = () => {
+        this.setState({ showAnnotation: true });
+    };
+      
+    handleAnnotationClose = () => {
+        this.setState({ showAnnotation: false });
+    };
+
+    handleHubOpen = () => {
+        this.setState({ showHub: true });
+    };
+      
+    handleHubClose = () => {
+        this.setState({ showHub: false });
+    };
+
+    handleCustomOpen = () => {
+        this.setState({ showCustom: true });
+    };
+      
+    handleCustomClose = () => {
+        this.setState({ showCustom: false });
+    };
+
     render() {
         const {isShowingNavigator, toggleNavigator, isShowing3D, on3DToggle} = this.props.settings;
         const {tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected} = this.props;
@@ -59,6 +89,7 @@ class Nav extends React.Component {
             <div className="Nav-container">
                 <div>
                     <img src={eglogo} width="300px" alt="browser logo"/>
+                    <span id="theNew" >The New</span>
                 </div>
                 <div className="Nav-genome Nav-center" 
                     style={{backgroundImage: `url(${logo})`, color: color, backgroundSize: "cover"}}>
@@ -78,9 +109,45 @@ class Nav extends React.Component {
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">🎹Tracks</button>
                     <div className="dropdown-menu">
                         <a className="dropdown-item" href="#">Track Facet Table</a>
-                        <a className="dropdown-item" href="#">Annotation Tracks</a>
-                        <a className="dropdown-item" href="#">Public Data Hubs</a>
-                        <a className="dropdown-item" href="#">Custom Tracks</a>
+                        <div className="dropdown-item" onClick={this.handleAnnotationOpen}>Annotation Tracks</div>
+                        <ReactModal 
+                            isOpen={this.state.showAnnotation}
+                            contentLabel="Annotation Tracks"
+                            ariaHideApp={false}
+                            onRequestClose={this.handleAnnotationClose}
+                            shouldCloseOnOverlayClick={true}
+                        >
+                            <span className="text-right" 
+                                style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
+                                onClick={this.handleAnnotationClose}>&times;</span>
+                            <AnnotationTrackSelector addedTracks={tracks} onTracksAdded={onTracksAdded} onTrackRemoved={onTrackRemoved} />
+                        </ReactModal>
+                        <div className="dropdown-item" onClick={this.handleHubOpen}>Public Data Hubs</div>
+                        <ReactModal 
+                            isOpen={this.state.showHub}
+                            contentLabel="Track Hubs"
+                            ariaHideApp={false}
+                            onRequestClose={this.handleHubClose}
+                            shouldCloseOnOverlayClick={true}
+                        >
+                            <span className="text-right" 
+                                style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
+                                onClick={this.handleHubClose}>&times;</span>
+                            <HubPane addedTracks={tracks} onTracksAdded={onTracksAdded} onTrackRemoved={onTrackRemoved} />
+                        </ReactModal>
+                        <div className="dropdown-item" onClick={this.handleCustomOpen}>Custom Tracks</div>
+                        <ReactModal 
+                            isOpen={this.state.showCustom}
+                            contentLabel="Custom Tracks"
+                            ariaHideApp={false}
+                            onRequestClose={this.handleCustomClose}
+                            shouldCloseOnOverlayClick={true}
+                        >
+                            <span className="text-right" 
+                                style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
+                                onClick={this.handleCustomClose}>&times;</span>
+                            <CustomTrackAdder addedTracks={tracks} onTracksAdded={onTracksAdded} onTrackRemoved={onTrackRemoved} />
+                        </ReactModal>
                         <div className="dropdown-item" onClick={this.handleListOpen}>Track List</div>
                         <ReactModal 
                             isOpen={this.state.showList}

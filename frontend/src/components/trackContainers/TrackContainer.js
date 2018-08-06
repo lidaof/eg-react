@@ -10,7 +10,6 @@ import ReorderableTrackContainer from './ReorderableTrackContainer';
 import ZoomableTrackContainer from './ZoomableTrackContainer';
 import MetadataHeader from './MetadataHeader';
 import { Tools, ToolButtons } from './Tools';
-import ZoomButtons from './ZoomButtons';
 
 import TrackLegend from '../trackVis/commonComponents/TrackLegend';
 import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
@@ -93,7 +92,7 @@ class TrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedTool: null,
+            selectedTool: Tools.DRAG,
             visualizerInfo: {
                 width: 0,
                 viewRegion: null,
@@ -198,7 +197,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element}
      */
     renderControls() {
-        const {viewRegion, onNewRegion, metadataTerms, onMetadataTermsChanged} = this.props;
+        const {metadataTerms, onMetadataTermsChanged} = this.props;
         return <div style={{display: "flex", alignItems: "flex-end"}} >
             <div>
                 {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}

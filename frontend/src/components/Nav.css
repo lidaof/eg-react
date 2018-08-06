@@ -36,3 +36,20 @@
 .dropdown-item:hover {
     background-color: #aac5f7;
 }
+
+#theNew {
+    color: red;
+    font-size: 0.7em;
+    position: absolute;
+    top: 1px;
+    left: 100px;
+    transform: rotate(-10deg);
+    animation-name: example;
+    animation-duration: 1s;
+}
+
+/* The animation code */
+@keyframes example {
+    from {font-size: 1.4em;}
+    to {font-size: 0.7em;}
+}

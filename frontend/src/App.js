@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 
 import { ActionCreators } from './AppState';
 
-import { DrawerMenu } from './DrawerMenu';
 import GenomePicker from './components/GenomePicker';
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
 import TrackContainer from './components/trackContainers/TrackContainer';
@@ -79,12 +78,12 @@ class App extends React.Component {
                 onTrackRemoved={this.removeTrack}
             />
             <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
-            <DrawerMenu
+            {/* <DrawerMenu
                 tracks={tracks}
                 genomeConfig={genomeConfig}
                 onTracksAdded={this.addTracks}
                 onTrackRemoved={this.removeTrack}
-            />
+            /> */}
             {
             this.props.settings.isShowing3D &&
                 <ErrorBoundary><BrowserScene viewRegion={viewRegion} tracks={tracks} /></ErrorBoundary>
