@@ -45,12 +45,12 @@ describe("methods", () => {
         expect(INSTANCE.getLength()).toBe(5);
     });
 
-    it("getGenomeCoordinates() is correct", () => {
-        expect(INSTANCE.getGenomeCoordinates()).toEqual(new ChromosomeInterval("chr1", 10, 15));
+    it("getLocus() is correct", () => {
+        expect(INSTANCE.getLocus()).toEqual(new ChromosomeInterval("chr1", 10, 15));
     });
 
     it("getOverlap() is correct", () => {
-        expect(INSTANCE.getOverlap(new ChromosomeInterval("chr1", 13, 20)))
+        expect(INSTANCE.getGenomeOverlap(new ChromosomeInterval("chr1", 13, 20)))
             .toEqual(new FeatureSegment(FEATURE, 3, 5));
     });
 

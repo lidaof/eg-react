@@ -5,13 +5,14 @@ import Chromosomes from './Chromosomes';
 import Ruler from './Ruler';
 import SelectedRegionBox from './SelectedRegionBox';
 
-import SelectableGenomeArea from '../SelectableGenomeArea';
-import DragAcrossView from '../DragAcrossView';
+import { SelectableGenomeArea } from '../SelectableGenomeArea';
+import { RegionPanTracker } from '../RegionPanTracker';
 import withAutoDimensions from '../withAutoDimensions';
+import withCurrentGenome from '../withCurrentGenome';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import LinearDrawingModel from '../../model/LinearDrawingModel';
-import { MouseButtons } from '../../util';
+import { MouseButton } from '../../util';
+import OpenInterval from '../../model/interval/OpenInterval';
 
 import './MainPane.css';
 
@@ -25,6 +26,8 @@ const RULER_Y = CHROMOSOME_Y + 30;
 const SELECT_BOX_Y = "5px";
 const SELECT_BOX_HEIGHT = "60px";
 
+const PrimaryGenomeChromosomes = withCurrentGenome(Chromosomes);
+
 /**
  * The main pane of the genome navigator.  Manages child components and listens for events that modify the view region.
  * 
@@ -32,7 +35,7 @@ const SELECT_BOX_HEIGHT = "60px";
  */
 class MainPane extends React.Component {
     static propTypes = {
-        width: PropTypes.number.isRequired, // The width of the pane
+        containerWidth: PropTypes.number.isRequired, // The width of the pane
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view
 
         /**
@@ -73,7 +76,6 @@ class MainPane extends React.Component {
     constructor(props) {
         super(props);
         this.mousewheel = this.mousewheel.bind(this);
-        this.areaSelected = this.areaSelected.bind(this);
     }
 
     /**
@@ -93,25 +95,13 @@ class MainPane extends React.Component {
     }
 
     /**
-     * Fires the callback signaling a new region has been selected.
-     * 
-     * @param {number} startX - the left X coordinate of the selected area
-     * @param {number} endX - the right X coordinate of the selected area
-     * @param {React.SyntheticEvent} event - the final mouse event that triggered the selection
-     */
-    areaSelected(startX, endX, event) {
-        const drawModel = new LinearDrawingModel(this.props.viewRegion, this.props.width);
-        this.props.onRegionSelected(drawModel.xToBase(startX), drawModel.xToBase(endX));
-    }
-
-    /**
      * Places a <svg> and children that draw things.
      * 
      * @override
      */
     render() {
-        const {width, viewRegion, selectedRegion, onNewViewRequested} = this.props;
-        if (width === 0) {
+        const {containerWidth, viewRegion, selectedRegion, onNewViewRequested, onRegionSelected} = this.props;
+        if (containerWidth === 0) {
             if (process.env.NODE_ENV !== "test") {
                 console.warn("Cannot render with a width of 0");
             }
@@ -120,29 +110,30 @@ class MainPane extends React.Component {
 
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView
-            button={MouseButtons.RIGHT}
-            onViewDrag={onNewViewRequested}
-            viewRegion={viewRegion}
+        <RegionPanTracker
             className="MainPane-opaque"
+            mouseButton={MouseButton.RIGHT}
+            onViewDrag={onNewViewRequested}
+            panRegion={viewRegion}
         >
             <SelectableGenomeArea
-                drawModel={new LinearDrawingModel(viewRegion, width)}
+                selectableRegion={viewRegion}
+                dragLimits={new OpenInterval(0, containerWidth)}
                 y={SELECT_BOX_Y}
                 height={SELECT_BOX_HEIGHT}
-                onAreaSelected={this.areaSelected}
+                onRegionSelected={onRegionSelected}
             >
                 <svg
-                    width={width}
+                    width={containerWidth}
                     height={SVG_HEIGHT}
                     onContextMenu={event => event.preventDefault()}
                     onWheel={this.mousewheel}
                     style={{border: "1px solid black"}}
                 >
-                    <Chromosomes viewRegion={viewRegion} width={width} y={CHROMOSOME_Y} />
-                    <Ruler viewRegion={viewRegion} width={width} y={RULER_Y} />
+                    <PrimaryGenomeChromosomes viewRegion={viewRegion} width={containerWidth} y={CHROMOSOME_Y} />
+                    <Ruler viewRegion={viewRegion} width={containerWidth} y={RULER_Y} />
                     <SelectedRegionBox
-                        width={width}
+                        width={containerWidth}
                         viewRegion={viewRegion}
                         selectedRegion={selectedRegion}
                         onNewViewRequested={onNewViewRequested}
@@ -150,7 +141,7 @@ class MainPane extends React.Component {
                     />
                 </svg>
             </SelectableGenomeArea>
-        </DragAcrossView>
+        </RegionPanTracker>
         );
     }
 }

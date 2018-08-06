@@ -4,7 +4,13 @@ import TrackLegend from './commonComponents/TrackLegend';
 import withAutoDimensions from '../withAutoDimensions';
 import ErrorMessage from '../ErrorMessage';
 
-const AutoDimensionLegend = withAutoDimensions(TrackLegend);
+/*
+ * withAutoDimensions provides a prop called `containerHeight`, but TrackLegend wants `height`.  This anonymous function
+ * does the necessary wiring.
+ */
+const AutoDimensionLegend = withAutoDimensions(function(props) {
+    return <TrackLegend height={props.containerHeight} {...props} />;
+});
 
 /**
  * A placeholder when we don't recognize a track's type.  It basically does nothing.

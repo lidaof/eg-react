@@ -96,7 +96,7 @@ class NumericalTrack extends React.Component {
      */
     renderTooltip(relativeX) {
         const {trackModel, viewRegion, width, unit} = this.props;
-        const value = this.xToValue[relativeX];
+        const value = this.xToValue[Math.round(relativeX)];
         const stringValue = typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : '(no data)';
         return (
         <div>

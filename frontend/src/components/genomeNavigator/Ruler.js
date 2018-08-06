@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TranslatableG from '../TranslatableG';
+import { TranslatableG } from '../TranslatableG';
 import RulerDesigner from '../../art/RulerDesigner';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+
+const RULER_DESIGNER = new RulerDesigner();
 
 /**
  * Draws a ruler that displays feature coordinates.
@@ -19,8 +21,7 @@ class Ruler extends React.PureComponent {
 
     render() {
         const {viewRegion, width, x, y} = this.props;
-        const designer = new RulerDesigner(viewRegion, width);
-        return <TranslatableG x={x} y={y} >{designer.design()}</TranslatableG>;
+        return <TranslatableG x={x} y={y} >{RULER_DESIGNER.design(viewRegion, width)}</TranslatableG>;
     }
 }
 

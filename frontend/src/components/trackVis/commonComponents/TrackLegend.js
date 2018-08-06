@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
 
-import TranslatableG from '../../TranslatableG';
+import { TranslatableG } from '../../TranslatableG';
 import TrackModel from '../../../model/TrackModel';
-import { withSettings } from "../../Settings";
 
 import './TrackLegend.css';
 
@@ -103,4 +102,4 @@ class TrackLegend extends React.PureComponent {
     }
 }
 
-export default withSettings(TrackLegend);
+export default TrackLegend;

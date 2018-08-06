@@ -21,6 +21,10 @@ const STROKE_WIDTH = 2;
 const ITEM_LIMIT = 1000;
 
 export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
+    static getHeight(props: ArcDisplayProps) {
+        return HEIGHT;
+    }
+
     render() {
         const {placedInteractions, viewWindow, width, opacityScale, color, onInteractionHovered,
             onMouseOut} = this.props;
@@ -54,7 +58,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
             />);
         }
-        return <svg width={width} height={HEIGHT} onMouseOut={onMouseOut}>{arcs}</svg>;
+        return <svg width={width} height={ArcDisplay.getHeight(this.props)} onMouseOut={onMouseOut}>{arcs}</svg>;
     }
 }
 

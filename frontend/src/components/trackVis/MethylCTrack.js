@@ -109,7 +109,7 @@ class MethylCTrack extends React.PureComponent {
      */
     renderTooltipContents(x) {
         const {trackModel, viewRegion, width, options} = this.props;
-        const strandsAtPixel = this.aggregatedRecords[x];
+        const strandsAtPixel = this.aggregatedRecords[Math.round(x)];
 
         return <div>
             {this.renderTooltipContentsForStrand(strandsAtPixel, options.isCombineStrands ? "combined" : "forward")}

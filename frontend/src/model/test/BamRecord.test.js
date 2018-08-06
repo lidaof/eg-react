@@ -1,5 +1,5 @@
 import { BamRecord } from '../BamRecord';
-import { BamFlags } from "../../vendor/bbi-js/main/bam";
+import { BamFlags } from '../../vendor/bbi-js/main/bam';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 
 describe('constructor', () => {

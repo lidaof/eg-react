@@ -4,6 +4,8 @@ import { FeatureSegment } from './interval/FeatureSegment';
 import ChromosomeInterval from './interval/ChromosomeInterval';
 import { Feature } from './Feature';
 
+const GAP_CHR = ''; // The special chromosome that gaps lie in.
+
 /**
  * A implicit coordinate system for the entire genome or a gene set view.  It represents everywhere that a user could
  * potentially navigate and view.
@@ -17,11 +19,30 @@ import { Feature } from './Feature';
 class NavigationContext {
     private _name: string;
     private _features: Feature[];
-    private _isGenome: boolean;
-    private _featureStarts: any[];
-    private _featureNameToIndex: {};
-    private _chrToFeatures: {[chr: string]: Feature[]};
+    private _sortedFeatureStarts: number[];
+    private _startCoordinateForFeature: Map<Feature, number>;
+    private _featuresForChr: {[chr: string]: Feature[]};
     private _totalBases: number;
+
+    /**
+     * Makes a special "feature" representing a gap in the genome.  To use, insert such objects into the feature list
+     * during NavigationContext construction.
+     * 
+     * @param {number} length - length of the gap in bases
+     * @param {string} [name] - custom name of the gap feature
+     * @return {Feature} a special "feature" representing a gap in the genome.
+     */
+    static makeGap(length: number, name='Gap'): Feature {
+        return new Feature(name, new ChromosomeInterval(GAP_CHR, 0, Math.round(length)));
+    }
+
+    /**
+     * @param {Feature} feature - feature to inspect
+     * @return {boolean} whether the feature represents a gap in the genome
+     */
+    static isGapFeature(feature: Feature) {
+        return feature.getLocus().chr === GAP_CHR;
+    }
 
     /**
      * Makes a new instance.  Features must have non-empty, unique names.  The `isGenome` parameter does not change any
@@ -32,35 +53,21 @@ class NavigationContext {
      * @param {boolean} isGenome - whether the context covers the entire genome
      * @throws {Error} if the feature list has a problem
      */
-    constructor(name: string, features: Feature[], isGenome=false) {
+    constructor(name: string, features: Feature[]) {
         this._name = name;
         this._features = features;
-        this._isGenome = isGenome;
-        this._featureStarts = [];
-        this._featureNameToIndex = {};
-        this._chrToFeatures = _.groupBy(features, feature => feature.getLocus().chr)
+        this._startCoordinateForFeature = new Map();
+        this._sortedFeatureStarts = [];
+        this._featuresForChr = _.groupBy(features, feature => feature.getLocus().chr)
         this._totalBases = 0;
 
-        let i = 0;
         for (const feature of features) {
-            // Make sure names are unique
-            const name = feature.getName();
-            if (!name) {
-                throw new Error("All features must have names");
+            if (this._startCoordinateForFeature.has(feature)) {
+                throw new Error(`Duplicate feature "${feature.getName()}" detected.  Features must be unique.`);
             }
-            if (this._featureNameToIndex[name] !== undefined) {
-                throw new Error(`Duplicate name ${name} detected; features must have unique names.`);
-            }
-            this._featureNameToIndex[name] = i;
-
-            // Add to feature list w/ additional details
-            this._featureStarts.push(this._totalBases);
+            this._startCoordinateForFeature.set(feature, this._totalBases);
+            this._sortedFeatureStarts.push(this._totalBases);
             this._totalBases += feature.getLength();
-            i++;
-        }
-
-        if (this._totalBases === 0) {
-            throw new Error("Context has 0 length");
         }
     }
 
@@ -99,24 +106,24 @@ class NavigationContext {
     }
 
     /**
-     * Gets the context coordinate of a feature's start, given the feature's name.  Throws an error if the feature
-     * cannot be found.
+     * Gets the context coordinate of a feature's start.  Throws an error if the feature cannot be found.
      * 
-     * @param {string} name - the feature's name
+     * @param {Feature} feature - the feature to find
      * @return {number} the context coordinate of the feature's start
-     * @throws {RangeError} if the feature's name is not in this context
+     * @throws {RangeError} if the feature is not in this context
      */
-    getFeatureStart(name: string): number {
-        const index = this._featureNameToIndex[name];
-        if (index === undefined) {
-            throw new RangeError(`Cannot find feature with name '${name}'`);
+    getFeatureStart(feature: Feature): number {
+        const coordinate = this._startCoordinateForFeature.get(feature);
+        if (coordinate === undefined) {
+            throw new RangeError(`Feature "${feature.getName()}" not in this navigation context`);
+        } else {
+            return coordinate;
         }
-        return this._featureStarts[index];
     }
 
     /**
-     * Given a context coordinate, gets the feature in which it is located.  Returns a FeatureSegment that expresses
-     * a base number relative to the feature's start.
+     * Given a context coordinate, gets the feature in which it is located.  Returns a FeatureSegment that has 0 length,
+     * representing a single base number relative to the feature's start.
      *
      * @param {number} base - the context coordinate to look up
      * @return {FeatureSegment} corresponding feature coordinate
@@ -124,42 +131,27 @@ class NavigationContext {
      */
     convertBaseToFeatureCoordinate(base: number): FeatureSegment {
         if (!this.getIsValidBase(base)) {
-            throw new RangeError("Invalid base number");
+            throw new RangeError(
+                `Base number ${base} is invalid.  Valid bases in this context: [0, ${this.getTotalBases()})`
+            );
         }
 
-        let index = this._features.length - 1; // We want the index of the feature that contains the context coordinate.
-        // It's ok to subtract 1 since there must be at least one feature, guaranteed by the constructor.
-        // Last feature (highest base #) to first (lowest base #)
-        while (index > 0 && base < this._featureStarts[index]) {
-            index--;
-        }
+        // Index of the feature that contains the context coordinate
+        const index = _.sortedLastIndex(this._sortedFeatureStarts, base) - 1;
         const feature = this._features[index];
-        const coordinate = base - this._featureStarts[index];
+        const coordinate = base - this._sortedFeatureStarts[index];
         return new FeatureSegment(feature, coordinate, coordinate);
     }
 
     /**
-     * Given a feature name and base number relative to the feature's start *indexed from 0*, finds the context
-     * coordinate in this navigation context.
-     *
-     * @param {string} featureName - name of the feature to look up
-     * @param {number} baseNum - base number relative to feature's start
-     * @return {number} the context coordinate
-     * @throws {RangeError} if the feature name or its relative base is not in this context
+     * Given a segment of a feature from this navigation context, gets the context coordinates the segment occupies.
+     * 
+     * @param {FeatureSegment} segment - feature segment from this context
+     * @return {OpenInterval} context coordinates the feature segment occupies
      */
-    convertFeatureCoordinateToBase(queryName: string, base: number): number {
-        const index = this._featureNameToIndex[queryName];
-        if (index === undefined) {
-            throw new RangeError(`Cannot find feature with name '${queryName}'`);
-        }
-        const feature = this._features[index];
-        const contextStart = this._featureStarts[index];
-
-        if (0 <= base && base <= feature.getLength()) {
-            return contextStart + base;
-        } else {
-            throw new RangeError(`Base number '${base}' not in feature '${queryName}'`);
-        }
+    convertFeatureSegmentToContextCoordinates(segment: FeatureSegment): OpenInterval {
+        const contextStart = this.getFeatureStart(segment.feature);
+        return new OpenInterval(contextStart + segment.relativeStart, contextStart + segment.relativeEnd);
     }
 
     /**
@@ -170,29 +162,44 @@ class NavigationContext {
      * @return {OpenInterval[]} intervals of context coordinates
      */
     convertGenomeIntervalToBases(chrInterval: ChromosomeInterval): OpenInterval[] {
-        if (this._isGenome) {
-            return [new OpenInterval(
-                this.convertFeatureCoordinateToBase(chrInterval.chr, chrInterval.start),
-                this.convertFeatureCoordinateToBase(chrInterval.chr, chrInterval.end),
-            )];
-        }
-        const potentialOverlaps = this._chrToFeatures[chrInterval.chr] || [];
+        const potentialOverlaps = this._featuresForChr[chrInterval.chr] || [];
         const contextIntervals = [];
         for (const feature of potentialOverlaps) {
-            const overlap = new FeatureSegment(feature).getOverlap(chrInterval);
+            const overlap = new FeatureSegment(feature).getGenomeOverlap(chrInterval);
             if (overlap) {
-                const start = this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeStart);
-                const end = this.convertFeatureCoordinateToBase(feature.getName(), overlap.relativeEnd);
-                contextIntervals.push(new OpenInterval(start, end));
+                contextIntervals.push(this.convertFeatureSegmentToContextCoordinates(overlap));
             }
         }
         return contextIntervals;
     }
 
     /**
-     * Parses an interval in this navigation context.  Should be formatted like "$featureName:$startBase-$endBase" OR
-     * "$featureName:$startBase-$featureName2:$endBase".  This format corresponds to UCSC-style chromosomal ranges, like
-     * "chr1:1000-chr2:1000", **except that we expect 0-indexed intervals**.
+     * Converts a context coordinate to one that ignores gaps in this instance.  Or, put another way, if we removed all
+     * gaps in this instance, what would be the context coordinate of `base` be?
+     * 
+     * @example
+     * navContext = [10bp feature, 10bp gap, 10bp feature]
+     * navContext.toGaplessCoordinate(5); // Returns 5
+     * navContext.toGaplessCoordinate(15); // Returns 10
+     * navContext.toGaplessCoordinate(25); // Returns 15
+     * 
+     * @param {number} base - the context coordinate to convert
+     * @return {number} context coordinate if gaps didn't exist
+     */
+    toGaplessCoordinate(base: number): number {
+        const featureCoordinate = this.convertBaseToFeatureCoordinate(base);
+        const featureIndex = this._features.findIndex(feature => feature === featureCoordinate.feature);
+        const gapFeaturesBefore = this._features.slice(0, featureIndex).filter(NavigationContext.isGapFeature);
+        let gapBasesBefore = _.sumBy(gapFeaturesBefore, feature => feature.getLength());
+        if (NavigationContext.isGapFeature(featureCoordinate.feature)) {
+            gapBasesBefore += featureCoordinate.relativeStart;
+        }
+        return base - gapBasesBefore;
+    }
+
+    /**
+     * Parses an location in this navigation context.  Should be formatted like "$chrName:$startBase-$endBase" OR
+     * "$featureName".  We expect 0-indexed intervals.
      * 
      * Returns an open interval of context coordinates.  Throws RangeError on parse failure.
      *
@@ -201,34 +208,22 @@ class NavigationContext {
      * @throws {RangeError} when parsing an interval outside of the context or something otherwise nonsensical
      */
     parse(str: string): OpenInterval {
-        str = str.trim();
-        let startName, endName, startBase, endBase;
-        let singleFeatureMatch, multiFeatureMatch;
-        // eslint-disable-next-line no-cond-assign
-        singleFeatureMatch = str.match(/([\w:]+)\W+(\d+)\W+(\d+)/);
-        multiFeatureMatch = str.match(/([\w:]+)\W+(\d+)-([\w:]+)\W+(\d+)/);
-        if ((singleFeatureMatch) !== null) {
-            startName = singleFeatureMatch[1];
-            endName = startName;
-            startBase = Number.parseInt(singleFeatureMatch[2], 10);
-            endBase = Number.parseInt(singleFeatureMatch[3], 10);
-        // eslint-disable-next-line no-cond-assign
-        } else if ((multiFeatureMatch) !== null) {
-            startName = multiFeatureMatch[1];
-            endName = multiFeatureMatch[3];
-            startBase = Number.parseInt(multiFeatureMatch[2], 10);
-            endBase = Number.parseInt(multiFeatureMatch[4], 10);
-        } else {
-            throw new RangeError("Couldn't parse coordinates");
+        const intervalMatch = str.match(/([\w:]+)\W+(\d+)\W+(\d+)/);
+        if (intervalMatch) {
+            const locus = ChromosomeInterval.parse(str);
+            const contextCoords = this.convertGenomeIntervalToBases(locus)[0];
+            if (!contextCoords) {
+                throw new RangeError('Location unavailable in this context');
+            } else {
+                return contextCoords;
+            }
         }
 
-        const startCoordinate = this.convertFeatureCoordinateToBase(startName, startBase);
-        const endCoordinate = this.convertFeatureCoordinateToBase(endName, endBase);
-        if (startCoordinate < endCoordinate) {
-            return new OpenInterval(startCoordinate, endCoordinate);
-        } else {
-            throw new RangeError("Start must be before end");
+        const feature = this._features.find(feature => feature.getName() === str);
+        if (!feature) {
+            throw new RangeError(`Could not find feature or chromosome with name of "${str}"`);
         }
+        return this.convertFeatureSegmentToContextCoordinates(new FeatureSegment(feature));
     }
 
     /**
@@ -236,14 +231,17 @@ class NavigationContext {
      * 
      * @param {number} queryStart - (inclusive) start of interval, as a context coordinate
      * @param {number} queryEnd - (exclusive) end of interval, as a context coordinate
+     * @param {boolean} [includeGaps] - whether to include gaps in the results.  Default: true
      * @return {FeatureSegment[]} list of feature intervals
      */
-    getFeaturesInInterval(queryStart: number, queryEnd: number): FeatureSegment[] {
+    getFeaturesInInterval(queryStart: number, queryEnd: number, includeGaps=true): FeatureSegment[] {
         const queryInterval = new OpenInterval(queryStart, queryEnd);
-        const results = []
-        for (let i = 0; i < this._features.length; i++) { // Check each feature for overlap with the query interval
-            const feature = this._features[i];
-            const start = this._featureStarts[i];
+        const results = [];
+        for (const feature of this._features) { // Check each feature for overlap with the query interval
+            if (!includeGaps && NavigationContext.isGapFeature(feature)) {
+                continue;
+            }
+            const start = this.getFeatureStart(feature);
             const end = start + feature.getLength(); // Noninclusive
             const overlap = new OpenInterval(start, end).getOverlap(queryInterval);
 
@@ -269,9 +267,9 @@ class NavigationContext {
      * @return {ChromosomeInterval[]} list of genomic locations
      */
     getLociInInterval(queryStart: number, queryEnd: number) {
-        const featureSegments = this.getFeaturesInInterval(queryStart, queryEnd);
-        const genomeIntervals = featureSegments.map(interval => interval.getGenomeCoordinates());
-        return ChromosomeInterval.mergeOverlaps(genomeIntervals);
+        const featureSegments = this.getFeaturesInInterval(queryStart, queryEnd, false);
+        const loci = featureSegments.map(interval => interval.getLocus());
+        return ChromosomeInterval.mergeOverlaps(loci);
     }
 }
 

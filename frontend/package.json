@@ -10,7 +10,9 @@
     "storybook": "start-storybook -p 9009 -s public",
     "test": "react-app-rewired test --env=jsdom --scripts-version react-scripts-ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "json5": "^1.0.1"
+  },
   "devDependencies": {
     "@storybook/addon-actions": "^3.3.15",
     "@storybook/addon-links": "^3.3.15",

@@ -12,22 +12,17 @@ import { GenomeInteraction } from './GenomeInteraction';
 export interface PlacedFeature {
     feature: Feature; // The feature
     /**
-     * The location of the feature in navigation context coordinates.  The programmer should not assume that this
-     * interval's length is equal to the feature's length, because some parts of the feature might not exist in the
-     * navigation context (suppose that the context only contains chr1:50-100 but the feature is chr1:0-200).
+     * The feature's *visible* part.  "Visible" means the parts of the feature that lie inside the nav context, as some
+     * parts might fall outside.  For example, the feature is chr1:0-200 but the context only contains chr1:50-100.
      */
-    contextLocation: OpenInterval;
-    xSpan: OpenInterval; // Horizontal location the feature should occupy
+    visiblePart: FeatureSegment;
+    contextLocation: OpenInterval; // The feature's *visible* part in navigation context coordinates
+    xSpan: OpenInterval; // Horizontal location of the feature's *visible* part
 }
 
 export interface PlacedSegment {
-    segment: FeatureSegment; // The segment
-    /**
-     * Location of the segment in nav context coordiantes.  See note for contextLocation in PlacedFeature for important
-     * details.
-     */
-    contextLocation: OpenInterval;
-    offsetRelativeToFeature: number; // Location of the context location relative to the feature's start
+    segment: FeatureSegment; // The segment, truncated to the visible part
+    xSpan: OpenInterval; // The x span of the segment
 }
 
 export class PlacedInteraction {
@@ -76,14 +71,17 @@ export class FeaturePlacer {
      */
     placeFeatures(features: Feature[], viewRegion: DisplayedRegionModel, width: number): PlacedFeature[] {
         const drawModel = new LinearDrawingModel(viewRegion, width);
+        const viewRegionBounds = viewRegion.getContextCoordinates();
         const navContext = viewRegion.getNavigationContext();
 
         const placements = [];
         for (const feature of features) {
-            for (const contextLocation of feature.computeNavContextCoordinates(navContext)) {
-                const xSpan = drawModel.baseSpanToXSpan(contextLocation, true);
-                if (xSpan) {
-                    placements.push({ feature, contextLocation, xSpan });
+            for (let contextLocation of feature.computeNavContextCoordinates(navContext)) {
+                contextLocation = contextLocation.getOverlap(viewRegionBounds); // Clamp the location to view region
+                if (contextLocation) {
+                    const xSpan = drawModel.baseSpanToXSpan(contextLocation);
+                    const visiblePart = this._getVisibleSegment(feature, navContext, contextLocation);
+                    placements.push({ feature, visiblePart, contextLocation, xSpan });
                 }
             }
         }
@@ -92,62 +90,66 @@ export class FeaturePlacer {
     }
 
     /**
-     * Gets the context location for feature segments, assuming that all segments are part of the same feature.  To
-     * disambiguate when a segment maps to multiple context locations, this method also requires the context location of
-     * the parent feature, which can be obtained from `placeFeatures()`.  This effectively puts a limit on where
-     * segments may map; there may be fewer placed segments than input segments.
+     * Gets the visible part of a feature after it has been placed in a navigation context.
      * 
-     * @param {FeatureSegment[]} segments - segments for which to get context locations
-     * @param {NavigationContext} navContext - navigation context to map to
-     * @param {OpenInterval} contextLocationOfFeature - context location of the feature from which the segments came
-     * @return {PlacedSegment[]} placed segments
+     * @param {Feature} feature - feature placed in a navigation context
+     * @param {NavigationContext} contextLocation - navigation context in which the feature was placed
+     * @param {OpenInterval} navContext - the feature's visible part in navigation context coordinates
+     * @return {FeatureSegment} - the visible part of the feature
      */
-    placeFeatureSegments(segments: FeatureSegment[], navContext: NavigationContext,
-        contextLocationOfFeature: OpenInterval): PlacedSegment[]
-    {
-        /**
-         * Convert mapped context location to genomic coordinates, so we can directly compare it to the segment's locus.
-         * This expression assumes the mapped location only spans one chromosome, which it should, because the feature
-         * should only span one chromosome as well.
-         */
-        const locusOfContextLocation = navContext
-            .convertBaseToFeatureCoordinate(contextLocationOfFeature.start) 
-            .getGenomeCoordinates();
-        const results = [];
+    _getVisibleSegment(feature: Feature, navContext: NavigationContext, contextLocation: OpenInterval): FeatureSegment {
+        const placedLocus = navContext.convertBaseToFeatureCoordinate(contextLocation.start).getLocus();
+        const distFromFeatureLocus = placedLocus.start - feature.getLocus().start;
+        const relativeStart = Math.max(0, distFromFeatureLocus);
+        return new FeatureSegment(feature, relativeStart, relativeStart + contextLocation.getLength());
+    }
+
+    /**
+     * Gets draw spans for feature segments, given a parent feature that has already been placed.
+     * 
+     * @param {PlacedFeature} placedFeature 
+     * @param {FeatureSegment[]} segments 
+     * @return {PlacedSegment[]}
+     */
+    placeFeatureSegments(placedFeature: PlacedFeature, segments: FeatureSegment[]): PlacedSegment[] {
+        const pixelsPerBase = placedFeature.xSpan.getLength() / placedFeature.contextLocation.getLength();
+        const placements = [];
         for (const segment of segments) {
-            // Distance of the segment's start from the mapped locus's start.  A positive value means the context
-            // location of the segment starts after the context location of the feature.
-            const distFromParentLocation = segment.getGenomeCoordinates().start - locusOfContextLocation.start;
-            // Context location of the start of the segment
-            const contextStart = contextLocationOfFeature.start + distFromParentLocation;
-            const unsafeContextLocation = new OpenInterval(contextStart, contextStart + segment.getLength());
-            const contextLocation = unsafeContextLocation.getOverlap(contextLocationOfFeature);
-            if (contextLocation) {
-                results.push({
-                    segment,
-                    contextLocation,
-                    offsetRelativeToFeature: segment.relativeStart + Math.max(0, distFromParentLocation)
+            const visibleSegment = segment.getOverlap(placedFeature.visiblePart);
+            if (visibleSegment) {
+                const basesFromVisiblePart = visibleSegment.relativeStart - placedFeature.visiblePart.relativeStart;
+                const distanceFromXSpan = basesFromVisiblePart * pixelsPerBase;
+                const xSpanStart = placedFeature.xSpan.start + distanceFromXSpan;
+                const xSpanLength = visibleSegment.getLength() * pixelsPerBase;
+                placements.push({
+                    segment: visibleSegment,
+                    xSpan: new OpenInterval(xSpanStart, xSpanStart + xSpanLength)
                 });
             }
         }
-        return results;
+
+        return placements;
     }
 
     placeInteractions(interactions: GenomeInteraction[], viewRegion: DisplayedRegionModel,
         width: number): PlacedInteraction[]
     {
         const drawModel = new LinearDrawingModel(viewRegion, width);
+        const viewRegionBounds = viewRegion.getContextCoordinates();
         const navContext = viewRegion.getNavigationContext();
 
         const mappedInteractions = [];
         for (const interaction of interactions) {
-            const contextLocations1 = navContext.convertGenomeIntervalToBases(interaction.locus1);
-            const contextLocations2 = navContext.convertGenomeIntervalToBases(interaction.locus2);
+            let contextLocations1 = navContext.convertGenomeIntervalToBases(interaction.locus1);
+            let contextLocations2 = navContext.convertGenomeIntervalToBases(interaction.locus2);
+            // Clamp the locations to the view region
+            contextLocations1 = contextLocations1.map(location => location.getOverlap(viewRegionBounds));
+            contextLocations2 = contextLocations2.map(location => location.getOverlap(viewRegionBounds));
             for (const location1 of contextLocations1) {
                 for (const location2 of contextLocations2) {
-                    const xSpan1 = drawModel.baseSpanToXSpan(location1, true);
-                    const xSpan2 = drawModel.baseSpanToXSpan(location2, true);
-                    if (xSpan1 && xSpan2) {
+                    if (location1 && location2) {
+                        const xSpan1 = drawModel.baseSpanToXSpan(location1);
+                        const xSpan2 = drawModel.baseSpanToXSpan(location2);
                         mappedInteractions.push(new PlacedInteraction(interaction, xSpan1, xSpan2));
                     }
                 }

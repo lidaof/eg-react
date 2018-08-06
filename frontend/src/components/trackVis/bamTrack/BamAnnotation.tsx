@@ -1,29 +1,26 @@
 import React from 'react';
-import TranslatableG from '../../TranslatableG';
-import { FeaturePlacer, PlacedSegment } from '../../../model/FeaturePlacer';
-import { AlignmentIterator, BamRecord } from '../../../model/BamRecord';
-import NavigationContext from '../../../model/NavigationContext';
-import LinearDrawingModel from '../../../model/LinearDrawingModel';
-import OpenInterval from '../../../model/interval/OpenInterval';
+import { TranslatableG } from '../../TranslatableG';
+import { FeaturePlacer, PlacedSegment, PlacedFeature } from '../../../model/FeaturePlacer';
+import { BamRecord } from '../../../model/BamRecord';
+import { AlignmentIterator } from '../../../model/alignment/AlignmentStringUtils';
 
 const HEIGHT = 10;
 const MIN_DRAW_WIDTH = 0.5 // Pixels
 const FEATURE_PLACER = new FeaturePlacer();
 
+export interface BamAnnotationOptions {
+    color?: string;
+    color2?: string;
+    mismatchColor?: string;
+    deletionColor?: string;
+    insertionColor?: string;
+}
+
 interface BamAnnotationProps {
-    record: BamRecord;
-    navContext: NavigationContext;
-    contextLocation: OpenInterval;
-    drawModel: LinearDrawingModel;
-    y: number;
-    options: {
-        color: string;
-        color2: string;
-        mismatchColor: string;
-        deletionColor: string;
-        insertionColor: string;
-    };
-    onClick(event: MouseEvent, record: BamRecord): void;
+    placedRecord: PlacedFeature;
+    options: BamAnnotationOptions;
+    y?: number;
+    onClick(event: React.MouseEvent, record: BamRecord): void;
 }
 
 /**
@@ -33,6 +30,10 @@ interface BamAnnotationProps {
  */
 export class BamAnnotation extends React.Component<BamAnnotationProps, {}> {
     static HEIGHT = HEIGHT;
+
+    static defaultProps = {
+        options: {}
+    };
 
     constructor(props: BamAnnotationProps) {
         super(props);
@@ -48,36 +49,39 @@ export class BamAnnotation extends React.Component<BamAnnotationProps, {}> {
      * @return {JSX.Element[]} the elements to render
      */
     renderRead(placedSegment: PlacedSegment) {
-        const {segment, contextLocation, offsetRelativeToFeature} = placedSegment;
-        const {record, drawModel, options} = this.props;
+        const {segment, xSpan} = placedSegment;
+        const record = segment.feature as BamRecord;
+        const options = this.props.options;
         // First, determine if we should draw this segment at all
-        const width = drawModel.basesToXWidth(segment.getLength());
-        if (width < MIN_DRAW_WIDTH) {
+        if (xSpan.getLength() < MIN_DRAW_WIDTH) {
             return null;
         }
 
         // A rect covering the entire segment
         const elements = [<rect
             key={segment.relativeStart}
-            x={drawModel.baseToX(contextLocation.start)}
+            x={xSpan.start}
             y={0}
-            width={width}
+            width={xSpan.getLength()}
             height={HEIGHT}
             fill={ record.getIsForwardStrand() ? options.color : options.color2 }
         />];
 
         // Check if we should be drawing sequence mismatches/misalignments
-        const widthOfOneBase = drawModel.basesToXWidth(1)
+        const widthOfOneBase = xSpan.getLength() / segment.getLength();
         if (widthOfOneBase < MIN_DRAW_WIDTH) {
             return elements; // No use drawing individual bases
         }
 
         const alignment = record.getAlignment();
         const referenceIter = new AlignmentIterator(alignment.reference);
-        referenceIter.advanceN(offsetRelativeToFeature);
+        referenceIter.advanceN(segment.relativeStart);
         let alignIndex = referenceIter.getIndexOfNextBase();
+        const maxIndex = alignIndex + segment.getLength();
+        
+        let x = xSpan.start;
         // For each base in the reference sequence...
-        for (let i = 0; i < contextLocation.getLength(); i++, alignIndex++) {
+        for (; alignIndex < maxIndex; alignIndex++, x += widthOfOneBase) {
             if (alignment.reference.charAt(alignIndex) === alignment.read.charAt(alignIndex)) {
                 // Sequence match; do nothing
                 continue;
@@ -90,8 +94,9 @@ export class BamAnnotation extends React.Component<BamAnnotationProps, {}> {
                 const color = alignment.read.charAt(alignIndex) === '-' ? options.deletionColor : options.mismatchColor;
                 elements.push(<rect
                     key={'mismatch' + alignIndex}
-                    x={drawModel.baseToX(contextLocation.start + i)}
-                    y={0} width={widthOfOneBase}
+                    x={x}
+                    y={0}
+                    width={widthOfOneBase}
                     height={HEIGHT}
                     fill={color}
                 />);
@@ -107,32 +112,29 @@ export class BamAnnotation extends React.Component<BamAnnotationProps, {}> {
      * @return {JSX.Element} the element to render
      */
     renderSkip(placedSegment: PlacedSegment) {
-        const {segment, contextLocation} = placedSegment;
-        // contextLocation is the segment's context location, not to be confused with `this.props.contextLocation`,
-        // which is the location of the BamRecord.
-        const drawModel = this.props.drawModel;
-        const length = drawModel.basesToXWidth(segment.getLength());
-        if (length < MIN_DRAW_WIDTH) {
+        const xSpan = placedSegment.xSpan;
+        if (xSpan.getLength() < MIN_DRAW_WIDTH) {
             return null;
         }
 
-        const x1 = drawModel.baseToX(contextLocation.start);
+        const [x1, x2] = xSpan;
         const y = HEIGHT/2;
-        return <line key={x1} x1={x1} y1={y} x2={x1 + length} y2={y} stroke="grey" />;
+        return <line key={x1} x1={x1} y1={y} x2={x2} y2={y} stroke="grey" />;
     }
 
-    handleClick(event: MouseEvent) {
-        this.props.onClick(event, this.props.record);
+    handleClick(event: React.MouseEvent) {
+        this.props.onClick(event, this.props.placedRecord.feature as BamRecord);
     }
 
     render() {
-        const {record, navContext, contextLocation} = this.props;
+        const placedRecord = this.props.placedRecord;
+        const record = this.props.placedRecord.feature as BamRecord;
         const segments = record.getSegments();
-        const placedAligned = FEATURE_PLACER.placeFeatureSegments(segments.aligned, navContext, contextLocation);
-        const placedSkipped = FEATURE_PLACER.placeFeatureSegments(segments.skipped, navContext, contextLocation);
+        const placedAligned = FEATURE_PLACER.placeFeatureSegments(placedRecord, segments.aligned);
+        const placedSkipped = FEATURE_PLACER.placeFeatureSegments(placedRecord, segments.skipped);
         return <TranslatableG y={this.props.y} onClick={this.handleClick} >
             {placedSkipped.map(this.renderSkip)}
             {placedAligned.map(this.renderRead)}
-        </TranslatableG>
+        </TranslatableG>;
     }
 }

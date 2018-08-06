@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 import Gene from '../../../model/Gene';
-import { DEFAULT_CATEGORY_COLORS } from './GeneAnnotation';
+import { DEFAULT_CATEGORY_COLORS, GeneAnnotation } from './GeneAnnotation';
 
 import '../commonComponents/tooltip/Tooltip.css';
 
@@ -19,6 +19,7 @@ class GeneDetail extends React.PureComponent {
 
     render() {
         const gene = this.props.gene;
+        const colors = GeneAnnotation.getDrawColors(gene);
         return <div style={{maxWidth: 400}}>
             <FeatureDetail feature={gene} />
             <i>{gene.description}</i>
@@ -26,8 +27,7 @@ class GeneDetail extends React.PureComponent {
                 {
                 gene.transcriptionClass && 
                     <span>
-                        Transcription class: <span style={{color:DEFAULT_CATEGORY_COLORS[gene.transcriptionClass]}} >
-                        {gene.transcriptionClass}</span>
+                        Transcription class: <span style={{color: colors.color}} >{gene.transcriptionClass}</span>
                     </span>
                 }
             </div>

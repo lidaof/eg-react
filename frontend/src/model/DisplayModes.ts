@@ -13,3 +13,8 @@ export enum InteractionDisplayMode {
     HEATMAP = "heatmap",
     ARC = "arc",
 };
+
+export const GenomeAlignDisplayModes = {
+    ROUGH: "rough",
+    FINE: "fine",
+};

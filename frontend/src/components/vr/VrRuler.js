@@ -43,7 +43,7 @@ class VrRuler extends React.Component {
 
     _makeLines() {
         const lineFactory = new VrRulerLineFactory(this.props.tickHeight);
-        const lineDesign = new RulerDesigner(this.props.viewRegion, this.props.width, lineFactory).design();
+        const lineDesign = new RulerDesigner(1, lineFactory).design(this.props.viewRegion, this.props.width);
         let lineVertices = [];
         for (let data of lineDesign) {
             if (data != null) {
@@ -58,7 +58,7 @@ class VrRuler extends React.Component {
 
     _makeText() {
         const textFactory = new VrRulerTextFactory(FONT_SIZE, this.state.font);
-        const textDesign = new RulerDesigner(this.props.viewRegion, this.props.width, textFactory).design();
+        const textDesign = new RulerDesigner(1, textFactory).design(this.props.viewRegion, this.props.width);
         const mergedGeometry = mergeGeometries(textDesign.filter(element => element != null));
         return new window.THREE.Mesh(mergedGeometry, MATERIAL);
     }

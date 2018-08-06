@@ -12,4 +12,6 @@ export interface GenomeConfig {
     defaultTracks: TrackModel[];
     publicHubData: any;
     publicHubList: any[];
+    annotationTracks: any;
+    twoBitURL?: string;
 }

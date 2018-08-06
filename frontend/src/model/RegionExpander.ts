@@ -1,12 +1,38 @@
-import OpenInterval from "./interval/OpenInterval";
-import DisplayedRegionModel from "./DisplayedRegionModel";
+import memoizeOne from 'memoize-one';
+import OpenInterval from './interval/OpenInterval';
+import DisplayedRegionModel from './DisplayedRegionModel';
+
+/**
+ * Data describing an expanded view region.
+ */
+export interface ViewExpansion {
+    /**
+     * Total width, in pixels, of the expanded view
+     */
+    visWidth: number;
+
+    /**
+     * Expanded region
+     */
+    visRegion: DisplayedRegionModel;
+
+    /**
+     * The X range of pixels that would display the unexpanded region
+     */
+    viewWindow: OpenInterval;
+
+    /**
+     * Unexpanded region; the region displayed in the viewWindow
+     */
+    viewWindowRegion: DisplayedRegionModel;
+}
 
 /**
  * Utility class that does calculations related to expanding view regions for the purposes of scrolling.
  * 
  * @author Silas Hsu
  */
-class RegionExpander {
+export class RegionExpander {
     static DEFAULT_EXPANSION = 1;
 
     /**
@@ -24,29 +50,20 @@ class RegionExpander {
     constructor(public multipleOnEachSide: number=RegionExpander.DEFAULT_EXPANSION) {
         this.multipleOnEachSide = multipleOnEachSide;
         this.zoomRatio = 2 * multipleOnEachSide + 1;
+        this.calculateExpansion = memoizeOne(this.calculateExpansion);
     }
-
-    /**
-     * Return object of calculateExpansion.  Note that the length of `viewWindow` equals the original width provided to
-     * the method.
-     * 
-     * @typedef {Object} RegionExpander~ExpansionData
-     * @property {number} expandedWidth - total width, in pixels, of the expanded view
-     * @property {DisplayedRegionModel} expandedRegion - model of expanded region
-     * @property {OpenInterval} viewWindow - the X range of pixels that would display the unexpanded region
-     */
 
     /**
      * Calculates an expansion of a view region from the input pixel width and region model.  Returns both the expanded
      * region and how many pixels on each side of the orignal view to allocate to display additional data.  Handles
      * cases such expanding near the edge of the genome, so that views will always remain inside the genome.
      * 
-     * @param {number} width - the width, in pixels, of the view to expand
      * @param {DisplayedRegionModel} region - the region that the unexpanded view will show
-     * @return {RegionExpander~ExpansionData} - data representing aspects of an expanded region
+     * @param {number} visWidth - the width, in pixels, of the view to expand
+     * @return {ViewExpansion} - data representing aspects of an expanded region
      */
-    calculateExpansion(width: number, region: DisplayedRegionModel) {
-        const pixelsPerBase = width / region.getWidth();
+    calculateExpansion(region: DisplayedRegionModel, visWidth: number): ViewExpansion {
+        const pixelsPerBase = visWidth / region.getWidth();
         const expandedRegion = region.clone().zoom(this.zoomRatio);
         const expandedWidth = expandedRegion.getWidth() * pixelsPerBase;
 
@@ -59,11 +76,10 @@ class RegionExpander {
         const rightExtraPixels = rightBaseDiff * pixelsPerBase;
 
         return {
-            width: expandedWidth,
-            viewRegion: expandedRegion,
+            visWidth: expandedWidth,
+            visRegion: expandedRegion,
             viewWindow: new OpenInterval(leftExtraPixels, expandedWidth - rightExtraPixels),
+            viewWindowRegion: region,
         };
     }
 }
-
-export default RegionExpander;

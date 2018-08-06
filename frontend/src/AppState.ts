@@ -15,23 +15,23 @@ if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  
     const storage = {};
 
     STORAGE = {
-      setItem(key: string, value: any) {
-        storage[key] = value || '';
-      },
-      getItem(key: string) {
-        return key in storage ? storage[key] : null;
-      },
-      removeItem(key: string) {
-        delete storage[key];
-      },
-      get length() {
-        return Object.keys(storage).length;
-      },
-      key(i: number) {
-        const keys = Object.keys(storage);
-        return keys[i] || null;
-      }
-    };    
+        setItem(key: string, value: any) {
+            storage[key] = value || '';
+        },
+        getItem(key: string) {
+            return key in storage ? storage[key] : null;
+        },
+        removeItem(key: string) {
+            delete storage[key];
+        },
+        get length() {
+            return Object.keys(storage).length;
+        },
+        key(i: number) {
+            const keys = Object.keys(storage);
+            return keys[i] || null;
+        }
+    };
 }
 const SESSION_KEY = "eg-react-session";
 export const MIN_VIEW_REGION_SIZE = 5;
@@ -151,12 +151,20 @@ function getNextState(prevState: AppState, action: AppAction) {
                 tracks: nextTracks
             };
         case ActionTypes.SET_VIEW_REGION:
-            if (!prevState.viewRegion || action.end - action.start < MIN_VIEW_REGION_SIZE) {
+            if (!prevState.viewRegion) {
                 return prevState;
-            } else {
-                const newRegion = prevState.viewRegion.clone().setRegion(action.start, action.end);
-                return { ...prevState, viewRegion: newRegion };
             }
+
+            let {start, end} = action;
+            const newLength = end - start;
+            if (newLength < MIN_VIEW_REGION_SIZE) {
+                const amountToExpand = 0.5 * (MIN_VIEW_REGION_SIZE - newLength);
+                start -= amountToExpand;
+                end += amountToExpand;
+            }
+
+            const newRegion = prevState.viewRegion.clone().setRegion(start, end);
+            return { ...prevState, viewRegion: newRegion };
         case ActionTypes.SET_TRACKS:
             return { ...prevState, tracks: action.tracks };
         case ActionTypes.SET_METADATA_TERMS:

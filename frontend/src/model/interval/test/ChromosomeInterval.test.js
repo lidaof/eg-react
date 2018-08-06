@@ -32,7 +32,7 @@ describe("mergeOverlaps", () => {
             new ChromosomeInterval("chr2", 0, 10),
             new ChromosomeInterval("chr2", 11, 12),
         ]);
-        expect(new Set(ChromosomeInterval.mergeOverlaps(INPUT))).toEqual(EXPECTED)
+        expect(new Set(ChromosomeInterval.mergeOverlaps(INPUT, 0))).toEqual(EXPECTED)
     });
 });
 

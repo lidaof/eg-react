@@ -4,7 +4,7 @@ import _ from 'lodash';
 import OpenInterval from './interval/OpenInterval';
 import { FeatureSegment } from './interval/FeatureSegment';
 
-/**FeatureSegment
+/**
  * A data container for gene annotations.
  *
  * @author Daofeng Li and Silas Hsu

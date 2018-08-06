@@ -1,6 +1,6 @@
 import Chromosome from '../Chromosome';
 import Genome from '../Genome';
-import TrackModel from '../../../model/TrackModel';
+import TrackModel from '../../TrackModel';
 import cytobands from './cytoBand.json';
 
 const genome = new Genome("mm10", [
@@ -48,13 +48,13 @@ const defaultTracks = [
 ];
 
 const publicHubData = {
-    "4D Nucleome Network": "The 4D Nucleome Network aims to understand the principles underlying nuclear organization " + 
-    "in space and time, the role nuclear organization plays in gene expression and cellular function, and how changes " 
-    + "in nuclear organization affect normal development as well as various diseases. The program is developing novel " 
-    + "tools to explore the dynamic nuclear architecture and its role in gene expression programs, " + 
-    "models to examine the relationship between nuclear organization and function, " + 
-    "and reference maps of nuclear architecture in a variety of cells and tissues as a community resource.",
-}
+    "4D Nucleome Network": "The 4D Nucleome Network aims to understand the principles underlying nuclear " + 
+    "organization in space and time, the role nuclear organization plays in gene expression and cellular function, " +
+    "and how changes in nuclear organization affect normal development as well as various diseases.  The program is " +
+    "developing novel tools to explore the dynamic nuclear architecture and its role in gene expression programs, " + 
+    "models to examine the relationship between nuclear organization and function, and reference maps of nuclear" + 
+    "architecture in a variety of cells and tissues as a community resource."
+};
 
 const publicHubList = [
     {

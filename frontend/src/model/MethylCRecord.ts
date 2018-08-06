@@ -3,11 +3,11 @@ import ChromosomeInterval from './interval/ChromosomeInterval';
 import _ from 'lodash';
 import BedRecord from '../dataSources/bed/BedRecord';
 
-const RecordInfoIndices = {
-    CONTEXT: 3,
-    VALUE: 4,
-    DEPTH: 6,
-    STRAND: 5
+enum MethylRecordColumnIndex {
+    CONTEXT=3,
+    VALUE=4,
+    STRAND=5,
+    DEPTH=6
 };
 
 interface AggregationByRecordsResult {
@@ -104,10 +104,10 @@ class MethylCRecord extends Feature {
     depth: number;
     constructor(bedRecord: BedRecord) {
         const locus = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
-        super('', locus,bedRecord[RecordInfoIndices.STRAND]);
-        this.context = bedRecord[RecordInfoIndices.CONTEXT]
-        this.value = Number.parseFloat(bedRecord[RecordInfoIndices.VALUE]); // methylation value, from 0 to 1
-        this.depth = Number.parseInt(bedRecord[RecordInfoIndices.DEPTH], 10); // read depth
+        super('', locus,bedRecord[MethylRecordColumnIndex.STRAND]);
+        this.context = bedRecord[MethylRecordColumnIndex.CONTEXT]
+        this.value = Number.parseFloat(bedRecord[MethylRecordColumnIndex.VALUE]); // methylation value, from 0 to 1
+        this.depth = Number.parseInt(bedRecord[MethylRecordColumnIndex.DEPTH], 10); // read depth
     }
 }
 

@@ -21,7 +21,7 @@ export default class OpenInterval implements IOpenInterval {
      * @param {number} end - end of the interval, exclusive
      * @throws {RangeError} if the end is less than the start
      */
-    constructor(public start: number, public end: number) {
+    constructor(public readonly start: number, public readonly end: number) {
         if (end < start) {
             throw new RangeError("End cannot be less than start");
         }

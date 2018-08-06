@@ -6,7 +6,7 @@ import Track from './commonComponents/Track';
 import AnnotationTrack from './commonComponents/annotation/AnnotationTrack';
 import TrackLegend from './commonComponents/TrackLegend';
 import Tooltip from './commonComponents/tooltip/Tooltip';
-import withTooltip from './commonComponents/tooltip/withTooltip';
+import { withTooltip } from './commonComponents/tooltip/withTooltip';
 import configOptionMerging from './commonComponents/configOptionMerging';
 
 import { RepeatMaskerFeature } from '../../model/RepeatMaskerFeature';
@@ -35,7 +35,6 @@ const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 class RepeatTrack extends React.PureComponent {
     static propTypes = Object.assign({},
         Track.propsFromTrackContainer,
-        withTooltip.INJECTED_PROPS,
         {
         data: PropTypes.array.isRequired, //PropTypes.arrayOf(PropTypes.instanceOf(RepeatMaskerFeature)).isRequired,
         }
@@ -59,39 +58,40 @@ class RepeatTrack extends React.PureComponent {
     }
 
     /**
-     * Renders one bar.
+     * Renders a group of bars.
      * 
-     * @param {PlacedFeature} placedFeature - feature and draw location
-     * @param {any} unused - unused
-     * @param {any} unused2 - unused
-     * @param {number} index - iteration index
+     * @param {PlacedFeatureGroup} placedGroup - features and draw location
      * @return {JSX.Element} element visualizing the feature
      */
-    renderAnnotation(placedFeature, unused, unused2, index) {
-        const {feature, xSpan} = placedFeature;
-        if (xSpan.getLength() <= 0) {
-            return null;
-        }
+    renderAnnotation(placedGroup) {
         const {categoryColors, height} = this.props.options;
-        const categoryId = feature.getCategoryId();
-        const color = categoryColors[categoryId];
 
-        const y = this.state.valueToY(feature.value);
-        const drawHeight = height - y;
-        if (drawHeight <= 0) {
-            return null;
-        }
+        return placedGroup.placedFeatures.map((placement, i) => {
+            const {xSpan, feature} = placement;
+            if (placement.xSpan.getLength <= 0) {
+                return null;
+            }
 
-        return <rect
-            key={index}
-            x={xSpan.start}
-            y={y}
-            width={xSpan.getLength()}
-            height={drawHeight}
-            fill={color}
-            fillOpacity={0.75}
-            onClick={event => this.renderTooltip(event, feature)}
-        />;
+            const categoryId = feature.getCategoryId();
+            const color = categoryColors[categoryId];
+
+            const y = this.state.valueToY(feature.value);
+            const drawHeight = height - y;
+            if (drawHeight <= 0) {
+                return null;
+            }
+
+            return <rect
+                key={i}
+                x={xSpan.start}
+                y={y}
+                width={xSpan.getLength()}
+                height={drawHeight}
+                fill={color}
+                fillOpacity={0.75}
+                onClick={event => this.renderTooltip(event, feature)}
+            />;
+        });
     }
 
     /**

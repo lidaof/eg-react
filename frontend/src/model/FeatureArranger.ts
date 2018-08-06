@@ -2,40 +2,44 @@ import DisplayedRegionModel from './DisplayedRegionModel';
 import { Feature } from './Feature';
 import { FeaturePlacer, PlacedFeature } from './FeaturePlacer';
 import LinearDrawingModel from './LinearDrawingModel';
+import OpenInterval from './interval/OpenInterval';
 
-/**
- * Draw information for a Feature, plus row
- */
-export interface PlacedFeatureWithRow extends PlacedFeature {
-    row: number; // The row assignment, indexed from 0
+export interface PlacedFeatureGroup {
+    feature: Feature;
+    row: number;
+    xSpan: OpenInterval;
+    placedFeatures: PlacedFeature[];
 }
-type PaddingFunc = (feature: Feature) => number;
+
+export type PaddingFunc = (feature: Feature) => number;
 
 /**
  * Return value from FeatureArranger::arrange()
  */
 interface FeatureArrangementResult {
-    placements: PlacedFeatureWithRow[]; // The draw locations of features that are visible
+    placements: PlacedFeatureGroup[]; // The draw locations of features that are visible
     numRowsAssigned: number; // Number of rows required to view all features
     numHidden: number; // Number of features omitted from featureArrangement
 }
+
+const FEATURE_PLACER = new FeaturePlacer();
 
 export class FeatureArranger {
     /**
      * Assigns rows to each placed feature, mutating the objects.  Returns the number of rows assigned.
      * 
-     * @param {PlacedFeature[]} placements - placed features to modify
+     * @param {PlacedFeature[]} groups - placed features to modify
      * @param {number | PaddingFunc} padding - getter of padding.  See the arrange() method for more info.
      * @return {number} the number of rows assigned
      */
-    _assignRows(placements: PlacedFeature[], padding: number | PaddingFunc): number {
+    _assignRows(groups: PlacedFeatureGroup[], padding: number | PaddingFunc): number {
         const maxXsForRows: number[] = [];
         const isConstPadding = typeof padding === "number";
-        for (const placedFeature of placements) {
+        for (const group of groups) {
             const horizontalPadding = isConstPadding ?
-                (padding as number) : (padding as PaddingFunc)(placedFeature.feature);
-            const startX = placedFeature.xSpan.start - horizontalPadding;
-            const endX = placedFeature.xSpan.end + horizontalPadding;
+                (padding as number) : (padding as PaddingFunc)(group.feature);
+            const startX = group.xSpan.start - horizontalPadding;
+            const endX = group.xSpan.end + horizontalPadding;
             // Find the first row where the interval won't overlap with others in the row
             let row = maxXsForRows.findIndex(maxX => maxX < startX);
             if (row === -1) { // Couldn't find a row -- make a new one
@@ -44,10 +48,40 @@ export class FeatureArranger {
             } else {
                 maxXsForRows[row] = endX;
             }
-            (placedFeature as PlacedFeatureWithRow).row = row;
+            group.row = row;
         }
 
         return maxXsForRows.length;
+    }
+
+    _combineAdjacent(placements: PlacedFeature[]): PlacedFeatureGroup[] {
+        placements.sort((a, b) => a.xSpan.start - b.xSpan.start);
+
+        const groups: PlacedFeatureGroup[] = [];
+        for (let i = 0; i < placements.length; i++) {
+            let j = i + 1;
+            while (j < placements.length) {
+                const prevLocusEnd = placements[j - 1].visiblePart.getLocus().end;
+                const currLocusStart = placements[j].visiblePart.getLocus().start;
+                if (prevLocusEnd !== currLocusStart) { // These two segments are not genomically adjacent
+                    break;
+                }
+                j++;
+            }
+
+            const placementsInGroup = placements.slice(i, j);
+            const firstPlacement = placements[0];
+            const lastPlacement = placements[placements.length - 1];
+            groups.push({
+                feature: firstPlacement.feature,
+                row: -1,
+                xSpan: new OpenInterval(firstPlacement.xSpan.start, lastPlacement.xSpan.end),
+                placedFeatures: placementsInGroup,
+            });
+            i = j;
+        }
+
+        return groups;
     }
 
     /**
@@ -66,17 +100,20 @@ export class FeatureArranger {
      */
     arrange(features: Feature[], viewRegion: DisplayedRegionModel, width: number,
             padding: number | PaddingFunc = 0): FeatureArrangementResult
-        {
+    {
         const drawModel = new LinearDrawingModel(viewRegion, width);
         const visibleFeatures = features.filter(feature => drawModel.basesToXWidth(feature.getLength()) >= 0.5);
 
-        const placer = new FeaturePlacer();
-        const placements = placer.placeFeatures(visibleFeatures, viewRegion, width);
-        const numRowsAssigned = this._assignRows(placements, padding);
+        const results: PlacedFeatureGroup[] = [];
+        for (const feature of visibleFeatures) {
+            const placements = FEATURE_PLACER.placeFeatures([feature], viewRegion, width);
+            results.push(...this._combineAdjacent(placements));
+        }
+        const numRowsAssigned = this._assignRows(results, padding);
         return {
-            placements: placements as PlacedFeatureWithRow[],
+            placements: results,
             numRowsAssigned,
-            numHidden: features.length - visibleFeatures.length,
+            numHidden: features.length - visibleFeatures.length
         };
     }
 }

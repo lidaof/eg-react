@@ -7,9 +7,26 @@ export interface TrackOptions {
 
 interface ITrackModelMetadata {
     'Track Type'?: string;
+    genome?: string;
     [k: string]: any;
 }
 
+/**
+ * Serialized track model, or the plain object argument to TrackModel's constructor.
+ * 
+ * @example
+ * {
+ *     type: 'bigWig',
+ *     name: 'My bigwig track',
+ *     options: {
+ *         color: 'blue'
+ *     },
+ *     url: 'https://example.com',
+ *     metadata: {
+ *         genome: 'hg19'
+ *     }
+ * }
+ */
 interface ITrackModel {
     name: string;
     type?: string;
@@ -19,20 +36,6 @@ interface ITrackModel {
     metadata: ITrackModelMetadata;
 }
 
-/*
-const SCHEMA = { // Schema for the plain object argument to the constructor.
-    type: "object",
-    properties: {
-        name: {type: "string"}, // Label
-        type | filetype: {type: "string"}, // Type of data
-        options: {type: "object"},
-        url: {type: "string"},
-        // A better name for `metadata` would be `tags` or `misc`.
-        // I don't like it, but it's what our JSON files contain.  
-        metadata: {type: "object"} 
-    }
-}
-*/
 let nextId = 0;
 
 /**
@@ -100,7 +103,7 @@ export class TrackModel {
      * @returns {string}
      * @memberof TrackModel
      */
-    getMetadata(term: string): string {
+    getMetadata(term: string): string | undefined {
         const value = this.metadata[term];
         if (Array.isArray(value)) {
             return value[value.length - 1];

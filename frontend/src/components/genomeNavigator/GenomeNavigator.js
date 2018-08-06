@@ -61,8 +61,8 @@ class GenomeNavigator extends React.Component {
         const firstFeature = features[0];
         const lastFeature = features[features.length - 1];
 
-        const startBase = navContext.getFeatureStart(firstFeature.getName());
-        const endBase = navContext.getFeatureStart(lastFeature.getName()) + lastFeature.getLength();
+        const startBase = navContext.getFeatureStart(firstFeature);
+        const endBase = navContext.getFeatureStart(lastFeature) + lastFeature.getLength();
         return new DisplayedRegionModel(navContext, startBase, endBase);
     }
 
