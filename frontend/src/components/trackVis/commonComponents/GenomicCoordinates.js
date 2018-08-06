@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../../model/LinearDrawingModel'
+import NavigationContext from '../../../model/NavigationContext';
 
 /**
  * Calculates genomic coordinates at a page coordinate and displays them.
@@ -22,8 +23,13 @@ class GenomicCoordinates extends React.Component {
     render() {
         const {viewRegion, width, x} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
-        const genomeCoord = drawModel.xToGenomeCoordinate(x);
-        return `${genomeCoord.chr}:${Math.floor(genomeCoord.start)}`;
+        const segment = drawModel.xToSegmentCoordinate(x);
+        if (NavigationContext.isGapFeature(segment.feature)) {
+            return segment.getName();
+        } else {
+            const locus = segment.getLocus();
+            return `${locus.chr}:${Math.floor(locus.start)}`;
+        }
     }
 }
 

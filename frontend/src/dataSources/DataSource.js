@@ -5,15 +5,15 @@
  */
 class DataSource {
     /**
-     * Gets data in the view region.
+     * Gets data in the view region.  Default implementation returns a promise for nothing.
      * 
      * @param {DisplayedRegionModel} region - region for which to fetch data
      * @param {number} basesPerPixel - bases per pixel.  Higher = more zoomed out
-     * @param {Object} options - rendering options
+     * @param {Object} [options] - rendering options
      * @return {Promise<any>} a Promise for the data
      */
-    getData(region, basesPerPixel, options) {
-        throw new Error("Not implemented");
+    getData(region, basesPerPixel, options={}) {
+        return Promise.resolve();
     }
 
     /**

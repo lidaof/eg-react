@@ -40,7 +40,7 @@ export class Feature {
     serialize(): IFeature {
         return {
             name: this.name,
-            locus: this.locus.serialize(),
+            locus: this.getLocus().serialize(),
             strand: this.strand
         }
     }

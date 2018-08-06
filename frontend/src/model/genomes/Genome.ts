@@ -3,7 +3,7 @@ import NavigationContext from '../NavigationContext';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 import OpenInterval from '../interval/OpenInterval';
 import TrackModel from '../TrackModel';
-import Chromosome from '../genomes/Chromosome';
+import Chromosome from './Chromosome';
 
 export interface GenomeConfig {
     genome: Genome;
@@ -88,7 +88,7 @@ export class Genome {
             const name = chr.getName();
             return new Feature(name, new ChromosomeInterval(name, 0, chr.getLength()))
         });
-        return new NavigationContext(this.getName(), features, true);
+        return new NavigationContext(this.getName(), features);
     }
 }
 

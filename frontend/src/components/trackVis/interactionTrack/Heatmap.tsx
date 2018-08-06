@@ -16,8 +16,12 @@ interface HeatmapProps {
 }
 
 export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
+    static getHeight(props: HeatmapProps) {
+        return 0.5 * props.viewWindow.getLength();
+    }
+
     render() {
-        const {placedInteractions, viewWindow, width, opacityScale, color, onInteractionHovered,
+        const {placedInteractions, width, opacityScale, color, onInteractionHovered,
             onMouseOut} = this.props;
         const diamonds = [];
         for (const placedInteraction of placedInteractions) {
@@ -47,6 +51,6 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
                 onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
             />);
         }
-        return <svg width={width} height={0.5 * viewWindow.getLength()} onMouseOut={onMouseOut} >{diamonds}</svg>;
+        return <svg width={width} height={Heatmap.getHeight(this.props)} onMouseOut={onMouseOut} >{diamonds}</svg>;
     }
 }

@@ -21,8 +21,9 @@ test('xToBase()', () => {
     expect(INSTANCE.xToBase(50)).toBeCloseTo(5);
 });
 
-test('xToGenomeCoordinate()', () => {
-    const result = INSTANCE.xToGenomeCoordinate(50);
-    expect(result.chr).toBe('chr1');
-    expect(result.start).toBeCloseTo(5);
+test('xToSegmentCoordinate()', () => {
+    const result = INSTANCE.xToSegmentCoordinate(50);
+    const locus = result.getLocus();
+    expect(locus.chr).toBe('chr1');
+    expect(locus.start).toBeCloseTo(5);
 });

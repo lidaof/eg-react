@@ -1,10 +1,8 @@
 import React from 'react';
 import LinearDrawingModel from '../model/LinearDrawingModel';
 
-const MAX_MAJOR_TICKS = 15;
-const MINOR_TICKS = 5;
-const MAJOR_TICK_HEIGHT = 10; // Minor tick height is half this
-const COLOR = '#bbb';
+const MINOR_TICKS = 10;
+// For default display colors, sizes, etc. scroll down to RulerElementFactory.
 
 /**
  * Designs a ruler that displays feature coordinates.  Note that feature coordinates are not necessarily genomic
@@ -18,19 +16,18 @@ export class RulerDesigner {
      * RulerElementFactory.  There is a default RulerElementFactory implementation; see those docs to find out what
      * it returns.
      * 
-     * @param {DisplayedRegionModel} viewRegion - region to visualize
-     * @param {number} width - width of the ruler
+     * @param {number} [tickSeparationHint] - requested X separation of major ticks
      * @param {RulerElementFactory} [rulerElementFactory] - element generator
      */
-    constructor(viewRegion, width, rulerElementFactory=new RulerElementFactory()) {
-        this._viewRegion = viewRegion;
-        this._drawModel = new LinearDrawingModel(viewRegion, width);
+    constructor(tickSeparationHint=50, rulerElementFactory=new RulerElementFactory()) {
+        this._tickSeparationHint = tickSeparationHint;
         this._elementFactory = rulerElementFactory;
     }
 
     /**
      * @typedef {Object} Ruler~Unit
      * @property {number} size - the number of base pairs in this unit
+     * @property {number} digits - the number of digits after the decimal point to display
      * @property {string} name - a string that represents this unit
      */
 
@@ -45,78 +42,105 @@ export class RulerDesigner {
         if (log10BasesPerTick >= 5) { // 10K
             return {
                 size: 1000000,
+                digits: 1,
                 name: "M",
             };
         } else if (log10BasesPerTick > 2) { // 100
             return {
                 size: 1000,
+                digits: 0,
                 name: "K",
             };
+        } else {
+            return {
+                size: 1,
+                digits: 0,
+                name: "",
+            };
         }
-
-        return {
-            size: 1,
-            name: "",
-        };
     }
 
     /**
      * Designs the ruler.  Returns an array of anything, depending on the RulerElementFactory configured when this
      * object was created.
      * 
-     * @return {any[]} - ruler design
+     * @param {DisplayedRegionModel} viewRegion - the region to visualize
+     * @param {number} width - X width of the ruler
+     * @return {any[]} ruler design
      */
-    design() {
-        // If one wanted MAX_MAJOR_TICKS to represent the min number of ticks, use Math.floor() instead.
-        const log10BasesPerMajorTick = Math.ceil(Math.log10(this._viewRegion.getWidth() / MAX_MAJOR_TICKS));
+    design(viewRegion, width) {
+        const navContext = viewRegion.getNavigationContext();
+        const drawModel = new LinearDrawingModel(viewRegion, width);
+        const numMajorTicks = drawModel.getDrawWidth() / this._tickSeparationHint;
+        // If one wanted numMajorTicks to represent the min number of ticks, use Math.floor() instead.
+        const log10BasesPerMajorTick = Math.ceil(Math.log10(viewRegion.getWidth() / numMajorTicks));
         const basesPerMajorTick = Math.pow(10, log10BasesPerMajorTick); // Ensures each major tick is a power of 10.
         const basesPerMinorTick = basesPerMajorTick / MINOR_TICKS;
-        const pixelsPerMajorTick = this._drawModel.basesToXWidth(basesPerMajorTick);
+        const pixelsPerMajorTick = drawModel.basesToXWidth(basesPerMajorTick);
         const pixelsPerMinorTick = pixelsPerMajorTick / MINOR_TICKS;
         const unit = this._getMajorUnit(log10BasesPerMajorTick);
 
-        const children = [];
+        const elementFactory = this._elementFactory;
+        const elements = [];
         // The horizontal line spanning the width of the ruler
-        children.push(this._elementFactory.mainLine(this._drawModel.getDrawWidth()));
+        elements.push(elementFactory.mainLine(drawModel.getDrawWidth()));
 
-        const segments = this._viewRegion.getFeatureSegments();
+        const segments = viewRegion.getFeatureSegments(false);
         for (const segment of segments) {
-            // Start of segment's feature, in context coordinates
-            const featureContextCoordinate = this._viewRegion.getNavigationContext().getFeatureStart(segment.getName());
-            const majorTickEndX = this._drawModel.baseToX(featureContextCoordinate + segment.relativeEnd);
-            // relativeBase = round down to the nearest major tick base for this region, to find where to start drawing
-            const relativeBase = Math.floor(segment.relativeStart / basesPerMajorTick) * basesPerMajorTick;
-            let majorX = this._drawModel.baseToX(featureContextCoordinate + relativeBase);
+            const segmentLocus = segment.getLocus();
+            const segmentContextSpan = navContext.convertFeatureSegmentToContextCoordinates(segment);
+            addTicks(segmentLocus, segmentContextSpan, true); // Major
+            if (basesPerMinorTick >= 1) {
+                addTicks(segmentLocus, segmentContextSpan, false); // Minor
+            }
+        }
 
-            // This loop updates relativeBase and majorX every iteration
-            // Draw major and minor ticks for this region (chromosome)
-            while (majorX < majorTickEndX) {
-                // Major ticks
-                children.push(this._elementFactory.majorTick(majorX));
-                if (relativeBase > 0) {
-                    children.push(this._elementFactory.majorTickText(majorX, relativeBase / unit.size + unit.name));
+        return elements;
+
+        function addTicks(segmentLocus, segmentContextSpan, isMajor=true) {
+            const [segmentContextStart, segmentContextEnd] = segmentContextSpan
+            let xStart, xEnd, startBase, xPerTick, basesPerTick, getTickElement, getTextElement;
+            if (isMajor) {
+                xPerTick = pixelsPerMajorTick;
+                basesPerTick = basesPerMajorTick;
+                // For some reason, the bind()s are necessary.
+                getTickElement = elementFactory.majorTick.bind(elementFactory);
+                getTextElement = elementFactory.majorTickText.bind(elementFactory);
+            } else {
+                xPerTick = pixelsPerMinorTick;
+                basesPerTick = basesPerMinorTick;
+                getTickElement = elementFactory.minorTick.bind(elementFactory);
+                getTextElement = elementFactory.minorTickText.bind(elementFactory);
+            }
+
+            startBase = roundUp(segmentLocus.start, basesPerTick);
+            const basesRounded = startBase - segmentLocus.start;
+            xStart = drawModel.baseToX(segmentContextStart + basesRounded);
+            xEnd = drawModel.baseToX(segmentContextEnd);
+
+            let x = xStart;
+            let base = startBase;
+            while (x < xEnd) {
+                elements.push(getTickElement(x));
+                const numberToDisplay = (base / unit.size).toFixed(unit.digits);
+                if (numberToDisplay > 0) {
+                    elements.push(getTextElement(x, numberToDisplay + unit.name));
                 }
 
-                // Minor ticks
-                let minorX = majorX + pixelsPerMinorTick;
-                let minorTickEndX = Math.min(majorX + pixelsPerMajorTick, majorTickEndX);
-                let minorBase = relativeBase + basesPerMinorTick;
-                while (minorX < minorTickEndX) {
-                    children.push(this._elementFactory.minorTick(minorX));
-                    children.push(this._elementFactory.minorTickText(minorX, minorBase / unit.size));
-                    minorBase += basesPerMinorTick;
-                    minorX += pixelsPerMinorTick;
-                }
+                x += xPerTick;
+                base += basesPerTick;
+            }
+        }
 
-                // Update major tick loop vars
-                relativeBase += basesPerMajorTick;
-                majorX += pixelsPerMajorTick;
-            } // End while (majorX < majorTickEndX) { ... }
-        } // End for (let region of regionList) { ... }
-
-        return children;
+        function roundUp(n, precision) {
+            return Math.ceil(n / precision) * precision;
+        }
     }
 }
+
+const COLOR = '#bbb';
+const MAJOR_TICK_HEIGHT = 10; // Minor tick height is half this
+const FONT_SIZE = 12;
 
 /**
  * A generator of elements for a Ruler design.  Allows customization of RulerDesigners.  The default implementation
@@ -131,9 +155,10 @@ export class RulerElementFactory {
      * @param {string} color - color of the elements
      * @param {number} majorTickHeight - height of major ticks.  Minor ticks will be half this height.
      */
-    constructor(color=COLOR, majorTickHeight=MAJOR_TICK_HEIGHT) {
+    constructor(color=COLOR, majorTickHeight=MAJOR_TICK_HEIGHT, fontSize=FONT_SIZE) {
         this.color = color;
         this.majorTickHeight = majorTickHeight;
+        this.fontSize = fontSize;
     }
 
     /**
@@ -153,7 +178,8 @@ export class RulerElementFactory {
      * @return {JSX.Element} 
      */
     majorTick(x) {
-        return <line key={x} x1={x} y1={-this.majorTickHeight} x2={x} y2={0} stroke={this.color} strokeWidth={2} />;
+        const key = "major" + x;
+        return <line key={key} x1={x} y1={-this.majorTickHeight} x2={x} y2={0} stroke={this.color} strokeWidth={2} />;
     }
 
     /**
@@ -164,7 +190,11 @@ export class RulerElementFactory {
      * @return {JSX.Element} 
      */
     majorTickText(x, text) {
-        return <text key={"text" + x}  x={x} y={20} style={{textAnchor: "middle"}} >{text}</text>;
+        const style = {
+            textAnchor: "middle",
+            fontSize: this.fontSize
+        };
+        return <text key={"text" + x} x={x} y={this.fontSize + 2} style={style} >{text}</text>;
     }
 
     /**
@@ -174,7 +204,9 @@ export class RulerElementFactory {
      * @return {JSX.Element} 
      */
     minorTick(x) {
-        return <line key={x} x1={x} y1={-this.majorTickHeight / 2} x2={x} y2={0} stroke={this.color} strokeWidth={1} />;
+        const key = "minor" + x;
+        const y1 = -this.majorTickHeight / 2;
+        return <line key={key} x1={x} y1={y1} x2={x} y2={0} stroke={this.color} strokeWidth={1} />;
     }
 
     /**

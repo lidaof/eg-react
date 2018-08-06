@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
 
-import TranslatableG from '../../TranslatableG';
+import { TranslatableG } from '../../TranslatableG';
 import TrackModel from '../../../model/TrackModel';
 
 import './TrackLegend.css';

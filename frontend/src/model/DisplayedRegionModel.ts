@@ -71,10 +71,11 @@ class DisplayedRegionModel {
     /**
      * Gets the features that overlap this view region in the navigation context.
      * 
+     * @param {boolean} [includeGaps] - whether to include gaps in the results.  Default: true
      * @return {FeatureSegment[]} list of feature intervals that overlap this view region
      */
-    getFeatureSegments(): FeatureSegment[] {
-        return this._navContext.getFeaturesInInterval(this._startBase, this._endBase);
+    getFeatureSegments(includeGaps=true): FeatureSegment[] {
+        return this._navContext.getFeaturesInInterval(this._startBase, this._endBase, includeGaps);
     }
 
     /**

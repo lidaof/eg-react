@@ -31,10 +31,9 @@ const MIN_BINS_PER_REGION = 50;
 const BIN_SIZES = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000];
 
 export class HicSource extends DataSource {
-    constructor(url, genome) {
+    constructor(url) {
         super();
         this.straw = new window.hic.Straw({ url: url });
-        this.genome = genome;
     }
 
     /**
@@ -64,17 +63,13 @@ export class HicSource extends DataSource {
         const records = await this.straw.getContactRecords('NONE', queryLocus1, queryLocus2, 'BP', binSize);
         const interactions = [];
         for (const record of records) {
-            let recordLocus1 = new ChromosomeInterval(
+            const recordLocus1 = new ChromosomeInterval(
                 queryLocus1.chr, record.bin1 * binSize, (record.bin1 + 1) * binSize
             );
-            let recordLocus2 = new ChromosomeInterval(
+            const recordLocus2 = new ChromosomeInterval(
                 queryLocus2.chr, record.bin2 * binSize, (record.bin2 + 1) * binSize
             );
-            recordLocus1 = this.genome.intersectInterval(recordLocus1);
-            recordLocus2 = this.genome.intersectInterval(recordLocus2);
-            if (recordLocus1 && recordLocus2) {
-                interactions.push(new GenomeInteraction(recordLocus1, recordLocus2, record.counts));
-            }
+            interactions.push(new GenomeInteraction(recordLocus1, recordLocus2, record.counts));
         }
         return interactions;
     }

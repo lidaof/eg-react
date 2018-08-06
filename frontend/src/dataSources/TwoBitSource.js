@@ -1,6 +1,7 @@
 import DataSource from './DataSource';
-const twoBit = require('../vendor/bbi-js/main/twoBit');
-const bin = require('../vendor/bbi-js/utils/bin');
+import { SequenceData } from '../model/SequenceData';
+import twoBit from '../vendor/bbi-js/main/twoBit';
+import bin from '../vendor/bbi-js/utils/bin';
 
 /**
  * Reads and gets data from remotely-hosted .2bit files.
@@ -30,14 +31,14 @@ class TwoBitSource extends DataSource {
      * Gets the sequence that covers the region.
      * 
      * @param {DisplayedRegionModel} region - region for which to fetch data
-     * @return {Promise<string>} - sequence in the region
+     * @return {Promise<SequenceData[]>} - sequence in the region
      */
     async getData(region) {
-        const promises = region.getFeatureSegments().map(segment =>
-            this.getSequenceInInterval(segment.getGenomeCoordinates())
-        );
-        const sequences = await Promise.all(promises);
-        return sequences.join("");
+        const promises = region.getGenomeIntervals().map(async locus => {
+            const sequence = await this.getSequenceInInterval(locus);
+            return new SequenceData(locus, sequence);
+        });
+        return Promise.all(promises);
     }
 
     /**

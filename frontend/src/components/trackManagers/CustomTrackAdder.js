@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import TrackModel from '../../model/TrackModel';
 
 // Just add a new entry here to support adding a new track type.
-const TRACK_TYPES = ['bam', 'bigWig', 'bedGraph', 'bed', 'bigBed'];
+const TRACK_TYPES = ['bam', 'bigWig', 'bedGraph', 'bed', 'bigBed', 'hic'];
 
 /**
  * UI for adding custom tracks.

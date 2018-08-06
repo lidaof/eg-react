@@ -1,21 +1,17 @@
 import NavigationContext from '../NavigationContext';
-import { CHROMOSOMES } from './toyRegion';
 import Feature from '../Feature';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
 import OpenInterval from '../interval/OpenInterval';
 
 const NAME = "Wow very genome";
-const instance = new NavigationContext(NAME, [
+const FEATURES = [
     new Feature("f1", new ChromosomeInterval("chr1", 0, 10)),
     new Feature("f2", new ChromosomeInterval("chr2", 0, 10)),
-    new Feature("f3", new ChromosomeInterval("chr2", 5, 15)), // Note overlap with feature 2!
-]);
+    new Feature("f3", new ChromosomeInterval("chr2", 5, 15)), // Note genomic overlap with feature 2!
+];
+const instance = new NavigationContext(NAME, FEATURES);
 
 describe("constructor", () => {
-    it("errors if not given any features", () => {
-        expect( () => new NavigationContext("Bad", []) ).toThrow(Error);
-    });
-
     it("errors if given non-features", () => {
         expect( () => new NavigationContext("Bad", [{cat: "meow"}]) ).toThrow(Error);
     });
@@ -40,13 +36,13 @@ describe("Getters", () => {
 
 describe("getFeatureStart()", () => {
     it("is correct", () => {
-        expect(instance.getFeatureStart("f1")).toBe(0);
-        expect(instance.getFeatureStart("f3")).toBe(20);
+        expect(instance.getFeatureStart(FEATURES[0])).toBe(0);
+        expect(instance.getFeatureStart(FEATURES[2])).toBe(20);
     });
 
-    it("errors when given an unknown feature name", () => {
-        expect(() => instance.getFeatureStart(null)).toThrow(RangeError);
-        expect(() => instance.getFeatureStart("very chromosome")).toThrow(RangeError);
+    it("errors when given an outside feature", () => {
+        const notInTheContext = new Feature('', new ChromosomeInterval('', 0, 10));
+        expect(() => instance.getFeatureStart(notInTheContext)).toThrow(RangeError);
     });
 });
 
@@ -63,36 +59,30 @@ describe("convertBaseToFeatureCoordinate()", () => {
     });
 });
 
-describe("parse() and convertFeatureCoordinateToBase()", () => {
-    it("parses one segment correctly", () => {
-        expect(instance.parse("f1:0-10")).toEqual({start: 0, end: 10});
+describe("parse()", () => {
+    it("parses a locus correctly", () => {
+        expect(instance.parse("chr1:0-1000")).toEqual({start: 0, end: 10});
     });
 
-    it("parses two segments correctly", () => {
-        expect(instance.parse("f1:9-f3:1")).toEqual({start: 9, end: 21});
+    it("parses just a feature name correctly", () => {
+        expect(instance.parse("f2")).toEqual({start: 10, end: 20});
     });
 
-    it("errors if given a nonsensical string", () => {
-        expect(() => instance.parse("f1:234s-130")).toThrow(RangeError);
+    it("errors if given a locus completely not in the context", () => {
+        expect(() => instance.parse("chr1:100-140")).toThrow(RangeError);
     });
 
     it("errors if end base is before start base", () => {
-        expect(() => instance.parse("f1:10-1")).toThrow(RangeError);
-        expect(() => instance.parse("f2:1-f1:5")).toThrow(RangeError);
+        expect(() => instance.parse("chr1:10-1")).toThrow(RangeError);
     });
 
-    it("errors if the chromosome doesn't exist", () => {
-        expect(() => instance.parse("f3:1-f4:10")).toThrow(RangeError);
-    });
-
-    it("errors if the base pair is out of range", () => {
-        expect(() => instance.parse("f1:1-11")).toThrow(RangeError);
+    it("errors if the chromosome or feature doesn't exist", () => {
+        expect(() => instance.parse("meow")).toThrow(RangeError);
     });
 });
 
 describe("convertGenomeIntervalToBases()", () => {
     it("is correct for 0 mappings", () => {
-        const feature = instance.getFeatures()[0];
         const chrInterval = new ChromosomeInterval("chr1", -1, -1);
         expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([]);
 
@@ -101,7 +91,6 @@ describe("convertGenomeIntervalToBases()", () => {
     });
 
     it("is correct for one mapping", () => {
-        const feature = instance.getFeatures()[0];
         const chrInterval = new ChromosomeInterval("chr1", 5, 10);
         expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([new OpenInterval(5, 10)]);
     });
@@ -138,5 +127,26 @@ describe("getLociInInterval()", () => {
             "chr1:4-10",
             "chr2:0-15"
         ]);
+    });
+});
+
+describe("Gap-related things", () => {
+    it("makeGap() makes features of the right length", () => {
+        expect(NavigationContext.makeGap(10).getLength()).toBe(10);
+    });
+
+    it("isGapFeature() detects gap features", () => {
+        const gap = NavigationContext.makeGap(10);
+        const nonGap = FEATURES[0];
+        expect(NavigationContext.isGapFeature(gap)).toBe(true);
+        expect(NavigationContext.isGapFeature(nonGap)).toBe(false);
+    });
+
+    it("toGaplessCoordinate() converts coordinates correctly", () => {
+        const features = [FEATURES[0], NavigationContext.makeGap(10), FEATURES[2]];
+        const instanceWithGaps = new NavigationContext("I have gaps", features);
+        expect(instanceWithGaps.toGaplessCoordinate(5)).toBe(5);
+        expect(instanceWithGaps.toGaplessCoordinate(15)).toBe(10);
+        expect(instanceWithGaps.toGaplessCoordinate(25)).toBe(15);
     });
 });

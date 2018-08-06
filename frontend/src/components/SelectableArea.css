@@ -11,7 +11,7 @@
     align-items: center;
 }
 
-.SelectableArea-box-too-small {
+.SelectableArea-box-invalid {
     border: 1px solid red;
     background-color: rgba(255, 0, 0, 0.1);
     color: red;
