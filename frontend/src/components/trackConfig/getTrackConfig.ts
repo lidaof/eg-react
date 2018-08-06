@@ -18,10 +18,10 @@ const TYPE_NAME_TO_CONFIG = {
     "bedgraph": BedGraphTrackConfig,
     "bigbed": BigBedTrackConfig,
     "bigwig": BigWigTrackConfig,
-    // "hic": HicTrackConfig,
+    "hic": HicTrackConfig,
     "geneannotation": GeneAnnotationTrackConfig,
     "methylc": MethylCTrackConfig,
-    // "repeatmasker": RepeatMaskerTrackConfig,
+    "repeatmasker": RepeatMaskerTrackConfig,
     "genomealign": GenomeAlignTrackConfig,
     "ruler": RulerTrackConfig,
 };

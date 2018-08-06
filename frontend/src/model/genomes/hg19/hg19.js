@@ -49,6 +49,11 @@ const defaultTracks = [
         }
     }),
     new TrackModel({
+        type: "repeatmasker",
+        name: "RepeatMasker",
+        url: "https://vizhub.wustl.edu/public/hg19/rmsk16.bb"
+    }),
+    new TrackModel({
         type: "bam",
         name: "Test bam",
         url: "https://wangftp.wustl.edu/~dli/test/a.bam"
@@ -62,6 +67,14 @@ const defaultTracks = [
         type: "methylc",
         name: "Methylation",
         url: "https://vizhub.wustl.edu/public/hg19/methylc2/h1.liftedtohg19.gz"
+    }),
+    new TrackModel({
+        type: "hic",
+        name: "test hic",
+        url: "https://epgg-test.wustl.edu/dli/long-range-test/test.hic",
+        options: {
+            displayMode: 'arc'
+        }
     }),
     new TrackModel({
         type: "ruler",

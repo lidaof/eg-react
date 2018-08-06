@@ -9,14 +9,14 @@ import { ArcDisplay } from './ArcDisplay';
 import Track, { PropsFromTrackContainer } from '../commonComponents/Track';
 import TrackLegend from '../commonComponents/TrackLegend';
 import configOptionMerging from '../commonComponents/configOptionMerging';
-import { withTooltip } from '../commonComponents/tooltip/withTooltip';
+import { withTooltip, TooltipCallbacks } from '../commonComponents/tooltip/withTooltip';
 import Tooltip from '../commonComponents/tooltip/Tooltip';
 
 import { InteractionDisplayMode } from '../../../model/DisplayModes';
 import { FeaturePlacer } from '../../../model/FeaturePlacer';
 import { GenomeInteraction } from '../../../model/GenomeInteraction';
 
-interface InteractionTrackProps extends PropsFromTrackContainer {
+interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
     data: GenomeInteraction[];
     options: {
         color: string;
@@ -24,8 +24,6 @@ interface InteractionTrackProps extends PropsFromTrackContainer {
         backgroundColor?: string;
         displayMode: InteractionDisplayMode;
     }
-    onShowTooltip(element: JSX.Element): void;
-    onHideTooltip(): void;
 }
 
 export const DEFAULT_OPTIONS = {
@@ -78,19 +76,21 @@ class InteractionTrack extends React.Component<InteractionTrackProps, {}> {
             onMouseOut: this.hideTooltip
         };
 
-        let visualizer;
+        let visualizer, height;
         if (options.displayMode === InteractionDisplayMode.HEATMAP) {
             visualizer = <Heatmap {...visualizerProps} />;
+            height = Heatmap.getHeight(visualizerProps);
         } else {
             visualizer = <ArcDisplay {...visualizerProps} />;
+            height = ArcDisplay.getHeight(visualizerProps);
         }
 
         return <Track
             {...this.props}
-            legend={<TrackLegend trackModel={trackModel} />}
+            legend={<TrackLegend trackModel={trackModel} height={height} />}
             visualizer={visualizer}
         />;
     }
 }
 
-export default withDefaultOptions(withTooltip(InteractionTrack as any));
+export default withDefaultOptions(withTooltip(InteractionTrack));
