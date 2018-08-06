@@ -30,7 +30,10 @@ function mapStateToProps(state) {
 const callbacks = {
     onNewViewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
-}
+};
+
+const withAppState = connect(mapStateToProps, callbacks);
+const withEnhancements = _.flowRight(withAppState, withCurrentGenome, withSettings);
 
 class App extends React.Component {
     static propTypes = {
@@ -78,12 +81,6 @@ class App extends React.Component {
                 onTrackRemoved={this.removeTrack}
             />
             <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
-            {/* <DrawerMenu
-                tracks={tracks}
-                genomeConfig={genomeConfig}
-                onTracksAdded={this.addTracks}
-                onTrackRemoved={this.removeTrack}
-            /> */}
             {
             this.props.settings.isShowing3D &&
                 <ErrorBoundary><BrowserScene viewRegion={viewRegion} tracks={tracks} /></ErrorBoundary>
@@ -94,4 +91,4 @@ class App extends React.Component {
     }
 }
 
-export default connect(mapStateToProps, callbacks)(withCurrentGenome(withSettings(App)));
+export default withEnhancements(App);

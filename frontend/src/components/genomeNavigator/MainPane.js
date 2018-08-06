@@ -120,7 +120,12 @@ class MainPane extends React.Component {
 
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
-        <DragAcrossView button={MouseButtons.RIGHT} onViewDrag={onNewViewRequested} viewRegion={viewRegion} className="Mainpane-opaque" >
+        <DragAcrossView
+            button={MouseButtons.RIGHT}
+            onViewDrag={onNewViewRequested}
+            viewRegion={viewRegion}
+            className="MainPane-opaque"
+        >
             <SelectableGenomeArea
                 drawModel={new LinearDrawingModel(viewRegion, width)}
                 y={SELECT_BOX_Y}

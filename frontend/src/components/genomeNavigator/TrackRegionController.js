@@ -4,6 +4,26 @@ import ReactModal from 'react-modal';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import GeneSearchBox from './GeneSearchBox';
 
+const MODAL_STYLE = {
+    content: {
+        top: "40px",
+        left: "543px",
+        right: "unset",
+        bottom: "unset",
+        overflow: "visible",
+        padding: "5px",
+        color: "black",
+    }
+};
+
+const X_BUTTON_STYLE = {
+    cursor: "pointer",
+    color: "red",
+    fontSize: "2em",
+    position:"absolute",
+    top: "-5px",
+    right: "15px"
+};
 
 /**
  * The display that is above the main pane of the genome navigator, which shows the current track region and a text
@@ -89,23 +109,11 @@ class TrackRegionController extends React.Component {
      * @inheritdoc
      */
     render() {
-        let region = this._currentRegionAsString();
+        const coordinates = this._currentRegionAsString();
         return (
         <div>
-            {/* <label>
-            Current region: {region} 
-            </label> */}
-                
-                {/* <input type="text" ref={(input) => this.input = input} defaultValue={region} size="30" onClick={this.handleClick}/>
-                <button 
-                    className="btn btn-secondary btn-sm" 
-                    style={{marginLeft: "2px"}} onClick={this.parseRegion.bind(this)}
-                    
-                >
-                    Go
-                </button> */}
             <button className="btn btn-secondary" onClick={this.handleOpenModal}>
-                {region}
+                {coordinates}
             </button>
             <ReactModal 
                 isOpen={this.state.showModal}
@@ -113,39 +121,33 @@ class TrackRegionController extends React.Component {
                 ariaHideApp={false}
                 onRequestClose={this.handleCloseModal}
                 shouldCloseOnOverlayClick={true}
-                style={{
-                    content: {
-                      top: "40px",
-                      left: "543px",
-                      right: "unset",
-                      bottom: "unset",
-                      overflow: "visible",
-                      padding: "5px",
-                      color: "black",
-                    }
-                }}
+                style={MODAL_STYLE}
             >
-                <span className="text-right" 
-                    style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
-                    onClick={this.handleCloseModal}>&times;</span>
+                <span className="text-right" style={X_BUTTON_STYLE} onClick={this.handleCloseModal}>×</span>
                 <h6>Gene search</h6>
                 <GeneSearchBox
                     navContext={this.props.selectedRegion.getNavigationContext()}
                     onRegionSelected={this.props.onRegionSelected}
                     handleCloseModal = {this.handleCloseModal}
                 />
-                <h6>Region search, current region {region}</h6>
-                <input type="text" ref={(input) => this.input = input} size="30" 
-                        placeholder="Coordinate"
-                        onClick={this.handleClick}/>
-                    <button 
-                        className="btn btn-secondary btn-sm" 
-                        style={{marginLeft: "2px"}} onClick={this.parseRegion.bind(this)}
-                    >
-                        Go
-                    </button>
+                <h6>Region search (current region is {coordinates})</h6>
+                <input
+                    ref={(input) => this.input = input}
+                    type="text"
+                    size="30" 
+                    placeholder="Coordinate"
+                    onClick={this.handleClick}
+                />
+                <button 
+                    className="btn btn-secondary btn-sm" 
+                    style={{marginLeft: "2px"}}
+                    onClick={this.parseRegion.bind(this)}
+                >
+                    Go
+                </button>
                 {
-                    this.state.badInputMessage.length > 0 ? <span className="alert-danger">{this.state.badInputMessage}</span> : null
+                this.state.badInputMessage.length > 0 &&
+                    <span className="alert-danger">{this.state.badInputMessage}</span>
                 }
             </ReactModal>
         </div>

@@ -26,7 +26,6 @@ export class AppSettings extends React.Component {
 
     toggleNavigator = () => {
         this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
-        //this.setState(state => ({ isShowingNavigator: !state.isShowingNavigator }));
     };
 
     toggle3DScene = () => {

@@ -55,14 +55,14 @@
 }
 
 
-.genomeNavigator-tooltip {
+.GenomeNavigator-tooltip {
     position: relative;
     display: inline-block;
     border-bottom: 1px dotted gray; /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
-.genomeNavigator-tooltip .genomeNavigator-tooltiptext {
+.GenomeNavigator-tooltip .GenomeNavigator-tooltiptext {
     visibility: hidden;
     width: 240px;
     background-color: gray;
@@ -76,16 +76,16 @@
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
-.genomeNavigator-tooltip:hover .genomeNavigator-tooltiptext {
+.GenomeNavigator-tooltip:hover .GenomeNavigator-tooltiptext {
     visibility: visible;
 }
 
-.genomeNavigator-tooltip .genomeNavigator-tooltiptext {
+.GenomeNavigator-tooltip .GenomeNavigator-tooltiptext {
     top: -20px;
     left: 120%; 
 }
 
-.genomeNavigator-tooltip .genomeNavigator-tooltiptext::after {
+.GenomeNavigator-tooltip .GenomeNavigator-tooltiptext::after {
     content: " ";
     position: absolute;
     top: 50%;

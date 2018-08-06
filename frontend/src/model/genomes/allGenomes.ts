@@ -24,20 +24,26 @@ for (const config of allGenomes) {
     genomeNameToConfig[genomeName] = config;
 }
 
-export const treeOfLife = {
+interface SpeciesConfig {
+    logoUrl: string;
+    assemblies: string[];
+    color: string;
+}
+
+export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
     human: {
-        logo: 'http://epigenomegateway.wustl.edu/browser/images/Human.png',
-        assemblies: [HG19.genome.getName(), HG38.genome.getName()],
+        logoUrl: 'http://epigenomegateway.wustl.edu/browser/images/Human.png',
+        assemblies: [ HG19.genome.getName(), HG38.genome.getName() ],
         color: 'white',
     },
     mouse: {
-        logo: 'http://epigenomegateway.wustl.edu/browser/images/Mouse.png',
-        assemblies: [MM10.genome.getName()],
+        logoUrl: 'http://epigenomegateway.wustl.edu/browser/images/Mouse.png',
+        assemblies: [ MM10.genome.getName() ],
         color: 'white',
     },
     zebrafish: {
-        logo: 'http://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
-        assemblies: [DAN_RER10.genome.getName()],
+        logoUrl: 'http://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
+        assemblies: [ DAN_RER10.genome.getName() ],
         color: 'yellow',
     },
 };
@@ -50,10 +56,10 @@ export function getGenomeConfig(genomeName: string): GenomeConfig {
     return genomeNameToConfig[genomeName] || null;
 }
 
-export function getGenomeInfo(genomeName: string): any {
+export function getSpeciesInfo(genomeName: string) {
     for (const [species, details] of Object.entries(treeOfLife) ) {
         if (details.assemblies.includes(genomeName)) {
-            return {name: species, logo: details.logo, color: details.color}
+            return { name: species, logo: details.logoUrl, color: details.color };
         }
     }
     return {name: '', logo: '', color: ''};

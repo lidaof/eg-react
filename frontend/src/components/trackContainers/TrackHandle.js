@@ -56,5 +56,4 @@ function ReparentableHandle(props) {
     return <Reparentable uid={"track-" + props.trackModel.getId()} ><TrackHandle {...props} /></Reparentable>
 }
 
-//export default TrackHandle;
 export default ReparentableHandle;

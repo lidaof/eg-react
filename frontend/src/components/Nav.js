@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import ReactModal from "react-modal";
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import { getGenomeInfo } from "../model/genomes/allGenomes";
+import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from './genomeNavigator/TrackRegionController';
 import ZoomButtons from './trackContainers/ZoomButtons';
 import { withSettings } from './Settings';
@@ -17,7 +17,6 @@ import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
 
-
 /**
  * the top navigation bar for browser
  * @author Daofeng Li
@@ -31,60 +30,12 @@ class Nav extends React.Component {
         onTracksAdded: PropTypes.func,
         onTrackRemoved: PropTypes.func,
     };
-
-    state = { 
-        showRegionset: false,
-        showList: false,
-        showAnnotation: false,
-        showHub: false,
-        showCustom: false,
-    };
-
-    handleRegionsetOpen = () => {
-        this.setState({ showRegionset: true });
-    };
-      
-    handleRegionsetClose = () => {
-        this.setState({ showRegionset: false });
-    };
-
-    handleListOpen = () => {
-        this.setState({ showList: true });
-    };
-      
-    handleListClose = () => {
-        this.setState({ showList: false });
-    };
-
-    handleAnnotationOpen = () => {
-        this.setState({ showAnnotation: true });
-    };
-      
-    handleAnnotationClose = () => {
-        this.setState({ showAnnotation: false });
-    };
-
-    handleHubOpen = () => {
-        this.setState({ showHub: true });
-    };
-      
-    handleHubClose = () => {
-        this.setState({ showHub: false });
-    };
-
-    handleCustomOpen = () => {
-        this.setState({ showCustom: true });
-    };
-      
-    handleCustomClose = () => {
-        this.setState({ showCustom: false });
-    };
-
+    
     render() {
         const {isShowingNavigator, toggleNavigator, isShowing3D, on3DToggle} = this.props.settings;
         const {tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected} = this.props;
         const genomeName = genomeConfig.genome.getName();
-        const {name, logo, color} = getGenomeInfo(genomeName)
+        const {name, logo, color} = getSpeciesInfo(genomeName)
         return (
             <div className="Nav-container">
                 <div>
@@ -105,93 +56,57 @@ class Nav extends React.Component {
                     <ZoomButtons viewRegion={selectedRegion} onNewRegion={onRegionSelected} />
                 </div>
                 <div className="Nav-center btn-group">
-                    <button type="button" className="btn btn-primary btn-sm dropdown-toggle" 
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">🎹Tracks</button>
+                    <DropdownOpener extraClassName="btn-primary" label="🎹Tracks" />
                     <div className="dropdown-menu">
                         <a className="dropdown-item" href="#">Track Facet Table</a>
-                        <div className="dropdown-item" onClick={this.handleAnnotationOpen}>Annotation Tracks</div>
-                        <ReactModal 
-                            isOpen={this.state.showAnnotation}
-                            contentLabel="Annotation Tracks"
-                            ariaHideApp={false}
-                            onRequestClose={this.handleAnnotationClose}
-                            shouldCloseOnOverlayClick={true}
-                        >
-                            <span className="text-right" 
-                                style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
-                                onClick={this.handleAnnotationClose}>&times;</span>
-                            <AnnotationTrackSelector addedTracks={tracks} onTracksAdded={onTracksAdded} onTrackRemoved={onTrackRemoved} />
-                        </ReactModal>
-                        <div className="dropdown-item" onClick={this.handleHubOpen}>Public Data Hubs</div>
-                        <ReactModal 
-                            isOpen={this.state.showHub}
-                            contentLabel="Track Hubs"
-                            ariaHideApp={false}
-                            onRequestClose={this.handleHubClose}
-                            shouldCloseOnOverlayClick={true}
-                        >
-                            <span className="text-right" 
-                                style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
-                                onClick={this.handleHubClose}>&times;</span>
-                            <HubPane addedTracks={tracks} onTracksAdded={onTracksAdded} onTrackRemoved={onTrackRemoved} />
-                        </ReactModal>
-                        <div className="dropdown-item" onClick={this.handleCustomOpen}>Custom Tracks</div>
-                        <ReactModal 
-                            isOpen={this.state.showCustom}
-                            contentLabel="Custom Tracks"
-                            ariaHideApp={false}
-                            onRequestClose={this.handleCustomClose}
-                            shouldCloseOnOverlayClick={true}
-                        >
-                            <span className="text-right" 
-                                style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
-                                onClick={this.handleCustomClose}>&times;</span>
-                            <CustomTrackAdder addedTracks={tracks} onTracksAdded={onTracksAdded} onTrackRemoved={onTrackRemoved} />
-                        </ReactModal>
-                        <div className="dropdown-item" onClick={this.handleListOpen}>Track List</div>
-                        <ReactModal 
-                            isOpen={this.state.showList}
-                            contentLabel="Track List"
-                            ariaHideApp={false}
-                            onRequestClose={this.handleListClose}
-                            shouldCloseOnOverlayClick={true}
-                        >
-                            <span className="text-right" 
-                                style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
-                                onClick={this.handleListClose}>&times;</span>
-                            <TrackList addedTracks={tracks} onTracksAdded={onTracksAdded} onTrackRemoved={onTrackRemoved} />
-                        </ReactModal>
+                        <ModalMenuItem itemLabel="Annotation Tracks">
+                            <AnnotationTrackSelector
+                                addedTracks={tracks}
+                                onTracksAdded={onTracksAdded}
+                                onTrackRemoved={onTrackRemoved} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Public Data Hubs">
+                            <HubPane 
+                                addedTracks={tracks} 
+                                onTracksAdded={onTracksAdded} 
+                                onTrackRemoved={onTrackRemoved} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Custom Tracks">
+                            <CustomTrackAdder 
+                                addedTracks={tracks} 
+                                onTracksAdded={onTracksAdded} 
+                                onTrackRemoved={onTrackRemoved} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Track List">
+                            <TrackList 
+                                addedTracks={tracks} 
+                                onTracksAdded={onTracksAdded} 
+                                onTrackRemoved={onTrackRemoved} />
+                        </ModalMenuItem>
                     </div>
                 </div>
                 <div className="Nav-center">
-                    <button type="button" className="btn btn-success btn-sm dropdown-toggle"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">🔧Apps</button>
+                    <DropdownOpener extraClassName="btn-success" label="🔧Apps" />
                     <div className="dropdown-menu">
-                        <div className="dropdown-item" onClick={this.handleRegionsetOpen}>Region Set View</div>
-                        <ReactModal 
-                            isOpen={this.state.showRegionset}
-                            contentLabel="Region set"
-                            ariaHideApp={false}
-                            onRequestClose={this.handleRegionsetClose}
-                            shouldCloseOnOverlayClick={true}
-                        >
-                            <span className="text-right" 
-                                style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}} 
-                                onClick={this.handleRegionsetClose}>&times;</span>
+                        <ModalMenuItem itemLabel="Region Set View">
                             <RegionSetSelector genome={genomeConfig.genome} />
-                        </ReactModal>
+                        </ModalMenuItem>
                         <div className="dropdown-item">Screenshot</div>
                     </div>
                 </div>
                 <div className="Nav-center">
-                    <button type="button" className="btn btn-info btn-sm dropdown-toggle"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">⚙Settings</button>
+                    <DropdownOpener extraClassName="btn-info" label="⚙Settings" />
                     <div className="dropdown-menu">
                         <label className="dropdown-item" htmlFor="switchNavigator">
-                            <input id="switchNavigator" type="checkbox" checked={isShowingNavigator} onChange={toggleNavigator} />
+                            <input
+                                id="switchNavigator"
+                                type="checkbox"
+                                checked={isShowingNavigator}
+                                onChange={toggleNavigator}
+                            />
                             <span style={{marginLeft: "1ch"}} >Show genome-wide navigator</span>
-                            <span className="genomeNavigator-tooltip">❓
-                                <div className="genomeNavigator-tooltiptext">
+                            <span className="GenomeNavigator-tooltip">❓
+                                <div className="GenomeNavigator-tooltiptext">
                                     <ul style={{lineHeight: "1.2em", marginBottom: 0}}>
                                         <li>Left mouse drag: select</li>
                                         <li>Right mouse drag: pan</li>
@@ -209,10 +124,66 @@ class Nav extends React.Component {
                 <div className="Nav-center">
                     <button type="button" className="btn btn-warning btn-sm">📖Documentation</button>
                 </div>
-                <div></div>
             </div>
         )
     }
 }
 
 export default withSettings(Nav);
+
+function DropdownOpener(props) {
+    const {extraClassName, label} = props;
+    return <button
+        type="button"
+        className={`btn btn-sm dropdown-toggle ${extraClassName}`}
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+    >
+        {label}
+    </button>
+}
+
+class ModalMenuItem extends React.Component {
+    static propTypes = {
+        itemLabel: PropTypes.string
+    };
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            isOpen: false
+        };
+        this.toggleOpen = this.toggleOpen.bind(this);
+    }
+
+    toggleOpen() {
+        this.setState(prevState => {return {isOpen: !prevState.isOpen}});
+    }
+
+    render() {
+        return <React.Fragment>
+            <div className="dropdown-item" onClick={this.toggleOpen}>{this.props.itemLabel}</div>
+            <ReactModal
+                isOpen={this.state.isOpen}
+                ariaHideApp={false}
+                onRequestClose={this.toggleOpen}
+                shouldCloseOnOverlayClick={true}
+            >
+                <ModalCloseButton onClick={this.toggleOpen} />
+                {this.props.children}
+            </ReactModal>
+        </React.Fragment>;
+    }
+}
+
+function ModalCloseButton(props) {
+    return (
+        <span
+            className="text-right" 
+            style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}}
+            onClick={props.onClick}>
+            ×
+        </span>
+    );
+}

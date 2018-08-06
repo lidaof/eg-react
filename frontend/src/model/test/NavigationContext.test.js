@@ -68,6 +68,10 @@ describe("parse() and convertFeatureCoordinateToBase()", () => {
         expect(instance.parse("f1:0-10")).toEqual({start: 0, end: 10});
     });
 
+    it("parses segments with spaces correctly", () => {
+        expect(instance.parse("f1\t\t\t0         10")).toEqual({start: 0, end: 10});
+    });
+
     it("parses two segments correctly", () => {
         expect(instance.parse("f1:9-f3:1")).toEqual({start: 9, end: 21});
     });

@@ -203,11 +203,10 @@ class NavigationContext {
     parse(str: string): OpenInterval {
         str = str.trim();
         let startName, endName, startBase, endBase;
-        let singleFeatureMatch, multiFeatureMatch, matchList;
+        let singleFeatureMatch, multiFeatureMatch;
         // eslint-disable-next-line no-cond-assign
-        singleFeatureMatch = str.match(/([\w:]+):(\d+)-(\d+)/);
-        multiFeatureMatch = str.match(/([\w:]+):(\d+)-([\w:]+):(\d+)/);
-        matchList = str.split(/[^\w\.]+/);
+        singleFeatureMatch = str.match(/([\w:]+)\W+(\d+)\W+(\d+)/);
+        multiFeatureMatch = str.match(/([\w:]+)\W+(\d+)-([\w:]+)\W+(\d+)/);
         if ((singleFeatureMatch) !== null) {
             startName = singleFeatureMatch[1];
             endName = startName;
@@ -219,18 +218,8 @@ class NavigationContext {
             endName = multiFeatureMatch[3];
             startBase = Number.parseInt(multiFeatureMatch[2], 10);
             endBase = Number.parseInt(multiFeatureMatch[4], 10);
-        } else if (matchList.length === 3) {
-            startName = matchList[0];
-            endName = startName;
-            startBase = Number.parseInt(matchList[1], 10);
-            endBase = Number.parseInt(matchList[2], 10);
-        } else if (matchList.length === 4) {
-            startName = matchList[0];
-            endName = matchList[2];
-            startBase = Number.parseInt(matchList[1], 10);
-            endBase = Number.parseInt(matchList[3], 10);
         } else {
-            throw new RangeError("Wrong coordinates");
+            throw new RangeError("Couldn't parse coordinates");
         }
 
         const startCoordinate = this.convertFeatureCoordinateToBase(startName, startBase);

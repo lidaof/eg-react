@@ -47,7 +47,7 @@ class GenomePicker extends React.PureComponent {
                             checked={this.state.species === species} 
                             onChange={this.chooseSpecies} />
                         <div>{species}</div>
-                        <div><img src={details.logo} alt={species}/></div>
+                        <div><img src={details.logoUrl} alt={species}/></div>
                     </label>
                 </div>
             );
