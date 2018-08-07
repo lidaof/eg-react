@@ -9,6 +9,31 @@ import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
 import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
+import { compose, combineReducers } from 'redux'
+import { reactReduxFirebase, firebaseReducer } from 'react-redux-firebase'
+import firebase from 'firebase'
+
+// Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyADX844efdjDQG2LrWLhSAB4RiymVnuhOM",
+    authDomain: "eg-session.firebaseapp.com",
+    databaseURL: "https://eg-session.firebaseio.com",
+    projectId: "eg-session",
+    storageBucket: "eg-session.appspot.com",
+}
+
+firebase.initializeApp(firebaseConfig);
+
+// react-redux-firebase options
+const config = {
+    userProfile: 'users', // firebase root where user profiles are stored
+    enableLogging: false, // enable/disable Firebase's database logging
+};
+
+// Add redux Firebase to compose
+const createStoreWithFirebase = compose(
+    reactReduxFirebase(firebase, config)
+)(createStore)
 
 let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
@@ -214,8 +239,14 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
     }
 }
 
+const rootReducer = combineReducers({
+    state: getNextState,
+    firebase: firebaseReducer,
+    // firestore: firestoreReducer // <- needed if using firestore
+  })
+
 // OK, so it's really an AppStore, but then that would mean something completely different 😛
-export const AppState = createStore(
+export const AppState = createStoreWithFirebase(
     getNextState,
     (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__()
 );
