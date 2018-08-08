@@ -1,9 +1,10 @@
 import { connect } from 'react-redux';
 import { AppState } from '../AppState';
+import { StateWithHistory } from "redux-undo";
 
-const mapStateToProps = (state: AppState) => {
+const mapStateToProps = (state: {browser: StateWithHistory<AppState>}) => {
     return {
-        legendWidth: state.trackLegendWidth
+        legendWidth: state.browser.present.trackLegendWidth
     };
 }
 

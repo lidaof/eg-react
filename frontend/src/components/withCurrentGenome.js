@@ -4,7 +4,7 @@ import { getGenomeConfig } from '../model/genomes/allGenomes';
 
 function getGenomeConfigFromStore(state) {
     return {
-        genomeConfig: getGenomeConfig(state.present.genomeName)
+        genomeConfig: getGenomeConfig(state.browser.present.genomeName)
     };
 }
 

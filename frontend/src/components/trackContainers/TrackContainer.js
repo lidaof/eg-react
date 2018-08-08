@@ -31,10 +31,10 @@ const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 ///////////
 function mapStateToProps(state) {
     return {
-        genome: state.genomeName,
-        viewRegion: state.viewRegion,
-        tracks: state.tracks,
-        metadataTerms: state.metadataTerms
+        genome: state.browser.present.genomeName,
+        viewRegion: state.browser.present.viewRegion,
+        tracks: state.browser.present.tracks,
+        metadataTerms: state.browser.present.metadataTerms
     };
 }
 
@@ -85,7 +85,7 @@ class TrackContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedTool: null,
+            selectedTool: Tools.DRAG,
         };
 
         this.toggleTool = this.toggleTool.bind(this);

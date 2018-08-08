@@ -3,7 +3,7 @@
  * 
  * @author Silas Hsu
  */
-import { createStore } from 'redux';
+import { createStore, combineReducers } from 'redux';
 import { getGenomeConfig } from './model/genomes/allGenomes';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
@@ -67,7 +67,7 @@ enum ActionType {
     SET_REGION_SET_LIST = "SET_REGION_SET_LIST",
     SET_REGION_SET_VIEW = "SET_REGION_SET_VIEW",
     SET_TRACK_LEGEND_WIDTH = "SET_TRACK_LEGEND_WIDTH",
-    INIT = "@@INIT",
+    // INIT = "@@INIT",
 }
 
 interface AppAction {
@@ -146,7 +146,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
 
     switch (action.type) {
         case ActionType.SET_GENOME: // Setting genome resets state.
-        case ActionType.INIT:
+        // case ActionType.INIT:
             let nextViewRegion = null;
             let nextTracks: TrackModel[] = [];
             const genomeConfig = getGenomeConfig(action.genomeName);
@@ -218,16 +218,20 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
     }
 }
 
+const rootReducer = combineReducers({
+    browser: undoable(getNextState, {limit: 10} )
+});
+
 // OK, so it's really an AppStore, but then that would mean something completely different 😛
 export const AppState = createStore(
-    undoable(getNextState, {limit: 10} ),
+    rootReducer,
     (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__()
 );
 
 window.addEventListener("beforeunload", () => {
     const state = AppState.getState();
     if (state !== initialState) {
-        const blob = new AppStateSaver().toJSON(state);
+        const blob = new AppStateSaver().toJSON(state.browser.present);
         STORAGE.setItem(SESSION_KEY, blob);
     }
 });

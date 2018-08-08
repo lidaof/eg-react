@@ -169,6 +169,21 @@ class DisplayedRegionModel {
         this.setRegion(rawStart, rawEnd);
         return this;
     }
+
+
+        /**
+     * @return {string} the currently displayed region in human-readable form
+     */
+    currentRegionAsString(): string {
+        const segments = this.getFeatureSegments();
+        if (segments.length === 1) {
+            return segments[0].toString();
+        } else {
+            const first = segments[0];
+            const last = segments[segments.length - 1];
+            return first.toStringWithOther(last);
+        }
+    }
 }
 
 export default DisplayedRegionModel;

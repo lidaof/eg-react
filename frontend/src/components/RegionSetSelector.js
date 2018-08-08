@@ -16,8 +16,8 @@ import Genome from '../model/genomes/Genome';
  */
 function mapStateToProps(state) {
     return {
-        sets: state.regionSets,
-        selectedSet: state.regionSetView
+        sets: state.browser.present.regionSets,
+        selectedSet: state.browser.present.regionSetView
     };
 }
 
