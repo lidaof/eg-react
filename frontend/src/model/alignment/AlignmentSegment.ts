@@ -29,11 +29,16 @@ export class AlignmentSegment extends FeatureSegment {
     getQueryLocus() {
         const {querySeq, queryLocus} = this.feature;
         // The sequence in the record "before" this sequence
-        const beforeSeq = querySeq.substring(0, this.sequenceInterval.start);
-        const basesBefore = countBases(beforeSeq);
-        const locusStart = queryLocus.start + basesBefore;
-        const locusLength = countBases(this.getQuerySequence());
-        return new ChromosomeInterval(queryLocus.chr, locusStart, locusStart + locusLength);
+        const baseOffset = countBases(querySeq.substring(0, this.sequenceInterval.start));
+        const baseLength = countBases(this.getQuerySequence());
+
+        if (this.feature.getIsReverseStrandQuery()) {
+            const end = queryLocus.end - baseOffset;
+            return new ChromosomeInterval(queryLocus.chr, end - baseLength, end);
+        } else {
+            const start = queryLocus.start + baseOffset;
+            return new ChromosomeInterval(queryLocus.chr, start, start + baseLength);
+        }
     }
 
     getQuerySequence() {

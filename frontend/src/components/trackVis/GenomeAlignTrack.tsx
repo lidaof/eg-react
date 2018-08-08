@@ -90,7 +90,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
     }
 
     renderRoughAlignment(placement: PlacedMergedAlignment) {
-        const {queryLocus, queryXSpan, segments} = placement;
+        const {queryFeature, queryXSpan, segments} = placement;
         const queryRectTopY = ROUGH_MODE_HEIGHT - RECT_HEIGHT;
         const queryGenomeRect = <rect
             x={queryXSpan.start}
@@ -99,10 +99,10 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             height={RECT_HEIGHT}
             fill={QUERY_COLOR}
             // tslint:disable-next-line:jsx-no-lambda
-            onClick={() => alert("You clicked on " + queryLocus)}
+            onClick={() => alert("You clicked on " + queryFeature.getLocus().toString())}
         />;
 
-        const estimatedLabelWidth = queryLocus.toString().length * FONT_SIZE;
+        const estimatedLabelWidth = queryFeature.toString().length * FONT_SIZE;
         let label = null;
         if (estimatedLabelWidth < queryXSpan.getLength()) {
             label = <text
@@ -113,7 +113,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 fill="white"
                 fontSize={12}
             >
-                {queryLocus.toString()}
+                {queryFeature.getLocus().toString()}
             </text>;
         }
 
@@ -138,7 +138,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             />;
         });
 
-        return <React.Fragment key={queryLocus.toString()} >
+        return <React.Fragment key={queryFeature.getLocus().toString()} >
             {queryGenomeRect}
             {label}
             {ensureMaxListLength(segmentPolygons, MAX_POLYGONS)}

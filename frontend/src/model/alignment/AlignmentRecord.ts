@@ -1,5 +1,6 @@
 import Feature from '../Feature';
 import ChromosomeInterval from '../interval/ChromosomeInterval';
+import { GAP_CHAR } from './AlignmentStringUtils';
 
 /**
  * A data container for a GenomeAlign record.
@@ -25,6 +26,10 @@ export class AlignmentRecord extends Feature {
         this.querySeq = queryseq || '';
         this.targetSeq = targetseq || '';
         this.queryStrand = strand;
+    }
+
+    getIsReverseStrandQuery() {
+        return this.queryStrand === GAP_CHAR;
     }
 }
 

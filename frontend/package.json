@@ -10,9 +10,7 @@
     "storybook": "start-storybook -p 9009 -s public",
     "test": "react-app-rewired test --env=jsdom --scripts-version react-scripts-ts"
   },
-  "dependencies": {
-    "json5": "^1.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@storybook/addon-actions": "^3.3.15",
     "@storybook/addon-links": "^3.3.15",
@@ -37,6 +35,7 @@
     "jest-image-snapshot": "^1.0.1",
     "jquery": "^3.2.1",
     "jquery.kinetic": "^2.2.4",
+    "json5": "^1.0.1",
     "jsonschema": "^1.2.0",
     "lodash": "^4.17.5",
     "memoize-one": "^3.1.1",

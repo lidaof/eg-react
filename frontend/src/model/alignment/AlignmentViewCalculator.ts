@@ -32,7 +32,7 @@ export interface PlacedSequenceSegment extends SequenceSegment {
 }
 
 interface QueryGenomePiece {
-    queryLocus: ChromosomeInterval;
+    queryFeature: Feature;
     queryXSpan: OpenInterval;
 }
 
@@ -76,7 +76,7 @@ export class AlignmentViewCalculator {
         this._viewBeingFetched = visData;
 
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
-        const isFineMode = drawModel.xWidthToBases(1) < MAX_FINE_MODE_BASES_PER_PIXEL
+        const isFineMode = drawModel.xWidthToBases(1) < MAX_FINE_MODE_BASES_PER_PIXEL;
         let records;
         if (isFineMode) {
             records = await this._alignmentFetcher.fetchAlignment(visRegion, visData, false);
@@ -214,7 +214,7 @@ export class AlignmentViewCalculator {
             }
 
             drawData.push({
-                queryLocus: mergeLocus,
+                queryFeature: new Feature(undefined, mergeLocus),
                 queryXSpan: mergeXSpan,
                 segments: placementsInsideMerge
             });
@@ -292,8 +292,14 @@ export class AlignmentViewCalculator {
         const queryPieces: QueryGenomePiece[] = [];
         for (const placement of placements) {
             const {record, visiblePart} = placement;
+            const isReverse = record.getIsReverseStrandQuery();
             const querySeq = visiblePart.getQuerySequence();
-            const baseLookup = makeBaseNumberLookup(querySeq, visiblePart.getQueryLocus().start);
+            let baseLookup;
+            if (isReverse) {
+                baseLookup = makeBaseNumberLookup(querySeq, visiblePart.getQueryLocus().end, true);
+            } else {
+                baseLookup = makeBaseNumberLookup(querySeq, visiblePart.getQueryLocus().start);
+            }
             const queryChr = record.queryLocus.chr;
 
             for (const segment of placement.querySegments) {
@@ -301,10 +307,19 @@ export class AlignmentViewCalculator {
                 if (isGap) {
                     continue;
                 }
+
                 const base = baseLookup[index];
                 const locusLength = countBases(querySeq.substr(index, length));
-                const segmentLocus = new ChromosomeInterval(queryChr, base, base + locusLength);
-                queryPieces.push({ queryLocus: segmentLocus, queryXSpan: xSpan });
+                let segmentLocus;
+                if (isReverse) {
+                    segmentLocus = new ChromosomeInterval(queryChr, base - locusLength, base);
+                } else {
+                    segmentLocus = new ChromosomeInterval(queryChr, base, base + locusLength);
+                }
+                queryPieces.push({
+                    queryFeature: new Feature(undefined, segmentLocus, record.queryStrand),
+                    queryXSpan: xSpan
+                });
             }
         }
 
@@ -319,21 +334,22 @@ export class AlignmentViewCalculator {
         const features = [];
 
         let x = 0;
-        let prevLocus = new ChromosomeInterval('', -1, -1); // A placeholder
+        let prevLocus = new ChromosomeInterval('', -1, -1); // Placeholder
         for (const piece of sortedPieces) {
-            const {queryXSpan, queryLocus} = piece;
+            const {queryXSpan, queryFeature} = piece;
+            const queryLocus = queryFeature.getLocus();
 
             const gapPixels = queryXSpan.start - x; // Compute potential gap
             const gapBases = Math.round(drawModel.xWidthToBases(gapPixels));
             if (gapBases >= 1) {
-                const doPiecesTouchInGenome = queryLocus.chr === prevLocus.chr && queryLocus.start === prevLocus.end;
-                const specialName = doPiecesTouchInGenome ? `${niceBpCount(gapBases)} gap` : undefined;
+                const specialName = doLociTouchInGenome(queryLocus, prevLocus) ?
+                    `${niceBpCount(gapBases)} gap` : undefined;
                 features.push(NavigationContext.makeGap(gapBases, specialName));
             }
 
-            features.push(new Feature(undefined, queryLocus));
+            features.push(queryFeature);
             x = queryXSpan.end;
-            prevLocus = piece.queryLocus;
+            prevLocus = queryLocus;
         }
 
         const finalGapBases = Math.round(drawModel.xWidthToBases(visWidth - x));
@@ -401,4 +417,12 @@ function computeCentroid(intervals: OpenInterval[]) {
     const numerator = _.sumBy(intervals, interval => 0.5 * interval.getLength() * (interval.start + interval.end));
     const denominator = _.sumBy(intervals, interval => interval.getLength());
     return numerator / denominator;
+}
+
+function doLociTouchInGenome(locus1: ChromosomeInterval, locus2: ChromosomeInterval) {
+    if (locus1.chr !== locus2.chr) {
+        return false;
+    }
+
+    return locus1.end === locus2.start || locus2.end === locus1.start;
 }

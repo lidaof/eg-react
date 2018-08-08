@@ -87,13 +87,13 @@ class LinearDrawingModel {
     }
 
     /**
-     * Gets the genomic coordinates that a pixel coordinate represents.
+     * Gets the segment coordinates that a pixel coordinate represents.
      * 
      * @param {number} pixel - pixel coordinate that represents a base
-     * @return {ChromosomeInterval} genomic coordinate that the pixel represents
+     * @return {FeatureSegment} segment coordinate that the pixel represents
      */
     xToSegmentCoordinate(pixel: number): FeatureSegment {
-        const contextBase = this.xToBase(pixel);
+        const contextBase = Math.floor(this.xToBase(pixel));
         return this._viewRegion.getNavigationContext().convertBaseToFeatureCoordinate(contextBase);
     }
 }

@@ -108,7 +108,7 @@ export class RegionPanTracker extends React.Component<RegionPanTrackProps> {
             (this.props.panRegion.getWidth() / event.currentTarget.clientWidth);
         // Why -1?  When the mouse moves to the right, parts on the left move into view.  Ergo, we're moving the view
         // region to the left.  Vice-versa for moving the mouse to the left.
-        const baseDiff = -1 * basesPerPixel * xDiff;
+        const baseDiff = Math.round(-1 * basesPerPixel * xDiff);
         const navContext = region.getNavigationContext();
         const [start, end] = region.getContextCoordinates();
 

@@ -20,7 +20,7 @@ class NavigationContext {
     private _name: string;
     private _features: Feature[];
     private _sortedFeatureStarts: number[];
-    private _startCoordinateForFeature: Map<Feature, number>;
+    private _minCoordinateForFeature: Map<Feature, number>;
     private _featuresForChr: {[chr: string]: Feature[]};
     private _totalBases: number;
 
@@ -56,18 +56,44 @@ class NavigationContext {
     constructor(name: string, features: Feature[]) {
         this._name = name;
         this._features = features;
-        this._startCoordinateForFeature = new Map();
+        this._minCoordinateForFeature = new Map();
         this._sortedFeatureStarts = [];
         this._featuresForChr = _.groupBy(features, feature => feature.getLocus().chr)
         this._totalBases = 0;
 
         for (const feature of features) {
-            if (this._startCoordinateForFeature.has(feature)) {
+            if (this._minCoordinateForFeature.has(feature)) {
                 throw new Error(`Duplicate feature "${feature.getName()}" detected.  Features must be unique.`);
             }
-            this._startCoordinateForFeature.set(feature, this._totalBases);
+            this._minCoordinateForFeature.set(feature, this._totalBases);
             this._sortedFeatureStarts.push(this._totalBases);
             this._totalBases += feature.getLength();
+        }
+    }
+
+    /**
+     * If the input segment is in a reverse strand feature, returns a new segment that is the same size, but moved to
+     * the other end of the feature.  In effect, it rotates a feature segment 180 degrees about the feature's center.
+     * 
+     * Otherwise, returns the input unmodified.
+     * 
+     * @example
+     * let feature: Feature; // Pretend it has a length of 10
+     * const segment = new FeatureSegment(feature, 2, 4);
+     * this._flipIfReverseStrand(segment); // Returns new segment [6, 8)
+     * 
+     * @param {FeatureSegment} segment - the feature segment to flip if on the reverse strand
+     * @return {FeatureSegment} flipped feature segment, but only if the input was on the reverse strand
+     */
+    _flipIfReverseStrand(segment: FeatureSegment) {
+        if (segment.feature.getIsReverseStrand()) {
+            return new FeatureSegment(segment.feature, flip(segment.relativeEnd), flip(segment.relativeStart));
+        } else {
+            return segment;
+        }
+
+        function flip(relativeBase: number) {
+            return segment.feature.getLength() - relativeBase;
         }
     }
 
@@ -106,14 +132,17 @@ class NavigationContext {
     }
 
     /**
-     * Gets the context coordinate of a feature's start.  Throws an error if the feature cannot be found.
+     * Gets the lowest context coordinate that the input feature has.  Throws an error if the feature cannot be found.
+     * 
+     * Note that if the feature is on the forward strand, the result will represent the feature's start.  Otherwise, it
+     * represents the feature's end.
      * 
      * @param {Feature} feature - the feature to find
-     * @return {number} the context coordinate of the feature's start
+     * @return {number} the lowest context coordinate of the feature
      * @throws {RangeError} if the feature is not in this context
      */
     getFeatureStart(feature: Feature): number {
-        const coordinate = this._startCoordinateForFeature.get(feature);
+        const coordinate = this._minCoordinateForFeature.get(feature);
         if (coordinate === undefined) {
             throw new RangeError(`Feature "${feature.getName()}" not in this navigation context`);
         } else {
@@ -122,7 +151,7 @@ class NavigationContext {
     }
 
     /**
-     * Given a context coordinate, gets the feature in which it is located.  Returns a FeatureSegment that has 0 length,
+     * Given a context coordinate, gets the feature in which it is located.  Returns a FeatureSegment that has 1 length,
      * representing a single base number relative to the feature's start.
      *
      * @param {number} base - the context coordinate to look up
@@ -140,7 +169,7 @@ class NavigationContext {
         const index = _.sortedLastIndex(this._sortedFeatureStarts, base) - 1;
         const feature = this._features[index];
         const coordinate = base - this._sortedFeatureStarts[index];
-        return new FeatureSegment(feature, coordinate, coordinate);
+        return this._flipIfReverseStrand(new FeatureSegment(feature, coordinate, coordinate + 1));
     }
 
     /**
@@ -150,6 +179,7 @@ class NavigationContext {
      * @return {OpenInterval} context coordinates the feature segment occupies
      */
     convertFeatureSegmentToContextCoordinates(segment: FeatureSegment): OpenInterval {
+        segment = this._flipIfReverseStrand(segment);
         const contextStart = this.getFeatureStart(segment.feature);
         return new OpenInterval(contextStart + segment.relativeStart, contextStart + segment.relativeEnd);
     }
@@ -208,22 +238,18 @@ class NavigationContext {
      * @throws {RangeError} when parsing an interval outside of the context or something otherwise nonsensical
      */
     parse(str: string): OpenInterval {
-        const intervalMatch = str.match(/([\w:]+)\W+(\d+)\W+(\d+)/);
-        if (intervalMatch) {
-            const locus = ChromosomeInterval.parse(str);
-            const contextCoords = this.convertGenomeIntervalToBases(locus)[0];
-            if (!contextCoords) {
-                throw new RangeError('Location unavailable in this context');
-            } else {
-                return contextCoords;
-            }
-        }
-
         const feature = this._features.find(feature => feature.getName() === str);
-        if (!feature) {
-            throw new RangeError(`Could not find feature or chromosome with name of "${str}"`);
+        if (feature) {
+            return this.convertFeatureSegmentToContextCoordinates(new FeatureSegment(feature));
         }
-        return this.convertFeatureSegmentToContextCoordinates(new FeatureSegment(feature));
+    
+        const locus = ChromosomeInterval.parse(str);
+        const contextCoords = this.convertGenomeIntervalToBases(locus)[0];
+        if (!contextCoords) {
+            throw new RangeError('Location unavailable in this context');
+        } else {
+            return contextCoords;
+        }
     }
 
     /**
@@ -247,8 +273,9 @@ class NavigationContext {
 
             if (overlap) {
                 const relativeStart = overlap.start - start;
-                const relativeEnd = overlap.end - start
-                results.push(new FeatureSegment(feature, relativeStart, relativeEnd));
+                const relativeEnd = overlap.end - start;
+                const segment = new FeatureSegment(feature, relativeStart, relativeEnd);
+                results.push(this._flipIfReverseStrand(segment));
             } else if (results.length > 0) { // No overlap
                 // Since features are sorted by start, we can be confident that there will be no more overlaps if we
                 // have seen overlaps before.

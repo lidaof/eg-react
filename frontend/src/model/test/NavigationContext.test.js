@@ -6,7 +6,7 @@ import OpenInterval from '../interval/OpenInterval';
 const NAME = "Wow very genome";
 const FEATURES = [
     new Feature("f1", new ChromosomeInterval("chr1", 0, 10)),
-    new Feature("f2", new ChromosomeInterval("chr2", 0, 10)),
+    new Feature("f2", new ChromosomeInterval("chr2", 0, 10), '-'), // Note reverse strand!
     new Feature("f3", new ChromosomeInterval("chr2", 5, 15)), // Note genomic overlap with feature 2!
 ];
 const instance = new NavigationContext(NAME, FEATURES);
@@ -47,10 +47,16 @@ describe("getFeatureStart()", () => {
 });
 
 describe("convertBaseToFeatureCoordinate()", () => {
-    it("returns the right info", () => {
+    it("returns the right info, forward strand", () => {
+        const coordinate = instance.convertBaseToFeatureCoordinate(5);
+        expect(coordinate.getName()).toBe("f1");
+        expect(coordinate.relativeStart).toEqual(5);
+    });
+
+    it("returns the right info, reverse strand", () => {
         const coordinate = instance.convertBaseToFeatureCoordinate(10);
-        expect(coordinate.getName()).toEqual("f2");
-        expect(coordinate.relativeStart).toEqual(0);
+        expect(coordinate.getName()).toBe("f2");
+        expect(coordinate.relativeStart).toBe(9);
     });
 
     it("errors when given a base outside the genome", () => {
@@ -65,11 +71,8 @@ describe("parse()", () => {
     });
 
     it("parses segments with spaces correctly", () => {
-        expect(instance.parse("f1\t\t\t0         10")).toEqual({start: 0, end: 10});
+        expect(instance.parse("chr1\t\t\t0         10")).toEqual({start: 0, end: 10});
     });
-
-    it("parses two segments correctly", () => {
-        expect(instance.parse("f1:9-f3:1")).toEqual({start: 9, end: 21});
 
     it("parses just a feature name correctly", () => {
         expect(instance.parse("f2")).toEqual({start: 10, end: 20});
@@ -105,8 +108,8 @@ describe("convertGenomeIntervalToBases()", () => {
     it("is correct for multiple mappings", () => {
         const chrInterval = new ChromosomeInterval("chr2", 5, 10);
         expect(instance.convertGenomeIntervalToBases(chrInterval)).toEqual([
-            new OpenInterval(15, 20),
-            new OpenInterval(20, 25)
+            new OpenInterval(10, 15), // From feature 2, reverse strand
+            new OpenInterval(20, 25) // From feature 3
         ]);
     });
 });

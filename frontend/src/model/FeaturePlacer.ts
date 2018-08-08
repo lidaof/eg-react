@@ -10,7 +10,7 @@ import { GenomeInteraction } from './GenomeInteraction';
  * Draw information for a Feature
  */
 export interface PlacedFeature {
-    feature: Feature; // The feature
+    feature: Feature; // The feature that was placed
     /**
      * The feature's *visible* part.  "Visible" means the parts of the feature that lie inside the nav context, as some
      * parts might fall outside.  For example, the feature is chr1:0-200 but the context only contains chr1:50-100.
@@ -18,6 +18,7 @@ export interface PlacedFeature {
     visiblePart: FeatureSegment;
     contextLocation: OpenInterval; // The feature's *visible* part in navigation context coordinates
     xSpan: OpenInterval; // Horizontal location of the feature's *visible* part
+    isReverse: boolean; // Whether the feature was placed into a reversed part of the navigation context
 }
 
 export interface PlacedSegment {
@@ -80,8 +81,8 @@ export class FeaturePlacer {
                 contextLocation = contextLocation.getOverlap(viewRegionBounds); // Clamp the location to view region
                 if (contextLocation) {
                     const xSpan = drawModel.baseSpanToXSpan(contextLocation);
-                    const visiblePart = this._getVisibleSegment(feature, navContext, contextLocation);
-                    placements.push({ feature, visiblePart, contextLocation, xSpan });
+                    const {visiblePart, isReverse} = this._locatePlacement(feature, navContext, contextLocation);
+                    placements.push({ feature, visiblePart, contextLocation, xSpan, isReverse });
                 }
             }
         }
@@ -90,18 +91,36 @@ export class FeaturePlacer {
     }
 
     /**
-     * Gets the visible part of a feature after it has been placed in a navigation context.
+     * Gets the visible part of a feature after it has been placed in a navigation context, as well as if was placed
+     * into a reversed part of the nav context.
      * 
      * @param {Feature} feature - feature placed in a navigation context
      * @param {NavigationContext} contextLocation - navigation context in which the feature was placed
      * @param {OpenInterval} navContext - the feature's visible part in navigation context coordinates
-     * @return {FeatureSegment} - the visible part of the feature
+     * @return {object} - placement details of the feature
      */
-    _getVisibleSegment(feature: Feature, navContext: NavigationContext, contextLocation: OpenInterval): FeatureSegment {
-        const placedLocus = navContext.convertBaseToFeatureCoordinate(contextLocation.start).getLocus();
-        const distFromFeatureLocus = placedLocus.start - feature.getLocus().start;
+    _locatePlacement(feature: Feature, navContext: NavigationContext, contextLocation: OpenInterval) {
+        // First, get the genomic coordinates of the context location, i.e. the "context locus"
+        const contextFeatureCoord = navContext.convertBaseToFeatureCoordinate(contextLocation.start);
+        const placedBase = contextFeatureCoord.getLocus().start;
+        const isReverse = contextFeatureCoord.feature.getIsReverseStrand();
+
+        // We have a base number, but it could be the end or the beginning of the context locus.
+        let contextLocusStart;
+        if (isReverse) {
+            // placedBase is the end base number of the context locus.  Convert to the start.
+            contextLocusStart = placedBase - contextLocation.getLength() + 1;
+        } else {
+            contextLocusStart = placedBase;
+        }
+
+        // Now, we can compare the context location locus to the feature's locus.
+        const distFromFeatureLocus = contextLocusStart - feature.getLocus().start; 
         const relativeStart = Math.max(0, distFromFeatureLocus);
-        return new FeatureSegment(feature, relativeStart, relativeStart + contextLocation.getLength());
+        return {
+            visiblePart: new FeatureSegment(feature, relativeStart, relativeStart + contextLocation.getLength()),
+            isReverse
+        };
     }
 
     /**

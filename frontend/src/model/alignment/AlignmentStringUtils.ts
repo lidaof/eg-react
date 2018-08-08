@@ -69,15 +69,18 @@ export function segmentSequence(sequence: string, minGapLength: number, onlyGaps
  * 
  * @param {string} sequence - the sequence to examine
  * @param {number} baseAtStart - the base number corresponding to the start of the string to iterate
+ * @param {boolean} [isReverse] - if true, makes base numbers count down rather than up
  * @return {number[]}
  */
-export function makeBaseNumberLookup(sequence: string, baseAtStart: number): number[] {
+export function makeBaseNumberLookup(sequence: string, baseAtStart: number, isReverse=false): number[] {
+   const diff = isReverse ? -1 : 1;
+
    const bases = [];
    let currentBase = baseAtStart;
    for (const char of sequence) {
        bases.push(currentBase);
        if (char !== GAP_CHAR) {
-           currentBase++;
+           currentBase += diff;
        }
    }
    return bases;
