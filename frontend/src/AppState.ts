@@ -10,6 +10,8 @@ import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
 import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
 
+import undoable from 'redux-undo';
+
 let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
     const storage = {};
@@ -65,6 +67,7 @@ enum ActionType {
     SET_REGION_SET_LIST = "SET_REGION_SET_LIST",
     SET_REGION_SET_VIEW = "SET_REGION_SET_VIEW",
     SET_TRACK_LEGEND_WIDTH = "SET_TRACK_LEGEND_WIDTH",
+    INIT = "@@INIT",
 }
 
 interface AppAction {
@@ -143,6 +146,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
 
     switch (action.type) {
         case ActionType.SET_GENOME: // Setting genome resets state.
+        case ActionType.INIT:
             let nextViewRegion = null;
             let nextTracks: TrackModel[] = [];
             const genomeConfig = getGenomeConfig(action.genomeName);
@@ -216,7 +220,7 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
 
 // OK, so it's really an AppStore, but then that would mean something completely different 😛
 export const AppState = createStore(
-    getNextState,
+    undoable(getNextState, {limit: 10} ),
     (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__()
 );
 

@@ -19,8 +19,8 @@ import './App.css';
 
 function mapStateToProps(state) {
     return {
-        viewRegion: state.viewRegion,
-        tracks: state.tracks,
+        viewRegion: state.present.viewRegion,
+        tracks: state.present.tracks,
     };
 }
 
