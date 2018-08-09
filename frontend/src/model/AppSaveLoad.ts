@@ -4,6 +4,7 @@ import DisplayedRegionModel from './DisplayedRegionModel';
 import { getGenomeConfig } from './genomes/allGenomes';
 import { AppState, DEFAULT_TRACK_LEGEND_WIDTH } from '../AppState';
 import OpenInterval from './interval/OpenInterval';
+// import { withFirebase } from 'react-redux-firebase'
 
 /**
  * Converter of app state to plain objects and JSON.  In other words, app state serializer.

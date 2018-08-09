@@ -58,7 +58,8 @@ class History extends React.Component {
             const items = stateList.map((value, index) => 
                 <li key={index} onClick={() => callback(index)}>
                     <button className="btn btn-sm btn-warning">
-                        Region: {value.viewRegion.currentRegionAsString()}, # of tracks: {value.tracks.length}
+                        Region: {value.viewRegion ? value.viewRegion.currentRegionAsString() : "(none)"}, 
+                        # of tracks: {value.tracks.length}
                     </button>
                 </li>
             );

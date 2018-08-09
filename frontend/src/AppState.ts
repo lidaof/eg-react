@@ -9,7 +9,6 @@ import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
 import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
-
 import undoable from 'redux-undo';
 
 let STORAGE: any = window.sessionStorage;
