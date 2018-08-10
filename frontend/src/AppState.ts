@@ -10,6 +10,9 @@ import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
 import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
 import undoable from 'redux-undo';
+import uuid from "uuid";
+import { getFunName } from './helper';
+
 
 let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
@@ -38,6 +41,14 @@ const SESSION_KEY = "eg-react-session";
 export const MIN_VIEW_REGION_SIZE = 5;
 export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
+const sessionString = uuid.v1();
+
+export interface SessionData {
+    date: Date,
+    data: AppState,
+    label: string,
+}
+
 export interface AppState {
     genomeName: string;
     viewRegion: DisplayedRegionModel;
@@ -46,6 +57,8 @@ export interface AppState {
     regionSets: RegionSet[];
     regionSetView: RegionSet;
     trackLegendWidth: number;
+    sessionId: string;
+    sessionStatus: SessionData[];
 }
 
 const initialState: AppState = {
@@ -56,6 +69,8 @@ const initialState: AppState = {
     regionSets: [], // Available region sets, to be used for region set view
     regionSetView: null, // Region set backing current region set view, if applicable
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
+    sessionId: sessionString,
+    sessionStatus: [],
 };
 
 enum ActionType {
@@ -66,6 +81,8 @@ enum ActionType {
     SET_REGION_SET_LIST = "SET_REGION_SET_LIST",
     SET_REGION_SET_VIEW = "SET_REGION_SET_VIEW",
     SET_TRACK_LEGEND_WIDTH = "SET_TRACK_LEGEND_WIDTH",
+    SAVE_SESSION = "SAVE_SESSION",
+    RESTORE_SESSION = "RESTORE_SESSION",
     // INIT = "@@INIT",
 }
 
@@ -120,6 +137,14 @@ export const ActionCreators = {
 
     setTrackLegendWidth: (width: number) => {
         return {type: ActionType.SET_TRACK_LEGEND_WIDTH, width};
+    },
+
+    saveSession: (sessionData: AppState) => {
+        return {type: ActionType.SAVE_SESSION, sessionData};
+    },
+
+    restoreRession: (sessionData: AppState) => {
+        return {type: ActionType.RESTORE_SESSION, sessionData};
     },
 };
 
@@ -184,6 +209,16 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return handleRegionSetViewChange(prevState, action.set);
         case ActionType.SET_TRACK_LEGEND_WIDTH:
             return { ...prevState, trackLegendWidth: action.width };
+        case ActionType.SAVE_SESSION:
+            const session: SessionData = {
+                label: getFunName(),
+                date: new Date(),
+                data: action.sessionData,
+            };
+            const newSession = [...prevState.sessionStatus, session];
+            return { ...prevState, sessionStatus: newSession };
+        case ActionType.RESTORE_SESSION:
+            return { ...prevState, ...action.sessionData };
         default:
             console.warn("Unknown change state action; ignoring.");
             console.warn(action);

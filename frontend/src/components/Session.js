@@ -1,43 +1,30 @@
 import React from 'react';
-import uuid from "uuid";
-import { getFunName } from "../helper";
 import { connect } from "react-redux";
-
-const sessionId = uuid.v1()
+import { ActionCreators } from "../AppState";
 
 class Session extends React.Component {
 
-    state = {
-        status: [], // list of object: {id: 0,1,2, date: Date(), label: fun name, data: {the history state}}
-    };
-
     saveSession = () => {
-        const newStatus = {
-            id: this.state.length,
-            date: Date(),
-            label: getFunName(),
-            data: this.props.state,
-        };
-        const status = [...this.state.status, newStatus];
-        this.setState({status});
+        this.props.onSaveSession(this.props.state.browser.present);
     }
 
     restoreSession = (status) => {
-        return
+        this.props.onRestoreSession(status.data);
     }
 
     renderSavedSession = () => {
-        if (this.state.status === 0){
+        if (this.props.state.browser.present.sessionStatus.length === 0){
             return;
         }
-        const statusList = this.state.status.map(status => 
-            <li key={status.id}>
-                {status.label} ({status.date}) <button className="btn btn-success btn-sm">Restore</button>
+        const statusList = this.props.state.browser.present.sessionStatus.map(status => 
+            <li key={status.label}>
+                {status.label} ({status.date.toLocaleString()}) 
+                <button className="btn btn-success btn-sm" onClick={() => this.restoreSession(status)}>Restore</button>
             </li>
         );
         return (
             <div>
-                <p>Session Id: {sessionId} </p>
+                <p>Session Id: {this.props.state.browser.present.sessionId} </p>
                 <p>Saved status:</p>
                 <ol>
                     {statusList}
@@ -60,5 +47,9 @@ const mapStateToProps = (state) => {
     return {state: state};
 }
 
+const mapDispathToProps = {
+    onSaveSession: ActionCreators.saveSession,
+    onRestoreSession: ActionCreators.restoreRession,
+};
 
-export default connect(mapStateToProps)(Session);
+export default connect(mapStateToProps, mapDispathToProps)(Session);

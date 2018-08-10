@@ -58,7 +58,7 @@ class History extends React.Component {
                 <li key={index} onClick={() => callback(index)}>
                     <button className="btn btn-sm btn-warning">
                         Region: {value.viewRegion ? value.viewRegion.currentRegionAsString() : "(none)"}, 
-                        # of tracks: {value.tracks.length}
+                        # of tracks: {value.tracks ? value.tracks.length: 0}
                     </button>
                 </li>
             );
