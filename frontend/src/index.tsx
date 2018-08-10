@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
-import App from './App';
+import AppRouter from './AppRouter';
 import AppState from './AppState';
 import registerServiceWorker from './registerServiceWorker';
 
@@ -16,7 +16,7 @@ import './index.css';
 
 const root = document.getElementById('root');
 if (root) {
-    ReactDOM.render(<Provider store={AppState} ><App /></Provider>, root);
+    ReactDOM.render(<Provider store={AppState} ><AppRouter /></Provider>, root);
     registerServiceWorker();
 } else {
     (window as any).React = React;

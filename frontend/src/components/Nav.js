@@ -15,6 +15,7 @@ import CustomTrackAdder from './trackManagers/CustomTrackAdder';
 import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
+import Session from "./Session";
 
 /**
  * the top navigation bar for browser
@@ -91,6 +92,9 @@ class Nav extends React.Component {
                     <div className="dropdown-menu">
                         <ModalMenuItem itemLabel="Region Set View">
                             <RegionSetSelector genome={genomeConfig.genome} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Session">
+                            <Session />
                         </ModalMenuItem>
                         <div className="dropdown-item">Screenshot</div>
                     </div>

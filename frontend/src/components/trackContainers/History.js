@@ -2,7 +2,6 @@ import React from 'react';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import { connect } from 'react-redux';
 import ReactModal from "react-modal";
-import { PassThrough } from 'stream';
 
 const MODAL_STYLE = {
     content: {
@@ -37,7 +36,7 @@ class History extends React.Component {
     }
 
     renderHistory() {
-        const {past, present, future} =  this.props.state;
+        const {past, future} =  this.props.state;
         if (past.length === 0 && future.length === 0) {
             return <div>No operation history yet!</div>;
         }
@@ -80,6 +79,7 @@ class History extends React.Component {
                 style={MODAL_STYLE}
             >
             <div>
+                <h3>Operation history</h3>
                 <button onClick={this.handleCloseModal} className="btn btn-sm btn-danger">Close</button>
                 <button onClick={this.props.clearHistory} className="btn btn-sm btn-info">Clear History</button>
             </div>
