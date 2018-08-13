@@ -14,6 +14,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import TrackModel from './model/TrackModel';
+import Notifications from 'react-notify-toast';
 
 import './App.css';
 
@@ -88,6 +89,7 @@ class App extends React.Component {
                 onTracksAdded={this.addTracks}
                 onTrackRemoved={this.removeTrack}
             />
+             <Notifications />
             {this.state.isShowingNavigator &&
                 <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
             }

@@ -25,7 +25,7 @@ export class AppStateSaver {
      * @param {Object} appState - app state tree
      * @return {Object} plain object representing app state
      */
-    toObject(appState: AppState) {
+    toObject(appState: AppState): object {
         const regionSetViewIndex = appState.regionSets.findIndex(set => set === appState.regionSetView);
         const object = {
             genomeName: appState.genomeName,
@@ -36,8 +36,14 @@ export class AppStateSaver {
             regionSetViewIndex,
             trackLegendWidth: appState.trackLegendWidth,
             sessionId: appState.sessionId,
-            sessionStatus: appState.sessionStatus,
-            restoredFrom: appState.restoredFrom,
+            sessionStatus: appState.sessionStatus.map(element => {
+                return {
+                    date: element.date,
+                    label: element.label,
+                    data: this.toObject(element.data),
+                }
+            }),
+            statusDate: appState.statusDate,
         };
         return object;
     }
@@ -75,8 +81,14 @@ export class AppStateLoader {
             regionSetView,
             trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
             sessionId: object.sessionId,
-            sessionStatus: object.sessionStatus,
-            restoredFrom: object.restoredFrom,
+            sessionStatus: object.sessionStatus.map((element: any) => {
+                return {
+                    date: new Date(element.date),
+                    label: element.label,
+                    data: this.fromObject(element.data)
+                };
+            }),
+            statusDate: new Date(object.statusDate),
         };
     }
 

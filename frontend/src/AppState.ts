@@ -59,7 +59,7 @@ export interface AppState {
     trackLegendWidth: number;
     sessionId: string;
     sessionStatus: SessionData[];
-    restoredFrom: string,
+    statusDate: Date,
 }
 
 const initialState: AppState = {
@@ -72,7 +72,7 @@ const initialState: AppState = {
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
     sessionId: sessionString,
     sessionStatus: [],
-    restoredFrom: "",
+    statusDate: new Date(),
 };
 
 enum ActionType {
@@ -141,7 +141,7 @@ export const ActionCreators = {
         return {type: ActionType.SET_TRACK_LEGEND_WIDTH, width};
     },
 
-    saveSession: (sessionData: any) => {
+    saveSession: (sessionData: [AppState, string]) => {
         return {type: ActionType.SAVE_SESSION, sessionData};
     },
 
@@ -212,13 +212,14 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         case ActionType.SET_TRACK_LEGEND_WIDTH:
             return { ...prevState, trackLegendWidth: action.width };
         case ActionType.SAVE_SESSION:
+            const statusDate = new Date();
             const session: SessionData = {
                 label: action.sessionData[1],
-                date: new Date(),
-                data: action.sessionData[0],
+                date: statusDate,
+                data: {...action.sessionData[0], statusDate},
             };
             const newSession = [...prevState.sessionStatus, session];
-            return { ...prevState, sessionStatus: newSession };
+            return { ...prevState, sessionStatus: newSession, statusDate };
         case ActionType.RESTORE_SESSION:
             const withoutSessionStatus = _.omit(action.sessionData, ['sessionId', 'sessionStatus']);
             // keeps status list on all status
