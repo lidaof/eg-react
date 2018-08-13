@@ -3,7 +3,7 @@
  * 
  * @author Silas Hsu
  */
-import { createStore, combineReducers } from 'redux';
+import { createStore, combineReducers, compose } from 'redux';
 import { getGenomeConfig } from './model/genomes/allGenomes';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
@@ -11,7 +11,8 @@ import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
 import undoable from 'redux-undo';
 import uuid from "uuid";
-
+import { firebaseReducer, reactReduxFirebase } from 'react-redux-firebase';
+import firebase from 'firebase';
 import _ from 'lodash';
 
 let STORAGE: any = window.sessionStorage;
@@ -44,9 +45,9 @@ export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 const sessionString = uuid.v1();
 
 export interface SessionData {
-    date: Date,
-    data: AppState,
-    label: string,
+    date: Date;
+    data: AppState;
+    label: string;
 }
 
 export interface AppState {
@@ -258,11 +259,33 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
 }
 
 const rootReducer = combineReducers({
-    browser: undoable(getNextState, {limit: 10} )
+    browser: undoable(getNextState, {limit: 10} ),
+    firebase: firebaseReducer,
 });
 
+
+// Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyADX844efdjDQG2LrWLhSAB4RiymVnuhOM",
+    authDomain: "eg-session.firebaseapp.com",
+    databaseURL: "https://eg-session.firebaseio.com",
+    storageBucket: "eg-session.appspot.com",
+  }
+  firebase.initializeApp(firebaseConfig)
+  
+  // react-redux-firebase options
+  const config = {
+    userProfile: 'users', // firebase root where user profiles are stored
+    enableLogging: false, // enable/disable Firebase's database logging
+  };
+  
+  // Add redux Firebase to compose
+  const createStoreWithFirebase = compose(
+    reactReduxFirebase(firebase, config)
+  )(createStore);
+
 // OK, so it's really an AppStore, but then that would mean something completely different 😛
-export const AppState = createStore(
+export const AppState = createStoreWithFirebase(
     rootReducer,
     (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__()
 );

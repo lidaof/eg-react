@@ -1,30 +1,22 @@
 import React from 'react';
 import { connect } from "react-redux";
 import { ActionCreators } from "../AppState";
-import base from "../base";
 import { getFunName } from '../helper';
 import './Session.css';
 import { notify } from 'react-notify-toast';
+import { firebaseConnect } from 'react-redux-firebase';
+import { compose } from 'redux';
+
 class Session extends React.Component {
 
     state = {
-        sessionData: null,
         statusLabel: getFunName(),
     };
 
-    // componentDidMount() {
-    //     this.setState({sessionData: this.props.state.browser.present});
-    //     this.ref = base.syncState(`sessions/${this.props.state.browser.present.sessionId}`,
-    //         {
-    //             context: this,
-    //             state: 'sessionData'
-    //         }
-    //     );
-    // }
-
-    // componentWillUnmount() {
-    //     base.removeBinding(this.ref);
-    // }
+    setSession = () => this.props.firebase.set(
+        `sessions/${this.props.state.browser.present.sessionId}`, 
+        this.props.state.browser.present
+    )
 
     handleChange = (event) => {
         this.setState({statusLabel: event.target.value});
@@ -35,14 +27,17 @@ class Session extends React.Component {
     }
 
     saveSession = () => {
-        this.props.onSaveSession([this.props.state.browser.present, this.state.statusLabel]);
-        this.setState({sessionData: this.props.state.browser.present});
-        notify.show('Session Saved!', 'success', 2000);
+        //this.props.onSaveSession([this.props.state.browser.present, this.state.statusLabel]);
+        this.props.firebase.set(
+            `sessions/${this.props.state.browser.present.sessionId}`, 
+            this.props.state.browser.present
+        )
+        .then(notify.show('Session Saved!', 'success', 2000))
+        .catch(notify.show('Session Error!', 'Error', 2000));
     }
 
     restoreSession = (status) => {
         this.props.onRestoreSession(status.data);
-        this.setState({sessionData: this.props.state.browser.present});
         notify.show('Session Restored!', 'success', 2000);
         this.renderSavedSession();
     }
@@ -111,4 +106,11 @@ const mapDispathToProps = {
     onRestoreSession: ActionCreators.restoreRession,
 };
 
-export default connect(mapStateToProps, mapDispathToProps)(Session);
+export default compose(
+    firebaseConnect([
+      'sessions'
+    ]),
+    connect((state) => ({
+      sessions: state.firebase.data.sessions,
+    }))
+  )(connect(mapStateToProps, mapDispathToProps)(Session));
