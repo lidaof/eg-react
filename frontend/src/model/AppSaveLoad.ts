@@ -37,6 +37,7 @@ export class AppStateSaver {
             trackLegendWidth: appState.trackLegendWidth,
             sessionId: appState.sessionId,
             sessionStatus: appState.sessionStatus,
+            restoredFrom: appState.restoredFrom,
         };
         return object;
     }
@@ -75,6 +76,7 @@ export class AppStateLoader {
             trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
             sessionId: object.sessionId,
             sessionStatus: object.sessionStatus,
+            restoredFrom: object.restoredFrom,
         };
     }
 

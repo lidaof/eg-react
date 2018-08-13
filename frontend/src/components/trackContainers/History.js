@@ -79,7 +79,7 @@ class History extends React.Component {
                 style={MODAL_STYLE}
             >
             <div>
-                <h3>Operation history</h3>
+                <h5>Operation history</h5>
                 <button onClick={this.handleCloseModal} className="btn btn-sm btn-danger">Close</button>
                 <button onClick={this.props.clearHistory} className="btn btn-sm btn-info">Clear History</button>
             </div>

@@ -11,8 +11,8 @@ import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
 import undoable from 'redux-undo';
 import uuid from "uuid";
-import { getFunName } from './helper';
 
+import _ from 'lodash';
 
 let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
@@ -59,6 +59,7 @@ export interface AppState {
     trackLegendWidth: number;
     sessionId: string;
     sessionStatus: SessionData[];
+    restoredFrom: string,
 }
 
 const initialState: AppState = {
@@ -71,6 +72,7 @@ const initialState: AppState = {
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
     sessionId: sessionString,
     sessionStatus: [],
+    restoredFrom: "",
 };
 
 enum ActionType {
@@ -139,7 +141,7 @@ export const ActionCreators = {
         return {type: ActionType.SET_TRACK_LEGEND_WIDTH, width};
     },
 
-    saveSession: (sessionData: AppState) => {
+    saveSession: (sessionData: any) => {
         return {type: ActionType.SAVE_SESSION, sessionData};
     },
 
@@ -211,14 +213,16 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, trackLegendWidth: action.width };
         case ActionType.SAVE_SESSION:
             const session: SessionData = {
-                label: getFunName(),
+                label: action.sessionData[1],
                 date: new Date(),
-                data: action.sessionData,
+                data: action.sessionData[0],
             };
             const newSession = [...prevState.sessionStatus, session];
             return { ...prevState, sessionStatus: newSession };
         case ActionType.RESTORE_SESSION:
-            return { ...prevState, ...action.sessionData };
+            const withoutSessionStatus = _.omit(action.sessionData, ['sessionId', 'sessionStatus']);
+            // keeps status list on all status
+            return { ...prevState, ...withoutSessionStatus };
         default:
             console.warn("Unknown change state action; ignoring.");
             console.warn(action);

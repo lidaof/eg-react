@@ -1,30 +1,71 @@
 import React from 'react';
 import { connect } from "react-redux";
 import { ActionCreators } from "../AppState";
+import base from "../base";
+import { getFunName } from '../helper';
+import './Session.css';
 
 class Session extends React.Component {
 
+    state = {
+        sessionData: null,
+        statusLabel: '',
+    };
+
+    // componentDidMount() {
+    //     this.setState({sessionData: this.props.state.browser.present});
+    //     this.ref = base.syncState(`sessions/${this.props.state.browser.present.sessionId}`,
+    //         {
+    //             context: this,
+    //             state: 'sessionData'
+    //         }
+    //     );
+    // }
+
+    // componentWillUnmount() {
+    //     base.removeBinding(this.ref);
+    // }
+
+    handleChange = (event) => {
+        this.setState({statusLabel: event.target.value});
+    }
+
+    setRandomLabel = () => {
+        this.setState({statusLabel: getFunName()});
+    }
+
     saveSession = () => {
-        this.props.onSaveSession(this.props.state.browser.present);
+        if(!this.state.sessionStatus){
+            this.warningBox();
+        }
+        this.props.onSaveSession([this.props.state.browser.present, this.state.statusLabel]);
+        this.setState({sessionData: this.props.state.browser.present});
     }
 
     restoreSession = (status) => {
         this.props.onRestoreSession(status.data);
+        this.setState({sessionData: this.props.state.browser.present});
     }
 
     renderSavedSession = () => {
-        if (this.props.state.browser.present.sessionStatus.length === 0){
+        const {sessionId, sessionStatus, restoredFrom} = this.props.state.browser.present;
+        if (sessionStatus.length === 0){
             return;
         }
-        const statusList = this.props.state.browser.present.sessionStatus.map(status => 
-            <li key={status.label}>
+        let restoreClass = "btn btn-success btn-sm";
+        const statusList = sessionStatus.map(status => {
+            if (restoredFrom === this.state.sessionData.restoredFrom) {
+                restoreClass += " disabled";
+            }
+            return <li key={status.label}>
                 {status.label} ({status.date.toLocaleString()}) 
-                <button className="btn btn-success btn-sm" onClick={() => this.restoreSession(status)}>Restore</button>
+                <button className={restoreClass} onClick={() => this.restoreSession(status)}>Restore</button>
             </li>
+        }    
         );
         return (
             <div>
-                <p>Session Id: {this.props.state.browser.present.sessionId} </p>
+                <p>Session Id: {sessionId} </p>
                 <p>Saved status:</p>
                 <ol>
                     {statusList}
@@ -33,10 +74,24 @@ class Session extends React.Component {
         );
     }
 
+    warningBox = () => {
+        return <div className="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>No status name!</strong> You should provide a name or using the random names.
+        <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>;
+    }
+
     render() {
        return (
            <div>
                <button className="btn btn-primary" onClick={this.saveSession}>Save session</button>
+               <label htmlFor="statusLabel">
+                Name your status: <input type="text" value={this.state.statusLabel} onChange={this.handleChange} /> or use a 
+                <button type="button" className="btn btn-warning btn-sm" onClick={this.setRandomLabel}>Random</button> name
+               </label>
+               
                {this.renderSavedSession()}
            </div>
        );
