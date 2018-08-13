@@ -191,14 +191,15 @@ class Chromosomes extends React.PureComponent {
     renderSequences() {
         const {viewRegion, width} = this.props;
         const placedSequences = this.featurePlacer.placeFeatures(this.state.sequenceData, viewRegion, width);
-        return placedSequences.map((placedSequence, i) => {
-            const {feature, visiblePart, xSpan} = placedSequence;
+        return placedSequences.map((placement, i) => {
+            const {feature, visiblePart, xSpan, isReverse} = placement;
             const {relativeStart, relativeEnd} = visiblePart;
             return <Sequence
                 key={i}
                 sequence={feature.sequence.substring(relativeStart, relativeEnd)}
                 xSpan={xSpan}
                 y={TOP_PADDING}
+                isReverseComplement={isReverse}
             />;
         });
     }

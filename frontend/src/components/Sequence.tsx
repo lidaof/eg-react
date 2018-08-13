@@ -1,12 +1,29 @@
 import React from 'react';
 import OpenInterval from '../model/interval/OpenInterval';
 
+const COMPLEMENT_BASE = {
+    A: 'T',
+    T: 'A',
+    G: 'C',
+    C: 'G'
+};
+
+function getReverseComplement(sequence: string): string {
+    let result = '';
+    for (let i = sequence.length - 1; i >= 0; i--) {
+        const char = sequence.charAt(i);
+        const complement = COMPLEMENT_BASE[ char.toUpperCase() ];
+        result += complement || char; // Default to the unmodified char if there is no complement
+    }
+    return result;
+}
+
 const BASE_COLORS = {
-    g: '#3899c7', // Blue
-    c: '#e05144', // Red
-    t: '#9238c7', // Purple
-    a: '#89c738', // Green
-    n: '#858585' // Grey
+    G: '#3899c7', // Blue
+    C: '#e05144', // Red
+    T: '#9238c7', // Purple
+    A: '#89c738', // Green
+    N: '#858585' // Grey
 };
 const UNKNOWN_BASE_COLOR = 'black';
 
@@ -17,6 +34,7 @@ interface SequenceProps {
     isDrawBackground?: boolean;
     height?: number;
     letterSize?: number;
+    isReverseComplement?: boolean;
 }
 
 /**
@@ -35,7 +53,7 @@ export class Sequence extends React.PureComponent<SequenceProps> {
     };
 
     render() {
-        const {sequence, xSpan, y, isDrawBackground, height, letterSize} = this.props;
+        const {sequence, xSpan, y, isDrawBackground, height, letterSize, isReverseComplement} = this.props;
         if (!sequence) {
             return null;
         }
@@ -45,17 +63,19 @@ export class Sequence extends React.PureComponent<SequenceProps> {
             return null;
         }
 
+        const sequenceToDraw = isReverseComplement ? getReverseComplement(sequence) : sequence;
+
         const rects = [];
         if (isDrawBackground) {
             let x = xSpan.start;
-            for (const base of sequence) {
+            for (const base of sequenceToDraw) {
                 rects.push(<rect
                     key={x}
                     x={x}
                     y={y}
                     width={baseWidth}
                     height={height}
-                    style={{fill: BASE_COLORS[base.toLowerCase()] || UNKNOWN_BASE_COLOR}}
+                    style={{fill: BASE_COLORS[base.toUpperCase()] || UNKNOWN_BASE_COLOR}}
                 />);
                 x += baseWidth;
             }
@@ -64,7 +84,7 @@ export class Sequence extends React.PureComponent<SequenceProps> {
         const letters = [];
         if (baseWidth >= letterSize) {
             let x = xSpan.start;
-            for (const base of sequence) {
+            for (const base of sequenceToDraw) {
                 letters.push(
                     <text
                         key={x}

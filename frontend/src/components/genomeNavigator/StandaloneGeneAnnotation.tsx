@@ -24,7 +24,8 @@ export function StandaloneGeneAnnotation(props: StandaloneGeneAnnotationProps): 
         visiblePart: new FeatureSegment(gene),
         contextLocation,
         xSpan,
-    }
+        isReverse: false
+    };
     return <svg width={elementWidth} height={GeneAnnotation.HEIGHT} >
         <GeneAnnotation placedGene={placedGene} />
     </svg>;

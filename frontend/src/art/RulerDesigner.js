@@ -89,17 +89,16 @@ export class RulerDesigner {
         for (const segment of segments) {
             const segmentLocus = segment.getLocus();
             const segmentContextSpan = navContext.convertFeatureSegmentToContextCoordinates(segment);
-            addTicks(segmentLocus, segmentContextSpan, true); // Major
+            addTicks(segmentLocus, segmentContextSpan, true, segment.feature.getIsReverseStrand()); // Major
             if (basesPerMinorTick >= 1) {
-                addTicks(segmentLocus, segmentContextSpan, false); // Minor
+                addTicks(segmentLocus, segmentContextSpan, false, segment.feature.getIsReverseStrand()); // Minor
             }
         }
 
         return elements;
 
-        function addTicks(segmentLocus, segmentContextSpan, isMajor=true) {
-            const [segmentContextStart, segmentContextEnd] = segmentContextSpan
-            let xStart, xEnd, startBase, xPerTick, basesPerTick, getTickElement, getTextElement;
+        function addTicks(locus, contextSpan, isMajor=true, isReverse=false) {
+            let xPerTick, basesPerTick, getTickElement, getTextElement;
             if (isMajor) {
                 xPerTick = pixelsPerMajorTick;
                 basesPerTick = basesPerMajorTick;
@@ -113,11 +112,18 @@ export class RulerDesigner {
                 getTextElement = elementFactory.minorTickText.bind(elementFactory);
             }
 
-            startBase = roundUp(segmentLocus.start, basesPerTick);
-            const basesRounded = startBase - segmentLocus.start;
-            xStart = drawModel.baseToX(segmentContextStart + basesRounded);
-            xEnd = drawModel.baseToX(segmentContextEnd);
-
+            let startBase, basesRounded;
+            if (isReverse) {
+                startBase = roundDown(locus.end, basesPerTick);
+                basesRounded = locus.end - startBase;
+                basesPerTick *= -1;
+            } else {
+                startBase = roundUp(locus.start, basesPerTick);
+                basesRounded = startBase - locus.start;
+            }
+            
+            const xStart = drawModel.baseToX(contextSpan.start + basesRounded);
+            const xEnd = drawModel.baseToX(contextSpan.end);
             let x = xStart;
             let base = startBase;
             while (x < xEnd) {
@@ -134,6 +140,10 @@ export class RulerDesigner {
 
         function roundUp(n, precision) {
             return Math.ceil(n / precision) * precision;
+        }
+
+        function roundDown(n, precision) {
+            return Math.floor(n / precision) * precision;
         }
     }
 }

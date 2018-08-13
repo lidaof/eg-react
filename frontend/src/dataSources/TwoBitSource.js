@@ -55,7 +55,7 @@ class TwoBitSource extends DataSource {
                 if (error) {
                     reject(error);
                 } else {
-                    resolve(data)
+                    resolve(data);
                 }
             });
         });
