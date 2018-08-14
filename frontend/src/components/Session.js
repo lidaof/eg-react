@@ -13,10 +13,11 @@ class Session extends React.Component {
         statusLabel: getFunName(),
     };
 
-    setSession = () => this.props.firebase.set(
-        `sessions/${this.props.state.browser.present.sessionId}`, 
-        this.props.state.browser.present
-    )
+    componentDidMount() {
+        this.props.firebase.set(
+        `sessions/${this.props.sessionId}`, 
+            []);
+    }
 
     handleChange = (event) => {
         this.setState({statusLabel: event.target.value});
@@ -27,29 +28,31 @@ class Session extends React.Component {
     }
 
     saveSession = () => {
-        //this.props.onSaveSession([this.props.state.browser.present, this.state.statusLabel]);
+        // this.props.onSaveSession([this.props.state.browser.present, this.state.statusLabel]);
+        const newSessions = [...this.props.sessions, this.props.state.browser];
         this.props.firebase.set(
-            `sessions/${this.props.state.browser.present.sessionId}`, 
-            this.props.state.browser.present
-        )
+            `sessions/${this.props.sessionId}`, newSessions)
         .then(notify.show('Session Saved!', 'success', 2000))
-        .catch(notify.show('Session Error!', 'Error', 2000));
+        .catch(notify.show('Session Saving Error!', 'Error', 2000));
     }
 
     restoreSession = (status) => {
-        this.props.onRestoreSession(status.data);
+        // this.props.onRestoreSession(status.data);
         notify.show('Session Restored!', 'success', 2000);
         this.renderSavedSession();
     }
 
     renderSavedSession = () => {
-        const {sessionId, sessionStatus, statusDate} = this.props.state.browser.present;
-        if (sessionStatus.length === 0){
-            return;
-        }
+        const { sessionId } = this.props
+        console.log(this.props);
+        // const {sessions} = this.props.state.firebase.data;
+        // if (sessions.length === 0){
+        //     return;
+        // }
+        const sessions = [];
         let restoreButton;
-        const statusList = sessionStatus.map((status,i) => {
-            if (statusDate.valueOf() === status.date.valueOf()) {
+        const statusList = sessions.map((status,i) => {
+            if (0) {
                 restoreButton = <button className="btn btn-secondary btn-sm" disabled>
                     Restored
                 </button>
@@ -60,7 +63,7 @@ class Session extends React.Component {
                 </button>
             }
             return <li key={i}>
-                {status.label} ({status.date.toLocaleString()}) 
+                {status.genomeName}
                 {restoreButton}
             </li>
         }    

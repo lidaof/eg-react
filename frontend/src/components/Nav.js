@@ -34,7 +34,7 @@ class Nav extends React.Component {
     render() {
         const {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
-            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene
+            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, sessionId
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
@@ -94,7 +94,7 @@ class Nav extends React.Component {
                             <RegionSetSelector genome={genomeConfig.genome} />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Session">
-                            <Session />
+                            <Session sessionId={sessionId} />
                         </ModalMenuItem>
                         <div className="dropdown-item">Screenshot</div>
                     </div>

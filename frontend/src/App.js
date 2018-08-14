@@ -22,6 +22,7 @@ function mapStateToProps(state) {
     return {
         viewRegion: state.browser.present.viewRegion,
         tracks: state.browser.present.tracks,
+        sessionId: state.browser.present.sessionId,
     };
 }
 
@@ -71,7 +72,7 @@ class App extends React.Component {
     };
 
     render() {
-        const {genomeConfig, viewRegion, tracks, onNewViewRegion} = this.props;
+        const {genomeConfig, viewRegion, tracks, onNewViewRegion, sessionId} = this.props;
         if (!genomeConfig) {
             return <div className="container-fluid"><GenomePicker /></div>;
         }
@@ -88,6 +89,7 @@ class App extends React.Component {
                 genomeConfig={genomeConfig}
                 onTracksAdded={this.addTracks}
                 onTrackRemoved={this.removeTrack}
+                sessionId={sessionId}
             />
              <Notifications />
             {this.state.isShowingNavigator &&
