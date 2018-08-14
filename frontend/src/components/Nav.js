@@ -93,7 +93,12 @@ class Nav extends React.Component {
                         <ModalMenuItem itemLabel="Region Set View">
                             <RegionSetSelector genome={genomeConfig.genome} />
                         </ModalMenuItem>
-                        <ModalMenuItem itemLabel="Session">
+                        <ModalMenuItem itemLabel="Session" style={{content: {
+                                                        right: "unset",
+                                                        bottom: "unset",
+                                                        overflow: "visible",
+                                                        padding: "5px",
+                                                    }}}>
                             <Session sessionId={sessionId} />
                         </ModalMenuItem>
                         <div className="dropdown-item">Screenshot</div>
@@ -174,6 +179,7 @@ class ModalMenuItem extends React.Component {
                 ariaHideApp={false}
                 onRequestClose={this.toggleOpen}
                 shouldCloseOnOverlayClick={true}
+                style={this.props.style}
             >
                 <ModalCloseButton onClick={this.toggleOpen} />
                 {this.props.children}

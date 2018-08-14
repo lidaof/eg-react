@@ -9,7 +9,7 @@ import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
 import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
-import undoable from 'redux-undo';
+import undoable, { StateWithHistory } from 'redux-undo';
 import uuid from "uuid";
 import { firebaseReducer, reactReduxFirebase } from 'react-redux-firebase';
 import firebase from 'firebase';
@@ -42,12 +42,21 @@ const SESSION_KEY = "eg-react-session";
 export const MIN_VIEW_REGION_SIZE = 5;
 export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
-const sessionString = uuid.v1();
-
-export interface SessionData {
+export interface Session {
+    id: number;
     date: Date;
-    data: AppState;
     label: string;
+}
+
+export interface SessionBundle {
+    id: string;
+    sessionsInBundle: Session[];
+    currentSessionId: number;
+}
+
+export interface SessionState {
+    id: string; // a id combination from bundle id and session id
+    state: StateWithHistory<AppState>;
 }
 
 export interface AppState {
@@ -58,11 +67,11 @@ export interface AppState {
     regionSets: RegionSet[];
     regionSetView: RegionSet;
     trackLegendWidth: number;
-    sessionId: string;
-    sessionStatus: SessionData[];
-    statusDate: Date,
+    bundleId: string;
+
 }
 
+const bundleId = uuid.v1();
 const initialState: AppState = {
     genomeName: "",
     viewRegion: null,
@@ -71,9 +80,7 @@ const initialState: AppState = {
     regionSets: [], // Available region sets, to be used for region set view
     regionSetView: null, // Region set backing current region set view, if applicable
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
-    sessionId: sessionString,
-    sessionStatus: [],
-    statusDate: new Date(),
+    bundleId,
 };
 
 enum ActionType {
@@ -86,7 +93,7 @@ enum ActionType {
     SET_TRACK_LEGEND_WIDTH = "SET_TRACK_LEGEND_WIDTH",
     SAVE_SESSION = "SAVE_SESSION",
     RESTORE_SESSION = "RESTORE_SESSION",
-    // INIT = "@@INIT",
+    DELETE_SESSION = "DELETE_SESSION",
 }
 
 interface AppAction {
@@ -142,12 +149,12 @@ export const ActionCreators = {
         return {type: ActionType.SET_TRACK_LEGEND_WIDTH, width};
     },
 
-    saveSession: (sessionData: [AppState, string]) => {
-        return {type: ActionType.SAVE_SESSION, sessionData};
+    saveSession: (session: Session, sessionState: SessionState) => {
+        return {type: ActionType.SAVE_SESSION, session, sessionState};
     },
 
-    restoreRession: (sessionData: AppState) => {
-        return {type: ActionType.RESTORE_SESSION, sessionData};
+    restoreRession: (session: Session) => {
+        return {type: ActionType.RESTORE_SESSION, session};
     },
 };
 
@@ -212,23 +219,31 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return handleRegionSetViewChange(prevState, action.set);
         case ActionType.SET_TRACK_LEGEND_WIDTH:
             return { ...prevState, trackLegendWidth: action.width };
-        case ActionType.SAVE_SESSION:
-            const statusDate = new Date();
-            const session: SessionData = {
-                label: action.sessionData[1],
-                date: statusDate,
-                data: {...action.sessionData[0], statusDate},
-            };
-            const newSession = [...prevState.sessionStatus, session];
-            return { ...prevState, sessionStatus: newSession, statusDate };
-        case ActionType.RESTORE_SESSION:
-            const withoutSessionStatus = _.omit(action.sessionData, ['sessionId', 'sessionStatus']);
-            // keeps status list on all status
-            return { ...prevState, ...withoutSessionStatus };
         default:
             console.warn("Unknown change state action; ignoring.");
             console.warn(action);
             return prevState;
+    }
+}
+
+const intialSessionBundle: SessionBundle = {
+    id: bundleId,
+    sessionsInBundle: [],
+    currentSessionId: 0,
+}
+
+function sessionReducer (prevSession: SessionBundle = intialSessionBundle, action: AppAction) {
+    switch(action.type){
+        case ActionType.SAVE_SESSION:
+
+            return prevSession;
+        case ActionType.RESTORE_SESSION:
+            return prevSession;
+        case ActionType.DELETE_SESSION:
+            return prevSession;
+        default:
+            return prevSession;
+
     }
 }
 
@@ -261,6 +276,7 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
 const rootReducer = combineReducers({
     browser: undoable(getNextState, {limit: 10} ),
     firebase: firebaseReducer,
+    session: sessionReducer,
 });
 
 

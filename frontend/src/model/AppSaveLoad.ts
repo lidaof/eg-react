@@ -35,15 +35,7 @@ export class AppStateSaver {
             regionSets: appState.regionSets.map(set => set.serialize()),
             regionSetViewIndex,
             trackLegendWidth: appState.trackLegendWidth,
-            sessionId: appState.sessionId,
-            sessionStatus: appState.sessionStatus.map(element => {
-                return {
-                    date: element.date,
-                    label: element.label,
-                    data: this.toObject(element.data),
-                }
-            }),
-            statusDate: appState.statusDate,
+            bundleId: appState.bundleId,
         };
         return object;
     }
@@ -80,15 +72,7 @@ export class AppStateLoader {
             regionSets,
             regionSetView,
             trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
-            sessionId: object.sessionId,
-            sessionStatus: object.sessionStatus.map((element: any) => {
-                return {
-                    date: new Date(element.date),
-                    label: element.label,
-                    data: this.fromObject(element.data)
-                };
-            }),
-            statusDate: new Date(object.statusDate),
+            bundleId: object.bundleId,
         };
     }
 
