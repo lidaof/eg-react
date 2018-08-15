@@ -13,11 +13,11 @@ class Session extends React.Component {
         statusLabel: getFunName(),
     };
 
-    // componentDidMount() {
-    //     this.props.firebase.set(
-    //     `sessions/${this.props.sessionId}`, 
-    //         []);
-    // }
+    componentDidMount() {
+        this.props.firebase.set(
+        `sessions/${this.props.sessionId}`, 
+            []);
+    }
 
     handleChange = (event) => {
         this.setState({statusLabel: event.target.value});
