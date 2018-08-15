@@ -96,7 +96,8 @@ export class GeneAnnotation extends React.Component<GeneAnnotationProps> {
         const exonRects = this._renderCenteredRects(placedTranslated, HEIGHT, color); // These are the translated exons
 
         // Arrows
-        const isToRight = gene.getIsForwardStrand();
+        // If this boolean expression confuses you, construct a truth table.  I needed one ;)
+        const isToRight = gene.getIsReverseStrand() === placedGene.isReverse;
         const intronArrows = <AnnotationArrows
             startX={xStart}
             endX={xEnd}

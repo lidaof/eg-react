@@ -49,11 +49,11 @@ class GeneAnnotationTrack extends React.Component {
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
      * @return {JSX.Element} element visualizing the gene
      */
-    renderAnnotation(placedGroup, y, isLastRow) {
+    renderAnnotation(placedGroup, y, isLastRow, index) {
         const gene = placedGroup.feature;
         const {viewWindow, options} = this.props;
         return <GeneAnnotationScaffold
-            key={gene.id}
+            key={index}
             gene={gene}
             xSpan={placedGroup.xSpan}
             viewWindow={viewWindow}

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import DisplayedRegionModel from './DisplayedRegionModel';
 import { Feature } from './Feature';
 import { FeaturePlacer, PlacedFeature } from './FeaturePlacer';
@@ -33,6 +34,8 @@ export class FeatureArranger {
      * @return {number} the number of rows assigned
      */
     _assignRows(groups: PlacedFeatureGroup[], padding: number | PaddingFunc): number {
+        groups.sort((a, b) => a.xSpan.start - b.xSpan.start);
+
         const maxXsForRows: number[] = [];
         const isConstPadding = typeof padding === "number";
         for (const group of groups) {
@@ -58,20 +61,16 @@ export class FeatureArranger {
         placements.sort((a, b) => a.xSpan.start - b.xSpan.start);
 
         const groups: PlacedFeatureGroup[] = [];
-        for (let i = 0; i < placements.length; i++) {
+        let i = 0;
+        while (i < placements.length) {
             let j = i + 1;
-            while (j < placements.length) {
-                const prevLocusEnd = placements[j - 1].visiblePart.getLocus().end;
-                const currLocusStart = placements[j].visiblePart.getLocus().start;
-                if (prevLocusEnd !== currLocusStart) { // These two segments are not genomically adjacent
-                    break;
-                }
+            while (j < placements.length && lociAreAdjacent(j - 1, j)) {
                 j++;
             }
 
             const placementsInGroup = placements.slice(i, j);
-            const firstPlacement = placements[0];
-            const lastPlacement = placements[placements.length - 1];
+            const firstPlacement = _.first(placementsInGroup);
+            const lastPlacement = _.last(placementsInGroup);
             groups.push({
                 feature: firstPlacement.feature,
                 row: -1,
@@ -82,6 +81,12 @@ export class FeatureArranger {
         }
 
         return groups;
+
+        function lociAreAdjacent(a: number, b: number) {
+            const locusA = placements[a].visiblePart.getLocus();
+            const locusB = placements[b].visiblePart.getLocus();
+            return locusA.end === locusB.start || locusA.start === locusB.end;
+        }
     }
 
     /**

@@ -52,6 +52,7 @@ export class BamAnnotation extends React.Component<BamAnnotationProps, {}> {
         const {segment, xSpan} = placedSegment;
         const record = segment.feature as BamRecord;
         const options = this.props.options;
+        const isReverse = this.props.placedRecord.isReverse;
         // First, determine if we should draw this segment at all
         if (xSpan.getLength() < MIN_DRAW_WIDTH) {
             return null;
@@ -68,9 +69,12 @@ export class BamAnnotation extends React.Component<BamAnnotationProps, {}> {
         />];
 
         // Check if we should be drawing sequence mismatches/misalignments
-        const widthOfOneBase = xSpan.getLength() / segment.getLength();
+        let widthOfOneBase = xSpan.getLength() / segment.getLength();
         if (widthOfOneBase < MIN_DRAW_WIDTH) {
             return elements; // No use drawing individual bases
+        }
+        if (isReverse) {
+            widthOfOneBase *= -1;
         }
 
         const alignment = record.getAlignment();
@@ -79,7 +83,7 @@ export class BamAnnotation extends React.Component<BamAnnotationProps, {}> {
         let alignIndex = referenceIter.getIndexOfNextBase();
         const maxIndex = alignIndex + segment.getLength();
         
-        let x = xSpan.start;
+        let x = isReverse ? xSpan.end - widthOfOneBase : xSpan.start;
         // For each base in the reference sequence...
         for (; alignIndex < maxIndex; alignIndex++, x += widthOfOneBase) {
             if (alignment.reference.charAt(alignIndex) === alignment.read.charAt(alignIndex)) {

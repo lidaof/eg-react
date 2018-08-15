@@ -26,6 +26,7 @@ class BedAnnotation extends React.Component {
         color: PropTypes.string, // Primary color to draw
         reverseStrandColor: PropTypes.string, // Color of reverse strand annotations
         isMinimal: PropTypes.bool, // Whether to just render a plain box
+        isInvertArrowDirection: PropTypes.bool, // Whether to reverse any arrow directions
         /**
          * Callback for click events.  Signature: (event: MouseEvent, feature: Feature): void
          *     `event`: the triggering click event
@@ -37,11 +38,12 @@ class BedAnnotation extends React.Component {
     static defaultProps = {
         color: "blue",
         reverseStrandColor: "red",
+        isInvertArrowDirection: false,
         onClick: (event, feature) => undefined,
     };
 
     render() {
-        const {feature, xSpan, y, color, reverseStrandColor, isMinimal, onClick} = this.props;
+        const {feature, xSpan, y, color, reverseStrandColor, isMinimal, isInvertArrowDirection, onClick} = this.props;
         const colorToUse = feature.getIsReverseStrand() ? reverseStrandColor : color;
         const contrastColor = getContrastingColor(colorToUse);
         const [startX, endX] = xSpan;
@@ -56,12 +58,13 @@ class BedAnnotation extends React.Component {
         }
 
         let arrows = null;
-        if (feature.getIsForwardStrand() || feature.getIsReverseStrand()) {
+        if (feature.getHasStrand()) {
             arrows = <AnnotationArrows
                 startX={startX}
                 endX={endX}
                 height={HEIGHT}
-                isToRight={feature.getIsForwardStrand()}
+                // If this boolean expression confuses you, construct a truth table.  I needed one ;)
+                isToRight={feature.getIsReverseStrand() === isInvertArrowDirection}
                 color={contrastColor}
             />;
         }

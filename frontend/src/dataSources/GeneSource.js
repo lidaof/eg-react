@@ -35,10 +35,12 @@ class GeneSource extends DataSource {
                 start: locus.start,
                 end: locus.end
             };
+            const genome = this.trackModel.getMetadata('genome') || this.trackModel.genome;
+
             /**
              * Gets an object that looks like {data: []}
              */
-            return axios.get(`/${this.trackModel.genome}/genes/${this.trackModel.name}/queryRegion`, {
+            return axios.get(`/${genome}/genes/${this.trackModel.name}/queryRegion`, {
                 params: params
             });
         });

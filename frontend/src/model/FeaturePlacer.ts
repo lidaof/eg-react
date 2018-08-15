@@ -133,15 +133,20 @@ export class FeaturePlacer {
     placeFeatureSegments(placedFeature: PlacedFeature, segments: FeatureSegment[]): PlacedSegment[] {
         const pixelsPerBase = placedFeature.xSpan.getLength() / placedFeature.contextLocation.getLength();
         const placements = [];
-        for (const segment of segments) {
-            const visibleSegment = segment.getOverlap(placedFeature.visiblePart);
-            if (visibleSegment) {
-                const basesFromVisiblePart = visibleSegment.relativeStart - placedFeature.visiblePart.relativeStart;
+        for (let segment of segments) {
+            segment = segment.getOverlap(placedFeature.visiblePart);
+            if (segment) {
+                const basesFromVisiblePart = segment.relativeStart - placedFeature.visiblePart.relativeStart;
                 const distanceFromXSpan = basesFromVisiblePart * pixelsPerBase;
-                const xSpanStart = placedFeature.xSpan.start + distanceFromXSpan;
-                const xSpanLength = visibleSegment.getLength() * pixelsPerBase;
+                const xSpanLength = segment.getLength() * pixelsPerBase;
+                let xSpanStart;
+                if (placedFeature.isReverse) {
+                    xSpanStart = placedFeature.xSpan.end - distanceFromXSpan - xSpanLength;
+                } else {
+                    xSpanStart = placedFeature.xSpan.start + distanceFromXSpan;
+                }
                 placements.push({
-                    segment: visibleSegment,
+                    segment,
                     xSpan: new OpenInterval(xSpanStart, xSpanStart + xSpanLength)
                 });
             }

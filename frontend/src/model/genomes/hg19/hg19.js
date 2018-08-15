@@ -88,6 +88,17 @@ const defaultTracks = [
         }
     }),
     new TrackModel({
+        type: 'geneAnnotation',
+        name: 'refGene',
+        genome: 'mm10',
+        options: {
+            maxRows: 10
+        },
+        metadata: {
+            genome: 'mm10'
+        }
+    }),
+    new TrackModel({
         name: 'mm10 bigwig',
         type: "bigwig",
         url: "https://epgg-test.wustl.edu/d/mm10/ENCFF577HVF.bigWig",
@@ -102,6 +113,14 @@ const defaultTracks = [
             genome: 'mm10'
         }
     }),
+    new TrackModel({
+        type: "bed",
+        name: "mm10 bed",
+        url: "https://wangftp.wustl.edu/~rsears/Stuart_Little/ATAC_080818/Bruce4_sub120_extendedto120_DownSample.bed.gz",
+        metadata: {
+            genome: "mm10"
+        }
+    })
 ];
 
 const publicHubData = {

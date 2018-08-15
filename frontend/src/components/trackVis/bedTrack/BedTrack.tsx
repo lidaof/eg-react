@@ -68,6 +68,7 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
                 isMinimal={isLastRow}
                 color={this.props.options.color}
                 reverseStrandColor={this.props.options.color2}
+                isInvertArrowDirection={placement.isReverse}
                 onClick={this.renderTooltip}
             />
         );
