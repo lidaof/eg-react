@@ -1,0 +1,13 @@
+button.btn-info {
+    margin-left: 10px;
+}
+
+button.btn-warning {
+    padding: 2px;
+    margin-bottom: 2px
+}
+
+p {
+    font-size: 1.1em;
+    font-style: italic;
+}

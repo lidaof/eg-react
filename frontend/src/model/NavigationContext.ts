@@ -240,9 +240,12 @@ class NavigationContext {
     parse(str: string): OpenInterval {
         const feature = this._features.find(feature => feature.getName() === str);
         if (feature) {
-            return this.convertFeatureSegmentToContextCoordinates(new FeatureSegment(feature));
+            const contextCoords = this.convertFeatureSegmentToContextCoordinates(new FeatureSegment(feature));
+            const center = 0.5 * (contextCoords.start + contextCoords.end);
+            // This is safe because of setRegion in DisplayedRegionModel
+            return new OpenInterval(center - 3, center + 3);
         }
-    
+
         const locus = ChromosomeInterval.parse(str);
         const contextCoords = this.convertGenomeIntervalToBases(locus)[0];
         if (!contextCoords) {

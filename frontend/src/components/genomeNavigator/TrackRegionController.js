@@ -64,20 +64,6 @@ class TrackRegionController extends React.Component {
     }
 
     /**
-     * @return {string} the currently displayed region in human-readable form
-     */
-    _currentRegionAsString() {
-        let segments = this.props.selectedRegion.getFeatureSegments();
-        if (segments.length === 1) {
-            return segments[0].toString();
-        } else {
-            let first = segments[0];
-            let last = segments[segments.length - 1];
-            return first.toStringWithOther(last);
-        }
-    }
-
-    /**
      * Parses user input that expresses a desired region for tracks to display.
      */
     parseRegion() {
@@ -109,7 +95,7 @@ class TrackRegionController extends React.Component {
      * @inheritdoc
      */
     render() {
-        const coordinates = this._currentRegionAsString();
+        const coordinates = this.props.selectedRegion.currentRegionAsString();
         return (
         <div>
             <button className="btn btn-secondary" onClick={this.handleOpenModal}>

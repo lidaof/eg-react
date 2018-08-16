@@ -14,13 +14,15 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import TrackModel from './model/TrackModel';
+import Notifications from 'react-notify-toast';
 
 import './App.css';
 
 function mapStateToProps(state) {
     return {
-        viewRegion: state.viewRegion,
-        tracks: state.tracks,
+        viewRegion: state.browser.present.viewRegion,
+        tracks: state.browser.present.tracks,
+        bundleId: state.browser.present.bundleId,
     };
 }
 
@@ -70,7 +72,7 @@ class App extends React.Component {
     };
 
     render() {
-        const {genomeConfig, viewRegion, tracks, onNewViewRegion} = this.props;
+        const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId} = this.props;
         if (!genomeConfig) {
             return <div className="container-fluid"><GenomePicker /></div>;
         }
@@ -87,7 +89,9 @@ class App extends React.Component {
                 genomeConfig={genomeConfig}
                 onTracksAdded={this.addTracks}
                 onTrackRemoved={this.removeTrack}
+                bundleId={bundleId}
             />
+             <Notifications />
             {this.state.isShowingNavigator &&
                 <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
             }

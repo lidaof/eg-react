@@ -31,7 +31,7 @@ export class Feature {
      * @param {ChromosomeInterval} locus - genomic location of the feature
      * @param {Strand} strand - strand info
      */
-    constructor(name: string, public locus: ChromosomeInterval, public strand?: Strand) {
+    constructor(name: string, public locus: ChromosomeInterval, public strand: Strand='') {
         this.name = name === undefined ? locus.toString() : name; // eslint-disable-line eqeqeq
         this.locus = locus;
         this.strand = strand;

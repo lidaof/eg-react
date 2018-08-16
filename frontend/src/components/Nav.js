@@ -15,6 +15,7 @@ import CustomTrackAdder from './trackManagers/CustomTrackAdder';
 import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
+import { SessionUI } from "./SessionUI";
 
 /**
  * the top navigation bar for browser
@@ -33,7 +34,7 @@ class Nav extends React.Component {
     render() {
         const {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
-            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene
+            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
@@ -91,6 +92,14 @@ class Nav extends React.Component {
                     <div className="dropdown-menu">
                         <ModalMenuItem itemLabel="Region Set View">
                             <RegionSetSelector genome={genomeConfig.genome} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Session" style={{content: {
+                                                        right: "unset",
+                                                        bottom: "unset",
+                                                        overflow: "visible",
+                                                        padding: "5px",
+                                                    }}}>
+                            <SessionUI bundleId={bundleId} />
                         </ModalMenuItem>
                         <div className="dropdown-item">Screenshot</div>
                     </div>
@@ -170,6 +179,7 @@ class ModalMenuItem extends React.Component {
                 ariaHideApp={false}
                 onRequestClose={this.toggleOpen}
                 shouldCloseOnOverlayClick={true}
+                style={this.props.style}
             >
                 <ModalCloseButton onClick={this.toggleOpen} />
                 {this.props.children}

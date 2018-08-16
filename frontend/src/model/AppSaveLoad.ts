@@ -4,6 +4,7 @@ import DisplayedRegionModel from './DisplayedRegionModel';
 import { getGenomeConfig } from './genomes/allGenomes';
 import { AppState, DEFAULT_TRACK_LEGEND_WIDTH } from '../AppState';
 import OpenInterval from './interval/OpenInterval';
+// import { withFirebase } from 'react-redux-firebase'
 
 /**
  * Converter of app state to plain objects and JSON.  In other words, app state serializer.
@@ -24,16 +25,17 @@ export class AppStateSaver {
      * @param {Object} appState - app state tree
      * @return {Object} plain object representing app state
      */
-    toObject(appState: AppState) {
+    toObject(appState: AppState): object {
         const regionSetViewIndex = appState.regionSets.findIndex(set => set === appState.regionSetView);
         const object = {
             genomeName: appState.genomeName,
             viewInterval: appState.viewRegion ? appState.viewRegion.getContextCoordinates().serialize() : null,
-            tracks: appState.tracks,
+            tracks: appState.tracks.map(track => track.serialize()),
             metadataTerms: appState.metadataTerms,
             regionSets: appState.regionSets.map(set => set.serialize()),
             regionSetViewIndex,
             trackLegendWidth: appState.trackLegendWidth,
+            bundleId: appState.bundleId,
         };
         return object;
     }
@@ -60,16 +62,17 @@ export class AppStateLoader {
      * @throws {Error} on deserialization errors
      */
     fromObject(object: any): AppState {
-        const regionSets = object.regionSets.map(RegionSet.deserialize);
+        const regionSets = object.regionSets ? object.regionSets.map(RegionSet.deserialize) : [];
         const regionSetView = regionSets[object.regionSetViewIndex] || null;
         return {
             genomeName: object.genomeName,
             viewRegion: this._restoreViewRegion(object, regionSetView),
-            tracks: object.tracks.map((data: any) => new TrackModel(data)),
-            metadataTerms: object.metadataTerms,
+            tracks: object.tracks.map((data: any) => TrackModel.deserialize(data)),
+            metadataTerms: object.metadataTerms || [],
             regionSets,
             regionSetView,
             trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
+            bundleId: object.bundleId,
         };
     }
 

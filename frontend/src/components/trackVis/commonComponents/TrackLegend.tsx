@@ -9,6 +9,7 @@ import { TranslatableG } from '../../TranslatableG';
 import TrackModel from '../../../model/TrackModel';
 
 import './TrackLegend.css';
+import { StateWithHistory } from 'redux-undo';
 
 interface TrackLegendProps {
     trackModel: TrackModel; // Track metadata
@@ -21,9 +22,9 @@ interface TrackLegendProps {
 const NUM_TICKS_SUGGESTION = 3;
 const AXIS_WIDTH = 30;
 
-const mapStateToProps = (state: AppState) => {
+const mapStateToProps = (state: {browser: StateWithHistory<AppState>}) => {
     return {
-        width: state.trackLegendWidth
+        width: state.browser.present.trackLegendWidth
     };
 }
 

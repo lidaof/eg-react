@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ButtonGroup from './ButtonGroup';
+import UndoRedo from "./UndoRedo";
+import History from "./History";
 
 export const Tools = {
     DRAG: {
@@ -40,6 +42,8 @@ export function ToolButtons(props) {
             </button>
         );
     }
+    buttons.push(<UndoRedo key="undoredo" />);
+    buttons.push(<History key="history" />)
 
     return <ButtonGroup label="Tools:" buttons={buttons} />;
 }

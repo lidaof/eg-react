@@ -3,12 +3,16 @@
  * 
  * @author Silas Hsu
  */
-import { createStore } from 'redux';
+import { createStore, combineReducers, compose } from 'redux';
 import { getGenomeConfig } from './model/genomes/allGenomes';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
 import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
+import undoable from 'redux-undo';
+import uuid from "uuid";
+import { firebaseReducer, reactReduxFirebase } from 'react-redux-firebase';
+import firebase from 'firebase';
 
 let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
@@ -37,6 +41,7 @@ const SESSION_KEY = "eg-react-session";
 export const MIN_VIEW_REGION_SIZE = 5;
 export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
+
 export interface AppState {
     genomeName: string;
     viewRegion: DisplayedRegionModel;
@@ -45,8 +50,10 @@ export interface AppState {
     regionSets: RegionSet[];
     regionSetView: RegionSet;
     trackLegendWidth: number;
+    bundleId: string;
 }
 
+const bundleId = uuid.v1();
 const initialState: AppState = {
     genomeName: "",
     viewRegion: null,
@@ -55,6 +62,7 @@ const initialState: AppState = {
     regionSets: [], // Available region sets, to be used for region set view
     regionSetView: null, // Region set backing current region set view, if applicable
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
+    bundleId,
 };
 
 enum ActionType {
@@ -65,6 +73,7 @@ enum ActionType {
     SET_REGION_SET_LIST = "SET_REGION_SET_LIST",
     SET_REGION_SET_VIEW = "SET_REGION_SET_VIEW",
     SET_TRACK_LEGEND_WIDTH = "SET_TRACK_LEGEND_WIDTH",
+    RESTORE_SESSION = "RESTORE_SESSION",
 }
 
 interface AppAction {
@@ -119,6 +128,10 @@ export const ActionCreators = {
     setTrackLegendWidth: (width: number) => {
         return {type: ActionType.SET_TRACK_LEGEND_WIDTH, width};
     },
+
+    restoreSession: (sessionState: object) => {
+        return {type: ActionType.RESTORE_SESSION, sessionState};
+    },
 };
 
 function getInitialState() {
@@ -143,6 +156,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
 
     switch (action.type) {
         case ActionType.SET_GENOME: // Setting genome resets state.
+        // case ActionType.INIT:
             let nextViewRegion = null;
             let nextTracks: TrackModel[] = [];
             const genomeConfig = getGenomeConfig(action.genomeName);
@@ -168,7 +182,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 start -= amountToExpand;
                 end += amountToExpand;
             }
-
             const newRegion = prevState.viewRegion.clone().setRegion(start, end);
             return { ...prevState, viewRegion: newRegion };
         case ActionType.SET_TRACKS:
@@ -181,12 +194,15 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return handleRegionSetViewChange(prevState, action.set);
         case ActionType.SET_TRACK_LEGEND_WIDTH:
             return { ...prevState, trackLegendWidth: action.width };
+        case ActionType.RESTORE_SESSION:
+            return new AppStateLoader().fromObject(action.sessionState);
         default:
             console.warn("Unknown change state action; ignoring.");
             console.warn(action);
             return prevState;
     }
 }
+
 
 /**
  * Handles a change in region set view.  Causes a change in the displayed region as well as region set.
@@ -214,16 +230,42 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
     }
 }
 
+const rootReducer = combineReducers({
+    browser: undoable(getNextState, {limit: 10} ),
+    firebase: firebaseReducer,
+});
+
+
+// Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyADX844efdjDQG2LrWLhSAB4RiymVnuhOM",
+    authDomain: "eg-session.firebaseapp.com",
+    databaseURL: "https://eg-session.firebaseio.com",
+    storageBucket: "eg-session.appspot.com",
+  }
+  firebase.initializeApp(firebaseConfig)
+  
+  // react-redux-firebase options
+  const config = {
+    userProfile: 'users', // firebase root where user profiles are stored
+    enableLogging: false, // enable/disable Firebase's database logging
+  };
+  
+  // Add redux Firebase to compose
+  const createStoreWithFirebase = compose(
+    reactReduxFirebase(firebase, config)
+  )(createStore);
+
 // OK, so it's really an AppStore, but then that would mean something completely different 😛
-export const AppState = createStore(
-    getNextState,
+export const AppState = createStoreWithFirebase(
+    rootReducer,
     (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__()
 );
 
 window.addEventListener("beforeunload", () => {
     const state = AppState.getState();
     if (state !== initialState) {
-        const blob = new AppStateSaver().toJSON(state);
+        const blob = new AppStateSaver().toJSON(state.browser.present);
         STORAGE.setItem(SESSION_KEY, blob);
     }
 });
