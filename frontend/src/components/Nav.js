@@ -15,7 +15,7 @@ import CustomTrackAdder from './trackManagers/CustomTrackAdder';
 import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
-import Session from "./Session";
+import { SessionUI } from "./SessionUI";
 
 /**
  * the top navigation bar for browser
@@ -34,7 +34,7 @@ class Nav extends React.Component {
     render() {
         const {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
-            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, sessionId
+            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
@@ -99,7 +99,7 @@ class Nav extends React.Component {
                                                         overflow: "visible",
                                                         padding: "5px",
                                                     }}}>
-                            <Session sessionId={sessionId} />
+                            <SessionUI bundleId={bundleId} />
                         </ModalMenuItem>
                         <div className="dropdown-item">Screenshot</div>
                     </div>

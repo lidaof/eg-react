@@ -41,6 +41,7 @@ let nextId = 0;
 /**
  * An object storing track metadata and state.
  * 
+ * @implements {Serializable}
  * @author Silas Hsu
  */
 export class TrackModel {
@@ -75,6 +76,16 @@ export class TrackModel {
         // Other misc props
         this.id = nextId;
         nextId++;
+    }
+
+    serialize() {
+        const plainObject = _.clone(this);
+        delete plainObject.id;
+        return plainObject;
+    }
+
+    static deserialize(plainObject: any) {
+        return new TrackModel(plainObject);
     }
 
     /**

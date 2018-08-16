@@ -9,11 +9,10 @@ import DisplayedRegionModel from './model/DisplayedRegionModel';
 import { AppStateSaver, AppStateLoader } from './model/AppSaveLoad';
 import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
-import undoable, { StateWithHistory } from 'redux-undo';
+import undoable from 'redux-undo';
 import uuid from "uuid";
 import { firebaseReducer, reactReduxFirebase } from 'react-redux-firebase';
 import firebase from 'firebase';
-import _ from 'lodash';
 
 let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
@@ -42,22 +41,6 @@ const SESSION_KEY = "eg-react-session";
 export const MIN_VIEW_REGION_SIZE = 5;
 export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
-export interface Session {
-    id: number;
-    date: Date;
-    label: string;
-}
-
-export interface SessionBundle {
-    id: string;
-    sessionsInBundle: Session[];
-    currentSessionId: number;
-}
-
-export interface SessionState {
-    id: string; // a id combination from bundle id and session id
-    state: StateWithHistory<AppState>;
-}
 
 export interface AppState {
     genomeName: string;
@@ -68,7 +51,6 @@ export interface AppState {
     regionSetView: RegionSet;
     trackLegendWidth: number;
     bundleId: string;
-
 }
 
 const bundleId = uuid.v1();
@@ -91,10 +73,7 @@ enum ActionType {
     SET_REGION_SET_LIST = "SET_REGION_SET_LIST",
     SET_REGION_SET_VIEW = "SET_REGION_SET_VIEW",
     SET_TRACK_LEGEND_WIDTH = "SET_TRACK_LEGEND_WIDTH",
-    SAVE_SESSION = "SAVE_SESSION",
     RESTORE_SESSION = "RESTORE_SESSION",
-    RETRIEVE_SESSION = "RETRIEVE_SESSION",
-    DELETE_SESSION = "DELETE_SESSION",
 }
 
 interface AppAction {
@@ -150,12 +129,8 @@ export const ActionCreators = {
         return {type: ActionType.SET_TRACK_LEGEND_WIDTH, width};
     },
 
-    saveSession: (session: Session, sessionState: SessionState) => {
-        return {type: ActionType.SAVE_SESSION, session, sessionState};
-    },
-
-    restoreRession: (session: Session) => {
-        return {type: ActionType.RESTORE_SESSION, session};
+    restoreSession: (sessionState: object) => {
+        return {type: ActionType.RESTORE_SESSION, sessionState};
     },
 };
 
@@ -207,7 +182,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 start -= amountToExpand;
                 end += amountToExpand;
             }
-
             const newRegion = prevState.viewRegion.clone().setRegion(start, end);
             return { ...prevState, viewRegion: newRegion };
         case ActionType.SET_TRACKS:
@@ -220,6 +194,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return handleRegionSetViewChange(prevState, action.set);
         case ActionType.SET_TRACK_LEGEND_WIDTH:
             return { ...prevState, trackLegendWidth: action.width };
+        case ActionType.RESTORE_SESSION:
+            return new AppStateLoader().fromObject(action.sessionState);
         default:
             console.warn("Unknown change state action; ignoring.");
             console.warn(action);
@@ -227,26 +203,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
     }
 }
 
-const intialSessionBundle: SessionBundle = {
-    id: bundleId,
-    sessionsInBundle: [],
-    currentSessionId: 0,
-}
-
-function sessionReducer (prevSession: SessionBundle = intialSessionBundle, action: AppAction) {
-    switch(action.type){
-        case ActionType.SAVE_SESSION:
-
-            return prevSession;
-        case ActionType.RESTORE_SESSION:
-            return prevSession;
-        case ActionType.DELETE_SESSION:
-            return prevSession;
-        default:
-            return prevSession;
-
-    }
-}
 
 /**
  * Handles a change in region set view.  Causes a change in the displayed region as well as region set.
@@ -277,7 +233,6 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
 const rootReducer = combineReducers({
     browser: undoable(getNextState, {limit: 10} ),
     firebase: firebaseReducer,
-    session: sessionReducer,
 });
 
 

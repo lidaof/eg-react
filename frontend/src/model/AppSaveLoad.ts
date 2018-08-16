@@ -30,7 +30,7 @@ export class AppStateSaver {
         const object = {
             genomeName: appState.genomeName,
             viewInterval: appState.viewRegion ? appState.viewRegion.getContextCoordinates().serialize() : null,
-            tracks: appState.tracks,
+            tracks: appState.tracks.map(track => track.serialize()),
             metadataTerms: appState.metadataTerms,
             regionSets: appState.regionSets.map(set => set.serialize()),
             regionSetViewIndex,
@@ -62,13 +62,13 @@ export class AppStateLoader {
      * @throws {Error} on deserialization errors
      */
     fromObject(object: any): AppState {
-        const regionSets = object.regionSets.map(RegionSet.deserialize);
+        const regionSets = object.regionSets ? object.regionSets.map(RegionSet.deserialize) : [];
         const regionSetView = regionSets[object.regionSetViewIndex] || null;
         return {
             genomeName: object.genomeName,
             viewRegion: this._restoreViewRegion(object, regionSetView),
-            tracks: object.tracks.map((data: any) => new TrackModel(data)),
-            metadataTerms: object.metadataTerms,
+            tracks: object.tracks.map((data: any) => TrackModel.deserialize(data)),
+            metadataTerms: object.metadataTerms || [],
             regionSets,
             regionSetView,
             trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
