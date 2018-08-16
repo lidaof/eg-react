@@ -46,7 +46,7 @@ export class SelectableGenomeArea extends React.PureComponent<SelectableGenomeAr
         function xToBase(x: number) {
             x -= dragLimits.start;
             const rawBase = drawModel.xToBase(x);
-            return Math.round( navContext.toGaplessCoordinate(rawBase) );
+            return navContext.toGaplessCoordinate( Math.round(rawBase) );
         }
     }
 
