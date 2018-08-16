@@ -50,12 +50,15 @@ class IsoformSelection extends React.PureComponent {
 
     async getSuggestions(geneName) {
         const genomeName = this.props.genomeConfig.genome.getName();
+        const chrListObject = this.props.genomeConfig.navContext._featuresForChr;
         const params = {
             q: geneName,
             isExact: true
         };
         const response = await axios.get(`/${genomeName}/genes/queryName`, {params: params});
-        const genes  = response.data.map(record => new Gene(record));
+        // filter out genes in super contigs in case those are not in chrom list
+        const recordsInFeatures = response.data.filter(record => chrListObject.hasOwnProperty(record.chrom) );
+        const genes  = recordsInFeatures.map(record => new Gene(record));
         this.setState({isLoading: false, genes: genes});
     }
 

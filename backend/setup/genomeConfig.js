@@ -50,6 +50,14 @@ const hg38 = [
     }
 ];
 
+const panTro5 = [
+    {
+        name: 'refGene',
+        file: 'refGene_load',
+        fieldsConfig: geneFieldsAndIndex
+    }
+];
+
 const mm10 = [
     {
         name: 'refGene',
@@ -66,6 +74,6 @@ const danRer10 = [
     }
 ];
 
-const genomeConfig = { hg19, mm10, danRer10, hg38 };
+const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5 };
 
 module.exports = genomeConfig;

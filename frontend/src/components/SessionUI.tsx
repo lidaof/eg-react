@@ -9,6 +9,8 @@ import { notify } from 'react-notify-toast';
 import { AppStateSaver } from '../model/AppSaveLoad';
 import { ActionCreators } from "../AppState";
 
+import './SessionUI.css';
+
 interface SessionBundle {
     bundleId: string;
     currentId: string;
@@ -127,9 +129,9 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         const buttons = Object.entries(bundle.sessionsInBundle || {}).map( ([id, session]) => {
             let button;
             if (id === bundle.currentId) {
-                button = <button className="btn btn-secondary btn-sm" disabled={true} >Restored</button>;
+                button = <button className="SessionUI btn btn-secondary btn-sm" disabled={true} >Restored</button>;
             } else {
-                button = <button className="btn btn-success btn-sm" onClick={() => this.restoreSession(id)} >
+                button = <button className="SessionUI btn btn-success btn-sm" onClick={() => this.restoreSession(id)} >
                     Restore
                 </button>;
             }
@@ -139,7 +141,8 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                 <span style={{marginRight: '1ch'}} >{session.label}</span>
                 ({new Date(session.date).toLocaleString()})
                 {button}
-                <button onClick={() => this.deleteSession(id)} className="btn btn-danger btn-sm">Delete</button>
+                <button onClick={() => this.deleteSession(id)} 
+                    className="SessionUI btn btn-danger btn-sm">Delete</button>
             </li>
             );
         });
@@ -162,7 +165,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                     or use a
                     <button
                         type="button"
-                        className="btn btn-warning btn-sm"
+                        className="SessionUI btn btn-warning btn-sm"
                         onClick={this.setRandomLabel}
                     >
                         Random name

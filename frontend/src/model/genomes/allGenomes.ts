@@ -2,6 +2,7 @@ import HG19 from './hg19/hg19';
 import HG38 from './hg38/hg38';
 import MM10 from './mm10/mm10';
 import DAN_RER10 from './danRer10/danRer10';
+import PANTRO5 from './panTro5/panTro5';
 import { GenomeConfig } from './GenomeConfig';
 
 /**
@@ -11,7 +12,8 @@ const allGenomes = [
     HG19,
     HG38,
     MM10,
-    DAN_RER10
+    PANTRO5,
+    DAN_RER10,
 ];
 
 const genomeNameToConfig = {};
@@ -34,6 +36,11 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
     human: {
         logoUrl: 'http://epigenomegateway.wustl.edu/browser/images/Human.png',
         assemblies: [ HG19.genome.getName(), HG38.genome.getName() ],
+        color: 'white',
+    },
+    chimp: {
+        logoUrl: 'http://epigenomegateway.wustl.edu/browser/images/Chimp.png',
+        assemblies: [ PANTRO5.genome.getName() ],
         color: 'white',
     },
     mouse: {
