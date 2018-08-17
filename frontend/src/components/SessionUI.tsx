@@ -35,10 +35,12 @@ interface HasBundleId {
 interface SessionUIProps extends CombinedAppState, HasBundleId {
     bundle?: SessionBundle;
     onRestoreSession: any;
+    onRetrieveBundle: any;
 }
 
 interface SessionUIState {
     newSessionLabel: string;
+    retrieveId: string;
 }
 
 class SessionUINotConnected extends React.Component<SessionUIProps, SessionUIState> {
@@ -48,6 +50,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         super(props);
         this.state = {
             newSessionLabel: getFunName(),
+            retrieveId: '',
         };
     }
 
@@ -88,7 +91,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
     }
 
     setSessionLabel = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({newSessionLabel: event.target.value});
+        this.setState({newSessionLabel: event.target.value.trim()});
     }
 
     setRandomLabel = () => {
@@ -109,7 +112,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
             notify.show('Error while restoring session', 'error', 2000);
         }
         this.props.onRestoreSession(bundle.sessionsInBundle[sessionId].state);
-        notify.show('Session restored!', 'success', 2000);
+        notify.show('Session restored.', 'success', 2000);
     }
 
     deleteSession = async (sessionId: string) => {
@@ -121,7 +124,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
             console.error(error);
             notify.show('Error while deleting session', 'error', 2000);
         };
-        notify.show('Session deleted!', 'success', 2000);
+        notify.show('Session deleted.', 'success', 2000);
     }
 
     renderSavedSessions = () => {
@@ -154,9 +157,33 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         return <ol>{buttons}</ol>;
     }
 
+    setRetrieveId = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({retrieveId: event.target.value.trim()});
+    }
+
+    retrieveSession = () => {
+        const { retrieveId } = this.state;
+        if( retrieveId.length === 0) {
+            notify.show('Session bundle Id cannot be empty.', 'error', 2000);
+            return
+        }
+        this.props.onRetrieveBundle(retrieveId);
+        const bundle = this.getBundle();
+        const currentId = bundle.currentId;
+        this.props.onRestoreSession(bundle.sessionsInBundle[currentId].state);
+        notify.show('Session retrieved.', 'success', 2000);
+    }
+
     render() {
         return (
         <div>
+            <div>
+                <label htmlFor="retrieveId">
+                    <input type="text" size={40} placeholder="Session bunlde Id" 
+                        value={this.state.retrieveId}
+                        onChange={this.setRetrieveId}/>
+                </label>
+                <button className="btn btn-info" onClick={this.retrieveSession}>Retrieve session</button></div>
             <button className="btn btn-primary" onClick={this.saveSession}>Save session</button>
             <div>
                 <label htmlFor="sessionLabel">
@@ -165,15 +192,11 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                         value={this.state.newSessionLabel}
                         size={30}
                         onChange={this.setSessionLabel}
-                    />
-                    or use a
-                    <button
+                    /> or use a <button
                         type="button"
                         className="SessionUI btn btn-warning btn-sm"
                         onClick={this.setRandomLabel}
-                    >
-                        Random name
-                    </button>
+                    > Random name</button>
                 </label>
             </div>
             {this.renderSavedSessions()}
@@ -184,6 +207,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
 
 const mapDispatchToProps = {
     onRestoreSession: ActionCreators.restoreSession,
+    onRetrieveBundle: ActionCreators.retrieveBundle,
 };
 
 const enhance = compose(

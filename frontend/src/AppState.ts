@@ -75,6 +75,7 @@ enum ActionType {
     SET_REGION_SET_VIEW = "SET_REGION_SET_VIEW",
     SET_TRACK_LEGEND_WIDTH = "SET_TRACK_LEGEND_WIDTH",
     RESTORE_SESSION = "RESTORE_SESSION",
+    RETRIEVE_BUNDLE = "RETRIEVE_BUNDLE",
 }
 
 interface AppAction {
@@ -133,6 +134,10 @@ export const ActionCreators = {
     restoreSession: (sessionState: object) => {
         return {type: ActionType.RESTORE_SESSION, sessionState};
     },
+
+    retrieveBundle: (bundleId: string) => {
+        return {type: ActionType.RETRIEVE_BUNDLE, bundleId}
+    }
 };
 
 function getInitialState() {
@@ -197,6 +202,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, trackLegendWidth: action.width };
         case ActionType.RESTORE_SESSION:
             return new AppStateLoader().fromObject(action.sessionState);
+        case ActionType.RETRIEVE_BUNDLE:
+            return { ...prevState, bundleId: action.bundleId };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);
