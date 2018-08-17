@@ -131,18 +131,22 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
             if (id === bundle.currentId) {
                 button = <button className="SessionUI btn btn-secondary btn-sm" disabled={true} >Restored</button>;
             } else {
+                // tslint:disable-next-line jsx-no-lambda
                 button = <button className="SessionUI btn btn-success btn-sm" onClick={() => this.restoreSession(id)} >
                     Restore
                 </button>;
             }
+
+            // tslint:disable-next-line jsx-no-lambda
+            const deleteButton = <button onClick={() => this.deleteSession(id)} 
+                                    className="SessionUI btn btn-danger btn-sm">Delete</button>
 
             return (
             <li key={id} >
                 <span style={{marginRight: '1ch'}} >{session.label}</span>
                 ({new Date(session.date).toLocaleString()})
                 {button}
-                <button onClick={() => this.deleteSession(id)} 
-                    className="SessionUI btn btn-danger btn-sm">Delete</button>
+                {deleteButton}
             </li>
             );
         });

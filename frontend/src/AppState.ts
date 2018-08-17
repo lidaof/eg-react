@@ -12,7 +12,8 @@ import RegionSet from './model/RegionSet';
 import undoable from 'redux-undo';
 import uuid from "uuid";
 import { firebaseReducer, reactReduxFirebase } from 'react-redux-firebase';
-import firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/database';
 
 let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
@@ -197,8 +198,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         case ActionType.RESTORE_SESSION:
             return new AppStateLoader().fromObject(action.sessionState);
         default:
-            console.warn("Unknown change state action; ignoring.");
-            console.warn(action);
+            // console.warn("Unknown change state action; ignoring.");
+            // console.warn(action);
             return prevState;
     }
 }
