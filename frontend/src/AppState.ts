@@ -142,6 +142,7 @@ export const ActionCreators = {
 
 function getInitialState() {
     let state = initialState;
+    console.log(window.location.href);
     const blob = STORAGE.getItem(SESSION_KEY);
     if (blob) {
         try {

@@ -9,7 +9,7 @@ const AppRouter = () => (
         <React.Fragment>
             <Switch>
                 <Route path="/" component={App} exact={true}/>
-                <Route path="/session/:sessionId" component={LoadSession} exact={true}/>
+                <Route path="/session/:sessionId" component={App} exact={true}/>
                 <Route component={NotFoundPage}/>
             </Switch>
         </React.Fragment>

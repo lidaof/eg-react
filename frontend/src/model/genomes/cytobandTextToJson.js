@@ -95,6 +95,9 @@ function convertTextToCytobandMap(text) {
         const cytobandObject = makeCytobandObject(rawRecord);
         if (cytobandObject) {
             const chrom = cytobandObject.chrom;
+            if (chrom.includes('_')) {
+                continue; // skip super contigs to reduce file size
+            }
             if (!result[chrom]) {
                 result[chrom] = [];
             }
