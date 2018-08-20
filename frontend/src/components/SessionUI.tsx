@@ -1,5 +1,5 @@
 import React from 'react';
-import uuid from 'uuid';
+import shortid from 'shortid';
 import { connect } from "react-redux";
 import { compose } from 'redux';
 import { firebaseConnect, getVal } from 'react-redux-firebase';
@@ -65,7 +65,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
     saveSession = async () => {
         const {firebase, browser} = this.props;
         const bundle = this.getBundle();
-        const sessionId = uuid.v1();
+        const sessionId = shortid.generate();
         const newSessionObj = {
             label: this.state.newSessionLabel,
             date: Date.now(),
@@ -183,8 +183,8 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                         value={this.state.retrieveId}
                         onChange={this.setRetrieveId}/>
                 </label>
-                <button className="btn btn-info" onClick={this.retrieveSession}>Retrieve session</button></div>
-            <button className="btn btn-primary" onClick={this.saveSession}>Save session</button>
+            <button className="SessionUI btn btn-info" onClick={this.retrieveSession}>Retrieve session</button></div>
+            <button className="SessionUI btn btn-primary" onClick={this.saveSession}>Save session</button>
             <div>
                 <label htmlFor="sessionLabel">
                     Name your session: <input
