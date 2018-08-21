@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
+import { compose } from 'redux';
 import { ActionCreators } from './AppState';
 
 import GenomePicker from './components/GenomePicker';
@@ -15,6 +15,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import TrackModel from './model/TrackModel';
 import Notifications from 'react-notify-toast';
+import { firebaseConnect, getVal } from 'react-redux-firebase';
 
 import './App.css';
 
@@ -31,8 +32,23 @@ const callbacks = {
     onTracksChanged: ActionCreators.setTracks,
 };
 
+
+const withBundle = compose(
+    firebaseConnect((props) => {
+        return [
+            { path: `sessions/${props.bundleId}` },
+        ]
+    }),
+    connect(
+        (state, props) => ({
+            bundle: getVal(state.firebase, `data/sessions/${props.bundleId}`),
+            browser: state.browser
+        }),
+    ),
+);
+
 const withAppState = connect(mapStateToProps, callbacks);
-const withEnhancements = _.flowRight(withAppState, withCurrentGenome);
+const withEnhancements = _.flowRight(withBundle, withAppState, withCurrentGenome);
 
 class App extends React.Component {
     static propTypes = {
@@ -73,6 +89,7 @@ class App extends React.Component {
 
     render() {
         const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId} = this.props;
+        console.log(this.props);
         if (!genomeConfig) {
             return <div className="container-fluid"><GenomePicker /></div>;
         }
