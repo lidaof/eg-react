@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import App from './App';
-import LoadSession from "./components/LoadSession";
 import NotFoundPage from './NotFound';
 
 const AppRouter = () => (
@@ -9,7 +8,6 @@ const AppRouter = () => (
         <React.Fragment>
             <Switch>
                 <Route path="/" component={App} exact={true}/>
-                <Route path="/session/:sessionId" component={App} exact={true}/>
                 <Route component={NotFoundPage}/>
             </Switch>
         </React.Fragment>

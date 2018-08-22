@@ -5,22 +5,21 @@ import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 import { ActionCreators } from "../AppState";
 import { Link } from "react-router-dom";
 
-class LoadSession extends React.PureComponent {
+class Live extends React.PureComponent {
 
     componentDidUpdate = () => {
-        const { bundleId, bundle, onSetRestore } = this.props;
-        const currentId = bundle[bundleId].currentId;
-        const genome = bundle[bundleId].sessionsInBundle[currentId].state.genomeName;
-        onSetRestore(genome, bundle[bundleId].sessionsInBundle[currentId].state);
+        const { liveId, live, onSetRestore } = this.props;
+        const genome = live.state.genomeName;
+        onSetRestore(genome, live.state);
     }
 
     render() {
-        const { bundle } = this.props;
-        if (!isLoaded(bundle)) {
+        const { live } = this.props;
+        if (!isLoaded(live)) {
             return <div>Loading...</div>;
         }
-        if (isEmpty(bundle)) {
-            return <div>Session bundle is empty
+        if (isEmpty(live)) {
+            return <div>Live browser content is empty
                 <br/>
             <Link to="/">Go home</Link>
             </div>;
@@ -35,12 +34,12 @@ const mapDispatchToProps = {
 
 export default compose(
     firebaseConnect(props => [
-        { path: `sessions/${props.bundleId}` }
+        { path: `live/${props.liveId}` }
     ]),
     connect(state => ({
-        bundle: state.firebase.data.sessions,
+        live: state.firebase.data.live,
         browser: state.browser,
     }),
     mapDispatchToProps
     )
-)(LoadSession);
+)(Live);

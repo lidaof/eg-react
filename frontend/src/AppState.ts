@@ -11,6 +11,7 @@ import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
 import undoable from 'redux-undo';
 import uuid from "uuid";
+import shortid from "shortid";
 import { firebaseReducer, reactReduxFirebase } from 'react-redux-firebase';
 import firebase from 'firebase/app';
 import 'firebase/database';
@@ -54,9 +55,12 @@ export interface AppState {
     regionSetView: RegionSet;
     trackLegendWidth: number;
     bundleId: string;
+    sessionFromUrl?: boolean;
+    liveId?: string;
 }
 
 const bundleId = uuid.v1();
+const liveId = shortid.generate();
 const initialState: AppState = {
     genomeName: "",
     viewRegion: null,
@@ -66,6 +70,8 @@ const initialState: AppState = {
     regionSetView: null, // Region set backing current region set view, if applicable
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
     bundleId,
+    sessionFromUrl: false,
+    liveId,
 };
 
 enum ActionType {
@@ -78,6 +84,7 @@ enum ActionType {
     SET_TRACK_LEGEND_WIDTH = "SET_TRACK_LEGEND_WIDTH",
     RESTORE_SESSION = "RESTORE_SESSION",
     RETRIEVE_BUNDLE = "RETRIEVE_BUNDLE",
+    SET_GENOME_RESTORE_SESSION = "SET_GENOME_RESTORE_SESSION",
 }
 
 interface AppAction {
@@ -139,19 +146,28 @@ export const ActionCreators = {
 
     retrieveBundle: (bundleId: string) => {
         return {type: ActionType.RETRIEVE_BUNDLE, bundleId}
-    }
+    },
+
+    setGenomeRestoreSession: (genomeName: string, sessionState: object) => {
+        return {type: ActionType.SET_GENOME_RESTORE_SESSION, genomeName, sessionState}
+    },
+
 };
 
 function getInitialState() {
     let state = initialState;
+    
     const { query } = querySting.parseUrl(window.location.href);
     let newState;
     if (!(_.isEmpty(query))) {
         if (query.bundle) {
-            newState = getNextState(state, {type: ActionType.RETRIEVE_BUNDLE, bundleId: query.bundle});
+            newState = {...state, bundleId: query.bundle, sessionFromUrl: true};
         }
         if(query.genome) {
             newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
+        }
+        if (query.live) {
+            newState = {...state, liveId: query.live};
         }
         return newState || state;
     }
@@ -175,7 +191,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
 
     switch (action.type) {
         case ActionType.SET_GENOME: // Setting genome resets state.
-        // case ActionType.INIT:
             let nextViewRegion = null;
             let nextTracks: TrackModel[] = [];
             const genomeConfig = getGenomeConfig(action.genomeName);
@@ -217,6 +232,9 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return new AppStateLoader().fromObject(action.sessionState);
         case ActionType.RETRIEVE_BUNDLE:
             return { ...prevState, bundleId: action.bundleId };
+        case ActionType.SET_GENOME_RESTORE_SESSION:
+            const state = new AppStateLoader().fromObject(action.sessionState);
+            return {...state, genomeName: action.genomeName}
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);

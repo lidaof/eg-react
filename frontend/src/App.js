@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { compose } from 'redux';
 import { ActionCreators } from './AppState';
-import { AppStateLoader } from './model/AppSaveLoad';
-import { getGenomeConfig } from './model/genomes/allGenomes';
 import GenomePicker from './components/GenomePicker';
 import Nav from './components/Nav';
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
@@ -12,11 +9,10 @@ import TrackContainer from './components/trackContainers/TrackContainer';
 import withCurrentGenome from './components/withCurrentGenome';
 import { BrowserScene } from './components/vr/BrowserScene';
 import ErrorBoundary from './components/ErrorBoundary';
-
 import DisplayedRegionModel from './model/DisplayedRegionModel';
 import TrackModel from './model/TrackModel';
 import Notifications from 'react-notify-toast';
-import { firebaseConnect, getVal } from 'react-redux-firebase';
+import LoadSession from './components/LoadSession';
 
 import './App.css';
 
@@ -25,6 +21,7 @@ function mapStateToProps(state) {
         viewRegion: state.browser.present.viewRegion,
         tracks: state.browser.present.tracks,
         bundleId: state.browser.present.bundleId,
+        sessionFromUrl: state.browser.present.sessionFromUrl,
     };
 }
 
@@ -33,22 +30,9 @@ const callbacks = {
     onTracksChanged: ActionCreators.setTracks,
 };
 
-const withBundle = compose(
-    firebaseConnect((props) => {
-        return [
-            { path: `sessions/${props.bundleId}` },
-        ]
-    }),
-    connect(
-        (state, props) => ({
-            bundle: getVal(state.firebase, `data/sessions/${props.bundleId}`),
-            // browser: state.browser
-        }),
-    ),
-);
 
 const withAppState = connect(mapStateToProps, callbacks);
-const withEnhancements = _.flowRight(withAppState, withCurrentGenome, withBundle);
+const withEnhancements = _.flowRight(withAppState, withCurrentGenome);
 
 class App extends React.Component {
     static propTypes = {
@@ -88,20 +72,10 @@ class App extends React.Component {
     };
 
     render() {
-        const { bundle } = this.props;
-        let appData, genomeConfig;
-        if (!(_.isEmpty(bundle))) {
-            const currentId = bundle.currentId;
-            // caused Maximum update depth exceeded error
-            // this.props.onRestoreSession(bundle.sessionsInBundle[currentId].state);
-            appData = new AppStateLoader().fromObject(bundle.sessionsInBundle[currentId].state);
-            genomeConfig = getGenomeConfig(appData.genomeName);
-        } else {
-            appData = this.props;
-            genomeConfig = appData.genomeConfig;
+        const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, sessionFromUrl} = this.props;
+        if (sessionFromUrl) {
+            return <div className="container-fluid"><LoadSession bundleId={bundleId} /></div>;
         }
-        console.log(appData);
-        const {viewRegion, tracks, onNewViewRegion, bundleId} = appData;
         if (!genomeConfig) {
             return <div className="container-fluid"><GenomePicker /></div>;
         }
