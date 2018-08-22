@@ -15,6 +15,7 @@ import { firebaseReducer, reactReduxFirebase } from 'react-redux-firebase';
 import firebase from 'firebase/app';
 import 'firebase/database';
 import querySting from "query-string";
+import _ from 'lodash';
 
 let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
@@ -144,16 +145,15 @@ export const ActionCreators = {
 function getInitialState() {
     let state = initialState;
     const { query } = querySting.parseUrl(window.location.href);
-    console.log(query);
     let newState;
-    if (query) {
+    if (!(_.isEmpty(query))) {
         if (query.bundle) {
             newState = getNextState(state, {type: ActionType.RETRIEVE_BUNDLE, bundleId: query.bundle});
         }
         if(query.genome) {
             newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
         }
-        return newState;
+        return newState || state;
     }
     const blob = STORAGE.getItem(SESSION_KEY);
     if (blob) {

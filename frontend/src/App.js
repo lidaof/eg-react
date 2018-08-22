@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { ActionCreators } from './AppState';
-
+import { AppStateLoader } from './model/AppSaveLoad';
+import { getGenomeConfig } from './model/genomes/allGenomes';
 import GenomePicker from './components/GenomePicker';
 import Nav from './components/Nav';
 import GenomeNavigator from './components/genomeNavigator/GenomeNavigator';
@@ -32,7 +33,6 @@ const callbacks = {
     onTracksChanged: ActionCreators.setTracks,
 };
 
-
 const withBundle = compose(
     firebaseConnect((props) => {
         return [
@@ -42,13 +42,13 @@ const withBundle = compose(
     connect(
         (state, props) => ({
             bundle: getVal(state.firebase, `data/sessions/${props.bundleId}`),
-            browser: state.browser
+            // browser: state.browser
         }),
     ),
 );
 
 const withAppState = connect(mapStateToProps, callbacks);
-const withEnhancements = _.flowRight(withBundle, withAppState, withCurrentGenome);
+const withEnhancements = _.flowRight(withAppState, withCurrentGenome, withBundle);
 
 class App extends React.Component {
     static propTypes = {
@@ -88,8 +88,20 @@ class App extends React.Component {
     };
 
     render() {
-        const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId} = this.props;
-        console.log(this.props);
+        const { bundle } = this.props;
+        let appData, genomeConfig;
+        if (!(_.isEmpty(bundle))) {
+            const currentId = bundle.currentId;
+            // caused Maximum update depth exceeded error
+            // this.props.onRestoreSession(bundle.sessionsInBundle[currentId].state);
+            appData = new AppStateLoader().fromObject(bundle.sessionsInBundle[currentId].state);
+            genomeConfig = getGenomeConfig(appData.genomeName);
+        } else {
+            appData = this.props;
+            genomeConfig = appData.genomeConfig;
+        }
+        console.log(appData);
+        const {viewRegion, tracks, onNewViewRegion, bundleId} = appData;
         if (!genomeConfig) {
             return <div className="container-fluid"><GenomePicker /></div>;
         }
