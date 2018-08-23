@@ -22,6 +22,7 @@ function mapStateToProps(state) {
         tracks: state.browser.present.tracks,
         bundleId: state.browser.present.bundleId,
         sessionFromUrl: state.browser.present.sessionFromUrl,
+        liveId: state.browser.present.liveId,
     };
 }
 
@@ -72,7 +73,7 @@ class App extends React.Component {
     };
 
     render() {
-        const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, sessionFromUrl} = this.props;
+        const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, sessionFromUrl, liveId} = this.props;
         if (sessionFromUrl) {
             return <div className="container-fluid"><LoadSession bundleId={bundleId} /></div>;
         }
@@ -93,6 +94,7 @@ class App extends React.Component {
                 onTracksAdded={this.addTracks}
                 onTrackRemoved={this.removeTrack}
                 bundleId={bundleId}
+                liveId={liveId}
             />
              <Notifications />
             {this.state.isShowingNavigator &&

@@ -36,6 +36,7 @@ export class AppStateSaver {
             regionSetViewIndex,
             trackLegendWidth: appState.trackLegendWidth,
             bundleId: appState.bundleId,
+            liveId: appState.liveId,
         };
         return object;
     }
@@ -73,6 +74,7 @@ export class AppStateLoader {
             regionSetView,
             trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
             bundleId: object.bundleId,
+            liveId: object.liveId,
         };
     }
 
