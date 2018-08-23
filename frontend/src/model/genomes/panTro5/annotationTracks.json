@@ -1,0 +1,15 @@
+{
+    "Genome comparison": [
+        {
+            "name": "hg38topanTro5",
+            "label": "Human hg38 to panTro5 blastz",
+            "querygenome": "hg38",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/panTro5/weaver/panTro5_hg38_axt.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/panTro5/vsHg38/"
+            }
+        }
+    ]
+}

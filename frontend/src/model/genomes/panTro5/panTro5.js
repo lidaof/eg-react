@@ -2,6 +2,7 @@ import Chromosome from '../Chromosome';
 import Genome from '../Genome';
 import TrackModel from '../../TrackModel';
 import cytobands from './cytoBandIdeo.json';
+import annotationTracks from './annotationTracks.json';
 
 const genome = new Genome("panTro5", [
     new Chromosome("chr1", 228573443),
@@ -57,6 +58,7 @@ const PANTRO5 = {
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
     twoBitURL: "https://vizhub.wustl.edu/public/panTro5/panTro5.2bit",
+    annotationTracks,
 };
 
 export default PANTRO5;

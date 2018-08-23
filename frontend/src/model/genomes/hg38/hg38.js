@@ -2,6 +2,7 @@ import Chromosome from '../Chromosome';
 import Genome from '../Genome';
 import TrackModel from '../../../model/TrackModel';
 import cytobands from './cytoBand.json';
+import annotationTracks from './annotationTracks.json';
 
 const genome = new Genome('hg38', [
     new Chromosome('chr1', 248956422),
@@ -84,6 +85,7 @@ const HG38 = {
     twoBitURL: 'https://vizhub.wustl.edu/public/hg38/hg38.2bit',
     publicHubData,
     publicHubList,
+    annotationTracks,
 };
 
 export default HG38;

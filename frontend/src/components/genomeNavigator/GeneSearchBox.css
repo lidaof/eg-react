@@ -1,0 +1,10 @@
+div.GeneSearchBox-speech {
+    position: absolute;
+    right: 5ch;
+    top: 10px;
+}
+
+div.GeneSearchBox-speech button {
+    padding: 2px;
+    margin-right: 2px;
+}

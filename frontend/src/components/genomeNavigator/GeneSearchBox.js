@@ -11,8 +11,10 @@ import OutsideClickDetector from '../OutsideClickDetector';
 
 import NavigationContext from '../../model/NavigationContext';
 import { Genome } from '../../model/genomes/Genome';
+import SpeechRecognition from 'react-speech-recognition';
 
 import '../../autosuggest.css';
+import './GeneSearchBox.css';
 
 const MIN_CHARS_FOR_SUGGESTIONS = 3; // Minimum characters to type before displaying suggestions
 const ENTER_KEY_CODE = 13;
@@ -22,6 +24,9 @@ const ISOFORM_POPOVER_STYLE = {
     backgroundColor: "white"
 };
 const DEBOUNCE_INTERVAL = 250;
+const options = {
+    autoStart: false
+  };
 
 /**
  * A box that accepts gene name queries, and gives suggestions as well.
@@ -47,10 +52,12 @@ class GeneSearchBox extends React.PureComponent {
 
     constructor(props) {
         super(props);
+        this.input = null;
         this.state = {
             inputValue: '', //user's input
             suggestions: [], // Matching gene symbols for the current input
             isShowingIsoforms: false,
+            speechInput: false, // text search input or speech
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.shouldSuggest = this.shouldSuggest.bind(this);
@@ -58,6 +65,8 @@ class GeneSearchBox extends React.PureComponent {
         this.showIsoforms = this.showIsoforms.bind(this);
         this.showIsoformsIfEnterPressed = this.showIsoformsIfEnterPressed.bind(this);
         this.setViewToGene = this.setViewToGene.bind(this);
+        this.startListening = this.startListening.bind(this);
+        this.stopListening = this.stopListening.bind(this);
     }
 
     handleInputChange(event, {newValue}) {
@@ -102,8 +111,42 @@ class GeneSearchBox extends React.PureComponent {
         this.setState({isShowingIsoforms: false});
     }
 
+    startListening() {
+        const { startListening } = this.props;
+        startListening();
+        this.setState( {
+            speechInput: true,
+        } );
+    }
+
+    stopListening() {
+        const { stopListening } = this.props;
+        stopListening();
+        this.setState( {
+            speechInput: false,
+        } );
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState( {
+            inputValue: nextProps.transcript.replace(/\s/g, ""),
+        } );
+        this.input.input.focus();
+    }
+
     render() {
-        const {inputValue, suggestions, isShowingIsoforms} = this.state;
+        const {suggestions, isShowingIsoforms, inputValue} = this.state;
+        const { resetTranscript, browserSupportsSpeechRecognition } = this.props;
+        let speechSearchBox;
+        if (browserSupportsSpeechRecognition) {
+            speechSearchBox = <div className="GeneSearchBox-speech">
+            <button className="btn btn-success btn-sm" onClick={this.startListening}>
+                Say a Gene
+            </button>
+            <button className="btn btn-info btn-sm" onClick={resetTranscript}>Reset</button>
+            <button className="btn btn-danger btn-sm" onClick={this.stopListening}>Stop</button>
+            </div>;
+        }
         let isoformPane = null;
         if (isShowingIsoforms) {
             isoformPane = (
@@ -117,6 +160,7 @@ class GeneSearchBox extends React.PureComponent {
 
         return (
         <div>
+            {speechSearchBox}
             {/* <label style={{marginBottom: 0}}>Gene search</label> */}
             <Manager>
                 <Target>
@@ -133,6 +177,7 @@ class GeneSearchBox extends React.PureComponent {
                             onChange: this.handleInputChange,
                             onKeyUp: this.showIsoformsIfEnterPressed
                         }}
+                        ref={(input) => this.input = input}
                         onSuggestionSelected={this.showIsoforms}
                     />
                 </Target>
@@ -143,4 +188,4 @@ class GeneSearchBox extends React.PureComponent {
     }
 }
 
-export default withCurrentGenome(GeneSearchBox);
+export default withCurrentGenome(SpeechRecognition(options)(GeneSearchBox));

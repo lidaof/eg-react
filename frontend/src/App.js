@@ -82,7 +82,7 @@ class App extends React.Component {
         }
 
         return (
-        <div className="container-fluid">
+        <div className="App container-fluid">
             <Nav
                 {...this.state}
                 onToggleNavigator={this.toggleNavigator}

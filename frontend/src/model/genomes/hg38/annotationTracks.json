@@ -1,0 +1,15 @@
+{
+    "Genome comparison": [
+        {
+            "name": "panTro5tohg38",
+            "label": "Chimp panTro5 to hg38 blastz",
+            "querygenome": "panTro5",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_panTro5_axt.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsPanTro5/"
+            }
+        }
+    ]
+}
