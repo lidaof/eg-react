@@ -8,6 +8,7 @@ import { StateWithHistory } from 'redux-undo';
 import { notify } from 'react-notify-toast';
 import { AppStateSaver } from '../model/AppSaveLoad';
 import { ActionCreators } from "../AppState";
+import LoadSession from "./LoadSession";
 
 import './SessionUI.css';
 
@@ -41,6 +42,7 @@ interface SessionUIProps extends CombinedAppState, HasBundleId {
 interface SessionUIState {
     newSessionLabel: string;
     retrieveId: string;
+    lastBundleId: string;
 }
 
 class SessionUINotConnected extends React.Component<SessionUIProps, SessionUIState> {
@@ -51,6 +53,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         this.state = {
             newSessionLabel: getFunName(),
             retrieveId: '',
+            lastBundleId: '',
         };
     }
 
@@ -60,6 +63,13 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
             bundleId: this.props.bundleId,
             currentId: '',
         };
+    }
+
+    componentDidMount() {
+        this.setState({
+            lastBundleId: this.props.bundleId,
+        }
+        );
     }
 
     saveSession = async () => {
@@ -101,6 +111,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
     restoreSession = async (sessionId: string) => {
         const {firebase} = this.props;
         const bundle = this.getBundle();
+        this.setState({lastBundleId: bundle.bundleId});
         const newBundle = {
             ...bundle,
             currentId: sessionId
@@ -129,9 +140,10 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
 
     renderSavedSessions = () => {
         const bundle: SessionBundle = this.getBundle();
+        const { lastBundleId } = this.state;
         const buttons = Object.entries(bundle.sessionsInBundle || {}).map( ([id, session]) => {
             let button;
-            if (id === bundle.currentId) {
+            if (lastBundleId === bundle.bundleId && id === bundle.currentId) {
                 button = <button className="SessionUI btn btn-secondary btn-sm" disabled={true} >Restored</button>;
             } else {
                 // tslint:disable-next-line jsx-no-lambda
@@ -165,13 +177,11 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         const { retrieveId } = this.state;
         if( retrieveId.length === 0) {
             notify.show('Session bundle Id cannot be empty.', 'error', 2000);
-            return
+            return null;
         }
         this.props.onRetrieveBundle(retrieveId);
-        const bundle = this.getBundle();
-        const currentId = bundle.currentId;
-        this.props.onRestoreSession(bundle.sessionsInBundle[currentId].state);
         notify.show('Session retrieved.', 'success', 2000);
+        return <LoadSession bundleId={retrieveId} />;
     }
 
     render() {
@@ -186,6 +196,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
             <button className="SessionUI btn btn-info" onClick={this.retrieveSession}>Retrieve session</button></div>
             <button className="SessionUI btn btn-primary" onClick={this.saveSession}>Save session</button>
             <div>
+                <p>Session bundle Id: {this.props.bundleId}</p>
                 <label htmlFor="sessionLabel">
                     Name your session: <input
                         type="text"

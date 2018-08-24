@@ -147,11 +147,11 @@ export const ActionCreators = {
     },
 
     retrieveBundle: (bundleId: string) => {
-        return {type: ActionType.RETRIEVE_BUNDLE, bundleId}
+        return {type: ActionType.RETRIEVE_BUNDLE, bundleId};
     },
 
     setGenomeRestoreSession: (genomeName: string, sessionState: object) => {
-        return {type: ActionType.SET_GENOME_RESTORE_SESSION, genomeName, sessionState}
+        return {type: ActionType.SET_GENOME_RESTORE_SESSION, genomeName, sessionState};
     },
 
 };

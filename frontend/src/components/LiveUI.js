@@ -4,6 +4,7 @@ import { compose } from 'redux';
 import { firebaseConnect, getVal } from 'react-redux-firebase';
 import { notify } from 'react-notify-toast';
 import { Redirect } from 'react-router'
+import { AppStateSaver } from '../model/AppSaveLoad';
 
 class LiveUI extends React.Component {
     
@@ -17,7 +18,11 @@ class LiveUI extends React.Component {
     goLive = async () => {
         const { liveId, firebase, browser} = this.props;
         try {
-            await firebase.set(`live/${liveId}`, {liveId, state: browser.present});
+            await firebase.set(`live/${liveId}`, {
+                    liveId, 
+                    state: new AppStateSaver().toObject(browser.present)
+                }
+            );
         } catch (error) {
             console.error(error);
             notify.show('Error while go live', 'error', 2000);
@@ -40,9 +45,9 @@ class LiveUI extends React.Component {
             <div>
                 <button className="btn btn-primary" onClick={this.goLive}>Go Live</button>
                 <p>
-                    How this works: Click the button above will navigate you to a new link, which you can share
-                    with your PI, collaborators or friends. What you see on the screen will be seen
-                    by them too, at real time.
+                    How this works: Click the button above will navigate you to a new link, <br/>
+                    which you can share with your PI, collaborators or friends. <br/>
+                    What you see on the screen will be seen by them too, at real time.
                 </p>
             </div>
         );

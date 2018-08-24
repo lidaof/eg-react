@@ -87,9 +87,9 @@ class TrackRegionController extends React.Component {
         this.handleCloseModal();
     }
 
-    handleClick(event) {
-        event.currentTarget.select();
-    }
+    // handleClick(event) {
+    //     event.currentTarget.select();
+    // }
 
     /**
      * @inheritdoc
@@ -122,7 +122,7 @@ class TrackRegionController extends React.Component {
                     type="text"
                     size="30" 
                     placeholder="Coordinate"
-                    onClick={this.handleClick}
+                    // onClick={this.handleClick}
                 />
                 <button 
                     className="btn btn-secondary btn-sm" 
