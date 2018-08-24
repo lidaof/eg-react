@@ -57,6 +57,7 @@ export interface AppState {
     bundleId: string;
     sessionFromUrl?: boolean;
     liveId?: string;
+    liveFromUrl?: boolean;
 }
 
 const bundleId = uuid.v1();
@@ -72,6 +73,7 @@ const initialState: AppState = {
     bundleId,
     sessionFromUrl: false,
     liveId,
+    liveFromUrl: false,
 };
 
 enum ActionType {
@@ -167,7 +169,7 @@ function getInitialState() {
             newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
         }
         if (query.live) {
-            newState = {...state, liveId: query.live};
+            newState = {...state, liveId: query.live, liveFromUrl: true};
         }
         return newState || state;
     }

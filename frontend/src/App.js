@@ -13,6 +13,7 @@ import DisplayedRegionModel from './model/DisplayedRegionModel';
 import TrackModel from './model/TrackModel';
 import Notifications from 'react-notify-toast';
 import LoadSession from './components/LoadSession';
+import Live from './components/Live';
 
 import './App.css';
 
@@ -21,8 +22,9 @@ function mapStateToProps(state) {
         viewRegion: state.browser.present.viewRegion,
         tracks: state.browser.present.tracks,
         bundleId: state.browser.present.bundleId,
-        sessionFromUrl: state.browser.present.sessionFromUrl,
         liveId: state.browser.present.liveId,
+        sessionFromUrl: state.browser.present.sessionFromUrl,
+        liveFromUrl: state.browser.present.liveFromUrl,
     };
 }
 
@@ -73,9 +75,12 @@ class App extends React.Component {
     };
 
     render() {
-        const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, sessionFromUrl, liveId} = this.props;
+        const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, sessionFromUrl, liveId, liveFromUrl} = this.props;
         if (sessionFromUrl) {
             return <div className="container-fluid"><LoadSession bundleId={bundleId} /></div>;
+        }
+        if (liveFromUrl) {
+            return <div className="container-fluid"><Live liveId={liveId} /></div>;
         }
         if (!genomeConfig) {
             return <div className="container-fluid"><GenomePicker /></div>;

@@ -9,8 +9,8 @@ class Live extends React.PureComponent {
 
     componentDidUpdate = () => {
         const { liveId, live, onSetRestore } = this.props;
-        const genome = live.state.genomeName;
-        onSetRestore(genome, live.state);
+        const genome = live[liveId].state.genomeName;
+        onSetRestore(genome, live[liveId].state);
     }
 
     render() {

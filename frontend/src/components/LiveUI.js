@@ -9,6 +9,9 @@ class LiveUI extends React.Component {
     
     constructor(props) {
         super(props);
+        this.state = {
+            isLive: false,
+        };
     }
 
     goLive = async () => {
@@ -20,14 +23,19 @@ class LiveUI extends React.Component {
             notify.show('Error while go live', 'error', 2000);
         }
         notify.show('Live mode!', 'success', 2000);
-        return <Redirect to={{
-            pathname: '/',
-            search: `?live=${liveId}`,
-          }}/>;
-        
+        this.setState({isLive: true});
+
     }
 
     render() {
+        const { liveId } = this.props;
+        if (this.state.isLive) {
+            return <Redirect to={{
+                pathname: '/',
+                search: `?live=${liveId}`,
+              }}/>;
+            
+        }
         return(
             <div>
                 <button className="btn btn-primary" onClick={this.goLive}>Go Live</button>
