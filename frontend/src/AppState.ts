@@ -11,7 +11,6 @@ import TrackModel from './model/TrackModel';
 import RegionSet from './model/RegionSet';
 import undoable from 'redux-undo';
 import uuid from "uuid";
-import shortid from "shortid";
 import { firebaseReducer, reactReduxFirebase } from 'react-redux-firebase';
 import firebase from 'firebase/app';
 import 'firebase/database';
@@ -61,7 +60,7 @@ export interface AppState {
 }
 
 const bundleId = uuid.v1();
-const liveId = shortid.generate();
+
 const initialState: AppState = {
     genomeName: "",
     viewRegion: null,
@@ -72,7 +71,7 @@ const initialState: AppState = {
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
     bundleId,
     sessionFromUrl: false,
-    liveId,
+    liveId: '',
     liveFromUrl: false,
 };
 

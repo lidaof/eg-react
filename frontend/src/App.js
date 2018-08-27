@@ -37,7 +37,7 @@ const callbacks = {
 const withAppState = connect(mapStateToProps, callbacks);
 const withEnhancements = _.flowRight(withAppState, withCurrentGenome);
 
-class App extends React.Component {
+export class App extends React.Component {
     static propTypes = {
         genomeConfig: PropTypes.object,
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel),

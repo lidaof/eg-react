@@ -4,7 +4,10 @@ import { compose } from 'redux';
 import { firebaseConnect, getVal } from 'react-redux-firebase';
 import { notify } from 'react-notify-toast';
 import { Redirect } from 'react-router'
+import shortid from "shortid";
 import { AppStateSaver } from '../model/AppSaveLoad';
+
+const liveId = shortid.generate();
 
 class LiveUI extends React.Component {
     
@@ -16,11 +19,12 @@ class LiveUI extends React.Component {
     }
 
     goLive = async () => {
-        const { liveId, firebase, browser} = this.props;
+        const { firebase, browser} = this.props;
+        const currentObj = new AppStateSaver().toObject(browser.present);
         try {
-            await firebase.set(`live/${liveId}`, {
+            await firebase.set(`live/${liveId}/`, {
                     liveId, 
-                    state: new AppStateSaver().toObject(browser.present)
+                    present: {...currentObj, liveId},
                 }
             );
         } catch (error) {
@@ -33,12 +37,20 @@ class LiveUI extends React.Component {
     }
 
     render() {
-        const { liveId } = this.props;
         if (this.state.isLive) {
-            return <Redirect to={{
-                pathname: '/',
-                search: `?live=${liveId}`,
-              }}/>;
+            return (
+                <React.Fragment>
+                    <p></p>
+                    <p>You are now in Live mode, <br/>you can share the current URL with others.</p>
+                    <Redirect to={{
+                        pathname: '/',
+                        search: `?live=${liveId}`,
+                    }}/>
+                </React.Fragment>
+            
+            )
+
+            ;
             
         }
         return(
@@ -55,14 +67,14 @@ class LiveUI extends React.Component {
 }
 
 const enhance = compose(
-    firebaseConnect((props) => {
+    firebaseConnect(() => {
         return [
-            { path: `live/${props.liveId}` },
+            { path: `live/${liveId}` },
         ]
     }),
     connect(
-        (state, props) => ({
-            live: getVal(state.firebase, `data/live/${props.liveId}`),
+        (state) => ({
+            live: getVal(state.firebase, `data/live/${liveId}`),
             browser: state.browser
         }),
     ),
