@@ -55,8 +55,6 @@ export interface AppState {
     trackLegendWidth: number;
     bundleId: string;
     sessionFromUrl?: boolean;
-    liveId?: string;
-    liveFromUrl?: boolean;
 }
 
 const bundleId = uuid.v1();
@@ -71,8 +69,6 @@ const initialState: AppState = {
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
     bundleId,
     sessionFromUrl: false,
-    liveId: '',
-    liveFromUrl: false,
 };
 
 enum ActionType {
@@ -166,9 +162,6 @@ function getInitialState() {
         }
         if(query.genome) {
             newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
-        }
-        if (query.live) {
-            newState = {...state, liveId: query.live, liveFromUrl: true};
         }
         return newState || state;
     }

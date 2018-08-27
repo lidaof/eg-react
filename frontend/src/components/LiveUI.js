@@ -43,8 +43,7 @@ class LiveUI extends React.Component {
                     <p></p>
                     <p>You are now in Live mode, <br/>you can share the current URL with others.</p>
                     <Redirect to={{
-                        pathname: '/',
-                        search: `?live=${liveId}`,
+                        pathname: `/live/${liveId}`,
                     }}/>
                 </React.Fragment>
             

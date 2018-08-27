@@ -70,7 +70,7 @@
     "react-speech-recognition": "^1.0.7",
     "react-table": "^6.7.4",
     "react-test-renderer": "^16.3.0",
-    "redux-undo": "^0.6.1",
+    "redux-undo": "^1.0.0-beta9-9-7",
     "script-loader": "^0.7.2",
     "shortid": "^2.2.13",
     "tcp-port-used": "^0.1.2",

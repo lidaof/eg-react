@@ -4,13 +4,40 @@ import { compose } from 'redux';
 import { firebaseConnect, isLoaded, isEmpty, getVal } from 'react-redux-firebase';
 import { ActionCreators } from "../AppState";
 import { Link } from "react-router-dom";
-import { App } from "../App";
-import { getGenomeConfig } from '../model/genomes/allGenomes';
-import { AppStateLoader } from '../model/AppSaveLoad';
+import App from "../App";
+import { AppStateSaver } from '../model/AppSaveLoad';
 
 class Live extends React.Component {
+
+    componentDidUpdate(prevProps){
+        const { liveId } = this.props.match.params;
+        const { live, onSetRestore } = this.props;
+        const genome = live[liveId].present.genomeName;
+        if(prevProps.live !== live) {
+            onSetRestore(genome, live[liveId].present);
+        }
+    }
+
+    async componentWillReceiveProps(nextProps) {
+        const {firebase, browser} = this.props;
+        const { liveId } = this.props.match.params;
+        if(nextProps.browser.present !== browser.present) {
+            const nextObj = new AppStateSaver().toObject(nextProps.browser.present);
+            try {
+                await firebase.update(`live/${liveId}/`, {
+                        present: nextObj,
+                    }
+                );
+            } catch (error) {
+                console.error(error);
+                notify.show('Error sync to live', 'error', 2000);
+            }
+        }
+    }
+
     render() {
-        const { live, liveId } = this.props;
+        const { liveId } = this.props.match.params;
+        const { live } = this.props;
         if (!isLoaded(live)) {
             return <div>Loading...</div>;
         }
@@ -20,45 +47,25 @@ class Live extends React.Component {
             <Link to="/">Go home</Link>
             </div>;
         }
-        console.log(this.props);
-        const { onNewViewRegion, onTracksChanged, browser, viewRegion, tracks } = this.props;
-        const liveState = live[liveId].present;
-        const genomeConfig = getGenomeConfig(liveState.genomeName);
-        return <App 
-                    genomeConfig={genomeConfig} 
-                    viewRegion={viewRegion}
-                    tracks={tracks}
-                    onNewViewRegion={onNewViewRegion}
-                    onTracksChanged={onTracksChanged}
-                />;
-        return <div>Test!</div>;
+        return <App />;
     }
 };
 
+
 const mapStateToProps = (state, props) => {
-    const fireObj = getVal(state.firebase, `data/live/${props.liveId}/present`);
-    const present = fireObj ? new AppStateLoader().fromObject(fireObj): undefined;
     return {
         live: state.firebase.data.live,
-        browser: {present},
-        // browser: state.browser,
-        viewRegion: present ? present.viewRegion: undefined,
-        tracks: present ? present.tracks: undefined,
-        bundleId: present ? present.bundleId: undefined,
-        liveId: present ? present.liveId: undefined,
-        sessionFromUrl: present ? present.sessionFromUrl: undefined,
-        liveFromUrl: present ? present.liveFromUrl: undefined,
+        browser: state.browser,
     };
 }
 
 const mapDispatchToProps = {
-    onNewViewRegion: ActionCreators.setViewRegion,
-    onTracksChanged: ActionCreators.setTracks,
+    onSetRestore: ActionCreators.setGenomeRestoreSession,
 };
 
 export default compose(
     firebaseConnect(props => [
-        { path: `live/${props.liveId}` }
+        { path: `live/${props.match.params.liveId}` }
     ]),
     connect(mapStateToProps, mapDispatchToProps),
 )(Live);

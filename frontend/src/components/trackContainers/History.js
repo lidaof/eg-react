@@ -3,6 +3,8 @@ import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import { connect } from 'react-redux';
 import ReactModal from "react-modal";
 
+import './History.css';
+
 const MODAL_STYLE = {
     content: {
         top: "40px",
@@ -45,7 +47,7 @@ class History extends React.Component {
         const futureItems = makeItemList(future, this.props.jumpToFuture);
 
         return (
-            <div>
+            <div className="History">
                 {past.length > 0 && <p>Go back:</p>}
                 {pastItems}
                 {future.length > 0 && <p>Go forward:</p>}
@@ -78,7 +80,7 @@ class History extends React.Component {
                 shouldCloseOnOverlayClick={true}
                 style={MODAL_STYLE}
             >
-            <div>
+            <div className="History">
                 <h5>Operation history</h5>
                 <button onClick={this.handleCloseModal} className="btn btn-sm btn-danger">Close</button>
                 <button onClick={this.props.clearHistory} className="btn btn-sm btn-info">Clear History</button>
