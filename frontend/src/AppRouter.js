@@ -5,7 +5,7 @@ import NotFoundPage from './NotFound';
 import Live from './components/Live';
 
 const AppRouter = () => (
-    <BrowserRouter>
+    <BrowserRouter basename="/browser">
         <React.Fragment>
             <Switch>
                 <Route path="/" component={App} exact={true}/>

@@ -13,6 +13,16 @@ function registerRoutes(server) {
             }
         }
     });
+    server.route({
+        method: 'GET',
+        path: `/js/{any*}`,
+        handler: {
+            directory: {
+                path: `${PUBLIC_FOLDER_NAME}/js`,
+                listing: true
+            }
+        }
+    });
 }
 
 module.exports = {

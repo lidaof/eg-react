@@ -15,7 +15,8 @@ const Good = require('good');
 const ROUTES = [
     require('./routes/geneNameSearch'),
     require('./routes/geneLocusSearch'),
-    require('./routes/public')
+    require('./routes/public'),
+    require('./routes/index'),
 ];
 
 /**
