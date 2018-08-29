@@ -1,6 +1,7 @@
 import { TrackConfig } from './TrackConfig';
 import { BamTrackConfig } from './BamTrackConfig';
 import { BedTrackConfig } from './BedTrackConfig';
+import { CategoricalTrackConfig } from './CategoricalTrackConfig';
 import { BigBedTrackConfig } from './BigBedTrackConfig';
 import { BedGraphTrackConfig } from './BedGraphTrackConfig';
 import { BigWigTrackConfig } from './BigWigTrackConfig';
@@ -15,6 +16,7 @@ import { TrackModel } from '../../model/TrackModel';
 const TYPE_NAME_TO_CONFIG = {
     "bam": BamTrackConfig,
     "bed": BedTrackConfig,
+    "categorical": CategoricalTrackConfig,
     "bedgraph": BedGraphTrackConfig,
     "bigbed": BigBedTrackConfig,
     "bigwig": BigWigTrackConfig,

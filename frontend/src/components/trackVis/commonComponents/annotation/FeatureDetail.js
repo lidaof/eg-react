@@ -11,11 +11,12 @@ import '../../commonComponents/tooltip/Tooltip.css';
 class FeatureDetail extends React.PureComponent {
     static propTypes = {
         feature: PropTypes.instanceOf(Feature).isRequired, // The Feature object for which to display info
+        category: PropTypes.object,
     };
 
     render() {
-        const feature = this.props.feature;
-        const featureName = feature.getName();
+        const {feature, category} = this.props;
+        const featureName = category ? category[feature.getName()].name: feature.getName();
         return (
         <div>
             {featureName ? <div className="Tooltip-major-text" >{featureName}</div> : null}
