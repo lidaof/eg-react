@@ -69,6 +69,11 @@ const defaultTracks = [
         url: "https://vizhub.wustl.edu/public/hg19/methylc2/h1.liftedtohg19.gz"
     }),
     new TrackModel({
+        type: "categorical",
+        name: "ChromHMM",
+        url: "https://egg.wustl.edu/d/hg19/E017_15_coreMarks_dense.gz"
+    }),
+    new TrackModel({
         type: "hic",
         name: "test hic",
         url: "https://epgg-test.wustl.edu/dli/long-range-test/test.hic",

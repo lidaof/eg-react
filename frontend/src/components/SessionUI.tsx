@@ -189,7 +189,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         <div>
             <div>
                 <label htmlFor="retrieveId">
-                    <input type="text" size={40} placeholder="Session bunlde Id" 
+                    <input type="text" size={40} placeholder="Session bundle Id" 
                         value={this.state.retrieveId}
                         onChange={this.setRetrieveId}/>
                 </label>

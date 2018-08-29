@@ -3,6 +3,13 @@
 const mongoUtils = require('./mongoUtils');
 const setUpServer = require('./server').setUpServer;
 
+const fs = require('fs');
+
+const tls = {
+  key: fs.readFileSync('/etc/letsencrypt/live/epigenome.tk/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/epigenome.tk/fullchain.pem')
+};
+
 const DEF_CONFIG = {
     dbUrl: 'mongodb://localhost:27017',
     host: 'localhost',
@@ -10,8 +17,11 @@ const DEF_CONFIG = {
 };
 const PROD_CONFIG = {
     dbUrl: 'mongodb://localhost:27017',
-    port: 3001
+    host:'ec2-54-89-252-92.compute-1.amazonaws.com',
+    port: 443,
+    tls: tls
 };
+
 const ExitCodes = {
     UNKNOWN_ARGUMENT: 1,
     MONGO_ERROR: 2,

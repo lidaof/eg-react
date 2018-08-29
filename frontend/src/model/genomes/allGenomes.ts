@@ -34,22 +34,22 @@ interface SpeciesConfig {
 
 export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
     human: {
-        logoUrl: 'http://epigenomegateway.wustl.edu/browser/images/Human.png',
+        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Human.png',
         assemblies: [ HG19.genome.getName(), HG38.genome.getName() ],
         color: 'white',
     },
     chimp: {
-        logoUrl: 'http://epigenomegateway.wustl.edu/browser/images/Chimp.png',
+        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Chimp.png',
         assemblies: [ PANTRO5.genome.getName() ],
         color: 'white',
     },
     mouse: {
-        logoUrl: 'http://epigenomegateway.wustl.edu/browser/images/Mouse.png',
+        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Mouse.png',
         assemblies: [ MM10.genome.getName() ],
         color: 'white',
     },
     zebrafish: {
-        logoUrl: 'http://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
+        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
         assemblies: [ DAN_RER10.genome.getName() ],
         color: 'yellow',
     },
