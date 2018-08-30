@@ -1,26 +1,8 @@
 'use strict';
+const fs = require('fs');
 
 const mongoUtils = require('./mongoUtils');
 const setUpServer = require('./server').setUpServer;
-
-const fs = require('fs');
-
-const tls = {
-  key: fs.readFileSync('/etc/letsencrypt/live/epigenome.tk/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/epigenome.tk/fullchain.pem')
-};
-
-const DEF_CONFIG = {
-    dbUrl: 'mongodb://localhost:27017',
-    host: 'localhost',
-    port: 3001
-};
-const PROD_CONFIG = {
-    dbUrl: 'mongodb://localhost:27017',
-    host:'ec2-54-89-252-92.compute-1.amazonaws.com',
-    port: 443,
-    tls: tls
-};
 
 const ExitCodes = {
     UNKNOWN_ARGUMENT: 1,
@@ -41,10 +23,25 @@ async function main(argv) {
 
     // Get environment config
     const environment = argv[2].toLowerCase();
-    let envConfig = DEF_CONFIG;
+    let envConfig;
     if (environment === "dev") {
-        envConfig = DEF_CONFIG;
+        const DEV_CONFIG = {
+            dbUrl: 'mongodb://localhost:27017',
+            host: 'localhost',
+            port: 3001
+        };
+        envConfig = DEV_CONFIG;
     } else if (environment === "prod") {
+        const tls = {
+            key: fs.readFileSync('/etc/letsencrypt/live/epigenome.tk/privkey.pem'),
+            cert: fs.readFileSync('/etc/letsencrypt/live/epigenome.tk/fullchain.pem')
+          };
+          const PROD_CONFIG = {
+              dbUrl: 'mongodb://localhost:27017',
+              host:'ec2-54-89-252-92.compute-1.amazonaws.com',
+              port: 443,
+              tls: tls
+          };          
         envConfig = PROD_CONFIG
     } else {
         console.error(`Unknown environment "${environment}".  Enter either "dev" or "prod"`);
