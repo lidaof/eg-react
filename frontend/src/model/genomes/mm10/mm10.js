@@ -37,6 +37,11 @@ const defaultTracks = [
         genome: "mm10",
     }),
     new TrackModel({
+        type: "geneAnnotation",
+        name: "gencodeM18",
+        genome: "mm10",
+    }),
+    new TrackModel({
         type: "ruler",
         name: "Ruler",
     }),
