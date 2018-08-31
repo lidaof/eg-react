@@ -72,7 +72,8 @@ def main():
         for line in fin:
             if line.startswith('#'): continue
             t = line.strip().split('\t')
-            if t[1] == 'HAVANA': continue # skip havana annotation
+            #if t[1] == 'HAVANA': continue # skip havana annotation
+            if t[2] == 'gene': continue
             details = t[-1].split(';')
             dd = {}
             for detail in details:
@@ -80,7 +81,7 @@ def main():
                 if detail:
                     xid, xvalue = detail.split()
                     dd[xid] = xvalue.strip('"')
-            geneid = dd['gene_id']
+            geneid = dd['transcript_id'] # not transcript_id is used here
             genetype = dd['gene_type']
             gtype = genetype
             if genetype in typeMap:
