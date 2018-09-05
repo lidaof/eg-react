@@ -19,6 +19,7 @@ export const DEFAULT_OPTIONS = {
     displayMode: NumericalDisplayModes.AUTO,
     height: 40,
     color: "blue",
+    color2: "darkorange",
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -56,7 +57,9 @@ class NumericalTrack extends React.Component {
     constructor(props) {
         super(props);
         this.xToValue = null;
+        this.xToValue2 = null;
         this.scales = null;
+        this.hasReverse = false;
 
         this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
         this.computeScales = memoizeOne(this.computeScales);
@@ -69,13 +72,28 @@ class NumericalTrack extends React.Component {
         return xToFeatures.map( DefaultAggregators.fromId(aggregatorId) );
     }
 
-    computeScales(xToValue, height) {
+    computeScales(xToValue, xToValue2, height) {
+        if (xToValue2) {
+            const min1 = _.min(xToValue); // Returns undefined if no data.  This will cause scales to return NaN.
+            const max1 = _.max(xToValue);
+            const min2 = _.min(xToValue2);
+            const max2 = _.max(xToValue2);
+            const max = _.max(max1, max2);
+            const min = _.min(min1, min2);
+            return {
+                valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
+                valueToOpacity: scaleLinear().domain([min1, max1]).range([0, 1]).clamp(true),
+                valueToOpacityReverse: scaleLinear().domain([-min1, -max1]).range([0, 1]).clamp(true),
+            };
+        } else {
         const min = _.min(xToValue); // Returns undefined if no data.  This will cause scales to return NaN.
         const max = _.max(xToValue);
         return {
             valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
             valueToOpacity: scaleLinear().domain([min, max]).range([0, 1]).clamp(true),
         };
+    }
+
     }
 
     getEffectiveDisplayMode() {
@@ -114,10 +132,18 @@ class NumericalTrack extends React.Component {
 
     render() {
         const {data, viewRegion, width, trackModel, unit, options} = this.props;
-        const {height, color, aggregateMethod} = options;
+        const {height, color, color2, aggregateMethod} = options;
+        const dataForward = data.filter(feature => feature.value >= 0);
+        const dataReverse = data.filter(feature => feature.value < 0);
+        console.log(dataForward);
+        console.log(dataReverse);
+        if (dataReverse.length > 0) {
+            this.hasReverse = true;
+            this.xToValue2 = this.aggregateFeatures(dataReverse, viewRegion, width, aggregateMethod);
+        }
         const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
-        this.xToValue = this.aggregateFeatures(data, viewRegion, width, aggregateMethod);
-        this.scales = this.computeScales(this.xToValue, height);
+        this.xToValue = this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod);
+        this.scales = this.computeScales(this.xToValue, this.xToValue2, height);
         
         const legend = <TrackLegend
             trackModel={trackModel}
@@ -179,14 +205,14 @@ class ValuePlot extends React.PureComponent {
             }
             return <rect key={x} x={x} y={y} width={1} height={drawHeight} fill={color} />;
         } else { // Assume HEATMAP
-            const opacity = scales.valueToOpacity(value);
+            const opacity = value >= 0 ? scales.valueToOpacity(value) : scales.valueToOpacityReverse(value);
             return <rect key={x} x={x} y={0} width={1} height={height} fill={color} fillOpacity={opacity} />;
         }
     }
 
     render() {
         const {xToValue, height} = this.props;
-        return <DesignRenderer type={RenderTypes.CANVAS} width={xToValue.length} height={height}>
+        return <DesignRenderer type={RenderTypes.SVG} width={xToValue.length} height={height}>
             {this.props.xToValue.map(this.renderPixel)}
         </DesignRenderer>
     }
