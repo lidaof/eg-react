@@ -16,10 +16,11 @@ interface TrackLegendProps {
     width: number; // Legend width
     height: number; // Legend height
     axisScale?: ScaleLinear<number, number>; // A d3 scale function, used for drawing axes
+    axisScaleReverse?: ScaleLinear<number, number>; // A d3 scale function, used for drawing axes
     style?: object;
 }
 
-const NUM_TICKS_SUGGESTION = 3;
+const NUM_TICKS_SUGGESTION = 2;
 const AXIS_WIDTH = 30;
 
 const mapStateToProps = (state: {browser: StateWithHistory<AppState>}) => {
@@ -69,6 +70,11 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             const axis = axisLeft(this.props.axisScale);
             axis.ticks(NUM_TICKS_SUGGESTION);
             select(this.gNode).call(axis);
+            if (this.props.axisScaleReverse) {
+                const axis2 = axisLeft(this.props.axisScaleReverse);
+                axis2.ticks(NUM_TICKS_SUGGESTION);
+                select(this.gNode).call(axis2);
+            }
         }
     }
 
@@ -81,7 +87,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
     }
 
     render() {
-        const {trackModel, width, height, axisScale, style} = this.props;
+        const {trackModel, width, height, axisScale, style, axisScaleReverse} = this.props;
         if (height <= 0) {
             return null;
         }

@@ -74,25 +74,27 @@ class NumericalTrack extends React.Component {
 
     computeScales(xToValue, xToValue2, height) {
         if (xToValue2) {
-            const min1 = _.min(xToValue); // Returns undefined if no data.  This will cause scales to return NaN.
+            //const min1 = _.min(xToValue); // Returns undefined if no data.  This will cause scales to return NaN.
             const max1 = _.max(xToValue);
             const min2 = _.min(xToValue2);
-            const max2 = _.max(xToValue2);
-            const max = _.max(max1, max2);
-            const min = _.min(min1, min2);
+            //const max2 = _.max(xToValue2);
+            const min1 = 0;
+            const max2 = 0;
             return {
-                valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
+                valueToY: scaleLinear().domain([max1, min1]).range([TOP_PADDING, height * 0.5]).clamp(true),
+                valueToYReverse: scaleLinear().domain([max2, min2]).range([0, height * 0.5 - TOP_PADDING]).clamp(true),
                 valueToOpacity: scaleLinear().domain([min1, max1]).range([0, 1]).clamp(true),
-                valueToOpacityReverse: scaleLinear().domain([-min1, -max1]).range([0, 1]).clamp(true),
+                valueToOpacityReverse: scaleLinear().domain([-max2, -min2]).range([0, 1]).clamp(true),
             };
         } else {
-        const min = _.min(xToValue); // Returns undefined if no data.  This will cause scales to return NaN.
-        const max = _.max(xToValue);
-        return {
-            valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
-            valueToOpacity: scaleLinear().domain([min, max]).range([0, 1]).clamp(true),
-        };
-    }
+            //const min = _.min(xToValue); // Returns undefined if no data.  This will cause scales to return NaN.
+            const min = 0;
+            const max = _.max(xToValue);
+            return {
+                valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
+                valueToOpacity: scaleLinear().domain([min, max]).range([0, 1]).clamp(true),
+            };
+        }
 
     }
 
@@ -135,8 +137,6 @@ class NumericalTrack extends React.Component {
         const {height, color, color2, aggregateMethod} = options;
         const dataForward = data.filter(feature => feature.value >= 0);
         const dataReverse = data.filter(feature => feature.value < 0);
-        console.log(dataForward);
-        console.log(dataReverse);
         if (dataReverse.length > 0) {
             this.hasReverse = true;
             this.xToValue2 = this.aggregateFeatures(dataReverse, viewRegion, width, aggregateMethod);
@@ -144,14 +144,37 @@ class NumericalTrack extends React.Component {
         const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
         this.xToValue = this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod);
         this.scales = this.computeScales(this.xToValue, this.xToValue2, height);
-        
         const legend = <TrackLegend
             trackModel={trackModel}
-            height={height}
+            height={this.hasReverse ? height * 0.5 : height}
             axisScale={isDrawingBars ? this.scales.valueToY : undefined}
+            axisScaleReverse={isDrawingBars ? this.scales.valueToYReverse : undefined}
             axisLegend={unit}
         />;
-        const visualizer = (
+        const visualizer = this.hasReverse ?
+        (   <React.Fragment>
+            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
+                <ValuePlot
+                    xToValue={this.xToValue}
+                    scales={this.scales}
+                    height={height * 0.5 }
+                    color={color}
+                    isDrawingBars={isDrawingBars}
+                />
+            </HoverTooltipContext>
+            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
+                <ValuePlot
+                    xToValue={this.xToValue2}
+                    scales={this.scales}
+                    height={height * 0.5}
+                    color={color2}
+                    isDrawingBars={isDrawingBars}
+                />
+            </HoverTooltipContext>
+            </React.Fragment>
+        )
+        :
+        (
             <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
                 <ValuePlot
                     xToValue={this.xToValue}
@@ -195,24 +218,27 @@ class ValuePlot extends React.PureComponent {
         if (!value || Number.isNaN(value)) {
             return null;
         }
-
         const {isDrawingBars, scales, height, color} = this.props;
+        const y = value > 0 ? scales.valueToY(value) : scales.valueToYReverse(value);
+        const drawY = value > 0 ? y : 0 ;
+        const drawHeight = value > 0 ? height - y : y;
+        console.log(value, y, drawY, drawHeight);
         if (isDrawingBars) {
-            const y = scales.valueToY(value);
-            const drawHeight = height - y;
+            // const y = scales.valueToY(value);
+            // const drawHeight = height - y;
             if (drawHeight <= 0) {
                 return null;
             }
-            return <rect key={x} x={x} y={y} width={1} height={drawHeight} fill={color} />;
+            return <rect key={x} x={x} y={drawY} width={1} height={drawHeight} fill={color} />;
         } else { // Assume HEATMAP
-            const opacity = value >= 0 ? scales.valueToOpacity(value) : scales.valueToOpacityReverse(value);
+            const opacity = value > 0 ? scales.valueToOpacity(value) : scales.valueToOpacityReverse(value);
             return <rect key={x} x={x} y={0} width={1} height={height} fill={color} fillOpacity={opacity} />;
         }
     }
 
     render() {
         const {xToValue, height} = this.props;
-        return <DesignRenderer type={RenderTypes.SVG} width={xToValue.length} height={height}>
+        return <DesignRenderer type={RenderTypes.CANVAS} width={xToValue.length} height={height}>
             {this.props.xToValue.map(this.renderPixel)}
         </DesignRenderer>
     }
