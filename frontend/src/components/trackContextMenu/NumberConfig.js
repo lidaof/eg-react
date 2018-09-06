@@ -17,6 +17,7 @@ class NumberConfig extends React.PureComponent {
         isFloat: PropTypes.bool, // Expects a float when truthy, expects an int when falsy
         step: PropTypes.number, // Step attribute; legal number interval
         width: PropTypes.string, // Width of the input element.  Can use CSS units.
+        hasSetButton: PropTypes.bool,
     });
 
     static defaultProps = {
@@ -68,13 +69,14 @@ class NumberConfig extends React.PureComponent {
     }
 
     render() {
-        const {optionName, optionsObjects, label, minValue} = this.props;
+        const {optionName, optionsObjects, label, minValue, hasSetButton} = this.props;
+        const setButton = hasSetButton === undefined ? true : hasSetButton;
         return <SingleInputConfig
             optionName={optionName}
             optionsObjects={optionsObjects}
             label={label}
             defaultValue={minValue}
-            hasSetButton={true}
+            hasSetButton={setButton}
             getInputElement={this.renderInputElement}
             onOptionSet={this.handleOptionSet}
         />;

@@ -117,13 +117,23 @@ class NumericalTrack extends React.Component {
     renderTooltip(relativeX) {
         const {trackModel, viewRegion, width, unit} = this.props;
         const value = this.xToValue[Math.round(relativeX)];
+        const value2 = this.hasReverse ? this.xToValue2[Math.round(relativeX)]: null;
         const stringValue = typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : '(no data)';
+        const stringValue2 = typeof value2 === "number" && !Number.isNaN(value2) ? value2.toFixed(2) : '(no data)';
         return (
         <div>
             <div>
-                <span className="Tooltip-major-text" style={{marginRight: 3}}>{stringValue}</span>
+                <span className="Tooltip-major-text" style={{marginRight: 3}}>
+                {this.hasReverse && "Forward: "} {stringValue}</span>
                 {unit && <span className="Tooltip-minor-text">{unit}</span>}
             </div>
+            {
+                this.hasReverse &&
+                <div>
+                    <span className="Tooltip-major-text" style={{marginRight: 3}}>Reverse: {stringValue2}</span>
+                    {unit && <span className="Tooltip-minor-text">{unit}</span>}
+                </div>
+            }
             <div className="Tooltip-minor-text" >
                 <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
             </div>
@@ -135,6 +145,7 @@ class NumericalTrack extends React.Component {
     render() {
         const {data, viewRegion, width, trackModel, unit, options} = this.props;
         const {height, color, color2, aggregateMethod} = options;
+        const halfHeight = height * 0.5;
         const dataForward = data.filter(feature => feature.value >= 0);
         const dataReverse = data.filter(feature => feature.value < 0);
         if (dataReverse.length > 0) {
@@ -146,27 +157,26 @@ class NumericalTrack extends React.Component {
         this.scales = this.computeScales(this.xToValue, this.xToValue2, height);
         const legend = <TrackLegend
             trackModel={trackModel}
-            height={this.hasReverse ? height * 0.5 : height}
+            height={height}
             axisScale={isDrawingBars ? this.scales.valueToY : undefined}
             axisScaleReverse={isDrawingBars ? this.scales.valueToYReverse : undefined}
             axisLegend={unit}
         />;
         const visualizer = this.hasReverse ?
         (   <React.Fragment>
-            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
+            <HoverTooltipContext tooltipRelativeY={halfHeight} getTooltipContents={this.renderTooltip} >
                 <ValuePlot
                     xToValue={this.xToValue}
                     scales={this.scales}
-                    height={height * 0.5 }
+                    height={halfHeight}
                     color={color}
                     isDrawingBars={isDrawingBars}
                 />
-            </HoverTooltipContext>
-            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
+                <hr style={{marginTop: 0, marginBottom: 0, padding: 0}} />
                 <ValuePlot
                     xToValue={this.xToValue2}
                     scales={this.scales}
-                    height={height * 0.5}
+                    height={halfHeight}
                     color={color2}
                     isDrawingBars={isDrawingBars}
                 />
@@ -222,7 +232,6 @@ class ValuePlot extends React.PureComponent {
         const y = value > 0 ? scales.valueToY(value) : scales.valueToYReverse(value);
         const drawY = value > 0 ? y : 0 ;
         const drawHeight = value > 0 ? height - y : y;
-        console.log(value, y, drawY, drawHeight);
         if (isDrawingBars) {
             // const y = scales.valueToY(value);
             // const drawHeight = height - y;

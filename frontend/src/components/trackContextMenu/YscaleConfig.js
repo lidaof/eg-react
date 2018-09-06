@@ -8,7 +8,7 @@ import NumberConfig from './NumberConfig';
  * @return {JSX.Element} element to render
  */
 function HeightConfig(props) {
-    return <NumberConfig {...props} optionName="height" label="Height (pixels):" minValue={5} step={5} hasSetButton={false} />;
+    return <NumberConfig {...props} optionName="height" label="Height (pixels):" minValue={5} step={5} />;
 }
 
 export default HeightConfig;

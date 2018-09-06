@@ -69,11 +69,13 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
 
             const axis = axisLeft(this.props.axisScale);
             axis.ticks(NUM_TICKS_SUGGESTION);
-            select(this.gNode).call(axis);
+            select(this.gNode).append("g").call(axis);
             if (this.props.axisScaleReverse) {
                 const axis2 = axisLeft(this.props.axisScaleReverse);
                 axis2.ticks(NUM_TICKS_SUGGESTION);
-                select(this.gNode).call(axis2);
+                select(this.gNode).append("g")
+                    .attr("transform", "translate(" + 0 + "," + this.props.height * 0.5 + ")")
+                    .call(axis2);
             }
         }
     }
@@ -91,7 +93,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
         if (height <= 0) {
             return null;
         }
-
+        const axisHeight = axisScaleReverse ? height * 0.5 : height;
         const divStyle = Object.assign({
             display: "flex",
             width,
@@ -105,7 +107,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
 
         let axis = null;
         if (axisScale) {
-            axis = <svg width={AXIS_WIDTH} height={height} style={{overflow: "visible"}} >
+            axis = <svg width={AXIS_WIDTH} height={axisHeight} style={{overflow: "visible"}} >
                 <TranslatableG innerRef={this.handleRef} x={AXIS_WIDTH} />
             </svg>;
         }
