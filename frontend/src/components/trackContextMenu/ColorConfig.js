@@ -75,3 +75,25 @@ export function SecondaryColorConfig(props) {
 export function BackgroundColorConfig(props) {
     return <ColorConfig {...props} optionName="backgroundColor" label="Background color" />;
 }
+
+
+/**
+ * A menu item that configures `trackModel.options.colorAboveMax`
+ * 
+ * @param {Object} props - object with shape ITEM_PROP_TYPES from TrackContextMenu
+ * @return {JSX.Element} element to render
+ */
+export function PrimaryAboveColorConfig(props) {
+    return <ColorConfig {...props} optionName="colorAboveMax" label="Primary color above max" />;
+}
+
+
+/**
+ * A menu item that configures `trackModel.options.color2BelowMin`
+ * 
+ * @param {Object} props - object with shape ITEM_PROP_TYPES from TrackContextMenu
+ * @return {JSX.Element} element to render
+ */
+export function SecondaryBelowColorConfig(props) {
+    return <ColorConfig {...props} optionName="color2BelowMin" label="Secondary color below min" />;
+}

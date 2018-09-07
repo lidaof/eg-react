@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { scaleLinear } from 'd3-scale';
 import memoizeOne from 'memoize-one';
-
+import { notify } from 'react-notify-toast';
 import Track from '../Track';
 import TrackLegend from '../TrackLegend';
 import GenomicCoordinates from '../GenomicCoordinates';
@@ -19,12 +19,16 @@ export const DEFAULT_OPTIONS = {
     displayMode: NumericalDisplayModes.AUTO,
     height: 40,
     color: "blue",
+    colorAboveMax: "red",
     color2: "darkorange",
+    color2BelowMin: "darkgreen",
+    yScale: "auto",
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 const AUTO_HEATMAP_THRESHOLD = 21; // If pixel height is less than this, automatically use heatmap
 const TOP_PADDING = 3;
+const THRESHOLD_HEIGHT = 3; // the bar tip height which represet value above max or below min
 
 /**
  * Track specialized in showing numerical data.
@@ -73,29 +77,36 @@ class NumericalTrack extends React.Component {
     }
 
     computeScales(xToValue, xToValue2, height) {
+        const {yScale, yMin, yMax} = this.props.options;
+        if (yMin > yMax) {
+            notify.show('Y-axis min must less than max', 'error', 2000);
+        }
+        let max = _.max(xToValue);
+        let min = xToValue2 ? _.min(xToValue2) : 0;
+        if (yScale === 'fixed') {
+            max = yMax ? yMax : max;
+            min = yMin ? yMin : min;
+        }
+        if (min > max) {
+            min = max;
+        }
         if (xToValue2) {
-            //const min1 = _.min(xToValue); // Returns undefined if no data.  This will cause scales to return NaN.
-            const max1 = _.max(xToValue);
-            const min2 = _.min(xToValue2);
-            //const max2 = _.max(xToValue2);
-            const min1 = 0;
-            const max2 = 0;
             return {
-                valueToY: scaleLinear().domain([max1, min1]).range([TOP_PADDING, height * 0.5]).clamp(true),
-                valueToYReverse: scaleLinear().domain([max2, min2]).range([0, height * 0.5 - TOP_PADDING]).clamp(true),
-                valueToOpacity: scaleLinear().domain([min1, max1]).range([0, 1]).clamp(true),
-                valueToOpacityReverse: scaleLinear().domain([-max2, -min2]).range([0, 1]).clamp(true),
+                valueToY: scaleLinear().domain([max, 0]).range([TOP_PADDING, height * 0.5]).clamp(true),
+                valueToYReverse: scaleLinear().domain([0, min]).range([0, height * 0.5 - TOP_PADDING]).clamp(true),
+                valueToOpacity: scaleLinear().domain([0, max]).range([0, 1]).clamp(true),
+                valueToOpacityReverse: scaleLinear().domain([0, -min]).range([0, 1]).clamp(true),
+                min,
+                max,
             };
         } else {
-            //const min = _.min(xToValue); // Returns undefined if no data.  This will cause scales to return NaN.
-            const min = 0;
-            const max = _.max(xToValue);
             return {
                 valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
                 valueToOpacity: scaleLinear().domain([min, max]).range([0, 1]).clamp(true),
+                min,
+                max,
             };
         }
-
     }
 
     getEffectiveDisplayMode() {
@@ -144,7 +155,7 @@ class NumericalTrack extends React.Component {
 
     render() {
         const {data, viewRegion, width, trackModel, unit, options} = this.props;
-        const {height, color, color2, aggregateMethod} = options;
+        const {height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin} = options;
         const halfHeight = height * 0.5;
         const dataForward = data.filter(feature => feature.value >= 0);
         const dataReverse = data.filter(feature => feature.value < 0);
@@ -170,6 +181,7 @@ class NumericalTrack extends React.Component {
                     scales={this.scales}
                     height={halfHeight}
                     color={color}
+                    colorOut={colorAboveMax}
                     isDrawingBars={isDrawingBars}
                 />
                 <hr style={{marginTop: 0, marginBottom: 0, padding: 0}} />
@@ -178,6 +190,7 @@ class NumericalTrack extends React.Component {
                     scales={this.scales}
                     height={halfHeight}
                     color={color2}
+                    colorOut={color2BelowMin}
                     isDrawingBars={isDrawingBars}
                 />
             </HoverTooltipContext>
@@ -191,6 +204,7 @@ class NumericalTrack extends React.Component {
                     scales={this.scales}
                     height={height}
                     color={color}
+                    colorOut={colorAboveMax}
                     isDrawingBars={isDrawingBars}
                 />
             </HoverTooltipContext>
@@ -228,17 +242,34 @@ class ValuePlot extends React.PureComponent {
         if (!value || Number.isNaN(value)) {
             return null;
         }
-        const {isDrawingBars, scales, height, color} = this.props;
+        const {isDrawingBars, scales, height, color, colorOut} = this.props;
         const y = value > 0 ? scales.valueToY(value) : scales.valueToYReverse(value);
-        const drawY = value > 0 ? y : 0 ;
-        const drawHeight = value > 0 ? height - y : y;
+        let drawY = value > 0 ? y : 0 ;
+        let drawHeight = value > 0 ? height - y : y;
+        
         if (isDrawingBars) {
             // const y = scales.valueToY(value);
             // const drawHeight = height - y;
             if (drawHeight <= 0) {
                 return null;
             }
-            return <rect key={x} x={x} y={drawY} width={1} height={drawHeight} fill={color} />;
+            let tipY;
+            if (value > scales.max || value < scales.min) {
+                drawHeight -= THRESHOLD_HEIGHT
+                if (value > scales.max) {
+                    tipY = y;
+                    drawY += THRESHOLD_HEIGHT;
+                } else {
+                    tipY = drawHeight;
+                }
+                return <g key={x}>
+                        <rect key={x} x={x} y={drawY} width={1} height={drawHeight} fill={color} />
+                        <rect key={x+'tip'} x={x} y={tipY} width={1} height={THRESHOLD_HEIGHT} fill={colorOut} />
+                    </g>;
+            } else {
+                return <rect key={x} x={x} y={drawY} width={1} height={drawHeight} fill={color} />;
+            }
+            
         } else { // Assume HEATMAP
             const opacity = value > 0 ? scales.valueToOpacity(value) : scales.valueToOpacityReverse(value);
             return <rect key={x} x={x} y={0} width={1} height={height} fill={color} fillOpacity={opacity} />;
