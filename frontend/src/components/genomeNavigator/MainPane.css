@@ -1,3 +1,7 @@
+.MainPane {
+    width: 100%;
+}
+
 .MainPane-opaque {
     opacity: 0.5;
 }

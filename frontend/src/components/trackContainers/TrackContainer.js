@@ -30,6 +30,9 @@ import './TrackContainer.css';
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 
+const pixelToMM = 0.264583333; // 1 pixel equals to 0.26mm
+const printWidth = 259.4; // print page with, already minus margin 1cm
+
 ///////////
 // HOC's //
 ///////////
@@ -98,6 +101,11 @@ class TrackContainer extends React.Component {
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.deselectAllTracks = this.deselectAllTracks.bind(this);
     }
+
+    // componentDidMount() {
+    //     const scaleFraction = this.props.containerWidth * pixelToMM / printWidth;
+    //     document.documentElement.style.setProperty('--scaleFraction', 1 / scaleFraction);
+    // }
 
     /**
      * Toggles the selection of a tool, or switches tool.
@@ -199,7 +207,7 @@ class TrackContainer extends React.Component {
             <div><History /></div>
             <div>
                 <ReactToPrint
-                    trigger={() => <button className="btn btn-light" title="Print Browser View">🖶</button>}
+                    trigger={() => <button className="btn btn-light" title="Print Browser View">🖨️</button>}
                     content={() => this.componentRef}
                 />
             </div>
@@ -243,25 +251,25 @@ class TrackContainer extends React.Component {
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
-                return <ReorderableTrackContainer ref={el => (this.componentRef = el)}
+                return <ReorderableTrackContainer
                     trackElements={trackElements}
                     trackModels={tracks}
                     onTracksChanged={onTracksChanged}
                 />;
             case Tools.ZOOM_IN:
-                return <ZoomableTrackContainer ref={el => (this.componentRef = el)}
+                return <ZoomableTrackContainer
                     trackElements={trackElements}
                     visData={primaryView}
                     onNewRegion={onNewRegion}
                 />;
             case Tools.DRAG:
-                return <PannableTrackContainer ref={el => (this.componentRef = el)}
+                return <PannableTrackContainer
                     trackElements={trackElements}
                     visData={primaryView}
                     onNewRegion={onNewRegion}
                 />;
             default:
-                return <div ref={el => (this.componentRef = el)}>{trackElements}</div>;
+                return trackElements;
         }
     }
 
@@ -278,7 +286,7 @@ class TrackContainer extends React.Component {
         <OutsideClickDetector onOutsideClick={this.deselectAllTracks} >
             {this.renderControls()}
             <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
-                <DivWithBullseye style={trackDivStyle}>
+                <DivWithBullseye style={trackDivStyle} ref={el => (this.componentRef = el)} id="trackContainer">
                     {this.renderSubContainer()}
                 </DivWithBullseye>
             </ContextMenuManager>

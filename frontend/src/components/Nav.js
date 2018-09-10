@@ -18,6 +18,8 @@ import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
 
+const VERSION = "v47.1";
+
 /**
  * the top navigation bar for browser
  * @author Daofeng Li
@@ -44,6 +46,7 @@ class Nav extends React.Component {
                 <div>
                     <img src={eglogo} width="300px" alt="browser logo"/>
                     <span id="theNew" >The New</span>
+                    <span id="theVersion">{VERSION}</span>
                 </div>
                 <div className="Nav-genome Nav-center" 
                     style={{backgroundImage: `url(${logo})`, color: color, backgroundSize: "cover"}}>

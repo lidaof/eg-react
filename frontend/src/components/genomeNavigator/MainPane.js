@@ -111,7 +111,7 @@ class MainPane extends React.Component {
         // Order of components matters; components listed later will be drawn IN FRONT of ones listed before
         return (
         <RegionPanTracker
-            className="MainPane-opaque"
+            className="MainPane MainPane-opaque"
             mouseButton={MouseButton.RIGHT}
             onViewDrag={onNewViewRequested}
             panRegion={viewRegion}
@@ -124,7 +124,7 @@ class MainPane extends React.Component {
                 onRegionSelected={onRegionSelected}
             >
                 <svg
-                    width={containerWidth}
+                    width="100%"
                     height={SVG_HEIGHT}
                     onContextMenu={event => event.preventDefault()}
                     onWheel={this.mousewheel}

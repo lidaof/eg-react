@@ -1,4 +1,26 @@
-@page { 
+/* :root {
+    --scaleFraction: 1;
+}
+
+@media print {
+    @page { 
+        size: 279.4mm 215.9mm; 
+        margin: 10mm;
+    }
+    body {
+        transform: scale(var(--scaleFraction));
+    }
+} */
+        /* zoom: var(--scaleFraction); */
+
+
+/* @page { 
     size: auto; 
-    margin: 1cm;
+    margin: 10mm;
+} */
+
+@page { 
+    size: 279.4mm 215.9mm; 
+    margin: 10mm;
+    /* transform: scale(var(--scaleFraction)); */
 }

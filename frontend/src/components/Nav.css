@@ -7,6 +7,38 @@
     /* grid-template-columns: min-content; */
 }
 
+@media screen and (max-width: 1380px) {
+    .Nav-container {
+        display: grid;
+        grid-template-columns: repeat(4, auto);
+        justify-items: center;
+    }
+}
+
+@media screen and (max-width: 960px) {
+    .Nav-container {
+        display: grid;
+        grid-template-columns: repeat(3, auto);
+        justify-items: center;
+    }
+}
+
+@media screen and (max-width: 776px) {
+    .Nav-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-items: center;
+    }
+}
+
+@media screen and (max-width: 554px) {
+    .Nav-container {
+        display: grid;
+        grid-template-columns: auto;
+        justify-items: center;
+    }
+}
+
 .Nav-container > div {
     padding: 0 5px;
 }
@@ -54,6 +86,13 @@
     to {font-size: 0.7em;}
 }
 
+#theVersion {
+    color: red;
+    font-size: 0.7em;
+    position: absolute;
+    top: 1px;
+    left: 290px;
+}
 
 .GenomeNavigator-tooltip {
     position: relative;
