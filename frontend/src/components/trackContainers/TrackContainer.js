@@ -22,6 +22,10 @@ import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
 import TrackModel from '../../model/TrackModel';
 import TrackSelectionBehavior from '../../model/TrackSelectionBehavior';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import UndoRedo from "./UndoRedo";
+import History from "./History";
+import ReactToPrint from "react-to-print";
+import './TrackContainer.css';
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
@@ -189,7 +193,15 @@ class TrackContainer extends React.Component {
         return <div style={{display: "flex", alignItems: "flex-end"}} >
             <div>
                 {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
-                <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} />
+                <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} /> 
+            </div>
+            <div><UndoRedo /></div>
+            <div><History /></div>
+            <div>
+                <ReactToPrint
+                    trigger={() => <button className="btn btn-light" title="Print Browser View">🖶</button>}
+                    content={() => this.componentRef}
+                />
             </div>
             <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
         </div>;
@@ -231,25 +243,25 @@ class TrackContainer extends React.Component {
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
-                return <ReorderableTrackContainer
+                return <ReorderableTrackContainer ref={el => (this.componentRef = el)}
                     trackElements={trackElements}
                     trackModels={tracks}
                     onTracksChanged={onTracksChanged}
                 />;
             case Tools.ZOOM_IN:
-                return <ZoomableTrackContainer
+                return <ZoomableTrackContainer ref={el => (this.componentRef = el)}
                     trackElements={trackElements}
                     visData={primaryView}
                     onNewRegion={onNewRegion}
                 />;
             case Tools.DRAG:
-                return <PannableTrackContainer
+                return <PannableTrackContainer ref={el => (this.componentRef = el)}
                     trackElements={trackElements}
                     visData={primaryView}
                     onNewRegion={onNewRegion}
                 />;
             default:
-                return trackElements;
+                return <div ref={el => (this.componentRef = el)}>{trackElements}</div>;
         }
     }
 

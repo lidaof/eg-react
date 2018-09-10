@@ -11,12 +11,12 @@ import { TrackModel } from '../model/TrackModel';
 import AnnotationTrackSelector from './trackManagers/AnnotationTrackSelector';
 import HubPane from './trackManagers/HubPane'
 import CustomTrackAdder from './trackManagers/CustomTrackAdder';
+import { SessionUI } from "./SessionUI";
+import LiveUI from "./LiveUI";
 
 import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
-import { SessionUI } from "./SessionUI";
-import LiveUI from "./LiveUI";
 
 /**
  * the top navigation bar for browser
@@ -110,7 +110,6 @@ class Nav extends React.Component {
                                                     }}}>
                             <LiveUI liveId={liveId} />
                         </ModalMenuItem>
-                        <div className="dropdown-item">Screenshot</div>
                     </div>
                 </div>
                 <div className="Nav-center">

@@ -81,8 +81,15 @@ class NumericalTrack extends React.Component {
         if (yMin > yMax) {
             notify.show('Y-axis min must less than max', 'error', 2000);
         }
-        let max = _.max(xToValue);
-        let min = xToValue2 ? _.min(xToValue2) : 0;
+        /*
+        All tracks get `PropsFromTrackContainer` (see `Track.ts`).
+
+        `props.viewWindow` contains the range of x that is visible when no dragging.  
+            It comes directly from the `ViewExpansion` object from `RegionExpander.ts`
+        */
+        const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
+        let max = _.max(visibleValues);
+        let min = xToValue2 ? _.min(xToValue2.slice(this.props.viewWindow.start, this.props.viewWindow.end)) : 0;
         if (yScale === 'fixed') {
             max = yMax ? yMax : max;
             min = yMin ? yMin : min;
