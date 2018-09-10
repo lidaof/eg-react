@@ -1,1 +1,0 @@
-# WashU Epigenome Browser Documentation
