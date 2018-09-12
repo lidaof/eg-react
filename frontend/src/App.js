@@ -48,6 +48,7 @@ class App extends React.Component {
         this.state = {
             isShowing3D: false,
             isShowingNavigator: true,
+            highlightEnteredRegion: true,
         };
         this.addTracks = this.addTracks.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
@@ -71,6 +72,10 @@ class App extends React.Component {
         this.setState(prevState => {return {isShowing3D: !prevState.isShowing3D}});
     };
 
+    toggleHighlight = () => {
+        this.setState(prevState => {return {highlightEnteredRegion: !prevState.highlightEnteredRegion}});
+    };    
+
     render() {
         const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, sessionFromUrl} = this.props;
         if (sessionFromUrl) {
@@ -86,6 +91,7 @@ class App extends React.Component {
                 {...this.state}
                 onToggleNavigator={this.toggleNavigator}
                 onToggle3DScene={this.toggle3DScene}
+                onToggleHighlight={this.toggleHighlight}
                 selectedRegion={viewRegion}
                 onRegionSelected={onNewViewRegion} 
                 tracks={tracks}

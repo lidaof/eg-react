@@ -93,6 +93,7 @@ class TrackContainer extends React.Component {
         super(props);
         this.state = {
             selectedTool: Tools.DRAG,
+            screenshotWidth: '279.4mm',
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -102,10 +103,13 @@ class TrackContainer extends React.Component {
         this.deselectAllTracks = this.deselectAllTracks.bind(this);
     }
 
-    // componentDidMount() {
-    //     const scaleFraction = this.props.containerWidth * pixelToMM / printWidth;
-    //     document.documentElement.style.setProperty('--scaleFraction', 1 / scaleFraction);
-    // }
+    componentDidMount() {
+        // const scaleFraction = this.props.containerWidth * pixelToMM / printWidth;
+        const screenshotWidth = this.props.containerWidth * pixelToMM + 20;
+        // document.documentElement.style.setProperty('--scaleFraction', 1 / scaleFraction);
+        document.documentElement.style.setProperty('--screenshotWidth', screenshotWidth + 'mm');
+        this.setState({screenshotWidth: screenshotWidth + 'mm'});
+    }
 
     /**
      * Toggles the selection of a tool, or switches tool.
@@ -209,6 +213,8 @@ class TrackContainer extends React.Component {
                 <ReactToPrint
                     trigger={() => <button className="btn btn-light" title="Print Browser View">🖨️</button>}
                     content={() => this.componentRef}
+                    pageStyle={{size: `${this.screenshotWidth} 215.9mm`, 
+                        margin: '10mm',}}
                 />
             </div>
             <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
