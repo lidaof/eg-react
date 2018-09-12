@@ -27,6 +27,8 @@ import History from "./History";
 import ReactToPrint from "react-to-print";
 import './TrackContainer.css';
 
+import HighlightRegion from "../HighlightRegion";
+
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 
@@ -283,7 +285,7 @@ class TrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {tracks, onTracksChanged} = this.props;
+        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView} = this.props;
         const selectedTool = this.state.selectedTool;
         const contextMenu = <TrackContextMenu tracks={tracks} onTracksChanged={onTracksChanged} />;
         const trackDivStyle = {border: "1px solid black", cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR};
@@ -293,7 +295,14 @@ class TrackContainer extends React.Component {
             {this.renderControls()}
             <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
                 <DivWithBullseye style={trackDivStyle} ref={el => (this.componentRef = el)} id="trackContainer">
-                    {this.renderSubContainer()}
+                    <HighlightRegion 
+                        enteredRegion={enteredRegion}
+                        highlightEnteredRegion={highlightEnteredRegion}
+                        visData={primaryView}
+                        basesPerPixel={this.props.basesPerPixel}
+                    >
+                        {this.renderSubContainer()}
+                    </HighlightRegion>
                 </DivWithBullseye>
             </ContextMenuManager>
         </OutsideClickDetector>

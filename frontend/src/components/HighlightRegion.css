@@ -1,0 +1,11 @@
+.HighlightRegion-box {
+    position: absolute;
+    border: 0;
+    background: rgba(255, 255, 0, 0.3);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.HighlightRegion-none {
+    display: none;
+}

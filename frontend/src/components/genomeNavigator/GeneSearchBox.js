@@ -105,6 +105,7 @@ class GeneSearchBox extends React.PureComponent {
         if (interval) {
             this.props.onRegionSelected(...interval);
             this.props.handleCloseModal();
+            this.props.onSetEnteredRegion(interval);
         } else {
             alert("Gene not available in current region set view"); // TODO better message
         }

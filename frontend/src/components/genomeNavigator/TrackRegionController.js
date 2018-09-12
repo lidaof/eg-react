@@ -53,6 +53,8 @@ class TrackRegionController extends React.Component {
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
+        this.parseRegion = this.parseRegion.bind(this);
+        this.keyPress = this.keyPress.bind(this);
     }
 
     handleOpenModal () {
@@ -62,6 +64,12 @@ class TrackRegionController extends React.Component {
     handleCloseModal () {
         this.setState({ showModal: false });
     }
+
+    keyPress(e){
+        if(e.keyCode === 13){
+           this.parseRegion();
+        }
+     }
 
     /**
      * Parses user input that expresses a desired region for tracks to display.
@@ -84,6 +92,7 @@ class TrackRegionController extends React.Component {
             this.setState({badInputMessage: ""});
         }
         this.props.onRegionSelected(parsedRegion.start, parsedRegion.end);
+        this.props.onSetEnteredRegion(parsedRegion);
         this.handleCloseModal();
     }
 
@@ -115,6 +124,8 @@ class TrackRegionController extends React.Component {
                     navContext={this.props.selectedRegion.getNavigationContext()}
                     onRegionSelected={this.props.onRegionSelected}
                     handleCloseModal = {this.handleCloseModal}
+                    onToggleHighlight={this.props.onToggleHighlight}
+                    onSetEnteredRegion={this.props.onSetEnteredRegion}
                 />
                 <h6>Region search (current region is {coordinates})</h6>
                 <input
@@ -123,11 +134,12 @@ class TrackRegionController extends React.Component {
                     size="30" 
                     placeholder="Coordinate"
                     // onClick={this.handleClick}
+                    onKeyDown={this.keyPress}
                 />
                 <button 
                     className="btn btn-secondary btn-sm" 
                     style={{marginLeft: "2px"}}
-                    onClick={this.parseRegion.bind(this)}
+                    onClick={this.parseRegion}
                 >
                     Go
                 </button>

@@ -37,7 +37,8 @@ class Nav extends React.Component {
     render() {
         const {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
-            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId, liveId
+            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId, liveId,
+            onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
@@ -56,6 +57,8 @@ class Nav extends React.Component {
                     <TrackRegionController
                         selectedRegion={selectedRegion}
                         onRegionSelected={onRegionSelected}
+                        onToggleHighlight={onToggleHighlight}
+                        onSetEnteredRegion={onSetEnteredRegion}
                     />
                 </div>
                 <div className="Nav-center">
@@ -135,6 +138,11 @@ class Nav extends React.Component {
                                     </ul>
                                 </div>
                             </span>
+                        </label>
+                        <label className="dropdown-item" htmlFor="isHighlightRegion">
+                            <input id="isHighlightRegion" type="checkbox" 
+                                checked={highlightEnteredRegion} onChange={onToggleHighlight} />
+                            <span style={{marginLeft: "1ch"}} >Highlight entered region</span>
                         </label>
                         <label className="dropdown-item" htmlFor="switch3D">
                             <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={onToggle3DScene} />
