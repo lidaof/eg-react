@@ -151,7 +151,9 @@ class Nav extends React.Component {
                     </div>
                 </div>
                 <div className="Nav-center">
-                    <button type="button" className="btn btn-warning btn-sm">📖Documentation</button>
+                    <a role="button" className="btn btn-warning btn-sm" 
+                        href="https://epigenomegateway.readthedocs.io/" 
+                        target="_blank">📖Documentation</a>
                 </div>
             </div>
         )

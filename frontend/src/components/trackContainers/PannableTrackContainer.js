@@ -30,9 +30,6 @@ export class PannableTrackContainer extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            xOffset: 0
-        };
         this.offsetOnDragStart = 0;
         this.viewDragStart = this.viewDragStart.bind(this);
         this.viewDrag = this.viewDrag.bind(this);
@@ -46,7 +43,7 @@ export class PannableTrackContainer extends React.Component {
      */
     viewDragStart(event) {
         event.preventDefault();
-        this.offsetOnDragStart = this.state.xOffset;
+        this.offsetOnDragStart = this.props.xOffset;
     }
 
     /**
@@ -69,7 +66,7 @@ export class PannableTrackContainer extends React.Component {
         the left.
         */
         if (-numPixelsOnRight < newXOffset && newXOffset < numPixelsOnLeft) {
-            this.setState({xOffset: newXOffset});
+            this.props.onXOffsetChanged(newXOffset);
         }
     }
 
@@ -92,7 +89,7 @@ export class PannableTrackContainer extends React.Component {
      */
     componentWillReceiveProps(newProps) {
         if (this.props.visData !== newProps.visData) {
-            this.setState({xOffset: 0});
+            this.props.onXOffsetChanged(0);
         }
     }
 
@@ -100,10 +97,10 @@ export class PannableTrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {trackElements, visData} = this.props;
+        const {trackElements, visData, xOffset} = this.props;
         const {visRegion, visWidth, viewWindowRegion} = visData;
         const tracksWithXOffset = trackElements.map( // Give xOffset to tracks
-            trackElement => React.cloneElement(trackElement, { xOffset: this.state.xOffset }) 
+            trackElement => React.cloneElement(trackElement, { xOffset }) 
         );
 
         return (

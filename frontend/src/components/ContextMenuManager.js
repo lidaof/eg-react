@@ -77,7 +77,7 @@ class ContextMenuManager extends React.PureComponent {
             menuPopper = (
                 <Manager>
                     <Target style={{position: "absolute", left: x, top: y}} />
-                    <Popper placement="bottom-start" >
+                    <Popper placement="bottom-start" style={{zIndex: 2}}>
                         <OutsideClickDetector onOutsideClick={this.handleOutsideClick} >
                             <ErrorBoundary>{menuElement}</ErrorBoundary>
                         </OutsideClickDetector>

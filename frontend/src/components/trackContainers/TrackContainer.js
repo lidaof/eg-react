@@ -96,6 +96,7 @@ class TrackContainer extends React.Component {
         this.state = {
             selectedTool: Tools.DRAG,
             screenshotWidth: '279.4mm',
+            xOffset: 0
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -103,6 +104,7 @@ class TrackContainer extends React.Component {
         this.handleMetadataClicked = this.handleMetadataClicked.bind(this);
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.deselectAllTracks = this.deselectAllTracks.bind(this);
+        this.changeXOffset = this.changeXOffset.bind(this);
     }
 
     componentDidMount() {
@@ -124,6 +126,10 @@ class TrackContainer extends React.Component {
         } else {
             this.setState({selectedTool: tool});
         }
+    }
+
+    changeXOffset(xOffset) {
+        this.setState({xOffset});
     }
 
     /**
@@ -275,6 +281,8 @@ class TrackContainer extends React.Component {
                     trackElements={trackElements}
                     visData={primaryView}
                     onNewRegion={onNewRegion}
+                    xOffset={this.state.xOffset}
+                    onXOffsetChanged={this.changeXOffset}
                 />;
             default:
                 return trackElements;
@@ -299,7 +307,7 @@ class TrackContainer extends React.Component {
                         enteredRegion={enteredRegion}
                         highlightEnteredRegion={highlightEnteredRegion}
                         visData={primaryView}
-                        basesPerPixel={this.props.basesPerPixel}
+                        xOffset={this.state.xOffset}
                     >
                         {this.renderSubContainer()}
                     </HighlightRegion>

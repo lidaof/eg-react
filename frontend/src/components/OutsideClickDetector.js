@@ -68,7 +68,7 @@ class OutsideClickDetector extends React.PureComponent {
      */
     render() {
         const {onOutsideClick, ...otherProps} = this.props;
-        return <div {...otherProps} ref={this.handleRef} />
+        return <div style={{position: "relative", zIndex: 0}} {...otherProps} ref={this.handleRef} />
     }
 }
 

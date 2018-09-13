@@ -75,7 +75,9 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                 axis2.ticks(NUM_TICKS_SUGGESTION);
                 select(this.gNode).append("g")
                     .attr("transform", "translate(" + 0 + "," + this.props.height * 0.5 + ")")
-                    .call(axis2);
+                    .call(axis2).selectAll(".tick")
+                    .filter( (d) =>  d === 0 )
+                    .remove();
             }
         }
     }
