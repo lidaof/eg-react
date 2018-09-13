@@ -5,6 +5,7 @@
     padding-bottom: 3px;
     padding-left: 6px;
     padding-right: 6px;
+    z-index: 2;
 }
 
 .Tooltip-major-text {

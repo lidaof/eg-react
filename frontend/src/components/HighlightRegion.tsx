@@ -45,17 +45,14 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     getHiglightedXs(xSpan: OpenInterval): OpenInterval {
         const {legendWidth} = this.props;
         const {viewWindowRegion, viewWindow} = this.props.visData;
-        console.log(viewWindowRegion);
-        const drawModel = new LinearDrawingModel(viewWindowRegion, xSpan.getLength());
+        const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
         const xRegion = drawModel.baseSpanToXSpan(xSpan);
-        console.log(xRegion);
-        let start = Math.max(legendWidth, legendWidth + xRegion.start);
-        let end = Math.min(xRegion.end + legendWidth, legendWidth + viewWindow.getLength());
-        if (end < start) {
-            start = legendWidth;
-            end = legendWidth + viewWindow.getLength();
+        let start = Math.max(legendWidth, xRegion.start + legendWidth);
+        let end = xRegion.end + legendWidth;
+        if (end <= start) {
+            start = -1;
+            end = 0;
         }
-        console.log(start, end);
         return new OpenInterval(start, end);
     }
 
@@ -75,7 +72,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         const theBox = <div className={className} style={style} />;
         return (
         <div
-            style={{position: "relative"}}
+            style={{position: "relative", overflow: "hidden"}}
         >
             {theBox}
             {children}
