@@ -103,7 +103,7 @@ class MetadataIndicator extends React.PureComponent {
 
     render() {
         return (
-        <div style={{display: "flex"}} >
+        <div style={{display: "flex", zIndex: 2}} >
             {this.props.terms.map(this.renderBoxForTerm)}
         </div>
         );

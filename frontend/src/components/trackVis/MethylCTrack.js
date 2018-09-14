@@ -292,7 +292,7 @@ class StrandVisualizer extends React.PureComponent {
 }
 
 function ReverseStrandLegend(props) {
-    const mockTrackModel = new TrackModel({name: "Reverse strand", isSelected: props.trackModel.isSelected});
+    const mockTrackModel = new TrackModel({name: " ", isSelected: props.trackModel.isSelected});
     return <TrackLegend
         trackModel={mockTrackModel}
         height={props.height}

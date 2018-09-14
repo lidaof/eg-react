@@ -167,7 +167,7 @@ class NumericalTrack extends React.Component {
         const {data, viewRegion, width, trackModel, unit, options} = this.props;
         const {height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin} = options;
         const halfHeight = height * 0.5;
-        const dataForward = data.filter(feature => feature.value >= 0);
+        const dataForward = data.filter(feature => feature.value === undefined || feature.value >= 0); // bed track to density mode
         const dataReverse = data.filter(feature => feature.value < 0);
         if (dataReverse.length > 0) {
             this.hasReverse = true;
