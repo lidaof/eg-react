@@ -75,6 +75,12 @@ class GenomeNavigator extends React.Component {
         if (thisNavContext !== nextNavContext) {
             this.setState({viewRegion: new DisplayedRegionModel(nextNavContext)});
         }
+        if (this.props.selectedRegion.getGenomeIntervals()[0].chr !== 
+                nextProps.selectedRegion.getGenomeIntervals()[0].chr) {
+            this.setState( {
+                viewRegion: this._setInitialView(nextProps.selectedRegion)
+            });
+        }
     }
 
     /**

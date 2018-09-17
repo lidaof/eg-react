@@ -5,7 +5,7 @@ import { withTrackLegendWidth } from '../withTrackLegendWidth';
 
 import { TrackModel } from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import { RegionExpander, ViewExpansion } from '../../model/RegionExpander';
+import { ViewExpansion } from '../../model/RegionExpander';
 import { GuaranteeMap } from '../../model/GuaranteeMap';
 import { AlignmentViewCalculator, Alignment } from '../../model/alignment/AlignmentViewCalculator';
 
@@ -15,6 +15,7 @@ interface DataManagerProps {
     viewRegion: DisplayedRegionModel; // Region that the user requests to view
     legendWidth: number;
     containerWidth: number;
+    expansionAmount: any;
 }
 
 interface DataManagerState {
@@ -32,8 +33,6 @@ interface WrappedComponentProps {
     primaryView: ViewExpansion;
 }
 
-const REGION_EXPANDER = new RegionExpander(1);
-
 export function withTrackView(WrappedComponent: React.ComponentType<WrappedComponentProps>) {
     class TrackViewManager extends React.Component<DataManagerProps, DataManagerState> {
         private _primaryGenome: string;
@@ -46,7 +45,8 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
                 queryGenome => new AlignmentViewCalculator(this._primaryGenome, queryGenome)
             );
             this.state = {
-                primaryView: REGION_EXPANDER.calculateExpansion(props.viewRegion, this.getVisualizationWidth())
+                primaryView: 
+                    this.props.expansionAmount.calculateExpansion(props.viewRegion, this.getVisualizationWidth())
             };
             this.fetchPrimaryView = memoizeOne(this.fetchPrimaryView);
         }
@@ -63,7 +63,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
         }
 
         async fetchPrimaryView(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<ViewExpansion> {
-            const visData = REGION_EXPANDER.calculateExpansion(viewRegion, this.getVisualizationWidth());
+            const visData = this.props.expansionAmount.calculateExpansion(viewRegion, this.getVisualizationWidth());
             const secondaryGenome = this.getSecondaryGenomes(tracks)[0]; // Just the first one
             if (!secondaryGenome) {
                 return visData;
@@ -84,7 +84,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
 
         fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): AlignmentPromises {
             const secondaryGenomes = this.getSecondaryGenomes(tracks);
-            const visData = REGION_EXPANDER.calculateExpansion(viewRegion, this.getVisualizationWidth());
+            const visData = this.props.expansionAmount.calculateExpansion(viewRegion, this.getVisualizationWidth());
             const alignmentForGenome: AlignmentPromises = {};
             for (const genome of secondaryGenomes) {
                 const alignmentCalculator = this._alignmentCalculatorForGenome.get(genome);

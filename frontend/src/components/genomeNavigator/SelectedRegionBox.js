@@ -98,6 +98,7 @@ class SelectedRegionBox extends React.Component {
                 y={LABEL_Y}
                 style={{...TEXT_STYLE, textAnchor: "start"}}
                 onClick={this.gotoPressed}
+                onMouseDown={e => e.stopPropagation()}
             >
                 GOTO
             </text>);
@@ -113,12 +114,13 @@ class SelectedRegionBox extends React.Component {
                 y={LABEL_Y}
                 style={{...TEXT_STYLE, textAnchor: "end"}}
                 onClick={this.gotoPressed}
+                onMouseDown={e => e.stopPropagation()}
             >
                 GOTO
             </text>);
         }
         return (
-        <TranslatableG x={x} y={y} >
+        <TranslatableG x={x} y={y} style={{cursor: "pointer"}}>
             {box}
             {gotoButton}
             {gotoText}

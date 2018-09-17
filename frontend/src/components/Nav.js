@@ -13,12 +13,16 @@ import HubPane from './trackManagers/HubPane'
 import CustomTrackAdder from './trackManagers/CustomTrackAdder';
 import { SessionUI } from "./SessionUI";
 import LiveUI from "./LiveUI";
+import { RegionExpander } from '../model/RegionExpander';
 
 import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
+import { ScreenshotUI } from "./ScreenshotUI";
 
 const VERSION = "v47.1";
+
+const REGION_EXPANDER = new RegionExpander(0);
 
 /**
  * the top navigation bar for browser
@@ -115,6 +119,9 @@ class Nav extends React.Component {
                                                         padding: "5px",
                                                     }}}>
                             <LiveUI liveId={liveId} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Screenshot">
+                            <ScreenshotUI expansionAmount={REGION_EXPANDER} />
                         </ModalMenuItem>
                     </div>
                 </div>

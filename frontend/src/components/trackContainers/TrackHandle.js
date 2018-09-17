@@ -9,7 +9,7 @@ import { getTrackConfig } from '../trackConfig/getTrackConfig';
  * 
  * @author Silas Hsu
  */
-class TrackHandle extends React.Component {
+export class TrackHandle extends React.Component {
     constructor(props) {
         super(props);
         this.state = this.getTrackSpecialization(props);

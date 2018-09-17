@@ -13,8 +13,11 @@ import DisplayedRegionModel from './model/DisplayedRegionModel';
 import TrackModel from './model/TrackModel';
 import Notifications from 'react-notify-toast';
 import LoadSession from './components/LoadSession';
+import { RegionExpander } from './model/RegionExpander';
 
 import './App.css';
+
+const REGION_EXPANDER = new RegionExpander(1);
 
 function mapStateToProps(state) {
     return {
@@ -118,6 +121,7 @@ class App extends React.Component {
             <TrackContainer 
                 enteredRegion={this.state.enteredRegion} 
                 highlightEnteredRegion={this.state.highlightEnteredRegion}
+                expansionAmount={REGION_EXPANDER}
             />
         </div>
         );
