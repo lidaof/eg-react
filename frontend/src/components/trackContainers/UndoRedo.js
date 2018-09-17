@@ -7,10 +7,10 @@ import './UndoRedo.css';
 let UndoRedo = ({ canUndo, canRedo, onUndo, onRedo }) => (
     <React.Fragment>
         <button onClick={onUndo} disabled={!canUndo} title="Undo" className="btn btn-light">
-        ↺
+        ⟲
         </button>
         <button onClick={onRedo} disabled={!canRedo} title="Redo" className="btn btn-light">
-        ↻
+        ⟳
         </button>
     </React.Fragment>
 );
