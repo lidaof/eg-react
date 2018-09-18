@@ -34,8 +34,8 @@ class ScreenshotUINotConnected extends React.Component {
 
     downloadSvg = () => {
         const tracks = Array.from(document.querySelector('#screenshotContainer').querySelectorAll('.Track'));
-        const boxHeight = tracks.reduce( (acc, cur) => acc + cur.clientHeight, 0 );
-        const boxWidth = tracks[0].clientWidth;
+        const boxHeight = tracks.reduce( (acc, cur) => acc + (cur.clientHeight || cur.offsetHeight), 0 );
+        const boxWidth = tracks[0].clientWidth || tracks[0].offsetWidth;
         const xmlns = "http://www.w3.org/2000/svg";
         const svgElem = document.createElementNS (xmlns, "svg");
         svgElem.setAttributeNS (null, "viewBox", "0 0 " + boxWidth + " " + boxHeight);
@@ -44,8 +44,8 @@ class ScreenshotUINotConnected extends React.Component {
         svgElem.style.display = "block";
         let x = 0, y = 0;
         tracks.forEach((ele, idx) => {
-            const legendWidth = ele.children[0].clientWidth + 1;
-            const legendHeight = ele.children[0].clientHeight + 1;
+            const legendWidth = (ele.children[0].clientWidth || ele.children[0].offsetWidth) + 1;
+            const legendHeight = (ele.children[0].clientHeight || ele.children[0].offsetHeight) + 1;
             const trackLabelText = ele.children[0].querySelector(".TrackLegend-label").textContent;
             if (trackLabelText) {
                 const labelSvg = document.createElementNS(xmlns,"text");
@@ -56,13 +56,15 @@ class ScreenshotUINotConnected extends React.Component {
                 labelSvg.appendChild(textNode);
                 svgElem.appendChild(labelSvg);
             }
-            const trackLegendAxisSvg = ele.children[0].querySelector("svg");
-            if (trackLegendAxisSvg) {
-                const x2 = x + legendWidth - trackLegendAxisSvg.clientWidth;
-                trackLegendAxisSvg.setAttribute("id", "legendAxis"+idx);
-                trackLegendAxisSvg.setAttribute("x", x2);
-                trackLegendAxisSvg.setAttribute("y", y);
-                svgElem.appendChild(trackLegendAxisSvg);
+            const trackLegendAxisSvgs = ele.children[0].querySelectorAll("svg"); // methylC has 2 svgs in legend
+            if (trackLegendAxisSvgs) {
+                const x2 = x + legendWidth - (trackLegendAxisSvgs[0].clientWidth || trackLegendAxisSvgs[0].offsetWidth);
+                trackLegendAxisSvgs.forEach((trackLegendAxisSvg, idx3) => {
+                    trackLegendAxisSvg.setAttribute("id", "legendAxis"+idx+idx3);
+                    trackLegendAxisSvg.setAttribute("x", x2);
+                    trackLegendAxisSvg.setAttribute("y", idx3 * (trackLegendAxisSvg.clientHeight || trackLegendAxisSvg.offsetHeight) + y);
+                    svgElem.appendChild(trackLegendAxisSvg);
+                });
             }
             const eleSvgs = ele.children[1].querySelectorAll('svg'); // bi-directional numerical track has 2 svgs!
             if (eleSvgs) {
@@ -70,8 +72,15 @@ class ScreenshotUINotConnected extends React.Component {
                 eleSvgs.forEach((eleSvg, idx2) => {
                     eleSvg.setAttribute("id", "svg"+idx+idx2);
                     eleSvg.setAttribute("x", x);
-                    eleSvg.setAttribute("y", idx2 * eleSvg.clientHeight + y);
-                    svgElem.appendChild(eleSvg);
+                    eleSvg.setAttribute("y", idx2 * (eleSvg.clientHeight || eleSvg.offsetHeight) + y);
+                    const svgStyle = eleSvg.getAttribute('style');
+                    if (svgStyle.includes('transform')) {
+                        const g = document.createElementNS(xmlns,"g");
+                        g.setAttributeNS(null,"transform", "translate(0, 39+6) scale(1, -1)"); 
+                    } else {
+                        svgElem.appendChild(eleSvg);
+                    }
+                    
                 }); 
             }
             y += legendHeight;
@@ -86,10 +95,15 @@ class ScreenshotUINotConnected extends React.Component {
             y += 1;
             x = 0;
         });
+        svgElem.setAttribute("xmlns", xmlns);
 
         const dl = document.createElement("a");
         document.body.appendChild(dl); // This line makes it work in Firefox.
-        dl.setAttribute("href", this.svgDataURL(svgElem));
+        //dl.setAttribute("href", this.svgDataURL(svgElem)); //chrome network error on svg > 1MB
+        const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+        const svgBlob = new Blob([preface, new XMLSerializer().serializeToString(svgElem)], {type:"image/svg+xml;charset=utf-8"});
+        const svgUrl = URL.createObjectURL(svgBlob);
+        dl.setAttribute("href", svgUrl);
         dl.setAttribute("download", (new Date()).toISOString() + "_eg.svg");
         dl.click();
         this.setState({display: "none", buttonDisabled: "disabled"});
