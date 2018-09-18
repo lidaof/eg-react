@@ -153,10 +153,10 @@ class MethylCTrack extends React.PureComponent {
     }
 
     renderVisualizer() {
-        const {width, options} = this.props;
+        const {width, options, forceSvg} = this.props;
         const {height, colorsForContext, depthColor, isCombineStrands} = options;
         const childProps = {
-            data: this.aggregatedRecords, scales: this.scales, htmlType: RenderTypes.CANVAS,
+            data: this.aggregatedRecords, scales: this.scales, htmlType: forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS,
             width, height, colorsForContext, depthColor
         };
         let strandRenderers, tooltipY;

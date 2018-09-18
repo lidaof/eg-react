@@ -164,7 +164,7 @@ class NumericalTrack extends React.Component {
     }
 
     render() {
-        const {data, viewRegion, width, trackModel, unit, options} = this.props;
+        const {data, viewRegion, width, trackModel, unit, options, forceSvg} = this.props;
         const {height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin} = options;
         const halfHeight = height * 0.5;
         const dataForward = data.filter(feature => feature.value === undefined || feature.value >= 0); // bed track to density mode
@@ -193,6 +193,7 @@ class NumericalTrack extends React.Component {
                     color={color}
                     colorOut={colorAboveMax}
                     isDrawingBars={isDrawingBars}
+                    forceSvg={forceSvg}
                 />
                 <hr style={{marginTop: 0, marginBottom: 0, padding: 0}} />
                 <ValuePlot
@@ -202,6 +203,7 @@ class NumericalTrack extends React.Component {
                     color={color2}
                     colorOut={color2BelowMin}
                     isDrawingBars={isDrawingBars}
+                    forceSvg={forceSvg}
                 />
             </HoverTooltipContext>
             </React.Fragment>
@@ -216,6 +218,7 @@ class NumericalTrack extends React.Component {
                     color={color}
                     colorOut={colorAboveMax}
                     isDrawingBars={isDrawingBars}
+                    forceSvg={forceSvg}
                 />
             </HoverTooltipContext>
         );
@@ -287,8 +290,8 @@ class ValuePlot extends React.PureComponent {
     }
 
     render() {
-        const {xToValue, height} = this.props;
-        return <DesignRenderer type={RenderTypes.CANVAS} width={xToValue.length} height={height}>
+        const {xToValue, height, forceSvg} = this.props;
+        return <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} width={xToValue.length} height={height}>
             {this.props.xToValue.map(this.renderPixel)}
         </DesignRenderer>
     }
