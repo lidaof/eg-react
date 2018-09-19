@@ -24,16 +24,12 @@ import TrackSelectionBehavior from '../../model/TrackSelectionBehavior';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import UndoRedo from "./UndoRedo";
 import History from "./History";
-import ReactToPrint from "react-to-print";
-import './TrackContainer.css';
 
 import HighlightRegion from "../HighlightRegion";
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 
-const pixelToMM = 0.264583333; // 1 pixel equals to 0.26mm
-const printWidth = 259.4; // print page with, already minus margin 1cm
 
 ///////////
 // HOC's //
@@ -105,14 +101,6 @@ class TrackContainer extends React.Component {
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.deselectAllTracks = this.deselectAllTracks.bind(this);
         this.changeXOffset = this.changeXOffset.bind(this);
-    }
-
-    componentDidMount() {
-        // const scaleFraction = this.props.containerWidth * pixelToMM / printWidth;
-        const screenshotWidth = this.props.containerWidth * pixelToMM + 20;
-        // document.documentElement.style.setProperty('--scaleFraction', 1 / scaleFraction);
-        document.documentElement.style.setProperty('--screenshotWidth', screenshotWidth + 'mm');
-        this.setState({screenshotWidth: screenshotWidth + 'mm'});
     }
 
     /**
@@ -217,14 +205,6 @@ class TrackContainer extends React.Component {
             </div>
             <div><UndoRedo /></div>
             <div><History /></div>
-            <div>
-                <ReactToPrint
-                    trigger={() => <button className="btn btn-light" title="Print Browser View">🖨️</button>}
-                    content={() => this.componentRef}
-                    pageStyle={{size: `${this.screenshotWidth} 215.9mm`, 
-                        margin: '10mm',}}
-                />
-            </div>
             <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
         </div>;
     }
@@ -302,7 +282,7 @@ class TrackContainer extends React.Component {
         <OutsideClickDetector onOutsideClick={this.deselectAllTracks} >
             {this.renderControls()}
             <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
-                <DivWithBullseye style={trackDivStyle} ref={el => (this.componentRef = el)} id="trackContainer">
+                <DivWithBullseye style={trackDivStyle} id="trackContainer">
                     <HighlightRegion 
                         enteredRegion={enteredRegion}
                         highlightEnteredRegion={highlightEnteredRegion}

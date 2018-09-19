@@ -130,7 +130,13 @@ class ScreenshotUINotConnected extends React.Component {
             <div>
                 <p>Please wait the following browser view finish loading, <br />
                 then click the Download button below to download the browser view as a SVG file.</p>
-                <button className="btn btn-success btn-sm" onClick={this.downloadSvg} disabled={this.state.buttonDisabled}>⬇ Download</button>
+                <button 
+                    className="btn btn-success btn-sm" 
+                    style={{marginBottom: "2ch"}}
+                    onClick={this.downloadSvg} 
+                    disabled={this.state.buttonDisabled}
+                >
+                    ⬇ Download</button>
                 <div id="screenshotContainer" style={{display: this.state.display}}>
                     {trackContents}
                 </div>
