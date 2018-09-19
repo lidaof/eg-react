@@ -20,7 +20,7 @@ interface TrackLegendProps {
     style?: object;
 }
 
-const NUM_TICKS_SUGGESTION = 2;
+// const NUM_TICKS_SUGGESTION = 2;
 const AXIS_WIDTH = 30;
 
 const mapStateToProps = (state: {browser: StateWithHistory<AppState>}) => {
@@ -68,11 +68,13 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             }
 
             const axis = axisLeft(this.props.axisScale);
-            axis.ticks(NUM_TICKS_SUGGESTION);
+            // axis.ticks(NUM_TICKS_SUGGESTION);
+            axis.tickValues(this.props.axisScale.domain());
             select(this.gNode).append("g").call(axis);
             if (this.props.axisScaleReverse) {
                 const axis2 = axisLeft(this.props.axisScaleReverse);
-                axis2.ticks(NUM_TICKS_SUGGESTION);
+                // axis2.ticks(NUM_TICKS_SUGGESTION);
+                axis2.tickValues(this.props.axisScaleReverse.domain());
                 select(this.gNode).append("g")
                     .attr("transform", "translate(" + 0 + "," + this.props.height * 0.5 + ")")
                     .call(axis2).selectAll(".tick")
@@ -110,7 +112,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
         let axis = null;
         if (axisScale) {
             axis = <svg width={AXIS_WIDTH} height={axisHeight} style={{overflow: "visible"}} >
-                <TranslatableG innerRef={this.handleRef} x={AXIS_WIDTH} />
+                <TranslatableG innerRef={this.handleRef} x={AXIS_WIDTH-1} />
             </svg>;
         }
 

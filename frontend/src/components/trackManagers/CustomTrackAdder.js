@@ -55,32 +55,32 @@ class CustomTrackAdder extends React.Component {
             </React.Fragment>
             );
         } else {
-            return <button className="btn btn-primary" onClick={this.handleSubmitClick} >SUBMIT</button>;
+            return <button className="btn btn-primary" onClick={this.handleSubmitClick} >Submit</button>;
         }
     }
 
     render() {
         const {type, url, name, urlError} = this.state;
         return (
-        <div>
+        <form>
             <h1>Add custom track</h1>
-            <div>
+            <div className="form-group">
                 <label>Track type</label>
-                <select value={type} onChange={event => this.setState({type: event.target.value})} >
+                <select className="form-control" value={type} onChange={event => this.setState({type: event.target.value})} >
                     {this.renderTypeOptions()}
                 </select>
             </div>
-            <div>
-                <label>File URL</label>
-                <input type="text" value={url} onChange={event => this.setState({url: event.target.value})} />
+            <div className="form-group">
+                <label>Track label</label>
+                <input type="text" className="form-control" value={name} onChange={event => this.setState({name: event.target.value})}/>
+            </div>
+            <div className="form-group">
+                <label>Track file URL</label>
+                <input type="text" className="form-control" value={url} onChange={event => this.setState({url: event.target.value})} />
                 <span style={{color: "red"}} >{urlError}</span>
             </div>
-            <div>
-                <label>Track label</label>
-                <input type="text" value={name} onChange={event => this.setState({name: event.target.value})}/>
-            </div>
             {this.renderButtons()}
-        </div>
+        </form>
         )
     }
 }

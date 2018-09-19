@@ -51,20 +51,24 @@ class RemoteHubAdder extends React.Component {
 
     render() {
         return (
-        <div>
-            <label>
-                Custom hub URL
+        <form>
+            <div className="form-group">
+                <label>
+                    Custom hub URL
+                </label>
                 <input
-                    type="text"
-                    value={this.state.inputUrl}
-                    onChange={event => this.setState({inputUrl: event.target.value})}
+                        type="text"
+                        className="form-control"
+                        value={this.state.inputUrl}
+                        onChange={event => this.setState({inputUrl: event.target.value})}
                 />
-            </label>
-            <button onClick={this.loadHub} disabled={this.state.isLoading || !this.state.inputUrl} >
-                Load from URL
-            </button>
-            <p style={{color: "red"}} >{this.state.error}</p>
-        </div>
+                <button onClick={this.loadHub} disabled={this.state.isLoading || !this.state.inputUrl} >
+                    Load from URL
+                </button>
+                <p style={{color: "red"}} >{this.state.error}</p>
+            </div>
+        </form>
+        
         );
     }
 }
@@ -99,7 +103,14 @@ class FileHubAdder extends React.Component {
     }
 
     render() {
-        return <div>Or <input type="file" onChange={this.handleFileUpload} /></div>;
+        return (
+            <div>Or <br />
+            <div className="custom-file">
+                <input type="file" className="custom-file-input" id="inputGroupFile01" onChange={this.handleFileUpload} />
+                <label className="custom-file-label" htmlFor="inputGroupFile01">Choose datahub file</label>
+            </div>
+            </div>
+        );
     }
 }
 
