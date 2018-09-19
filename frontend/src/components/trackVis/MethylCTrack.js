@@ -255,7 +255,7 @@ class StrandVisualizer extends React.PureComponent {
     }
 
     renderDepthPlot() {
-        const {data, scales, strand, depthColor} = this.props;
+        const {data, scales, strand, depthColor, height} = this.props;
         let elements = [];
         for (let x = 0; x < data.length - 1; x++) {
             const currentRecord = data[x][strand];
@@ -266,16 +266,27 @@ class StrandVisualizer extends React.PureComponent {
                 elements.push(<line key={x} x1={x} y1={y1} x2={x + 1} y2={y2} stroke={depthColor} />);
             }
         }
-        return elements;
+        if (strand === PLOT_DOWNWARDS_STRAND) {
+            const transform = `translate(0, ${height+1}) scale(1, -1)`;
+            return <g transform={transform}>{elements}</g>;
+        } else {
+            return elements;
+        }
+        
     }
 
     render() {
         const {data, strand, width, height, htmlType} = this.props;
-        const style = strand === PLOT_DOWNWARDS_STRAND ?
+        let style = strand === PLOT_DOWNWARDS_STRAND ?
             {transform: "scale(1, -1)", borderBottom: "1px solid lightgrey"} : undefined;
         let bars = [];
         for (let x = 0; x < data.length; x++) {
             bars.push(this.renderBarElement(x))
+        }
+        if (htmlType === RenderTypes.SVG && strand === PLOT_DOWNWARDS_STRAND) {
+            const transform = `translate(0, ${height+1}) scale(1, -1)`;
+            bars = <g transform={transform}>{bars}</g>;
+            style = undefined;
         }
         return (
         <DesignRenderer

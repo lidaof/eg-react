@@ -73,14 +73,7 @@ class ScreenshotUINotConnected extends React.Component {
                     eleSvg.setAttribute("id", "svg"+idx+idx2);
                     eleSvg.setAttribute("x", x);
                     eleSvg.setAttribute("y", idx2 * (eleSvg.clientHeight || eleSvg.offsetHeight) + y);
-                    const svgStyle = eleSvg.getAttribute('style');
-                    if (svgStyle.includes('transform')) {
-                        const g = document.createElementNS(xmlns,"g");
-                        g.setAttributeNS(null,"transform", "translate(0, 39+6) scale(1, -1)"); 
-                    } else {
-                        svgElem.appendChild(eleSvg);
-                    }
-                    
+                    svgElem.appendChild(eleSvg);    
                 }); 
             }
             y += legendHeight;
