@@ -198,7 +198,7 @@ class TrackContainer extends React.Component {
      */
     renderControls() {
         const {metadataTerms, onMetadataTermsChanged} = this.props;
-        return <div style={{display: "flex", alignItems: "flex-end"}} >
+        return <div style={{display: "flex", alignItems: "flex-end", position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"}} >
             <div>
                 {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
                 <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} /> 
@@ -276,7 +276,11 @@ class TrackContainer extends React.Component {
         const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView} = this.props;
         const selectedTool = this.state.selectedTool;
         const contextMenu = <TrackContextMenu tracks={tracks} onTracksChanged={onTracksChanged} />;
-        const trackDivStyle = {border: "1px solid black", cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR};
+        const trackDivStyle = {
+                                border: "1px solid black", 
+                                paddingBottom: "3px",
+                                cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR
+                            };
 
         return (
         <OutsideClickDetector onOutsideClick={this.deselectAllTracks} >

@@ -69,12 +69,18 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
 
             const axis = axisLeft(this.props.axisScale);
             // axis.ticks(NUM_TICKS_SUGGESTION);
-            axis.tickValues(this.props.axisScale.domain());
+            const axisDomain = this.props.axisScale.domain();
+            if (!axisDomain.includes(NaN)) {
+                axis.tickValues(axisDomain);
+            }            
             select(this.gNode).append("g").call(axis);
             if (this.props.axisScaleReverse) {
                 const axis2 = axisLeft(this.props.axisScaleReverse);
                 // axis2.ticks(NUM_TICKS_SUGGESTION);
-                axis2.tickValues(this.props.axisScaleReverse.domain());
+                const axis2Domain = this.props.axisScaleReverse.domain();
+                if(!axis2Domain.includes(NaN)) {
+                    axis2.tickValues(axis2Domain);
+                }
                 select(this.gNode).append("g")
                     .attr("transform", "translate(" + 0 + "," + this.props.height * 0.5 + ")")
                     .call(axis2).selectAll(".tick")
