@@ -11,6 +11,7 @@ import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import NavigationContext from '../../model/NavigationContext';
 import { FeaturePlacer } from '../../model/FeaturePlacer';
 import TwoBitSource from '../../dataSources/TwoBitSource';
+import { TranslatableG } from '../TranslatableG';
 
 const HEIGHT = 15;
 const TOP_PADDING = 5;
@@ -260,11 +261,11 @@ class Chromosomes extends React.PureComponent {
             this.renderCytobandsInLocus(locus, drawModel)
         );
 
-        return <svg x={this.props.x} y={this.props.y}>
+        return <TranslatableG x={this.props.x} y={this.props.y}>
             {boxesAndLabels}
             {cytobands}
             {drawModel.basesToXWidth(1) > Sequence.MIN_X_WIDTH_PER_BASE && this.renderSequences()}
-        </svg>;
+        </TranslatableG>;
     }
 }
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CustomHubAdder from './CustomHubAdder';
 import HubTable from './HubTable';
 import TrackModel from '../../model/TrackModel';
 import FacetTable from './FacetTable';
@@ -8,7 +7,7 @@ import FacetTable from './FacetTable';
 import './HubPane.css';
 
 /**
- * The window containing UI for loading public track hubs, loading custom hubs, and adding tracks from hubs.
+ * The window containing UI for loading public track hubs and adding tracks from hubs.
  * 
  * @author Silas Hsu
  */
@@ -22,12 +21,8 @@ class HubPane extends React.PureComponent {
         super(props);
         this.state = {
             availableTracks: [],
-            isHubTableVisible: false,
-            isCustomHubInputVisible: false,
         };
         this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
-        this.toggleHubTable = this.toggleHubTable.bind(this);
-        this.toggleCustomHubInput = this.toggleCustomHubInput.bind(this);
     }
 
     /**
@@ -44,20 +39,6 @@ class HubPane extends React.PureComponent {
     }
 
     /**
-     * Sets state to toggle the visibility of the public track hub list.
-     */
-    toggleHubTable() {
-        this.setState({isHubTableVisible: !this.state.isHubTableVisible});
-    }
-
-    /**
-     * Sets state to toggle the visibility of the form to load a custom hub
-     */
-    toggleCustomHubInput() {
-        this.setState({isCustomHubInputVisible: !this.state.isCustomHubInputVisible});
-    }
-
-    /**
      * Renders:
      *     Conditionally, public track hub list
      *     Conditionally, form to load a custom hub
@@ -70,19 +51,7 @@ class HubPane extends React.PureComponent {
     render() {
         return (
         <div>
-            <button
-                className={!this.state.isHubTableVisible ? "btn btn-primary" : "btn btn-light"}
-                onClick={this.toggleHubTable}
-            >
-                {!this.state.isHubTableVisible ? "Show public hubs" : "Hide public hubs"}
-            </button>
-
-            <button className="btn btn-light" onClick={this.toggleCustomHubInput}>Custom hub...</button>
-            {
-            this.state.isCustomHubInputVisible &&
-                <CustomHubAdder onTracksAdded={tracks => this.addToAvailableTracks(tracks, true)} />
-            }
-            {this.state.isHubTableVisible && <HubTable onHubLoaded={this.addToAvailableTracks} />}
+             <HubTable onHubLoaded={this.addToAvailableTracks} />
             {
             this.state.availableTracks.length > 0 ?
                 <FacetTable

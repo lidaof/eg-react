@@ -34,7 +34,7 @@ class ScreenshotUINotConnected extends React.Component {
 
     downloadSvg = () => {
         const tracks = Array.from(document.querySelector('#screenshotContainer').querySelectorAll('.Track'));
-        const boxHeight = tracks.reduce( (acc, cur) => acc + (cur.clientHeight || cur.offsetHeight), 0 );
+        const boxHeight = tracks.reduce( (acc, cur) => acc + (cur.clientHeight || cur.offsetHeight), 20 );
         const boxWidth = tracks[0].clientWidth || tracks[0].offsetWidth;
         const xmlns = "http://www.w3.org/2000/svg";
         const svgElem = document.createElementNS (xmlns, "svg");
@@ -49,7 +49,7 @@ class ScreenshotUINotConnected extends React.Component {
             const trackLabelText = ele.children[0].querySelector(".TrackLegend-label").textContent;
             if (trackLabelText) {
                 const labelSvg = document.createElementNS(xmlns,"text");
-                labelSvg.setAttributeNS(null,"x",x+2);     
+                labelSvg.setAttributeNS(null,"x",x+4);     
                 labelSvg.setAttributeNS(null,"y",y+14); 
                 labelSvg.setAttributeNS(null,"font-size","12");
                 const textNode = document.createTextNode(trackLabelText);
@@ -57,7 +57,7 @@ class ScreenshotUINotConnected extends React.Component {
                 svgElem.appendChild(labelSvg);
             }
             const trackLegendAxisSvgs = ele.children[0].querySelectorAll("svg"); // methylC has 2 svgs in legend
-            if (trackLegendAxisSvgs) {
+            if (trackLegendAxisSvgs.length > 0) {
                 const x2 = x + legendWidth - (trackLegendAxisSvgs[0].clientWidth || trackLegendAxisSvgs[0].offsetWidth);
                 trackLegendAxisSvgs.forEach((trackLegendAxisSvg, idx3) => {
                     trackLegendAxisSvg.setAttribute("id", "legendAxis"+idx+idx3);
@@ -67,7 +67,7 @@ class ScreenshotUINotConnected extends React.Component {
                 });
             }
             const eleSvgs = ele.children[1].querySelectorAll('svg'); // bi-directional numerical track has 2 svgs!
-            if (eleSvgs) {
+            if (eleSvgs.length > 0) {
                 x += legendWidth;
                 eleSvgs.forEach((eleSvg, idx2) => {
                     eleSvg.setAttribute("id", "svg"+idx+idx2);
@@ -76,7 +76,8 @@ class ScreenshotUINotConnected extends React.Component {
                     svgElem.appendChild(eleSvg);    
                 }); 
             }
-            y += legendHeight;
+            y += (ele.clientHeight || ele.offsetHeight);
+            y += 2; //draw separare line
             const sepLine = document.createElementNS(xmlns,'line');
             sepLine.setAttribute('id','line'+idx);
             sepLine.setAttribute('x1','0');
@@ -85,7 +86,7 @@ class ScreenshotUINotConnected extends React.Component {
             sepLine.setAttribute('y2',y);
             sepLine.setAttribute("stroke", "lightgray")
             svgElem.appendChild(sepLine);
-            y += 1;
+            y += 2;
             x = 0;
         });
         svgElem.setAttribute("xmlns", xmlns);

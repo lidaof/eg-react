@@ -224,6 +224,7 @@ class NumericalTrack extends React.Component {
         );
         return <Track
             {...this.props}
+            style={{paddingBottom: "5px"}}
             legend={legend}
             visualizer={visualizer}
         />;

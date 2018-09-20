@@ -113,26 +113,29 @@ class HubTable extends React.PureComponent {
      */
     render() {
         const {publicHubData} = this.props.genomeConfig;
-        return <ReactTable
-            filterable
-            defaultPageSize={10}
-            data={this.state.hubs}
-            columns={this.columns}
-            minRows={Math.min(this.state.hubs.length, 10)}
-            SubComponent={row => {
-                let collectionDetails = publicHubData[row.original.collection] || <i>No data available.</i>;
-                let hubDetails = row.original.description || <i>No data available.</i>
-                return (
-                    <div style={{padding: "20px"}}>
-                        <h3>Collection details</h3>
-                        {collectionDetails}
-                        <h3>Hub details</h3>
-                        {hubDetails}
-                    </div>
-                );
-            }}
-            collapseOnSortingChange={false}
-        />
+        return <div>
+                <h1>Public data hubs</h1>
+                <ReactTable
+                    filterable
+                    defaultPageSize={10}
+                    data={this.state.hubs}
+                    columns={this.columns}
+                    minRows={Math.min(this.state.hubs.length, 10)}
+                    SubComponent={row => {
+                        let collectionDetails = publicHubData[row.original.collection] || <i>No data available.</i>;
+                        let hubDetails = row.original.description || <i>No data available.</i>
+                        return (
+                            <div style={{padding: "20px"}}>
+                                <h3>Collection details</h3>
+                                {collectionDetails}
+                                <h3>Hub details</h3>
+                                {hubDetails}
+                            </div>
+                        );
+                    }}
+                    collapseOnSortingChange={false}
+                />
+        </div>
     }
 }
 

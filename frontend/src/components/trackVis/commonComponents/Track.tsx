@@ -25,6 +25,7 @@ export interface PropsFromTrackContainer extends TrackData {
     xOffset?: number; // The horizontal amount to translate visualizations
     index?: number; // Number to pass in the callbacks
     options?: TrackOptions; // Track options
+    style?: object; // optional style from each track file
 
     /**
      * Callback for context menu events.
@@ -113,6 +114,7 @@ class Track extends React.Component<TrackProps> {
         const {
             trackModel, width, viewWindow, metadataTerms, xOffset, // Track container props
             legend, visualizer, message, isLoading, error, options, // Track subtype props
+            style
         } = this.props;
         return (
         <div
@@ -122,7 +124,7 @@ class Track extends React.Component<TrackProps> {
             onClick={this.handleClick}
         >
             {legend}
-            <div style={{backgroundColor: options.backgroundColor, overflowX: "hidden"}}>
+            <div style={{...style, backgroundColor: options.backgroundColor, overflowX: "hidden"}}>
                 {isLoading && <TrackLoadingNotice />}
                 <FreezeWhileLoading isLoading={isLoading} >
                     <ViewWindow
