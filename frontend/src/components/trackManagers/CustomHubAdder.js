@@ -52,6 +52,7 @@ class RemoteHubAdder extends React.Component {
     render() {
         return (
         <form>
+            <h1>Add custom data hub</h1>
             <div className="form-group">
                 <label>
                     Custom hub URL

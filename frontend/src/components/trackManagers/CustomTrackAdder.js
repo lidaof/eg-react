@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TrackModel from '../../model/TrackModel';
 import CustomHubAdder from './CustomHubAdder';
-
-import "./CustomTrackAdder.css";
+import FacetTable from './FacetTable';
 
 // Just add a new entry here to support adding a new track type.
-const TRACK_TYPES = ['bam', 'bigWig', 'bedGraph', 'bed', 'bigBed', 'hic'];
+const TRACK_TYPES = ['bigWig', 'bedGraph', 'bed', 'bigBed', 'hic', 'bam'];
 
 /**
  * UI for adding custom tracks.
@@ -21,6 +20,7 @@ class CustomTrackAdder extends React.Component {
 
     constructor(props) {
         super(props);
+        this.trackUI = null;
         this.state = {
             type: TRACK_TYPES[0],
             url: "",
@@ -31,6 +31,10 @@ class CustomTrackAdder extends React.Component {
         };
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
         this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
+    }
+
+    componentDidMount() {
+        this.trackUI.click();
     }
 
     handleSubmitClick() {
@@ -104,29 +108,32 @@ class CustomTrackAdder extends React.Component {
     }
 
     renderCustomHubAdder() {
-        // https://codepen.io/wizly/pen/BlKxo
         return <CustomHubAdder onTracksAdded={tracks => this.addToAvailableTracks(tracks, true)} />;
     }
 
     render() {
         return (
-            <div id="CustomTrackAdder" className="container">	
-                <ul className="nav nav-pills">
-                    <li className="active">
-                    <a  href="#TrackAdd" data-toggle="tab">Add Custom Track</a>
-                    </li>
-                    <li><a href="#HubAdd" data-toggle="tab">Add Custom Data Hub</a>
-                    </li>
+            <div id="CustomTrackAdder">	  
+                <ul className="nav nav-tabs" role="tablist">
+                <li className="nav-item">
+                    <a className="nav-link" href="#TrackAdd" role="tab" data-toggle="tab" ref={(trackUI) => this.trackUI = trackUI}>Add Custom Track</a>
+                </li>
+                <li className="nav-item">
+                    <a className="nav-link" href="#HubAdd" role="tab" data-toggle="tab">Add Custom Data Hub</a>
+                </li>
                 </ul>
-
-                <div className="tab-content clearfix">
-                    <div className="tab-pane active" id="TrackAdd">
-                        {this.renderCustomTrackAdder()}
-                    </div>
-                    <div className="tab-pane" id="HubAdd">
-                        {this.renderCustomHubAdder()}
-                    </div>
+                <div className="tab-content">
+                <div role="tabpanel" className="tab-pane fade" id="TrackAdd">{this.renderCustomTrackAdder()}</div>
+                <div role="tabpanel" className="tab-pane fade" id="HubAdd">{this.renderCustomHubAdder()}</div>
                 </div>
+                {
+                    this.state.availableTracks.length > 0 &&
+                    <FacetTable
+                        tracks={this.state.availableTracks}
+                        addedTracks={this.props.addedTracks}
+                        onTracksAdded={this.props.onTracksAdded}
+                    /> 
+                }
             </div>
         );
     }

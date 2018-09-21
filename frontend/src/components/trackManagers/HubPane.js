@@ -4,8 +4,6 @@ import HubTable from './HubTable';
 import TrackModel from '../../model/TrackModel';
 import FacetTable from './FacetTable';
 
-import './HubPane.css';
-
 /**
  * The window containing UI for loading public track hubs and adding tracks from hubs.
  * 
