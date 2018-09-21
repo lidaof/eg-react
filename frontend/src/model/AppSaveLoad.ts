@@ -35,7 +35,9 @@ export class AppStateSaver {
             regionSets: appState.regionSets.map(set => set.serialize()),
             regionSetViewIndex,
             trackLegendWidth: appState.trackLegendWidth,
-            bundleId: appState.bundleId,        };
+            bundleId: appState.bundleId,
+            isShowingNavigator: appState.isShowingNavigator,
+        };
         return object;
     }
 }
@@ -72,6 +74,7 @@ export class AppStateLoader {
             regionSetView,
             trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
             bundleId: object.bundleId,
+            isShowingNavigator: object.isShowingNavigator,
         };
     }
 

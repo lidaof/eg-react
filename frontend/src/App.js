@@ -25,12 +25,16 @@ function mapStateToProps(state) {
         tracks: state.browser.present.tracks,
         bundleId: state.browser.present.bundleId,
         sessionFromUrl: state.browser.present.sessionFromUrl,
+        trackLegendWidth: state.browser.present.trackLegendWidth,
+        isShowingNavigator: state.browser.present.isShowingNavigator,
     };
 }
 
 const callbacks = {
     onNewViewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
+    onLegendWidthChange: ActionCreators.setTrackLegendWidth,
+    onToggleNavigator: ActionCreators.toggleNavigator,
 };
 
 
@@ -50,7 +54,7 @@ class App extends React.Component {
         super(props);
         this.state = {
             isShowing3D: false,
-            isShowingNavigator: true,
+            // isShowingNavigator: true,
             highlightEnteredRegion: true,
             enteredRegion: null,
         };
@@ -68,9 +72,9 @@ class App extends React.Component {
         this.props.onTracksChanged(newTracks);
     }
 
-    toggleNavigator = () => {
-        this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
-    };
+    // toggleNavigator = () => {
+    //     this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
+    // };
 
     toggle3DScene = () => {
         this.setState(prevState => {return {isShowing3D: !prevState.isShowing3D}});
@@ -85,7 +89,8 @@ class App extends React.Component {
     }
 
     render() {
-        const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, sessionFromUrl} = this.props;
+        const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, 
+                sessionFromUrl, trackLegendWidth, onLegendWidthChange, isShowingNavigator, onToggleNavigator} = this.props;
         if (sessionFromUrl) {
             return <div className="container-fluid"><LoadSession bundleId={bundleId} /></div>;
         }
@@ -97,7 +102,8 @@ class App extends React.Component {
         <div className="App container-fluid">
             <Nav
                 {...this.state}
-                onToggleNavigator={this.toggleNavigator}
+                isShowingNavigator={isShowingNavigator}
+                onToggleNavigator={onToggleNavigator}
                 onToggle3DScene={this.toggle3DScene}
                 onToggleHighlight={this.toggleHighlight}
                 onSetEnteredRegion={this.setEnteredRegion}
@@ -109,9 +115,11 @@ class App extends React.Component {
                 onTracksAdded={this.addTracks}
                 onTrackRemoved={this.removeTrack}
                 bundleId={bundleId}
+                trackLegendWidth={trackLegendWidth}
+                onLegendWidthChange={onLegendWidthChange}
             />
              <Notifications />
-            {this.state.isShowingNavigator &&
+            {isShowingNavigator &&
                 <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
             }
             {

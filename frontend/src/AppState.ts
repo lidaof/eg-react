@@ -55,6 +55,7 @@ export interface AppState {
     trackLegendWidth: number;
     bundleId: string;
     sessionFromUrl?: boolean;
+    isShowingNavigator: boolean;
 }
 
 const bundleId = uuid.v1();
@@ -69,6 +70,7 @@ const initialState: AppState = {
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
     bundleId,
     sessionFromUrl: false,
+    isShowingNavigator: true,
 };
 
 enum ActionType {
@@ -82,6 +84,7 @@ enum ActionType {
     RESTORE_SESSION = "RESTORE_SESSION",
     RETRIEVE_BUNDLE = "RETRIEVE_BUNDLE",
     SET_GENOME_RESTORE_SESSION = "SET_GENOME_RESTORE_SESSION",
+    TOGGLE_NAVIGATOR = "TOGGLE_NAVIGATOR",
 }
 
 interface AppAction {
@@ -148,6 +151,10 @@ export const ActionCreators = {
     setGenomeRestoreSession: (genomeName: string, sessionState: object) => {
         return {type: ActionType.SET_GENOME_RESTORE_SESSION, genomeName, sessionState};
     },
+
+    toggleNavigator: () => {
+        return {type: ActionType.TOGGLE_NAVIGATOR}
+    }
 
 };
 
@@ -228,7 +235,9 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, bundleId: action.bundleId };
         case ActionType.SET_GENOME_RESTORE_SESSION:
             const state = new AppStateLoader().fromObject(action.sessionState);
-            return {...state, genomeName: action.genomeName}
+            return {...state, genomeName: action.genomeName};
+        case ActionType.TOGGLE_NAVIGATOR:
+            return {...prevState, isShowingNavigator: !prevState.isShowingNavigator};
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);

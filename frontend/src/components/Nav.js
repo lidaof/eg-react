@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from 'prop-types';
 import ReactModal from "react-modal";
+import _ from "lodash";
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from './genomeNavigator/TrackRegionController';
@@ -14,11 +15,11 @@ import CustomTrackAdder from './trackManagers/CustomTrackAdder';
 import { SessionUI } from "./SessionUI";
 import LiveUI from "./LiveUI";
 import { RegionExpander } from '../model/RegionExpander';
+import { ScreenshotUI } from "./ScreenshotUI";
 
 import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
-import { ScreenshotUI } from "./ScreenshotUI";
 
 const VERSION = "v47.1";
 
@@ -36,20 +37,36 @@ class Nav extends React.Component {
         genomeConfig: PropTypes.object.isRequired,
         onTracksAdded: PropTypes.func,
         onTrackRemoved: PropTypes.func,
+        trackLegendWidth: PropTypes.number,
+        onLegendWidthChange: PropTypes.func,
     };
+
+    constructor(props) {
+        super(props);
+        this.debounced = _.debounce(this.props.onLegendWidthChange, 250);
+    }
     
+    changeLegendWidth = (e) => {
+        const width = Number.parseFloat(e.currentTarget.value);
+        //const debounced = _.debounce(this.props.onLegendWidthChange, 250);
+        if (width >= 60 && width <= 200) {
+            //this.props.onLegendWidthChange(width);
+            this.debounced(width);
+        }
+    }
+
     render() {
         const {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
             isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId, liveId,
-            onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion
+            onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
         return (
             <div className="Nav-container">
-                <div>
-                    <img src={eglogo} width="300px" alt="browser logo"/>
+                <div id="logoDiv">
+                    <img src={eglogo} width="180px" height="30px" alt="browser logo"/>
                     <span id="theNew" >The New</span>
                     <span id="theVersion">{VERSION}</span>
                 </div>
@@ -154,6 +171,12 @@ class Nav extends React.Component {
                         <label className="dropdown-item" htmlFor="switch3D">
                             <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={onToggle3DScene} />
                             <span style={{marginLeft: "1ch"}} >Show 3D scene</span>
+                        </label>
+                        <label className="dropdown-item" htmlFor="setLegendWidth">
+                            <input type="number" id="legendWidth" step="5" min="60" max="200" 
+                                value={trackLegendWidth}
+                                onChange={this.changeLegendWidth} />
+                            <span style={{marginLeft: "1ch"}}>Change track legend width</span>
                         </label>
                     </div>
                 </div>

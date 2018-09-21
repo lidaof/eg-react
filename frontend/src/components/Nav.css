@@ -7,7 +7,7 @@
     /* grid-template-columns: min-content; */
 }
 
-@media screen and (max-width: 1380px) {
+@media screen and (max-width: 1050px) {
     .Nav-container {
         display: grid;
         grid-template-columns: repeat(4, auto);
@@ -15,7 +15,7 @@
     }
 }
 
-@media screen and (max-width: 960px) {
+@media screen and (max-width: 630px) {
     .Nav-container {
         display: grid;
         grid-template-columns: repeat(3, auto);
@@ -23,7 +23,7 @@
     }
 }
 
-@media screen and (max-width: 776px) {
+@media screen and (max-width: 436px) {
     .Nav-container {
         display: grid;
         grid-template-columns: auto auto;
@@ -31,7 +31,7 @@
     }
 }
 
-@media screen and (max-width: 554px) {
+@media screen and (max-width: 234px) {
     .Nav-container {
         display: grid;
         grid-template-columns: auto;
@@ -40,14 +40,14 @@
 }
 
 .Nav-container > div {
-    padding: 0 5px;
+    padding: 0 1px;
 }
 
 .Nav-genome {
     opacity: 0.3;
     text-align: center;
     cursor: pointer;
-    width: 243px;
+    width: 150px;
 }
 
 .Nav-genome:hover {
@@ -73,8 +73,8 @@
     color: red;
     font-size: 0.7em;
     position: absolute;
-    top: 1px;
-    left: 100px;
+    top: 3px;
+    left: 50px;
     transform: rotate(-10deg);
     animation-name: example;
     animation-duration: 1s;
@@ -90,8 +90,13 @@
     color: red;
     font-size: 0.7em;
     position: absolute;
-    top: 1px;
-    left: 290px;
+    top: 3px;
+    left: 150px;
+}
+
+#logoDiv {
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 .GenomeNavigator-tooltip {
@@ -133,4 +138,8 @@
     border-width: 5px;
     border-style: solid;
     border-color: transparent gray transparent transparent;
+}
+
+#legendWidth {
+    width: 6ch;
 }
