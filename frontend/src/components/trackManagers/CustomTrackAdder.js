@@ -51,7 +51,7 @@ class CustomTrackAdder extends React.Component {
         if (!this.state.url) {
             this.setState({urlError: "Enter a URL"});
         } else {
-            const newTrack = new TrackModel({...this.state, options: {displayMode: 'show'}});
+            const newTrack = new TrackModel(this.state);
             this.props.onTracksAdded([newTrack]);
             this.props.onAddTracksToPool([newTrack], false);
             this.setState({urlError: "", trackAdded: true});

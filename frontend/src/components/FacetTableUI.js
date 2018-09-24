@@ -9,6 +9,7 @@ class FacetTableUI extends React.Component {
         return (
             <Tabs>
                 <Tab label="Public tracks facet table">
+                    <h1>Tracks from public hubs</h1>
                 {
                     publicTracksPool.length > 0 ?
                         <FacetTable
@@ -20,6 +21,7 @@ class FacetTableUI extends React.Component {
                 }
                 </Tab>
                 <Tab label="Custom tracks facet table">
+                    <h1>Tracks from custom track or hubs</h1>
                     {
                         customTracksPool.length > 0 ?
                         <FacetTable

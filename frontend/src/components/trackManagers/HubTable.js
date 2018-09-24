@@ -18,14 +18,12 @@ import "react-table/react-table.css";
 class HubTable extends React.PureComponent {
     static propTypes = {
         onHubLoaded: PropTypes.func,
+        onHubUpdated: PropTypes.func,
     }
 
     constructor(props) {
         super(props);
         this.hubParser = new DataHubParser(1);
-        this.state = {
-            hubs: this.props.genomeConfig.publicHubList ? this.props.genomeConfig.publicHubList.slice(): []
-        };
         this.loadHub = this.loadHub.bind(this);
         this.getAddHubCell = this.getAddHubCell.bind(this);
 
@@ -57,12 +55,12 @@ class HubTable extends React.PureComponent {
     /**
      * Gets a copy of this table's hub list, except with one hub modified.
      * 
-     * @param {number} index - the index of the hub to modify in this.state.hubs
+     * @param {number} index - the index of the hub to modify in this.props.publicHubs
      * @param {Partial<Hub>} propsToMerge - props to merge into the selected hub
      * @return copy of this table's hub list, with one hub modified
      */
     _cloneHubsAndModifyOne(index, propsToMerge) {
-        let hubs = this.state.hubs.slice();
+        let hubs = this.props.publicHubs.slice();
         let hub = _.cloneDeep(hubs[index]);
         Object.assign(hub, propsToMerge);
         hubs[index] = hub;
@@ -72,19 +70,19 @@ class HubTable extends React.PureComponent {
     /**
      * Loads the tracks in a hub and passes them to the callback specified by this.props
      * 
-     * @param {number} index - the index of the hub in this.state.hubs
+     * @param {number} index - the index of the hub in this.props.publicHubs
      */
     async loadHub(index) {
         if (this.props.onHubLoaded) {
-            const hub = this.state.hubs[index];
+            const hub = this.props.publicHubs[index];
             let newHubs = this._cloneHubsAndModifyOne(index, {isLoading: true});
-            this.setState({hubs: newHubs});
+            this.props.onHubUpdated(newHubs);
             const json = await new Json5Fetcher().get(hub.url);
             const tracksStartIndex = hub.oldHubFormat ? 1 : 0;
             const tracks = await this.hubParser.getTracksInHub(json, hub.name, hub.oldHubFormat, tracksStartIndex);
-            this.props.onHubLoaded(tracks);
+            this.props.onHubLoaded(tracks, true, hub.url);
             let loadedHubs = this._cloneHubsAndModifyOne(index, {isLoading: false, isLoaded: true});
-            this.setState({hubs: loadedHubs});
+            this.props.onHubUpdated(loadedHubs);
         }
     }
 
@@ -118,12 +116,12 @@ class HubTable extends React.PureComponent {
                 <ReactTable
                     filterable
                     defaultPageSize={10}
-                    data={this.state.hubs}
+                    data={this.props.publicHubs}
                     columns={this.columns}
-                    minRows={Math.min(this.state.hubs.length, 10)}
+                    minRows={Math.min(this.props.publicHubs.length, 10)}
                     SubComponent={row => {
-                        let collectionDetails = publicHubData[row.original.collection] || <i>No data available.</i>;
-                        let hubDetails = row.original.description || <i>No data available.</i>
+                        let collectionDetails = publicHubData[row.original.collection] || <i>No details available.</i>;
+                        let hubDetails = row.original.description || <i>No details available.</i>
                         return (
                             <div style={{padding: "20px"}}>
                                 <h3>Collection details</h3>

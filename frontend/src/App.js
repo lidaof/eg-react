@@ -50,6 +50,14 @@ class App extends React.Component {
         onTracksChanged: PropTypes.func,
     };
 
+    componentWillMount() {
+        if (this.props.genomeConfig && this.props.genomeConfig.publicHubList) {
+            this.setState({
+                publicHubs: this.props.genomeConfig.publicHubList.slice(),
+            })
+        }
+    }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -59,10 +67,12 @@ class App extends React.Component {
             enteredRegion: null,
             publicTracksPool: [],
             customTracksPool: [],
+            publicHubs: []
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
+        this.updatePublicHubs = this.updatePublicHubs.bind(this);
     }
 
     /**
@@ -77,6 +87,10 @@ class App extends React.Component {
         } else {
             this.setState({customTracksPool: this.state.customTracksPool.concat(newTracks)});
         }
+    }
+
+    updatePublicHubs(publicHubs) {
+        this.setState({publicHubs});
     }
 
     addTracks(tracks) {
@@ -134,6 +148,7 @@ class App extends React.Component {
                 trackLegendWidth={trackLegendWidth}
                 onLegendWidthChange={onLegendWidthChange}
                 onAddTracksToPool={this.addTracksToPool}
+                onHubUpdated={this.updatePublicHubs}
             />
              <Notifications />
             {isShowingNavigator &&

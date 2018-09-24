@@ -38,8 +38,8 @@ class FacetTable extends Component {
             columnList: [],
             parent2children: {},
             child2ancestor: {}, // child to top most parent hash
-            rowHeader: DEFAULT_ROW,
-            columnHeader: DEFAULT_COLUMN,
+            rowHeader: '',
+            columnHeader: '',
             showModalId: null,
             metaKeys: [],
         };
@@ -50,10 +50,20 @@ class FacetTable extends Component {
         this.handleCloseModal = this.handleCloseModal.bind(this);
         this.handleRowChange = this.handleRowChange.bind(this);
         this.handleColumnChange = this.handleColumnChange.bind(this);
+        this.initializeTracks = this.initializeTracks.bind(this);
     }
 
-    componentDidMount() {
-        const allTracks = this.props.tracks;
+    componentDidMount(){
+        this.initializeTracks(this.props.tracks);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.tracks !== this.props.tracks) {
+            this.initializeTracks(nextProps.tracks);
+        }
+    }
+
+    initializeTracks(allTracks) {
         const allKeys = allTracks.map(track => Object.keys(track.metadata));
         const metaKeys = _.union(...allKeys);
         let tracks = []; // fix dup metadata
@@ -129,20 +139,28 @@ class FacetTable extends Component {
             let newTrack = {...track, metadata: metadata};
             tracks.push( new TrackModel(newTrack) );
         }
-        //console.log(tracks);
+        const rowHeader = metaKeys.includes(DEFAULT_ROW) ? DEFAULT_ROW : metaKeys[0];
+        let columnHeader = metaKeys.includes(DEFAULT_COLUMN) ? DEFAULT_COLUMN : metaKeys[1];
+        const rowList = [{
+            name: rowHeader, expanded: false, children: parent2children[rowHeader]
+        }];
+        let columnList;
+        if (columnHeader) {
+            columnList = [{
+                name: columnHeader, expanded: false, children: parent2children[columnHeader]
+            }]
+        } else {
+            columnList = [{name: '--'}]
+        }
         this.setState({
-            rowList: [{
-                name: this.state.rowHeader, expanded: false, children: parent2children[this.state.rowHeader]
-            }],
-            columnList: [{
-                name: this.state.columnHeader, expanded: false, children: parent2children[this.state.columnHeader]
-            }],
+            rowList,
+            columnList,
             tracks,
             parent2children,
             child2ancestor,
             metaKeys,
-            rowHeader: metaKeys.includes(DEFAULT_ROW) ? DEFAULT_ROW : metaKeys[1],
-            columnHeader: metaKeys.includes(DEFAULT_COLUMN) ? DEFAULT_COLUMN : metaKeys[2],
+            rowHeader,
+            columnHeader: columnHeader? columnHeader : UNUSED_META_KEY,
         });
     }
 
@@ -358,7 +376,7 @@ class FacetTable extends Component {
 
         return (
         <label>
-            {isColumn ?  'Column:' : 'Row:'}
+            {isColumn ?  'Column: ' : 'Row: '}
             <select value={stateToRead} onChange={changeCallback} >
                 {this.state.metaKeys
                     .filter(metaKey => metaKey !== otherState)

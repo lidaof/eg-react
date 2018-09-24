@@ -61,7 +61,7 @@ class Nav extends React.Component {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
             isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId, liveId,
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
-            onAddTracksToPool, publicTracksPool, customTracksPool
+            onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
@@ -111,6 +111,8 @@ class Nav extends React.Component {
                                 onTrackRemoved={onTrackRemoved}
                                 onAddTracksToPool={onAddTracksToPool}
                                 publicTracksPool={publicTracksPool}
+                                publicHubs={publicHubs}
+                                onHubUpdated={onHubUpdated}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Custom Tracks">
