@@ -63,11 +63,12 @@ class RemoteHubAdder extends React.Component {
                         value={this.state.inputUrl}
                         onChange={event => this.setState({inputUrl: event.target.value})}
                 />
-                <button onClick={this.loadHub} disabled={this.state.isLoading || !this.state.inputUrl} >
-                    Load from URL
-                </button>
-                <p style={{color: "red"}} >{this.state.error}</p>
             </div>
+            <button onClick={this.loadHub} disabled={this.state.isLoading || !this.state.inputUrl} 
+                    className="btn btn-success">
+                    Load from URL
+            </button>
+            <p style={{color: "red"}} >{this.state.error}</p>
         </form>
         
         );

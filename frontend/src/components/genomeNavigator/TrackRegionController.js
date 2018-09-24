@@ -7,7 +7,7 @@ import GeneSearchBox from './GeneSearchBox';
 const MODAL_STYLE = {
     content: {
         top: "40px",
-        left: "543px",
+        left: "300px",
         right: "unset",
         bottom: "unset",
         overflow: "visible",

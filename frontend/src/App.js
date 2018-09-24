@@ -57,9 +57,26 @@ class App extends React.Component {
             // isShowingNavigator: true,
             highlightEnteredRegion: true,
             enteredRegion: null,
+            publicTracksPool: [],
+            customTracksPool: [],
         };
+        this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
+    }
+
+    /**
+     * Adds a list of tracks to the list of all tracks available from a public or custom hub.
+     * 
+     * @param {TrackModel[]} newTracks - additions to the list of all tracks available from a hub
+     * @param {boolean} toPublic - whether to also add the tracks to public or custom pool
+     */
+    addTracksToPool(newTracks, toPublic=true) {
+        if (toPublic) {
+            this.setState({publicTracksPool: this.state.publicTracksPool.concat(newTracks)});
+        } else {
+            this.setState({customTracksPool: this.state.customTracksPool.concat(newTracks)});
+        }
     }
 
     addTracks(tracks) {
@@ -107,7 +124,6 @@ class App extends React.Component {
                 onToggle3DScene={this.toggle3DScene}
                 onToggleHighlight={this.toggleHighlight}
                 onSetEnteredRegion={this.setEnteredRegion}
-                highlightEnteredRegion={this.state.highlightEnteredRegion}
                 selectedRegion={viewRegion}
                 onRegionSelected={onNewViewRegion} 
                 tracks={tracks}
@@ -117,6 +133,7 @@ class App extends React.Component {
                 bundleId={bundleId}
                 trackLegendWidth={trackLegendWidth}
                 onLegendWidthChange={onLegendWidthChange}
+                onAddTracksToPool={this.addTracksToPool}
             />
              <Notifications />
             {isShowingNavigator &&

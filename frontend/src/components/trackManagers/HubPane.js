@@ -12,15 +12,17 @@ import FacetTable from './FacetTable';
 class HubPane extends React.PureComponent {
     static propTypes = {
         addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
-        onTracksAdded: PropTypes.func
+        publicTracksPool: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
+        onTracksAdded: PropTypes.func,
+        onAddTracksToPool: PropTypes.func,
     };
 
     constructor(props) {
         super(props);
-        this.state = {
-            availableTracks: [],
-        };
-        this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
+        // this.state = {
+        //     availableTracks: [],
+        // };
+        // this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
     }
 
     /**
@@ -29,12 +31,12 @@ class HubPane extends React.PureComponent {
      * @param {TrackModel[]} newTracks - additions to the list of all tracks available from a hub
      * @param {boolean} makeVisible - whether to also add the tracks to the visible (added) track list
      */
-    addToAvailableTracks(newTracks, makeVisible=false) {
-        this.setState({availableTracks: this.state.availableTracks.concat(newTracks)});
-        if (makeVisible) {
-            this.props.onTracksAdded(newTracks)
-        }
-    }
+    // addToAvailableTracks(newTracks, makeVisible=false) {
+    //     this.setState({availableTracks: this.state.availableTracks.concat(newTracks)});
+    //     if (makeVisible) {
+    //         this.props.onTracksAdded(newTracks)
+    //     }
+    // }
 
     /**
      * Renders:
@@ -49,11 +51,11 @@ class HubPane extends React.PureComponent {
     render() {
         return (
         <div>
-             <HubTable onHubLoaded={this.addToAvailableTracks} />
+             <HubTable onHubLoaded={this.props.onAddTracksToPool} />
             {
-            this.state.availableTracks.length > 0 ?
+            this.props.publicTracksPool.length > 0 ?
                 <FacetTable
-                    tracks={this.state.availableTracks}
+                    tracks={this.props.publicTracksPool}
                     addedTracks={this.props.addedTracks}
                     onTracksAdded={this.props.onTracksAdded}
                 /> :

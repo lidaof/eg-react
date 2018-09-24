@@ -16,6 +16,7 @@ import { SessionUI } from "./SessionUI";
 import LiveUI from "./LiveUI";
 import { RegionExpander } from '../model/RegionExpander';
 import { ScreenshotUI } from "./ScreenshotUI";
+import FacetTableUI from "./FacetTableUI";
 
 import eglogo from '../images/eglogo.jpg';
 
@@ -59,7 +60,8 @@ class Nav extends React.Component {
         const {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
             isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId, liveId,
-            onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth
+            onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
+            onAddTracksToPool, publicTracksPool, customTracksPool
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
@@ -88,7 +90,14 @@ class Nav extends React.Component {
                 <div className="Nav-center btn-group">
                     <DropdownOpener extraClassName="btn-primary" label="🎹Tracks" />
                     <div className="dropdown-menu">
-                        <a className="dropdown-item" href="#">Track Facet Table</a>
+                        <ModalMenuItem itemLabel="Track Facet Table">
+                            <FacetTableUI 
+                                publicTracksPool={publicTracksPool}
+                                customTracksPool={customTracksPool}
+                                addedTracks={tracks} 
+                                onTracksAdded={onTracksAdded} 
+                            />
+                        </ModalMenuItem>
                         <ModalMenuItem itemLabel="Annotation Tracks">
                             <AnnotationTrackSelector
                                 addedTracks={tracks}
@@ -99,13 +108,19 @@ class Nav extends React.Component {
                             <HubPane 
                                 addedTracks={tracks} 
                                 onTracksAdded={onTracksAdded} 
-                                onTrackRemoved={onTrackRemoved} />
+                                onTrackRemoved={onTrackRemoved}
+                                onAddTracksToPool={onAddTracksToPool}
+                                publicTracksPool={publicTracksPool}
+                            />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Custom Tracks">
                             <CustomTrackAdder 
                                 addedTracks={tracks} 
                                 onTracksAdded={onTracksAdded} 
-                                onTrackRemoved={onTrackRemoved} />
+                                onTrackRemoved={onTrackRemoved} 
+                                onAddTracksToPool={onAddTracksToPool}
+                                customTracksPool={customTracksPool}
+                            />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Track List">
                             <TrackList 

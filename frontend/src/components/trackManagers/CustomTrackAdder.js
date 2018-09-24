@@ -1,11 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {Tabs, Tab} from 'react-bootstrap-tabs';
 import TrackModel from '../../model/TrackModel';
 import CustomHubAdder from './CustomHubAdder';
 import FacetTable from './FacetTable';
 
 // Just add a new entry here to support adding a new track type.
 const TRACK_TYPES = ['bigWig', 'bedGraph', 'bed', 'bigBed', 'hic', 'bam'];
+
+const TYPES_DESC = [
+        'numerical data', 
+        'numerical data, processed by tabix in .gz format',
+        'annotationd data, processed by tabix in .gz format',
+        'anotation data',
+        'long range interaction data',
+        'reads alignment data'
+    ];
 
 /**
  * UI for adding custom tracks.
@@ -15,7 +25,9 @@ const TRACK_TYPES = ['bigWig', 'bedGraph', 'bed', 'bigBed', 'hic', 'bam'];
 class CustomTrackAdder extends React.Component {
     static propTypes = {
         addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
+        customTracksPool: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
         onTracksAdded: PropTypes.func,
+        onAddTracksToPool: PropTypes.func,
     };
 
     constructor(props) {
@@ -27,14 +39,8 @@ class CustomTrackAdder extends React.Component {
             name: "",
             urlError: "",
             trackAdded: false,
-            availableTracks: [],
         };
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
-        this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
-    }
-
-    componentDidMount() {
-        this.trackUI.click();
     }
 
     handleSubmitClick() {
@@ -45,26 +51,15 @@ class CustomTrackAdder extends React.Component {
         if (!this.state.url) {
             this.setState({urlError: "Enter a URL"});
         } else {
-            this.props.onTracksAdded([new TrackModel(this.state)]);
+            const newTrack = new TrackModel({...this.state, options: {displayMode: 'show'}});
+            this.props.onTracksAdded([newTrack]);
+            this.props.onAddTracksToPool([newTrack], false);
             this.setState({urlError: "", trackAdded: true});
         }
     }
 
-    /**
-     * Adds a list of tracks to the list of all tracks available from a hub.
-     * 
-     * @param {TrackModel[]} newTracks - additions to the list of all tracks available from a hub
-     * @param {boolean} makeVisible - whether to also add the tracks to the visible (added) track list
-     */
-    addToAvailableTracks(newTracks, makeVisible=false) {
-        this.setState({availableTracks: this.state.availableTracks.concat(newTracks)});
-        if (makeVisible) {
-            this.props.onTracksAdded(newTracks)
-        }
-    }
-
     renderTypeOptions() {
-        return TRACK_TYPES.map(type => <option key={type} value={type} >{type}</option>);
+        return TRACK_TYPES.map((type,i) => <option key={type} value={type} >{type} - {TYPES_DESC[i]}</option>);
     }
 
     renderButtons() {
@@ -108,28 +103,22 @@ class CustomTrackAdder extends React.Component {
     }
 
     renderCustomHubAdder() {
-        return <CustomHubAdder onTracksAdded={tracks => this.addToAvailableTracks(tracks, true)} />;
+        return <CustomHubAdder onTracksAdded={tracks => this.props.onAddTracksToPool(tracks, false)} />;
     }
 
     render() {
         return (
             <div id="CustomTrackAdder">	  
-                <ul className="nav nav-tabs" role="tablist">
-                <li className="nav-item">
-                    <a className="nav-link" href="#TrackAdd" role="tab" data-toggle="tab" ref={(trackUI) => this.trackUI = trackUI}>Add Custom Track</a>
-                </li>
-                <li className="nav-item">
-                    <a className="nav-link" href="#HubAdd" role="tab" data-toggle="tab">Add Custom Data Hub</a>
-                </li>
-                </ul>
-                <div className="tab-content">
-                <div role="tabpanel" className="tab-pane fade" id="TrackAdd">{this.renderCustomTrackAdder()}</div>
-                <div role="tabpanel" className="tab-pane fade" id="HubAdd">{this.renderCustomHubAdder()}</div>
-                </div>
+                <div>
+                    <Tabs>
+                        <Tab label="Add Custom Track">{this.renderCustomTrackAdder()}</Tab>
+                        <Tab label="Add Custom Data Hub">{this.renderCustomHubAdder()}</Tab>
+                    </Tabs>
+                </div>   
                 {
-                    this.state.availableTracks.length > 0 &&
+                    this.props.customTracksPool.length > 0 &&
                     <FacetTable
-                        tracks={this.state.availableTracks}
+                        tracks={this.props.customTracksPool}
                         addedTracks={this.props.addedTracks}
                         onTracksAdded={this.props.onTracksAdded}
                     /> 
