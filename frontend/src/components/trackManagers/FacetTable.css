@@ -133,3 +133,8 @@ button.expanded {
 button.not-button {
     cursor: text;
 }
+
+.green {
+    color: green;
+    font-weight: bold;
+}

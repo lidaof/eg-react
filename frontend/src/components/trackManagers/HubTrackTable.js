@@ -13,13 +13,12 @@ import 'react-table/react-table.css';
 class HubTrackTable extends React.PureComponent {
     static propTypes = {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
-        addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
         onTrackAdded: PropTypes.func,
+        addedTrackSets: PropTypes.instanceOf(Set),
     }
 
     static defaultProps = {
         tracks: [],
-        addedTracks: [],
     }
 
     constructor(props) {
@@ -40,7 +39,7 @@ class HubTrackTable extends React.PureComponent {
             return null;
         }
         let track = reactTableRow.original;
-        if (addedTrackIds.has(track.getId())) {
+        if (addedTrackIds.has(track.url)) {
             return <span>✓</span>
         }
 
@@ -51,7 +50,6 @@ class HubTrackTable extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        let addedTrackSet = new Set(this.props.addedTracks.map(track => track.getId()));
         let columns = [
             {
                 Header: "Name",
@@ -92,7 +90,7 @@ class HubTrackTable extends React.PureComponent {
             },
             {
                 Header: "Add",
-                Cell: reactTableRow => this.getAddTrackCell(reactTableRow, addedTrackSet),
+                Cell: reactTableRow => this.getAddTrackCell(reactTableRow, this.props.addedTrackSets),
                 width: 50,
                 filterable: false
             }

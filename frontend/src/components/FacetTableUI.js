@@ -5,7 +5,8 @@ import FacetTable from './trackManagers/FacetTable';
 class FacetTableUI extends React.Component {
 
     render() {
-        const {publicTracksPool, customTracksPool, addedTracks, onTracksAdded} = this.props;
+        const {publicTracksPool, customTracksPool, addedTracks, onTracksAdded, 
+                addedTrackSets} = this.props;
         return (
             <Tabs>
                 <Tab label="Public tracks facet table">
@@ -16,6 +17,7 @@ class FacetTableUI extends React.Component {
                             tracks={publicTracksPool}
                             addedTracks={addedTracks}
                             onTracksAdded={onTracksAdded}
+                            addedTrackSets={addedTrackSets}
                         /> :
                         <p>No public tracks from data hubs yet.  Load a hub first.</p>
                 }
@@ -28,6 +30,7 @@ class FacetTableUI extends React.Component {
                             tracks={customTracksPool}
                             addedTracks={addedTracks}
                             onTracksAdded={onTracksAdded}
+                            addedTrackSets={addedTrackSets}
                         /> :
                         <p>No custom tracks yet. Submit custom tracks or load custom data hub.</p>
                     }

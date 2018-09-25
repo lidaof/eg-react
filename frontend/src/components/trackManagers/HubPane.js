@@ -15,6 +15,7 @@ class HubPane extends React.PureComponent {
         publicTracksPool: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
         onTracksAdded: PropTypes.func,
         onAddTracksToPool: PropTypes.func,
+        addedTrackSets: PropTypes.instanceOf(Set),
     };
 
     constructor(props) {

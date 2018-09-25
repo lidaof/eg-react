@@ -331,9 +331,14 @@ class FacetTable extends Component {
             return;
         }
         const id = `modal-${row.name}-${col.name}`;
+        const addUrls = found.filter(tk => this.props.addedTrackSets.has(tk.url))
         return (
         <div>
-            <button onClick={()=>this.handleOpenModal(id)} className="facet-item"> 0/{found.length} </button>
+            <button onClick={()=>this.handleOpenModal(id)} className="facet-item">
+                <span className="green">{addUrls.length}</span>
+                /
+                {found.length}
+            </button>
             <ReactModal
                isOpen={showModalId === id}
                contentLabel="track list"
@@ -349,7 +354,7 @@ class FacetTable extends Component {
                 </div> */}
                 <HubTrackTable
                     tracks={found}
-                    addedTracks={this.props.addedTracks}
+                    addedTrackSets={this.props.addedTrackSets}
                     onTrackAdded={track => this.props.onTracksAdded([track])}
                 />
             </ReactModal>

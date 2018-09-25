@@ -68,8 +68,8 @@ class App extends React.Component {
             publicTracksPool: [],
             customTracksPool: [],
             publicHubs: [],
-            publicTrackSets: new Set(),
-            customTrackSets: new Set(),
+            // publicTrackSets: new Set(),
+            // customTrackSets: new Set(),
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
@@ -85,16 +85,16 @@ class App extends React.Component {
      */
     addTracksToPool(newTracks, toPublic=true) {
         if (toPublic) {
-            const urlSets = new Set([...this.state.publicTrackSets, ...newTracks.map(track => track.url)]);
+            // const urlSets = new Set([...this.state.publicTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
                 publicTracksPool: this.state.publicTracksPool.concat(newTracks),
-                publicTrackSets: urlSets,
+                // publicTrackSets: urlSets,
             });
         } else {
-            const urlSets = new Set([...this.state.customTrackSets, ...newTracks.map(track => track.url)]);
+            // const urlSets = new Set([...this.state.customTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
                 customTracksPool: this.state.customTracksPool.concat(newTracks),
-                customTrackSets: urlSets,
+                // customTrackSets: urlSets,
             });
         }
     }
@@ -138,7 +138,7 @@ class App extends React.Component {
         if (!genomeConfig) {
             return <div className="container-fluid"><GenomePicker /></div>;
         }
-        const tracksUrlSets = new Set(tracks.map(track => track.url));
+        const tracksUrlSets = new Set(tracks.filter(track => track.url).map(track => track.url));
         return (
         <div className="App container-fluid">
             <Nav
