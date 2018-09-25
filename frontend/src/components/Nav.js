@@ -61,7 +61,8 @@ class Nav extends React.Component {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
             isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId, liveId,
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
-            onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs
+            onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs,
+            publicTrackSets, customTrackSets, addedTrackSets
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
@@ -95,7 +96,10 @@ class Nav extends React.Component {
                                 publicTracksPool={publicTracksPool}
                                 customTracksPool={customTracksPool}
                                 addedTracks={tracks} 
-                                onTracksAdded={onTracksAdded} 
+                                onTracksAdded={onTracksAdded}
+                                publicTrackSets={publicTrackSets}
+                                customTrackSets={customTrackSets}
+                                addedTrackSets={addedTrackSets}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Annotation Tracks">
@@ -113,6 +117,8 @@ class Nav extends React.Component {
                                 publicTracksPool={publicTracksPool}
                                 publicHubs={publicHubs}
                                 onHubUpdated={onHubUpdated}
+                                publicTrackSets={publicTrackSets}
+                                addedTrackSets={addedTrackSets}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Custom Tracks">
@@ -122,6 +128,8 @@ class Nav extends React.Component {
                                 onTrackRemoved={onTrackRemoved} 
                                 onAddTracksToPool={onAddTracksToPool}
                                 customTracksPool={customTracksPool}
+                                customTrackSets={customTrackSets}
+                                addedTrackSets={addedTrackSets}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Track List">

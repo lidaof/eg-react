@@ -67,7 +67,9 @@ class App extends React.Component {
             enteredRegion: null,
             publicTracksPool: [],
             customTracksPool: [],
-            publicHubs: []
+            publicHubs: [],
+            publicTrackSets: new Set(),
+            customTrackSets: new Set(),
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
@@ -83,9 +85,17 @@ class App extends React.Component {
      */
     addTracksToPool(newTracks, toPublic=true) {
         if (toPublic) {
-            this.setState({publicTracksPool: this.state.publicTracksPool.concat(newTracks)});
+            const urlSets = new Set([...this.state.publicTrackSets, ...newTracks.map(track => track.url)]);
+            this.setState({
+                publicTracksPool: this.state.publicTracksPool.concat(newTracks),
+                publicTrackSets: urlSets,
+            });
         } else {
-            this.setState({customTracksPool: this.state.customTracksPool.concat(newTracks)});
+            const urlSets = new Set([...this.state.customTrackSets, ...newTracks.map(track => track.url)]);
+            this.setState({
+                customTracksPool: this.state.customTracksPool.concat(newTracks),
+                customTrackSets: urlSets,
+            });
         }
     }
 
@@ -128,7 +138,7 @@ class App extends React.Component {
         if (!genomeConfig) {
             return <div className="container-fluid"><GenomePicker /></div>;
         }
-
+        const tracksUrlSets = new Set(tracks.map(track => track.url));
         return (
         <div className="App container-fluid">
             <Nav
@@ -149,6 +159,7 @@ class App extends React.Component {
                 onLegendWidthChange={onLegendWidthChange}
                 onAddTracksToPool={this.addTracksToPool}
                 onHubUpdated={this.updatePublicHubs}
+                addedTrackSets={tracksUrlSets}
             />
              <Notifications />
             {isShowingNavigator &&
