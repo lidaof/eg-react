@@ -10,7 +10,7 @@ import './FacetTable.css';
 
 const DEFAULT_ROW = 'Sample';
 const DEFAULT_COLUMN = 'Assay';
-const UNUSED_META_KEY = 'notused';
+export const UNUSED_META_KEY = 'notused';
 
 /**
  * component for display facet table for a data hub
@@ -346,16 +346,18 @@ class FacetTable extends Component {
                id={id}
                style={{overlay: {zIndex: 3}}}
             >
-                <button onClick={this.handleCloseModal}>Close</button>
-                {/* <div>
-                    <ul>
-                        {found.map(track => <li key={track.id}>{track.name}</li>)}
-                    </ul>
-                </div> */}
+                <span
+                    className="text-right" 
+                    style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}}
+                    onClick={this.handleCloseModal}>
+                    ×
+                </span>
                 <HubTrackTable
                     tracks={found}
                     addedTrackSets={this.props.addedTrackSets}
                     onTrackAdded={track => this.props.onTracksAdded([track])}
+                    rowHeader={rowHeader}
+                    columnHeader={columnHeader}
                 />
             </ReactModal>
         </div>

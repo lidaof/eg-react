@@ -28,6 +28,7 @@ class CustomTrackAdder extends React.Component {
         customTracksPool: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
         onTracksAdded: PropTypes.func,
         onAddTracksToPool: PropTypes.func,
+        addedTrackSets: PropTypes.instanceOf(Set),
     };
 
     constructor(props) {
@@ -39,6 +40,7 @@ class CustomTrackAdder extends React.Component {
             name: "",
             urlError: "",
             trackAdded: false,
+            selectedTabIndex: 0,
         };
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
     }
@@ -51,7 +53,7 @@ class CustomTrackAdder extends React.Component {
         if (!this.state.url) {
             this.setState({urlError: "Enter a URL"});
         } else {
-            const newTrack = new TrackModel(this.state);
+            const newTrack = new TrackModel({...this.state, datahub: 'Custom track'});
             this.props.onTracksAdded([newTrack]);
             this.props.onAddTracksToPool([newTrack], false);
             this.setState({urlError: "", trackAdded: true});
@@ -110,7 +112,7 @@ class CustomTrackAdder extends React.Component {
         return (
             <div id="CustomTrackAdder">	  
                 <div>
-                    <Tabs>
+                    <Tabs onSelect={(index, label) => this.setState({selectedTabIndex: index})} selected={this.state.selectedTabIndex}>
                         <Tab label="Add Custom Track">{this.renderCustomTrackAdder()}</Tab>
                         <Tab label="Add Custom Data Hub">{this.renderCustomHubAdder()}</Tab>
                     </Tabs>
@@ -121,6 +123,7 @@ class CustomTrackAdder extends React.Component {
                         tracks={this.props.customTracksPool}
                         addedTracks={this.props.addedTracks}
                         onTracksAdded={this.props.onTracksAdded}
+                        addedTrackSets={this.props.addedTrackSets}
                     /> 
                 }
             </div>
