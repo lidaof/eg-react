@@ -1,6 +1,7 @@
 .TrackContextMenu-body {
     z-index: 1;
     min-width: 200px;
+    max-width: 400px;
     background-color: white;
     border: 1px solid grey;
     border-radius: 0.25rem;
@@ -19,4 +20,41 @@
 
 .TrackContextMenu-hoverable-item-danger:hover {
     background-color: pink;
+}
+
+.Collapsible h6 {
+    margin-bottom: 0;
+    font-weight: bold;
+    font-size: 1em
+}
+
+.Collapsible table {
+    margin-bottom: 0;
+}
+
+.Collapsible p {
+    margin-bottom: 3px;
+}
+
+.Collapsible__trigger {
+    font-weight: bold;
+    padding-left: 3px;
+    text-decoration: underline;
+    cursor: pointer;
+    position: relative;
+    display: block;
+}
+
+.Collapsible__trigger:after {
+    content: '▼';
+    transform: rotate(-90deg);
+    position: absolute;
+    top: 0;
+    right: 10px;
+    display: block;
+    transition: transform 300ms; 
+}
+
+.Collapsible__trigger.is-open:after {
+    transform: rotate(0deg); 
 }

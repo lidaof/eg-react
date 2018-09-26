@@ -2,6 +2,7 @@ import Chromosome from '../Chromosome';
 import Genome from '../Genome';
 import TrackModel from '../../TrackModel';
 import cytobands from './cytoBand.json';
+import annotationTracks from "./annotationTracks.json";
 
 const genome = new Genome("mm10", [
     new Chromosome("chr1", 195471971),
@@ -48,7 +49,7 @@ const defaultTracks = [
     new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
-        url: 'https://vizhub.wustl.edu/public/mm10/rmsk16.bb'
+        url: 'https://vizhub.wustl.edu/public/mm10/rmsk16.bb',
     }),
 ];
 
@@ -80,6 +81,7 @@ const MM10 = {
     twoBitURL: "https://vizhub.wustl.edu/public/mm10/mm10.2bit",
     publicHubData,
     publicHubList,
+    annotationTracks,
 };
 
 export default MM10;

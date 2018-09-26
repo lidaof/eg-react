@@ -19,7 +19,7 @@ const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 interface CategoricalTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
     data: Feature[];
     options: {
-        category: object;
+        categories: object;
         height?: number;
     }
 }
@@ -47,7 +47,7 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
     renderTooltip(event: React.MouseEvent, feature: Feature) {
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} >
-                <FeatureDetail feature={feature} category={this.props.options.category} />
+                <FeatureDetail feature={feature} categories={this.props.options.categories} />
             </Tooltip>
         );
         this.props.onShowTooltip(tooltip);
@@ -70,9 +70,9 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
                 xSpan={placement.xSpan}
                 y={0}
                 isMinimal={false}
-                color={this.props.options.category[placement.feature.getName()].color}
+                color={this.props.options.categories[placement.feature.getName()].color}
                 onClick={this.renderTooltip}
-                category={this.props.options.category}
+                categories={this.props.options.categories}
                 height={this.props.options.height}
             />
         );

@@ -73,7 +73,7 @@ const defaultTracks = [
         name: "ChromHMM",
         url: "https://egg.wustl.edu/d/hg19/E017_15_coreMarks_dense.gz",
         options: {
-            category: {
+            categories: {
                 "1": {name: "Active TSS", color: "#ff0000"},
                 "2": {name: "Flanking Active TSS", color: "#ff4500"},
                 "3": {name: "Transcr at gene 5' and 3'", color: "#32cd32"},

@@ -63,12 +63,13 @@ export class TrackModel {
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
-        this.name = this.label || this.name || "";
+        this.name = this.name || "";
+        this.label = this.label || "";
         this.isSelected = this.isSelected || false;
         this.type = this.type || this.filetype || "";
         this.type = this.type.toLowerCase();
         this.options = this.options || {}; // `options` stores dynamically-configurable options.
-        this.options.label = this.name; // ...which is why we copy this.name.
+        this.options.label = this.label || this.name || ""; // ...which is why we copy this.name.
         this.url = this.url || "";
         this.metadata = this.metadata || {};
         this.metadata["Track type"] = this.type;

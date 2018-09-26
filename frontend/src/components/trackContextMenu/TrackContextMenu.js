@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import Collapsible from 'react-collapsible';
 import TrackModel from '../../model/TrackModel';
 import { getTrackConfig } from '../trackConfig/getTrackConfig';
 
@@ -119,11 +120,47 @@ class TrackContextMenu extends React.PureComponent {
             <MenuTitle tracks={selectedTracks} />
             {this.renderTrackSpecificItems(selectedTracks)}
             <RemoveOption numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
+            <TrackMoreInfo tracks={selectedTracks} />
         </div>
         );
     }
 }
 
+function TrackMoreInfo(props) {
+    const numTracks = props.tracks.length;
+    if (numTracks !== 1) {
+        return;
+    }
+    const track = props.tracks[0];
+    let info = []
+    if (track.details) {
+        info.push(<div key="details"><ObjectAsTable title="Details" content={track.details}/></div>);
+    }
+    if (track.url) {
+        info.push(<div key="url"><h6>URL</h6><p>{track.url}</p></div> );
+    }
+    if (track.metadata) {
+        info.push(<div key="metadata"><ObjectAsTable title="Metadata" content={track.metadata}/></div>);
+    }
+    return  <Collapsible trigger="More information">
+                <div className="TrackContextMenu-item">{info}</div>
+            </Collapsible>;
+}
+
+function ObjectAsTable(props) {
+    const {title, content} = props;
+    const rows = Object.entries(content).map( (key, value) => <tr key={value}><td>{key[0]}</td><td>{key[1]}</td></tr> )
+    return(
+        <React.Fragment>
+            <h6>{title}</h6>
+            <table className="table table-sm table-striped">
+                <tbody>
+                    {rows}
+                </tbody>
+            </table>
+        </React.Fragment>
+    );
+}
 /**
  * Title for the context menu.
  * 
