@@ -2,6 +2,7 @@
     "Ruler": [
         {
             "type": "ruler",
+            "label": "Ruler",
             "name": "Ruler"
         }
     ],

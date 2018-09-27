@@ -50,14 +50,6 @@ class App extends React.Component {
         onTracksChanged: PropTypes.func,
     };
 
-    componentWillMount() {
-        if (this.props.genomeConfig && this.props.genomeConfig.publicHubList) {
-            this.setState({
-                publicHubs: this.props.genomeConfig.publicHubList.slice(),
-            })
-        }
-    }
-
     constructor(props) {
         super(props);
         this.state = {
@@ -67,7 +59,6 @@ class App extends React.Component {
             enteredRegion: null,
             publicTracksPool: [],
             customTracksPool: [],
-            publicHubs: [],
             // publicTrackSets: new Set(),
             // customTrackSets: new Set(),
         };
@@ -138,7 +129,12 @@ class App extends React.Component {
         if (!genomeConfig) {
             return <div className="container-fluid"><GenomePicker /></div>;
         }
-        const tracksUrlSets = new Set(tracks.filter(track => track.url).map(track => track.url));
+        const tracksUrlSets = new Set([
+                ...tracks.filter(track => track.url).map(track => track.url),
+                ...tracks.filter(track => !track.url).map(track => track.name),
+        ]);
+        // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
+        const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
         return (
         <div className="App container-fluid">
             <Nav
@@ -160,6 +156,7 @@ class App extends React.Component {
                 onAddTracksToPool={this.addTracksToPool}
                 onHubUpdated={this.updatePublicHubs}
                 addedTrackSets={tracksUrlSets}
+                publicHubs={publicHubs}
             />
              <Notifications />
             {isShowingNavigator &&

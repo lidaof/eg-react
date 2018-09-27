@@ -1,3 +1,8 @@
 .App {
   margin-bottom: 30px;
 }
+
+.dense-button{
+  padding: 2px;
+  line-height: 1
+}

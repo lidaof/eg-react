@@ -106,7 +106,8 @@ class Nav extends React.Component {
                             <AnnotationTrackSelector
                                 addedTracks={tracks}
                                 onTracksAdded={onTracksAdded}
-                                onTrackRemoved={onTrackRemoved} />
+                                addedTrackSets={addedTrackSets} 
+                            />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Public Data Hubs">
                             <HubPane 

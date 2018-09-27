@@ -20,6 +20,7 @@
 
 .TrackContextMenu-hoverable-item-danger:hover {
     background-color: pink;
+    cursor: pointer;
 }
 
 .Collapsible h6 {

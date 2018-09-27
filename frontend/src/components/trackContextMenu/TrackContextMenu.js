@@ -129,7 +129,7 @@ class TrackContextMenu extends React.PureComponent {
 function TrackMoreInfo(props) {
     const numTracks = props.tracks.length;
     if (numTracks !== 1) {
-        return;
+        return null;
     }
     const track = props.tracks[0];
     let info = []

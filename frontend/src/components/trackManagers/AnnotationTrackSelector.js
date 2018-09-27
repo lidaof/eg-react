@@ -10,7 +10,7 @@ import withCurrentGenome from '../withCurrentGenome';
  * @param {Object} schemaNode - object from  
  * @param {string} nodeLabel - what to 
  */
-function convertOldBrowserSchema(schemaNode, nodeLabel) {
+function convertAnnotationJsonSchema(schemaNode, nodeLabel) {
     if (!schemaNode) {
         return {
             isExpanded: false,
@@ -29,7 +29,7 @@ function convertOldBrowserSchema(schemaNode, nodeLabel) {
     for (let propName of Object.getOwnPropertyNames(schemaNode)) {
         let propValue = schemaNode[propName];
         if (typeof propValue === "object") {
-            children.push(convertOldBrowserSchema(schemaNode[propName], propName))
+            children.push(convertAnnotationJsonSchema(propValue, propName))
         }
     }
     return {
@@ -48,19 +48,21 @@ class AnnotationTrackSelector extends React.Component {
     static propTypes = {
         genomeConfig: PropTypes.object.isRequired,
         addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
-        onTrackAdded: PropTypes.func,
+        onTracksAdded: PropTypes.func,
+        addedTrackSets: PropTypes.instanceOf(Set),
     }
 
     static defaultProps = {
-        onTrackAdded: () => undefined
+        onTracksAdded: () => undefined
     }
 
     constructor(props) {
         super(props);
         const {genome, annotationTracks} = props.genomeConfig;
-        this.data = convertOldBrowserSchema(annotationTracks, genome.getName());
+        this.data = convertAnnotationJsonSchema(annotationTracks, genome.getName());
         this.nodeToggled = this.nodeToggled.bind(this);
         this.renderLeaf = this.renderLeaf.bind(this);
+        this.addLeafTrack = this.addLeafTrack.bind(this);
     }
 
     nodeToggled(node) {
@@ -68,16 +70,20 @@ class AnnotationTrackSelector extends React.Component {
         this.setState({});
     }
 
+    addLeafTrack(trackModel) {
+        this.props.onTracksAdded(trackModel);
+    }
+
     renderLeaf(trackModel) {
-        if (this.addedTrackSet.has(trackModel)) {
-            return <div>{trackModel.label} (ADDED)</div>;
+        if (this.props.addedTrackSets.has(trackModel.name) || this.props.addedTrackSets.has(trackModel.url)) {
+            return <div>{trackModel.label} (Added)</div>;
         }
         
-        return <div>{trackModel.label} <button onClick={() => this.props.onTrackAdded(trackModel)}>+</button></div>;
+        return <div>{trackModel.label} <button onClick={() => this.addLeafTrack(trackModel) } 
+                                            className="btn btn-sm btn-success dense-button">Add</button></div>;
     }
 
     render() {
-        this.addedTrackSet = new Set(this.props.addedTracks);
         return <TreeView data={this.data} onNodeToggled={this.nodeToggled} leafRenderer={this.renderLeaf} />;
     }
 }
