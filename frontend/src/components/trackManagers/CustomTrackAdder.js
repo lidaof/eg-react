@@ -112,7 +112,10 @@ class CustomTrackAdder extends React.Component {
         return (
             <div id="CustomTrackAdder">	  
                 <div>
-                    <Tabs onSelect={(index, label) => this.setState({selectedTabIndex: index})} selected={this.state.selectedTabIndex}>
+                    <Tabs onSelect={(index, label) => this.setState({selectedTabIndex: index})} 
+                        selected={this.state.selectedTabIndex}
+                        headerStyle={{fontWeight: 'bold'}} activeHeaderStyle={{color: 'blue'}}
+                    >
                         <Tab label="Add Custom Track">{this.renderCustomTrackAdder()}</Tab>
                         <Tab label="Add Custom Data Hub">{this.renderCustomHubAdder()}</Tab>
                     </Tabs>

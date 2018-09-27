@@ -41,16 +41,19 @@ class HubTrackTable extends React.PureComponent {
         }
         let track = reactTableRow.original;
         if (addedTrackUrls.has(track.url)) {
-            return <span>✓</span>
+            return <span>✓</span>;
         }
 
-        return <button onClick={() => this.props.onTrackAdded(this.props.tracks[reactTableRow.index])}>+</button>
+        return <button onClick={() => this.props.onTrackAdded(this.props.tracks[reactTableRow.index])}>+</button>;
     }
 
     /**
      * @inheritdoc
      */
     render() {
+        const defaultFilterMethod = (filter, row) =>
+        String(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase());
+
         const {rowHeader, columnHeader} = this.props;
         let columns = [];
         columns.push(
@@ -92,7 +95,7 @@ class HubTrackTable extends React.PureComponent {
                             tracks={this.props.tracks}
                             metadataPropToSearch={columnHeader}
                             onChange={cellInfo.onChange}
-                        />,
+                        /> ,
                     headerStyle: {flex: "100 0 auto", overflow: "visible"}
                 }
             );
@@ -129,11 +132,10 @@ class HubTrackTable extends React.PureComponent {
                 <h1>Track table</h1>
                 <ReactTable
                     filterable
-                    defaultFilterMethod={(filter, row) =>
-                        String(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase())
-                    }
+                    defaultFilterMethod={defaultFilterMethod}
                     data={this.props.tracks}
                     columns={columns}
+                    className="-striped -highlight"
                 />
             </React.Fragment>
         

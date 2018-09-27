@@ -42,6 +42,9 @@ class TrackSearchBox extends React.Component {
         let suggestions = new Set();
         for (let track of this.props.tracks) {
             let trackHierarchy = track.metadata[this.props.metadataPropToSearch];
+            if (!trackHierarchy) {
+                continue;
+            }
             if (!this._isSameArray(trackHierarchy, inputHierarchy, inputHierarchy.length - 1)) {
                 continue;
             }

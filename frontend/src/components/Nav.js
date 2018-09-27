@@ -137,7 +137,9 @@ class Nav extends React.Component {
                             <TrackList 
                                 addedTracks={tracks} 
                                 onTracksAdded={onTracksAdded} 
-                                onTrackRemoved={onTrackRemoved} />
+                                onTrackRemoved={onTrackRemoved}
+                                addedTrackSets={addedTrackSets} 
+                            />
                         </ModalMenuItem>
                     </div>
                 </div>

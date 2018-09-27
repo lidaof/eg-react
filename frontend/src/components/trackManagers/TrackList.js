@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
-import './TrackList.css';
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 /**
  * A complete list of tracks
@@ -16,19 +16,65 @@ import './TrackList.css';
 class TrackList extends React.Component {
     static propTypes = {
         addedTracks: PropTypes.arrayOf(PropTypes.object),
-        onTrackAdded: PropTypes.func,
-        onTrackRemoved: PropTypes.func
+        onTracksAdded: PropTypes.func,
+        onTrackRemoved: PropTypes.func,
+        addedTrackSets: PropTypes.instanceOf(Set),
     };
 
     static defaultProps = {
-        onTrackAdded: () => undefined,
+        onTracksAdded: () => undefined,
         onTrackRemoved: () => undefined,
     };
 
     constructor(props) {
         super(props);
+        this.state = {
+            availableTrackSets: new Set(),
+        };
+        this.getRemoveTrackCell = this.getRemoveTrackCell.bind(this);
+        this.removeTrack = this.removeTrack.bind(this);
+        this.getAddTrackCell = this.getAddTrackCell.bind(this);
+        this.addTrack = this.addTrack.bind(this);
     }
 
+    removeTrack(reactTableRow) {
+        this.props.onTrackRemoved(reactTableRow.index);
+        const track = reactTableRow.original;
+        this.setState({
+            availableTrackSets: new Set([
+                ...this.state.availableTrackSets, track
+            ]),
+        });
+    }
+
+    getRemoveTrackCell(reactTableRow) {
+        if (!this.props.onTrackRemoved) {
+            return null;
+        }
+        return <button 
+                    onClick={() => this.removeTrack(reactTableRow)}
+                    className="btn btn-sm btn-danger"
+                >✘</button>;
+    }
+
+    addTrack(reactTableRow) {
+        const track = reactTableRow.original;
+        console.log(track);
+        this.props.onTracksAdded(track);
+        // this.setState({
+        //     availableTrackSets: this.state.availableTrackSets.delete(track),
+        // });
+    }
+
+    getAddTrackCell(reactTableRow) {
+        if (!this.props.onTracksAdded) {
+            return null;
+        }
+        return <button 
+                onClick={() => this.addTrack(reactTableRow)}
+                className="btn btn-sm btn-success"
+                >+</button>;
+    }
    
     /**
      * 
@@ -36,22 +82,72 @@ class TrackList extends React.Component {
      * @override
      */
     render() {
-        const {addedTracks, onTrackRemoved} = this.props;
-        const currentTrackList = addedTracks.map((track, index) => (
-            <li key={index}>
-                {track.getDisplayLabel()}
-                <span className="btn btn-link TrackList-remove-track-button" onClick={() => onTrackRemoved(index)} >✘</span>
-            </li>
-            )
-        );
-        
+        const columnsForRemove = [
+            {
+                Header: "Label",
+                accessor: "label",
+            },
+            {
+                Header: "Track type",
+                accessor: "type",
+            },
+            {
+                Header: "Remove",
+                Cell: reactTableRow => this.getRemoveTrackCell(reactTableRow),
+                width: 50,
+                filterable: false
+            }
+        ];
+        const columnsForAdd = [
+            {
+                Header: "Label",
+                accessor: "label",
+            },
+            {
+                Header: "Track type",
+                accessor: "type",
+            },
+            {
+                Header: "Add",
+                Cell: reactTableRow => this.getAddTrackCell(reactTableRow),
+                width: 50,
+                filterable: false
+            }
+        ];
+        const {addedTracks} = this.props;
+        const availTracks = Array.from(this.state.availableTrackSets);
         return (
-        <div className="TrackList-parent">
-            <div className="TrackList-sidebar">
-                <h3>Current tracks</h3>
-                <ul className="TrackList-tracklist">{currentTrackList}</ul>
-            </div>
-        </div>);
+            <React.Fragment>
+            <h3>Displayed tracks</h3>
+            <ReactTable
+                filterable
+                defaultPageSize={10}
+                minRows={Math.min(addedTracks.length, 10)}
+                defaultFilterMethod={(filter, row) =>
+                    String(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase())
+                }
+                data={addedTracks}
+                columns={columnsForRemove}
+                className="-striped -highlight"
+            />
+            {
+                availTracks.length > 0 &&
+                <React.Fragment>
+                    <h3 style={{marginTop: "10px"}}>Available tracks</h3>
+                    <ReactTable
+                        filterable
+                        defaultPageSize={10}
+                        minRows={Math.min(availTracks.length, 10)}
+                        defaultFilterMethod={(filter, row) =>
+                            String(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase())
+                        }
+                        data={availTracks}
+                        columns={columnsForAdd}
+                        className="-striped -highlight"
+                    />
+                </React.Fragment>
+            }
+        </React.Fragment>);
     }
 }
 

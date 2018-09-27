@@ -322,9 +322,17 @@ class FacetTable extends Component {
                 // confusing code here, need to check if column was used
                 if (col === UNUSED_META_KEY) {
                     found.push(track);
-                } else if ( col.name === columnHeader || track.metadata[columnHeader].includes(col.name) ) {
-                    found.push(track);
-                }
+                } else {
+                    if (!track.metadata[columnHeader]) {
+                        if ( col.name === columnHeader ) {
+                            found.push(track);
+                        }
+                        continue;
+                    }
+                    if ( col.name === columnHeader || track.metadata[columnHeader].includes(col.name) ) {
+                        found.push(track);
+                    }
+                } 
             }
         }
         if (!found.length) {

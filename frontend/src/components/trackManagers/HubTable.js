@@ -132,6 +132,7 @@ class HubTable extends React.PureComponent {
                         );
                     }}
                     collapseOnSortingChange={false}
+                    className="-striped -highlight"
                 />
         </div>
     }

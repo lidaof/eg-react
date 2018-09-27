@@ -8,7 +8,7 @@ class FacetTableUI extends React.Component {
         const {publicTracksPool, customTracksPool, addedTracks, onTracksAdded, 
                 addedTrackSets} = this.props;
         return (
-            <Tabs>
+            <Tabs headerStyle={{fontWeight: 'bold'}} activeHeaderStyle={{color: 'blue'}}>
                 <Tab label="Public tracks facet table">
                     <h1>Tracks from public hubs</h1>
                 {

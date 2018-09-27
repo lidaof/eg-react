@@ -6,3 +6,29 @@
   padding: 2px;
   line-height: 1
 }
+
+.nav-link {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  cursor: hand;
+  cursor: pointer;
+}
+
+.tab-link {
+  color:red;
+}
+
+.nav-tabs a.nav-link:hover {
+  color: red;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: whitesmoke;
+}
+
+.nav-tabs .nav-link.active:hover {
+  color: red;
+  background-color: whitesmoke;
+}
