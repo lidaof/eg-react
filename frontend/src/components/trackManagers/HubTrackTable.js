@@ -73,7 +73,7 @@ class HubTrackTable extends React.PureComponent {
                 {
                     Header: rowHeader,
                     id: rowHeader.toLowerCase(),
-                    accessor: data => Array.isArray(data.metadata[rowHeader]) ? data.metadata[rowHeader].join(' > ') : data.metadata[rowHeader],
+                    accessor: data => data.getMetadataAsArray(rowHeader).join(' > '),
                     Filter: (cellInfo) => 
                         <TrackSearchBox
                             tracks={this.props.tracks}
@@ -89,7 +89,7 @@ class HubTrackTable extends React.PureComponent {
                 {
                     Header: columnHeader,
                     id: columnHeader.toLowerCase(),
-                    accessor: data => Array.isArray(data.metadata[columnHeader]) ? data.metadata[columnHeader].join(' > ') : data.metadata[columnHeader],
+                    accessor: data => data.getMetadataAsArray(columnHeader).join(' > '),
                     Filter: (cellInfo) => 
                         <TrackSearchBox
                             tracks={this.props.tracks}

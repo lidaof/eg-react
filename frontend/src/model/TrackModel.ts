@@ -124,6 +124,15 @@ export class TrackModel {
         }
     }
 
+    getMetadataAsArray(term: string): string[] | undefined {
+        const value = this.metadata[term];
+        if (Array.isArray(value)) {
+            return value;
+        } else {
+            return [value];
+        }
+    }
+
     /**
      * **Shallowly** clones this.
      * 

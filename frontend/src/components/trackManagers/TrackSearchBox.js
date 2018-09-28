@@ -41,7 +41,7 @@ class TrackSearchBox extends React.Component {
         let inputHierarchy = suggestionEvent.value.split(HIERARCHY_DELIMITER);
         let suggestions = new Set();
         for (let track of this.props.tracks) {
-            let trackHierarchy = track.metadata[this.props.metadataPropToSearch];
+            let trackHierarchy = track.getMetadataAsArray(this.props.metadataPropToSearch);
             if (!trackHierarchy) {
                 continue;
             }
