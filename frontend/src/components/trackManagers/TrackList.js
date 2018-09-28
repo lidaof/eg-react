@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+import TrackModel from '../../model/TrackModel';
 
 /**
  * A complete list of tracks
@@ -19,6 +20,8 @@ class TrackList extends React.Component {
         onTracksAdded: PropTypes.func,
         onTrackRemoved: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
+        addTracktoAvailable: PropTypes.func,
+        removeTrackFromAvailable: PropTypes.func,
     };
 
     static defaultProps = {
@@ -28,9 +31,6 @@ class TrackList extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            availableTrackSets: new Set(),
-        };
         this.getRemoveTrackCell = this.getRemoveTrackCell.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
         this.getAddTrackCell = this.getAddTrackCell.bind(this);
@@ -40,11 +40,7 @@ class TrackList extends React.Component {
     removeTrack(reactTableRow) {
         this.props.onTrackRemoved(reactTableRow.index);
         const track = reactTableRow.original;
-        this.setState({
-            availableTrackSets: new Set([
-                ...this.state.availableTrackSets, track
-            ]),
-        });
+        this.props.addTracktoAvailable(track);
     }
 
     getRemoveTrackCell(reactTableRow) {
@@ -59,11 +55,8 @@ class TrackList extends React.Component {
 
     addTrack(reactTableRow) {
         const track = reactTableRow.original;
-        console.log(track);
-        this.props.onTracksAdded(track);
-        // this.setState({
-        //     availableTrackSets: this.state.availableTrackSets.delete(track),
-        // });
+        this.props.removeTrackFromAvailable(track);
+        this.props.onTracksAdded(TrackModel.deserialize(track.serialize()));
     }
 
     getAddTrackCell(reactTableRow) {
@@ -114,8 +107,8 @@ class TrackList extends React.Component {
                 filterable: false
             }
         ];
-        const {addedTracks} = this.props;
-        const availTracks = Array.from(this.state.availableTrackSets);
+        const {addedTracks, availableTrackSets} = this.props;
+        const availTracks = Array.from(availableTrackSets);
         return (
             <React.Fragment>
             <h3>Displayed tracks</h3>

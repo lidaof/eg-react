@@ -43,11 +43,13 @@ class TrackContextMenu extends React.PureComponent {
          *         `nextTracks` - array of TrackModel derived from the `tracks` prop
          */
         onTracksChanged: PropTypes.func,
+        deselectAllTracks: PropTypes.func,
     };
 
     static defaultProps = {
         tracks: [],
         onTracksChanged: () => undefined,
+        deselectAllTracks: () => undefined,
     };
 
     constructor(props) {
@@ -119,6 +121,7 @@ class TrackContextMenu extends React.PureComponent {
         <div className="TrackContextMenu-body">
             <MenuTitle tracks={selectedTracks} />
             {this.renderTrackSpecificItems(selectedTracks)}
+            <DeselectOption numTracks={selectedTracks.length} onClick={this.props.deselectAllTracks} />
             <RemoveOption numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
             <TrackMoreInfo tracks={selectedTracks} />
         </div>
@@ -185,6 +188,18 @@ function RemoveOption(props) {
     <div onClick={props.onClick} className="TrackContextMenu-item TrackContextMenu-hoverable-item-danger" >
         {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}
         ❌ {props.numTracks === 1 ? "Remove" : `Remove ${props.numTracks} tracks`}
+    </div>
+    );
+}
+
+function DeselectOption(props) {
+    if (props.numTracks === 1) {
+        return null;
+    }
+    return (
+    <div onClick={props.onClick} className="TrackContextMenu-item TrackContextMenu-hoverable-item-warn" >
+        {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}
+        ☐  {`Deselect ${props.numTracks} tracks`}
     </div>
     );
 }

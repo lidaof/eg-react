@@ -22,7 +22,7 @@ import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
 
-const VERSION = "v47.1";
+const VERSION = "v47.2";
 
 const REGION_EXPANDER = new RegionExpander(0);
 
@@ -62,7 +62,8 @@ class Nav extends React.Component {
             isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId, liveId,
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
             onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs,
-            publicTrackSets, customTrackSets, addedTrackSets
+            publicTrackSets, customTrackSets, addedTrackSets, addTracktoAvailable, removeTrackFromAvailable,
+            availableTrackSets
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
@@ -138,7 +139,11 @@ class Nav extends React.Component {
                                 addedTracks={tracks} 
                                 onTracksAdded={onTracksAdded} 
                                 onTrackRemoved={onTrackRemoved}
-                                addedTrackSets={addedTrackSets} 
+                                addedTrackSets={addedTrackSets}
+                                availableTrackSets={availableTrackSets}
+                                addTracktoAvailable={addTracktoAvailable}
+                                removeTrackFromAvailable={removeTrackFromAvailable}
+                                availableTrackSets={availableTrackSets}
                             />
                         </ModalMenuItem>
                     </div>

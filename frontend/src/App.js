@@ -61,11 +61,30 @@ class App extends React.Component {
             customTracksPool: [],
             // publicTrackSets: new Set(),
             // customTrackSets: new Set(),
+            availableTrackSets: new Set(),
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
         this.updatePublicHubs = this.updatePublicHubs.bind(this);
+        this.addTracktoAvailable = this.addTracktoAvailable.bind(this);
+        this.removeTrackFromAvailable = this.removeTrackFromAvailable.bind(this);
+    }
+
+    addTracktoAvailable(trackModel) {
+        this.setState({
+            availableTrackSets: new Set([
+                ...this.state.availableTrackSets, trackModel
+            ]),
+        });
+    }
+
+    removeTrackFromAvailable(trackModel) {
+        const newTrackSets = new Set(Array.from(this.state.availableTrackSets));
+        newTrackSets.delete(trackModel);
+        this.setState({
+            availableTrackSets: newTrackSets,
+        });
     }
 
     /**
@@ -157,6 +176,8 @@ class App extends React.Component {
                 onHubUpdated={this.updatePublicHubs}
                 addedTrackSets={tracksUrlSets}
                 publicHubs={publicHubs}
+                removeTrackFromAvailable={this.removeTrackFromAvailable}
+                addTracktoAvailable={this.addTracktoAvailable}
             />
              <Notifications />
             {isShowingNavigator &&

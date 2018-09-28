@@ -275,7 +275,7 @@ class TrackContainer extends React.Component {
     render() {
         const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView} = this.props;
         const selectedTool = this.state.selectedTool;
-        const contextMenu = <TrackContextMenu tracks={tracks} onTracksChanged={onTracksChanged} />;
+        const contextMenu = <TrackContextMenu tracks={tracks} onTracksChanged={onTracksChanged} deselectAllTracks={this.deselectAllTracks} />;
         const trackDivStyle = {
                                 border: "1px solid black", 
                                 paddingBottom: "3px",

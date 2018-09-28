@@ -23,6 +23,11 @@
     cursor: pointer;
 }
 
+.TrackContextMenu-hoverable-item-warn:hover {
+    background-color: #f3ba12;
+    cursor: pointer;
+}
+
 .Collapsible h6 {
     margin-bottom: 0;
     font-weight: bold;
