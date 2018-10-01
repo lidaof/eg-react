@@ -280,10 +280,10 @@ const rootReducer = combineReducers({
 
 // Firebase config
 const firebaseConfig = {
-    apiKey: "AIzaSyADX844efdjDQG2LrWLhSAB4RiymVnuhOM",
-    authDomain: "eg-session.firebaseapp.com",
-    databaseURL: "https://eg-session.firebaseio.com",
-    storageBucket: "eg-session.appspot.com",
+    apiKey: process.env.REACT_APP_FIREBASE_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_DOMAIN,
+    databaseURL: process.env.REACT_APP_FIREBASE_DATABASE,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
   }
   firebase.initializeApp(firebaseConfig)
   
