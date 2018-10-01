@@ -185,7 +185,7 @@ class App extends React.Component {
             }
             {
             this.state.isShowing3D &&
-                <ErrorBoundary><BrowserScene viewRegion={viewRegion} tracks={tracks} /></ErrorBoundary>
+                <ErrorBoundary><BrowserScene viewRegion={viewRegion} tracks={tracks} expansionAmount={REGION_EXPANDER} /></ErrorBoundary>
             }
             <TrackContainer 
                 enteredRegion={this.state.enteredRegion} 

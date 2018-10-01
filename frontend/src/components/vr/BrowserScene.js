@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
+import _ from 'lodash';
 
 import VrRuler from './VrRuler';
 import { NumericalTrack3D } from './NumericalTrack3D';
@@ -13,6 +14,8 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import TrackModel from '../../model/TrackModel';
 import { RegionExpander } from '../../model/RegionExpander';
 import withCurrentGenome from '../withCurrentGenome';
+import { withTrackData } from '../trackContainers/TrackDataManager';
+import { withTrackView } from '../trackContainers/TrackViewManager';
 
 const COMPONENT_FOR_TRACK_TYPE = {
     bigwig: NumericalTrack3D,
@@ -23,10 +26,12 @@ const InteractionTrack = withCurrentGenome(withHicData(InteractionTrack3D));
 const TRACK_SEPARATION = 1; // In meters
 const TRACK_WIDTH = 100;
 const TRACK_HEIGHT = 1;
-const REGION_EXPANDER = new RegionExpander(1);
-REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
+// const REGION_EXPANDER = new RegionExpander(1);
+// REGION_EXPANDER.calculateExpansion = memoizeOne(REGION_EXPANDER.calculateExpansion);
 
-export class BrowserScene extends React.Component {
+const withEnhancements = _.flowRight(withTrackView, withTrackData);
+
+class BrowserSceneBasic extends React.Component {
     static propTypes = {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // Region to render
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)), // Array of tracks to render
@@ -43,8 +48,8 @@ export class BrowserScene extends React.Component {
     }
 
     render() {
-        let {viewRegion, tracks, renderTrack, trackWidth, children, ...otherProps} = this.props;
-        const expandedRegion = REGION_EXPANDER.calculateExpansion(viewRegion, TRACK_WIDTH).visRegion;
+        let {viewRegion, tracks, trackData, primaryView, renderTrack, trackWidth, children, ...otherProps} = this.props;
+        const expandedRegion = this.props.expansionAmount.calculateExpansion(viewRegion, TRACK_WIDTH).visRegion;
         let z = -TRACK_SEPARATION;
         const tracksAndRulers = [];
         for (let trackModel of tracks) {
@@ -52,10 +57,13 @@ export class BrowserScene extends React.Component {
             if (!Component3D) {
                 continue;
             }
+            const id = trackModel.getId();
+            const data = trackData[id];
             tracksAndRulers.push(
                 <React.Fragment key={trackModel.getId()}>
                     <Component3D
                         trackModel={trackModel}
+                        {...data}
                         viewRegion={expandedRegion}
                         width={TRACK_WIDTH}
                         height={TRACK_HEIGHT}
@@ -92,3 +100,5 @@ export class BrowserScene extends React.Component {
         );
     }
 }
+
+export const BrowserScene = withEnhancements(BrowserSceneBasic);

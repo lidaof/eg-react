@@ -58,7 +58,7 @@ class VrRuler extends React.Component {
 
     _makeText() {
         const textFactory = new VrRulerTextFactory(FONT_SIZE, this.state.font);
-        const textDesign = new RulerDesigner(1, textFactory).design(this.props.viewRegion, this.props.width);
+        const textDesign = new RulerDesigner(4, textFactory).design(this.props.viewRegion, this.props.width);
         const mergedGeometry = mergeGeometries(textDesign.filter(element => element != null));
         return new window.THREE.Mesh(mergedGeometry, MATERIAL);
     }
