@@ -1,3 +1,12 @@
 .MetadataSelectionMenu ul {
     list-style-type: none;
 }
+.MetadataSelectionMenu {
+    position: absolute;
+    z-index: 4;
+    background: #edeef1;
+    padding: 5px;
+    right: 75px;
+    top: 54px;
+    min-width: 235px;
+}

@@ -107,6 +107,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
         const divStyle = Object.assign({
             display: "flex",
             width,
+            minWidth: width,
             height,
             backgroundColor: trackModel.isSelected ? "yellow" : undefined,
         }, style);

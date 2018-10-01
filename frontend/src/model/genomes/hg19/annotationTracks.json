@@ -93,7 +93,7 @@
             "name": "CpGsites",
             "label": "CpG sites",
             "filetype": "categorical",
-            "categories": {
+            "category": {
                 "1": {
                     "name":"CpG sites",
                     "color": "rgb(134,0,179)"

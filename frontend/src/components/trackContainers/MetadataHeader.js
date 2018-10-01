@@ -29,7 +29,9 @@ class MetadataHeader extends React.PureComponent {
         <div className="MetadataHeader-container" >
             <MetadataSelectionMenu terms={this.props.terms} style={editMenuStyle} onNewTerms={this.props.onNewTerms} />
             <ul className="MetadataHeader-terms">
-                <li onClick={() => this.setState({isShowingEditMenu: !this.state.isShowingEditMenu})} >Edit...</li>
+                <li onClick={() => this.setState({isShowingEditMenu: !this.state.isShowingEditMenu})} >
+                    <button className="btn btn-sm btn-success dense-button">Metadata »</button>
+                </li>
                 {
                 this.props.terms.map(term =>
                     <li key={term} style={{width: termWidth, fontSize: termWidth * 0.75}} >{term}</li>

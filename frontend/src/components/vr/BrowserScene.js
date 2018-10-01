@@ -44,7 +44,7 @@ export class BrowserScene extends React.Component {
 
     render() {
         let {viewRegion, tracks, renderTrack, trackWidth, children, ...otherProps} = this.props;
-        const expandedRegion = REGION_EXPANDER.calculateExpansion(TRACK_WIDTH, viewRegion).viewRegion;
+        const expandedRegion = REGION_EXPANDER.calculateExpansion(viewRegion, TRACK_WIDTH).visRegion;
         let z = -TRACK_SEPARATION;
         const tracksAndRulers = [];
         for (let trackModel of tracks) {

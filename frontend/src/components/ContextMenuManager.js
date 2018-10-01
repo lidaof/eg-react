@@ -87,7 +87,7 @@ class ContextMenuManager extends React.PureComponent {
         }
 
         return (
-        <div style={{position: "relative"}} onContextMenu={this.handleContextMenu} >
+        <div style={{position: "relative", zIndex: 0}} onContextMenu={this.handleContextMenu} >
             {children}
             {menuPopper}
         </div>

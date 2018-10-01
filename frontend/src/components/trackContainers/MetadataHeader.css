@@ -2,6 +2,7 @@
     margin-left: auto;
     margin-right: 0;
     padding-bottom: 5px;
+    position: relative;
 }
 
 .MetadataHeader-terms {
