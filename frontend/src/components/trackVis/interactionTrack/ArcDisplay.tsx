@@ -22,7 +22,8 @@ const ITEM_LIMIT = 1000;
 
 export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     static getHeight(props: ArcDisplayProps) {
-        return HEIGHT;
+        // return HEIGHT;
+        return 0.5 * props.viewWindow.getLength();
     }
 
     render() {

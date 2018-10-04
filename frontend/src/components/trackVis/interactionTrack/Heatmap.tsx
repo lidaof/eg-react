@@ -35,8 +35,8 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
             const gapLength = xSpan2.start - xSpan1.end;
             const topX = gapCenter;
             const topY = 0.5 * gapLength;
-            const halfSpan1 = 0.5 * xSpan1.getLength();
-            const halfSpan2 = 0.5 * xSpan2.getLength();
+            const halfSpan1 = Math.max(0.5 * xSpan1.getLength(), 4);
+            const halfSpan2 = Math.max(0.5 * xSpan2.getLength(), 4);
             const points = [ // Going counterclockwise
                 [topX, topY], // Top
                 [topX - halfSpan1, topY + halfSpan1], // Left
