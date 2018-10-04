@@ -7,6 +7,7 @@ import { BedGraphTrackConfig } from './BedGraphTrackConfig';
 import { BigWigTrackConfig } from './BigWigTrackConfig';
 import { GeneAnnotationTrackConfig } from './GeneAnnotationTrackConfig';
 import { HicTrackConfig } from './HicTrackConfig';
+import { LongRangeTrackConfig } from './LongRangeTrackConfig';
 import { MethylCTrackConfig } from './MethylCTrackConfig';
 import { RepeatMaskerTrackConfig } from './RepeatMaskerTrackConfig';
 import { GenomeAlignTrackConfig } from './GenomeAlignTrackConfig';
@@ -21,6 +22,7 @@ const TYPE_NAME_TO_CONFIG = {
     "bigbed": BigBedTrackConfig,
     "bigwig": BigWigTrackConfig,
     "hic": HicTrackConfig,
+    "longrange": LongRangeTrackConfig,
     "geneannotation": GeneAnnotationTrackConfig,
     "methylc": MethylCTrackConfig,
     "repeatmasker": RepeatMaskerTrackConfig,

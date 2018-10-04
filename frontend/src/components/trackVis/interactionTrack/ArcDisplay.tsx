@@ -32,7 +32,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         const curveYScale = scaleLinear().domain([0, viewWindow.getLength()]).range([0, 2 * HEIGHT]).clamp(true);
         let sortedInteractions = placedInteractions.slice().sort((a, b) => b.interaction.score - a.interaction.score);
         sortedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
-        for (const placedInteraction of sortedInteractions) {
+        for (const [index, placedInteraction] of sortedInteractions.entries()) {
             const score = placedInteraction.interaction.score;
             if (!score) {
                 continue;
@@ -48,7 +48,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
             }
 
             arcs.push(<path
-                key={placedInteraction.generateKey()}
+                key={placedInteraction.generateKey()+index}
                 d={moveTo(xSpan1Center, 0) + quadraticCurveTo(spanCenter, curveYScale(spanLength), xSpan2Center, 0)}
                 fill="none"
                 opacity={opacityScale(score)}

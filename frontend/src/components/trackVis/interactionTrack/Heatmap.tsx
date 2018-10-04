@@ -24,7 +24,7 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
         const {placedInteractions, width, opacityScale, color, onInteractionHovered,
             onMouseOut} = this.props;
         const diamonds = [];
-        for (const placedInteraction of placedInteractions) {
+        for (const [index, placedInteraction] of placedInteractions.entries()) {
             const score = placedInteraction.interaction.score;
             if (!score) {
                 continue;
@@ -44,7 +44,7 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
                 [topX + halfSpan2, topY + halfSpan2] // Right
             ];
             diamonds.push(<polygon
-                key={placedInteraction.generateKey()}
+                key={placedInteraction.generateKey()+index}
                 points={points as any} // React can convert the array to a string
                 fill={color}
                 opacity={opacityScale(score)}

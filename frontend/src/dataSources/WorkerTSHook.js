@@ -6,7 +6,9 @@
 import BedWorker from './bed/Bed.worker';
 import BigWorker from './big/Big.worker';
 import GenomeAlignWorker from './bed/GenomeAlign.worker';
+import LongRangeWorker from "./bed/LongRange.worker";
 
 export { BedWorker };
 export { BigWorker };
 export { GenomeAlignWorker };
+export { LongRangeWorker };

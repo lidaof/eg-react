@@ -47,6 +47,11 @@ const defaultTracks = [
         name: "Ruler",
     }),
     new TrackModel({
+        type: "longrange",
+        name: "ES-E14 ChIA-PET",
+        url: "https://egg.wustl.edu/d/mm9/GSE28247_st3c.gz",
+    }),
+    new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
         url: 'https://vizhub.wustl.edu/public/mm10/rmsk16.bb',

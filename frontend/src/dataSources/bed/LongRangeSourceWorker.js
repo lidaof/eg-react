@@ -1,6 +1,7 @@
-import JSON5 from 'json5';
 import BedSourceWorker from './BedSourceWorker';
 import WorkerRunnableSource from '../worker/WorkerRunnableSource';
+import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
+import { GenomeInteraction } from '../../model/GenomeInteraction';
 
 export class LongRangeSourceWorker extends WorkerRunnableSource {
     constructor(url) {
@@ -10,14 +11,21 @@ export class LongRangeSourceWorker extends WorkerRunnableSource {
 
     async getData(loci, basesPerPixel, options={}) {
         const bedRecords = await this.bedSourceWorker.getData(loci);
-        bedRecords.map(record => {
-            let data = JSON5.parse('{' + record[3] + '}');
-            if (options.isRoughMode) {
-                data.genomealign.targetseq = null;
-                data.genomealign.queryseq = null;
+        const interactions = [];
+        bedRecords.forEach(record => {
+            const regexMatch = record[3].match(/(\w+)\W+(\d+)\W+(\d+)\W+(\d+)/);
+            if (regexMatch) {
+                const chr = regexMatch[1];
+                const start = Number.parseInt(regexMatch[2], 10);
+                const end = Number.parseInt(regexMatch[3], 10);
+                const score = Number.parseInt(regexMatch[4], 10);
+                const recordLocus1 = new ChromosomeInterval(record.chr, record.start, record.end);
+                const recordLocus2 = new ChromosomeInterval(chr, start, end);
+                interactions.push(new GenomeInteraction(recordLocus1, recordLocus2, score));
+            } else {
+                console.error(`${record[3]} not formated correctly in longrange track`);
             }
-            record[3] = data;
         });
-        return bedRecords;
+        return interactions;
     }
 }
