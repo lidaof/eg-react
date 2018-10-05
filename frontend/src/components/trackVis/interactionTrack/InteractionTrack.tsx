@@ -76,18 +76,19 @@ class InteractionTrack extends React.Component<InteractionTrackProps, {}> {
             onMouseOut: this.hideTooltip
         };
 
-        let visualizer, height;
+        let visualizer; // , height;
         if (options.displayMode === InteractionDisplayMode.HEATMAP) {
             visualizer = <Heatmap {...visualizerProps} />;
-            height = Heatmap.getHeight(visualizerProps);
+            // height = Heatmap.getHeight(visualizerProps);
         } else {
             visualizer = <ArcDisplay {...visualizerProps} />;
-            height = ArcDisplay.getHeight(visualizerProps);
+            // height = ArcDisplay.getHeight(visualizerProps);
         }
 
         return <Track
             {...this.props}
-            legend={<TrackLegend trackModel={trackModel} height={height} />}
+            // legend={<TrackLegend trackModel={trackModel} height={height} />}
+            legend={<TrackLegend trackModel={trackModel} height={50} />}
             visualizer={visualizer}
         />;
     }

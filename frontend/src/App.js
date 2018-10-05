@@ -57,6 +57,7 @@ class App extends React.Component {
             // isShowingNavigator: true,
             highlightEnteredRegion: true,
             enteredRegion: null,
+            publicHubs: [],
             publicTracksPool: [],
             customTracksPool: [],
             // publicTrackSets: new Set(),
@@ -69,6 +70,14 @@ class App extends React.Component {
         this.updatePublicHubs = this.updatePublicHubs.bind(this);
         this.addTracktoAvailable = this.addTracktoAvailable.bind(this);
         this.removeTrackFromAvailable = this.removeTrackFromAvailable.bind(this);
+    }
+
+    componentWillMount() {
+        if (this.props.genomeConfig && this.props.genomeConfig.publicHubList) {
+            this.setState({
+                publicHubs: this.props.genomeConfig.publicHubList.slice(),
+            })
+        }
     }
 
     addTracktoAvailable(trackModel) {
@@ -153,7 +162,7 @@ class App extends React.Component {
                 ...tracks.filter(track => !track.url).map(track => track.name),
         ]);
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
-        const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
+        // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
         return (
         <div className="App container-fluid">
             <Nav
@@ -175,7 +184,7 @@ class App extends React.Component {
                 onAddTracksToPool={this.addTracksToPool}
                 onHubUpdated={this.updatePublicHubs}
                 addedTrackSets={tracksUrlSets}
-                publicHubs={publicHubs}
+                // publicHubs={publicHubs}
                 removeTrackFromAvailable={this.removeTrackFromAvailable}
                 addTracktoAvailable={this.addTracktoAvailable}
             />

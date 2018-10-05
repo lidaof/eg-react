@@ -121,7 +121,7 @@ class HubTable extends React.PureComponent {
                     minRows={Math.min(this.props.publicHubs.length, 10)}
                     SubComponent={row => {
                         let collectionDetails = publicHubData[row.original.collection] || <i>No details available.</i>;
-                        let hubDetails = row.original.description || <i>No details available.</i>
+                        let hubDetails = row.original.description || <i>No description available.</i>
                         return (
                             <div style={{padding: "20px"}}>
                                 <h3>Collection details</h3>

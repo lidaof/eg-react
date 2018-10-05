@@ -3,6 +3,7 @@ import { ScaleLinear, scaleLinear } from 'd3-scale';
 import { PlacedInteraction } from '../../../model/FeaturePlacer';
 import OpenInterval from '../../../model/interval/OpenInterval';
 import { GenomeInteraction } from '../../../model/GenomeInteraction';
+import _ from 'lodash';
 
 import './ArcDisplay.css';
 
@@ -22,15 +23,16 @@ const ITEM_LIMIT = 1000;
 
 export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     static getHeight(props: ArcDisplayProps) {
-        // return HEIGHT;
-        return 0.5 * props.viewWindow.getLength();
+        return HEIGHT;
+        // return 0.5 * props.viewWindow.getLength();
     }
+    
 
     render() {
         const {placedInteractions, viewWindow, width, opacityScale, color, onInteractionHovered,
             onMouseOut} = this.props;
-        const arcs = [];
-        const curveYScale = scaleLinear().domain([0, viewWindow.getLength()]).range([0, 2 * HEIGHT]).clamp(true);
+        const arcs = [], arcHeights = [];
+        const curveYScale = scaleLinear().domain([0, viewWindow.getLength()]).range([0, HEIGHT]).clamp(true);
         let sortedInteractions = placedInteractions.slice().sort((a, b) => b.interaction.score - a.interaction.score);
         sortedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
         for (const [index, placedInteraction] of sortedInteractions.entries()) {
@@ -47,10 +49,13 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
             if (spanLength < 1) {
                 continue;
             }
-
+            const arcHeight = curveYScale(spanLength);
+            if(spanCenter > viewWindow.start && spanCenter < viewWindow.end) {
+                arcHeights.push(arcHeight);
+            }
             arcs.push(<path
                 key={placedInteraction.generateKey()+index}
-                d={moveTo(xSpan1Center, 0) + quadraticCurveTo(spanCenter, curveYScale(spanLength), xSpan2Center, 0)}
+                d={moveTo(xSpan1Center, 0) + quadraticCurveTo(spanCenter, arcHeight, xSpan2Center, 0)}
                 fill="none"
                 opacity={opacityScale(score)}
                 className="ArcDisplay-emphasize-on-hover"
@@ -59,7 +64,8 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
             />);
         }
-        return <svg width={width} height={ArcDisplay.getHeight(this.props)} onMouseOut={onMouseOut}>{arcs}</svg>;
+        const height = arcHeights.length > 0 ? Math.round(_.max(arcHeights)) || 0.5 * HEIGHT: 50;
+        return <svg width={width} height={height} onMouseOut={onMouseOut}>{arcs}</svg>;
     }
 }
 
