@@ -68,6 +68,11 @@ const mm10 = [
         name: 'gencodeM18',
         file: 'gencodeM18_load',
         fieldsConfig: geneFieldsAndIndex
+    },
+    {
+        name: 'gencodeM18Basic',
+        file: 'gencodeM18_load_basic',
+        fieldsConfig: geneFieldsAndIndex
     }
 ];
 

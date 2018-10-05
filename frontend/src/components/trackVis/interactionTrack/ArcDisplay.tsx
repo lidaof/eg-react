@@ -49,13 +49,15 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
             if (spanLength < 1) {
                 continue;
             }
-            const arcHeight = curveYScale(spanLength);
+            const arcHeight = curveYScale(spanLength) * 0.5 + 10;
+            // const arcHeight =  Math.max(50, spanLength * ((1 / Math.SQRT2) - 0.5) + 22);
+            // const arcHeight = 0.375 * Math.abs( - xSpan1.start - xSpan2.start + 2 * spanCenter);
             if(spanCenter > viewWindow.start && spanCenter < viewWindow.end) {
                 arcHeights.push(arcHeight);
             }
             arcs.push(<path
                 key={placedInteraction.generateKey()+index}
-                d={moveTo(xSpan1Center, 0) + quadraticCurveTo(spanCenter, arcHeight, xSpan2Center, 0)}
+                d={moveTo(xSpan1Center, 0) + quadraticCurveTo(spanCenter, curveYScale(spanLength), xSpan2Center, 0)}
                 fill="none"
                 opacity={opacityScale(score)}
                 className="ArcDisplay-emphasize-on-hover"
@@ -64,7 +66,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
             />);
         }
-        const height = arcHeights.length > 0 ? Math.round(_.max(arcHeights)) || 0.5 * HEIGHT: 50;
+        const height = arcHeights.length > 0 ? Math.round(_.max(arcHeights)) : 50;
         return <svg width={width} height={height} onMouseOut={onMouseOut}>{arcs}</svg>;
     }
 }
