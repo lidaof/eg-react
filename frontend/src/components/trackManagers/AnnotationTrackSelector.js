@@ -71,6 +71,7 @@ class AnnotationTrackSelector extends React.Component {
     }
 
     addLeafTrack(trackModel) {
+        trackModel.genome = this.props.genomeConfig.genome.getName();
         this.props.onTracksAdded(trackModel);
     }
 
