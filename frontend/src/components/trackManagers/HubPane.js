@@ -15,7 +15,9 @@ class HubPane extends React.PureComponent {
         publicTracksPool: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
         onTracksAdded: PropTypes.func,
         onAddTracksToPool: PropTypes.func,
+        addTermToMetaSets: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
+        publicTrackSets: PropTypes.instanceOf(Set),
     };
 
     constructor(props) {
@@ -55,7 +57,7 @@ class HubPane extends React.PureComponent {
              <HubTable 
                 onHubLoaded={this.props.onAddTracksToPool} 
                 publicHubs={this.props.publicHubs} 
-                onHubUpdated={this.props.onHubUpdated} 
+                onHubUpdated={this.props.onHubUpdated}
              />
             {
             this.props.publicTracksPool.length > 0 ?
@@ -65,6 +67,7 @@ class HubPane extends React.PureComponent {
                     onTracksAdded={this.props.onTracksAdded}
                     publicTrackSets={this.props.publicTrackSets}
                     addedTrackSets={this.props.addedTrackSets}
+                    addTermToMetaSets={this.props.addTermToMetaSets}
                 /> :
                 <p>No tracks from data hubs yet.  Load a hub first.</p>
             }

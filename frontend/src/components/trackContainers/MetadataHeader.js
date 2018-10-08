@@ -8,6 +8,7 @@ class MetadataHeader extends React.PureComponent {
     static propTypes = {
         terms: PropTypes.arrayOf(PropTypes.string),
         onNewTerms: PropTypes.func,
+        suggestedMetaSets: PropTypes.instanceOf(Set),
     };
 
     static defaultProps = {
@@ -25,12 +26,19 @@ class MetadataHeader extends React.PureComponent {
     render() {
         const termWidth = MetadataIndicator.WIDTH;
         const editMenuStyle = this.state.isShowingEditMenu ? undefined : {display: "none"};
+        const suffix = this.state.isShowingEditMenu ? '🗴' : '»';
+        const buttonStyle = this.state.isShowingEditMenu ? ' btn btn-sm btn-danger dense-button ' : 'btn btn-sm btn-success dense-button';
         return (
         <div className="MetadataHeader-container" >
-            <MetadataSelectionMenu terms={this.props.terms} style={editMenuStyle} onNewTerms={this.props.onNewTerms} />
+            <MetadataSelectionMenu 
+                terms={this.props.terms} 
+                style={editMenuStyle} 
+                onNewTerms={this.props.onNewTerms} 
+                suggestedMetaSets={this.props.suggestedMetaSets} 
+            />
             <ul className="MetadataHeader-terms">
                 <li onClick={() => this.setState({isShowingEditMenu: !this.state.isShowingEditMenu})} >
-                    <button className="btn btn-sm btn-success dense-button">Metadata »</button>
+                    <button className={buttonStyle}>Metadata {suffix}</button>
                 </li>
                 {
                 this.props.terms.map(term =>

@@ -83,7 +83,12 @@ const publicHubList = [
         name: "4DN HiC datasets",
         numTracks: 23,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~dli/test/4dn_mm10.json"
+        url: "https://wangftp.wustl.edu/~dli/test/4dn_mm10.json",
+        description: {
+            'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+            'hub built date': 'Sep 1 2018',
+            'hub built notes': 'metadata information are obtained directly from 4DN data portal'
+        },
     },
 ]
 

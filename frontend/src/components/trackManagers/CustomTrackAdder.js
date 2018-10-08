@@ -28,6 +28,7 @@ class CustomTrackAdder extends React.Component {
         customTracksPool: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
         onTracksAdded: PropTypes.func,
         onAddTracksToPool: PropTypes.func,
+        addTermToMetaSets: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
     };
 
@@ -127,6 +128,7 @@ class CustomTrackAdder extends React.Component {
                         addedTracks={this.props.addedTracks}
                         onTracksAdded={this.props.onTracksAdded}
                         addedTrackSets={this.props.addedTrackSets}
+                        addTermToMetaSets={this.props.addTermToMetaSets}
                     /> 
                 }
             </div>

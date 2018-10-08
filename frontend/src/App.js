@@ -63,6 +63,7 @@ class App extends React.Component {
             // publicTrackSets: new Set(),
             // customTrackSets: new Set(),
             availableTrackSets: new Set(),
+            suggestedMetaSets: new Set(["Track type"]),
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
@@ -70,14 +71,34 @@ class App extends React.Component {
         this.updatePublicHubs = this.updatePublicHubs.bind(this);
         this.addTracktoAvailable = this.addTracktoAvailable.bind(this);
         this.removeTrackFromAvailable = this.removeTrackFromAvailable.bind(this);
+        this.addTermToMetaSets = this.addTermToMetaSets.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         if (this.props.genomeConfig && this.props.genomeConfig.publicHubList) {
             this.setState({
                 publicHubs: this.props.genomeConfig.publicHubList.slice(),
             })
         }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.genomeConfig && nextProps.genomeConfig !== this.props.genomeConfig) {
+            if (nextProps.genomeConfig.publicHubList) {
+                this.setState({
+                    publicHubs: nextProps.genomeConfig.publicHubList.slice(),
+                })
+            }
+        }
+    }
+
+    addTermToMetaSets(term) {
+        const toBeAdded = Array.isArray(term) ? term : [term];
+        this.setState({
+            suggestedMetaSets: new Set([
+                ...this.state.suggestedMetaSets, ...toBeAdded
+            ]),
+        });
     }
 
     addTracktoAvailable(trackModel) {
@@ -187,6 +208,7 @@ class App extends React.Component {
                 // publicHubs={publicHubs}
                 removeTrackFromAvailable={this.removeTrackFromAvailable}
                 addTracktoAvailable={this.addTracktoAvailable}
+                addTermToMetaSets={this.addTermToMetaSets}
             />
              <Notifications />
             {isShowingNavigator &&
@@ -200,6 +222,7 @@ class App extends React.Component {
                 enteredRegion={this.state.enteredRegion} 
                 highlightEnteredRegion={this.state.highlightEnteredRegion}
                 expansionAmount={REGION_EXPANDER}
+                suggestedMetaSets={this.state.suggestedMetaSets}
             />
         </div>
         );

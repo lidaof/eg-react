@@ -79,6 +79,7 @@ class TrackContainer extends React.Component {
          * Callback requesting a change in the metadata terms.  Signature: (newTerms: string[]): void
          */
         onMetadataTermsChanged: PropTypes.func,
+        suggestedMetaSets: PropTypes.instanceOf(Set),
     };
 
     static defaultProps = {
@@ -197,7 +198,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element}
      */
     renderControls() {
-        const {metadataTerms, onMetadataTermsChanged} = this.props;
+        const {metadataTerms, onMetadataTermsChanged, suggestedMetaSets} = this.props;
         return <div style={{display: "flex", alignItems: "flex-end", position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"}} >
             <div>
                 {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
@@ -205,7 +206,7 @@ class TrackContainer extends React.Component {
             </div>
             <div><UndoRedo /></div>
             <div><History /></div>
-            <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} />
+            <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} suggestedMetaSets={suggestedMetaSets} />
         </div>;
     }
 

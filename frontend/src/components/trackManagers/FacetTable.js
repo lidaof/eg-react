@@ -23,6 +23,9 @@ class FacetTable extends Component {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
         addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
         onTrackAdded: PropTypes.func,
+        addTermToMetaSets: PropTypes.func,
+        addedTrackSets: PropTypes.instanceOf(Set),
+        publicTrackSets: PropTypes.instanceOf(Set),
     }
 
     static defaultProps = {
@@ -66,6 +69,7 @@ class FacetTable extends Component {
     initializeTracks(allTracks) {
         const allKeys = allTracks.map(track => Object.keys(track.metadata));
         const metaKeys = _.union(...allKeys);
+        this.props.addTermToMetaSets(metaKeys);
         let tracks = []; // fix dup metadata
         let rawtracks = []; //add raw metadata after dup remove, add is
         const parent2children = {}; // key: parent terms, value: set of [child terms]

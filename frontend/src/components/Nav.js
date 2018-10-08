@@ -63,7 +63,7 @@ class Nav extends React.Component {
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
             onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs,
             publicTrackSets, customTrackSets, addedTrackSets, addTracktoAvailable, removeTrackFromAvailable,
-            availableTrackSets
+            availableTrackSets, addTermToMetaSets
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName)
@@ -101,6 +101,7 @@ class Nav extends React.Component {
                                 publicTrackSets={publicTrackSets}
                                 customTrackSets={customTrackSets}
                                 addedTrackSets={addedTrackSets}
+                                addTermToMetaSets={addTermToMetaSets}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Annotation Tracks">
@@ -121,6 +122,7 @@ class Nav extends React.Component {
                                 onHubUpdated={onHubUpdated}
                                 publicTrackSets={publicTrackSets}
                                 addedTrackSets={addedTrackSets}
+                                addTermToMetaSets={addTermToMetaSets}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Custom Tracks">
@@ -132,6 +134,7 @@ class Nav extends React.Component {
                                 customTracksPool={customTracksPool}
                                 customTrackSets={customTrackSets}
                                 addedTrackSets={addedTrackSets}
+                                addTermToMetaSets={addTermToMetaSets}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Track List">

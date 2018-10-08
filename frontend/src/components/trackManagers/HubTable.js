@@ -1,4 +1,3 @@
-
 import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
@@ -8,7 +7,7 @@ import DataHubParser from '../../model/DataHubParser';
 import withCurrentGenome from '../withCurrentGenome';
 
 import "react-table/react-table.css";
-
+import { ObjectAsTable } from "../trackContextMenu/TrackContextMenu";
 
 /**
  * Table that displays available public track hubs.
@@ -121,7 +120,7 @@ class HubTable extends React.PureComponent {
                     minRows={Math.min(this.props.publicHubs.length, 10)}
                     SubComponent={row => {
                         let collectionDetails = publicHubData[row.original.collection] || <i>No details available.</i>;
-                        let hubDetails = row.original.description || <i>No description available.</i>
+                        let hubDetails = row.original.description ? <ObjectAsTable content={row.original.description}/> : <i>No description available.</i>;
                         return (
                             <div style={{padding: "20px"}}>
                                 <h3>Collection details</h3>

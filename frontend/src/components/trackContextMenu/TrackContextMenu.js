@@ -150,12 +150,15 @@ function TrackMoreInfo(props) {
             </Collapsible>;
 }
 
-function ObjectAsTable(props) {
+export function ObjectAsTable(props) {
     const {title, content} = props;
-    const rows = Object.entries(content).map( (key, value) => <tr key={value}><td>{key[0]}</td><td>{key[1]}</td></tr> )
+    const rows = Object.entries(content).map( (key, value) => <tr key={value}><td>{key[0]}</td><td>
+                    { Array.isArray(key[1]) ? key[1].join(' > ') : key[1] }
+                </td></tr>);
+    const tableTitle = title ? <h6>{title}</h6> : '';
     return(
         <React.Fragment>
-            <h6>{title}</h6>
+            {tableTitle}
             <table className="table table-sm table-striped">
                 <tbody>
                     {rows}

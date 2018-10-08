@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './MetadataSelectionMenu.css';
 
-const SUGGESTED_TERMS = ["Track type", "Sample", "Assay"];
+// const SUGGESTED_TERMS = ["Track type", "Sample", "Assay"];
 
 /**
  * Menu that selects metadata terms to be used in our track metadata indicators.
@@ -16,7 +16,8 @@ class MetadataSelectionMenu extends React.PureComponent {
         /*
          * Callback for when a new term list has been configured.  Signature: (newTerms: string[]): void
          */
-        onNewTerms: PropTypes.func
+        onNewTerms: PropTypes.func,
+        suggestedMetaSets: PropTypes.instanceOf(Set),
     };
 
     static defaultProps = {
@@ -69,7 +70,7 @@ class MetadataSelectionMenu extends React.PureComponent {
      */
     renderTerms() {
         const items = this.props.terms.map(
-            term => <li key={term}><button onClick={() => this.removeTerm(term)} >x</button> {term}</li>
+            term => <li key={term}><button className="btn btn-sm btn-danger dense-button" onClick={() => this.removeTerm(term)} >🗴</button> {term}</li>
         );
         return <ul>{items}</ul>;
     }
@@ -80,9 +81,9 @@ class MetadataSelectionMenu extends React.PureComponent {
     renderSuggestedTerms() {
         const currentTerms = new Set(this.props.terms);
         let items = [];
-        for (let term of SUGGESTED_TERMS) {
+        for (let term of Array.from(this.props.suggestedMetaSets)) {
             if (!currentTerms.has(term)) {
-                items.push(<li key={term}><button onClick={() => this.addTerm(term)} >+</button> {term}</li>);
+                items.push(<li key={term}><button className="btn btn-sm btn-success dense-button" onClick={() => this.addTerm(term)} >+</button> {term}</li>);
             }
         }
         return <ul>{items}</ul>;
