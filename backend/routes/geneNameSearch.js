@@ -15,12 +15,6 @@ const genomeConfig = require('../setup/genomeConfig');
  */
 function registerRoutes(server) {
     server.route({
-        config: {
-            cors: {
-                origin: ['*'],
-                additionalHeaders: ['cache-control', 'x-requested-with']
-            }
-        },
         method: 'GET',
         path: '/{genome}/genes/queryName',
         handler: queryGenesWithName,
