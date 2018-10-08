@@ -15,6 +15,7 @@ import SpeechRecognition from 'react-speech-recognition';
 
 import '../../autosuggest.css';
 import './GeneSearchBox.css';
+import { AWS_API } from '../../dataSources/GeneSource';
 
 const MIN_CHARS_FOR_SUGGESTIONS = 3; // Minimum characters to type before displaying suggestions
 const ENTER_KEY_CODE = 13;
@@ -83,7 +84,7 @@ class GeneSearchBox extends React.PureComponent {
             q: changeData.value.trim(),
             getOnlyNames: true,
         };
-        const response = await axios.get(`/${genomeName}/genes/queryName`, {params: params});
+        const response = await axios.get(`${AWS_API}/${genomeName}/genes/queryName`, {params: params});
         this.setState({suggestions: response.data});
     }
 

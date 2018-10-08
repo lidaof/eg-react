@@ -18,6 +18,12 @@ const GENOME_2_COLLECTION_NAME = {
  */
 function registerRoutes(server) {
     server.route({
+        config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
+        },
         method: 'GET',
         path: '/{genome}/genes/{collection}/queryRegion',
         handler: queryGenesInRegion,

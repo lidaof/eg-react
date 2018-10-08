@@ -32,7 +32,7 @@ async function setUpServer(mongoClient, options) {
 
     const swaggerOptions = { // Swagger sets up a webpage with API documentation
         info: {
-            title: 'eg-react API Documentation',
+            title: 'WashU Epigenome Browser API Documentation',
         },
     };
 

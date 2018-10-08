@@ -43,8 +43,21 @@ async function main(argv) {
               tls: tls
           };          
         envConfig = PROD_CONFIG
+    } else if (environment === "api")   {
+            const API_CONFIG = {
+                dbUrl: 'mongodb://localhost:27017',
+                host: 'ec2-35-174-168-189.compute-1.amazonaws.com',
+                port: 80,
+                routes: {
+                    cors: {
+                      origin: ['*'],
+                      additionalHeaders: ['token']
+                    }
+                }
+            };
+        envConfig = API_CONFIG;
     } else {
-        console.error(`Unknown environment "${environment}".  Enter either "dev" or "prod"`);
+        console.error(`Unknown environment "${environment}".  Enter either "dev" or "prod" or "api"`);
         process.exit(ExitCodes.UNKNOWN_ARGUMENT);
     }
     const {dbUrl, ...serverOptions} = envConfig;

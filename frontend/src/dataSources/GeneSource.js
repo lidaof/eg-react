@@ -2,6 +2,8 @@ import axios from 'axios';
 import _ from 'lodash';
 import DataSource from './DataSource';
 
+
+export const AWS_API = "http://ec2-35-174-168-189.compute-1.amazonaws.com";
 /**
  * A DataSource that calls our backend API for gene annotations.
  *
@@ -40,7 +42,7 @@ class GeneSource extends DataSource {
             /**
              * Gets an object that looks like {data: []}
              */
-            return axios.get(`/${genome}/genes/${this.trackModel.name}/queryRegion`, {
+            return axios.get(`${AWS_API}/${genome}/genes/${this.trackModel.name}/queryRegion`, {
                 params: params
             });
         });
