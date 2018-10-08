@@ -3,7 +3,7 @@ import _ from 'lodash';
 import DataSource from './DataSource';
 
 
-export const AWS_API = "http://ec2-35-174-168-189.compute-1.amazonaws.com";
+export const AWS_API = "https://api.epigenomegateway.org";
 /**
  * A DataSource that calls our backend API for gene annotations.
  *
