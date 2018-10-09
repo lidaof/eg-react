@@ -12,6 +12,7 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import NavigationContext from '../../model/NavigationContext';
 
 import './IsoformSelection.css';
+import { AWS_API } from '../../dataSources/GeneSource';
 
 const DRAW_WIDTH = 200;
 
@@ -55,7 +56,7 @@ class IsoformSelection extends React.PureComponent {
             q: geneName,
             isExact: true
         };
-        const response = await axios.get(`/${genomeName}/genes/queryName`, {params: params});
+        const response = await axios.get(`${AWS_API}/${genomeName}/genes/queryName`, {params: params});
         // filter out genes in super contigs in case those are not in chrom list
         const recordsInFeatures = response.data.filter(record => chrListObject.hasOwnProperty(record.chrom) );
         const genes  = recordsInFeatures.map(record => new Gene(record));
