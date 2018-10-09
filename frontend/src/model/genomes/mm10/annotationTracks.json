@@ -41,6 +41,28 @@
             "filetype": "geneAnnotation"
         }
     ],
+    "Genome Annotation": [
+        {
+            "name": "CGIs",
+            "label": "CpG Islands",
+            "filetype": "bed",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands.bed.gz",
+            "height": 21,
+            "options": {
+                "color": "#FE8801"
+            }
+        }, 
+        {
+            "name": "blacklist",
+            "label": "mm10 Encode Blacklist",
+            "filetype": "bed",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10.blacklist.bed.gz",
+            "height": 21,
+            "options": {
+                "color": "#000000"
+            }
+         }   
+    ],
     "RepeatMasker": {
         "All Repeats": [
             {
@@ -48,7 +70,7 @@
                 "label": "RepeatMasker",
                 "filetype": "repeatmasker",
                 "url": "https://vizhub.wustl.edu/public/mm10/rmsk16.bb",
-                "height": 40
+                "height": 30
             }
         ]
     }
