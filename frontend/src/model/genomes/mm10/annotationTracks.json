@@ -50,17 +50,17 @@
             "height": 21,
             "options": {
                 "color": "#FE8801"
-            },
+            }
         }, 
         {
             "name": "blacklist",
             "label": "mm10 Encode Blacklist",
-            "filetype": "bed"
+            "filetype": "bed",
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10.blacklist.bed.gz",
-            "height": 21
+            "height": 21,
             "options": {
                 "color": "#000000"
-            },
+            }
          }   
     ],
     "RepeatMasker": {
