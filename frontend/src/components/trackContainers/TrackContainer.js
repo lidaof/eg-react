@@ -92,7 +92,6 @@ class TrackContainer extends React.Component {
         super(props);
         this.state = {
             selectedTool: Tools.DRAG,
-            screenshotWidth: '279.4mm',
             xOffset: 0
         };
 
@@ -199,7 +198,8 @@ class TrackContainer extends React.Component {
      */
     renderControls() {
         const {metadataTerms, onMetadataTermsChanged, suggestedMetaSets} = this.props;
-        return <div style={{display: "flex", alignItems: "flex-end", position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"}} >
+        // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
+        return <div style={{display: "flex", alignItems: "flex-end"}}>
             <div>
                 {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
                 <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} /> 

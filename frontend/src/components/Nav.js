@@ -210,7 +210,7 @@ class Nav extends React.Component {
                         </label>
                         <label className="dropdown-item" htmlFor="setLegendWidth">
                             <input type="number" id="legendWidth" step="5" min="60" max="200" 
-                                value={trackLegendWidth}
+                                defaultValue={trackLegendWidth}
                                 onChange={this.changeLegendWidth} />
                             <span style={{marginLeft: "1ch"}}>Change track legend width</span>
                         </label>

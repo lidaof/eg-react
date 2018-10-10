@@ -6,6 +6,8 @@ import { BedWorker } from '../../dataSources/WorkerTSHook';
 import BedRecord from '../../dataSources/bed/BedRecord';
 import HeightConfig from '../trackContextMenu/HeightConfig';
 import { TrackConfig } from './TrackConfig';
+import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
+import { CategoryColorConfig } from '../trackContextMenu/CategoryColorConfig';
 
 enum BedColumnIndex {
     CATEGORY=3,
@@ -30,7 +32,7 @@ export class CategoricalTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), HeightConfig];
+        return [...super.getMenuComponents(), HeightConfig, CategoryColorConfig, BackgroundColorConfig];
     }
 
     getComponent() {

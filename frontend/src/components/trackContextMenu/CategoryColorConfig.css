@@ -1,0 +1,5 @@
+.CategoryColorConfig-table {
+    display: grid;
+    grid-template-columns: auto auto;
+    margin-bottom: 5px;
+}
