@@ -41,9 +41,87 @@
             "filetype": "geneAnnotation"
         }
     ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://vizhub.wustl.edu/public/mm10/rmsk16.bb",
+                "height": 30
+            }
+        ]
+    },
+    "Conservation": [
+        {
+            "name": "VertebratephastCons60way",
+            "label": "Vertebrate PhastCons 60-way",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/mm10/phastCons.bigWig",
+            "height": 30,
+            "options": { "color": "#006385"}
+        },
+        {
+            "name": "EuarchontoGliresphastCons60way",
+            "label": "EuarchontoGlires PhastCons 60-way",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/mm10/phastCons60wayEuarchontoGlire.bigWig",
+            "height": 30,
+            "options": { "color": "#006385"}
+        },
+        {
+            "name": "GliresphastCons60way",
+            "label": "Glires PhastCons 60-way",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/mm10/phastCons60wayGlire.bigWig",
+            "height": 30,
+            "options": { "color": "#006385"}
+        },
+        {
+            "name": "PlacentalsphastCons60way",
+            "label": "Placental PhastCons 60-way",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/mm10/phastCons60wayPlacental.bigWig",
+            "height": 30,
+            "options": { "color": "#006385"}
+        },
+        {
+            "name": "VertebratephyloP60way",
+            "label": "Vertebrate PhyloP 60-way",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/mm10/phyloP60way.bigWig",
+            "height": 30,
+            "options": { "color": "#006385", "color2": "#852100"}
+        },
+        {
+            "name": "EuarchontoGliresphyloP60way",
+            "label": "EuarchontoGlires PhyloP 60-way",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/mm10/phyloP60wayEuarchontoglire.bigWig",
+            "height": 30,
+            "options": { "color": "#006385", "color2": "#852100"}
+        },
+        {
+            "name": "GliresphyloP60way",
+            "label": "Glires PhyloP 60-way",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/mm10/phastCons60wayGlire.bigWig",
+            "height": 30,
+            "options": { "color": "#006385", "color2": "#852100"}
+        },
+        {
+            "name": "PlacentalephyloP60way",
+            "label": "Placental PhyloP 60-way",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/mm10/phyloP60wayPlacental.bigWigg",
+            "height": 30,
+            "options": { "color": "#006385", "color2": "#852100"}
+        }
+        
+    ],
     "Genome Annotation": [
         {
-            "name": "CGIs",
+             "name": "CGIs",
             "label": "CpG Islands",
             "filetype": "bed",
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands.bed.gz",
@@ -61,17 +139,36 @@
             "options": {
                 "color": "#000000"
             }
-         }   
-    ],
-    "RepeatMasker": {
-        "All Repeats": [
-            {
-                "name": "rmsk_all",
-                "label": "RepeatMasker",
-                "filetype": "repeatmasker",
-                "url": "https://vizhub.wustl.edu/public/mm10/rmsk16.bb",
-                "height": 30
+         },
+        {
+            "type": "categorical",
+            "name": "CpG Context",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
+              },
+              "backgroundColor":"#071CEC"
             }
-        ]
-    }
+        },
+        {
+            "name": "gc5Base",
+            "label": "GC percent",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/mm10/gc5Base.bigWig",
+            "height": 30,
+            "options": {
+                "color": "#4785C2",
+                "color2": "#4747C2",
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 100
+            }
+        }
+    ]
+    
 }
