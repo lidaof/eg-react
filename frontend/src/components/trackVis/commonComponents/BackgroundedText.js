@@ -13,7 +13,7 @@ class BackgroundedText extends React.Component {
         // Props that are associated with <text>
         x: PropTypes.number, // x location of the text
         y: PropTypes.number, // y location of the text
-        alignmentBaseline: PropTypes.oneOf(["hanging", "middle", "baseline"]), // Vertical alignment of text
+        dominantBaseline: PropTypes.oneOf(["hanging", "middle", "baseline"]), // Vertical alignment of text
         textAnchor: PropTypes.oneOf(["start", "middle", "end"]), // Horizontal alignment of text
         children: PropTypes.string, // The actual text to display
         // fontSize: the only INVALID prop - use `height` instead
@@ -28,7 +28,7 @@ class BackgroundedText extends React.Component {
     static defaultProps = {
         x: 0,
         y: 0,
-        alignmentBaseline: "baseline",
+        dominantBaseline: "baseline",
         textAnchor: "start",
         children: "",
 
@@ -55,13 +55,13 @@ class BackgroundedText extends React.Component {
     }
 
     getRectY() {
-        const {y, height, alignmentBaseline} = this.props;
+        const {y, height, dominantBaseline} = this.props;
         let textTopY;
-        if (alignmentBaseline === "hanging") {
+        if (dominantBaseline === "hanging") {
             textTopY = y;
-        } else if (alignmentBaseline === "middle") {
+        } else if (dominantBaseline === "middle") {
             textTopY = y - 0.5 * height;
-        } else { // alignmentBaseline === "baseline"
+        } else { // dominantBaseline === "baseline"
             textTopY = y - height;
         }
         return textTopY;

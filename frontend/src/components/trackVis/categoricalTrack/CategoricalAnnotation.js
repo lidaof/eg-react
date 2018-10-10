@@ -64,7 +64,7 @@ class CategoricalAnnotation extends React.Component {
                     y={centerY}
                     height={TEXT_HEIGHT - 1}
                     fill={contrastColor}
-                    alignmentBaseline="hanging"
+                    dominantBaseline="hanging"
                     textAnchor="middle"
                     backgroundColor={color}
                     backgroundOpacity={1}

@@ -90,7 +90,7 @@ export class Sequence extends React.PureComponent<SequenceProps> {
                         key={x}
                         x={x + baseWidth/2}
                         y={y + height/2 + 1}
-                        alignmentBaseline="middle"
+                        dominantBaseline="middle"
                         style={{textAnchor: "middle", fill: 'white', fontSize: letterSize}}
                     >
                         {base}

@@ -59,7 +59,7 @@ class Nav extends React.Component {
     render() {
         const {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
-            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId, liveId,
+            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId,
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
             onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs,
             publicTrackSets, customTrackSets, addedTrackSets, addTracktoAvailable, removeTrackFromAvailable,
@@ -171,7 +171,7 @@ class Nav extends React.Component {
                                                         overflow: "visible",
                                                         padding: "5px",
                                                     }}}>
-                            <LiveUI liveId={liveId} />
+                            <LiveUI />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Screenshot">
                             <ScreenshotUI expansionAmount={REGION_EXPANDER} />

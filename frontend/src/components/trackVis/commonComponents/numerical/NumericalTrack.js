@@ -88,7 +88,7 @@ class NumericalTrack extends React.Component {
             It comes directly from the `ViewExpansion` object from `RegionExpander.ts`
         */
         const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
-        let max = _.max(visibleValues);
+        let max = _.max(visibleValues) || 0; // in case undefined returned here, cause maxboth be undefined too
         let min = xToValue2 ? _.min(xToValue2.slice(this.props.viewWindow.start, this.props.viewWindow.end)) : 0;
         const maxBoth = Math.max(Math.abs(max), Math.abs(min));
         max = maxBoth;

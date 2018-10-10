@@ -102,14 +102,14 @@
 .GenomeNavigator-tooltip {
     position: relative;
     display: inline-block;
-    border-bottom: 1px dotted gray; /* If you want dots under the hoverable text */
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
 .GenomeNavigator-tooltip .GenomeNavigator-tooltiptext {
     visibility: hidden;
     width: 240px;
-    background-color: gray;
+    background-color: black;
     color: #fff;
     padding: 5px 0;
     border-radius: 6px;
@@ -125,19 +125,21 @@
 }
 
 .GenomeNavigator-tooltip .GenomeNavigator-tooltiptext {
-    top: -20px;
-    left: 120%; 
+    widows: 240px;
+    top: 100%;
+    left: 50%; 
+    margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
 }
 
 .GenomeNavigator-tooltip .GenomeNavigator-tooltiptext::after {
     content: " ";
     position: absolute;
-    top: 50%;
-    right: 100%; /* To the left of the tooltip */
-    margin-top: -5px;
+    bottom: 100%;  /* At the top of the tooltip */
+    left: 24%;
+    margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: transparent gray transparent transparent;
+    border-color: transparent transparent black transparent;
 }
 
 #legendWidth {
