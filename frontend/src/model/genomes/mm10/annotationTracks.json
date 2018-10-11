@@ -121,16 +121,6 @@
     ],
     "Genome Annotation": [
         {
-             "name": "CGIs",
-            "label": "CpG Islands",
-            "filetype": "bed",
-            "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands.bed.gz",
-            "height": 21,
-            "options": {
-                "color": "#FE8801"
-            }
-        }, 
-        {
             "name": "blacklist",
             "label": "mm10 Encode Blacklist",
             "filetype": "bed",
@@ -155,6 +145,28 @@
               "backgroundColor":"#071CEC"
             }
         },
+        {
+            "type": "categorical",
+            "name": "CpG Islands",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
+              }
+            }
+        },
+        {
+            "name": "CpGs",
+            "label": "CpGs",
+            "filetype": "bedgraph",
+            "url": "https://epgg-test.wustl.edu/d/mm10/CpG.bed.gz",
+            "height": 21,
+            "options": {
+                "color": "#cc00cc"
+            }
+         },
         {
             "name": "gc5Base",
             "label": "GC percent",
