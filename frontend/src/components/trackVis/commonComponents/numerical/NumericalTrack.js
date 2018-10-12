@@ -172,9 +172,11 @@ class NumericalTrack extends React.Component {
         if (dataReverse.length > 0) {
             this.hasReverse = true;
             this.xToValue2 = this.aggregateFeatures(dataReverse, viewRegion, width, aggregateMethod);
+        } else {
+            this.xToValue2 = [];
         }
         const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
-        this.xToValue = this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod);
+        this.xToValue = dataForward.length > 0 ? this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod) : [];
         this.scales = this.computeScales(this.xToValue, this.xToValue2, height);
         const legend = <TrackLegend
             trackModel={trackModel}

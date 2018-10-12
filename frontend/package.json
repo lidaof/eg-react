@@ -8,7 +8,8 @@
     "eject": "react-scripts-ts eject",
     "start": "react-app-rewired start --scripts-version react-scripts-ts",
     "storybook": "start-storybook -p 9009 -s public",
-    "test": "react-app-rewired test --env=jsdom --scripts-version react-scripts-ts"
+    "test": "react-app-rewired test --env=jsdom --scripts-version react-scripts-ts",
+    "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete"
   },
   "dependencies": {},
   "devDependencies": {
