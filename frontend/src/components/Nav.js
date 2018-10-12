@@ -22,7 +22,7 @@ import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
 
-const VERSION = "v47.2";
+const VERSION = "v47.2.1";
 
 const REGION_EXPANDER = new RegionExpander(0);
 
