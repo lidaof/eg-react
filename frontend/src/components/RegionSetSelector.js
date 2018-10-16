@@ -134,7 +134,7 @@ class RegionSetSelector extends React.Component {
 
         return (
         <div key={index} style={{backgroundColor: isBackingView ? "lightgreen" : undefined}} >
-            <button className="btn btn-link" onClick={() => this.setState({indexBeingConfigured: index})} >
+            <button title="Click to edit" className="btn btn-link" onClick={() => this.setState({indexBeingConfigured: index})} >
                 {text}
             </button> {useSetButton} {deleteButton}
         </div>
@@ -149,7 +149,7 @@ class RegionSetSelector extends React.Component {
             <h3>Select a gene/region set</h3>
             {selectedSet ? <button className="btn btn-sm btn-warning" onClick={() => onSetSelected(null)} >Exit region set view</button> : null }
             {sets.map(this.renderItemForSet)}
-            <button className="btn btn-sm btn-primary" onClick={() => this.setState({indexBeingConfigured: sets.length})} >Configure new set...</button>
+            <button className="btn btn-sm btn-primary" onClick={() => this.setState({indexBeingConfigured: sets.length})} >Add new set</button>
             <RegionSetConfig
                 genome={genome}
                 set={setBeingConfigured}
