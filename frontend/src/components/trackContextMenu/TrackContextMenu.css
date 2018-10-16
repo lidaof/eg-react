@@ -28,6 +28,12 @@
     cursor: pointer;
 }
 
+.TrackContextMenu-URL {
+    font-style: italic;
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
 .Collapsible h6 {
     margin-bottom: 0;
     font-weight: bold;

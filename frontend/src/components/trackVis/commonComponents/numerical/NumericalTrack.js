@@ -89,10 +89,10 @@ class NumericalTrack extends React.Component {
         */
         const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
         let max = _.max(visibleValues) || 0; // in case undefined returned here, cause maxboth be undefined too
-        let min = (xToValue2 ? _.min(xToValue2.slice(this.props.viewWindow.start, this.props.viewWindow.end)) : 0 ) || 0;
+        let min = (xToValue2.length > 0 ? _.min(xToValue2.slice(this.props.viewWindow.start, this.props.viewWindow.end)) : 0 ) || 0;
         const maxBoth = Math.max(Math.abs(max), Math.abs(min));
         max = maxBoth;
-        min = xToValue2 ? -maxBoth : 0;
+        min = xToValue2.length > 0 ? -maxBoth : 0;
         if (yScale === 'fixed') {
             max = yMax ? yMax : max;
             min = yMin ? yMin : min;
@@ -100,7 +100,7 @@ class NumericalTrack extends React.Component {
         if (min > max) {
             min = max;
         }
-        if (xToValue2) {
+        if (xToValue2.length > 0) {
             return {
                 valueToY: scaleLinear().domain([max, 0]).range([TOP_PADDING, height * 0.5]).clamp(true),
                 valueToYReverse: scaleLinear().domain([0, min]).range([0, height * 0.5 - TOP_PADDING]).clamp(true),

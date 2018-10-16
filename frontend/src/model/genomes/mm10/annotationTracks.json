@@ -160,7 +160,7 @@
         {
             "name": "CpGs",
             "label": "CpGs",
-            "filetype": "bedgraph",
+            "filetype": "bed",
             "url": "https://epgg-test.wustl.edu/d/mm10/CpG.bed.gz",
             "height": 21,
             "options": {

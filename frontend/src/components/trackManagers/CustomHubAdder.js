@@ -57,6 +57,9 @@ class RemoteHubAdder extends React.Component {
                 <label>
                     Custom hub URL
                 </label>
+                <span style={{marginLeft: "10px", fontStyle: "italic"}}>
+                    <a href="https://epigenomegateway.readthedocs.io/en/latest/datahub.html" target="_blank">data hub documentation</a>
+                </span>
                 <input
                         type="text"
                         className="form-control"

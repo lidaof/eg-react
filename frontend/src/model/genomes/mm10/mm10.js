@@ -66,6 +66,11 @@ const defaultTracks = [
         name: 'RepeatMasker',
         url: 'https://vizhub.wustl.edu/public/mm10/rmsk16.bb',
     }),
+    new TrackModel({
+        type: 'refbed',
+        name: 'refGene in refbed',
+        url: 'https://wangftp.wustl.edu/~rsears/FOR_DAOFENG/gencodeM18_load_basic_Gene.bed.gz',
+    }),
 ];
 
 const publicHubData = {

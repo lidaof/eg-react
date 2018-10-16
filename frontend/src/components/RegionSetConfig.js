@@ -120,7 +120,7 @@ class RegionSetConfig extends React.Component {
                 <td>{feature.getLocus().toString()}</td>
                 <td>{feature.getIsForwardStrand() ? "+" : "-"}</td>
                 <td>{flankedLocus}</td>
-                <td><button onClick={() => this.deleteRegion(i)}>Delete</button></td>
+                <td><button className="btn btn-sm btn-danger" onClick={() => this.deleteRegion(i)}>Delete</button></td>
             </tr>);
         }
 
@@ -157,22 +157,18 @@ class RegionSetConfig extends React.Component {
             </table>
             <div>
                 <label>
-                    New region name
-                    <input
+                    New region name: <input
                         type="text"
                         value={this.state.newRegionName}
                         onChange={event => this.setState({newRegionName: event.target.value})}
                     />
-                </label>
-                <label>
-                    New region locus
-                    <input
+                </label> <label>
+                    New region locus: <input
                         type="text"
                         value={this.state.newRegionLocus}
                         onChange={event => this.setState({newRegionLocus: event.target.value})}
                     />
-                </label>
-                <button onClick={this.addRegion}>Add new region</button>
+                </label> <button className="btn btn-sm btn-success" onClick={this.addRegion}>Add new region</button>
                 {this.state.newRegionError ? this.state.newRegionError.message : null}
             </div>
             <FlankingStratConfig
@@ -180,13 +176,12 @@ class RegionSetConfig extends React.Component {
                 onNewStrategy={this.changeSetStrategy}
             />
             <div>
-                <button
+                <button className="btn btn-sm btn-primary"
                     onClick={() => this.props.onSetConfigured(this.state.set)}
                     disabled={this.isSaveButtonDisabled()}
                 >
                     Save changes
-                </button>
-                <button onClick={this.cancelPressed}>Cancel</button>
+                </button> <button className="btn btn-sm btn-secondary" onClick={this.cancelPressed}>Cancel</button>
             </div>
         </div>
         );

@@ -22,26 +22,21 @@ class FlankingStratConfig extends React.Component {
         <div>
             <h4>Set flanking region</h4>
             <label>
-                Upstream bases
-                <input
+                Upstream bases: <input
                     type="number"
                     min={0}
                     value={this.props.strategy.upstream}
                     onChange={event => this.inputChanged("upstream", Number.parseInt(event.target.value, 10))}
                 />
-            </label>
-            <label>
-                Downstream bases
-                <input
+            </label> <label>
+                Downstream bases: <input
                     type="number"
                     min={0}
                     value={this.props.strategy.downstream}
                     onChange={event => this.inputChanged("downstream", Number.parseInt(event.target.value, 10))}
                 />
-            </label>
-            <label>
-                Surrounding:
-                <select
+            </label> <label>
+                Surrounding: <select
                     value={this.props.strategy.type}
                     onChange={event => this.inputChanged("type", Number.parseInt(event.target.value, 10))}
                 >

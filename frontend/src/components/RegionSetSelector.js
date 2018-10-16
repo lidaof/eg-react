@@ -121,24 +121,22 @@ class RegionSetSelector extends React.Component {
 
         let useSetButton;
         if (isBackingView) {
-            useSetButton = <button disabled={true} >Is current view</button>;
+            useSetButton = <button className="btn btn-sm btn-info" disabled={true} >Is current view</button>;
         } else {
             useSetButton = (
-                <button onClick={() => this.props.onSetSelected(set)} disabled={numRegions <= 0} >
+                <button className="btn btn-sm btn-success" onClick={() => this.props.onSetSelected(set)} disabled={numRegions <= 0} >
                     Enter region set view
                 </button>
             );
         }
 
-        const deleteButton = <button onClick={() => this.deleteSet(index)} >DELETE</button>;
+        const deleteButton = <button className="btn btn-sm btn-danger" onClick={() => this.deleteSet(index)} >DELETE</button>;
 
         return (
         <div key={index} style={{backgroundColor: isBackingView ? "lightgreen" : undefined}} >
             <button className="btn btn-link" onClick={() => this.setState({indexBeingConfigured: index})} >
                 {text}
-            </button>
-            {useSetButton}
-            {deleteButton}
+            </button> {useSetButton} {deleteButton}
         </div>
         );
     }
@@ -149,9 +147,9 @@ class RegionSetSelector extends React.Component {
         return (
         <div>
             <h3>Select a gene/region set</h3>
-            {selectedSet ? <button onClick={() => onSetSelected(null)} >Exit region set view</button> : null }
+            {selectedSet ? <button className="btn btn-sm btn-warning" onClick={() => onSetSelected(null)} >Exit region set view</button> : null }
             {sets.map(this.renderItemForSet)}
-            <button onClick={() => this.setState({indexBeingConfigured: sets.length})} >Configure new set...</button>
+            <button className="btn btn-sm btn-primary" onClick={() => this.setState({indexBeingConfigured: sets.length})} >Configure new set...</button>
             <RegionSetConfig
                 genome={genome}
                 set={setBeingConfigured}

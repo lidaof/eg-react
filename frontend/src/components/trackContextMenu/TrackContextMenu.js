@@ -6,6 +6,7 @@ import TrackModel from '../../model/TrackModel';
 import { getTrackConfig } from '../trackConfig/getTrackConfig';
 
 import './TrackContextMenu.css';
+import { CopyToClip } from '../CopyToClipboard';
 
 /**
  * Props that menu items will recieve.
@@ -140,7 +141,7 @@ function TrackMoreInfo(props) {
         info.push(<div key="details"><ObjectAsTable title="Details" content={track.details}/></div>);
     }
     if (track.url) {
-        info.push(<div key="url"><h6>URL</h6><p>{track.url}</p></div> );
+        info.push(<div key="url"><h6>URL <CopyToClip value={track.url} /></h6><p className="TrackContextMenu-URL">{track.url}</p></div> );
     }
     if (track.metadata) {
         info.push(<div key="metadata"><ObjectAsTable title="Metadata" content={track.metadata}/></div>);

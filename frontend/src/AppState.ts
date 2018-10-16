@@ -17,7 +17,7 @@ import 'firebase/database';
 import querySting from "query-string";
 import _ from 'lodash';
 
-let STORAGE: any = window.sessionStorage;
+export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
     const storage = {};
 
@@ -40,7 +40,8 @@ if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  
         }
     };
 }
-const SESSION_KEY = "eg-react-session";
+export const SESSION_KEY = "eg-react-session";
+export const NO_SAVE_SESSION = "eg-no-session"
 export const MIN_VIEW_REGION_SIZE = 5;
 export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
@@ -305,10 +306,12 @@ export const AppState = createStoreWithFirebase(
 );
 
 window.addEventListener("beforeunload", () => {
-    const state = AppState.getState();
-    if (state !== initialState) {
-        const blob = new AppStateSaver().toJSON(state.browser.present);
-        STORAGE.setItem(SESSION_KEY, blob);
+    if ( !STORAGE.getItem(NO_SAVE_SESSION) ){
+        const state = AppState.getState();
+        if (state !== initialState) {
+            const blob = new AppStateSaver().toJSON(state.browser.present);
+            STORAGE.setItem(SESSION_KEY, blob);
+        }
     }
 });
 
