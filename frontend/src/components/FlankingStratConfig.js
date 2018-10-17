@@ -20,7 +20,7 @@ class FlankingStratConfig extends React.Component {
     render() {
         return (
         <div>
-            <h4>Set flanking region</h4>
+            <h6>3. Set flanking region</h6>
             <label>
                 Upstream bases: <input
                     type="number"

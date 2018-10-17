@@ -91,6 +91,11 @@ class RegionSetConfig extends React.Component {
         const inputListRaw = this.state.regionList.trim().split('\n');
         const inputListRaw2 = inputListRaw.map(item => item.trim());
         const inputList = inputListRaw2.filter(item => item !== '')
+        if (inputList.length === 0) {
+            notify.show('Input content is empty or cannot find any location on genome', 'error', 2000);
+            this.setState({loadingMsg: ''});
+            return null;
+        }
         const promise = inputList.map((symbol) => {
             try{
                 const locus = ChromosomeInterval.parse(symbol);
@@ -251,16 +256,8 @@ class RegionSetConfig extends React.Component {
         return (
         <div>
             <h3>{this.props.set ? `Editing set: "${this.props.set.name}"` : "Create a new set"}</h3>
-            <label>
-                Enter name
-                <input
-                    type="text"
-                    placeholder="Set name"
-                    value={this.state.set ? this.state.set.name : 'New set'}
-                    onChange={this.changeSetName}
-                />
-            </label>
-            
+        
+            { !this.state.set &&
             <div>
                 <h4>Enter a list of regions</h4>
                 <p>Enter a list of gene names or coordinates to make a gene set one item per line. 
@@ -273,31 +270,41 @@ class RegionSetConfig extends React.Component {
                     <div>
                         <input className="btn btn-sm btn-primary" type="submit" value="Add" /> <input 
                             className="btn btn-sm btn-secondary" type="reset" value="Clear" onClick={this.resetList} 
-                            /> <span style={{fontStyle: 'italic'}}>{this.state.loadingMsg}</span>
+                            /> <span style={{fontStyle: 'italic', color: 'red'}}>{this.state.loadingMsg}</span>
                     </div>
                 </form>
             </div>
+            }
 
-            <div>
-                <h4>Add one region</h4>
-                <label>
-                    New region name: <input
-                        type="text"
-                        value={this.state.newRegionName}
-                        onChange={event => this.setState({newRegionName: event.target.value})}
-                    />
-                </label> <label>
-                    New region locus: <input
-                        type="text"
-                        value={this.state.newRegionLocus}
-                        onChange={event => this.setState({newRegionLocus: event.target.value})}
-                    />
-                </label> <button className="btn btn-sm btn-success" onClick={this.addRegion}>Add new region</button>
-                {this.state.newRegionError ? this.state.newRegionError.message : null}
-            </div>
-
-            {this.state.set &&
+            {this.state.set && this.state.set.features.length > 0 &&
             <React.Fragment>
+                <label style={{marginTop: '1ch'}}>
+                    1. Rename this set: <input
+                        type="text"
+                        placeholder="Set name"
+                        value={this.state.set ? this.state.set.name : 'New set'}
+                        onChange={this.changeSetName}
+                    />
+                </label>
+
+                <div>
+                    <h6>2. Add one region or delete region(s) from the table below</h6>
+                    <label>
+                        New region name: <input
+                            type="text"
+                            value={this.state.newRegionName}
+                            onChange={event => this.setState({newRegionName: event.target.value})}
+                        />
+                    </label> <label>
+                        New region locus: <input
+                            type="text"
+                            value={this.state.newRegionLocus}
+                            onChange={event => this.setState({newRegionLocus: event.target.value})}
+                        />
+                    </label> <button className="btn btn-sm btn-success" onClick={this.addRegion}>Add new region</button>
+                    {this.state.newRegionError ? this.state.newRegionError.message : null}
+                </div>
+
                 <ReactTable
                 filterable
                 defaultPageSize={10}
@@ -315,8 +322,7 @@ class RegionSetConfig extends React.Component {
                 <button className="btn btn-sm btn-primary"
                     onClick={() => this.props.onSetConfigured(this.state.set)}
                     disabled={this.isSaveButtonDisabled()}
-                >
-                    Save changes
+                >Add Set
                 </button> <button className="btn btn-sm btn-secondary" onClick={this.cancelPressed}>Cancel</button>
                 </div>
             </React.Fragment>
