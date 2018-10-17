@@ -26,6 +26,7 @@ import UndoRedo from "./UndoRedo";
 import History from "./History";
 
 import HighlightRegion from "../HighlightRegion";
+import { VerticalDivider } from './VerticalDivider';
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
@@ -288,14 +289,17 @@ class TrackContainer extends React.Component {
             {this.renderControls()}
             <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
                 <DivWithBullseye style={trackDivStyle} id="trackContainer">
-                    <HighlightRegion 
-                        enteredRegion={enteredRegion}
-                        highlightEnteredRegion={highlightEnteredRegion}
-                        visData={primaryView}
-                        xOffset={this.state.xOffset}
-                    >
-                        {this.renderSubContainer()}
-                    </HighlightRegion>
+                    <VerticalDivider visData={primaryView}
+                            xOffset={this.state.xOffset}>
+                        <HighlightRegion 
+                            enteredRegion={enteredRegion}
+                            highlightEnteredRegion={highlightEnteredRegion}
+                            visData={primaryView}
+                            xOffset={this.state.xOffset}
+                        >
+                            {this.renderSubContainer()}
+                        </HighlightRegion>
+                    </VerticalDivider>
                 </DivWithBullseye>
             </ContextMenuManager>
         </OutsideClickDetector>
