@@ -40,11 +40,11 @@ base=${my_GTF%.gtf}
 #Note this is designed to take in a Gencode formatted file.
 
 #Let's get most of the information to start
-awk -v OFS="\t" '{ if($3=="transcript") print $12,$1,$4,$5,".",".",$7,$16,$12,$14,$18,".",".",$10}' $my_GTF | sed 's/;//g' | sed 's/"//g' | sort -k9,9 > First_Part.bed
+awk -v OFS="\t" '{ if($3=="transcript") print $12,$1,$4-1,$5,".",".",$7,$16,$12,$14,$18,".",".",$10}' $my_GTF | sed 's/;//g' | sed 's/"//g' | sort -k9,9 > First_Part.bed
 
 #Now lets make files containing exons and UTRs
 mkdir temp_dir_bed
-awk -v OFS="\t" '{ if($3=="exon" || $3=="UTR") print $1,$4,$5,$12,$3}' $my_GTF | sed 's/;//g' | sed 's/"//g' |awk '{print>"temp_dir_bed/temp."$4}'
+awk -v OFS="\t" '{ if($3=="exon" || $3=="UTR") print $1,$4-1,$5,$12,$3}' $my_GTF | sed 's/;//g' | sed 's/"//g' |awk '{print>"temp_dir_bed/temp."$4}'
 
 #Now we make a second file to join with the first
 touch Second_Part.txt
