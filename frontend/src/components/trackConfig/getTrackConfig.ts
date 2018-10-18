@@ -16,6 +16,8 @@ import { RulerTrackConfig } from './RulerTrackConfig';
 import { TrackModel } from '../../model/TrackModel';
 import { RefBedTrackConfig } from './RefBedTrackConfig';
 
+export const INTERACTION_TYPES = ['hic', 'longrange', 'biginteract'];
+
 const TYPE_NAME_TO_CONFIG = {
     "bam": BamTrackConfig,
     "bed": BedTrackConfig,

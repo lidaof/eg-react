@@ -26,7 +26,7 @@ const TYPES_DESC = [
 /**
  * UI for adding custom tracks.
  * 
- * @author Silas Hsu
+ * @author Silas Hsu and Daofeng Li
  */
 class CustomTrackAdder extends React.Component {
     static propTypes = {

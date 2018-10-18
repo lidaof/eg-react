@@ -275,9 +275,15 @@ class TrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView} = this.props;
+        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView, trackData} = this.props;
         const selectedTool = this.state.selectedTool;
-        const contextMenu = <TrackContextMenu tracks={tracks} onTracksChanged={onTracksChanged} deselectAllTracks={this.deselectAllTracks} />;
+        const contextMenu = <TrackContextMenu 
+                                tracks={tracks} 
+                                onTracksChanged={onTracksChanged} 
+                                deselectAllTracks={this.deselectAllTracks} 
+                                primaryView={primaryView}
+                                trackData={trackData}
+                            />;
         const trackDivStyle = {
                                 border: "1px solid black", 
                                 paddingBottom: "3px",

@@ -4,6 +4,11 @@ import JSON5 from 'json5';
 import Json5Fetcher from '../../model/Json5Fetcher';
 import DataHubParser from '../../model/DataHubParser';
 
+/**
+ * custom hub add UI
+ * @author Silas Hsu and Daofeng Li
+ */
+
 function CustomHubAdder(props) {
     return (
     <div>

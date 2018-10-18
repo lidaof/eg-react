@@ -2,6 +2,11 @@ import React from 'react';
 import LinearDrawingModel from "../../model/LinearDrawingModel";
 import { withTrackLegendWidth } from '../../components/withTrackLegendWidth';
 
+/**
+ * a component to draw a light gray line between chromosome or feature boundary
+ * @author Daofeng Li
+ */
+
 class VerticalDividerNotConnected extends React.Component {
     render() {
         const { children, legendWidth, xOffset } = this.props;
@@ -13,7 +18,7 @@ class VerticalDividerNotConnected extends React.Component {
             const drawWidth = drawModel.basesToXWidth(segment.getLength());
 
             if (x > 0) { // Thick line at boundaries of each feature, except the first one
-                boxesAndLabels.push(<div
+                boxesAndLabels.push(<div key={"divider"+x}
                 style={{
                     borderRight: "1px solid lightgray",
                     position: "absolute",
@@ -26,7 +31,6 @@ class VerticalDividerNotConnected extends React.Component {
             }
             x += drawWidth;
         }
-        console.log(boxesAndLabels);
         return (
             <div style={{position: "relative", overflow: "hidden"}}>
                 {children}
