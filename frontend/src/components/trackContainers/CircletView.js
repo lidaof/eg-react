@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Circos, { CHORDS } from 'react-circos';
+import TrackModel from '../../model/TrackModel';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
 
 import './CircletView.css';
@@ -14,7 +15,8 @@ export class CircletView extends React.PureComponent {
     static propTypes = {
         size: PropTypes.number,
         primaryView: PropTypes.object,
-        trackData: PropTypes.arrayOf(PropTypes.object)
+        trackData: PropTypes.object,
+        track: PropTypes.instanceOf(TrackModel),
     };
 
     static defaultProps = {
@@ -26,15 +28,16 @@ export class CircletView extends React.PureComponent {
     }
 
     getLayout = () => {
-        const navContext = this.props.primaryView.visRegion.getNavigationContext();
+        const {track, trackData, primaryView} = this.props;
+        const navContext = primaryView.visRegion.getNavigationContext();
         const chrSet = new Set();
-        this.props.data.forEach(item => {
+        trackData[track.id].data.forEach(item => {
             chrSet.add(item.locus1.chr);
             chrSet.add(item.locus2.chr);
         })
         const layout = [];
         navContext.getFeatures().forEach((feature, idx) => {
-            if (chrSet.has(feature.getName())) {
+            //if (chrSet.has(feature.getName())) {
                 layout.push(
                     {
                         len: feature.getLength(),
@@ -43,7 +46,7 @@ export class CircletView extends React.PureComponent {
                         color: COLORS[idx]
                     }
                 );
-            }
+            //}
         });
         return layout;
     };
@@ -57,7 +60,8 @@ export class CircletView extends React.PureComponent {
             "target": { "id": "chr17", "start": 31478117, "end": 35478117 }
         },
         */
-        const chords = this.props.data.map(item => {
+        const {track, trackData} = this.props;
+        const chords = trackData[track.id].data.map(item => {
             return {
                 source: { id: item.locus1.chr, start: item.locus1.start, end: item.locus1.start },
                 target: { id: item.locus2.chr, start: item.locus2.end, end: item.locus2.end }

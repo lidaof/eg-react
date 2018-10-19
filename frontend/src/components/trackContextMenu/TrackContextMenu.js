@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import Collapsible from 'react-collapsible';
-import ReactModal from "react-modal";
 import TrackModel from '../../model/TrackModel';
 import { getTrackConfig, INTERACTION_TYPES } from '../trackConfig/getTrackConfig';
 import { CopyToClip } from '../CopyToClipboard';
-import { CircletView } from "../trackContainers/CircletView";
+
 
 import './TrackContextMenu.css';
 
@@ -25,8 +24,6 @@ export const ITEM_PROP_TYPES = {
      *     `value` - new value for the option
      */
     onOptionSet: PropTypes.func.isRequired,
-    primaryView: PropTypes.object,
-    trackData: PropTypes.object,
 };
 
 /**
@@ -126,7 +123,7 @@ class TrackContextMenu extends React.PureComponent {
         <div className="TrackContextMenu-body">
             <MenuTitle tracks={selectedTracks} />
             {this.renderTrackSpecificItems(selectedTracks)}
-            <CircletViewConfig tracks={selectedTracks} trackData={this.props.trackData} primaryView={this.props.primaryView}/>
+            <CircletViewConfig tracks={selectedTracks} onCircletRequested={this.props.onCircletRequested}/>
             <DeselectOption numTracks={selectedTracks.length} onClick={this.props.deselectAllTracks} />
             <RemoveOption numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
             <TrackMoreInfo tracks={selectedTracks} />
@@ -139,50 +136,20 @@ class TrackContextMenu extends React.PureComponent {
  * a menu item to invoke circlet view modal for interaction tracks
  */
 
-class CircletViewConfig extends React.PureComponent {
-    static propTypes = {};
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            showModal: false
-          };
-        this.handleOpenModal = this.handleOpenModal.bind(this);
-        this.handleCloseModal = this.handleCloseModal.bind(this);
+function CircletViewConfig(props) {
+    const numTracks = props.tracks.length;
+    if (numTracks !== 1) {
+        return null;
     }
-
-    handleOpenModal () {
-        this.setState({ showModal: true });
-      }
-      
-      handleCloseModal () {
-        this.setState({ showModal: false });
-      }
-
-    render() {
-        const {tracks, trackData, primaryView} = this.props;
-        if (tracks.length !== 1) {
-            return null;
-        }
-        const track = tracks[0];
-        if (!INTERACTION_TYPES.includes(track.type)) {
-            return null;
-        }
-        const data = trackData[track.id].data;
-        return (
+    const track = props.tracks[0];
+    if (!INTERACTION_TYPES.includes(track.type)) {
+        return null;
+    }
+    return (
         <div className="TrackContextMenu-item">
-            <button onClick={this.handleOpenModal}>Circlet view</button>
-            <ReactModal 
-                isOpen={this.state.showModal}
-                contentLabel="circlet-opener"
-                ariaHideApp={false}
-                >
-                <button onClick={this.handleCloseModal}>Close</button>
-                <CircletView primaryView={primaryView} data={data}/>
-            </ReactModal>
+            <button onClick={track => props.onCircletRequested(track)}>Circlet view</button>            
         </div>
         );
-    }
 }
 
 function TrackMoreInfo(props) {
