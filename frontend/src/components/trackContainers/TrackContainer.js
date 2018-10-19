@@ -129,11 +129,11 @@ class TrackContainer extends React.Component {
         this.setState({xOffset});
     }
 
-    handleOpenModal (track) {
+    handleOpenModal(track) {
         this.setState({ showModal: true, trackForCircletView: track });
     }
       
-    handleCloseModal () {
+    handleCloseModal() {
         this.setState({ showModal: false, trackForCircletView: null });
     }
 
@@ -337,7 +337,7 @@ class TrackContainer extends React.Component {
                     </DivWithBullseye>
                 </ContextMenuManager>
             </OutsideClickDetector>
-            {this.state.trackForCircletView && this.renderModal()}
+            {this.renderModal()}
         </React.Fragment>
         );
     }

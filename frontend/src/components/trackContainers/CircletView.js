@@ -27,8 +27,7 @@ export class CircletView extends React.PureComponent {
         super(props);
     }
 
-    getLayout = () => {
-        const {track, trackData, primaryView} = this.props;
+    getLayout = (primaryView, track, trackData) => {
         const navContext = primaryView.visRegion.getNavigationContext();
         const chrSet = new Set();
         trackData[track.id].data.forEach(item => {
@@ -37,7 +36,7 @@ export class CircletView extends React.PureComponent {
         })
         const layout = [];
         navContext.getFeatures().forEach((feature, idx) => {
-            //if (chrSet.has(feature.getName())) {
+            // if (chrSet.has(feature.getName())) {
                 layout.push(
                     {
                         len: feature.getLength(),
@@ -46,12 +45,12 @@ export class CircletView extends React.PureComponent {
                         color: COLORS[idx]
                     }
                 );
-            //}
+            // }
         });
         return layout;
     };
 
-    getChords = () => {
+    getChords = (track, trackData) => {
         /**
          * the data looks like this:
          * 
@@ -60,20 +59,20 @@ export class CircletView extends React.PureComponent {
             "target": { "id": "chr17", "start": 31478117, "end": 35478117 }
         },
         */
-        const {track, trackData} = this.props;
         const chords = trackData[track.id].data.map(item => {
             return {
-                source: { id: item.locus1.chr, start: item.locus1.start, end: item.locus1.start },
-                target: { id: item.locus2.chr, start: item.locus2.end, end: item.locus2.end }
+                source: { id: item.locus1.chr, start: item.locus1.start - 2000000, end: item.locus1.start + 2000000 },
+                target: { id: item.locus2.chr, start: item.locus2.end - 2000000, end: item.locus2.end + 2000000 },
+                value: item.score
             };
         });
         return chords;
     };
 
     render() {
-        const { size } = this.props;
-        const layout = this.getLayout();
-        const chords = this.getChords();
+        const { size, primaryView, track, trackData } = this.props;
+        const layout = track ? this.getLayout(primaryView, track, trackData): [];
+        const chords = track? this.getChords(track, trackData): [];
         console.log(layout);
         console.log(chords);
         return (
@@ -96,17 +95,14 @@ export class CircletView extends React.PureComponent {
                     }}
                     tracks={[{
                     type: CHORDS,
-                    data: chords2,
+                    data: chords,
                     config: {
-                        radius: (d) => {
-                        if (d.source.id === 'chr6') {
-                            return 0.5;
-                        }
-                        return null;
-                        },
                         logScale: false,
                         opacity: 0.7,
                         color: '#ff5722',
+                        tooltipContent: function (d) {
+                            return '<h3>' + d.source.id + ' ➤ ' + d.target.id + ': ' + d.value + '</h3><i>(CTRL+C to copy to clipboard)</i>'
+                        },
                     },
                     }]}
                     size={size}

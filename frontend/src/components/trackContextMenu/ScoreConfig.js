@@ -8,29 +8,27 @@ import { PrimaryAboveColorConfig, SecondaryBelowColorConfig } from "./ColorConfi
  * @param {Object} props - props as specified by React
  * @return {JSX.Element} element to render
  */
-function YscaleConfig(props) {
-    const fixedScales = props.optionsObjects[0].yScale === 'fixed' ? <React.Fragment>
+function ScoreConfig(props) {
+    const fixedScales = props.optionsObjects[0].scoreScale === 'fixed' ? <React.Fragment>
         <NumberConfig {...props} 
-            optionName="yMax" 
-            label="Y-axis max:" 
+            optionName="scoreMax" 
+            label="Score max:" 
             isFloat={true} 
             hasSetButton={false} 
         />
-        <PrimaryAboveColorConfig {...props} />
         <NumberConfig {...props} 
-            optionName="yMin" 
-            label="Y-axis min:" 
+            optionName="scoreMin" 
+            label="Score min:" 
             isFloat={true} 
             hasSetButton={false} 
         />
-        <SecondaryBelowColorConfig {...props} />
     </React.Fragment> : null;
     return (
         <React.Fragment> 
             <SelectConfig 
                 {...props} 
-                optionName="yScale" 
-                label="Y-axis scale:" 
+                optionName="scoreScale" 
+                label="Score scale:" 
                 choices={{
                     AUTO: "auto",
                     FIXED: "fixed",
@@ -43,4 +41,4 @@ function YscaleConfig(props) {
     );
 }
 
-export default YscaleConfig;
+export default ScoreConfig;

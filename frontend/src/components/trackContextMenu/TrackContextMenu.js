@@ -147,7 +147,7 @@ function CircletViewConfig(props) {
     }
     return (
         <div className="TrackContextMenu-item">
-            <button onClick={track => props.onCircletRequested(track)}>Circlet view</button>            
+            <button onClick={() => props.onCircletRequested(track)}>Circlet view</button>
         </div>
         );
 }

@@ -6,7 +6,7 @@ import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import { GenomeInteraction } from '../../model/GenomeInteraction';
 import { InteractionDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';
 import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
-
+import ScoreConfig from '../trackContextMenu/ScoreConfig';
 /*
 Example record from the data source
 DASFeature {
@@ -62,6 +62,7 @@ export class BigInteractTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [InteractionDisplayModeConfig, PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
+        return [InteractionDisplayModeConfig, ScoreConfig,
+            PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
     }
 }
