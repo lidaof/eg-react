@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Circos, { CHORDS } from 'react-circos';
 import TrackModel from '../../model/TrackModel';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
+import { HicSource } from '../../dataSources/HicSource';
 
 import './CircletView.css';
 
@@ -25,6 +26,12 @@ export class CircletView extends React.PureComponent {
 
     constructor(props) {
         super(props);
+    }
+
+    async componentDidMount(){
+        const dataSource = new HicSource(this.props.track.url);
+        const data = await dataSource.getDataAll(this.props.primaryView.visRegion, {binSize: 2500000});
+        console.log(data);
     }
 
     getLayout = (primaryView, track, trackData) => {

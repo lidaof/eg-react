@@ -60,6 +60,7 @@ export class HicSource extends DataSource {
      * @param {number} binSize 
      */
     async getInteractionsBetweenLoci(queryLocus1, queryLocus2, binSize) {
+        // NONE/VC/VC_SQRT/KR  normalization
         const records = await this.straw.getContactRecords('NONE', queryLocus1, queryLocus2, 'BP', binSize);
         const interactions = [];
         for (const record of records) {
@@ -90,6 +91,18 @@ export class HicSource extends DataSource {
             for (const locus2 of loci.slice(index1)) {
                 promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
             }
+        }
+        const dataForEachSegment = await Promise.all(promises);
+        return _.flatMap(dataForEachSegment);
+    }
+
+    async getDataAll(region, options) {
+        const binSize = options.binSize || this.getAutoBinSize(region.getWidth());
+        const promises = [];
+        const loci = region.getGenomeIntervals();
+        const locus2 = new ChromosomeInterval('chr7', 0, 145441459);
+        for (const locus1 of loci) {
+            promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
         }
         const dataForEachSegment = await Promise.all(promises);
         return _.flatMap(dataForEachSegment);
