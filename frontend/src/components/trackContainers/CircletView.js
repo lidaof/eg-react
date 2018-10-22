@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { RadioGroup, RadioButton } from 'react-radio-buttons';
 import Circos, { CHORDS } from 'react-circos';
 import TrackModel from '../../model/TrackModel';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
 import { HicSource } from '../../dataSources/HicSource';
+import LinearDrawingModel from '../../model/LinearDrawingModel';
 
 import './CircletView.css';
 
@@ -12,7 +14,7 @@ import './CircletView.css';
  * @author Daofeng Li
  */
 
-export class CircletView extends React.PureComponent {
+export class CircletView extends React.Component {
     static propTypes = {
         size: PropTypes.number,
         primaryView: PropTypes.object,
@@ -26,38 +28,85 @@ export class CircletView extends React.PureComponent {
 
     constructor(props) {
         super(props);
+        this.state={
+            isLoadingData: true,
+            layoutKey: "currentRegion",
+            dataKey: "currentRegion",
+            data: null,
+        };
     }
 
     async componentDidMount(){
         const dataSource = new HicSource(this.props.track.url);
-        const data = await dataSource.getDataAll(this.props.primaryView.visRegion, {binSize: 2500000});
-        console.log(data);
+        const data = await dataSource.getDataAll(this.props.primaryView.visRegion, {});
+        this.setState( {
+            isLoadingData: false,
+            data: {
+                currentRegion: this.props.trackData[this.props.track.id].data,
+                currentChromosome: data[0],
+                wholeGenome: data[1],
+            }
+        })
     }
 
-    getLayout = (primaryView, track, trackData) => {
+    onChangeLayout = (value) => {
+        this.setState({layoutKey: value});
+    }
+
+    onChangeData = (value) => {
+        this.setState({dataKey: value});
+    }
+
+    getLayout = () => {
+        const { primaryView, track, trackData } = this.props;
         const navContext = primaryView.visRegion.getNavigationContext();
         const chrSet = new Set();
         trackData[track.id].data.forEach(item => {
             chrSet.add(item.locus1.chr);
             chrSet.add(item.locus2.chr);
         })
-        const layout = [];
+        const regionSting = primaryView.visRegion.currentRegionAsString();
+        const layoutRegion = [
+            {
+                len: primaryView.visRegion.getWidth(),
+                id: 'current',
+                label: regionSting,
+                color: 'pink'
+            }
+        ];
+        const layoutWhole = [];
+        const layoutChrom = []
         navContext.getFeatures().forEach((feature, idx) => {
-            // if (chrSet.has(feature.getName())) {
-                layout.push(
+            const name = feature.getName();
+            if(name !== 'chrM') {
+                layoutWhole.push(
                     {
                         len: feature.getLength(),
-                        id: feature.getName(),
-                        label: feature.getName(),
+                        id: name,
+                        label: name,
                         color: COLORS[idx]
                     }
                 );
-            // }
+            }
+            if (chrSet.has(name)) {
+                layoutChrom.push(
+                    {
+                        len: feature.getLength(),
+                        id: name,
+                        label: name,
+                        color: COLORS[idx]
+                    }
+                );
+            }
         });
-        return layout;
+        return {
+            currentRegion: layoutRegion,
+            currentChromosome: layoutChrom,
+            wholeGenome: layoutWhole,
+        }
     };
 
-    getChords = (track, trackData) => {
+    getChords = (layoutKey, dataKey) => {
         /**
          * the data looks like this:
          * 
@@ -66,25 +115,39 @@ export class CircletView extends React.PureComponent {
             "target": { "id": "chr17", "start": 31478117, "end": 35478117 }
         },
         */
-        const chords = trackData[track.id].data.map(item => {
+        const { primaryView, track, trackData } = this.props;
+        const { data } = this.state;
+        if (layoutKey === 'currentRegion' && dataKey === 'currentRegion' ) {
+            const drawModel = new LinearDrawingModel(primaryView.visRegion, primaryView.visRegion.getWidth());
+            const viewRegionBounds = primaryView.visRegion.getContextCoordinates();
+            const navContext = primaryView.visRegion.getNavigationContext();
+            const data2 = data ? data[dataKey] : trackData[track.id].data;
+            return data2.map(item => {
+                let contextLocations1 = navContext.convertGenomeIntervalToBases(item.locus1);
+                let contextLocations2 = navContext.convertGenomeIntervalToBases(item.locus2);
+                contextLocations1 = contextLocations1.map(location => location.getOverlap(viewRegionBounds));
+                contextLocations2 = contextLocations2.map(location => location.getOverlap(viewRegionBounds));
+                const xSpan1 = drawModel.baseSpanToXSpan(contextLocations1[0]);
+                const xSpan2 = drawModel.baseSpanToXSpan(contextLocations2[0]);
+                return {
+                    source: { id: 'current', start: xSpan1.start, end: xSpan1.end},
+                    target: { id: 'current', start: xSpan2.start, end: xSpan2.end},
+                    value: item.score
+                };
+            });
+        }
+        const chords = data[dataKey].map(item => {
             return {
-                source: { id: item.locus1.chr, start: item.locus1.start - 2000000, end: item.locus1.start + 2000000 },
-                target: { id: item.locus2.chr, start: item.locus2.end - 2000000, end: item.locus2.end + 2000000 },
+                source: { id: item.locus1.chr, start: item.locus1.start, end: item.locus1.start},
+                target: { id: item.locus2.chr, start: item.locus2.end, end: item.locus2.end},
                 value: item.score
             };
         });
         return chords;
     };
 
-    render() {
-        const { size, primaryView, track, trackData } = this.props;
-        const layout = track ? this.getLayout(primaryView, track, trackData): [];
-        const chords = track? this.getChords(track, trackData): [];
-        console.log(layout);
-        console.log(chords);
-        return (
-            <div className="CircletView-container">
-                <Circos
+    drawCircos = (layout, chords, size) => {
+        return <Circos
                     layout={layout}
                     config={{
                     innerRadius: size / 2 - 80,
@@ -108,12 +171,54 @@ export class CircletView extends React.PureComponent {
                         opacity: 0.7,
                         color: '#ff5722',
                         tooltipContent: function (d) {
-                            return '<h3>' + d.source.id + ' ➤ ' + d.target.id + ': ' + d.value + '</h3><i>(CTRL+C to copy to clipboard)</i>'
+                            return '<p>' + d.source.id + ' ➤ ' + d.target.id + ': ' + d.value + '</p>'
                         },
                     },
                     }]}
                     size={size}
                 />
+    }
+
+    render() {
+        const { size } = this.props;
+        const {layoutKey, dataKey} = this.state;
+        const layout = this.getLayout()[layoutKey] || [];
+        const chords = this.getChords(layoutKey, dataKey) || [];
+        console.log(layout);
+        console.log(chords);
+        const chromOption = this.state.isLoadingData ? "Current chromosome (data still downloading)": "Current chromosome";
+        const genomeOtion = this.state.isLoadingData ? "Whole genome (data still downloading)": "Whole genome";
+        return (
+            <div>
+            <div className="CircletView-menu">
+                <h3>Choose a layout range: </h3>
+                <RadioGroup onChange={ this.onChangeLayout } value={this.state.layoutKey} horizontal>
+                    <RadioButton value="currentRegion">
+                        Current region
+                    </RadioButton>
+                    <RadioButton value="currentChromosome" disabled={this.state.isLoadingData}>
+                        {chromOption}
+                    </RadioButton>
+                    <RadioButton value="wholeGenome" disabled={this.state.isLoadingData}>
+                        {genomeOtion}
+                    </RadioButton>
+                </RadioGroup>
+                <h3>Choose data from: </h3>
+                <RadioGroup onChange={ this.onChangeData } value={this.state.dataKey} horizontal> 
+                    <RadioButton value="currentRegion">
+                        Current region
+                    </RadioButton>
+                    <RadioButton value="currentChromosome" disabled={this.state.isLoadingData}>
+                        {chromOption}
+                    </RadioButton>
+                    <RadioButton value="wholeGenome" disabled={this.state.isLoadingData}>
+                        {genomeOtion}
+                    </RadioButton>
+                </RadioGroup>
+            </div>
+            <div className="CircletView-container">
+                {this.drawCircos(layout, chords, size)}
+            </div>
             </div>
         );
     }
