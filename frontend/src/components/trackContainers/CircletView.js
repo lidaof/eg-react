@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { RadioGroup, RadioButton } from 'react-radio-buttons';
-import Circos, { CHORDS } from 'react-circos';
+import Circos, { CHORDS } from '../../react-circos/index';
 import TrackModel from '../../model/TrackModel';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
 import { HicSource } from '../../dataSources/HicSource';
@@ -47,6 +47,15 @@ export class CircletView extends React.Component {
                 wholeGenome: data[1],
             }
         })
+        // for testing
+        // this.setState({
+        //     isLoadingData: false,
+        //     data: {
+        //         currentRegion: this.props.trackData[this.props.track.id].data,
+        //         currentChromosome: this.props.trackData[this.props.track.id].data,
+        //         wholeGenome: this.props.trackData[this.props.track.id].data,
+        //     }
+        // });
     }
 
     onChangeLayout = (value) => {
