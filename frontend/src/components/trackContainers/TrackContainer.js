@@ -99,6 +99,7 @@ class TrackContainer extends React.Component {
             xOffset: 0,
             showModal: false,
             trackForCircletView: null, // the trackmodel for circlet view
+            circletColor: '#ff5722',
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -110,6 +111,7 @@ class TrackContainer extends React.Component {
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
         this.renderModal = this.renderModal.bind(this);
+        this.setCircletColor = this.setCircletColor.bind(this);
     }
 
     /**
@@ -135,6 +137,10 @@ class TrackContainer extends React.Component {
       
     handleCloseModal() {
         this.setState({ showModal: false, trackForCircletView: null });
+    }
+
+    setCircletColor(color) {
+        this.setState({circletColor: color});
     }
 
     /**
@@ -289,14 +295,20 @@ class TrackContainer extends React.Component {
 
     renderModal() {
         const {primaryView, trackData} = this.props;
-        const { trackForCircletView } = this.state;
+        const { trackForCircletView, circletColor } = this.state;
         return <ReactModal 
                 isOpen={this.state.showModal}
                 contentLabel="circlet-opener"
                 ariaHideApp={false}
                 >
                 <button onClick={this.handleCloseModal}>Close</button>
-                <CircletView primaryView={primaryView} trackData={trackData} track={trackForCircletView}/>
+                <CircletView 
+                    primaryView={primaryView} 
+                    trackData={trackData} 
+                    track={trackForCircletView}
+                    color={circletColor}
+                    setCircletColor={this.setCircletColor}
+                />
             </ReactModal>;
     }
 

@@ -2,3 +2,15 @@
     margin-top: 100px;
     margin-left: 100px;
 }
+
+.CircletView-config {
+    position: absolute;
+    right: 10px;
+    z-index: 1;
+}
+
+.CircletView-config > div {
+    margin: 3px;
+    padding: 3px;
+    border-bottom: 1px lightblue solid;
+}

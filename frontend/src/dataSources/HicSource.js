@@ -115,6 +115,6 @@ export class HicSource extends DataSource {
         const allData =  _.flatMap(dataForEachSegment);
         const chrSets = new Set(loci.map(item => item.chr));
         const chrData = allData.filter(item => chrSets.has(item.locus1.chr) && chrSets.has(item.locus2.chr));
-        return [ensureMaxListLength(chrData, 2000), ensureMaxListLength(allData, 2000)];
+        return [ensureMaxListLength(chrData, 5000), ensureMaxListLength(allData, 5000)];
     }
 }

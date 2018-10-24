@@ -18,7 +18,7 @@ function getReverseComplement(sequence: string): string {
     return result;
 }
 
-const BASE_COLORS = {
+export const BASE_COLORS = {
     G: '#3899c7', // Blue
     C: '#e05144', // Red
     T: '#9238c7', // Purple

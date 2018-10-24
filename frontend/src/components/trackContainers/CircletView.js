@@ -1,13 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { RadioGroup, RadioButton } from 'react-radio-buttons';
+import _ from 'lodash';
+import { scaleLinear } from 'd3-scale';
 import Circos, { CHORDS } from '../../react-circos/index';
 import TrackModel from '../../model/TrackModel';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
 import { HicSource } from '../../dataSources/HicSource';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
+import ColorPicker from '../ColorPicker';
 
 import './CircletView.css';
+
+const FLANK_LENGTH = 0;
 
 /**
  * a component to draw circlet view for long range tracks
@@ -20,10 +25,12 @@ export class CircletView extends React.Component {
         primaryView: PropTypes.object,
         trackData: PropTypes.object,
         track: PropTypes.instanceOf(TrackModel),
+        color: PropTypes.string,
+        setCircletColor: PropTypes.func,
     };
 
     static defaultProps = {
-        size: 800
+        size: 800,
     };
 
     constructor(props) {
@@ -31,22 +38,53 @@ export class CircletView extends React.Component {
         this.state={
             isLoadingData: true,
             layoutKey: "currentRegion",
+            layout: {},
+            currentData: [],
             dataKey: "currentRegion",
             data: null,
+            scoreMin: 0,
+            scoreMax: 0,
+            isChecked: false,
         };
+        this.scale = null;
     }
 
     async componentDidMount(){
-        const dataSource = new HicSource(this.props.track.url);
-        const data = await dataSource.getDataAll(this.props.primaryView.visRegion, {});
+        const { track, primaryView, trackData} = this.props;
+        const layout = this.getLayout();
+        const currentData = this.getCurrentData();
+        const max2 = _.maxBy(currentData, 'value');
+        const min2 = _.minBy(currentData, 'value');
+        const max = max2 ? max2.value : 0;
+        const min = min2 ? min2.value : 0;
         this.setState( {
-            isLoadingData: false,
-            data: {
-                currentRegion: this.props.trackData[this.props.track.id].data,
-                currentChromosome: data[0],
-                wholeGenome: data[1],
-            }
-        })
+            layout,
+            currentData,
+            scoreMin: min, 
+            scoreMax: max,
+        });
+        if (track.type === 'hic') { // only hic need load additional data
+            const dataSource = new HicSource(track.url);
+            const data = await dataSource.getDataAll(primaryView.visRegion, {});
+            this.setState( {
+                isLoadingData: false,
+                data: {
+                    currentRegion: trackData[track.id].data,
+                    currentChromosome: data[0],
+                    wholeGenome: data[1],
+                }
+            });
+        } else {
+            this.setState({
+                isLoadingData: false,
+                data: {
+                    currentRegion: trackData[track.id].data,
+                    currentChromosome: trackData[track.id].data,
+                    wholeGenome: trackData[track.id].data,
+                }
+            });
+        }
+        
         // for testing
         // this.setState({
         //     isLoadingData: false,
@@ -58,12 +96,35 @@ export class CircletView extends React.Component {
         // });
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if(prevState.dataKey !== this.state.dataKey) {
+            const data = this.getChords(this.state.layoutKey, this.state.dataKey);
+            const max2 = _.maxBy(data, 'value');
+            const min2 = _.minBy(data, 'value');
+            const max = max2 ? max2.value : 0;
+            const min = min2 ? min2.value : 0;
+            this.setState({scoreMin: min, scoreMax: max});
+        }
+    }
+
     onChangeLayout = (value) => {
         this.setState({layoutKey: value});
     }
 
     onChangeData = (value) => {
         this.setState({dataKey: value});
+    }
+
+    onChangeScoreMin = (event) => {
+        this.setState({scoreMin: Number.parseFloat(event.target.value)});
+    }
+
+    onChangeScoreMax = (event) => {
+        this.setState({scoreMax: Number.parseFloat(event.target.value)});
+    }
+
+    handleCheck = () => {
+        this.setState({isChecked: !this.state.isChecked});
     }
 
     getLayout = () => {
@@ -73,7 +134,9 @@ export class CircletView extends React.Component {
         trackData[track.id].data.forEach(item => {
             chrSet.add(item.locus1.chr);
             chrSet.add(item.locus2.chr);
-        })
+        });
+        // in case data is empty, the chrSet will be empty
+        primaryView.visRegion.getGenomeIntervals().forEach(chrInterval => chrSet.add(chrInterval.chr));
         const regionSting = primaryView.visRegion.currentRegionAsString();
         const layoutRegion = [
             {
@@ -115,6 +178,26 @@ export class CircletView extends React.Component {
         }
     };
 
+    getCurrentData = () => {
+        const { primaryView, track, trackData } = this.props;
+        const drawModel = new LinearDrawingModel(primaryView.visRegion, primaryView.visRegion.getWidth());
+        const viewRegionBounds = primaryView.visRegion.getContextCoordinates();
+        const navContext = primaryView.visRegion.getNavigationContext();
+        return trackData[track.id].data.map(item => {
+            let contextLocations1 = navContext.convertGenomeIntervalToBases(item.locus1);
+            let contextLocations2 = navContext.convertGenomeIntervalToBases(item.locus2);
+            contextLocations1 = contextLocations1.map(location => location.getOverlap(viewRegionBounds));
+            contextLocations2 = contextLocations2.map(location => location.getOverlap(viewRegionBounds));
+            const xSpan1 = drawModel.baseSpanToXSpan(contextLocations1[0]);
+            const xSpan2 = drawModel.baseSpanToXSpan(contextLocations2[0]);
+            return {
+                source: { id: 'current', start: xSpan1.start, end: xSpan1.end},
+                target: { id: 'current', start: xSpan2.start, end: xSpan2.end},
+                value: item.score
+            };
+        });
+    }
+
     getChords = (layoutKey, dataKey) => {
         /**
          * the data looks like this:
@@ -124,38 +207,50 @@ export class CircletView extends React.Component {
             "target": { "id": "chr17", "start": 31478117, "end": 35478117 }
         },
         */
-        const { primaryView, track, trackData } = this.props;
-        const { data } = this.state;
+        const { data, currentData } = this.state;
         if (layoutKey === 'currentRegion' && dataKey === 'currentRegion' ) {
-            const drawModel = new LinearDrawingModel(primaryView.visRegion, primaryView.visRegion.getWidth());
-            const viewRegionBounds = primaryView.visRegion.getContextCoordinates();
-            const navContext = primaryView.visRegion.getNavigationContext();
-            const data2 = data ? data[dataKey] : trackData[track.id].data;
-            return data2.map(item => {
-                let contextLocations1 = navContext.convertGenomeIntervalToBases(item.locus1);
-                let contextLocations2 = navContext.convertGenomeIntervalToBases(item.locus2);
-                contextLocations1 = contextLocations1.map(location => location.getOverlap(viewRegionBounds));
-                contextLocations2 = contextLocations2.map(location => location.getOverlap(viewRegionBounds));
-                const xSpan1 = drawModel.baseSpanToXSpan(contextLocations1[0]);
-                const xSpan2 = drawModel.baseSpanToXSpan(contextLocations2[0]);
-                return {
-                    source: { id: 'current', start: xSpan1.start, end: xSpan1.end},
-                    target: { id: 'current', start: xSpan2.start, end: xSpan2.end},
-                    value: item.score
-                };
-            });
+            return currentData;
         }
         const chords = data[dataKey].map(item => {
             return {
-                source: { id: item.locus1.chr, start: item.locus1.start, end: item.locus1.start},
-                target: { id: item.locus2.chr, start: item.locus2.end, end: item.locus2.end},
+                source: { id: item.locus1.chr, start: item.locus1.start - FLANK_LENGTH, end: item.locus1.end + FLANK_LENGTH},
+                target: { id: item.locus2.chr, start: item.locus2.start - FLANK_LENGTH, end: item.locus2.end + FLANK_LENGTH},
                 value: item.score
             };
         });
         return chords;
     };
 
-    drawCircos = (layout, chords, size) => {
+
+    downloadSvg = () => {
+        const box = document.querySelector('#circletViewContainer');
+        const boxHeight = box.clientHeight || box.offsetHeight;
+        const boxWidth = box.clientWidth || box.offsetWidth;
+        const xmlns = "http://www.w3.org/2000/svg";
+        const svgElem = document.createElementNS (xmlns, "svg");
+        svgElem.setAttributeNS (null, "viewBox", "0 0 " + boxWidth + " " + boxHeight);
+        svgElem.setAttributeNS (null, "width", boxWidth);
+        svgElem.setAttributeNS (null, "height", boxHeight);
+        svgElem.style.display = "block";
+        let x = 0, y = 0;
+        const eleSvg = box.querySelector('svg');
+        eleSvg.setAttribute("id", "svgCirclet");
+        eleSvg.setAttribute("x", x);
+        eleSvg.setAttribute("y", y);
+        const eleClone = eleSvg.cloneNode(true);
+        svgElem.appendChild(eleClone);
+        svgElem.setAttribute("xmlns", xmlns);
+        const dl = document.createElement("a");
+        document.body.appendChild(dl); // This line makes it work in Firefox.
+        const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+        const svgBlob = new Blob([preface, new XMLSerializer().serializeToString(svgElem)], {type:"image/svg+xml;charset=utf-8"});
+        const svgUrl = URL.createObjectURL(svgBlob);
+        dl.setAttribute("href", svgUrl);
+        dl.setAttribute("download", (new Date()).toISOString() + "_eg_circlet.svg");
+        dl.click();
+    }
+
+    drawCircos = (layout, chords, size, color, scale, isChecked) => {
         return <Circos
                     layout={layout}
                     config={{
@@ -177,8 +272,8 @@ export class CircletView extends React.Component {
                     data: chords,
                     config: {
                         logScale: false,
-                        opacity: 0.7,
-                        color: '#ff5722',
+                        opacity: isChecked ? 1: d => scale(d.value),
+                        color,
                         tooltipContent: function (d) {
                             return '<p>' + d.source.id + ' ➤ ' + d.target.id + ': ' + d.value + '</p>'
                         },
@@ -189,268 +284,70 @@ export class CircletView extends React.Component {
     }
 
     render() {
-        const { size } = this.props;
-        const {layoutKey, dataKey} = this.state;
-        const layout = this.getLayout()[layoutKey] || [];
+        const { size, color, setCircletColor } = this.props;
+        const {layout, layoutKey, dataKey, scoreMin, scoreMax, isChecked} = this.state;
+        const layout2 = layout[layoutKey] || [];
         const chords = this.getChords(layoutKey, dataKey) || [];
-        console.log(layout);
+        console.log(layout2);
         console.log(chords);
+        const scale = scaleLinear().domain([scoreMin, scoreMax]).range([0, 1]).clamp(true);
         const chromOption = this.state.isLoadingData ? "Current chromosome (data still downloading)": "Current chromosome";
         const genomeOtion = this.state.isLoadingData ? "Whole genome (data still downloading)": "Whole genome";
         return (
             <div>
             <div className="CircletView-menu">
-                <h3>Choose a layout range: </h3>
+                <h4>Choose a layout range: </h4>
                 <RadioGroup onChange={ this.onChangeLayout } value={this.state.layoutKey} horizontal>
-                    <RadioButton value="currentRegion">
+                    <RadioButton value="currentRegion" rootColor="gray" padding={8}>
                         Current region
                     </RadioButton>
-                    <RadioButton value="currentChromosome" disabled={this.state.isLoadingData}>
+                    <RadioButton value="currentChromosome" disabled={this.state.isLoadingData} rootColor="gray" padding={8}>
                         {chromOption}
                     </RadioButton>
-                    <RadioButton value="wholeGenome" disabled={this.state.isLoadingData}>
+                    <RadioButton value="wholeGenome" disabled={this.state.isLoadingData} rootColor="gray" padding={8}>
                         {genomeOtion}
                     </RadioButton>
                 </RadioGroup>
-                <h3>Choose data from: </h3>
+                <h4>Choose data from: </h4>
                 <RadioGroup onChange={ this.onChangeData } value={this.state.dataKey} horizontal> 
-                    <RadioButton value="currentRegion">
+                    <RadioButton value="currentRegion" rootColor="gray" padding={8}>
                         Current region
                     </RadioButton>
-                    <RadioButton value="currentChromosome" disabled={this.state.isLoadingData}>
+                    <RadioButton value="currentChromosome" disabled={this.state.isLoadingData} rootColor="gray" padding={8}>
                         {chromOption}
                     </RadioButton>
-                    <RadioButton value="wholeGenome" disabled={this.state.isLoadingData}>
+                    <RadioButton value="wholeGenome" disabled={this.state.isLoadingData} rootColor="gray" padding={8}>
                         {genomeOtion}
                     </RadioButton>
                 </RadioGroup>
+                <div className="CircletView-config">
+                    <div>
+                        Change color: <ColorPicker color={color} label="" onChange={color => setCircletColor(color.hex)} />
+                    </div>
+                    <div>
+                        <div>Change score scale: </div>
+                        <label>
+                            Min: <input type="text" value={scoreMin} size={10} onChange={this.onChangeScoreMin} />
+                        </label> <label>
+                            Max: <input type="text" value={scoreMax} size={10} onChange={this.onChangeScoreMax} />
+                        </label>
+                    </div>
+                    <div>
+                        <label htmlFor="turnOffScale">Turn off scale </label> <input 
+                            onChange={this.handleCheck} id="turnOffScale" type="checkbox" checked={isChecked}/>
+                    </div>
+                    <div>
+                        <button 
+                        className="btn btn-success btn-sm" 
+                        onClick={this.downloadSvg} 
+                        >⬇ Download</button>
+                    </div>
+                </div>
             </div>
-            <div className="CircletView-container">
-                {this.drawCircos(layout, chords, size)}
+            <div className="CircletView-container" id="circletViewContainer">
+                {this.drawCircos(layout2, chords, size, color, scale, isChecked)}
             </div>
             </div>
         );
     }
 }
-
-const chords2 = [
-    {
-        source: {
-            id: 'chr6',
-            start: 22186054,
-            end: 26186054
-        },
-        target: {
-            id: 'chr6',
-            start: 31478117,
-            end: 35478117
-        }
-    },
-    {
-        source: {
-            id: 'chr6',
-            start: 74807187,
-            end: 78807187
-        },
-        target: {
-            id: 'chr6',
-            start: 89852878,
-            end: 93852878
-        }
-    },
-    {
-        source: {
-            id: 'chr6',
-            start: 32372614,
-            end: 36372614
-        },
-        target: {
-            id: 'chr6',
-            start: 125650987,
-            end: 129650987
-        }
-    },
-    {
-        source: {
-            id: 'chr6',
-            start: 32372616,
-            end: 36372616
-        },
-        target: {
-            id: 'chr6',
-            start: 157440784,
-            end: 161440784
-        }
-    },
-    {
-        source: {
-            id: 'chr2',
-            start: 131012108,
-            end: 135012108
-        },
-        target: {
-            id: 'chr5',
-            start: 172541752,
-            end: 176541752
-        }
-    },
-    {
-        source: {
-            id: 'chr1',
-            start: 89852783,
-            end: 93852783
-        },
-        target: {
-            id: 'chr2',
-            start: 131036705,
-            end: 135036705
-        }
-    },
-
-
-
-    {
-        source: {
-            id: 'chr1',
-            start: -1431493,
-            end: 2568507
-        },
-        target: {
-            id: 'chr17',
-            start: 31478117,
-            end: 35478117
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 35360418,
-            end: 39360418
-        },
-        target: {
-            id: 'chr17',
-            start: 31478115,
-            end: 35478115
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478116,
-            end: 35478116
-        },
-        target: {
-            id: 'chrX',
-            start: 106297810,
-            end: 110297810
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478131,
-            end: 35478131
-        },
-        target: {
-            id: 'chr8',
-            start: 134786084,
-            end: 138786084
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478111,
-            end: 35478111
-        },
-        target: {
-            id: 'chr2',
-            start: 86124673,
-            end: 90124673
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478116,
-            end: 35478116
-        },
-        target: {
-            id: 'chr1',
-            start: 235766312,
-            end: 239766312
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478116,
-            end: 35478116
-        },
-        target: {
-            id: 'chr1',
-            start: 89853039,
-            end: 93853039
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478117,
-            end: 35478117
-        },
-        target: {
-            id: 'chr2',
-            start: 131012644,
-            end: 135012644
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478115,
-            end: 35478115
-        },
-        target: {
-            id: 'chr11',
-            start: 83194786,
-            end: 87194786
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478115,
-            end: 35478115
-        },
-        target: {
-            id: 'chr11',
-            start: 83194786,
-            end: 87194786
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478117,
-            end: 35478117
-        },
-        target: {
-            id: 'chr1',
-            start: 89852849,
-            end: 93852849
-        }
-    },
-    {
-        source: {
-            id: 'chr17',
-            start: 31478114,
-            end: 35478114
-        },
-        target: {
-            id: 'chrX',
-            start: 106297713,
-            end: 110297713
-        }
-    }
-];

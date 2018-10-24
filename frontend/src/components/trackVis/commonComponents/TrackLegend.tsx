@@ -10,6 +10,7 @@ import TrackModel from '../../../model/TrackModel';
 
 import './TrackLegend.css';
 import { StateWithHistory } from 'redux-undo';
+import { BASE_COLORS } from '../../Sequence';
 
 interface TrackLegendProps {
     trackModel: TrackModel; // Track metadata
@@ -45,6 +46,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
         super(props);
         this.gNode = null;
         this.handleRef = this.handleRef.bind(this);
+        this.plotATCGLegend = this.plotATCGLegend.bind(this);
     }
 
     componentDidMount() {
@@ -98,6 +100,14 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
         }
     }
 
+    plotATCGLegend() {
+        const divs = Object.entries(BASE_COLORS).map(base => {
+            return <div key={base[0]} 
+                style={{backgroundColor: base[1],color:"white"}}>{base[0]}</div>;
+        });
+        return divs;
+    }
+
     render() {
         const {trackModel, width, height, axisScale, style, axisScaleReverse} = this.props;
         if (height <= 0) {
@@ -127,6 +137,8 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
         return (
         <div style={divStyle} title={label}>
             <p className="TrackLegend-label" style={pStyle} >{label}</p>
+            <div style={{display: "flex", alignItems: "center", fontSize: "12px"}}>
+                {trackModel.type === 'ruler' && this.plotATCGLegend()}</div>
             {axis}
         </div>
         );
