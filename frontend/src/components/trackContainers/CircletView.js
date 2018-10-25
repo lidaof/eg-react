@@ -12,8 +12,6 @@ import ColorPicker from '../ColorPicker';
 
 import './CircletView.css';
 
-const FLANK_LENGTH = 0;
-
 /**
  * a component to draw circlet view for long range tracks
  * @author Daofeng Li
@@ -45,6 +43,7 @@ export class CircletView extends React.Component {
             scoreMin: 0,
             scoreMax: 0,
             isChecked: false,
+            flanking: 0,
         };
         this.scale = null;
     }
@@ -123,6 +122,10 @@ export class CircletView extends React.Component {
         this.setState({scoreMax: Number.parseFloat(event.target.value)});
     }
 
+    onChangeFlanking = (event) => {
+        this.setState({flanking: Number.parseInt(event.target.value, 10)});
+    }
+
     handleCheck = () => {
         this.setState({isChecked: !this.state.isChecked});
     }
@@ -183,19 +186,25 @@ export class CircletView extends React.Component {
         const drawModel = new LinearDrawingModel(primaryView.visRegion, primaryView.visRegion.getWidth());
         const viewRegionBounds = primaryView.visRegion.getContextCoordinates();
         const navContext = primaryView.visRegion.getNavigationContext();
-        return trackData[track.id].data.map(item => {
+        const currentData = [];
+        trackData[track.id].data.forEach(item => {
             let contextLocations1 = navContext.convertGenomeIntervalToBases(item.locus1);
             let contextLocations2 = navContext.convertGenomeIntervalToBases(item.locus2);
             contextLocations1 = contextLocations1.map(location => location.getOverlap(viewRegionBounds));
             contextLocations2 = contextLocations2.map(location => location.getOverlap(viewRegionBounds));
-            const xSpan1 = drawModel.baseSpanToXSpan(contextLocations1[0]);
-            const xSpan2 = drawModel.baseSpanToXSpan(contextLocations2[0]);
-            return {
-                source: { id: 'current', start: xSpan1.start, end: xSpan1.end},
-                target: { id: 'current', start: xSpan2.start, end: xSpan2.end},
-                value: item.score
-            };
+            // when other end out side of range will return null
+            if(contextLocations1.length > 0 && contextLocations1[0] !== null &&
+                contextLocations2.length > 0 && contextLocations2[0] !== null) {
+                const xSpan1 = drawModel.baseSpanToXSpan(contextLocations1[0]);
+                const xSpan2 = drawModel.baseSpanToXSpan(contextLocations2[0]);
+                currentData.push({
+                    source: { id: 'current', start: xSpan1.start, end: xSpan1.end},
+                    target: { id: 'current', start: xSpan2.start, end: xSpan2.end},
+                    value: item.score
+                });
+            }
         });
+        return currentData;
     }
 
     getChords = (layoutKey, dataKey) => {
@@ -207,14 +216,14 @@ export class CircletView extends React.Component {
             "target": { "id": "chr17", "start": 31478117, "end": 35478117 }
         },
         */
-        const { data, currentData } = this.state;
+        const { data, currentData, flanking } = this.state;
         if (layoutKey === 'currentRegion' && dataKey === 'currentRegion' ) {
             return currentData;
         }
         const chords = data[dataKey].map(item => {
             return {
-                source: { id: item.locus1.chr, start: item.locus1.start - FLANK_LENGTH, end: item.locus1.end + FLANK_LENGTH},
-                target: { id: item.locus2.chr, start: item.locus2.start - FLANK_LENGTH, end: item.locus2.end + FLANK_LENGTH},
+                source: { id: item.locus1.chr, start: item.locus1.start - flanking, end: item.locus1.end + flanking},
+                target: { id: item.locus2.chr, start: item.locus2.start - flanking, end: item.locus2.end + flanking},
                 value: item.score
             };
         });
@@ -285,18 +294,16 @@ export class CircletView extends React.Component {
 
     render() {
         const { size, color, setCircletColor } = this.props;
-        const {layout, layoutKey, dataKey, scoreMin, scoreMax, isChecked} = this.state;
+        const {layout, layoutKey, dataKey, scoreMin, scoreMax, isChecked, flanking} = this.state;
         const layout2 = layout[layoutKey] || [];
         const chords = this.getChords(layoutKey, dataKey) || [];
-        console.log(layout2);
-        console.log(chords);
         const scale = scaleLinear().domain([scoreMin, scoreMax]).range([0, 1]).clamp(true);
         const chromOption = this.state.isLoadingData ? "Current chromosome (data still downloading)": "Current chromosome";
         const genomeOtion = this.state.isLoadingData ? "Whole genome (data still downloading)": "Whole genome";
         return (
             <div>
             <div className="CircletView-menu">
-                <h4>Choose a layout range: </h4>
+                <h5>Choose a layout range: </h5>
                 <RadioGroup onChange={ this.onChangeLayout } value={this.state.layoutKey} horizontal>
                     <RadioButton value="currentRegion" rootColor="gray" padding={8}>
                         Current region
@@ -308,7 +315,7 @@ export class CircletView extends React.Component {
                         {genomeOtion}
                     </RadioButton>
                 </RadioGroup>
-                <h4>Choose data from: </h4>
+                <h5>Choose data from: (please note only .hic track will fetch additional data)</h5>
                 <RadioGroup onChange={ this.onChangeData } value={this.state.dataKey} horizontal> 
                     <RadioButton value="currentRegion" rootColor="gray" padding={8}>
                         Current region
@@ -330,6 +337,12 @@ export class CircletView extends React.Component {
                             Min: <input type="text" value={scoreMin} size={10} onChange={this.onChangeScoreMin} />
                         </label> <label>
                             Max: <input type="text" value={scoreMax} size={10} onChange={this.onChangeScoreMax} />
+                        </label>
+                    </div>
+                    <div>
+                        <div>Change flanking at each side: </div>
+                        <label>
+                            Length: <input type="number" value={flanking} step={10000} size={10} onChange={this.onChangeFlanking} />bp
                         </label>
                     </div>
                     <div>

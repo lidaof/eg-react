@@ -39,13 +39,13 @@ export class RulerDesigner {
      * @return {Ruler~Unit} the unit for tick labels
      */
     _getMajorUnit(log10BasesPerTick) {
-        if (log10BasesPerTick >= 5) { // 10K
+        if (log10BasesPerTick >= 6) { // 10K (Daofeng updated to 6 from 5)
             return {
                 size: 1000000,
                 digits: 1,
                 name: "M",
             };
-        } else if (log10BasesPerTick > 2) { // 100
+        } else if (log10BasesPerTick > 3) { // 100 (Daofeng updated to 3 from 2)
             return {
                 size: 1000,
                 digits: 0,
