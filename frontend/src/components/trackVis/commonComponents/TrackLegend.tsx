@@ -83,7 +83,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             select(this.gNode).selectAll("text")
                 .filter((d, i) => i === 0 && d !== 0 ).attr("dy", "0.58em")
             select(this.gNode).selectAll("text")
-                .filter((d, i) => i === 1 && d !== 0).attr("dy", dy0);
+                .filter((d, i) => i === 1).attr("dy", dy0);
             if (this.props.axisScaleReverse) {
                 const axis2 = axisLeft(this.props.axisScaleReverse);
                 // axis2.ticks(NUM_TICKS_SUGGESTION);
@@ -98,7 +98,12 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                     .remove();
                 select(this.gNode).selectAll("text")
                     .filter((d, i) => i === 2 ).attr("dy", 0);
+                select(this.gNode).selectAll("text")
+                    .filter((d, i) => d === 0 && i === 0 ).remove();
+                
             }
+            select(this.gNode).selectAll("text")
+                .filter((d, i) => d === 0 && i === 0 ).remove();
         }
     }
 

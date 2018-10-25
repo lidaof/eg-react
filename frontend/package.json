@@ -65,6 +65,7 @@
     "react-color": "^2.14.0",
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.3.0",
+    "react-hot-keys": "^1.2.2",
     "react-modal": "^3.6.1",
     "react-notify-toast": "^0.5.0",
     "react-popper": "^0.8.2",

@@ -138,6 +138,24 @@ class DisplayedRegionModel {
     }
 
     /**
+     * pan same width to left
+     * @return {this}
+     */
+    panLeft(): this {
+        const width = this.getWidth();
+        return this.pan(width);
+    }
+
+    /**
+     * pan same width to right
+     * @return {this}
+     */
+    panRight(): this {
+        const width = this.getWidth();
+        return this.pan(-width);
+    }
+
+    /**
      * Multiplies the size of the current region by a factor, also ensuring view boundaries stay within the genome.
      * Factors less than 1 zoom in (region gets shorter); factors greater than 1 zoom out (region gets longer).
      * Additionally, one can specify the focal point of the zoom as the number of region widths from the left edge.  By

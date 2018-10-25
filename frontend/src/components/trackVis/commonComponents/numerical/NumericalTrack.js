@@ -27,7 +27,7 @@ export const DEFAULT_OPTIONS = {
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 const AUTO_HEATMAP_THRESHOLD = 21; // If pixel height is less than this, automatically use heatmap
-const TOP_PADDING = 3;
+const TOP_PADDING = 0;
 const THRESHOLD_HEIGHT = 3; // the bar tip height which represet value above max or below min
 
 /**
@@ -226,7 +226,7 @@ class NumericalTrack extends React.Component {
         );
         return <Track
             {...this.props}
-            style={{paddingBottom: "5px"}}
+            // style={{paddingBottom: "5px"}}
             legend={legend}
             visualizer={visualizer}
         />;

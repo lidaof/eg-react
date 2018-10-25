@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import connect from 'react-redux/lib/connect/connect';
 import ReactModal from "react-modal";
+import Hotkeys from 'react-hot-keys';
 
 import { ActionCreators } from '../../AppState';
 
@@ -112,8 +113,33 @@ class TrackContainer extends React.Component {
         this.handleCloseModal = this.handleCloseModal.bind(this);
         this.renderModal = this.renderModal.bind(this);
         this.setCircletColor = this.setCircletColor.bind(this);
+        this.onKeyDown = this.onKeyDown.bind(this);
     }
 
+
+    onKeyDown(keyName, e, handle) {
+        switch(keyName){
+            case "alt+h":
+            case "alt+d":
+                this.toggleTool(Tools.DRAG);
+                break;
+            case "alt+s":
+            case "alt+r":
+                this.toggleTool(Tools.REORDER);
+                break;
+            case "alt+m":
+                this.toggleTool(Tools.ZOOM_IN);
+                break;
+            case "alt+z":
+                const newRegionLeft = this.props.primaryView.viewWindowRegion.clone().panLeft();
+                this.props.onNewRegion(...newRegionLeft.getContextCoordinates());
+                break;
+            case "alt+x":
+                const newRegionRight = this.props.primaryView.viewWindowRegion.clone().panRight();
+                this.props.onNewRegion(...newRegionRight.getContextCoordinates());
+                break;
+        }
+    }
     /**
      * Toggles the selection of a tool, or switches tool.
      * 
@@ -350,6 +376,10 @@ class TrackContainer extends React.Component {
                 </ContextMenuManager>
             </OutsideClickDetector>
             {this.renderModal()}
+            <Hotkeys 
+                keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x" 
+                onKeyDown={this.onKeyDown.bind(this)}
+            ></Hotkeys>
         </React.Fragment>
         );
     }
