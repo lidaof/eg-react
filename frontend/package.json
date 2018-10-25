@@ -1,6 +1,6 @@
 {
   "name": "eg-react",
-  "version": "47.1.1",
+  "version": "47.2.1",
   "private": true,
   "scripts": {
     "build": "react-app-rewired build --scripts-version react-scripts-ts",

@@ -71,7 +71,7 @@ const publicHubList = [
         name: "4DN HiC datasets",
         numTracks: 59,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~dli/test/4dn_hg38.json",
+        url: "https://vizhub.wustl.edu/public/hg38/4dn_hg38.json",
         description: "The Hi-C datasets from 4DN data portal for human.",
     },
 ]

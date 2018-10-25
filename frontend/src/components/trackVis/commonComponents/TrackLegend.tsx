@@ -3,14 +3,15 @@ import { connect } from 'react-redux';
 import { ScaleLinear } from 'd3-scale';
 import { select } from 'd3-selection';
 import { axisLeft } from 'd3-axis';
-
 import { AppState } from '../../../AppState';
 import { TranslatableG } from '../../TranslatableG';
 import TrackModel from '../../../model/TrackModel';
+import { StateWithHistory } from 'redux-undo';
+import { BASE_COLORS, Sequence } from '../../Sequence';
+import LinearDrawingModel from '../../../model/LinearDrawingModel';
+import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 
 import './TrackLegend.css';
-import { StateWithHistory } from 'redux-undo';
-import { BASE_COLORS } from '../../Sequence';
 
 interface TrackLegendProps {
     trackModel: TrackModel; // Track metadata
@@ -19,6 +20,8 @@ interface TrackLegendProps {
     axisScale?: ScaleLinear<number, number>; // A d3 scale function, used for drawing axes
     axisScaleReverse?: ScaleLinear<number, number>; // A d3 scale function, used for drawing axes
     style?: object;
+    trackWidth?: number;
+    trackViewRegion?: DisplayedRegionModel;
 }
 
 // const NUM_TICKS_SUGGESTION = 2;
@@ -74,8 +77,13 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             const axisDomain = this.props.axisScale.domain();
             if (!axisDomain.includes(NaN)) {
                 axis.tickValues(axisDomain);
-            }            
+            }
+            const dy0 = this.props.axisScaleReverse ? "0.32em" : 0;    
             select(this.gNode).append("g").call(axis);
+            select(this.gNode).selectAll("text")
+                .filter((d, i) => i === 0 && d !== 0 ).attr("dy", "0.58em")
+            select(this.gNode).selectAll("text")
+                .filter((d, i) => i === 1 && d !== 0).attr("dy", dy0);
             if (this.props.axisScaleReverse) {
                 const axis2 = axisLeft(this.props.axisScaleReverse);
                 // axis2.ticks(NUM_TICKS_SUGGESTION);
@@ -86,8 +94,10 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                 select(this.gNode).append("g")
                     .attr("transform", "translate(" + 0 + "," + this.props.height * 0.5 + ")")
                     .call(axis2).selectAll(".tick")
-                    .filter( (d) =>  d === 0 )
+                    .filter( d =>  d === 0 )
                     .remove();
+                select(this.gNode).selectAll("text")
+                    .filter((d, i) => i === 2 ).attr("dy", 0);
             }
         }
     }
@@ -109,7 +119,8 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
     }
 
     render() {
-        const {trackModel, width, height, axisScale, style, axisScaleReverse} = this.props;
+        const {trackModel, width, height, axisScale, style, axisScaleReverse,
+            trackViewRegion, trackWidth} = this.props;
         if (height <= 0) {
             return null;
         }
@@ -134,11 +145,20 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
         }
 
         const label = trackModel.getDisplayLabel();
+        let plotLegend = false;
+        if(trackModel.type === 'ruler') {
+            const drawModel = new LinearDrawingModel(trackViewRegion, trackWidth);
+            if (drawModel.basesToXWidth(1) > Sequence.MIN_X_WIDTH_PER_BASE) {
+                plotLegend = true;
+            } else {
+                plotLegend = false;
+            }
+        }
         return (
         <div style={divStyle} title={label}>
             <p className="TrackLegend-label" style={pStyle} >{label}</p>
             <div style={{display: "flex", alignItems: "center", fontSize: "12px"}}>
-                {trackModel.type === 'ruler' && this.plotATCGLegend()}</div>
+                {plotLegend && this.plotATCGLegend()}</div>
             {axis}
         </div>
         );
