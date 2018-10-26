@@ -78,10 +78,12 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             if (!axisDomain.includes(NaN)) {
                 axis.tickValues(axisDomain);
             }
-            const dy0 = this.props.axisScaleReverse ? "0.32em" : 0;    
-            select(this.gNode).append("g").call(axis);
+            const dy0 = this.props.axisScaleReverse ? "0.32em" : "-0.1em"; 
+            if(axisDomain[0] !== axisDomain[1]) {
+                select(this.gNode).append("g").call(axis);
+            }   
             select(this.gNode).selectAll("text")
-                .filter((d, i) => i === 0 && d !== 0 ).attr("dy", "0.58em")
+                .filter((d, i) => i === 0 && d !== 0 ).attr("dy", "0.6em")
             select(this.gNode).selectAll("text")
                 .filter((d, i) => i === 1).attr("dy", dy0);
             if (this.props.axisScaleReverse) {
@@ -91,19 +93,16 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                 if(!axis2Domain.includes(NaN)) {
                     axis2.tickValues(axis2Domain);
                 }
-                select(this.gNode).append("g")
-                    .attr("transform", "translate(" + 0 + "," + this.props.height * 0.5 + ")")
-                    .call(axis2).selectAll(".tick")
-                    .filter( d =>  d === 0 )
-                    .remove();
+                if(axis2Domain[0] !== axis2Domain[1]) {
+                    select(this.gNode).append("g")
+                        .attr("transform", "translate(" + 0 + "," + this.props.height * 0.5 + ")")
+                        .call(axis2).selectAll(".tick")
+                        .filter( d =>  d === 0 )
+                        .remove();
+                }
                 select(this.gNode).selectAll("text")
-                    .filter((d, i) => i === 2 ).attr("dy", 0);
-                select(this.gNode).selectAll("text")
-                    .filter((d, i) => d === 0 && i === 0 ).remove();
-                
+                    .filter((d, i) => i === 2 ).attr("dy", "-0.1em");  
             }
-            select(this.gNode).selectAll("text")
-                .filter((d, i) => d === 0 && i === 0 ).remove();
         }
     }
 
