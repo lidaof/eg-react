@@ -74,19 +74,19 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
 
         fetchTracks(prevTracks: TrackModel[] = []) {
             const addedTracks = _.differenceBy(this.props.tracks, prevTracks, track => track.getId());
-            const removedTracks = _.differenceBy(prevTracks, this.props.tracks, track => track.getId());
+            // const removedTracks = _.differenceBy(prevTracks, this.props.tracks, track => track.getId());
             for (const track of addedTracks) {
                 this.fetchTrack(track);
             }
 
             // Clean up the data sources and state of removed tracks
-            const deletionUpdate = {};
-            for (const track of removedTracks) {
-                const id = track.getId();
-                this._dataSourceManager.cleanUp(id);
-                deletionUpdate[id] = undefined;
-            }
-            this.setState(deletionUpdate);
+            // const deletionUpdate = {};
+            // for (const track of removedTracks) {
+            //     const id = track.getId();
+            //     this._dataSourceManager.cleanUp(id);
+            //     deletionUpdate[id] = undefined;
+            // }
+            // this.setState(deletionUpdate);
         }
 
         async fetchTrack(track: TrackModel) {

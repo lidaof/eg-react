@@ -205,6 +205,16 @@ export class CircletView extends React.Component {
             }
         });
         return currentData;
+        // TODO: repalce block above with use of FeaturePlacer
+        // const featurePlacer = new FeaturePlacer();
+        // const placements = featurePlacer.placeInteractions(interactions, viewRegion, width);
+        // return placements.map(placement => {
+        //     return {
+        //         souce: {id: 'current', start: placement.xSpan1.start, end: placement.xSpan1.end },
+        //         target: {id: 'current', start: placement.xSpan2.start, end: placement.xSpan2.end },
+        //         value: placement.interaction.score
+        //     };
+        // }
     }
 
     getChords = (layoutKey, dataKey) => {

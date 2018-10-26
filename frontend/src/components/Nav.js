@@ -17,15 +17,17 @@ import LiveUI from "./LiveUI";
 import { RegionExpander } from '../model/RegionExpander';
 import { ScreenshotUI } from "./ScreenshotUI";
 import FacetTableUI from "./FacetTableUI";
+import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "src/AppState";
+import { HotKeyInfo } from "./HotKeyInfo";
+import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
 
 import eglogo from '../images/eglogo.jpg';
-
 import './Nav.css';
-import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "src/AppState";
 
-const VERSION = "v47.2.1";
+const VERSION = "v47.2.2";
 
-const REGION_EXPANDER = new RegionExpander(0);
+const REGION_EXPANDER1 = new RegionExpander(1);
+const REGION_EXPANDER0 = new RegionExpander(0);
 
 /**
  * the top navigation bar for browser
@@ -95,6 +97,8 @@ class Nav extends React.Component {
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName);
+        const hasInteractionTrack = tracks.some(model => INTERACTION_TYPES.includes(model.type)) ? true : false;
+        const REGION_EXPANDER = hasInteractionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
         return (
             <div className="Nav-container">
                 <div id="logoDiv">
@@ -202,7 +206,7 @@ class Nav extends React.Component {
                             <LiveUI />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Screenshot">
-                            <ScreenshotUI expansionAmount={REGION_EXPANDER} />
+                            <ScreenshotUI expansionAmount={REGION_EXPANDER} needClip={hasInteractionTrack} />
                         </ModalMenuItem>
                     </div>
                 </div>
@@ -249,9 +253,20 @@ class Nav extends React.Component {
                     </div>
                 </div>
                 <div className="Nav-center">
-                    <a role="button" className="btn btn-warning btn-sm" 
-                        href="https://epigenomegateway.readthedocs.io/" 
-                        target="_blank">📖Documentation</a>
+                    <DropdownOpener extraClassName="btn-warning" label="📖Help" />
+                    <div className="dropdown-menu">
+                        <label className="dropdown-item">
+                            <a href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
+                        </label>
+                        <ModalMenuItem itemLabel="Hotkeys" style={{content: {
+                                                        left: "unset",
+                                                        bottom: "unset",
+                                                        overflow: "visible",
+                                                        padding: "5px",
+                                                    }}}>
+                            <HotKeyInfo  />
+                        </ModalMenuItem>
+                    </div>
                 </div>
             </div>
         )

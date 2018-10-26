@@ -118,6 +118,7 @@ class TrackContainer extends React.Component {
 
 
     onKeyDown(keyName, e, handle) {
+        const { primaryView, onNewRegion } = this.props;
         switch(keyName){
             case "alt+h":
             case "alt+d":
@@ -131,12 +132,20 @@ class TrackContainer extends React.Component {
                 this.toggleTool(Tools.ZOOM_IN);
                 break;
             case "alt+z":
-                const newRegionLeft = this.props.primaryView.viewWindowRegion.clone().panLeft();
-                this.props.onNewRegion(...newRegionLeft.getContextCoordinates());
+                const newRegionLeft = primaryView.viewWindowRegion.clone().panLeft();
+                onNewRegion(...newRegionLeft.getContextCoordinates());
                 break;
             case "alt+x":
-                const newRegionRight = this.props.primaryView.viewWindowRegion.clone().panRight();
-                this.props.onNewRegion(...newRegionRight.getContextCoordinates());
+                const newRegionRight = primaryView.viewWindowRegion.clone().panRight();
+                onNewRegion(...newRegionRight.getContextCoordinates());
+                break;
+            case "alt+i":
+                const newRegionRightIn = primaryView.viewWindowRegion.clone().zoom(0.5);
+                onNewRegion(...newRegionRightIn.getContextCoordinates());
+                break;
+            case "alt+o":
+                const newRegionRightOut = primaryView.viewWindowRegion.clone().zoom(2);
+                onNewRegion(...newRegionRightOut.getContextCoordinates());
                 break;
         }
     }
@@ -377,7 +386,7 @@ class TrackContainer extends React.Component {
             </OutsideClickDetector>
             {this.renderModal()}
             <Hotkeys 
-                keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x" 
+                keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o" 
                 onKeyDown={this.onKeyDown.bind(this)}
             ></Hotkeys>
         </React.Fragment>
