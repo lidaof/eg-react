@@ -23,7 +23,7 @@ import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
 import eglogo from '../images/eglogo.jpg';
 import './Nav.css';
 
-const VERSION = "v47.2.2";
+const VERSION = "47.2.3";
 
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
@@ -103,7 +103,7 @@ class Nav extends React.Component {
                 <div id="logoDiv">
                     <img src={eglogo} width="180px" height="30px" alt="browser logo"/>
                     <span id="theNew" >The New</span>
-                    <span id="theVersion">{VERSION}</span>
+                    <span id="theVersion">v{VERSION}</span>
                 </div>
                 <div className="Nav-genome Nav-center" 
                     style={{backgroundImage: `url(${logo})`, color: color, backgroundSize: "cover"}}>

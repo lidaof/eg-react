@@ -14,3 +14,7 @@
     text-align: right;
     vertical-align: middle;
 }
+
+.MetadataHeader-terms li:first-child {
+    writing-mode: horizontal-tb;
+}

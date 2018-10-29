@@ -52,11 +52,10 @@ class RemoteHubAdder extends React.Component {
         const tracks = await parser.getTracksInHub(json, "Custom hub");
         if (tracks) {
             this.props.onAddTracksToPool(tracks, false);
-            tracks.forEach(track => {
-                if (track.showOnHubLoad) {
-                    this.props.onTracksAdded(tracks);
-                }
-            });
+            const tracksToShow = tracks.filter(track => track.showOnHubLoad);
+            if (tracksToShow.length > 0) {
+                this.props.onTracksAdded(tracksToShow);
+            }
             this.setState({isLoading: false, error: ""});
         }
     }

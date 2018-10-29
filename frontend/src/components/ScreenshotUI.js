@@ -42,12 +42,17 @@ class ScreenshotUINotConnected extends React.Component {
         svgElem.setAttributeNS(null, "width", boxWidth + "");
         svgElem.setAttributeNS(null, "height", boxHeight + "");
         svgElem.style.display = "block";
-        const svgElemg = document.createElementNS (xmlns, "g");
+        const svgElemg = document.createElementNS (xmlns, "g"); // for labels, separate lines etc
+        const svgElemg2 = document.createElementNS (xmlns, "g"); // for tracks contents
         const translateX = this.props.needClip ? -this.props.primaryView.viewWindow.start : 0;
+        const clipDef = document.createElementNS(xmlns, "defs");
+        const clipPath = document.createElementNS(xmlns, "clipPath");
+        clipPath.setAttributeNS(null, "id", "cutoff-legend-space");
+        let clipWidth, clipHeight, clipX;
         let x = 0, y = 5;
         tracks.forEach((ele, idx) => {
             const legendWidth = ele.children[0].clientWidth + 1;
-            const trackHeight = ele.children[1].clientHeight + 10;
+            const trackHeight = ele.children[1].clientHeight + 5;
             const trackLabelText = ele.children[0].querySelector(".TrackLegend-label").textContent;
             if (trackLabelText) {
                 const labelSvg = document.createElementNS(xmlns,"text");
@@ -81,7 +86,7 @@ class ScreenshotUINotConnected extends React.Component {
                 }); 
             }
             trackG.setAttributeNS(null, "transform", `translate(${translateX})`);
-            svgElemg.appendChild(trackG);
+            svgElemg2.appendChild(trackG);
             // metadata ?
             y += trackHeight;
             y += 2; //draw separare line
@@ -95,8 +100,23 @@ class ScreenshotUINotConnected extends React.Component {
             svgElemg.appendChild(sepLine);
             y += 2;
             x = 0;
+            clipX = legendWidth - 1;
         });
+        clipHeight = boxHeight;
+        clipWidth = boxWidth - clipX;
+        const clipRect = document.createElementNS(xmlns, "rect");
+        clipRect.setAttribute('x', clipX+'');
+        clipRect.setAttribute('y', '0');
+        clipRect.setAttribute('width', clipWidth+'');
+        clipRect.setAttribute('height', clipHeight+'');
+        clipPath.appendChild(clipRect);
+        clipDef.appendChild(clipPath);
+        if(this.props.needClip) {
+            svgElem.appendChild(clipDef);
+            svgElemg2.setAttributeNS(null, "clip-path", "url(#cutoff-legend-space)");
+        }
         svgElem.appendChild(svgElemg);
+        svgElem.appendChild(svgElemg2);
         svgElem.setAttribute("xmlns", xmlns);
 
         const dl = document.createElement("a");

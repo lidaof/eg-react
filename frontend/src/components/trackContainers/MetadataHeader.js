@@ -26,7 +26,7 @@ class MetadataHeader extends React.PureComponent {
     render() {
         const termWidth = MetadataIndicator.WIDTH;
         const editMenuStyle = this.state.isShowingEditMenu ? undefined : {display: "none"};
-        const suffix = this.state.isShowingEditMenu ? '🗴' : '»';
+        const suffix = this.state.isShowingEditMenu ? '↩' : '»';
         const buttonStyle = this.state.isShowingEditMenu ? ' btn btn-sm btn-danger dense-button ' : 'btn btn-sm btn-success dense-button';
         return (
         <div className="MetadataHeader-container" >

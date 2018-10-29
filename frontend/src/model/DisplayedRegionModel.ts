@@ -138,12 +138,12 @@ class DisplayedRegionModel {
     }
 
     /**
-     * pan same width to left
+     * pan same width to left, pan left not same as drag left, coords get smaller
      * @return {this}
      */
     panLeft(): this {
         const width = this.getWidth();
-        return this.pan(width);
+        return this.pan(-width);
     }
 
     /**
@@ -152,7 +152,7 @@ class DisplayedRegionModel {
      */
     panRight(): this {
         const width = this.getWidth();
-        return this.pan(-width);
+        return this.pan(width);
     }
 
     /**
