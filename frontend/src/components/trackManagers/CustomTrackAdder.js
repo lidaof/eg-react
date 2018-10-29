@@ -115,7 +115,8 @@ class CustomTrackAdder extends React.Component {
     }
 
     renderCustomHubAdder() {
-        return <CustomHubAdder onTracksAdded={tracks => this.props.onAddTracksToPool(tracks, false)} />;
+        return <CustomHubAdder onTracksAdded={tracks => this.props.onTracksAdded(tracks)} 
+                    onAddTracksToPool={tracks => this.props.onAddTracksToPool(tracks, false)}/>;
     }
 
     render() {

@@ -1,10 +1,10 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "eg-react",
+  "name": "WashU Epigenome Browser",
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "192x192",
+      "sizes": "24x24",
       "type": "image/png"
     }
   ],

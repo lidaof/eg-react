@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import JSON5 from 'json5';
 import Json5Fetcher from '../../model/Json5Fetcher';
 import DataHubParser from '../../model/DataHubParser';
+import TrackList from './TrackList';
 
 /**
  * custom hub add UI
@@ -12,8 +13,8 @@ import DataHubParser from '../../model/DataHubParser';
 function CustomHubAdder(props) {
     return (
     <div>
-        <RemoteHubAdder onTracksAdded={props.onTracksAdded} />
-        <FileHubAdder onTracksAdded={props.onTracksAdded} />
+        <RemoteHubAdder onTracksAdded={props.onTracksAdded} onAddTracksToPool={props.onAddTracksToPool} />
+        <FileHubAdder onTracksAdded={props.onTracksAdded} onAddTracksToPool={props.onAddTracksToPool} />
     </div>
     );
 }
@@ -21,6 +22,7 @@ function CustomHubAdder(props) {
 class RemoteHubAdder extends React.Component {
     static propTypes = {
         onTracksAdded: PropTypes.func,
+        onAddTracksToPool: PropTypes.func,
     };
 
     constructor(props) {
@@ -49,7 +51,12 @@ class RemoteHubAdder extends React.Component {
         const parser = new DataHubParser(0);
         const tracks = await parser.getTracksInHub(json, "Custom hub");
         if (tracks) {
-            this.props.onTracksAdded(tracks);
+            this.props.onAddTracksToPool(tracks, false);
+            tracks.forEach(track => {
+                if (track.showOnHubLoad) {
+                    this.props.onTracksAdded(tracks);
+                }
+            });
             this.setState({isLoading: false, error: ""});
         }
     }
@@ -108,7 +115,12 @@ class FileHubAdder extends React.Component {
         const parser = new DataHubParser(0);
         const tracks = await parser.getTracksInHub(json, "Custom hub");
         if (tracks) {
-            this.props.onTracksAdded(tracks);
+            this.props.onAddTracksToPool(tracks, false);
+            tracks.forEach(track => {
+                if (track.showOnHubLoad) {
+                    this.props.onTracksAdded(tracks);
+                }
+            });
         }
     }
 

@@ -15,7 +15,7 @@ import ReorderableTrackContainer from './ReorderableTrackContainer';
 import { ZoomableTrackContainer } from './ZoomableTrackContainer';
 import MetadataHeader from './MetadataHeader';
 import { Tools, ToolButtons } from './Tools';
-
+import ZoomButtons from './ZoomButtons';
 import OutsideClickDetector from '../OutsideClickDetector';
 import ContextMenuManager from '../ContextMenuManager';
 import DivWithBullseye from '../DivWithBullseye';
@@ -31,6 +31,7 @@ import History from "./History";
 import HighlightRegion from "../HighlightRegion";
 import { VerticalDivider } from './VerticalDivider';
 import { CircletView } from "./CircletView";
+import ButtonGroup from './ButtonGroup';
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
@@ -114,11 +115,28 @@ class TrackContainer extends React.Component {
         this.renderModal = this.renderModal.bind(this);
         this.setCircletColor = this.setCircletColor.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
+        this.panLeftOrRight = this.panLeftOrRight.bind(this);
+        this.zoomOut = this.zoomOut.bind(this);
     }
 
+    panLeftOrRight(left=true) {
+        const { primaryView, onNewRegion } = this.props;
+        let newRegion;
+        if (left) {
+            newRegion = primaryView.viewWindowRegion.clone().panLeft();
+        } else {
+            newRegion = primaryView.viewWindowRegion.clone().panRight();
+        }
+        onNewRegion(...newRegion.getContextCoordinates());
+    }
+
+    zoomOut(factor) {
+        const { primaryView, onNewRegion } = this.props;
+        const newRegion = primaryView.viewWindowRegion.clone().zoom(factor);
+        onNewRegion(...newRegion.getContextCoordinates());
+    }
 
     onKeyDown(keyName, e, handle) {
-        const { primaryView, onNewRegion } = this.props;
         switch(keyName){
             case "alt+h":
             case "alt+d":
@@ -132,20 +150,16 @@ class TrackContainer extends React.Component {
                 this.toggleTool(Tools.ZOOM_IN);
                 break;
             case "alt+z":
-                const newRegionLeft = primaryView.viewWindowRegion.clone().panLeft();
-                onNewRegion(...newRegionLeft.getContextCoordinates());
+                this.panLeftOrRight(true);
                 break;
             case "alt+x":
-                const newRegionRight = primaryView.viewWindowRegion.clone().panRight();
-                onNewRegion(...newRegionRight.getContextCoordinates());
+                this.panLeftOrRight(false);
                 break;
             case "alt+i":
-                const newRegionRightIn = primaryView.viewWindowRegion.clone().zoom(0.5);
-                onNewRegion(...newRegionRightIn.getContextCoordinates());
+                this.zoomOut(0.5);
                 break;
             case "alt+o":
-                const newRegionRightOut = primaryView.viewWindowRegion.clone().zoom(2);
-                onNewRegion(...newRegionRightOut.getContextCoordinates());
+                this.zoomOut(2);
                 break;
         }
     }
@@ -255,17 +269,21 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element}
      */
     renderControls() {
-        const {metadataTerms, onMetadataTermsChanged, suggestedMetaSets} = this.props;
+        const {metadataTerms, onMetadataTermsChanged, suggestedMetaSets, viewRegion, onNewRegion} = this.props;
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
-        return <div style={{display: "flex", alignItems: "flex-end"}}>
-            <div>
-                {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
+        const panLeftButton = <button className="btn btn-outline-dark" title="Pan left"
+                                style={{fontFamily: "monospace"}} onClick={() => this.panLeftOrRight(true)}>◀</button>;
+        const panRightButton = <button className="btn btn-outline-dark" title="Pan right"
+                                style={{fontFamily: "monospace"}} onClick={() => this.panLeftOrRight(false)}>▶</button>;
+        return <div style={{display: "flex", alignItems: "center"}}>
                 <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} /> 
-            </div>
-            <div><UndoRedo /></div>
-            <div><History /></div>
-            <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} suggestedMetaSets={suggestedMetaSets} />
-        </div>;
+                <ButtonGroup buttons={panLeftButton} />
+                <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} />
+                <ButtonGroup buttons={panRightButton} />
+                <div><UndoRedo /></div>
+                <div><History /></div>
+                <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} suggestedMetaSets={suggestedMetaSets} />
+            </div>;
     }
 
     /**

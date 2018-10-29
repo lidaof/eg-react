@@ -5,7 +5,6 @@ import _ from "lodash";
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from './genomeNavigator/TrackRegionController';
-import ZoomButtons from './trackContainers/ZoomButtons';
 import RegionSetSelector from './RegionSetSelector';
 import TrackList from "./trackManagers/TrackList";
 import { TrackModel } from '../model/TrackModel';
@@ -118,9 +117,9 @@ class Nav extends React.Component {
                         onSetEnteredRegion={onSetEnteredRegion}
                     />
                 </div>
-                <div className="Nav-center">
+                {/* <div className="Nav-center">
                     <ZoomButtons viewRegion={selectedRegion} onNewRegion={onRegionSelected} />
-                </div>
+                </div> */}
                 <div className="Nav-center btn-group">
                     <DropdownOpener extraClassName="btn-primary" label="🎹Tracks" />
                     <div className="dropdown-menu">

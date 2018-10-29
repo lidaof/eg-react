@@ -72,7 +72,11 @@ const publicHubList = [
         numTracks: 59,
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/hg38/4dn_hg38.json",
-        description: "The Hi-C datasets from 4DN data portal for human.",
+        description: {
+            'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+            'hub built date': 'Sep 1 2018',
+            'hub built notes': 'metadata information are obtained directly from 4DN data portal'
+        },
     },
 ]
 

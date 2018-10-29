@@ -4,6 +4,8 @@ import ButtonGroup from './ButtonGroup';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 
 const ZOOMS = [
+    { factor: 0.2, text: "+5", title: "Zoom in 5-fold" },
+    { factor: 0.5, text: "+1", title: "Zoom in 1-fold" },
     { factor: 2/3, text: "+⅓", title: "Zoom in 1/3-fold" },
     { factor: 4/3, text: "-⅓", title: "Zoom out 1/3-fold" },
     { factor: 2, text: "-1", title: "Zoom out 1-fold" },
