@@ -65,7 +65,7 @@ const Visualizer = withCurrentGenome(RulerVisualizer);
 function RulerTrack(props) {
     return <Track
         {...props}
-        legend={<TrackLegend height={HEIGHT} trackModel={props.trackModel} />}
+        legend={<TrackLegend height={HEIGHT} trackModel={props.trackModel} trackViewRegion={props.viewRegion} trackWidth={props.width} />}
         visualizer={<Visualizer viewRegion={props.viewRegion} width={props.width} trackModel={props.trackModel} />}
     />;
 }

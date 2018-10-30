@@ -11,6 +11,7 @@ if (process.env.NODE_ENV !== "test" && typeof window === "undefined") {
 } // else that script have better been included in a <script> tag!
 
 const MAX_GZIP_BLOCK_SIZE = 1 << 16;
+const DATA_FILTER_LIMIT_LENGTH = 30000;
 
 /**
  * Perform a network request for binary data.
@@ -109,8 +110,12 @@ class BedSourceWorker extends WorkerRunnableSource {
      */
     _parseAndFilterFeatures(buffer, chromosome, start, end) {
         const text = new TextDecoder('utf-8').decode(buffer);
-        const lines = ensureMaxListLength(text.split('\n'), this.dataLimit);
-
+        let lines;
+        if(end - start > DATA_FILTER_LIMIT_LENGTH) {
+            lines = ensureMaxListLength(text.split('\n'), this.dataLimit);    
+        } else {
+            lines = text.split('\n');
+        }
         let features = [];
         for (let line of lines) {
             const columns = line.split('\t');

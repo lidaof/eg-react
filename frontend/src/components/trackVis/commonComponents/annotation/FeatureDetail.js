@@ -17,9 +17,18 @@ class FeatureDetail extends React.PureComponent {
     render() {
         const {feature, category} = this.props;
         const featureName = category ? category[feature.getName()].name: feature.getName();
+        let ncbiLink, ncbiURL, ensemblLink, ensemblURL;
+        if (feature.id) {
+            ncbiURL = `https://www.ncbi.nlm.nih.gov/gene/?term=${feature.id.split('.')[0]}`;
+            ensemblURL = `http://www.ensembl.org/Multi/Search/Results?q=${feature.id}`;
+            ncbiLink =  <a href={ncbiURL} target="_blank">NCBI🔗</a>;
+            ensemblLink =  <a href={ensemblURL} target="_blank">Ensembl🔗</a>;
+        }
+        
         return (
         <div>
             {featureName ? <div className="Tooltip-major-text" >{featureName}</div> : null}
+            {feature.id ? <div>{feature.id} {ncbiLink} {ensemblLink}</div> : null}
             <div>{feature.getLocus().toString()} ({feature.getLocus().getLength()}bp)</div>
             {feature.getHasStrand() ? <div>Strand: {feature.getStrand()}</div> : null}
         </div>

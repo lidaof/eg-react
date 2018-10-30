@@ -21705,6 +21705,54 @@ var hic = (function (hic) {
  * Copyright (c) 2016-2017 The Regents of the University of California
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+ * following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+var hic = (function (hic) {
+
+    hic.CaptionManager = function ($caption) {
+
+        var self = this;
+
+        this.$caption = $caption;
+
+        $caption.keyup(function (e) {
+            self.getCaption($(this));
+        });
+    };
+
+    hic.CaptionManager.prototype.getCaption = function ($caption) {
+        this.text = $caption.text();
+        console.log('caption ' + this.text);
+    };
+
+    hic.CaptionManager.prototype.setCaption = function (string) {
+        this.text = string;
+        this.$caption.text(string);
+    };
+
+    return hic;
+})(hic || {});
+
+/*
+ *  The MIT License (MIT)
+ *
+ * Copyright (c) 2016-2017 The Regents of the University of California
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
  * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
  * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
@@ -21989,9 +22037,12 @@ var hic = (function (hic) {
 
         switch (this.displayMode) {
             case 'AOB':
+            case 'BOA':
                 this.ratioColorScale = colorScale;
+                break;
             case 'AMB':
-                return diffColorScale = colorScale;
+                this.diffColorScale = colorScale;
+                break;
             default:
                 this.colorScale = colorScale;
         }
@@ -22010,6 +22061,7 @@ var hic = (function (hic) {
     hic.ContactMatrixView.prototype.getColorScale = function () {
         switch (this.displayMode) {
             case 'AOB':
+            case 'BOA':
                 return this.ratioColorScale;
             case 'AMB':
                 return this.diffColorScale;
@@ -22134,7 +22186,7 @@ var hic = (function (hic) {
         if (!self.browser.dataset || self.initialImage) {
             return Promise.resolve();
         }
-        
+
         self.startSpinner();
         return getMatrices.call(self, state.chr1, state.chr2)
 
@@ -22287,8 +22339,8 @@ var hic = (function (hic) {
 
         colorKey = colorScaleKey(self.browser.state, self.displayMode);   // This doesn't feel right, state should be an argument
 
-        if ('AOB' === self.displayMode) {
-            return Promise.resolve(self.colorScale);     // Don't adjust color scale for A/B.
+        if ('AOB' === self.displayMode || 'BOA' === self.displayMode) {
+            return Promise.resolve(self.ratioColorScale);     // Don't adjust color scale for A/B.
         }
 
         if (self.colorScaleCache[colorKey]) {
@@ -22297,7 +22349,7 @@ var hic = (function (hic) {
             if (changed) {
                 self.browser.eventBus.post(hic.Event("ColorScale", self.colorScale));
             }
-            return Promise.resolve();
+            return Promise.resolve(self.colorScale);
         }
 
         else {
@@ -22317,7 +22369,7 @@ var hic = (function (hic) {
                     }
 
                     dataset = ('B' === self.displayMode ? self.browser.controlDataset : self.browser.dataset);
-                    promises.push(dataset.getNormalizedBlock(zd, blockNumber, normalization))
+                    promises.push(dataset.getNormalizedBlock(zd, blockNumber, normalization, self.browser.eventBus))
                 }
             }
 
@@ -22432,11 +22484,21 @@ var hic = (function (hic) {
 
                 .then(function (blocks) {
 
-                    var block = blocks[0],
-                        controlBlock,
-                        image;
+                    var averageCount, ctrlAverageCount, averageAcrossMapAndControl, block, controlBlock, image;
 
-                    if (blocks.length > 0) controlBlock = blocks[1];
+                    if("BOA" === self.displayMode) {
+                        ctrlAverageCount  = zd.averageCount;
+                        averageCount = zdControl ? zdControl.averageCount : 1;
+                        block = blocks[1];
+                        controlBlock = blocks[0];
+                    }else {
+                        averageCount = zd.averageCount;
+                        ctrlAverageCount = zdControl ? zdControl.averageCount : 1;
+                        block = blocks[0];
+                        if (blocks.length > 0) controlBlock = blocks[1];
+                    }
+                    averageAcrossMapAndControl = (averageCount + ctrlAverageCount) / 2;
+
 
                     if (block && block.records.length > 0) {
                         image = drawBlock(block, controlBlock, transpose);
@@ -22484,7 +22546,7 @@ var hic = (function (hic) {
                         ctx = image.getContext('2d');
                         ctx.clearRect(0, 0, image.width, image.height);
 
-                        if ('AOB' === self.displayMode || 'AMB' === self.displayMode) {
+                        if ('AOB' === self.displayMode || 'BOA' === self.displayMode || 'AMB' === self.displayMode) {
                             controlRecords = {};
                             controlBlock.records.forEach(function (record) {
                                 controlRecords[record.getKey()] = record;
@@ -22496,11 +22558,6 @@ var hic = (function (hic) {
                         if (useImageData) {
                             id = ctx.getImageData(0, 0, image.width, image.height);
                         }
-
-                        var averageCount = zd.averageCount;
-                        var ctrlAverageCount = zdControl ? zdControl.averageCount : 1;
-                        var averageAcrossMapAndControl = (averageCount + ctrlAverageCount) / 2;
-
 
                         for (i = 0; i < block.records.length; i++) {
 
@@ -22517,7 +22574,7 @@ var hic = (function (hic) {
                             switch (self.displayMode) {
 
                                 case 'AOB':
-
+                                case 'BOA':
                                     key = rec.getKey();
                                     controlRec = controlRecords[key];
                                     if (!controlRec) {
@@ -22626,10 +22683,10 @@ var hic = (function (hic) {
             var promises = [];
 
             var dataset = 'B' === this.displayMode ? this.browser.controlDataset : this.browser.dataset;
-            promises.push(dataset.getNormalizedBlock(zd, blockNumber, normalization));
+            promises.push(dataset.getNormalizedBlock(zd, blockNumber, normalization, this.browser.eventBus));
 
             if (zdControl) {
-                promises.push(this.browser.controlDataset.getNormalizedBlock(zdControl, blockNumber, normalization));
+                promises.push(this.browser.controlDataset.getNormalizedBlock(zdControl, blockNumber, normalization, this.browser.eventBus));
             }
 
             return Promise.all(promises);
@@ -22800,35 +22857,28 @@ var hic = (function (hic) {
                 $viewport[0].addEventListener("wheel", mouseWheelHandler, 250, false);
             }
 
-            // Document level events
-            $(document).on({
+            // document level events
+            $(document).on('keydown.contact_matrix_view', function (e) {
+                if (undefined === self.willShowCrosshairs && true === mouseOver && true === e.shiftKey) {
+                    self.willShowCrosshairs = true;
+                }
+            });
 
-                keydown: function (e) {
-                    if (undefined === self.willShowCrosshairs && true === mouseOver && true === e.shiftKey) {
-                        self.willShowCrosshairs = true;
-                    }
-                },
+            $(document).on('keyup.contact_matrix_view', function (e) {
+                self.browser.hideCrosshairs();
+                self.willShowCrosshairs = undefined;
+            });
 
-                keyup: function (e) {
-                    if (/*true === e.shiftKey*/true) {
-                        self.browser.hideCrosshairs();
-                        self.willShowCrosshairs = undefined;
-                    }
-                },
+            // for sweep-zoom allow user to sweep beyond viewport extent
+            // sweep area clamps since viewport mouse handlers stop firing
+            // when the viewport boundary is crossed.
+            $(document).on('mouseup.contact_matrix_view', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
 
-                // for sweep-zoom allow user to sweep beyond viewport extent
-                // sweep area clamps since viewport mouse handlers stop firing
-                // when the viewport boundary is crossed.
-                mouseup: function (e) {
-
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    if (isSweepZooming) {
-                        isSweepZooming = false;
-                        self.sweepZoom.commit();
-                    }
-
+                if (isSweepZooming) {
+                    isSweepZooming = false;
+                    self.sweepZoom.commit();
                 }
             });
         }
@@ -23247,8 +23297,8 @@ var hic = (function (hic) {
     hic.ControlMapWidget = function (browser, $parent) {
 
         var self = this,
-            optionStrings,
-            $options;
+            $toggle_container,
+            $cycle_container;
 
         this.browser = browser;
 
@@ -23258,61 +23308,322 @@ var hic = (function (hic) {
         $parent.append(this.$container);
 
         // select
-        this.$control_map_selector = $('<select>');
-        this.$control_map_selector.attr('name', 'control_map_selector');
-        this.$control_map_selector.on('change', function (e) {
-            var value;
-            value = $(this).val();
-            browser.setDisplayMode(value);
-        });
-        this.$container.append(this.$control_map_selector);
+        this.$select = $('<select>');
+        this.$select.attr('name', 'control_map_selector');
+        this.$container.append(this.$select);
+
+        // a-b toggle icon
+        $toggle_container = $('<div>');
+        this.$container.append($toggle_container);
+
+        // cycle button
+        $cycle_container = $('<div>');
+        this.$container.append($cycle_container);
+
+        this.controlMapHash = new hic.ControlMapHash(browser, this.$select, $toggle_container, $cycle_container, toggle_arrows_up(), toggle_arrows_down());
 
         browser.eventBus.subscribe("ControlMapLoad", function (event) {
-            updateOptions.call(self, browser);
+            let displayMode;
+
+            displayMode = browser.getDisplayMode();
+            self.controlMapHash.updateOptions( browser.getDisplayMode() );
             self.$container.show();
-        })
+        });
 
         browser.eventBus.subscribe("MapLoad", function (event) {
             if (!browser.controlDataset) {
                 self.$container.hide();
             }
-        })
+        });
+
+    };
+    
+    hic.ControlMapWidget.prototype.toggleDisplayMode = function () {
+        this.controlMapHash.toggleDisplayMode();
+    }
+    
+    hic.ControlMapWidget.prototype.toggleDisplayModeCycle = function () {
+        this.controlMapHash.toggleDisplayModeCycle();
+    }
+    
+    hic.ControlMapWidget.prototype.getDisplayModeCycle = function () {
+        return this.controlMapHash.cycleID;
+    }
+    
+    hic.ControlMapWidget.prototype
+
+    hic.ControlMapHash = function (browser, $select, $toggle, $cycle, $img_a, $img_b) {
+
+        let self = this,
+            A,
+            B,
+            Cycle,
+            AOB,
+            BOA;
+
+        this.browser = browser;
+        this.$select = $select;
+        this.$toggle = $toggle;
+        this.$cycle = $cycle;
+
+        // a arrow
+        this.$img_a = $img_a;
+        this.$toggle.append(this.$img_a);
+
+        // b arrow
+        this.$img_b = $img_b;
+        this.$toggle.append(this.$img_b);
+
+        A   = { title: 'A',   value: 'A',   other: 'B',   $hidden: $img_b, $shown: $img_a };
+        B   = { title: 'B',   value: 'B',   other: 'A',   $hidden: $img_a, $shown: $img_b };
+        AOB = { title: 'A/B', value: 'AOB', other: 'BOA', $hidden: $img_b, $shown: $img_a };
+        BOA = { title: 'B/A', value: 'BOA', other: 'AOB', $hidden: $img_a, $shown: $img_b };
+
+        this.hash =
+            {
+                'A': A,
+                'B': B,
+                'AOB': AOB,
+                'BOA': BOA
+            };
+
+        this.$select.on('change', function (e) {
+            let value;
+
+            self.disableDisplayModeCycle();
+
+            value = $(this).val();
+            self.setDisplayMode( value );
+        });
+
+        this.$toggle.on('click', function (e) {
+            self.disableDisplayModeCycle();
+            self.toggleDisplayMode();
+        });
+
+        // cycle outline
+        this.$cycle_outline = cycle_outline();
+        $cycle.append(this.$cycle_outline);
+
+        // cycle solid
+        this.$cycle_solid = cycle_solid();
+        $cycle.append(this.$cycle_solid);
+        this.$cycle_solid.hide();
+
+        $cycle.on('click', function () {
+            self.toggleDisplayModeCycle();
+        });
+
+        $cycle.hide();
 
     };
 
+    hic.ControlMapHash.prototype.disableDisplayModeCycle = function () {
 
-    function updateOptions(browser) {
+        if (this.cycleID) {
 
-        var self = this,
-            optionStrings,
-            option;
+            window.clearInterval(this.cycleID);
+            this.cycleID = undefined;
 
-        optionStrings =
-            [
-                {title: 'A', value: 'A'},
-                {title: 'B', value: 'B'},
-                {title: 'A/B', value: 'AOB'}
-                //{title: 'A-B', value: 'AMB'}
-            ];
+            this.$cycle_solid.hide();
+            this.$cycle_outline.show();
+        }
 
-        this.$control_map_selector.empty();
-        optionStrings.forEach(function (o) {
-            var isSelected;
+    };
 
-            isSelected = browser.getDisplayMode() === o.value;
+    hic.ControlMapHash.prototype.toggleDisplayModeCycle = function () {
+        let self = this;
 
-            option = $('<option>')
-                .attr('title', o.title)
-                .attr('value', o.value)
-                .text(o.title);
+        if (this.cycleID) {
 
-            if(isSelected) {
+            this.disableDisplayModeCycle();
+        } else {
+
+            this.cycleID = window.setInterval(function () {
+                self.toggleDisplayMode();
+            }, 2500);
+
+            this.$cycle_solid.show();
+            this.$cycle_outline.hide();
+        }
+
+    };
+
+    hic.ControlMapHash.prototype.toggleDisplayMode = function () {
+
+        let displayModeOld,
+            displayModeNew,
+            str;
+
+        displayModeOld = this.browser.getDisplayMode();
+
+        // render new display mode
+        displayModeNew = this.hash[ displayModeOld ].other;
+        this.browser.setDisplayMode(displayModeNew);
+
+        // update exchange icon
+        this.hash[ displayModeNew ].$hidden.hide();
+        this.hash[ displayModeNew ].$shown.show();
+
+        // update select element
+        str = 'option[value=' + displayModeNew + ']';
+
+        this.$select.find( str ).prop('selected', true);
+
+    };
+
+    hic.ControlMapHash.prototype.setDisplayMode = function (displayMode) {
+
+        setDisplayModeHelper.call(this, displayMode);
+
+        this.browser.setDisplayMode(displayMode);
+    };
+
+    hic.ControlMapHash.prototype.updateOptions = function (displayMode) {
+        let self = this;
+
+        this.$img_a.hide();
+        this.$img_b.hide();
+
+        this.$select.empty();
+
+        Object.keys(this.hash).forEach(function (key) {
+            let item,
+                option;
+
+            item = self.hash[ key ];
+
+            option = $('<option>').attr('title', item.title).attr('value', item.value).text(item.title);
+
+            if(displayMode === item.value) {
+
                 option.attr('selected', true);
+                item.$shown.show();
+
+                setDisplayModeHelper.call(self, displayMode);
             }
 
-            self.$control_map_selector.append(option);
+            self.$select.append(option);
+
         });
 
+    };
+
+    function setDisplayModeHelper (displayMode) {
+
+        this.hash[ displayMode ].$hidden.hide();
+        this.hash[ displayMode ].$shown.show();
+
+        this.$cycle.show();
+        this.$toggle.show();
+
+        // if ('A' === displayMode || 'B' === displayMode) {
+        //     this.$cycle.show();
+        //     this.$toggle.show();
+        // } else {
+        //     this.$cycle.hide();
+        //     this.$toggle.hide();
+        // }
+
+    }
+
+    function toggle_arrows_up() {
+        let str,
+            a;
+
+        str = '<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n' +
+            '    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->\n' +
+            '    <title>Toggle Maps</title>\n' +
+            '    <desc>Created with Sketch.</desc>\n' +
+            '    <defs></defs>\n' +
+            '    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+            '        <g id="Group">\n' +
+            '            <rect id="Rectangle" stroke="#A6A6A6" stroke-width="1.25201381" fill="#F8F8F8" x="0.626006904" y="0.626006904" width="32.7479862" height="32.7479862" rx="3.91254315"></rect>\n' +
+            '            <g id="arrows" transform="translate(6.533947, 7.003452)" fill-rule="nonzero" stroke="#5F5F5F" stroke-width="0.626006904">\n' +
+            '                <path d="M25.9411017,8.76431329 L11.8559464,8.76431329 L11.8559464,6.88629258 C11.8559464,6.05237313 10.8440845,5.63114873 10.2529383,6.22229488 L7.12290378,9.3523294 C6.75622024,9.71905207 6.75622024,10.3136021 7.12290378,10.6802857 L10.2529383,13.8103202 C10.8409153,14.3982581 11.8559464,13.9850935 11.8559464,13.1463616 L11.8559464,11.2683409 L25.9411017,11.2683409 C26.4597093,11.2683409 26.8801121,10.8479381 26.8801121,10.3293306 L26.8801121,9.70332365 C26.8801121,9.18471605 26.4597093,8.76431329 25.9411017,8.76431329 Z" id="down-arrow" fill="#F8F8F8" transform="translate(16.864002, 10.016110) rotate(-90.000000) translate(-16.864002, -10.016110) "></path>\n' +
+            '                <path d="M13.1470856,8.76431329 L-0.938069748,8.76431329 L-0.938069748,6.88629258 C-0.938069748,6.05237313 -1.94993166,5.63114873 -2.5410778,6.22229488 L-5.67111233,9.3523294 C-6.03779587,9.71905207 -6.03779587,10.3136021 -5.67111233,10.6802857 L-2.5410778,13.8103202 C-1.95310082,14.3982581 -0.938069748,13.9850935 -0.938069748,13.1463616 L-0.938069748,11.2683409 L13.1470856,11.2683409 C13.6656932,11.2683409 14.086096,10.8479381 14.086096,10.3293306 L14.086096,9.70332365 C14.086096,9.18471605 13.6656932,8.76431329 13.1470856,8.76431329 Z" id="up-arrow" fill="#5F5F5F" transform="translate(4.069985, 10.016110) scale(1, -1) rotate(-90.000000) translate(-4.069985, -10.016110) "></path>\n' +
+            '            </g>\n' +
+            '        </g>\n' +
+            '    </g>\n' +
+            '</svg>';
+
+        a = str.split('\n').join(' ');
+
+        return $(a);
+    }
+
+    function toggle_arrows_down() {
+        let str,
+            b;
+
+        str = '<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n' +
+            '    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->\n' +
+            '    <title>Toggle Maps</title>\n' +
+            '    <desc>Created with Sketch.</desc>\n' +
+            '    <defs></defs>\n' +
+            '    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+            '        <g id="Group">\n' +
+            '            <rect id="Rectangle" stroke="#A6A6A6" stroke-width="1.25201381" fill="#F8F8F8" x="0.626006904" y="0.626006904" width="32.7479862" height="32.7479862" rx="3.91254315"></rect>\n' +
+            '            <g id="arrows" transform="translate(6.533947, 7.003452)" fill-rule="nonzero" stroke="#5F5F5F" stroke-width="0.626006904">\n' +
+            '                <path d="M25.9411017,8.76431329 L11.8559464,8.76431329 L11.8559464,6.88629258 C11.8559464,6.05237313 10.8440845,5.63114873 10.2529383,6.22229488 L7.12290378,9.3523294 C6.75622024,9.71905207 6.75622024,10.3136021 7.12290378,10.6802857 L10.2529383,13.8103202 C10.8409153,14.3982581 11.8559464,13.9850935 11.8559464,13.1463616 L11.8559464,11.2683409 L25.9411017,11.2683409 C26.4597093,11.2683409 26.8801121,10.8479381 26.8801121,10.3293306 L26.8801121,9.70332365 C26.8801121,9.18471605 26.4597093,8.76431329 25.9411017,8.76431329 Z" id="down-arrow" fill="#5F5F5F" transform="translate(16.864002, 10.016110) rotate(-90.000000) translate(-16.864002, -10.016110) "></path>\n' +
+            '                <path d="M13.1470856,8.76431329 L-0.938069748,8.76431329 L-0.938069748,6.88629258 C-0.938069748,6.05237313 -1.94993166,5.63114873 -2.5410778,6.22229488 L-5.67111233,9.3523294 C-6.03779587,9.71905207 -6.03779587,10.3136021 -5.67111233,10.6802857 L-2.5410778,13.8103202 C-1.95310082,14.3982581 -0.938069748,13.9850935 -0.938069748,13.1463616 L-0.938069748,11.2683409 L13.1470856,11.2683409 C13.6656932,11.2683409 14.086096,10.8479381 14.086096,10.3293306 L14.086096,9.70332365 C14.086096,9.18471605 13.6656932,8.76431329 13.1470856,8.76431329 Z" id="up-arrow" fill="#F8F8F8" transform="translate(4.069985, 10.016110) scale(1, -1) rotate(-90.000000) translate(-4.069985, -10.016110) "></path>\n' +
+            '            </g>\n' +
+            '        </g>\n' +
+            '    </g>\n' +
+            '</svg>';
+
+        b = str.split('\n').join(' ');
+
+        return $(b);
+    }
+
+    function cycle_outline() {
+        let str,
+            b;
+
+        str = '<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n' +
+            '    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->\n' +
+            '    <title>Cycle Maps</title>\n' +
+            '    <desc>Created with Sketch.</desc>\n' +
+            '    <defs></defs>\n' +
+            '    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+            '        <g id="Group" fill="#F8F8F8">\n' +
+            '            <rect id="Rectangle" stroke="#A6A6A6" stroke-width="1.25201381" x="0.626006904" y="0.626006904" width="32.7479862" height="32.7479862" rx="3.91254315"></rect>\n' +
+            '            <g id="circle-notch-group" transform="translate(5.947066, 6.103567)" fill-rule="nonzero" stroke="#5F5F5F" stroke-width="0.75">\n' +
+            '                <path d="M12.5012159,1.07356655 L12.5012159,1.81734411 C12.5012159,2.29971235 12.8262916,2.71738683 13.2908449,2.84717621 C16.7518005,3.81392183 19.2875784,6.98762275 19.2875784,10.7595067 C19.2875784,15.2996349 15.6133435,18.9745898 11.072508,18.9745898 C6.53238683,18.9745898 2.85743758,15.3003493 2.85743758,10.7595067 C2.85743758,6.98815851 5.39276905,3.81401113 8.85408182,2.84717621 C9.31872442,2.71738683 9.64380011,2.29962306 9.64380011,1.81721016 L9.64380011,1.07392373 C9.64380011,0.372561009 8.98150471,-0.138381443 8.30233269,0.0365908983 C3.5094195,1.27117502 -0.0270343765,5.6342771 0.00015572077,10.8189768 C0.0323016485,16.9379636 4.97728293,21.8448684 11.0963496,21.8319654 C17.2005487,21.819107 22.1449942,16.8667067 22.1449942,10.7595067 C22.1449942,5.5968181 18.611621,1.2595221 13.831209,0.0336441837 C13.1565464,-0.139363681 12.5012159,0.377070376 12.5012159,1.07356655 Z" id="circle-notch---solid"></path>\n' +
+            '            </g>\n' +
+            '        </g>\n' +
+            '    </g>\n' +
+            '</svg>';
+
+        b = str.split('\n').join(' ');
+
+        return $(b);
+
+    }
+
+    function cycle_solid() {
+        let str,
+            b;
+
+        str = '<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n' +
+            '    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->\n' +
+            '    <title>Cycle Maps</title>\n' +
+            '    <desc>Created with Sketch.</desc>\n' +
+            '    <defs></defs>\n' +
+            '    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+            '        <g id="Group">\n' +
+            '            <rect id="Rectangle" stroke="#A6A6A6" stroke-width="1.25201381" fill="#F8F8F8" x="0.626006904" y="0.626006904" width="32.7479862" height="32.7479862" rx="3.91254315"></rect>\n' +
+            '            <g id="circle-notch-group" transform="translate(5.947066, 6.103567)" fill="#5F5F5F" fill-rule="nonzero">\n' +
+            '                <path d="M12.5012159,1.07356655 L12.5012159,1.81734411 C12.5012159,2.29971235 12.8262916,2.71738683 13.2908449,2.84717621 C16.7518005,3.81392183 19.2875784,6.98762275 19.2875784,10.7595067 C19.2875784,15.2996349 15.6133435,18.9745898 11.072508,18.9745898 C6.53238683,18.9745898 2.85743758,15.3003493 2.85743758,10.7595067 C2.85743758,6.98815851 5.39276905,3.81401113 8.85408182,2.84717621 C9.31872442,2.71738683 9.64380011,2.29962306 9.64380011,1.81721016 L9.64380011,1.07392373 C9.64380011,0.372561009 8.98150471,-0.138381443 8.30233269,0.0365908983 C3.5094195,1.27117502 -0.0270343765,5.6342771 0.00015572077,10.8189768 C0.0323016485,16.9379636 4.97728293,21.8448684 11.0963496,21.8319654 C17.2005487,21.819107 22.1449942,16.8667067 22.1449942,10.7595067 C22.1449942,5.5968181 18.611621,1.2595221 13.831209,0.0336441837 C13.1565464,-0.139363681 12.5012159,0.377070376 12.5012159,1.07356655 Z" id="circle-notch---solid"></path>\n' +
+            '            </g>\n' +
+            '        </g>\n' +
+            '    </g>\n' +
+            '</svg>';
+
+        b = str.split('\n').join(' ');
+
+        return $(b);
 
     }
 
@@ -23749,7 +24060,7 @@ var hic = (function (hic) {
             }
             query = hic.extractQuery(queryString);
             uriDecode = queryString.includes("%2C");
-            decodeQuery(query, config, uriDecode);
+            igv.Browser.decodeQuery(query, config, uriDecode);
         }
 
         browser = new hic.Browser($hic_container, config);
@@ -23802,6 +24113,22 @@ var hic = (function (hic) {
 
                 if (config.tracks) {
                     browser.loadTracks(config.tracks);
+                }
+            })
+            .then(function (ignore) {
+                var promises = [];
+                if (config.normVectorFiles) {
+                    config.normVectorFiles.forEach(function (nv) {
+                        promises.push(browser.loadNormalizationFile(nv));
+                    })
+                }
+                return Promise.all(promises);
+
+            })
+
+            .then(function (ignore) {
+                if(config.cycle) {
+                    browser.controlMapWidget.toggleDisplayModeCycle();
                 }
             })
 
@@ -24109,7 +24436,7 @@ var hic = (function (hic) {
         }
 
         this.contactMatrixView.startSpinner();
-    }
+    };
 
     hic.Browser.prototype.stopSpinner = function () {
 
@@ -24118,17 +24445,20 @@ var hic = (function (hic) {
         }
 
         this.contactMatrixView.stopSpinner();
-    }
+    };
 
     hic.Browser.prototype.setDisplayMode = function (mode) {
         this.contactMatrixView.setDisplayMode(mode);
         this.eventBus.post(hic.Event("DisplayMode", mode));
-    }
+    };
 
     hic.Browser.prototype.getDisplayMode = function () {
         return this.contactMatrixView ? this.contactMatrixView.displayMode : undefined;
-    }
+    };
 
+    hic.Browser.prototype.toggleDisplayMode = function () {
+        this.controlMapWidget.toggleDisplayMode();
+    };
 
     hic.Browser.prototype.getColorScale = function () {
 
@@ -24136,6 +24466,7 @@ var hic = (function (hic) {
 
         switch (this.getDisplayMode()) {
             case 'AOB':
+            case 'BOA':
                 return this.contactMatrixView.ratioColorScale;
             case 'AMB':
                 return this.contactMatrixView.diffColorScale;
@@ -24146,7 +24477,7 @@ var hic = (function (hic) {
 
     hic.Browser.prototype.setColorScaleThreshold = function (threshold) {
         this.contactMatrixView.setColorScaleThreshold(threshold);
-    }
+    };
 
     hic.Browser.prototype.updateCrosshairs = function (coords) {
         var xGuide,
@@ -24214,8 +24545,7 @@ var hic = (function (hic) {
      */
     hic.Browser.prototype.loadTracks = function (trackConfigurations) {
 
-        var self = this,
-            errorPrefix;
+        var self = this, errorPrefix, promisesNV;
 
         // If loading a single track remember its name, for error message
         errorPrefix = trackConfigurations.length == 1 ? "Error loading track " + trackConfigurations[0].name : "Error loading tracks";
@@ -24226,12 +24556,11 @@ var hic = (function (hic) {
 
             .then(function (trackConfigurations) {
 
-
-                var trackXYPairs,
-                    promises2D;
+                var trackXYPairs, promises2D;
 
                 trackXYPairs = [];
                 promises2D = [];
+                promisesNV = [];
 
                 trackConfigurations.forEach(function (config) {
 
@@ -24245,6 +24574,11 @@ var hic = (function (hic) {
                         }
 
                         config.height = self.layoutController.track_height;
+
+                        if (fn.endsWith(".juicerformat") || fn.endsWith("nv") || fn.endsWith(".juicerformat.gz") || fn.endsWith("nv.gz")) {
+                            self.loadNormalizationFile(config.url);
+                            return;
+                        }
 
                         if (config.type === undefined) {
                             // Assume this is a 2D track
@@ -24265,10 +24599,13 @@ var hic = (function (hic) {
                 return Promise.all(promises2D);
             })
             .then(function (tracks2D) {
-                if(tracks2D && tracks2D.length > 0) {
+                if (tracks2D && tracks2D.length > 0) {
                     self.tracks2D = self.tracks2D.concat(tracks2D);
                     self.eventBus.post(hic.Event("TrackLoad2D", self.tracks2D));
                 }
+            })
+            .then(function (ignore) {
+                return Promise.all(promisesNV);
             })
             .then(function (ignore) {   // finally
                 self.contactMatrixView.stopSpinner();
@@ -24315,6 +24652,38 @@ var hic = (function (hic) {
             return promises;
         }
 
+
+    }
+
+
+    hic.Browser.prototype.loadNormalizationFile = function (url) {
+
+        var self = this;
+
+        if (!this.dataset) return;
+
+        self.eventBus.post(hic.Event("NormalizationFileLoad", "start"));
+
+        return this.dataset.hicReader.readNormalizationVectorFile(url, this.dataset.chromosomes)
+
+            .then(function (normVectors) {
+
+                Object.assign(self.dataset.normVectorCache, normVectors);
+
+                normVectors["types"].forEach(function (type) {
+
+                    if (!self.dataset.normalizationTypes) {
+                        self.dataset.normalizationTypes = [];
+                    }
+                    if (_.contains(self.dataset.normalizationTypes, type) === false) {
+                        self.dataset.normalizationTypes.push(type);
+                    }
+
+                    self.eventBus.post(hic.Event("NormVectorIndexLoad", self.dataset));
+                });
+
+                return normVectors;
+            })
 
     }
 
@@ -24378,13 +24747,12 @@ var hic = (function (hic) {
     hic.Browser.prototype.loadHicFile = function (config) {
 
         var self = this,
-            hicReader;
+            hicReader, queryString, query, uriDecode;
 
         if (!config.url) {
             console.log("No .hic url specified");
             return Promise.resolve(undefined);
         }
-
 
         self.contactMatrixView.startSpinner();
         this.isLoadingHICFile = true;
@@ -25440,6 +25808,10 @@ var hic = (function (hic) {
                 queryString.push(paramString("controlNvi", nviString));
             }
 
+            if(this.controlMapWidget.getDisplayModeCycle() !== undefined) {
+                queryString.push(paramString("cycle", "true"))
+            }
+
         }
 
 
@@ -25480,19 +25852,28 @@ var hic = (function (hic) {
             }
         }
 
-        if (this.normVectorFiles.length > 0) {
-
-            var normVectorString = "";
-            this.normVectorFiles.forEach(function (url) {
-
-                if (normVectorString.length > 0) normVectorString += "|||";
-                normVectorString += url;
-
-            });
-
-            queryString.push(paramString("normVectorFiles", normVectorString));
-
+        var captionDiv = document.getElementById('hic-caption');
+        if (captionDiv) {
+            var captionText = captionDiv.textContent;
+            if (captionText) {
+                captionText = captionText.trim();
+                if (captionText) {
+                    queryString.push(paramString("caption", captionText));
+                }
+            }
         }
+
+        // if (this.config.normVectorFiles && this.config.normVectorFiles.length > 0) {
+        //
+        //     var normVectorString = "";
+        //     this.config.normVectorFiles.forEach(function (url) {
+        //
+        //         if (normVectorString.length > 0) normVectorString += "|||";
+        //         normVectorString += url;
+        //
+        //     });
+        //     queryString.push(paramString("normVectorFiles", normVectorString));
+        // }
 
         return queryString.join("&");
 
@@ -25508,10 +25889,10 @@ var hic = (function (hic) {
      * @param query
      * @param config
      */
-    function decodeQuery(query, config, uriDecode) {
+    igv.Browser.decodeQuery = function (query, config, uriDecode) {
 
         var hicUrl, name, stateString, colorScale, trackString, selectedGene, nvi, normVectorString,
-            controlUrl, ratioColorScale, controlName, displayMode, controlNvi;
+            controlUrl, ratioColorScale, controlName, displayMode, controlNvi, captionText, cycle;
 
 
         hicUrl = query["hicUrl"];
@@ -25528,9 +25909,11 @@ var hic = (function (hic) {
         ratioColorScale = query["ratioColorScale"];
         displayMode = query["displayMode"];
         controlNvi = query["controlNvi"];
+        captionText = query["caption"];
+        cycle = query["cycle"];
 
         if (hicUrl) {
-            hicUrl = paramDecodeV0(hicUrl, uriDecode);
+            hicUrl = parapmDecode(hicUrl, uriDecode);
             Object.keys(urlShortcuts).forEach(function (key) {
                 var value = urlShortcuts[key];
                 if (hicUrl.startsWith(key)) hicUrl = hicUrl.replace(key, value);
@@ -25539,10 +25922,10 @@ var hic = (function (hic) {
 
         }
         if (name) {
-            config.name = paramDecodeV0(name, uriDecode);
+            config.name = parapmDecode(name, uriDecode);
         }
         if (controlUrl) {
-            controlUrl = paramDecodeV0(controlUrl, uriDecode);
+            controlUrl = parapmDecode(controlUrl, uriDecode);
             Object.keys(urlShortcuts).forEach(function (key) {
                 var value = urlShortcuts[key];
                 if (controlUrl.startsWith(key)) controlUrl = controlUrl.replace(key, value);
@@ -25550,25 +25933,25 @@ var hic = (function (hic) {
             config.controlUrl = controlUrl;
         }
         if (controlName) {
-            config.controlName = paramDecodeV0(controlName, uriDecode);
+            config.controlName = parapmDecode(controlName, uriDecode);
         }
 
         if (stateString) {
-            stateString = paramDecodeV0(stateString, uriDecode);
+            stateString = parapmDecode(stateString, uriDecode);
             config.state = destringifyStateV0(stateString);
 
         }
         if (colorScale) {
-            colorScale = paramDecodeV0(colorScale, uriDecode);
+            colorScale = parapmDecode(colorScale, uriDecode);
             config.colorScale = hic.destringifyColorScale(colorScale);
         }
 
         if (displayMode) {
-            config.displayMode = paramDecodeV0(displayMode, uriDecode);
+            config.displayMode = parapmDecode(displayMode, uriDecode);
         }
 
         if (trackString) {
-            trackString = paramDecodeV0(trackString, uriDecode);
+            trackString = parapmDecode(trackString, uriDecode);
             config.tracks = destringifyTracksV0(trackString);
 
             // If an oAuth token is provided append it to track configs.
@@ -25583,15 +25966,26 @@ var hic = (function (hic) {
             igv.FeatureTrack.selectedGene = selectedGene;
         }
 
-        if (normVectorString) {
-            config.normVectorFiles = normVectorString.split("|||");
+        if (captionText) {
+            captionText = parapmDecode(captionText, uriDecode);
+            var captionDiv = document.getElementById("hic-caption");
+            if (captionDiv) {
+                captionDiv.textContent = captionText;
+            }
         }
 
+        config.cycle = cycle;
+
+        // Norm vector file loading disabled -- too slow
+        // if (normVectorString) {
+        //     config.normVectorFiles = normVectorString.split("|||");
+        // }
+
         if (nvi) {
-            config.nvi = paramDecodeV0(nvi, uriDecode);
+            config.nvi = parapmDecode(nvi, uriDecode);
         }
         if (controlNvi) {
-            config.controlNvi = paramDecodeV0(controlNvi, uriDecode);
+            config.controlNvi = parapmDecode(controlNvi, uriDecode);
         }
 
         function destringifyStateV0(string) {
@@ -25612,7 +26006,7 @@ var hic = (function (hic) {
             var trackStringList = tracks.split("|||"),
                 configList = [], keys, key, i, len;
 
-            _.each(trackStringList, function (trackString) {
+            trackStringList.forEach(function (trackString) {
                 var tokens,
                     url,
                     config,
@@ -25693,7 +26087,7 @@ var hic = (function (hic) {
         return s;
     }
 
-    function paramDecodeV0(str, uriDecode) {
+    function parapmDecode(str, uriDecode) {
 
         if (uriDecode) {
             return decodeURIComponent(str);   // Still more backward compatibility
@@ -25954,7 +26348,7 @@ var hic = (function (hic) {
 
         if ("DisplayMode" === event.type) {
 
-            if ("AOB" === event.data) {
+            if ("AOB" === event.data || "BOA" === event.data) {
                 this.$minusButton.show();
             }
             else {
@@ -26049,7 +26443,8 @@ var hic = (function (hic) {
         this.blockCache = {};
         this.blockCacheKeys = [];
         this.normVectorCache = {};
-
+        this.normalizationTypes = ['NONE'];
+        
         // Cache at most 10 blocks
         this.blockCacheLimit = hic.isMobile() ? 4 : 10;
     };
@@ -26081,7 +26476,7 @@ var hic = (function (hic) {
     }
 
 
-    hic.Dataset.prototype.getNormalizedBlock = function (zd, blockNumber, normalization) {
+    hic.Dataset.prototype.getNormalizedBlock = function (zd, blockNumber, normalization, eventBus) {
 
         var self = this;
 
@@ -26107,6 +26502,9 @@ var hic = (function (hic) {
 
                                     if (nv1 === undefined || nv2 === undefined) {
                                         console.log("Undefined normalization vector for: " + normalization);
+                                        if(eventBus) {
+                                            eventBus.post(new hic.Event("NormalizationExternalChange", "NONE"));
+                                        }
                                         return block;
                                     }
 
@@ -26391,7 +26789,7 @@ var hic = (function (hic) {
 
         var self = this,
             dataset = new hic.Dataset(this);
-        
+
         dataset.name = config.name;
 
         return self.readHeader(dataset)
@@ -26569,7 +26967,7 @@ var hic = (function (hic) {
     hic.HiCReader.prototype.readNormExpectedValuesAndNormVectorIndex = function (dataset) {
 
         var self = this,
-            range;
+            range, nEntries, nviStart, byteCount;
 
         if (this.normExpectedValueVectorsPosition === undefined) {
             return Promise.resolve();
@@ -26579,52 +26977,43 @@ var hic = (function (hic) {
             return Promise.resolve(this.normVectorIndex);
         }
 
+        return skipExpectedValues.call(self, self.normExpectedValueVectorsPosition)
 
-        return skipExpectedValues.call(self, self.normExpectedValueVectorsPosition, -1)
+            .then(function (nvi) {
 
-            .then(function (nviStart) {
+                nviStart = nvi;
+                byteCount = 4;
 
-                range = {start: nviStart, size: 100000}
+                range = {start: nviStart, size: 4}
 
                 return igv.xhr.loadArrayBuffer(self.path, igv.buildOptions(self.config, {range: range}))
             })
 
             .then(function (data) {
 
-                var key, nEntries, type, unit, binSize, p0, chrIdx, filePosition, sizeInBytes;
+                var range, binaryParser, sizeEstimate;
 
-                var binaryParser = new igv.BinaryParser(new DataView(data));
+                binaryParser = new igv.BinaryParser(new DataView(data));
+                nEntries = binaryParser.getInt();
 
+                sizeEstimate = nEntries * 30;
+                range = {start: nviStart + byteCount, size: sizeEstimate}
+                return igv.xhr.loadArrayBuffer(self.path, igv.buildOptions(self.config, {range: range}))
+
+            })
+            .then(function (data) {
                 dataset.normalizedExpectedValueVectors = {};
-
-                // Normalization vector index
-                p0 = binaryParser.position;
                 self.normVectorIndex = {};
 
-                if (!dataset.normalizationTypes) {
-                    dataset.normalizationTypes = [];
-                }
-                dataset.normalizationTypes.push('NONE');
+                return processEntries(nEntries, data)
+            })
 
-                nEntries = binaryParser.getInt();
-                while (nEntries-- > 0) {
-                    type = binaryParser.getString();
-                    chrIdx = binaryParser.getInt();
-                    unit = binaryParser.getString();
-                    binSize = binaryParser.getInt();
-                    filePosition = binaryParser.getLong();
-                    sizeInBytes = binaryParser.getInt();
-                    key = hic.getNormalizationVectorKey(type, chrIdx, unit, binSize);
+            .then(function (ignore) {
 
-                    if (_.contains(dataset.normalizationTypes, type) === false) {
-                        dataset.normalizationTypes.push(type);
-                    }
-                    self.normVectorIndex[key] = {filePosition: filePosition, size: sizeInBytes};
-                }
 
                 self.normalizationVectorIndexRange = {
-                    start: range.start + p0,
-                    size: binaryParser.position - p0
+                    start: nviStart,
+                    size: byteCount
                 };
 
                 return self;
@@ -26635,6 +27024,48 @@ var hic = (function (hic) {
                 console.error(e);
                 self.normalizationVectorIndexRange = undefined;
             })
+
+
+        function processEntries(nEntries, data) {
+
+            var key, type, unit, binSize, p0, chrIdx, filePosition, sizeInBytes, sizeEstimate;
+
+            var binaryParser = new igv.BinaryParser(new DataView(data));
+
+            while (nEntries-- > 0) {
+
+                if (binaryParser.available() < 100) {
+
+                    nEntries++;   // Reset counter as entry is not processed
+
+                    byteCount += binaryParser.position;
+
+                    sizeEstimate = Math.max(1000, nEntries * 30);
+                    range = {start: nviStart + byteCount, size: sizeEstimate}
+
+                    return igv.xhr.loadArrayBuffer(self.path, igv.buildOptions(self.config, {range: range}))
+                        .then(function (data) {
+                            return processEntries(nEntries, data);
+                        })
+                }
+
+                type = binaryParser.getString();      //15
+                chrIdx = binaryParser.getInt();       //4
+                unit = binaryParser.getString();      //3
+                binSize = binaryParser.getInt();      //4
+                filePosition = binaryParser.getLong();  //8
+                sizeInBytes = binaryParser.getInt();     //4
+                key = hic.getNormalizationVectorKey(type, chrIdx, unit, binSize);
+
+                if (_.contains(dataset.normalizationTypes, type) === false) {
+                    dataset.normalizationTypes.push(type);
+                }
+                self.normVectorIndex[key] = {filePosition: filePosition, size: sizeInBytes};
+
+            }
+            byteCount += binaryParser.position;
+            return Promise.resolve(self);
+        }
 
 
     };
@@ -26785,11 +27216,6 @@ var hic = (function (hic) {
 
                 // Normalization vector index
                 if (undefined === self.normVectorIndex) self.normVectorIndex = {};
-
-                if (!dataset.normalizationTypes) {
-                    dataset.normalizationTypes = [];
-                }
-                dataset.normalizationTypes.push('NONE');
 
                 p0 = binaryParser.position;
                 normalizationIndexPosition = range.start + p0;
@@ -27110,6 +27536,82 @@ var hic = (function (hic) {
             })
 
     }
+
+
+    hic.HiCReader.prototype.readNormalizationVectorFile = function (url, chromosomes) {
+
+        var self = this;
+        var options = igv.buildOptions({});    // Add oauth token, if any
+
+        return igv.xhr
+
+            .loadString(url, options)
+
+            .then(function (data) {
+
+                var lines = data.split('\n'),
+                    len = lines.length,
+                    line, i, type, chr, binSize, unit, tokens, values, v, key, chrIdx, chrMap, vectors, types;
+
+                types = new Set();
+                vectors = {};
+                chrMap = {};
+                chromosomes.forEach(function (chr) {
+                    chrMap[chr.name] = chr.index;
+                    if (chr.name.startsWith("chr")) {
+                        chrMap[chr.name.substring(3)] = chr.index;
+                    } else {
+                        chrMap["chr" + chr.name] = chr.index;
+                    }
+                })
+
+                for (i = 0; i < len; i++) {
+                    line = lines[i].trim();
+                    if (line.startsWith("vector")) {
+
+                        if (key) {
+                            vectors[key] = new hic.NormalizationVector(type, chrIdx, unit, binSize, values)
+                        }
+                        values = [];
+
+                        tokens = line.split("\t");
+                        type = tokens[1];
+                        chr = tokens[2];
+                        binSize = tokens[3];
+                        unit = tokens[4];
+
+
+                        chrIdx = chrMap[chr];
+                        if (chrIdx) {
+                            types.add(type);
+                            key = hic.getNormalizationVectorKey(type, chrIdx, unit.toString(), binSize);
+                        } else {
+                            key = undefined;
+                            console.log("Unknown chromosome: " + chr);
+                        }
+
+
+                    }
+                    else {
+                        if (key && values) {
+                            v = (line.length === 0 || line == ".") ? NaN : parseFloat(line);
+                            values.push(v);
+                        }
+                    }
+                }
+
+                // Last one
+                if (key && values && values.length > 0) {
+                    vectors[key] = new hic.NormalizationVector(type, chrIdx, unit, binSize, values);
+                }
+
+                vectors.types = types;
+
+                return vectors;
+            })
+
+    };
+
 
     function MatrixZoomData(chr1, chr2, zoom, blockBinCount, blockColumnCount, chr1Sites, chr2Sites) {
         this.chr1 = chr1;    // chromosome index
@@ -28163,15 +28665,19 @@ var hic = (function (hic) {
         var self = this,
             chr1 = region1.chr,
             chr2 = region2.chr,
-            x1 = region1.start / binsize, 
-            x2 = region1.end / binsize,
-            y1 = region2.start / binsize,
-            y2 = region2.end / binsize;
+            x1 = (region1.start === undefined) ? undefined :  region1.start / binsize,
+            x2 = (region1.end === undefined) ? undefined : region1.end / binsize,
+            y1 = (region2.start === undefined) ? undefined : region2.start / binsize,
+            y2 = (region2.end === undefined) ? undefined : region2.end / binsize;
 
         return getDataset.call(self)
+
             .then(function (dataset) {
 
                 self.dataset = dataset;
+
+                if("ALL" === chr1.toUpperCase()) chr1 = chr1.toUpperCase();
+                if("ALL" === chr2.toUpperCase()) chr2 = chr2.toUpperCase();
 
                 var chr1idx = dataset.getChrIndexFromName(chr1),
                     chr2idx = dataset.getChrIndexFromName(chr2);
@@ -28183,8 +28689,9 @@ var hic = (function (hic) {
                 return dataset.getMatrix(chr1idx, chr2idx)
             })
             .then(function (matrix) {
+
                 // Find the requested resolution
-                var z = self.dataset.getZoomIndexForBinSize(binsize, units);
+                var z = undefined === binsize ? 0 : self.dataset.getZoomIndexForBinSize(binsize, units);
                 if (z === -1) {
                     throw new Error("Invalid bin size");
                 }
@@ -28193,8 +28700,8 @@ var hic = (function (hic) {
                     blockBinCount = zd.blockBinCount,   // Dimension in bins of a block (width = height = blockBinCount)
                     col1 = x1 === undefined ? 0 : Math.floor(x1 / blockBinCount),
                     col2 = x1 === undefined ? zd.blockColumnCount : Math.floor(x2 / blockBinCount),
-                    row1 = Math.floor(y1 / blockBinCount),
-                    row2 = Math.floor(y2 / blockBinCount),
+                    row1 = y1 === undefined ? 0 : Math.floor(y1 / blockBinCount),
+                    row2 = y2 === undefined ? zd.blockColumnCount :  Math.floor(y2 / blockBinCount),
                     row, column, sameChr, blockNumber,
                     promises = [];
 
@@ -28215,15 +28722,16 @@ var hic = (function (hic) {
                 return Promise.all(promises);
             })
             .then(function (blocks) {
+
                 var contactRecords = [];
 
                 blocks.forEach(function (block) {
-                    if (block === null) { // This is most likely caused by a base pair range outside the chromosome
+                    if (!block) { // This is most likely caused by a base pair range outside the chromosome
                         return;
                     }
                     block.records.forEach(function(rec) {
                         // TODO -- transpose?
-                        if(rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2) {
+                        if(x1 === undefined || (rec.bin1 >= x1 && rec.bin1 <= x2 && rec.bin2 >= y1 && rec.bin2 <= y2)) {
                             contactRecords.push(rec);
                         }
                     });
@@ -29725,6 +30233,7 @@ var hic = (function (hic) {
         this.browser.eventBus.subscribe("MapLoad", this);
         this.browser.eventBus.subscribe("NormVectorIndexLoad", this);
         this.browser.eventBus.subscribe("NormalizationFileLoad", this);
+        this.browser.eventBus.subscribe("NormalizationExternalChange", this);
 
     };
 
@@ -29760,6 +30269,16 @@ var hic = (function (hic) {
             } else {
                 this.stopNotReady();
             }
+        }  else if ("NormalizationExternalChange" === event.type) {
+
+            var filter = this.$normalization_selector
+                .find('option')
+                .filter(function (index) {
+                    var s1 = this.value;
+                    var s2 = event.data;
+                    return s1 === s2;
+                })
+                .prop('selected', true);
         }
 
         function updateOptions() {

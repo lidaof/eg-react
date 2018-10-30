@@ -88,11 +88,11 @@ class NumericalTrack extends React.Component {
             It comes directly from the `ViewExpansion` object from `RegionExpander.ts`
         */
         const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
-        let max = _.max(visibleValues);
-        let min = xToValue2 ? _.min(xToValue2.slice(this.props.viewWindow.start, this.props.viewWindow.end)) : 0;
+        let max = _.max(visibleValues) || 0; // in case undefined returned here, cause maxboth be undefined too
+        let min = (xToValue2.length > 0 ? _.min(xToValue2.slice(this.props.viewWindow.start, this.props.viewWindow.end)) : 0 ) || 0;
         const maxBoth = Math.max(Math.abs(max), Math.abs(min));
         max = maxBoth;
-        min = xToValue2 ? -maxBoth : 0;
+        min = xToValue2.length > 0 ? -maxBoth : 0;
         if (yScale === 'fixed') {
             max = yMax ? yMax : max;
             min = yMin ? yMin : min;
@@ -100,7 +100,7 @@ class NumericalTrack extends React.Component {
         if (min > max) {
             min = max;
         }
-        if (xToValue2) {
+        if (xToValue2.length > 0) {
             return {
                 valueToY: scaleLinear().domain([max, 0]).range([TOP_PADDING, height * 0.5]).clamp(true),
                 valueToYReverse: scaleLinear().domain([0, min]).range([0, height * 0.5 - TOP_PADDING]).clamp(true),
@@ -172,9 +172,11 @@ class NumericalTrack extends React.Component {
         if (dataReverse.length > 0) {
             this.hasReverse = true;
             this.xToValue2 = this.aggregateFeatures(dataReverse, viewRegion, width, aggregateMethod);
+        } else {
+            this.xToValue2 = [];
         }
         const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
-        this.xToValue = this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod);
+        this.xToValue = dataForward.length > 0 ? this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod) : [];
         this.scales = this.computeScales(this.xToValue, this.xToValue2, height);
         const legend = <TrackLegend
             trackModel={trackModel}

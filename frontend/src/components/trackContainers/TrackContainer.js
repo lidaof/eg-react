@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import connect from 'react-redux/lib/connect/connect';
+import ReactModal from "react-modal";
+
 import { ActionCreators } from '../../AppState';
 
 import { withTrackData } from './TrackDataManager';
@@ -26,6 +28,8 @@ import UndoRedo from "./UndoRedo";
 import History from "./History";
 
 import HighlightRegion from "../HighlightRegion";
+import { VerticalDivider } from './VerticalDivider';
+import { CircletView } from "./CircletView";
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
@@ -92,8 +96,10 @@ class TrackContainer extends React.Component {
         super(props);
         this.state = {
             selectedTool: Tools.DRAG,
-            screenshotWidth: '279.4mm',
-            xOffset: 0
+            xOffset: 0,
+            showModal: false,
+            trackForCircletView: null, // the trackmodel for circlet view
+            circletColor: '#ff5722',
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -102,6 +108,10 @@ class TrackContainer extends React.Component {
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.deselectAllTracks = this.deselectAllTracks.bind(this);
         this.changeXOffset = this.changeXOffset.bind(this);
+        this.handleOpenModal = this.handleOpenModal.bind(this);
+        this.handleCloseModal = this.handleCloseModal.bind(this);
+        this.renderModal = this.renderModal.bind(this);
+        this.setCircletColor = this.setCircletColor.bind(this);
     }
 
     /**
@@ -119,6 +129,18 @@ class TrackContainer extends React.Component {
 
     changeXOffset(xOffset) {
         this.setState({xOffset});
+    }
+
+    handleOpenModal(track) {
+        this.setState({ showModal: true, trackForCircletView: track });
+    }
+      
+    handleCloseModal() {
+        this.setState({ showModal: false, trackForCircletView: null });
+    }
+
+    setCircletColor(color) {
+        this.setState({circletColor: color});
     }
 
     /**
@@ -199,7 +221,8 @@ class TrackContainer extends React.Component {
      */
     renderControls() {
         const {metadataTerms, onMetadataTermsChanged, suggestedMetaSets} = this.props;
-        return <div style={{display: "flex", alignItems: "flex-end", position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"}} >
+        // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
+        return <div style={{display: "flex", alignItems: "flex-end"}}>
             <div>
                 {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
                 <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} /> 
@@ -270,35 +293,64 @@ class TrackContainer extends React.Component {
         }
     }
 
+    renderModal() {
+        const {primaryView, trackData} = this.props;
+        const { trackForCircletView, circletColor } = this.state;
+        return <ReactModal 
+                isOpen={this.state.showModal}
+                contentLabel="circlet-opener"
+                ariaHideApp={false}
+                >
+                <button onClick={this.handleCloseModal}>Close</button>
+                <CircletView 
+                    primaryView={primaryView} 
+                    trackData={trackData} 
+                    track={trackForCircletView}
+                    color={circletColor}
+                    setCircletColor={this.setCircletColor}
+                />
+            </ReactModal>;
+    }
+
     /**
      * @inheritdoc
      */
     render() {
         const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView} = this.props;
-        const selectedTool = this.state.selectedTool;
-        const contextMenu = <TrackContextMenu tracks={tracks} onTracksChanged={onTracksChanged} deselectAllTracks={this.deselectAllTracks} />;
+        const { selectedTool } = this.state;
+        const contextMenu = <TrackContextMenu 
+                                tracks={tracks} 
+                                onTracksChanged={onTracksChanged} 
+                                deselectAllTracks={this.deselectAllTracks} 
+                                onCircletRequested={this.handleOpenModal}
+                            />;
         const trackDivStyle = {
                                 border: "1px solid black", 
                                 paddingBottom: "3px",
                                 cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR
                             };
-
         return (
-        <OutsideClickDetector onOutsideClick={this.deselectAllTracks} >
-            {this.renderControls()}
-            <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
-                <DivWithBullseye style={trackDivStyle} id="trackContainer">
-                    <HighlightRegion 
-                        enteredRegion={enteredRegion}
-                        highlightEnteredRegion={highlightEnteredRegion}
-                        visData={primaryView}
-                        xOffset={this.state.xOffset}
-                    >
-                        {this.renderSubContainer()}
-                    </HighlightRegion>
-                </DivWithBullseye>
-            </ContextMenuManager>
-        </OutsideClickDetector>
+        <React.Fragment>
+            <OutsideClickDetector onOutsideClick={this.deselectAllTracks} >
+                {this.renderControls()}
+                <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
+                    <DivWithBullseye style={trackDivStyle} id="trackContainer">
+                        <VerticalDivider visData={primaryView}
+                                xOffset={this.state.xOffset}>
+                            <HighlightRegion 
+                                enteredRegion={enteredRegion}
+                                highlightEnteredRegion={highlightEnteredRegion}
+                                visData={primaryView}
+                                xOffset={this.state.xOffset}
+                                >
+                                {this.renderSubContainer()}
+                            </HighlightRegion>
+                        </VerticalDivider>
+                    </DivWithBullseye>
+                </ContextMenuManager>
+            </OutsideClickDetector>
+            {this.renderModal()}
+        </React.Fragment>
         );
     }
 }

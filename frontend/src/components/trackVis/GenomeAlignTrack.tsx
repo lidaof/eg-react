@@ -108,7 +108,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             label = <text
                 x={0.5 * (queryXSpan.start + queryXSpan.end)}
                 y={queryRectTopY + 0.5 * RECT_HEIGHT}
-                alignmentBaseline="middle"
+                dominantBaseline="middle"
                 textAnchor="middle"
                 fill="white"
                 fontSize={12}

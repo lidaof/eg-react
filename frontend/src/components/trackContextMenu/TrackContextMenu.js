@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import Collapsible from 'react-collapsible';
 import TrackModel from '../../model/TrackModel';
-import { getTrackConfig } from '../trackConfig/getTrackConfig';
+import { getTrackConfig, INTERACTION_TYPES } from '../trackConfig/getTrackConfig';
+import { CopyToClip } from '../CopyToClipboard';
+
 
 import './TrackContextMenu.css';
 
@@ -121,12 +123,33 @@ class TrackContextMenu extends React.PureComponent {
         <div className="TrackContextMenu-body">
             <MenuTitle tracks={selectedTracks} />
             {this.renderTrackSpecificItems(selectedTracks)}
+            <CircletViewConfig tracks={selectedTracks} onCircletRequested={this.props.onCircletRequested}/>
             <DeselectOption numTracks={selectedTracks.length} onClick={this.props.deselectAllTracks} />
             <RemoveOption numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
             <TrackMoreInfo tracks={selectedTracks} />
         </div>
         );
     }
+}
+
+/**
+ * a menu item to invoke circlet view modal for interaction tracks
+ */
+
+function CircletViewConfig(props) {
+    const numTracks = props.tracks.length;
+    if (numTracks !== 1) {
+        return null;
+    }
+    const track = props.tracks[0];
+    if (!INTERACTION_TYPES.includes(track.type)) {
+        return null;
+    }
+    return (
+        <div className="TrackContextMenu-item">
+            <button onClick={() => props.onCircletRequested(track)}>Circlet view</button>
+        </div>
+        );
 }
 
 function TrackMoreInfo(props) {
@@ -140,7 +163,7 @@ function TrackMoreInfo(props) {
         info.push(<div key="details"><ObjectAsTable title="Details" content={track.details}/></div>);
     }
     if (track.url) {
-        info.push(<div key="url"><h6>URL</h6><p>{track.url}</p></div> );
+        info.push(<div key="url"><h6>URL <CopyToClip value={track.url} /></h6><p className="TrackContextMenu-URL">{track.url}</p></div> );
     }
     if (track.metadata) {
         info.push(<div key="metadata"><ObjectAsTable title="Metadata" content={track.metadata}/></div>);

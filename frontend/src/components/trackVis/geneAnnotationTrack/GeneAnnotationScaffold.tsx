@@ -103,7 +103,7 @@ export class GeneAnnotationScaffold extends React.PureComponent<GeneAnnotationSc
                 y={0}
                 height={GeneAnnotation.HEIGHT}
                 fill={color}
-                alignmentBaseline="hanging"
+                dominantBaseline="hanging"
                 textAnchor={textAnchor}
                 backgroundColor={backgroundColor}
                 backgroundOpacity={labelHasBackground ? 0.65 : 0}

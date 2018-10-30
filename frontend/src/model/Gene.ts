@@ -4,6 +4,22 @@ import _ from 'lodash';
 import OpenInterval from './interval/OpenInterval';
 import { FeatureSegment } from './interval/FeatureSegment';
 
+export interface IdbRecord {
+    id: string;
+    name?: string;
+    chrom: string;
+    strand: string;
+    txStart: number;
+    txEnd: number;
+    cdsStart: number;
+    cdsEnd: number;
+    exonStarts: string;
+    exonEnds: string;
+    transcriptionClass?: string;
+    description?: string;
+    collection?: string;
+}
+
 /**
  * A data container for gene annotations.
  *
@@ -11,7 +27,7 @@ import { FeatureSegment } from './interval/FeatureSegment';
  */
 class Gene extends Feature {
     public dbRecord: any;
-    public id: number;
+    public id: string;
     public description?: string;
     public transcriptionClass?: string;
     public collection?: string;
@@ -43,7 +59,7 @@ class Gene extends Feature {
      * @param {dbRecord} record - dbRecord object to use
      * @param {trackModel} trackModel for gene search information
      */
-    constructor(dbRecord: any) {
+    constructor(dbRecord: IdbRecord) {
         const locus = new ChromosomeInterval(dbRecord.chrom, dbRecord.txStart, dbRecord.txEnd);
         super(dbRecord.name, locus, dbRecord.strand);
         this.dbRecord = dbRecord;

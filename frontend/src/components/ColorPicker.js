@@ -83,7 +83,7 @@ class ColorPicker extends React.PureComponent {
         return (
         <Manager>
             <Target>{pickerOpener}</Target>
-            <Popper placement="bottom" >{pickerElement}</Popper>
+            <Popper placement="bottom" style={{zIndex: 2}}>{pickerElement}</Popper>
         </Manager>
         );
     }

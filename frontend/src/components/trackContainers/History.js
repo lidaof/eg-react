@@ -5,6 +5,11 @@ import ReactModal from "react-modal";
 
 import './History.css';
 
+/**
+ * a component to show users' history of operations
+ * @author Daofeng Li
+ */
+
 const MODAL_STYLE = {
     content: {
         top: "40px",

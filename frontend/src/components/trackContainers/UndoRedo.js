@@ -4,6 +4,11 @@ import { connect } from 'react-redux';
 
 import './UndoRedo.css';
 
+/**
+ * a component to undo, redo one user's operation on trackContainer
+ * @author Daofeng Li
+ */
+
 let UndoRedo = ({ canUndo, canRedo, onUndo, onRedo }) => (
     <React.Fragment>
         <button onClick={onUndo} disabled={!canUndo} title="Undo" className="btn btn-light">

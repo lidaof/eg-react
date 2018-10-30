@@ -21,8 +21,9 @@ import FacetTableUI from "./FacetTableUI";
 import eglogo from '../images/eglogo.jpg';
 
 import './Nav.css';
+import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "src/AppState";
 
-const VERSION = "v47.2";
+const VERSION = "v47.2.1";
 
 const REGION_EXPANDER = new RegionExpander(0);
 
@@ -44,9 +45,16 @@ class Nav extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            isCacheEnabled: true,
+        };
         this.debounced = _.debounce(this.props.onLegendWidthChange, 250);
     }
     
+    componentDidMount(){
+        this.enableCache();
+    }
+
     changeLegendWidth = (e) => {
         const width = Number.parseFloat(e.currentTarget.value);
         //const debounced = _.debounce(this.props.onLegendWidthChange, 250);
@@ -56,17 +64,37 @@ class Nav extends React.Component {
         }
     }
 
+    disableCache = () => {
+        STORAGE.removeItem(SESSION_KEY);
+        STORAGE.setItem(NO_SAVE_SESSION, 1);
+    }
+
+    enableCache = () => {
+        STORAGE.removeItem(NO_SAVE_SESSION);
+    }
+
+    toggleCache = () => {
+        if (this.state.isCacheEnabled) {
+            this.disableCache();
+            this.setState({isCacheEnabled: false});
+        } else {
+            this.enableCache();
+            this.setState({isCacheEnabled: true});
+        }
+    };
+
+
     render() {
         const {
             tracks, genomeConfig, onTracksAdded, onTrackRemoved, selectedRegion, onRegionSelected,
-            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId, liveId,
+            isShowingNavigator, onToggleNavigator, isShowing3D, onToggle3DScene, bundleId,
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
             onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs,
             publicTrackSets, customTrackSets, addedTrackSets, addTracktoAvailable, removeTrackFromAvailable,
             availableTrackSets, addTermToMetaSets
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
-        const {name, logo, color} = getSpeciesInfo(genomeName)
+        const {name, logo, color} = getSpeciesInfo(genomeName);
         return (
             <div className="Nav-container">
                 <div id="logoDiv">
@@ -171,7 +199,7 @@ class Nav extends React.Component {
                                                         overflow: "visible",
                                                         padding: "5px",
                                                     }}}>
-                            <LiveUI liveId={liveId} />
+                            <LiveUI />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Screenshot">
                             <ScreenshotUI expansionAmount={REGION_EXPANDER} />
@@ -208,9 +236,13 @@ class Nav extends React.Component {
                             <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={onToggle3DScene} />
                             <span style={{marginLeft: "1ch"}} >Show 3D scene</span>
                         </label>
+                        <label className="dropdown-item" htmlFor="cacheToggle">
+                            <input id="cacheToggle" type="checkbox" checked={this.state.isCacheEnabled} onChange={this.toggleCache} />
+                            <span style={{marginLeft: "1ch"}} >Restore current view after Refresh</span>
+                        </label>
                         <label className="dropdown-item" htmlFor="setLegendWidth">
                             <input type="number" id="legendWidth" step="5" min="60" max="200" 
-                                value={trackLegendWidth}
+                                defaultValue={trackLegendWidth}
                                 onChange={this.changeLegendWidth} />
                             <span style={{marginLeft: "1ch"}}>Change track legend width</span>
                         </label>

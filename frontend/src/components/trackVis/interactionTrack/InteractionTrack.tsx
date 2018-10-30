@@ -15,6 +15,7 @@ import Tooltip from '../commonComponents/tooltip/Tooltip';
 import { InteractionDisplayMode } from '../../../model/DisplayModes';
 import { FeaturePlacer } from '../../../model/FeaturePlacer';
 import { GenomeInteraction } from '../../../model/GenomeInteraction';
+import { notify } from 'react-notify-toast';
 
 interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
     data: GenomeInteraction[];
@@ -23,6 +24,9 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
         color2: string;
         backgroundColor?: string;
         displayMode: InteractionDisplayMode;
+        scoreScale?: string,
+        scoreMax?: number,
+        scoreMin?: number,
     }
 }
 
@@ -30,7 +34,8 @@ export const DEFAULT_OPTIONS = {
     color: '#B8008A',
     color2: '#006385',
     backgroundColor: 'white',
-    displayMode: InteractionDisplayMode.HEATMAP
+    displayMode: InteractionDisplayMode.HEATMAP,
+    scoreScale: 'auto',
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -46,15 +51,27 @@ class InteractionTrack extends React.Component<InteractionTrackProps, {}> {
         this.hideTooltip = this.hideTooltip.bind(this);
     }
 
-    makeOpacityScale(interactions: GenomeInteraction[]) {
-        const maxScore = interactions.length > 0 ? _.maxBy(interactions, 'score').score : 0;
-        return scaleLinear().domain([0, maxScore]).range([0, 1]).clamp(true);
+    makeOpacityScale(interactions: GenomeInteraction[], options: any) {
+        const {scoreScale, scoreMin, scoreMax} = options;
+        if (scoreScale === 'auto') {
+            const maxScore = interactions.length > 0 ? _.maxBy(interactions, 'score').score : 0;
+            return scaleLinear().domain([0, maxScore]).range([0, 1]).clamp(true);
+        } else {
+            if (scoreMin >= scoreMax) {
+                notify.show('Score min cannot be greater than Score max', 'error', 2000);
+            }
+            return scaleLinear().domain([scoreMin, scoreMax]).range([0, 1]).clamp(true);
+        }
     }
 
     showTooltip(event: React.MouseEvent, interaction: GenomeInteraction) {
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} ignoreMouse={true} >
-                Score: {interaction.score}
+                <div>
+                    <div>{interaction.locus1.toString()}</div>
+                    <div>{interaction.locus2.toString()}</div>
+                    <div>Score: {interaction.score}</div>
+                </div>
             </Tooltip>
         );
         this.props.onShowTooltip(tooltip);
@@ -70,7 +87,7 @@ class InteractionTrack extends React.Component<InteractionTrackProps, {}> {
             placedInteractions: this.featurePlacer.placeInteractions(data, visRegion, width),
             viewWindow,
             width,
-            opacityScale: this.makeOpacityScale(data),
+            opacityScale: this.makeOpacityScale(data, options),
             color: options.color,
             onInteractionHovered: this.showTooltip,
             onMouseOut: this.hideTooltip

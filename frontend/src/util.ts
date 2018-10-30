@@ -116,3 +116,8 @@ export function niceBpCount(bases: number) {
         return `${rounded} bp`;
     }
 }
+
+export function ceil(value: number, precision: number) {
+    const multiplier = Math.pow(10, precision || 0);
+    return Math.ceil(value * multiplier) / multiplier;
+}

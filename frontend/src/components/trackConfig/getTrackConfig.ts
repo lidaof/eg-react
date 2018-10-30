@@ -14,6 +14,9 @@ import { RepeatMaskerTrackConfig } from './RepeatMaskerTrackConfig';
 import { GenomeAlignTrackConfig } from './GenomeAlignTrackConfig';
 import { RulerTrackConfig } from './RulerTrackConfig';
 import { TrackModel } from '../../model/TrackModel';
+import { RefBedTrackConfig } from './RefBedTrackConfig';
+
+export const INTERACTION_TYPES = ['hic', 'longrange', 'biginteract'];
 
 const TYPE_NAME_TO_CONFIG = {
     "bam": BamTrackConfig,
@@ -26,6 +29,7 @@ const TYPE_NAME_TO_CONFIG = {
     "longrange": LongRangeTrackConfig,
     "biginteract": BigInteractTrackConfig,
     "geneannotation": GeneAnnotationTrackConfig,
+    "refbed": RefBedTrackConfig,
     "methylc": MethylCTrackConfig,
     "repeatmasker": RepeatMaskerTrackConfig,
     "genomealign": GenomeAlignTrackConfig,

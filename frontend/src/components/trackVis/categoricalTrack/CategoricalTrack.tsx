@@ -13,6 +13,7 @@ import configOptionMerging from '../commonComponents/configOptionMerging';
 export const DEFAULT_OPTIONS = {
     height: 20,
     color: "blue",
+    maxRows: 1,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -82,7 +83,6 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
         return <AnnotationTrack
             {...this.props}
             rowHeight={this.props.options.height}
-            options={{maxRows: 1}}
             getAnnotationElement={this.renderAnnotation}
         />;
     }

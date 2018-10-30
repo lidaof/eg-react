@@ -6,6 +6,7 @@ import InteractionTrack, { DEFAULT_OPTIONS } from '../trackVis/interactionTrack/
 
 import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import { InteractionDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';
+import ScoreConfig from '../trackContextMenu/ScoreConfig';
 
 export class LongRangeTrackConfig extends TrackConfig {
     constructor(props: any) {
@@ -22,6 +23,7 @@ export class LongRangeTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [InteractionDisplayModeConfig, PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
+        return [InteractionDisplayModeConfig, ScoreConfig,
+            PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
     }
 }

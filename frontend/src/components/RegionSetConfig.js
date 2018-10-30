@@ -1,13 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import axios from 'axios';
+import { notify } from 'react-notify-toast';
+import ReactTable from "react-table";
 import FlankingStratConfig from './FlankingStratConfig';
-
 import Genome from '../model/genomes/Genome';
 import Feature from '../model/Feature';
 import FlankingStrategy from '../model/FlankingStrategy';
 import RegionSet from '../model/RegionSet';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
+import { AWS_API } from '../dataSources/GeneSource';
+
+import "react-table/react-table.css";
 
 /**
  * Placeholder genes for a new set
@@ -19,6 +23,14 @@ const GENES = [
     new Feature("CYP26B1", new ChromosomeInterval("chr2", 72356366, 72375167), "-"),
     new Feature("CYP51A1", new ChromosomeInterval("chr7", 91741462, 91764059), "-"),
 ];
+
+const DEFAULT_LIST = `CYP4A22
+chr10:96796528-96829254
+CYP2A6
+CYP3A4
+chr1:47223509-47276522
+CYP1A2
+`;
 
 class RegionSetConfig extends React.Component {
     static propTypes = {
@@ -51,16 +63,88 @@ class RegionSetConfig extends React.Component {
             newRegionName: "",
             newRegionLocus: "",
             newRegionError: null,
+            regionList: DEFAULT_LIST,
+            loadingMsg: '',
+
         };
         this.changeSetName = this.changeSetName.bind(this);
         this.changeSetStrategy = this.changeSetStrategy.bind(this);
         this.addRegion = this.addRegion.bind(this);
         this.deleteRegion = this.deleteRegion.bind(this);
         this.cancelPressed = this.cancelPressed.bind(this);
+        this.handleListChange = this.handleListChange.bind(this);
+        this.resetList = this.resetList.bind(this);
+        this.handleAddList = this.handleAddList.bind(this);
+    }
+
+    handleListChange(event) {
+        this.setState({regionList: event.target.value});
+    }
+
+    resetList(event) {
+        this.setState({regionList: ""});
+    }
+
+    async handleAddList(event) {
+        event.preventDefault();
+        this.setState({loadingMsg: 'loading'});
+        const inputListRaw = this.state.regionList.trim().split('\n');
+        const inputListRaw2 = inputListRaw.map(item => item.trim());
+        const inputList = inputListRaw2.filter(item => item !== '')
+        if (inputList.length === 0) {
+            notify.show('Input content is empty or cannot find any location on genome', 'error', 2000);
+            this.setState({loadingMsg: ''});
+            return null;
+        }
+        const promise = inputList.map((symbol) => {
+            try{
+                const locus = ChromosomeInterval.parse(symbol);
+                if (locus) {
+                    return new Feature(symbol, locus);
+                }
+            }catch(error) {
+            }
+            return this.getSymbolRegions(symbol);
+        });
+        const parsed = await Promise.all(promise);
+        const parsed2 = parsed.map((item, index) => {
+            if (Array.isArray(item)) {
+                if ( item.length === 0 ) {return null;}
+                const hits = item.map(gene => {
+                    if (gene.name.toLowerCase() === inputList[index].toLowerCase()) {
+                        return new Feature(gene.name, new ChromosomeInterval(gene.chrom, gene.txStart, gene.txEnd), gene.strand);
+                    }
+                });
+                return hits[0] || null;
+            } else {
+                return item;
+            }
+        })
+        const nullList = parsed2.filter(item => item === null);
+        if (nullList.length > 0) {
+            notify.show(`${nullList.length} item(s) cannot find location(s) on genome`, 'error', 2000);
+        } else {
+            notify.show(`${parsed2.length} region(s) added`, 'success', 2000);
+        }
+        this.setState({loadingMsg: ''});
+        // return parsed2.filter(item => item !== null);
+        const set = new RegionSet("New set",parsed2.filter(item => item !== null), this.props.genome, new FlankingStrategy());
+        this.setState({set});
+    }
+
+    async getSymbolRegions(symbol) {
+        const genomeName = this.props.genome.getName();
+        const params = {
+            q: symbol,
+            getOnlyNames: false,
+        };
+        const response = await axios.get(`${AWS_API}/${genomeName}/genes/queryName`, {params: params});
+        return response.data;
     }
 
     getRegionSetFromProps(props) {
-        return props.set || new RegionSet("New set", GENES, props.genome, new FlankingStrategy());
+        // return props.set || new RegionSet("New set", GENES, props.genome, new FlankingStrategy());
+        return props.set;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -120,7 +204,7 @@ class RegionSetConfig extends React.Component {
                 <td>{feature.getLocus().toString()}</td>
                 <td>{feature.getIsForwardStrand() ? "+" : "-"}</td>
                 <td>{flankedLocus}</td>
-                <td><button onClick={() => this.deleteRegion(i)}>Delete</button></td>
+                <td><button className="btn btn-sm btn-danger" onClick={() => this.deleteRegion(i)}>Delete</button></td>
             </tr>);
         }
 
@@ -137,57 +221,112 @@ class RegionSetConfig extends React.Component {
     }
 
     render() {
+        const defaultFilterMethod = (filter, row) =>
+        String(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase());
+        const features = this.state.set ? this.state.set.features: [];
+        const flankedFeatures = this.state.set ? this.state.set.makeFlankedFeatures(): [];
+        const columns = [
+            {
+                Header: "Name",
+                accessor: feature => feature.getName(),
+                id: "name",
+            },
+            {
+                Header: "Locus",
+                accessor: feature => feature.getLocus().toString(),
+                id: "locus",
+            },
+            {
+                Header: "Strand",
+                accessor: feature => feature.getIsForwardStrand() ? "+" : "-",
+                id: "strand",
+            },
+            {
+                Header: "Coordinates to view",
+                Cell: reactTableRow => flankedFeatures[reactTableRow.index] ? flankedFeatures[reactTableRow.index].getLocus().toString() : "(invalid)",
+                id: "adjustedLocus",
+            },
+            {
+                Header: "Delete",
+                Cell: reactTableRow => <button className="btn btn-sm btn-danger" onClick={() => this.deleteRegion(reactTableRow.index)}>Delete</button>,
+                id: "deleteLocus",
+            }
+
+        ];
         return (
         <div>
-            <h3>{this.props.set ? `Configuring set: "${this.props.set.name}"` : "Create new set"}</h3>
-            <label>
-                Enter name
-                <input
-                    type="text"
-                    placeholder="Set name"
-                    value={this.state.set.name}
-                    onChange={this.changeSetName}
-                />
-            </label>
-            <table className="table">
-                <thead>
-                    <tr><th>Name</th><th>Locus</th><th>Strand</th><th>Coordinates to view</th><th>Delete</th></tr>
-                </thead>
-                <tbody>{this.renderRegions()}</tbody>
-            </table>
+            <h3>{this.props.set ? `Editing set: "${this.props.set.name}"` : "Create a new set"}</h3>
+        
+            { !this.state.set &&
             <div>
-                <label>
-                    New region name
-                    <input
-                        type="text"
-                        value={this.state.newRegionName}
-                        onChange={event => this.setState({newRegionName: event.target.value})}
-                    />
-                </label>
-                <label>
-                    New region locus
-                    <input
-                        type="text"
-                        value={this.state.newRegionLocus}
-                        onChange={event => this.setState({newRegionLocus: event.target.value})}
-                    />
-                </label>
-                <button onClick={this.addRegion}>Add new region</button>
-                {this.state.newRegionError ? this.state.newRegionError.message : null}
+                <h4>Enter a list of regions</h4>
+                <p>Enter a list of gene names or coordinates to make a gene set one item per line. 
+                    Gene names and coordinates can be mixed for input. Coordinate string must be in the form of "chr1:345-678"
+                    fields can be joined by space/tab/comma/colon/hyphen.</p>
+                <form onSubmit={this.handleAddList}>
+                    <label>
+                        <textarea value={this.state.regionList} onChange={this.handleListChange} rows={10} cols={40} />
+                    </label>
+                    <div>
+                        <input className="btn btn-sm btn-primary" type="submit" value="Add" /> <input 
+                            className="btn btn-sm btn-secondary" type="reset" value="Clear" onClick={this.resetList} 
+                            /> <span style={{fontStyle: 'italic', color: 'red'}}>{this.state.loadingMsg}</span>
+                    </div>
+                </form>
             </div>
-            <FlankingStratConfig
-                strategy={this.state.set.flankingStrategy}
-                onNewStrategy={this.changeSetStrategy}
-            />
-            <div>
-                <button
+            }
+
+            {this.state.set && this.state.set.features.length > 0 &&
+            <React.Fragment>
+                <label style={{marginTop: '1ch'}}>
+                    1. Rename this set: <input
+                        type="text"
+                        placeholder="Set name"
+                        value={this.state.set ? this.state.set.name : 'New set'}
+                        onChange={this.changeSetName}
+                    />
+                </label>
+
+                <div>
+                    <h6>2. Add one region or delete region(s) from the table below</h6>
+                    <label>
+                        New region name: <input
+                            type="text"
+                            value={this.state.newRegionName}
+                            onChange={event => this.setState({newRegionName: event.target.value})}
+                        />
+                    </label> <label>
+                        New region locus: <input
+                            type="text"
+                            value={this.state.newRegionLocus}
+                            onChange={event => this.setState({newRegionLocus: event.target.value})}
+                        />
+                    </label> <button className="btn btn-sm btn-success" onClick={this.addRegion}>Add new region</button>
+                    {this.state.newRegionError ? this.state.newRegionError.message : null}
+                </div>
+
+                <ReactTable
+                filterable
+                defaultPageSize={10}
+                defaultFilterMethod={defaultFilterMethod}
+                minRows={Math.min(features.length, 10)}
+                data={features}
+                columns={columns}
+                className="-striped -highlight"
+                />
+                <FlankingStratConfig
+                    strategy={this.state.set.flankingStrategy}
+                    onNewStrategy={this.changeSetStrategy}
+                />
+                <div>
+                <button className="btn btn-sm btn-primary"
                     onClick={() => this.props.onSetConfigured(this.state.set)}
                     disabled={this.isSaveButtonDisabled()}
-                >
-                    Save changes
-                </button>
-                <button onClick={this.cancelPressed}>Cancel</button>
-            </div>
+                >Add Set
+                </button> <button className="btn btn-sm btn-secondary" onClick={this.cancelPressed}>Cancel</button>
+                </div>
+            </React.Fragment>
+            }
         </div>
         );
     }

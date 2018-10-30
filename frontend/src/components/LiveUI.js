@@ -15,6 +15,7 @@ class LiveUI extends React.Component {
         super(props);
         this.state = {
             isLive: false,
+            shouldGoHome: false,
         };
     }
 
@@ -36,6 +37,10 @@ class LiveUI extends React.Component {
 
     }
 
+    endLive = () => {
+        this.setState({shouldGoHome: true});
+    }
+
     render() {
         if (this.state.isLive) {
             return (
@@ -47,21 +52,26 @@ class LiveUI extends React.Component {
                     }}/>
                 </React.Fragment>
             
-            )
-
-            ;
+            );
             
+        } else {
+            return(
+                <div>
+                    <button className="btn btn-primary" onClick={this.goLive}>Go Live</button>
+                    <p>
+                        How this works: Click the button above will navigate you to a new link, <br/>
+                        which you can share with your PI, collaborators or friends. <br/>
+                        What you see on the screen will be seen by them too, at real time.
+                    </p>
+                    <button className="btn btn-warning" onClick={this.endLive}>End Live</button>
+                    { this.state.shouldGoHome &&
+                        <Redirect to={{
+                            pathname: `/`,
+                        }}/>
+                    }
+                </div>
+            );
         }
-        return(
-            <div>
-                <button className="btn btn-primary" onClick={this.goLive}>Go Live</button>
-                <p>
-                    How this works: Click the button above will navigate you to a new link, <br/>
-                    which you can share with your PI, collaborators or friends. <br/>
-                    What you see on the screen will be seen by them too, at real time.
-                </p>
-            </div>
-        );
     }
 }
 

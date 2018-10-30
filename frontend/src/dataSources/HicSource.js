@@ -2,6 +2,7 @@ import _ from 'lodash';
 import DataSource from './DataSource';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import { GenomeInteraction } from '../model/GenomeInteraction';
+import { ensureMaxListLength } from '../util';
 
 /**
  * First, some monkey patching for juicebox.js
@@ -60,6 +61,7 @@ export class HicSource extends DataSource {
      * @param {number} binSize 
      */
     async getInteractionsBetweenLoci(queryLocus1, queryLocus2, binSize) {
+        // NONE/VC/VC_SQRT/KR  normalization
         const records = await this.straw.getContactRecords('NONE', queryLocus1, queryLocus2, 'BP', binSize);
         const interactions = [];
         for (const record of records) {
@@ -86,12 +88,33 @@ export class HicSource extends DataSource {
         const binSize = options.binSize || this.getAutoBinSize(region.getWidth());
         const promises = [];
         const loci = region.getGenomeIntervals();
-        for (const locus1 of loci) {
-            for (const locus2 of loci) {
+        for (const [index1,locus1] of loci.entries()) {
+            for (const locus2 of loci.slice(index1)) {
                 promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
             }
         }
         const dataForEachSegment = await Promise.all(promises);
         return _.flatMap(dataForEachSegment);
+    }
+
+    async getDataAll(region, options) {
+        const binSize = options.binSize || this.getAutoBinSize(region.getWidth());
+        const promises = [];
+        const loci = region.getGenomeIntervals();
+        // const locus2 = new ChromosomeInterval('chr7', 0, 145441459);
+        // const locus2 = {chr: "all"};
+        const navContext = region.getNavigationContext();
+        navContext.getFeatures().forEach(feature => {
+            for (const locus1 of loci) {
+                const locus2 = feature.getLocus();
+                if(locus2.chr === 'chrM') {continue;}
+                promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
+            }
+        });
+        const dataForEachSegment = await Promise.all(promises);
+        const allData =  _.flatMap(dataForEachSegment);
+        const chrSets = new Set(loci.map(item => item.chr));
+        const chrData = allData.filter(item => chrSets.has(item.locus1.chr) && chrSets.has(item.locus2.chr));
+        return [ensureMaxListLength(chrData, 5000), ensureMaxListLength(allData, 5000)];
     }
 }

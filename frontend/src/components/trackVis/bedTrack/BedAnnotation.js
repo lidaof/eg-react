@@ -79,7 +79,7 @@ class BedAnnotation extends React.Component {
                     y={0}
                     height={HEIGHT - 1}
                     fill={contrastColor}
-                    alignmentBaseline="hanging"
+                    dominantBaseline="hanging"
                     textAnchor="middle"
                     backgroundColor={colorToUse}
                     backgroundOpacity={1}

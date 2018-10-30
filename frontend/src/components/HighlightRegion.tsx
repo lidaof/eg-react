@@ -17,9 +17,9 @@ interface HighlightRegionProps {
 }
 
 /**
- * Creates and manages the boxes that the user can drag across the screen to select a new region.
+ * Creates a box that highlight user's entered region, from gene or region locator
  * 
- * @author Silas Hsu
+ * @author Daofeng Li, modified from Silas Hsu
  */
 class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     static defaultProps: HighlightRegionProps = {

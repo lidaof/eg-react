@@ -18,7 +18,7 @@ function getReverseComplement(sequence: string): string {
     return result;
 }
 
-const BASE_COLORS = {
+export const BASE_COLORS = {
     G: '#3899c7', // Blue
     C: '#e05144', // Red
     T: '#9238c7', // Purple
@@ -90,7 +90,7 @@ export class Sequence extends React.PureComponent<SequenceProps> {
                         key={x}
                         x={x + baseWidth/2}
                         y={y + height/2 + 1}
-                        alignmentBaseline="middle"
+                        dominantBaseline="middle"
                         style={{textAnchor: "middle", fill: 'white', fontSize: letterSize}}
                     >
                         {base}

@@ -37,11 +37,11 @@ const defaultTracks = [
         name: "refGene",
         genome: "mm10",
     }),
-    new TrackModel({
-        type: "geneAnnotation",
-        name: "gencodeM18",
-        genome: "mm10",
-    }),
+    // new TrackModel({
+    //     type: "geneAnnotation",
+    //     name: "gencodeM18",
+    //     genome: "mm10",
+    // }),
     new TrackModel({
         type: "geneAnnotation",
         name: "gencodeM18Basic",
@@ -51,21 +51,26 @@ const defaultTracks = [
         type: "ruler",
         name: "Ruler",
     }),
-    new TrackModel({
-        type: "longrange",
-        name: "ES-E14 ChIA-PET",
-        url: "https://egg.wustl.edu/d/mm9/GSE28247_st3c.gz",
-    }),
-    new TrackModel({
-        type: "biginteract",
-        name: "test bigInteract",
-        url: "https://epgg-test.wustl.edu/dli/long-range-test/interactExample3.inter.bb",
-    }),
+    // new TrackModel({
+    //     type: "longrange",
+    //     name: "ES-E14 ChIA-PET",
+    //     url: "https://egg.wustl.edu/d/mm9/GSE28247_st3c.gz",
+    // }),
+    // new TrackModel({
+    //     type: "biginteract",
+    //     name: "test bigInteract",
+    //     url: "https://epgg-test.wustl.edu/dli/long-range-test/interactExample3.inter.bb",
+    // }),
     new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
         url: 'https://vizhub.wustl.edu/public/mm10/rmsk16.bb',
     }),
+    // new TrackModel({
+    //     type: 'refbed',
+    //     name: 'refGene in refbed',
+    //     url: 'https://wangftp.wustl.edu/~rsears/FOR_DAOFENG/gencodeM18_load_basic_Gene.bed.gz',
+    // }),
 ];
 
 const publicHubData = {
@@ -83,7 +88,7 @@ const publicHubList = [
         name: "4DN HiC datasets",
         numTracks: 23,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~dli/test/4dn_mm10.json",
+        url: "https://vizhub.wustl.edu/public/mm10/4dn_mm10.json",
         description: {
             'hub built by': 'Daofeng Li (dli23@wustl.edu)',
             'hub built date': 'Sep 1 2018',

@@ -18,7 +18,7 @@ const COLORS = [ // A long list of unique colors.  From the old browser.
 */
 
 // A long list of unique colors.
-const COLORS = [ // From https://stackoverflow.com/questions/1168260/algorithm-for-generating-unique-colors
+export const COLORS = [ // From https://stackoverflow.com/questions/1168260/algorithm-for-generating-unique-colors
     "#000000", "#00FF00", "#0000FF", "#FF0000", "#01FFFE", "#FFA6FE", "#FFDB66", "#006401", "#010067", "#95003A",
     "#007DB5", "#FF00F6", "#FFEEE8", "#774D00", "#90FB92", "#0076FF", "#D5FF00", "#FF937E", "#6A826C", "#FF029D",
     "#FE8900", "#7A4782", "#7E2DD2", "#85A900", "#FF0056", "#A42400", "#00AE7E", "#683D3B", "#BDC6FF", "#263400",

@@ -6,21 +6,27 @@ import CustomHubAdder from './CustomHubAdder';
 import FacetTable from './FacetTable';
 
 // Just add a new entry here to support adding a new track type.
-const TRACK_TYPES = ['bigWig', 'bedGraph', 'bed', 'bigBed', 'hic', 'bam'];
+const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'bam'];
 
 const TYPES_DESC = [
         'numerical data', 
         'numerical data, processed by tabix in .gz format',
+        'methylation data, processed by tabix in .gz format',
+        'categorical data, processed by tabix in .gz format',
         'annotationd data, processed by tabix in .gz format',
         'anotation data',
-        'long range interaction data',
+        'repeats annotation data in bigBed format',
+        'gene annotationd data, processed by tabix in .gz format',
+        'long range interaction data in hic format',
+        'long range interaction data in longrange format',
+        'long range interaction data in bigInteract format',
         'reads alignment data'
     ];
 
 /**
  * UI for adding custom tracks.
  * 
- * @author Silas Hsu
+ * @author Silas Hsu and Daofeng Li
  */
 class CustomTrackAdder extends React.Component {
     static propTypes = {
@@ -87,6 +93,9 @@ class CustomTrackAdder extends React.Component {
             <h1>Add custom track</h1>
             <div className="form-group">
                 <label>Track type</label>
+                <span style={{marginLeft: "10px", fontStyle: "italic"}}>
+                    <a href="https://epigenomegateway.readthedocs.io/en/latest/tracks.html" target="_blank">track format documentation</a>
+                </span>
                 <select className="form-control" value={type} onChange={event => this.setState({type: event.target.value})} >
                     {this.renderTypeOptions()}
                 </select>

@@ -236,7 +236,7 @@ class Chromosomes extends React.PureComponent {
                     x2={x}
                     y2={TOP_PADDING * 2 + HEIGHT}
                     stroke={"#000"}
-                    strokeWidth={2}
+                    strokeWidth={1}
                 />);
             }
 
