@@ -1,5 +1,61 @@
 {
-    "Genome comparison": [
+    "Genome Annotation": [
+        {
+            "type": "categorical",
+            "name": "CpG Context",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
+              },
+              "backgroundColor":"#071CEC"
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Context",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_unmasked_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
+              },
+              "backgroundColor":"#071CEC"
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
+              }
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands (unmaasked)",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_unmasked_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
+              }
+            }
+        }
+    ],
+    "Genome Comparison": [
         {
             "name": "panTro5tohg38",
             "label": "Chimp panTro5 to hg38 blastz",
@@ -9,6 +65,98 @@
             "details": {
                 "source": "UCSC Genome Browser",
                 "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsPanTro5/"
+            }
+        }
+    ],
+    "Mappability": [
+         {
+            "name": "24mer Mapability",
+            "label": "24mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.24.bigwig",
+            "height": 40,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "24mer",
+                "software": "GEM",
+                "runby": "X.Zhuo"
+            }
+        },
+         {
+            "name": "36mer Mapability",
+            "label": "36mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.36.bigwig",
+            "height": 40,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "36mer",
+                "software": "GEM",
+                "runby": "X.Zhuo"
+            }
+        },
+         {
+            "name": "50mer Mapability",
+            "label": "50mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.50.bigwig",
+            "height": 40,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "50mer",
+                "software": "GEM",
+                "runby": "X.Zhuo"
+            }
+        },
+         {
+            "name": "75mer Mapability",
+            "label": "75mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.75.bigwig",
+            "height": 40,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "75mer",
+                "software": "GEM",
+                "runby": "X.Zhuo"
+            }
+        },
+         {
+            "name": "100mer Mapability",
+            "label": "100mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.100.bigwig",
+            "height": 40,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "100mer",
+                "software": "GEM",
+                "runby": "X.Zhuo"
             }
         }
     ]
