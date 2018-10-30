@@ -57,6 +57,13 @@
     ],
     "Genome Comparison": [
         {
+            "name": "mm10tohg38",
+            "label": "Rat mm10 to hg38 blastz",
+            "querygenome": "mm10",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_mm10_axt.gz"
+        },
+        {
             "name": "panTro5tohg38",
             "label": "Chimp panTro5 to hg38 blastz",
             "querygenome": "panTro5",
@@ -66,6 +73,20 @@
                 "source": "UCSC Genome Browser",
                 "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsPanTro5/"
             }
+        },
+        {
+            "name": "rheMac3tohg38",
+            "label": "Rhesus Macaque rheMac3 to hg38 blastz",
+            "querygenome": "rheMac3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rheMac3_axt.gz"
+        },
+         {
+            "name": "rn5tohg38",
+            "label": "Rat rn5 to hg38 blastz",
+            "querygenome": "rn5",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rn5_axt.gz"
         }
     ],
     "Mappability": [
@@ -74,7 +95,7 @@
             "label": "24mer alignability",
             "filetype": "bigwig",
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.24.bigwig",
-            "height": 40,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
@@ -92,7 +113,7 @@
             "label": "36mer alignability",
             "filetype": "bigwig",
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.36.bigwig",
-            "height": 40,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
@@ -110,7 +131,7 @@
             "label": "50mer alignability",
             "filetype": "bigwig",
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.50.bigwig",
-            "height": 40,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
@@ -128,7 +149,7 @@
             "label": "75mer alignability",
             "filetype": "bigwig",
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.75.bigwig",
-            "height": 40,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
@@ -146,7 +167,7 @@
             "label": "100mer alignability",
             "filetype": "bigwig",
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38.mappability.100.bigwig",
-            "height": 40,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
