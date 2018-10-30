@@ -1,6 +1,20 @@
 {
     "Genome Annotation": [
         {
+            "name": "blacklist",
+            "label": "hg38 Encode Blacklist",
+            "filetype": "bed",
+            "url": "https://epgg-test.wustl.edu/d/hg38/hg38.blacklist.bed.gz",
+            "height": 21,
+            "options": {
+                "color": "#000000"
+            },
+            "details": {
+                "source": "mod/mouse/humanENCODE Blacklists",
+                "download url": "http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/hg38-human/hg38.blacklist.bed.gz"
+            }
+         },
+        {
             "type": "categorical",
             "name": "CpG Context",
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_Shores_Shelves.bed.gz",
