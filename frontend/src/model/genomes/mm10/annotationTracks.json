@@ -147,11 +147,38 @@
         },
         {
             "type": "categorical",
+            "name": "CpG Context",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_unmasked_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
+              },
+              "backgroundColor":"#071CEC"
+            }
+        },
+        {
+            "type": "categorical",
             "name": "CpG Islands",
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_category.bed.gz",
             "height": 30,
             "options": {
               "label": "CpG Context",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
+              }
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands (unmaasked)",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_unmasked_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
               "category": {
                 "CGI": {"name": "CGI", "color": "#FE8801"}
               }
