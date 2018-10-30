@@ -44,7 +44,7 @@
         },
         {
             "type": "categorical",
-            "name": "CpG Islands (unmaasked)",
+            "name": "CpG Islands (unmasked)",
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_unmasked_category.bed.gz",
             "height": 30,
             "options": {
@@ -53,7 +53,21 @@
                 "CGI": {"name": "CGI", "color": "#FE8801"}
               }
             }
-        }
+        },
+        {
+            "name": "gc5Base",
+            "label": "GC percent",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/hg38/gc5Base.bigWig",
+            "height": 30,
+            "options": {
+                "color": "#4785C2",
+                "color2": "#4747C2",
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 100
+            }
+        }   
     ],
     "Genome Comparison": [
         {
