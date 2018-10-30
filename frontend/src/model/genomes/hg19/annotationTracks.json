@@ -127,7 +127,7 @@
         },
         {
             "type": "categorical",
-            "name": "CpG Islands (unmaasked)",
+            "name": "CpG Islands (unmasked)",
             "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_category.bed.gz",
             "height": 30,
             "options": {
