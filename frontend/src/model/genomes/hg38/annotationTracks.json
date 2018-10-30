@@ -1,4 +1,22 @@
 {
+   "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://vizhub.wustl.edu/public/hg38/rmsk16.bb",
+                "height": 30
+            }
+        ]
+    },
     "Genome Annotation": [
         {
             "name": "blacklist",
