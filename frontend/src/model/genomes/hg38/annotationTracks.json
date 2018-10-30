@@ -17,7 +17,7 @@
         },
         {
             "type": "categorical",
-            "name": "CpG Context",
+            "name": "CpG Context (unmasked)",
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_unmasked_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
