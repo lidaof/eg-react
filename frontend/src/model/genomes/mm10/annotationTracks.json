@@ -147,11 +147,38 @@
         },
         {
             "type": "categorical",
+            "name": "CpG Context",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_unmasked_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
+              },
+              "backgroundColor":"#071CEC"
+            }
+        },
+        {
+            "type": "categorical",
             "name": "CpG Islands",
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_category.bed.gz",
             "height": 30,
             "options": {
               "label": "CpG Context",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
+              }
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands (unmasked)",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_unmasked_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
               "category": {
                 "CGI": {"name": "CGI", "color": "#FE8801"}
               }
@@ -181,6 +208,50 @@
                 "yMax": 100
             }
         }
-    ]
+    ],
+    "Genome Comparison": [
+        {
+            "name": "cavPor3tomm10",
+            "label": "Guinea Pig cavPor3 to mm10 blastz",
+            "querygenome": "cavPor3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_cavPor3_axt.gz"
+        },
+        {
+            "name": "danRer7tomm10",
+            "label": "Zebrafish danRer7 to mm10 blastz",
+            "querygenome": "danRer7",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_danRer7_axt.gz"
+        },
+        {
+            "name": "hg19tomm10",
+            "label": "Human hg19 to mm10 blastz",
+            "querygenome": "hg19",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_hg19_axt.gz"
+        },
+        {
+            "name": "hg38tomm10",
+            "label": "Human hg38 to mm10 blastz",
+            "querygenome": "hg38",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_hg38_axt.gz"
+        },
+        {
+            "name": "rheMac3tomm10",
+            "label": "Rhesus macaque rheMac3 to mm10 blastz",
+            "querygenome": "rheMac3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rheMac3_axt.gz"
+        },
+        {
+            "name": "rn5tomm10",
+            "label": "Rat rn5 to mm10 blastz",
+            "querygenome": "rn5",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rn5_axt.gz"
+        }
+     ]
     
 }
