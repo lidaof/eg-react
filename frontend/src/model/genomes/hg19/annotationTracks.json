@@ -84,6 +84,20 @@
     ],
     "Genome Annotation": [
         {
+            "name": "blacklist",
+            "label": "hg19 Encode Blacklist",
+            "filetype": "bed",
+            "url": "https://epgg-test.wustl.edu/d/hg39/hg19.blacklist.bed.gz",
+            "height": 21,
+            "options": {
+                "color": "#000000"
+            },
+            "details": {
+                "source": "mod/mouse/humanENCODE Blacklists",
+                "download url": "http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/hg19-human/wgEncodeHg19ConsensusSignalArtifactRegions.bed.gz"
+            }
+         },
+        {
             "type": "categorical",
             "name": "CpG Context",
             "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_Shores_Shelves.bed.gz",
@@ -100,7 +114,7 @@
         },
         {
             "type": "categorical",
-            "name": "CpG Context",
+            "name": "CpG Context (unmasked)",
             "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
