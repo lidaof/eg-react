@@ -162,7 +162,7 @@
             }
         }
     ],
-    "Genome comparison": [
+    "Genome Comparison": [
         {
             "name": "mm9tohg19",
             "label": "Mouse mm9 to hg19 blastz",
