@@ -82,31 +82,77 @@
             "options": { "color": "#006385", "color2": "#852100"}
         }
     ],
-    "G/C related": [
+    "Genome Annotation": [
         {
-            "name": "cpgisland",
-            "label": "CpG island",
-            "filetype": "bed",
-            "url": "https://egg.wustl.edu/d/hg19/cpgisland.gz"
+            "type": "categorical",
+            "name": "CpG Context",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
+              },
+              "backgroundColor":"#071CEC"
+            }
         },
         {
-            "name": "CpGsites",
-            "label": "CpG sites",
-            "filetype": "categorical",
-            "category": {
-                "1": {
-                    "name":"CpG sites",
-                    "color": "rgb(134,0,179)"
-                }
-            },
-            "url": "https://egg.wustl.edu/d/hg19/CpGsites.gz"
+            "type": "categorical",
+            "name": "CpG Context",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
+              },
+              "backgroundColor":"#071CEC"
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
+              }
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands (unmaasked)",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
+              }
+            }
+        },
+        {
+            "name": "CpGs",
+            "label": "CpGs",
+            "filetype": "bed",
+            "url": "https://egg.wustl.edu/d/hg19/CpGsites.gz",
+            "height": 21,
+            "options": {
+                "color": "#cc00cc"
+            }
         },
         {
             "name": "gc5Base",
             "label": "GC percent",
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/hg19/gc5Base.bigWig",
-            "height": 50,
+            "height": 30,
             "options": {
                 "color": "#4785C2",
                 "color2": "#4747C2",
