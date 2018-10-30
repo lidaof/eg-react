@@ -219,7 +219,7 @@
             "label": "100mer alignability ENCODE/CRG(Guigo)",
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign100mer.bigWig",
-            "height": 50,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
@@ -239,7 +239,7 @@
             "label": "75mer alignability ENCODE/CRG(Guigo)",
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign75mer.bigWig",
-            "height": 50,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
@@ -279,7 +279,7 @@
             "label": "40mer alignability ENCODE/CRG(Guigo)",
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign40mer.bigWig",
-            "height": 50,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
@@ -299,7 +299,7 @@
             "label": "36mer alignability ENCODE/CRG(Guigo)",
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign36mer.bigWig",
-            "height": 50,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
@@ -319,7 +319,7 @@
             "label": "24mer alignability ENCODE/CRG(Guigo)",
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign24mer.bigWig",
-            "height": 50,
+            "height": 30,
             "options": {
                 "yScale": "fixed",
                 "yMin": 0,
