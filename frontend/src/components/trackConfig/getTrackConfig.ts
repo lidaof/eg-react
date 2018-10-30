@@ -9,6 +9,7 @@ import { GeneAnnotationTrackConfig } from './GeneAnnotationTrackConfig';
 import { HicTrackConfig } from './HicTrackConfig';
 import { LongRangeTrackConfig } from './LongRangeTrackConfig';
 import { BigInteractTrackConfig } from './BigInteractTrackConfig';
+import { CoolTrackConfig } from './CoolTrackConfig';
 import { MethylCTrackConfig } from './MethylCTrackConfig';
 import { RepeatMaskerTrackConfig } from './RepeatMaskerTrackConfig';
 import { GenomeAlignTrackConfig } from './GenomeAlignTrackConfig';
@@ -28,6 +29,7 @@ const TYPE_NAME_TO_CONFIG = {
     "hic": HicTrackConfig,
     "longrange": LongRangeTrackConfig,
     "biginteract": BigInteractTrackConfig,
+    "cool": CoolTrackConfig,
     "geneannotation": GeneAnnotationTrackConfig,
     "refbed": RefBedTrackConfig,
     "methylc": MethylCTrackConfig,

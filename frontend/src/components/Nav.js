@@ -123,18 +123,6 @@ class Nav extends React.Component {
                 <div className="Nav-center btn-group">
                     <DropdownOpener extraClassName="btn-primary" label="🎹Tracks" />
                     <div className="dropdown-menu">
-                        <ModalMenuItem itemLabel="Track Facet Table">
-                            <FacetTableUI 
-                                publicTracksPool={publicTracksPool}
-                                customTracksPool={customTracksPool}
-                                addedTracks={tracks} 
-                                onTracksAdded={onTracksAdded}
-                                publicTrackSets={publicTrackSets}
-                                customTrackSets={customTrackSets}
-                                addedTrackSets={addedTrackSets}
-                                addTermToMetaSets={addTermToMetaSets}
-                            />
-                        </ModalMenuItem>
                         <ModalMenuItem itemLabel="Annotation Tracks">
                             <AnnotationTrackSelector
                                 addedTracks={tracks}
@@ -152,6 +140,18 @@ class Nav extends React.Component {
                                 publicHubs={publicHubs}
                                 onHubUpdated={onHubUpdated}
                                 publicTrackSets={publicTrackSets}
+                                addedTrackSets={addedTrackSets}
+                                addTermToMetaSets={addTermToMetaSets}
+                            />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Track Facet Table">
+                            <FacetTableUI 
+                                publicTracksPool={publicTracksPool}
+                                customTracksPool={customTracksPool}
+                                addedTracks={tracks} 
+                                onTracksAdded={onTracksAdded}
+                                publicTrackSets={publicTrackSets}
+                                customTrackSets={customTrackSets}
                                 addedTrackSets={addedTrackSets}
                                 addTermToMetaSets={addTermToMetaSets}
                             />
