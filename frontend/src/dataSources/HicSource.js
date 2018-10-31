@@ -88,9 +88,14 @@ export class HicSource extends DataSource {
         const binSize = options.binSize || this.getAutoBinSize(region.getWidth());
         const promises = [];
         const loci = region.getGenomeIntervals();
-        for (const [index1,locus1] of loci.entries()) {
-            for (const locus2 of loci.slice(index1)) {
-                promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
+        // for (const [index1,locus1] of loci.entries()) {
+        //     for (const locus2 of loci.slice(index1)) {
+        //         promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
+        //     }
+        // }
+        for (let i = 0; i < loci.length; i++) {
+            for (let j = i; j < loci.length; j++) {
+                promises.push(this.getInteractionsBetweenLoci(loci[i], loci[j], binSize));
             }
         }
         const dataForEachSegment = await Promise.all(promises);

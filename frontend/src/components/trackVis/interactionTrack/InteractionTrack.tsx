@@ -39,26 +39,28 @@ export const DEFAULT_OPTIONS = {
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
-class InteractionTrack extends React.Component<InteractionTrackProps, {}> {
+class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
     public featurePlacer: FeaturePlacer;
 
     constructor(props: InteractionTrackProps) {
         super(props);
         this.featurePlacer = new FeaturePlacer();
         this.featurePlacer.placeInteractions = memoizeOne(this.featurePlacer.placeInteractions);
-        this.makeOpacityScale = memoizeOne(this.makeOpacityScale);
+        // this.makeOpacityScale = memoizeOne(this.makeOpacityScale);
         this.showTooltip = this.showTooltip.bind(this);
         this.hideTooltip = this.hideTooltip.bind(this);
     }
 
-    makeOpacityScale(interactions: GenomeInteraction[], options: any) {
-        const {scoreScale, scoreMin, scoreMax} = options;
+
+    makeOpacityScale = () => {
+        const {scoreScale, scoreMin, scoreMax} = this.props.options;
         if (scoreScale === 'auto') {
-            const maxScore = interactions.length > 0 ? _.maxBy(interactions, 'score').score : 0;
+            const maxScore = this.props.data.length > 0 ? _.maxBy(this.props.data, 'score').score : 0;
             return scaleLinear().domain([0, maxScore]).range([0, 1]).clamp(true);
         } else {
             if (scoreMin >= scoreMax) {
                 notify.show('Score min cannot be greater than Score max', 'error', 2000);
+                return scaleLinear().domain([scoreMax-1, scoreMax]).range([0, 1]).clamp(true);
             }
             return scaleLinear().domain([scoreMin, scoreMax]).range([0, 1]).clamp(true);
         }
@@ -87,12 +89,12 @@ class InteractionTrack extends React.Component<InteractionTrackProps, {}> {
             placedInteractions: this.featurePlacer.placeInteractions(data, visRegion, width),
             viewWindow,
             width,
-            opacityScale: this.makeOpacityScale(data, options),
+            opacityScale: this.makeOpacityScale(),
             color: options.color,
             onInteractionHovered: this.showTooltip,
             onMouseOut: this.hideTooltip
         };
-
+        console.log(this.makeOpacityScale().domain());
         let visualizer; // , height;
         if (options.displayMode === InteractionDisplayMode.HEATMAP) {
             visualizer = <Heatmap {...visualizerProps} />;

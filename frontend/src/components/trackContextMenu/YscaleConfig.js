@@ -14,14 +14,14 @@ function YscaleConfig(props) {
             optionName="yMax" 
             label="Y-axis max:" 
             isFloat={true} 
-            hasSetButton={false} 
+            hasSetButton={true} // when type 0.5 before you type 5 browser trying to set the scale and get fail
         />
         <PrimaryAboveColorConfig {...props} />
         <NumberConfig {...props} 
             optionName="yMin" 
             label="Y-axis min:" 
             isFloat={true} 
-            hasSetButton={false} 
+            hasSetButton={true}
         />
         <SecondaryBelowColorConfig {...props} />
     </React.Fragment> : null;
