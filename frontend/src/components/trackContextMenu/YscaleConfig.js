@@ -2,6 +2,7 @@ import React from 'react';
 import SelectConfig from './SelectConfig';
 import NumberConfig from './NumberConfig';
 import { PrimaryAboveColorConfig, SecondaryBelowColorConfig } from "./ColorConfig";
+import { ScaleChoices } from '../../model/ScaleChoices';
 /**
  * A context menu item that configures track y-scale.
  * 
@@ -32,10 +33,10 @@ function YscaleConfig(props) {
                 optionName="yScale" 
                 label="Y-axis scale:" 
                 choices={{
-                    AUTO: "auto",
-                    FIXED: "fixed",
+                    AUTO: ScaleChoices.AUTO,
+                    FIXED: ScaleChoices.FIXED,
                 }}
-                defaultValue="auto"
+                defaultValue={ScaleChoices.AUTO}
             />
             {fixedScales}
             

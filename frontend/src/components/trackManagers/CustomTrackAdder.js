@@ -6,7 +6,7 @@ import CustomHubAdder from './CustomHubAdder';
 import FacetTable from './FacetTable';
 
 // Just add a new entry here to support adding a new track type.
-const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'bam'];
+const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'cool', 'bam'];
 
 const TYPES_DESC = [
         'numerical data', 
@@ -20,6 +20,7 @@ const TYPES_DESC = [
         'long range interaction data in hic format',
         'long range interaction data in longrange format',
         'long range interaction data in bigInteract format',
+        'long range interaction data in cool format, use data uuid instead of URL',
         'reads alignment data'
     ];
 

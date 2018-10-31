@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import { scaleLinear } from 'd3-scale';
+import { notify } from 'react-notify-toast';
 
 import { Heatmap } from './Heatmap';
 import { ArcDisplay } from './ArcDisplay';
@@ -15,7 +16,7 @@ import Tooltip from '../commonComponents/tooltip/Tooltip';
 import { InteractionDisplayMode } from '../../../model/DisplayModes';
 import { FeaturePlacer } from '../../../model/FeaturePlacer';
 import { GenomeInteraction } from '../../../model/GenomeInteraction';
-import { notify } from 'react-notify-toast';
+import { ScaleChoices } from '../../../model/ScaleChoices';
 
 interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
     data: GenomeInteraction[];
@@ -35,7 +36,7 @@ export const DEFAULT_OPTIONS = {
     color2: '#006385',
     backgroundColor: 'white',
     displayMode: InteractionDisplayMode.HEATMAP,
-    scoreScale: 'auto',
+    scoreScale: ScaleChoices.AUTO,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -54,7 +55,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
 
     makeOpacityScale = () => {
         const {scoreScale, scoreMin, scoreMax} = this.props.options;
-        if (scoreScale === 'auto') {
+        if (scoreScale === ScaleChoices.AUTO) {
             const maxScore = this.props.data.length > 0 ? _.maxBy(this.props.data, 'score').score : 0;
             return scaleLinear().domain([0, maxScore]).range([0, 1]).clamp(true);
         } else {
@@ -94,7 +95,6 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             onInteractionHovered: this.showTooltip,
             onMouseOut: this.hideTooltip
         };
-        console.log(this.makeOpacityScale().domain());
         let visualizer; // , height;
         if (options.displayMode === InteractionDisplayMode.HEATMAP) {
             visualizer = <Heatmap {...visualizerProps} />;
