@@ -14,6 +14,7 @@ import TrackModel from './model/TrackModel';
 import Notifications from 'react-notify-toast';
 import LoadSession from './components/LoadSession';
 import { RegionExpander } from './model/RegionExpander';
+import { Footer } from './components/Footer';
 
 import './App.css';
 
@@ -224,6 +225,7 @@ class App extends React.Component {
                 expansionAmount={REGION_EXPANDER}
                 suggestedMetaSets={this.state.suggestedMetaSets}
             />
+            <Footer />
         </div>
         );
     }

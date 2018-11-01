@@ -3,7 +3,7 @@ import DataSource from './DataSource';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import { GenomeInteraction } from '../model/GenomeInteraction';
 
-const HIGLASS_API_URL = "http://higlass.io/api/v1/fragments_by_loci/";
+const HIGLASS_API_URL = "https://higlass.io/api/v1/fragments_by_loci/";
 const MATRIX_SIZE = 50; // how many data chunks returned from the API for a query region
 
 export class CoolSource extends DataSource {
