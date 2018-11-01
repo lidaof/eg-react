@@ -1,4 +1,44 @@
 {
+   "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+   "Genes": [
+        {
+            "name": "refGene",
+            "label": "RefSeq genes",
+            "filetype": "geneAnnotation"
+        },
+        
+        {
+            "name": "gencodeV28",
+            "label": "GENCODE V28 genes",
+            "options": {
+                "categoryColors": {
+                    "coding": "rgb(0,60,179)",
+                    "nonCoding": "rgb(0,128,0)",
+                    "pseudogene": "rgb(230,0,172)",
+                    "problem": "rgb(255,0,0)",
+                    "polyA": "rgb(0,0,51)"
+                }
+            },
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://vizhub.wustl.edu/public/hg38/rmsk16.bb",
+                "height": 30
+            }
+        ]
+    },
     "Genome Annotation": [
         {
             "name": "blacklist",
