@@ -7,7 +7,8 @@
  */
 
 const GENE_FILEDS = // The mapping from column names to field names in the database
-    'id,chrom,strand,txStart,txEnd,cdsStart,cdsEnd,exonStarts,exonEnds,name,transcriptionClass,description';
+    // 'id,chrom,strand,txStart,txEnd,cdsStart,cdsEnd,exonStarts,exonEnds,name,transcriptionClass,description';
+    'chrom,txStart,txEnd,cdsStart,cdsEnd,strand,name,id,transcriptionClass,exonStarts,exonEnds,description';
 
 const geneFieldsAndIndex = {
     fields: GENE_FILEDS,

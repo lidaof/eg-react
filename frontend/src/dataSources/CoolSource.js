@@ -26,8 +26,8 @@ export class CoolSource extends DataSource {
             data: [[queryLocus1.chr, queryLocus1.start, queryLocus1.end, 
                 queryLocus2.chr, queryLocus2.start, queryLocus2.end, this.dataUuid, 0]],
             params: {
+                precision: 3,
                 dims: MATRIX_SIZE,
-                precision: 3
               },
         });
         const basesPerCell1 = Math.round(queryLocus1.getLength() / MATRIX_SIZE);

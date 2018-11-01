@@ -71,11 +71,11 @@ const defaultTracks = [
     //     name: 'refGene in refbed',
     //     url: 'https://wangftp.wustl.edu/~rsears/FOR_DAOFENG/gencodeM18_load_basic_Gene.bed.gz',
     // }),
-    new TrackModel({
-        type: 'cool',
-        name: 'Cool Track',
-        url: 'CQMd6V_cRw6iCI_-Unl3PQ'
-    }),
+    // new TrackModel({
+    //     type: 'cool',
+    //     name: 'Cool Track',
+    //     url: 'CQMd6V_cRw6iCI_-Unl3PQ'
+    // }),
 ];
 
 const publicHubData = {
