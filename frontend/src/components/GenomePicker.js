@@ -80,12 +80,12 @@ class GenomePicker extends React.PureComponent {
         return (
             <div className="GenomePicker-outer">
                 <div>
-                    <ul class="nav justify-content-end">
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
+                    <ul className="nav justify-content-end">
+                    <li className="nav-item">
+                        <a className="nav-link" href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="http://epigenomegateway.wustl.edu/legacy/" target="_blank">The 'old' browser</a>
+                    <li className="nav-item">
+                        <a className="nav-link" href="http://epigenomegateway.wustl.edu/legacy/" target="_blank">The 'old' browser</a>
                     </li>
                     </ul> 
                 </div>

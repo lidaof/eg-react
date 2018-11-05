@@ -12,6 +12,8 @@ import { BrowserScene } from './components/vr/BrowserScene';
 import { Custom3DObject } from './components/vr/Custom3DObject';
 import { mergeGeometries } from './components/vr/mergeGeometries';
 
+import EmbeddedContainer from './components/EmbeddedContainer';
+
 import './index.css';
 
 const root = document.getElementById('root');
@@ -26,4 +28,7 @@ if (root) {
     (window as any).BrowserScene = BrowserScene;
     (window as any).Custom3DObject = Custom3DObject;
     (window as any).mergeGeometries = mergeGeometries;
+    (window as any).renderBrowserInElement = () => 
+        ReactDOM.render(<Provider store={AppState} ><EmbeddedContainer/></Provider>, 
+            document.getElementById('embed'));
 }

@@ -81,7 +81,7 @@ class CustomTrackAdder extends React.Component {
 
     renderTypeOptions() {
         return Object.entries(TRACK_TYPES).map((types) =>
-            <optgroup label={types[0]}>
+            <optgroup label={types[0]} key={types[0]}>
                 {
                     types[1].map(type => <option key={type} value={type} >{type} - {TYPES_DESC[type]}</option>)
                 }

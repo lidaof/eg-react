@@ -40,7 +40,7 @@ class HubTrackTable extends React.PureComponent {
             return null;
         }
         let track = reactTableRow.original;
-        if (addedTrackUrls.has(track.url)) {
+        if (addedTrackUrls.has(track.url) || addedTrackUrls.has(track.name)) {
             return <span>✓</span>;
         }
 

@@ -188,6 +188,7 @@
             "name": "mm9tohg19",
             "label": "Mouse mm9 to hg19 blastz",
             "querygenome": "mm9",
+            "metadata": {"genome": "mm9"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm9_axt.gz"
         },
@@ -195,6 +196,7 @@
             "name": "mm10tohg19",
             "label": "Mouse mm10 to hg19 blastz",
             "querygenome": "mm10",
+            "metadata": {"genome": "mm10"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm10_axt.gz"
         },
@@ -202,6 +204,7 @@
             "name": "rn4tohg19",
             "label": "Rat rn4 to hg19 blastz",
             "querygenome": "rn4",
+            "metadata": {"genome": "rn4"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_rn4_axt.gz"
         },
@@ -209,6 +212,7 @@
             "name": "rn5tohg19",
             "label": "Rat rn5 to hg19 blastz",
             "querygenome": "rn5",
+            "metadata": {"genome": "rn5"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_rn5_axt.gz"
         },
@@ -216,6 +220,7 @@
             "name": "rheMac3tohg19",
             "label": "Rhesus macaque rheMac3 to hg19 blastz",
             "querygenome": "rheMac3",
+            "metadata": {"genome": "rheMac3"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_rheMac3_axt.gz"
         },
@@ -223,6 +228,7 @@
             "name": "cavPor3tohg19",
             "label": "Guinea pig cavPor3 to hg19 blastz",
             "querygenome": "cavPor3",
+            "metadata": {"genome": "cavPor3"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_cavPor3_axt.gz"
         },
@@ -230,6 +236,7 @@
             "name": "danRer7tohg19",
             "label": "Zebrafish danRer7 to hg19 blastz",
             "querygenome": "danRer7",
+            "metadata": {"genome": "danRer7"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_danRer7_axt.gz"
         }

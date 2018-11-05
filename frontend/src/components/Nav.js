@@ -278,7 +278,7 @@ function DropdownOpener(props) {
     const {extraClassName, label} = props;
     return <button
         type="button"
-        className={`btn btn-sm dropdown-toggle ${extraClassName}`}
+        className={`btn dropdown-toggle ${extraClassName}`}
         data-toggle="dropdown"
         aria-haspopup="true"
         aria-expanded="false"
