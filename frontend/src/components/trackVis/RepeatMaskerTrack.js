@@ -15,7 +15,7 @@ import { AnnotationDisplayModes } from '../../model/DisplayModes';
 import './commonComponents/tooltip/Tooltip.css';
 
 export const MAX_BASES_PER_PIXEL = 6000; // The higher this number, the more zooming out we support
-const TOP_PADDING = 0;
+const TOP_PADDING = 2;
 export const DEFAULT_OPTIONS = {
     maxRows: 1,
     height: 40,

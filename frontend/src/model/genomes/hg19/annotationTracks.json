@@ -14,8 +14,22 @@
         },
         
         {
-            "name": "gencodeV28",
-            "label": "GENCODE V28 genes",
+            "name": "gencodeV29",
+            "label": "GENCODE V29 genes",
+            "options": {
+                "categoryColors": {
+                    "coding": "rgb(0,60,179)",
+                    "nonCoding": "rgb(0,128,0)",
+                    "pseudogene": "rgb(230,0,172)",
+                    "problem": "rgb(255,0,0)",
+                    "polyA": "rgb(0,0,51)"
+                }
+            },
+            "filetype": "geneAnnotation"
+        },
+        {
+            "name": "gencodeV29Basic",
+            "label": "GENCODE V29 basic genes",
             "options": {
                 "categoryColors": {
                     "coding": "rgb(0,60,179)",

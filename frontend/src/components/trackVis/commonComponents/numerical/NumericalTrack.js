@@ -28,7 +28,7 @@ export const DEFAULT_OPTIONS = {
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 const AUTO_HEATMAP_THRESHOLD = 21; // If pixel height is less than this, automatically use heatmap
-const TOP_PADDING = 0;
+const TOP_PADDING = 2;
 const THRESHOLD_HEIGHT = 3; // the bar tip height which represet value above max or below min
 
 /**

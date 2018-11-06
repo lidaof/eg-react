@@ -13,8 +13,8 @@
             "filetype": "geneAnnotation"
         }, 
         {
-            "name": "gencodeM18",
-            "label": "GENCODE M18 genes",
+            "name": "gencodeM19",
+            "label": "GENCODE M19 genes",
             "options": {
                 "categoryColors": {
                     "coding": "rgb(0,60,179)",
@@ -27,8 +27,8 @@
             "filetype": "geneAnnotation"
         },
         {
-            "name": "gencodeM18Basic",
-            "label": "GENCODE M18 genes (basic set)",
+            "name": "gencodeM19Basic",
+            "label": "GENCODE M19 genes (basic set)",
             "options": {
                 "categoryColors": {
                     "coding": "rgb(0,60,179)",

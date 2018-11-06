@@ -39,12 +39,12 @@ const defaultTracks = [
     }),
     // new TrackModel({
     //     type: "geneAnnotation",
-    //     name: "gencodeM18",
+    //     name: "gencodeM19",
     //     genome: "mm10",
     // }),
     new TrackModel({
         type: "geneAnnotation",
-        name: "gencodeM18Basic",
+        name: "gencodeM19Basic",
         genome: "mm10",
     }),
     new TrackModel({

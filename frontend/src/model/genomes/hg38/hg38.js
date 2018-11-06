@@ -42,7 +42,7 @@ const defaultTracks = [
     }),
     new TrackModel({
         type: 'geneAnnotation',
-        name: 'gencodeV28',
+        name: 'gencodeV29',
         genome: 'hg38'
     }),
     new TrackModel({
