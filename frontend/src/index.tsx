@@ -28,7 +28,8 @@ if (root) {
     (window as any).BrowserScene = BrowserScene;
     (window as any).Custom3DObject = Custom3DObject;
     (window as any).mergeGeometries = mergeGeometries;
-    (window as any).renderBrowserInElement = () => 
-        ReactDOM.render(<Provider store={AppState} ><EmbeddedContainer/></Provider>, 
-            document.getElementById('embed'));
 }
+
+(window as any).renderBrowserInElement = (contents: any, container: any) => 
+ReactDOM.render(<Provider store={AppState} ><EmbeddedContainer contents={contents} /></Provider>, 
+    container);

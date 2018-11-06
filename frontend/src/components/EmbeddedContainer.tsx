@@ -2,10 +2,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { ActionCreators } from "../AppState";
+import App from "../App";
 
-class EmbeddedContainer extends React.PureComponent {
+interface EmbeddedProps {
+    onSetRestore: any;
+    contents: any;
+}
 
-    componentDidUpdate = () => {
+class EmbeddedContainer extends React.PureComponent<EmbeddedProps> {
+
+    componentDidUpdate() {
         const { genomeName, viewInterval, trackLegendWidth, isShowingNavigator,  tracks} = this.props.contents;
         const state = {
             viewInterval,
@@ -16,8 +22,8 @@ class EmbeddedContainer extends React.PureComponent {
         this.props.onSetRestore(genomeName, state);
     }
 
-    render() {
-        return null;
+    render(): any {
+        return <App />;
     }   
 };
 
