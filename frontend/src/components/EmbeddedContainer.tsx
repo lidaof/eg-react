@@ -12,18 +12,23 @@ interface EmbeddedProps {
 class EmbeddedContainer extends React.PureComponent<EmbeddedProps> {
 
     componentDidUpdate() {
-        const { genomeName, viewInterval, trackLegendWidth, isShowingNavigator,  tracks} = this.props.contents;
+        const { genomeName, viewInterval, trackLegendWidth, isShowingNavigator, tracks, 
+            metadataTerms, regionSets, regionSetViewIndex} = this.props.contents;
         const state = {
             viewInterval,
             trackLegendWidth,
             tracks,
             isShowingNavigator,
+            metadataTerms,
+            regionSets,
+            regionSetViewIndex,
         };
         this.props.onSetRestore(genomeName, state);
     }
 
     render(): any {
-        return <App />;
+        const otherProps = {embeddingMode: true};
+        return <App {...otherProps}/>;
     }   
 };
 

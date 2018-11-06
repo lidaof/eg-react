@@ -57,10 +57,10 @@ class FullDisplayMode extends React.Component<FullDisplayModeProps> {
 
     getHeight(numRows: number): number {
         const {rowHeight, options} = this.props;
-        const rowsToDraw = Math.min(numRows, options.maxRows) + 1;
-        // if (rowsToDraw < 1) {
-        //     rowsToDraw = 1;
-        // }
+        let rowsToDraw = Math.min(numRows, options.maxRows);
+        if (rowsToDraw < 1) {
+            rowsToDraw = 1;
+        }
         return rowsToDraw * rowHeight + TOP_PADDING;
     }
 
@@ -107,7 +107,7 @@ class FullVisualizer extends React.PureComponent<FullVisualizerProps> {
      */
     renderAnnotation(placedGroup: PlacedFeatureGroup, i: number) {
         const {rowHeight, maxRows, getAnnotationElement} = this.props;
-        const maxRowIndex = (maxRows || Infinity);
+        const maxRowIndex = (maxRows || Infinity) - 1;
         // Compute y
         const rowIndex = Math.min(placedGroup.row, maxRowIndex);
         const y = rowIndex * rowHeight + TOP_PADDING;

@@ -49,6 +49,7 @@ class App extends React.Component {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
         onNewViewRegion: PropTypes.func,
         onTracksChanged: PropTypes.func,
+        embeddingMode: PropTypes.bool,
     };
 
     constructor(props) {
@@ -172,7 +173,8 @@ class App extends React.Component {
 
     render() {
         const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, 
-                sessionFromUrl, trackLegendWidth, onLegendWidthChange, isShowingNavigator, onToggleNavigator} = this.props;
+                sessionFromUrl, trackLegendWidth, onLegendWidthChange, 
+                isShowingNavigator, onToggleNavigator, embeddingMode} = this.props;
         if (sessionFromUrl) {
             return <div className="container-fluid"><LoadSession bundleId={bundleId} /></div>;
         }
@@ -210,6 +212,7 @@ class App extends React.Component {
                 removeTrackFromAvailable={this.removeTrackFromAvailable}
                 addTracktoAvailable={this.addTracktoAvailable}
                 addTermToMetaSets={this.addTermToMetaSets}
+                embeddingMode={embeddingMode}
             />
              <Notifications />
             {isShowingNavigator &&
@@ -225,7 +228,7 @@ class App extends React.Component {
                 expansionAmount={REGION_EXPANDER}
                 suggestedMetaSets={this.state.suggestedMetaSets}
             />
-            <Footer />
+            {!embeddingMode && <Footer />}
         </div>
         );
     }

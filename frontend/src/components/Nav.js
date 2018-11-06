@@ -19,11 +19,11 @@ import FacetTableUI from "./FacetTableUI";
 import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "src/AppState";
 import { HotKeyInfo } from "./HotKeyInfo";
 import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
-
+import packageJson from '../../package.json';
 import eglogo from '../images/eglogo.jpg';
 import './Nav.css';
 
-const VERSION = "47.2.3";
+// const VERSION = "47.2.3";
 
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
@@ -92,7 +92,7 @@ class Nav extends React.Component {
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
             onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs,
             publicTrackSets, customTrackSets, addedTrackSets, addTracktoAvailable, removeTrackFromAvailable,
-            availableTrackSets, addTermToMetaSets
+            availableTrackSets, addTermToMetaSets, embeddingMode
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName);
@@ -103,7 +103,7 @@ class Nav extends React.Component {
                 <div id="logoDiv">
                     <img src={eglogo} width="180px" height="30px" alt="browser logo"/>
                     <span id="theNew" >The New</span>
-                    <span id="theVersion">v{VERSION}</span>
+                    <span id="theVersion">v{packageJson.version}</span>
                 </div>
                 <div className="Nav-genome Nav-center" 
                     style={{backgroundImage: `url(${logo})`, color: color, backgroundSize: "cover"}}>

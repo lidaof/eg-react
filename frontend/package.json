@@ -1,5 +1,5 @@
 {
-  "name": "eg-react",
+  "name": "epgg",
   "version": "47.2.3",
   "private": false,
   "repository": {
@@ -92,5 +92,5 @@
     "zlib": "^1.0.5"
   },
   "homepage": "http://epigenomegateway.wustl.edu/browser/",
-  "proxy": "http://localhost:3001"
+  "license" : "SEE LICENSE IN LICENSE.txt"
 }

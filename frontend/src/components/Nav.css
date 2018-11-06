@@ -95,6 +95,7 @@
 }
 
 #logoDiv {
+    position: relative;
     display: flex;
     flex-direction: column-reverse;
 }
