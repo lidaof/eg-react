@@ -100,7 +100,7 @@ class Nav extends React.Component {
             <div className="Nav-container">
                 <div id="logoDiv">
                     <img src="https://epigenomegateway.wustl.edu/images/eglogo.jpg" width="180px" height="30px" alt="browser logo"/>
-                    <span id="theNew" >The New</span>
+                    {/* <span id="theNew" >The New</span> */}
                     <span id="theVersion">v{packageJson.version}</span>
                 </div>
                 <div className="Nav-genome Nav-center" 

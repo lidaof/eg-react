@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { ActionCreators } from "../AppState";
-import App from "../App";
+import { ActionCreators } from '../AppState';
+import App from '../App';
 
 interface EmbeddedProps {
     onSetRestore: any;
@@ -11,11 +10,12 @@ interface EmbeddedProps {
 
 class EmbeddedContainer extends React.PureComponent<EmbeddedProps> {
 
-    componentDidUpdate() {
-        const { genomeName, viewInterval, trackLegendWidth, isShowingNavigator, tracks, 
-            metadataTerms, regionSets, regionSetViewIndex} = this.props.contents;
+    componentDidMount() {
+        const { genomeName, displayRegion, trackLegendWidth, isShowingNavigator, tracks, 
+            metadataTerms, regionSets, regionSetViewIndex } = this.props.contents;        
         const state = {
-            viewInterval,
+            genomeName,
+            displayRegion,
             trackLegendWidth,
             tracks,
             isShowingNavigator,
@@ -34,12 +34,14 @@ class EmbeddedContainer extends React.PureComponent<EmbeddedProps> {
     }   
 };
 
+const mapStateToProps = (state: any) => {
+    return {
+        browser: state.browser,
+    };
+}
+
 const mapDispatchToProps = {
     onSetRestore: ActionCreators.setGenomeRestoreSession,
 };
 
-export default compose(
-    connect(null,
-    mapDispatchToProps
-    )
-)(EmbeddedContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(EmbeddedContainer);
