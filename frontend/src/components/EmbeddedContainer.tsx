@@ -26,7 +26,9 @@ class EmbeddedContainer extends React.PureComponent<EmbeddedProps> {
         this.props.onSetRestore(genomeName, state);
     }
 
-    render(): any {
+    render(): JSX.Element {
+        // somehow react complain `Property 'embeddingMode' does not exist on type 'IntrinsicAttributes'
+        // if I give the prop directly
         const otherProps = {embeddingMode: true};
         return <App {...otherProps}/>;
     }   

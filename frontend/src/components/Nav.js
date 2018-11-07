@@ -20,10 +20,8 @@ import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "src/AppState";
 import { HotKeyInfo } from "./HotKeyInfo";
 import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
 import packageJson from '../../package.json';
-import eglogo from '../images/eglogo.jpg';
-import './Nav.css';
 
-// const VERSION = "47.2.3";
+import './Nav.css';
 
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
@@ -101,7 +99,7 @@ class Nav extends React.Component {
         return (
             <div className="Nav-container">
                 <div id="logoDiv">
-                    <img src={eglogo} width="180px" height="30px" alt="browser logo"/>
+                    <img src="https://epigenomegateway.wustl.edu/images/eglogo.jpg" width="180px" height="30px" alt="browser logo"/>
                     <span id="theNew" >The New</span>
                     <span id="theVersion">v{packageJson.version}</span>
                 </div>

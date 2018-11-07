@@ -8,7 +8,7 @@ import NumberConfig from './NumberConfig';
  * @return {JSX.Element} element to render
  */
 function MaxRowsConfig(props) {
-    return <NumberConfig {...props} optionName="maxRows" label="Max rows:" minValue={1} />;
+    return <NumberConfig {...props} optionName="maxRows" label="Max rows (including overflow row):" minValue={1} />;
 }
 
 export default MaxRowsConfig;

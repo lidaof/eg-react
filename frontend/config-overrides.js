@@ -20,11 +20,14 @@ module.exports = (config, env) => {
             cacheDirectory: true,
         },
         test: /\.(js|jsx)$/,
-      });
+    });
 
     config.module.rules.push({
         test: /\.worker\.js/,
-        use: { loader: 'worker-loader' }
-    })
+        use: {
+            loader: 'worker-loader',
+            options: { inline: true }
+        },       
+    });
     return config;
 }
