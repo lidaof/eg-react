@@ -1,35 +1,56 @@
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+"use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var React = _interopRequireWildcard(require("react"));
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var ReactDOM = _interopRequireWildcard(require("react-dom"));
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+var _reactRedux = require("react-redux");
 
-import React from 'react';
-import EmbeddedContainer from '../components/EmbeddedContainer';
+var _AppRouter = _interopRequireDefault(require("./AppRouter"));
 
-var Epgg = function (_React$Component) {
-    _inherits(Epgg, _React$Component);
+var _AppState = _interopRequireDefault(require("./AppState"));
 
-    function Epgg() {
-        _classCallCheck(this, Epgg);
+var _registerServiceWorker = _interopRequireDefault(require("./registerServiceWorker"));
 
-        return _possibleConstructorReturn(this, (Epgg.__proto__ || Object.getPrototypeOf(Epgg)).apply(this, arguments));
-    }
+var _hg = _interopRequireDefault(require("./model/genomes/hg19/hg19"));
 
-    _createClass(Epgg, [{
-        key: 'render',
-        value: function render() {
-            return React.createElement(
-                'div',
-                null,
-                React.createElement(EmbeddedContainer, this.props)
-            );
-        }
-    }]);
+var _DisplayedRegionModel = _interopRequireDefault(require("./model/DisplayedRegionModel"));
 
-    return Epgg;
-}(React.Component);
+var _BrowserScene = require("./components/vr/BrowserScene");
 
-export default Epgg;
+var _Custom3DObject = require("./components/vr/Custom3DObject");
+
+var _mergeGeometries = require("./components/vr/mergeGeometries");
+
+var _EmbeddedContainer = _interopRequireDefault(require("./components/EmbeddedContainer"));
+
+require("./index.css");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+var root = document.getElementById('root');
+
+if (root) {
+  ReactDOM.render(React.createElement(_reactRedux.Provider, {
+    store: _AppState.default
+  }, React.createElement(_AppRouter.default, null)), root);
+  (0, _registerServiceWorker.default)();
+} else {
+  window.React = React;
+  window.ReactDOM = ReactDOM;
+  window.hg19Context = _hg.default.navContext;
+  window.DisplayedRegionModel = _DisplayedRegionModel.default;
+  window.BrowserScene = _BrowserScene.BrowserScene;
+  window.Custom3DObject = _Custom3DObject.Custom3DObject;
+  window.mergeGeometries = _mergeGeometries.mergeGeometries;
+}
+
+window.renderBrowserInElement = function (contents, container) {
+  return ReactDOM.render(React.createElement(_reactRedux.Provider, {
+    store: _AppState.default
+  }, React.createElement(_EmbeddedContainer.default, {
+    contents: contents
+  })), container);
+};

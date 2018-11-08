@@ -23,6 +23,7 @@
     "node_modules",
     "build",
     "dist",
+    "umd",
     "scripts",
     "acceptance-tests",
     "webpack",

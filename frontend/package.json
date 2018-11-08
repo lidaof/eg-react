@@ -14,7 +14,7 @@
     "storybook": "start-storybook -p 9009 -s public",
     "test": "react-app-rewired test --env=jsdom --scripts-version react-scripts-ts",
     "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
-    "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/lib --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,__snapshots__"
+    "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules"
   },
   "dependencies": {},
   "peerDependencies": {
@@ -23,6 +23,13 @@
     "react-dom": "^16.3.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.5",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/preset-env": "^7.1.5",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.1.0",
     "@firebase/app": "^0.3.3",
     "@storybook/addon-actions": "^3.3.15",
     "@storybook/addon-links": "^3.3.15",
@@ -105,8 +112,8 @@
     "genomics",
     "data visualization"
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/lib.js",
+  "module": "dist/lib.js",
   "files": [
     "umd",
     "dist"

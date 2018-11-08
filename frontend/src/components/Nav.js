@@ -16,7 +16,7 @@ import LiveUI from "./LiveUI";
 import { RegionExpander } from '../model/RegionExpander';
 import { ScreenshotUI } from "./ScreenshotUI";
 import FacetTableUI from "./FacetTableUI";
-import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "src/AppState";
+import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "../AppState";
 import { HotKeyInfo } from "./HotKeyInfo";
 import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
 import packageJson from '../../package.json';
