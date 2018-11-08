@@ -3,6 +3,7 @@ import HG38 from './hg38/hg38';
 import MM10 from './mm10/mm10';
 import DAN_RER10 from './danRer10/danRer10';
 import PANTRO5 from './panTro5/panTro5';
+import RN6 from './rn6/rn6';
 import { GenomeConfig } from './GenomeConfig';
 
 /**
@@ -14,6 +15,7 @@ const allGenomes = [
     MM10,
     PANTRO5,
     DAN_RER10,
+    RN6,
 ];
 
 const genomeNameToConfig = {};
@@ -46,6 +48,11 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
     mouse: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Mouse.png',
         assemblies: [ MM10.genome.getName() ],
+        color: 'white',
+    },
+    rat: {
+        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Rat.png',
+        assemblies: [ RN6.genome.getName() ],
         color: 'white',
     },
     zebrafish: {

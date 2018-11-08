@@ -5,7 +5,6 @@ import _ from "lodash";
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from './genomeNavigator/TrackRegionController';
-import ZoomButtons from './trackContainers/ZoomButtons';
 import RegionSetSelector from './RegionSetSelector';
 import TrackList from "./trackManagers/TrackList";
 import { TrackModel } from '../model/TrackModel';
@@ -17,15 +16,15 @@ import LiveUI from "./LiveUI";
 import { RegionExpander } from '../model/RegionExpander';
 import { ScreenshotUI } from "./ScreenshotUI";
 import FacetTableUI from "./FacetTableUI";
-
-import eglogo from '../images/eglogo.jpg';
+import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "../AppState";
+import { HotKeyInfo } from "./HotKeyInfo";
+import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
+import packageJson from '../../package.json';
 
 import './Nav.css';
-import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "src/AppState";
 
-const VERSION = "v47.2.1";
-
-const REGION_EXPANDER = new RegionExpander(0);
+const REGION_EXPANDER1 = new RegionExpander(1);
+const REGION_EXPANDER0 = new RegionExpander(0);
 
 /**
  * the top navigation bar for browser
@@ -91,16 +90,18 @@ class Nav extends React.Component {
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
             onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs,
             publicTrackSets, customTrackSets, addedTrackSets, addTracktoAvailable, removeTrackFromAvailable,
-            availableTrackSets, addTermToMetaSets
+            availableTrackSets, addTermToMetaSets, embeddingMode
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName);
+        const hasInteractionTrack = tracks.some(model => INTERACTION_TYPES.includes(model.type)) ? true : false;
+        const REGION_EXPANDER = hasInteractionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
         return (
             <div className="Nav-container">
                 <div id="logoDiv">
-                    <img src={eglogo} width="180px" height="30px" alt="browser logo"/>
-                    <span id="theNew" >The New</span>
-                    <span id="theVersion">{VERSION}</span>
+                    <img src="https://epigenomegateway.wustl.edu/images/eglogo.jpg" width="180px" height="30px" alt="browser logo"/>
+                    {/* <span id="theNew" >The New</span> */}
+                    <span id="theVersion">v{packageJson.version}</span>
                 </div>
                 <div className="Nav-genome Nav-center" 
                     style={{backgroundImage: `url(${logo})`, color: color, backgroundSize: "cover"}}>
@@ -114,24 +115,12 @@ class Nav extends React.Component {
                         onSetEnteredRegion={onSetEnteredRegion}
                     />
                 </div>
-                <div className="Nav-center">
+                {/* <div className="Nav-center">
                     <ZoomButtons viewRegion={selectedRegion} onNewRegion={onRegionSelected} />
-                </div>
+                </div> */}
                 <div className="Nav-center btn-group">
                     <DropdownOpener extraClassName="btn-primary" label="🎹Tracks" />
                     <div className="dropdown-menu">
-                        <ModalMenuItem itemLabel="Track Facet Table">
-                            <FacetTableUI 
-                                publicTracksPool={publicTracksPool}
-                                customTracksPool={customTracksPool}
-                                addedTracks={tracks} 
-                                onTracksAdded={onTracksAdded}
-                                publicTrackSets={publicTrackSets}
-                                customTrackSets={customTrackSets}
-                                addedTrackSets={addedTrackSets}
-                                addTermToMetaSets={addTermToMetaSets}
-                            />
-                        </ModalMenuItem>
                         <ModalMenuItem itemLabel="Annotation Tracks">
                             <AnnotationTrackSelector
                                 addedTracks={tracks}
@@ -149,6 +138,18 @@ class Nav extends React.Component {
                                 publicHubs={publicHubs}
                                 onHubUpdated={onHubUpdated}
                                 publicTrackSets={publicTrackSets}
+                                addedTrackSets={addedTrackSets}
+                                addTermToMetaSets={addTermToMetaSets}
+                            />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Track Facet Table">
+                            <FacetTableUI 
+                                publicTracksPool={publicTracksPool}
+                                customTracksPool={customTracksPool}
+                                addedTracks={tracks} 
+                                onTracksAdded={onTracksAdded}
+                                publicTrackSets={publicTrackSets}
+                                customTrackSets={customTrackSets}
                                 addedTrackSets={addedTrackSets}
                                 addTermToMetaSets={addTermToMetaSets}
                             />
@@ -202,7 +203,7 @@ class Nav extends React.Component {
                             <LiveUI />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Screenshot">
-                            <ScreenshotUI expansionAmount={REGION_EXPANDER} />
+                            <ScreenshotUI expansionAmount={REGION_EXPANDER} needClip={hasInteractionTrack} />
                         </ModalMenuItem>
                     </div>
                 </div>
@@ -249,9 +250,20 @@ class Nav extends React.Component {
                     </div>
                 </div>
                 <div className="Nav-center">
-                    <a role="button" className="btn btn-warning btn-sm" 
-                        href="https://epigenomegateway.readthedocs.io/" 
-                        target="_blank">📖Documentation</a>
+                    <DropdownOpener extraClassName="btn-warning" label="📖Help" />
+                    <div className="dropdown-menu">
+                        <label className="dropdown-item">
+                            <a href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
+                        </label>
+                        <ModalMenuItem itemLabel="Hotkeys" style={{content: {
+                                                        left: "unset",
+                                                        bottom: "unset",
+                                                        overflow: "visible",
+                                                        padding: "5px",
+                                                    }}}>
+                            <HotKeyInfo  />
+                        </ModalMenuItem>
+                    </div>
                 </div>
             </div>
         )
@@ -264,7 +276,7 @@ function DropdownOpener(props) {
     const {extraClassName, label} = props;
     return <button
         type="button"
-        className={`btn btn-sm dropdown-toggle ${extraClassName}`}
+        className={`btn dropdown-toggle ${extraClassName}`}
         data-toggle="dropdown"
         aria-haspopup="true"
         aria-expanded="false"

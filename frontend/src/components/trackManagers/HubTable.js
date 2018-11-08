@@ -5,9 +5,9 @@ import ReactTable from "react-table";
 import Json5Fetcher from "../../model/Json5Fetcher";
 import DataHubParser from '../../model/DataHubParser';
 import withCurrentGenome from '../withCurrentGenome';
+import { ObjectAsTable } from "../trackContextMenu/TrackContextMenu";
 
 import "react-table/react-table.css";
-import { ObjectAsTable } from "../trackContextMenu/TrackContextMenu";
 
 /**
  * Table that displays available public track hubs.
@@ -82,6 +82,10 @@ class HubTable extends React.PureComponent {
             this.props.onHubLoaded(tracks, true, hub.url);
             let loadedHubs = this._cloneHubsAndModifyOne(index, {isLoading: false, isLoaded: true});
             this.props.onHubUpdated(loadedHubs);
+            const tracksToShow = tracks.filter(track => track.showOnHubLoad);
+            if (tracksToShow.length > 0) {
+                this.props.onTracksAdded(tracksToShow);
+            }
         }
     }
 

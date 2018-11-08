@@ -93,7 +93,12 @@ export class AppStateLoader {
             return null;
         }
 
-        const viewInterval = OpenInterval.deserialize(object.viewInterval);
+        let viewInterval;
+        if( object.hasOwnProperty('viewInterval') ){
+            viewInterval = OpenInterval.deserialize(object.viewInterval);
+        } else {
+            viewInterval = genomeConfig.navContext.parse(object.displayRegion);
+        }
         if (regionSetView) {
             return new DisplayedRegionModel(regionSetView.makeNavContext(), ...viewInterval);
         } else {

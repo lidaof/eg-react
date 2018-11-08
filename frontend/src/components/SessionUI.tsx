@@ -416,7 +416,7 @@ function getFunName() {
         "stork",
         "deer",
         "macaw",
-        "ducj",
+        "duck",
         "shark",
         "chinchilla",
         "python",

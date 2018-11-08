@@ -39,12 +39,12 @@ const defaultTracks = [
     }),
     // new TrackModel({
     //     type: "geneAnnotation",
-    //     name: "gencodeM18",
+    //     name: "gencodeM19",
     //     genome: "mm10",
     // }),
     new TrackModel({
         type: "geneAnnotation",
-        name: "gencodeM18Basic",
+        name: "gencodeM19Basic",
         genome: "mm10",
     }),
     new TrackModel({
@@ -70,6 +70,11 @@ const defaultTracks = [
     //     type: 'refbed',
     //     name: 'refGene in refbed',
     //     url: 'https://wangftp.wustl.edu/~rsears/FOR_DAOFENG/gencodeM18_load_basic_Gene.bed.gz',
+    // }),
+    // new TrackModel({
+    //     type: 'cool',
+    //     name: 'Cool Track',
+    //     url: 'CQMd6V_cRw6iCI_-Unl3PQ'
     // }),
 ];
 

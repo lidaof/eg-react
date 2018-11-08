@@ -70,7 +70,7 @@ class MetadataSelectionMenu extends React.PureComponent {
      */
     renderTerms() {
         const items = this.props.terms.map(
-            term => <li key={term}><button className="btn btn-sm btn-danger dense-button" onClick={() => this.removeTerm(term)} >🗴</button> {term}</li>
+            term => <li key={term}><button className="btn btn-sm btn-danger dense-button" onClick={() => this.removeTerm(term)} >-</button> {term}</li>
         );
         return <ul>{items}</ul>;
     }

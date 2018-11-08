@@ -28,7 +28,7 @@ export class AlignmentFetcher {
             return this.makeErrorSource();
         }
         const annotationTracks = genomeConfig.annotationTracks || {};
-        const comparisonTracks = annotationTracks["Genome comparison"] || [];
+        const comparisonTracks = annotationTracks["Genome Comparison"] || [];
         const theTrack = comparisonTracks.find((track: any) => track.querygenome === this.queryGenome) || {};
         const url = theTrack.url;
         if (!url) {

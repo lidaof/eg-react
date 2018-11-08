@@ -13,11 +13,13 @@ export const DEFAULT_OPTIONS = {
     color: 'blue',
     backgroundColor: 'white',
     categoryColors: {
-        coding: 'rgb(0,60,179)',
-        nonCoding: 'rgb(0,128,0)',
+        coding: 'rgb(101,1,168)',
+        nonCoding: 'rgb(1,193,75)',
         pseudogene: 'rgb(230,0,172)',
-        problem: 'rgb(255,0,0)',
-        polyA: 'rgb(0,0,51)'
+        pseudo: 'rgb(230,0,172)',
+        problem: 'rgb(224,2,2)',
+        polyA: 'rgb(237,127,2)',
+        other:'rgb(128,128,128)'
     },
 }
 

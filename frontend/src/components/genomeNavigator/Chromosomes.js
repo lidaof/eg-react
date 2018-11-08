@@ -20,6 +20,7 @@ const FEATURE_LABEL_SIZES = [16, 12, 8];
 
 const CYTOBAND_COLORS = {
     'gneg': {bandColor: "white", textColor: "rgb(0,0,0)"},
+    'gpos': {bandColor: "rgb(180,180,180)", textColor: "rgb(0,0,0)"},
     'gpos25': {bandColor: "rgb(180,180,180)", textColor: "rgb(0,0,0)"},
     'gpos50': {bandColor: "rgb(120,120,120)", textColor: "rgb(255,255,255)"},
     'gpos75': {bandColor: "rgb(60,60,60)", textColor: "rgb(255,255,255)"},

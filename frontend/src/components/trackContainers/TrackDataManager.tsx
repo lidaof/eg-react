@@ -41,7 +41,7 @@ const INITIAL_TRACK_DATA: TrackData = {
 };
 
 export function withTrackData(WrappedComponent: React.ComponentType<{trackData: TrackDataMap}>) {
-    return class TrackDataManager extends React.Component<DataManagerProps, TrackDataMap> {
+    return class TrackDataManager extends React.Component<DataManagerProps, {dataForId: TrackDataMap}> {
         private _dataSourceManager: DataSourceManager;
         private _primaryGenome: string;
 
@@ -49,18 +49,20 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
             super(props);
             this._primaryGenome = props.genome;
             this._dataSourceManager = new DataSourceManager();
-            this.state = {};
+            this.state = {
+                dataForId: {}
+            };
         }
 
         componentDidMount() {
-            this.fetchTracks();
+            this.detectNeededTrackUpdates();
         }
 
         componentDidUpdate(prevProps: DataManagerProps) {
             if (this.props.viewRegion !== prevProps.viewRegion) {
-                this.fetchTracks(); // Fetch all
+                this.detectNeededTrackUpdates(); // Fetch all
             } else if (this.props.tracks !== prevProps.tracks) {
-                this.fetchTracks(prevProps.tracks); // Fetch some
+                this.detectNeededTrackUpdates(prevProps.tracks); // Fetch some
             }
         }
 
@@ -72,7 +74,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
             return region === this.props.viewRegion;
         }
 
-        fetchTracks(prevTracks: TrackModel[] = []) {
+        detectNeededTrackUpdates(prevTracks: TrackModel[] = []) {
             const addedTracks = _.differenceBy(this.props.tracks, prevTracks, track => track.getId());
             const removedTracks = _.differenceBy(prevTracks, this.props.tracks, track => track.getId());
             for (const track of addedTracks) {
@@ -80,13 +82,13 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
             }
 
             // Clean up the data sources and state of removed tracks
-            const deletionUpdate = {};
+            const deletionUpdate = _.clone(this.state.dataForId);
             for (const track of removedTracks) {
                 const id = track.getId();
                 this._dataSourceManager.cleanUp(id);
-                deletionUpdate[id] = undefined;
+                delete deletionUpdate[id];
             }
-            this.setState(deletionUpdate);
+            this.setState({dataForId: deletionUpdate});
         }
 
         async fetchTrack(track: TrackModel) {
@@ -136,13 +138,13 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
         dispatchTrackUpdate(track: TrackModel, newTrackState: Partial<TrackData>) {
             const id = track.getId();
             this.setState(prevState => {
-                const update = {};
+                const update = _.clone(prevState.dataForId);
                 const prevTrackData = prevState[id] || INITIAL_TRACK_DATA;
                 update[id] = {
                     ...prevTrackData,
                     ...newTrackState
                 };
-                return update;
+                return {dataForId: update};
             });
         }
 
@@ -151,16 +153,16 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
             const result: TrackDataMap = {};
             let isMissingData = false;
             for (const id of ids) {
-                if (!(id in this.state)) {
+                if (!(id in this.state.dataForId)) {
                     result[id] = INITIAL_TRACK_DATA;
                     isMissingData = true;
                 }
             }
 
             if (isMissingData) {
-                return Object.assign(result, this.state);
+                return Object.assign(result, this.state.dataForId);
             } else {
-                return this.state;
+                return this.state.dataForId;
             }
         }
 

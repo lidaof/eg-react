@@ -7,7 +7,8 @@
  */
 
 const GENE_FILEDS = // The mapping from column names to field names in the database
-    'id,chrom,strand,txStart,txEnd,cdsStart,cdsEnd,exonStarts,exonEnds,name,transcriptionClass,description';
+    // 'id,chrom,strand,txStart,txEnd,cdsStart,cdsEnd,exonStarts,exonEnds,name,transcriptionClass,description';
+    'chrom,txStart,txEnd,cdsStart,cdsEnd,strand,name,id,transcriptionClass,exonStarts,exonEnds,description';
 
 const geneFieldsAndIndex = {
     fields: GENE_FILEDS,
@@ -27,12 +28,17 @@ const geneFieldsAndIndex = {
 const hg19 = [
     {
         name: 'refGene',
-        file: 'refGene_load',
+        file: 'HG19_RefSeq_Gene.bed',
         fieldsConfig: geneFieldsAndIndex
     },
     {
-        name: 'gencodeV28',
-        file: 'gencodeV28_load',
+        name: 'gencodeV29',
+        file: 'gencode.v29lift37.hg19.annotation_Gene.bed',
+        fieldsConfig: geneFieldsAndIndex
+    },
+    {
+        name: 'gencodeV29Basic',
+        file: 'gencode.v29lift37.hg19.basic.annotation_Gene.bed',
         fieldsConfig: geneFieldsAndIndex
     }
 ];
@@ -40,20 +46,30 @@ const hg19 = [
 const hg38 = [
     {
         name: 'refGene',
-        file: 'refGene_load',
+        file: 'HG38_RefSeq_Gene.bed',
         fieldsConfig: geneFieldsAndIndex
     },
     {
-        name: 'gencodeV28',
-        file: 'gencodeV28_load',
+        name: 'gencodeV29',
+        file: 'gencode.v29.hg38.annotation_Gene.bed',
         fieldsConfig: geneFieldsAndIndex
-    }
+    },
+    {
+        name: 'gencodeV29Basic',
+        file: 'gencode.v29.hg38.basic.annotation_Gene.bed',
+        fieldsConfig: geneFieldsAndIndex
+    },
+    {
+        name: 'Ensembl_GRCh38_94',
+        file: 'Homo_sapiens.GRCh38.94.chr_Gene.bed',
+        fieldsConfig: geneFieldsAndIndex
+    },
 ];
 
 const panTro5 = [
     {
         name: 'refGene',
-        file: 'refGene_load',
+        file: 'panTro5_Gene.bed',
         fieldsConfig: geneFieldsAndIndex
     }
 ];
@@ -61,29 +77,42 @@ const panTro5 = [
 const mm10 = [
     {
         name: 'refGene',
-        file: 'refGene_load',
+        file: 'MM10_RefSeq_Gene.bed',
         fieldsConfig: geneFieldsAndIndex
     },
     {
-        name: 'gencodeM18',
-        file: 'gencodeM18_load',
+        name: 'gencodeM19',
+        file: 'gencode.vM19.annotation_Gene.bed',
         fieldsConfig: geneFieldsAndIndex
     },
     {
-        name: 'gencodeM18Basic',
-        file: 'gencodeM18_load_basic',
+        name: 'gencodeM19Basic',
+        file: 'gencode.vM19.basic.annotation_Gene.bed',
         fieldsConfig: geneFieldsAndIndex
     }
 ];
 
 const danRer10 = [
     {
-        name: 'ncbiRefSeq',
-        file: 'ncbiRefSeq_load',
+        name: 'refGene',
+        file: 'DANRER10_RefSeq_Gene.bed',
+        fieldsConfig: geneFieldsAndIndex
+    },
+    {
+        name: 'Ensembl_GRCz10_91',
+        file: 'Danio_rerio.GRCz10.91.chr_Gene.bed',
+        fieldsConfig: geneFieldsAndIndex
+    },
+];
+
+const rn6 = [
+    {
+        name: 'refGene',
+        file: 'rn6_Gene.bed',
         fieldsConfig: geneFieldsAndIndex
     }
 ];
 
-const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5 };
+const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6 };
 
 module.exports = genomeConfig;

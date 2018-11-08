@@ -19,7 +19,7 @@ import { getContrastingColor } from '../../util';
 import './commonComponents/tooltip/Tooltip.css';
 import './MethylCTrack.css';
 
-const VERTICAL_PADDING = 3;
+const VERTICAL_PADDING = 0;
 const PLOT_DOWNWARDS_STRAND = "reverse";
 const DEFAULT_COLORS_FOR_CONTEXT = {
     CG: { color: "rgb(100,139,216)", background: "#d9d9d9" },

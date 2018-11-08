@@ -6,22 +6,34 @@ import CustomHubAdder from './CustomHubAdder';
 import FacetTable from './FacetTable';
 
 // Just add a new entry here to support adding a new track type.
-const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'bam'];
+// const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'cool', 'bam'];
 
-const TYPES_DESC = [
-        'numerical data', 
-        'numerical data, processed by tabix in .gz format',
-        'methylation data, processed by tabix in .gz format',
-        'categorical data, processed by tabix in .gz format',
-        'annotationd data, processed by tabix in .gz format',
-        'anotation data',
-        'repeats annotation data in bigBed format',
-        'gene annotationd data, processed by tabix in .gz format',
-        'long range interaction data in hic format',
-        'long range interaction data in longrange format',
-        'long range interaction data in bigInteract format',
-        'reads alignment data'
-    ];
+const TRACK_TYPES = {
+    Numerical: ['bigWig', 'bedGraph'],
+    Annotation: ['bed', 'bigBed', 'refBed'],
+    Categorical: ['categorical'],
+    Methylation: ['methylC'],
+    Interaction: ['hic','cool','bigInteract','longrange'],
+    Repeats: ['repeatmasker'],
+    Alignment: ['bam'],
+
+};
+
+const TYPES_DESC = {
+    bigWig: 'numerical data', 
+    bedGraph: 'numerical data, processed by tabix in .gz format',
+    methylC: 'methylation data, processed by tabix in .gz format',
+    categorical: 'categorical data, processed by tabix in .gz format',
+    bed: 'annotationd data, processed by tabix in .gz format',
+    bigBed: 'anotation data',
+    repeatmasker: 'repeats annotation data in bigBed format',
+    refBed: 'gene annotationd data, processed by tabix in .gz format',
+    hic: 'long range interaction data in hic format',
+    longrange: 'long range interaction data in longrange format',
+    bigInteract: 'long range interaction data in bigInteract format',
+    cool: 'long range interaction data in cool format, use data uuid instead of URL',
+    bam: 'reads alignment data',
+};
 
 /**
  * UI for adding custom tracks.
@@ -42,7 +54,7 @@ class CustomTrackAdder extends React.Component {
         super(props);
         this.trackUI = null;
         this.state = {
-            type: TRACK_TYPES[0],
+            type: TRACK_TYPES.Numerical[0],
             url: "",
             name: "",
             urlError: "",
@@ -68,7 +80,13 @@ class CustomTrackAdder extends React.Component {
     }
 
     renderTypeOptions() {
-        return TRACK_TYPES.map((type,i) => <option key={type} value={type} >{type} - {TYPES_DESC[i]}</option>);
+        return Object.entries(TRACK_TYPES).map((types) =>
+            <optgroup label={types[0]} key={types[0]}>
+                {
+                    types[1].map(type => <option key={type} value={type} >{type} - {TYPES_DESC[type]}</option>)
+                }
+            </optgroup>
+        );
     }
 
     renderButtons() {
@@ -101,21 +119,22 @@ class CustomTrackAdder extends React.Component {
                 </select>
             </div>
             <div className="form-group">
-                <label>Track label</label>
-                <input type="text" className="form-control" value={name} onChange={event => this.setState({name: event.target.value})}/>
-            </div>
-            <div className="form-group">
                 <label>Track file URL</label>
                 <input type="text" className="form-control" value={url} onChange={event => this.setState({url: event.target.value})} />
                 <span style={{color: "red"}} >{urlError}</span>
             </div>
+            <div className="form-group">
+                <label>Track label</label>
+                <input type="text" className="form-control" value={name} onChange={event => this.setState({name: event.target.value})}/>
+            </div>
             {this.renderButtons()}
         </form>
-        )
+        );
     }
 
     renderCustomHubAdder() {
-        return <CustomHubAdder onTracksAdded={tracks => this.props.onAddTracksToPool(tracks, false)} />;
+        return <CustomHubAdder onTracksAdded={tracks => this.props.onTracksAdded(tracks)} 
+                    onAddTracksToPool={tracks => this.props.onAddTracksToPool(tracks, false)}/>;
     }
 
     render() {

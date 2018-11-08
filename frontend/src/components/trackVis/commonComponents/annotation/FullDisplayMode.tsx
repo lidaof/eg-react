@@ -12,7 +12,7 @@ const SVG_STYLE = {
     display: "block",
     overflow: "visible",
 };
-const TOP_PADDING = 5;
+const TOP_PADDING = 2;
 
 /**
  * Callback for getting an annotation to render

@@ -13,6 +13,7 @@ import configOptionMerging from '../configOptionMerging';
 import { RenderTypes, DesignRenderer } from '../../../../art/DesignRenderer';
 import { NumericalDisplayModes } from '../../../../model/DisplayModes';
 import { FeatureAggregator, DefaultAggregators } from '../../../../model/FeatureAggregator';
+import { ScaleChoices } from '../../../../model/ScaleChoices';
 
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN,
@@ -22,12 +23,12 @@ export const DEFAULT_OPTIONS = {
     colorAboveMax: "red",
     color2: "darkorange",
     color2BelowMin: "darkgreen",
-    yScale: "auto",
+    yScale: ScaleChoices.AUTO,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 const AUTO_HEATMAP_THRESHOLD = 21; // If pixel height is less than this, automatically use heatmap
-const TOP_PADDING = 3;
+const TOP_PADDING = 2;
 const THRESHOLD_HEIGHT = 3; // the bar tip height which represet value above max or below min
 
 /**
@@ -93,7 +94,7 @@ class NumericalTrack extends React.Component {
         const maxBoth = Math.max(Math.abs(max), Math.abs(min));
         max = maxBoth;
         min = xToValue2.length > 0 ? -maxBoth : 0;
-        if (yScale === 'fixed') {
+        if (yScale === ScaleChoices.FIXED) {
             max = yMax ? yMax : max;
             min = yMin ? yMin : min;
         }
@@ -226,7 +227,7 @@ class NumericalTrack extends React.Component {
         );
         return <Track
             {...this.props}
-            style={{paddingBottom: "5px"}}
+            // style={{paddingBottom: "5px"}}
             legend={legend}
             visualizer={visualizer}
         />;

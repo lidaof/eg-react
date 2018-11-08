@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { ActionCreators } from '../AppState';
 import { treeOfLife } from '../model/genomes/allGenomes';
+import { Footer } from './Footer';
 
 import './GenomePicker.css';
 
@@ -77,25 +78,41 @@ class GenomePicker extends React.PureComponent {
 
     render() {
         return (
-        <div className="GenomePicker-main">
-            <div className="GenomePicker-species capitalize">
-                {this.renderTree()}
-            </div> 
-            <div className="GenomePicker-assembly">
-                { this.state.species && this.renderAssembly() }
+            <div className="GenomePicker-outer">
+                <div>
+                    <ul className="nav justify-content-end">
+                    <li className="nav-item">
+                        <a className="nav-link" href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
+                    </li>
+                    <li className="nav-item">
+                        <a className="nav-link" href="http://epigenomegateway.wustl.edu/legacy/" target="_blank">The 'old' browser</a>
+                    </li>
+                    </ul> 
+                </div>
+                <hr style={{margin: 0}} />
+                <div className="GenomePicker-main">
+                    <div className="GenomePicker-species capitalize">
+                        {this.renderTree()}
+                    </div> 
+                    <div className="GenomePicker-assembly">
+                        { this.state.species && this.renderAssembly() }
+                    </div>
+                    <div className="GenomePicker-go">
+                        {
+                        this.state.assembly &&
+                            <button
+                                className="btn btn-primary btn-lg btn-block"
+                                onClick={() => this.props.onGenomeSelected(this.state.assembly)}
+                            >
+                                Go ⇒
+                            </button>
+                        }
+                    </div>
+                </div>
+                <hr />
+                <Footer/>
             </div>
-            <div className="GenomePicker-go">
-                {
-                this.state.assembly &&
-                    <button
-                        className="btn btn-primary btn-lg btn-block"
-                        onClick={() => this.props.onGenomeSelected(this.state.assembly)}
-                    >
-                        Go ⇒
-                    </button>
-                }
-            </div>
-        </div>
+        
         );
     }
 }

@@ -19,7 +19,7 @@ export class RulerDesigner {
      * @param {number} [tickSeparationHint] - requested X separation of major ticks
      * @param {RulerElementFactory} [rulerElementFactory] - element generator
      */
-    constructor(tickSeparationHint=50, rulerElementFactory=new RulerElementFactory()) {
+    constructor(tickSeparationHint=60, rulerElementFactory=new RulerElementFactory()) {
         this._tickSeparationHint = tickSeparationHint;
         this._elementFactory = rulerElementFactory;
     }

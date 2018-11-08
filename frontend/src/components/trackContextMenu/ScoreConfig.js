@@ -1,9 +1,10 @@
 import React from 'react';
 import SelectConfig from './SelectConfig';
 import NumberConfig from './NumberConfig';
-import { PrimaryAboveColorConfig, SecondaryBelowColorConfig } from "./ColorConfig";
+import { ScaleChoices } from '../../model/ScaleChoices';
+
 /**
- * A context menu item that configures track y-scale.
+ * A context menu item that configures interaction track score scale.
  * 
  * @param {Object} props - props as specified by React
  * @return {JSX.Element} element to render
@@ -14,13 +15,13 @@ function ScoreConfig(props) {
             optionName="scoreMax" 
             label="Score max:" 
             isFloat={true} 
-            hasSetButton={false} 
+            hasSetButton={true}
         />
         <NumberConfig {...props} 
             optionName="scoreMin" 
             label="Score min:" 
             isFloat={true} 
-            hasSetButton={false} 
+            hasSetButton={true}
         />
     </React.Fragment> : null;
     return (
@@ -30,10 +31,10 @@ function ScoreConfig(props) {
                 optionName="scoreScale" 
                 label="Score scale:" 
                 choices={{
-                    AUTO: "auto",
-                    FIXED: "fixed",
+                    AUTO: ScaleChoices.AUTO,
+                    FIXED: ScaleChoices.FIXED,
                 }}
-                defaultValue="auto"
+                defaultValue={ScaleChoices.AUTO}
             />
             {fixedScales}
             

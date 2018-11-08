@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ReactModal from 'react-modal';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import GeneSearchBox from './GeneSearchBox';
+import { CopyToClip } from '../CopyToClipboard';
 
 const MODAL_STYLE = {
     content: {
@@ -127,7 +128,7 @@ class TrackRegionController extends React.Component {
                     onToggleHighlight={this.props.onToggleHighlight}
                     onSetEnteredRegion={this.props.onSetEnteredRegion}
                 />
-                <h6>Region search (current region is {coordinates})</h6>
+                <h6>Region search (current region is {coordinates} <CopyToClip value={coordinates} />)</h6>
                 <input
                     ref={(input) => this.input = input}
                     type="text"
