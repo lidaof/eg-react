@@ -23,7 +23,6 @@
 Create a HTML page with following contents: (the example shows how to embed a mouse browser with 2 bigWig tracks from ENCODE data portal)
 
 ```html
-<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -44,40 +43,34 @@ Create a HTML page with following contents: (the example shows how to embed a mo
   <script src="https://unpkg.com/epgg@latest/umd/epgg.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/epgg@latest/umd/epgg.css">
 </head>
-
 <body>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
   <h1>Embedding test</h1>
-  <div id="embed"></div>
+  <div id="embed" style="width:1000px"></div>
   <h2>some other headings</h2>
   <script>
     const container = document.getElementById('embed');
     const contents = { 
         "genomeName": "mm10", 
-        displayRegion: "chr5:51997494-52853744",
+        "displayRegion": "chr5:51997494-52853744",
         "trackLegendWidth": 120, 
         "isShowingNavigator": true,
         "tracks": [
           { 
             "type": "geneannotation", 
             "name": "refGene", 
-            "label": "refGene", 
-            "options": { "label": "refGene", "maxRows": 6 }, 
-            "url": "", 
-            "metadata": { "Track type": "geneannotation" } 
+            "genome": "mm10"
           }, 
           { 
             "type": "geneannotation", 
             "name": "gencodeM19Basic", 
-            "label": "gencodeM19Basic", 
-            "options": { "label": "gencodeM19Basic", "maxRows": 5 }, 
-            "url": "", "metadata": { "Track type": "geneannotation" }
+            "genome": "mm10"
           }, 
           { 
             "type": "ruler", 
-            "name": "Ruler", "label": "Ruler", 
-            "options": { "label": "Ruler" }, 
-            "url": "", 
-            "metadata": { "Track type": "ruler" } 
+            "name": "Ruler" 
           }, 
           { 
             "type": "bigWig", 

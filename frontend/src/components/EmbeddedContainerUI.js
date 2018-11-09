@@ -12,42 +12,53 @@ class EmbeddedContainerUI extends React.Component {
                   { 
                     type: "geneannotation", 
                     name: "gencodeM19Basic", 
-                    label: "gencodeM19Basic", 
-                    options: { label: "gencodeM19Basic", maxRows: 5 }, 
-                    url: "", metadata: { "Track type": "geneannotation" }
+                    genome: "mm10"
                   }, 
                   { 
                     type: "geneannotation", 
                     name: "refGene", 
-                    label: "refGene", 
-                    options: { label: "refGene", maxRows: 6 }, 
-                    url: "", 
-                    metadata: { "Track type": "geneannotation" } 
+                    genome: "mm10"
                   },
                   { 
                     type: "ruler", 
-                    name: "Ruler", label: "Ruler", 
-                    options: { label: "Ruler" }, 
-                    url: "", 
-                    metadata: { "Track type": "ruler" } 
+                    name: "Ruler",
                   }, 
                   { 
                     type: "repeatmasker", 
                     name: "RepeatMasker", 
                     url: "https://vizhub.wustl.edu/public/mm10/rmsk16.bb", 
-                    label: "RepeatMasker",
-                    options: { label: "RepeatMasker" }, metadata: { "Track type": "repeatmasker" } 
                   }
                 ], 
                 metadataTerms: [], 
                 regionSets: [], 
                 regionSetViewIndex: -1, 
               };
+            // const contents2 = { 
+            //     genomeName: "hg19", 
+            //     displayRegion: "chr6:51997494-52853744",
+            //     trackLegendWidth: 120, 
+            //     isShowingNavigator: true,
+            //     tracks: [
+            //       { 
+            //         type: "geneannotation", 
+            //         name: "refGene", 
+            //         genome: "hg19"
+            //       },
+            //       { 
+            //         type: "ruler", 
+            //         name: "Ruler"
+            //       }, 
+            //     ], 
+            //     metadataTerms: [], 
+            //     regionSets: [], 
+            //     regionSetViewIndex: -1, 
+            //   };
             return (
                 <div>
                     <h1>Embedded browser</h1>
                     <EmbeddedContainer contents={contents} />
                     <h2>test</h2>
+                    {/* <EmbeddedContainer contents={contents2} /> */}
                 </div>
             );
         }

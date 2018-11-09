@@ -1,0 +1,17 @@
+User Agreement for Open-Source Software
+
+This is a user agreement (“Agreement”) between You and The Washington University (“WU”) and governs Your use of the computer code provided here (the "Software").  “You” and “Your” means the individual or legal entity licensing the Software under this Agreement.
+
+1.	WU hereby grants to You a non-exclusive, royalty-free license to use, copy, modify, merge, publish, and distribute the computer code provided here (the "Software"), specifically excluding commercial use or sales.  This license does not grant any rights or licenses to any other patents, copyrights, or other forms of intellectual property owned or controlled by WU. You agree to include this Agreement and the copyright notice below in all copies or substantial portions of the Software. 
+
+Copyright (c) 2018 Washington University in St. Louis 
+
+2.	You may publish and present the results of any work resulting from use of the Software. You agree to acknowledge the contribution of the Software by citing the Software and its creators in all written publications concerning the use of the Software as follows:
+
+Zhou X, et al., Nature Methods 8, 989-990 (2011)
+
+3.	YOU AGREE THAT THE SOFTWARE PROVIDED HEREUNDER IS EXPERIMENTAL AND IS PROVIDED "AS IS", WITHOUT ANY WARRANTY OF ANY KIND, EXPRESSED OR IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE, OR NON-INFRINGEMENT OF ANY THIRD-PARTY PATENT, COPYRIGHT, OR ANY OTHER THIRD-PARTY RIGHT. IN NO EVENT SHALL THE CREATORS OF THE SOFTWARE OR WU BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR IN ANY WAY CONNECTED WITH THE SOFTWARE, THE USE OF THE SOFTWARE, OR THIS AGREEMENT, WHETHER IN BREACH OF CONTRACT, TORT OR OTHERWISE, EVEN IF SUCH PARTY IS ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+4.	Except to the extent prohibited by law, You agree to indemnify, defend, reimburse and hold harmless WU, WU personnel, WU’s Affiliates, and each of their respective trustees, faculty, staff, employees, students, directors, officers, agents, successors and assigns (altogether the “WU Indemnitees”) from, for and against any and all judgments, settlements, losses, expenses, damages and/or liabilities and any and all court costs, attorneys’ fees, and expert witness fees and expenses that a WU Indemnitee may incur from any and all allegations, claims, suits, actions or proceedings (the “Claims”) arising out of, relating to, or incidental to Your breach of this Agreement or Your use, development, commercialization, or other exploitation of the Software, whether by or through You, and including all Claims for infringement, injury to business, personal injury, and product liability.  The obligations set forth in this Section shall survive termination of this Agreement, shall continue even after assignment of rights and responsibilities, and shall not be limited by any provision of this Agreement outside this Section.
+
+5.	You may not use the trademarks or name of WU for any commercial, advertisement, or promotional purposes without the prior consent of WU. 

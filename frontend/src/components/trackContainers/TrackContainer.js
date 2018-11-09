@@ -32,6 +32,7 @@ import HighlightRegion from "../HighlightRegion";
 import { VerticalDivider } from './VerticalDivider';
 import { CircletView } from "./CircletView";
 import ButtonGroup from './ButtonGroup';
+import TrackRegionController from '../genomeNavigator/TrackRegionController';
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
@@ -269,14 +270,23 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element}
      */
     renderControls() {
-        const {metadataTerms, onMetadataTermsChanged, suggestedMetaSets, viewRegion, onNewRegion} = this.props;
+        const {metadataTerms, onMetadataTermsChanged, suggestedMetaSets, viewRegion, 
+            onNewRegion, onToggleHighlight, onSetEnteredRegion} = this.props;
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
         const panLeftButton = <button className="btn btn-outline-dark" title="Pan left"
                                 style={{fontFamily: "monospace"}} onClick={() => this.panLeftOrRight(true)}>◀</button>;
         const panRightButton = <button className="btn btn-outline-dark" title="Pan right"
                                 style={{fontFamily: "monospace"}} onClick={() => this.panLeftOrRight(false)}>▶</button>;
         return <div style={{display: "flex", alignItems: "center"}}>
-                <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} /> 
+                <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} />
+                { this.props.embeddingMode && 
+                    <TrackRegionController 
+                        selectedRegion={viewRegion}
+                        onRegionSelected={onNewRegion}
+                        onToggleHighlight={onToggleHighlight}
+                        onSetEnteredRegion={onSetEnteredRegion}
+                    /> 
+                }
                 <ButtonGroup buttons={panLeftButton} />
                 <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} />
                 <ButtonGroup buttons={panRightButton} />
