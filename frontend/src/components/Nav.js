@@ -263,6 +263,9 @@ class Nav extends React.Component {
                                                     }}}>
                             <HotKeyInfo  />
                         </ModalMenuItem>
+                        <label className="dropdown-item">
+                            <a href="http://epigenomegateway.wustl.edu/legacy" target="_blank">The 'old' browser</a>
+                        </label>
                     </div>
                 </div>
             </div>

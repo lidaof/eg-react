@@ -171,6 +171,14 @@ function getInitialState() {
         if(query.genome) {
             newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
         }
+        if(query.session) {
+            window.location.href = 
+`http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&session=${query.session}&statusId=${query.statusId}`;
+        }
+        if(query.datahub) {
+            window.location.href = 
+`http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&datahub=${query.datahub}`;
+        }
         return newState || state;
     }
     const blob = STORAGE.getItem(SESSION_KEY);
