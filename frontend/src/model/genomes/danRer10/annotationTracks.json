@@ -1,0 +1,238 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "refGene",
+            "label": "RefSeq genes",
+            "filetype": "geneAnnotation"
+        }, 
+        {
+            "name": "gencodeM19",
+            "label": "GENCODE M19 genes",
+            "options": {
+                "categoryColors": {
+                    "coding": "rgb(0,60,179)",
+                    "nonCoding": "rgb(0,128,0)",
+                    "pseudogene": "rgb(230,0,172)",
+                    "problem": "rgb(255,0,0)",
+                    "polyA": "rgb(0,0,51)"
+                }
+            },
+            "filetype": "geneAnnotation"
+        }
+     ],
+     "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://vizhub.wustl.edu/public/danRer10/rmsk16.bb",
+                "height": 30
+            }
+        ]
+    },
+    "Genome Annotation": [
+        {
+            "type": "categorical",
+            "name": "CpG Context",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/DanRer10_cpgIslands_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
+              },
+              "backgroundColor":"#071CEC"
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Context (unmasked)",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/DanRer10_cpgIslands_unmasked_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
+              },
+              "backgroundColor":"#071CEC"
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/DanRer10_cpgIslands_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
+              }
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands (unmasked)",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/DanRer10_cpgIslands_unmasked_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
+              }
+            }
+        },
+        {
+            "name": "CpGs",
+            "label": "CpGs",
+            "filetype": "bed",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/CpG_simple.bed.gz",
+            "height": 21,
+            "options": {
+                "color": "#cc00cc"
+            }
+         },
+        {
+            "name": "gc5Base",
+            "label": "GC percent",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/danRer10/gc5Base.bigWig",
+            "height": 30,
+            "options": {
+                "color": "#4785C2",
+                "color2": "#4747C2",
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 100
+            }
+        }
+    ],
+    "Mappability": [
+         {
+            "name": "24mer Mapability",
+            "label": "24mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/danRer10.mappability.24.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "24mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },
+        {
+            "name": "36mer Mapability",
+            "label": "36mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/danRer10.mappability.36.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "36mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },
+        {
+            "name": "50mer Mapability",
+            "label": "50mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/danRer10.mappability.50.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "50mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },
+        {
+            "name": "75mer Mapability",
+            "label": "75mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/danRer10.mappability.75.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "75mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },  
+        {
+            "name": "100mer Mapability",
+            "label": "100mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/danRer10.mappability.100.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "100mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },
+        {
+            "name": "150mer Mapability",
+            "label": "150mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/danRer10/danRer10.mappability.150.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "150mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        }
+    ]
+}
+        

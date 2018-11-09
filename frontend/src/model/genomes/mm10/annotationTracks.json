@@ -262,6 +262,121 @@
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rn5_axt.gz"
         }
-     ]
-    
+    ],
+    "Mappability": [
+         {
+            "name": "24mer Mapability",
+            "label": "24mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10.mappability.24.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "24mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },
+        {
+            "name": "36mer Mapability",
+            "label": "36mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10.mappability.36.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "36mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },
+        {
+            "name": "50mer Mapability",
+            "label": "50mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10.mappability.50.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "50mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },
+        {
+            "name": "75mer Mapability",
+            "label": "75mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10.mappability.75.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "75mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },  
+        {
+            "name": "100mer Mapability",
+            "label": "100mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10.mappability.100.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "100mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        },
+        {
+            "name": "150mer Mapability",
+            "label": "150mer alignability",
+            "filetype": "bigwig",
+            "url": "https://epgg-test.wustl.edu/d/mm10/mm10.mappability.150.bw",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1,
+                "color": "#09B4BC"
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "size": "150mer",
+                "software": "GEM",
+                "runby": "R.Sears"
+            }
+        }
+    ]
 }
