@@ -189,7 +189,8 @@ class MethylCTrack extends React.PureComponent {
             {...this.props}
             legend={
                 <div>
-                    <TrackLegend trackModel={trackModel} height={options.height} axisScale={this.scales.methylToY} />
+                    <TrackLegend trackModel={trackModel} height={options.height} axisScale={this.scales.methylToY} 
+                        noShiftFirstAxisLabel={!options.isCombineStrands}/>
                     {!options.isCombineStrands && <ReverseStrandLegend trackModel={trackModel} height={options.height} />}
                 </div>
             }
@@ -307,6 +308,7 @@ function ReverseStrandLegend(props) {
     return <TrackLegend
         trackModel={mockTrackModel}
         height={props.height}
+        noRenderFirstAxisLabel={true}
         axisScale={scaleLinear().domain([0, 1]).range([0, props.height - VERTICAL_PADDING])}
     />;
 }

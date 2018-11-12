@@ -2,6 +2,7 @@ import SCAFFOLDS from './scaffolds';
 import Chromosome from '../Chromosome';
 import { Genome } from '../Genome';
 import TrackModel from '../../TrackModel';
+import annotationTracks from "./annotationTracks.json";
 
 const GENOME_NAME = "danRer10";
 
@@ -62,6 +63,7 @@ const DAN_RER10 = {
     defaultRegion,
     defaultTracks,
     twoBitURL: 'https://vizhub.wustl.edu/public/danRer10/danRer10.2bit',
+    annotationTracks,
 };
 
 export default DAN_RER10;

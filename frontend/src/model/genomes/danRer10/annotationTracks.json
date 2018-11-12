@@ -13,8 +13,8 @@
             "filetype": "geneAnnotation"
         }, 
         {
-            "name": "gencodeM19",
-            "label": "GENCODE M19 genes",
+            "name": "Ensembl_GRCz10_91",
+            "label": "Ensembl release 91 genes",
             "options": {
                 "categoryColors": {
                     "coding": "rgb(0,60,179)",

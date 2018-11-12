@@ -22,6 +22,8 @@ interface TrackLegendProps {
     style?: object;
     trackWidth?: number;
     trackViewRegion?: DisplayedRegionModel;
+    noRenderFirstAxisLabel?: boolean;
+    noShiftFirstAxisLabel?: boolean;
 }
 
 // const NUM_TICKS_SUGGESTION = 2;
@@ -78,14 +80,21 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             if (!axisDomain.includes(NaN)) {
                 axis.tickValues(axisDomain);
             }
-            const dy0 = this.props.axisScaleReverse ? "0.32em" : "-0.1em"; 
+            console.log(this.props.axisScaleReverse, this.props.noShiftFirstAxisLabel, 
+                this.props.axisScaleReverse || this.props.noShiftFirstAxisLabel);
+            const dy0 = this.props.axisScaleReverse || this.props.noShiftFirstAxisLabel ? "0.32em" : "-0.1em"; 
             if(axisDomain[0] !== axisDomain[1]) {
                 select(this.gNode).append("g").call(axis);
             }   
             select(this.gNode).selectAll("text")
-                .filter((d, i) => i === 0 && d !== 0 ).attr("dy", "0.6em")
+                .filter((d, i) => i === 0 && d !== 0 ).attr("dy", "0.6em");
             select(this.gNode).selectAll("text")
                 .filter((d, i) => i === 1).attr("dy", dy0);
+            if (this.props.noRenderFirstAxisLabel) {
+                select(this.gNode).selectAll(".tick")
+                        .filter( (d, i) =>  i === 0 )
+                        .remove();
+            }
             if (this.props.axisScaleReverse) {
                 const axis2 = axisLeft(this.props.axisScaleReverse);
                 // axis2.ticks(NUM_TICKS_SUGGESTION);
