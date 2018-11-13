@@ -22,7 +22,7 @@ interface TrackLegendProps {
     style?: object;
     trackWidth?: number;
     trackViewRegion?: DisplayedRegionModel;
-    noRenderFirstAxisLabel?: boolean;
+    hideFirstAxisLabel?: boolean;
     noShiftFirstAxisLabel?: boolean;
 }
 
@@ -59,7 +59,8 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
     }
 
     componentDidUpdate(nextProps: TrackLegendProps) {
-        if (this.props.axisScale !== nextProps.axisScale) {
+        if (this.props.axisScale !== nextProps.axisScale || 
+            this.props.noShiftFirstAxisLabel !== nextProps.noShiftFirstAxisLabel) {
             this.drawAxis();
         }
     }
@@ -80,8 +81,6 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             if (!axisDomain.includes(NaN)) {
                 axis.tickValues(axisDomain);
             }
-            console.log(this.props.axisScaleReverse, this.props.noShiftFirstAxisLabel, 
-                this.props.axisScaleReverse || this.props.noShiftFirstAxisLabel);
             const dy0 = this.props.axisScaleReverse || this.props.noShiftFirstAxisLabel ? "0.32em" : "-0.1em"; 
             if(axisDomain[0] !== axisDomain[1]) {
                 select(this.gNode).append("g").call(axis);
@@ -90,7 +89,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                 .filter((d, i) => i === 0 && d !== 0 ).attr("dy", "0.6em");
             select(this.gNode).selectAll("text")
                 .filter((d, i) => i === 1).attr("dy", dy0);
-            if (this.props.noRenderFirstAxisLabel) {
+            if (this.props.hideFirstAxisLabel) {
                 select(this.gNode).selectAll(".tick")
                         .filter( (d, i) =>  i === 0 )
                         .remove();

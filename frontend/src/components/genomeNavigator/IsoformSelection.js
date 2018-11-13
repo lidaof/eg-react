@@ -86,7 +86,7 @@ class IsoformSelection extends React.PureComponent {
                 className="IsoformSelection-item"
                 onClick={() => this.props.onGeneSelected(gene)}
             >
-                <div>{gene.collection}</div>
+                <div className="IsoformSelection-collection">{gene.collection}</div>
                 <div>{gene.getLocus().toString()}</div>
                 <div>
                     <StandaloneGeneAnnotation

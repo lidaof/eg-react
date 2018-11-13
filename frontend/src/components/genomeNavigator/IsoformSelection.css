@@ -15,6 +15,11 @@
     align-items: center;
 }
 
+.IsoformSelection-collection {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
 .IsoformSelection-item:hover {
     background-color: #fdbb84;
     cursor: pointer;

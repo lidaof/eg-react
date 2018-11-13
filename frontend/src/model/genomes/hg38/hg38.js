@@ -63,9 +63,30 @@ const publicHubData = {
     + "tools to explore the dynamic nuclear architecture and its role in gene expression programs, " + 
     "models to examine the relationship between nuclear organization and function, " + 
     "and reference maps of nuclear architecture in a variety of cells and tissues as a community resource.",
+    "Encyclopedia of DNA Elements (ENCODE)": "The Encyclopedia of DNA Elements (ENCODE) Consortium is an " +
+        "international collaboration of research groups funded by the National Human Genome Research Institute " +
+        "(NHGRI). The goal of ENCODE is to build a comprehensive parts list of functional elements in the human " +
+        "genome, including elements that act at the protein and RNA levels, and regulatory elements that control " +
+        "cells and circumstances in which a gene is active.",
 }
 
 const publicHubList = [
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE signal of unique reads",
+        numTracks: 5230,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/new/mpssur_GRCh38.json",
+        description: 'signal of unique reads.'
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE signal of all reads",
+        numTracks: 5230,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/new/mpssar_GRCh38.json",
+        description: 'signal of all reads.'
+    },
     {
         collection: "4D Nucleome Network",
         name: "4DN HiC datasets",
@@ -77,7 +98,7 @@ const publicHubList = [
             'hub built date': 'Sep 1 2018',
             'hub built notes': 'metadata information are obtained directly from 4DN data portal'
         },
-    },
+    }
 ]
 
 const HG38 = {

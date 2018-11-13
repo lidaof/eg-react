@@ -3,5 +3,6 @@
     font-size: x-small;
     line-height: 1;
     word-wrap: break-word;
+    word-break: break-all;
     overflow: hidden;
 }

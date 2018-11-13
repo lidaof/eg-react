@@ -84,10 +84,23 @@ const publicHubData = {
     "and how changes in nuclear organization affect normal development as well as various diseases.  The program is " +
     "developing novel tools to explore the dynamic nuclear architecture and its role in gene expression programs, " + 
     "models to examine the relationship between nuclear organization and function, and reference maps of nuclear" + 
-    "architecture in a variety of cells and tissues as a community resource."
+    "architecture in a variety of cells and tissues as a community resource.",
+    "Encyclopedia of DNA Elements (ENCODE)": "The Encyclopedia of DNA Elements (ENCODE) Consortium is an " +
+        "international collaboration of research groups funded by the National Human Genome Research Institute " +
+        "(NHGRI). The goal of ENCODE is to build a comprehensive parts list of functional elements in the human " +
+        "genome, including elements that act at the protein and RNA levels, and regulatory elements that control " +
+        "cells and circumstances in which a gene is active.",
 };
 
 const publicHubList = [
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "Mouse ENCODE",
+        numTracks: 1616,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/mm10/new/mm10encode2015",
+        description: 'The Mouse ENCODE Consortium consisted of a number of Data Production Centers and made use of the human ENCODE Data Coordination Center (DCC) at the University of California, Santa Cruz (currently at Stanford University). Production Centers generally focused on different data types, including transcription     factor and polymerase occupancy, DNaseI hypersensitivity, histone modification, and RNA transcription.'
+    },
     {
         collection: "4D Nucleome Network",
         name: "4DN HiC datasets",

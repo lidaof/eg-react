@@ -158,69 +158,133 @@ const publicHubData = {
 
 const publicHubList = [
     {
-        collection: "Encyclopedia of DNA Elements (ENCODE)",
-        name: "ENCODE signal of unique reads",
-        numTracks: 7729,
-        oldHubFormat: true,
-        url: "https://vizhub.wustl.edu/public/hg19/hg19_mpssur.json"
-    },
-    {
-        collection: "Encyclopedia of DNA Elements (ENCODE)",
-        name: "ENCODE signal of all reads",
-        numTracks: 7842,
-        oldHubFormat: true,
-        url: "https://vizhub.wustl.edu/public/hg19/hg19_mpssar.json"
-    },
-    {
-        collection: "Encyclopedia of DNA Elements (ENCODE)",
-        name: "ENCODE all other types",
-        numTracks: 5937,
-        oldHubFormat: true,
-        description: "Base overlap signal, fold change over control, genome compartments, percentage normalized signal, etc.",
-        url: "https://vizhub.wustl.edu/public/hg19/hg19_other_rmdup.json"
-    },
-    {
-        collection: "Encyclopedia of DNA Elements (ENCODE)",
-        name: "ENCODE legacy hub",
-        numTracks: 4251,
-        oldHubFormat: true,
-        url: "https://vizhub.wustl.edu/public/hg19/encode.md"
-    },
-    {
-        collection: "Long-range chromatin interaction experiments",
-        name: "Long-range chromatin interaction experiments",
-        numTracks: 156,
-        oldHubFormat: true,
-        url: "https://vizhub.wustl.edu/public/hg19/longrange4"
-    },
-    {
         collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
         name: "Roadmap Data from GEO",
-        numTracks: 2737,
+        numTracks: 2728,
         oldHubFormat: false,
-        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap9",
+        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap9_methylC.md",
     },
     {
         collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
         name: "methylCRF tracks from Roadmap",
         numTracks: 16,
-        oldHubFormat: true,
+        oldHubFormat: false,
         description: "Single CpG methylation value prediction by methylCRF algorithm (PMID:23804401) using Roadmap data.",
-        url: "https://vizhub.wustl.edu/public/hg19/methylCRF.roadmap.hub"
+        url: "https://vizhub.wustl.edu/public/hg19/new/methylCRF.roadmap.hub"
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Observed DNase and ChIP-seq Pvalue and Normalized RPKM RNAseq signal tracks",
+        numTracks: 1136,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap_consolidated_02182015.json.md.pvalsig",
+        description: "Observed data Pvalue tracks for DNase and ChIP-seq, and Normalized RPKM signal tracks for RNAseq",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Observed DNase and ChIP-seq Fold-change and Normalized RPKM RNAseq signal tracks",
+        numTracks: 1136,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap_consolidated_02182015.json.md.fcsig",
+        description: "Observed data Fold-change tracks for DNase and ChIP-seq, and Normalized RPKM signal tracks for RNAseq",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "All Chromatin states tracks",
+        numTracks: 352,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap_consolidated_02182015.json.md.hmm",
+        description: "include 15 state core model from observed data, 18 state expanded model from observed data and 25 state model from imputed data",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Imputed data signal tracks",
+        numTracks: 4315,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap_consolidated_02182015.json.md.impsig",
+        description: "All data types (histone, DNase, RNA and methylation)",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Unconsolidated epigenomes, Observed DNase and ChIP-seq Pvalue signal tracks",
+        numTracks: 1915,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap_unconsolidated_02182015.json.md.pvalsig",
+        description: "For the unconsolidated epigenomes, observed data Pvalue tracks for DNase and ChIP-seq",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Unconsolidated epigenomes, Observed DNase and ChIP-seq Fold-change signal tracks",
+        numTracks: 1915,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap_unconsolidated_02182015.json.md.fcsig",
+        description: "For the unconsolidated epigenomes,observed data Fold-change tracks for DNase and ChIP-seq",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Complete Consolidated dataset",
+        numTracks: 18181,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap_consolidated_02182015.json.md",
+        description: "This is the complete set of Roadmap Epigenomics Integrative Analysis Hub. Consolidated refer to the 127 reference epigenomes that uses additional steps of pooling and subsampling and these are the ones used in the paper. All data types were reprocessed for the consolidated epigenomes.Also please     refer to <a href=https://egg2.wustl.edu/roadmap/web_portal/ target=_blank>web portal</a> if get slow loading of this hub.",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Roadmap Epigenomics Analysis Hub Unconsolidated set",
+        numTracks: 9990,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/roadmap_unconsolidated_02182015.json.md",
+        description: "Unconsolidated data is basically all the ChIP-seq and DNase Release 9 data at the EDACC as it was except filtered for 36 bp read length mappability and processed to create peak calls and signal tracks.",
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE signal of unique reads",
+        numTracks: 7729,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/hg19_mpssur.json"
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE signal of all reads",
+        numTracks: 7842,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/hg19_mpssar.json"
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE all other types",
+        numTracks: 5937,
+        oldHubFormat: false,
+        description: "Base overlap signal, fold change over control, genome compartments, percentage normalized signal, etc.",
+        url: "https://vizhub.wustl.edu/public/hg19/new/hg19_other_rmdup.json"
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "ENCODE legacy hub",
+        numTracks: 4253,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/encode.md"
+    },
+    {
+        collection: "Long-range chromatin interaction experiments",
+        name: "Long-range chromatin interaction experiments",
+        numTracks: 156,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/longrange4"
     },
     {
         collection: "HiC interaction from Juicebox",
         name: "HiC interaction from Juicebox",
         numTracks: 193,
-        oldHubFormat: true,
-        url: "https://epgg-test.wustl.edu/dli/long-range-test/hg19-juiceboxhub"
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/hg19-juiceboxhub"
     },
     {
         collection: "Human 450K and 27K array data from TCGA",
         name: "Human 450K and 27K array data from TCGA",
         numTracks: 2551,
-        oldHubFormat: true,
-        url: "https://vizhub.wustl.edu/public/hg19/TCGA-450k-hub2"
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/TCGA-450k-hub2"
     },
 ];
 
