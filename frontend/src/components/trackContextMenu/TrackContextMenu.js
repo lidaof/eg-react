@@ -175,6 +175,9 @@ function TrackMoreInfo(props) {
 
 export function ObjectAsTable(props) {
     const {title, content} = props;
+    if (typeof content === 'string') {
+        return <div>{content}</div>;
+    }
     const rows = Object.entries(content).map( (key, value) => <tr key={value}><td>{key[0]}</td><td>
                     { Array.isArray(key[1]) ? key[1].join(' > ') : key[1] }
                 </td></tr>);

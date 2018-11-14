@@ -113,6 +113,18 @@ const publicHubList = [
             'hub built notes': 'metadata information are obtained directly from 4DN data portal'
         },
     },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "Mouse ENCODE from ENCODE data portal",
+        numTracks: 13001,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/mm10/new/mm10_encode_mouse_bigwig_metadata_nov142018.json",
+        description: {
+            'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+            'hub built date': 'Nov 14 2018',
+            'hub built notes': 'metadata information are obtained directly from ENCODE data portal, track files are hosted by ENCODE data portal as well'
+        },
+    },
 ]
 
 const MM10 = {

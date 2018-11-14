@@ -76,16 +76,23 @@ class HubTable extends React.PureComponent {
             const hub = this.props.publicHubs[index];
             let newHubs = this._cloneHubsAndModifyOne(index, {isLoading: true});
             this.props.onHubUpdated(newHubs);
-            const json = await new Json5Fetcher().get(hub.url);
-            const tracksStartIndex = hub.oldHubFormat ? 1 : 0;
-            const tracks = await this.hubParser.getTracksInHub(json, hub.name, hub.oldHubFormat, tracksStartIndex);
-            this.props.onHubLoaded(tracks, true, hub.url);
-            let loadedHubs = this._cloneHubsAndModifyOne(index, {isLoading: false, isLoaded: true});
-            this.props.onHubUpdated(loadedHubs);
-            const tracksToShow = tracks.filter(track => track.showOnHubLoad);
-            if (tracksToShow.length > 0) {
-                this.props.onTracksAdded(tracksToShow);
+            try {
+                const json = await new Json5Fetcher().get(hub.url);
+                const tracksStartIndex = hub.oldHubFormat ? 1 : 0;
+                const tracks = await this.hubParser.getTracksInHub(json, hub.name, hub.oldHubFormat, tracksStartIndex);
+                this.props.onHubLoaded(tracks, true, hub.url);
+                let loadedHubs = this._cloneHubsAndModifyOne(index, {isLoading: false, isLoaded: true});
+                this.props.onHubUpdated(loadedHubs);
+                const tracksToShow = tracks.filter(track => track.showOnHubLoad);
+                if (tracksToShow.length > 0) {
+                    this.props.onTracksAdded(tracksToShow);
+                }
+            } catch (error) {
+                console.error(error);
+                let loadedHubs = this._cloneHubsAndModifyOne(index, {error: 1, isLoading: false});
+                this.props.onHubUpdated(loadedHubs);
             }
+            
         }
     }
 
@@ -99,11 +106,13 @@ class HubTable extends React.PureComponent {
     getAddHubCell(reactTableRow) {
         let hub = reactTableRow.original;
         if (hub.isLoaded) {
-            return <span>✓</span>
+            return <span>✓</span>;
         }
-
+        if (hub.error) {
+            return <span>Error</span>;
+        }
         if (hub.isLoading) {
-            return <span>Loading...</span>
+            return <span>Loading...</span>;
         }
 
         return <button onClick={() => this.loadHub(reactTableRow.index)}>+</button>

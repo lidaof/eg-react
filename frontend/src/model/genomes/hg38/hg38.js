@@ -98,7 +98,31 @@ const publicHubList = [
             'hub built date': 'Sep 1 2018',
             'hub built notes': 'metadata information are obtained directly from 4DN data portal'
         },
-    }
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "Human ENCODE from ENCODE data portal",
+        numTracks: 38092,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/new/GRCh38_encode_human_bigwig_metadata_nov142018.json",
+        description: {
+            'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+            'hub built date': 'Nov 14 2018',
+            'hub built notes': 'metadata information are obtained directly from ENCODE data portal, track files are hosted by ENCODE data portal as well'
+        },
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "Human ENCODE HiC from ENCODE data portal",
+        numTracks: 20,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/new/GRCh38_encode_human_hic_metadata_nov142018.json",
+        description: {
+            'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+            'hub built date': 'Nov 14 2018',
+            'hub built notes': 'metadata information are obtained directly from ENCODE data portal, track files are hosted by ENCODE data portal as well'
+        },
+    },
 ]
 
 const HG38 = {

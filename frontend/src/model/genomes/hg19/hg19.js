@@ -238,6 +238,30 @@ const publicHubList = [
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "Human ENCODE from ENCODE data portal",
+        numTracks: 48657,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/hg19_encode_human_bigwig_metadata_nov142018.json",
+        description: {
+            'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+            'hub built date': 'Nov 14 2018',
+            'hub built notes': 'metadata information are obtained directly from ENCODE data portal, track files are hosted by ENCODE data portal as well'
+        },
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
+        name: "Human ENCODE HiC from ENCODE data portal",
+        numTracks: 104,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/hg19_encode_human_hic_metadata_nov142018.json",
+        description: {
+            'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+            'hub built date': 'Nov 14 2018',
+            'hub built notes': 'metadata information are obtained directly from ENCODE data portal, track files are hosted by ENCODE data portal as well'
+        },
+    },
+    {
+        collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE signal of unique reads",
         numTracks: 7729,
         oldHubFormat: false,

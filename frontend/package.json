@@ -1,13 +1,13 @@
 {
   "name": "epgg",
-  "version": "47.2.7",
+  "version": "47.2.8",
   "repository": {
     "type": "git",
     "url": "https://github.com/lidaof/eg-react.git"
   },
   "scripts": {
     "build": "react-app-rewired build --scripts-version react-scripts-ts && npm run build-dist",
-    "build-dist": "rm -f umd/* && cd build && cp static/js/*.js ../umd/epgg.js && cp static/css/*.css ../umd/epgg.css && cp *worker.js ../umd/ && cd ../umd && sed -i 's/\/browser\///g' epgg.js",
+    "build-dist": "rm -f umd/* && cd build && cp static/js/*.js ../umd/epgg.js && cp static/css/*.css ../umd/epgg.css && cp *worker.js ../umd/ && cd ../umd && sed -i ''  's//browser/./g' *.js",
     "build-storybook": "build-storybook -s public",
     "eject": "react-scripts-ts eject",
     "start": "react-app-rewired start --scripts-version react-scripts-ts",

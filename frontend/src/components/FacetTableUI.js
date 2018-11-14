@@ -4,11 +4,20 @@ import FacetTable from './trackManagers/FacetTable';
 
 class FacetTableUI extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            selectedTabIndex: 0,
+        };
+    }
+
     render() {
         const {publicTracksPool, customTracksPool, addedTracks, onTracksAdded, 
                 addedTrackSets, addTermToMetaSets} = this.props;
         return (
-            <Tabs headerStyle={{fontWeight: 'bold'}} activeHeaderStyle={{color: 'blue'}}>
+            <Tabs onSelect={(index, label) => this.setState({selectedTabIndex: index})} 
+                  selected={this.state.selectedTabIndex}
+                  headerStyle={{fontWeight: 'bold'}} activeHeaderStyle={{color: 'blue'}}>
                 <Tab label="Public tracks facet table">
                     <h1>Tracks from public hubs</h1>
                 {
