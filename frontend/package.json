@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "react-app-rewired build --scripts-version react-scripts-ts && npm run build-dist",
-    "build-dist": "cd build && cp static/js/*.js ../umd/epgg.js && cp static/css/*.css ../umd/epgg.css",
+    "build-dist": "rm -f umd/* && cd build && cp static/js/*.js ../umd/epgg.js && cp static/css/*.css ../umd/epgg.css && cp *worker.js ../umd/ && cd ../umd && sed -i 's/\/browser\///g' epgg.js",
     "build-storybook": "build-storybook -s public",
     "eject": "react-scripts-ts eject",
     "start": "react-app-rewired start --scripts-version react-scripts-ts",

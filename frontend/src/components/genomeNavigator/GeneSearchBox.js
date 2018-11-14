@@ -22,7 +22,9 @@ const ENTER_KEY_CODE = 13;
 const ISOFORM_POPOVER_STYLE = {
     zIndex: 1,
     border: "2px solid grey",
-    backgroundColor: "white"
+    backgroundColor: "white",
+    maxHeight: "800px",
+    overflow: "auto",
 };
 const DEBOUNCE_INTERVAL = 250;
 const options = {

@@ -8,3 +8,8 @@ div.GeneSearchBox-speech button {
     padding: 2px;
     margin-right: 2px;
 }
+
+.react-autosuggest__suggestions-container--open {
+    max-height: 800px;
+    overflow: auto;
+}
