@@ -168,9 +168,6 @@ function getInitialState() {
         if (query.bundle) {
             newState = {...state, bundleId: query.bundle, sessionFromUrl: true};
         }
-        if(query.genome) {
-            newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
-        }
         if(query.session) {
             window.location.href = 
 `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&session=${query.session}&statusId=${query.statusId}`;
@@ -178,6 +175,13 @@ function getInitialState() {
         if(query.datahub) {
             window.location.href = 
 `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&datahub=${query.datahub}`;
+        }
+        if(query.publichub) {
+            window.location.href = 
+`http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&publichub=${query.publichub}`;
+        }
+        if(query.genome) {
+            newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
         }
         return newState || state;
     }
