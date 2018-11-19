@@ -50,6 +50,9 @@ export class FeatureSegment {
         return this.relativeEnd;
     }
 
+    /**
+     * @return {OpenInterval} new OpenInterval containing this segment's relative start and end.
+     */
     toOpenInterval(): OpenInterval {
         return new OpenInterval(this.relativeStart, this.relativeEnd);
     }
@@ -69,9 +72,7 @@ export class FeatureSegment {
     }
 
     /**
-     * Gets the genomic location of this interval, considering both the attached Feature's location and this interval.
-     * 
-     * @return {ChromosomeInterval} genomic location of this interval
+     * @return {ChromosomeInterval} the genomic location that this segment covers
      */
     getLocus(): ChromosomeInterval {
         const featureLocus = this.feature.getLocus();

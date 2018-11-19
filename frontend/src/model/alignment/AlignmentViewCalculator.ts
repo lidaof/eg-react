@@ -174,9 +174,11 @@ export class AlignmentViewCalculator {
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
         const mergeDistance = drawModel.xWidthToBases(MERGE_PIXEL_DISTANCE);
 
+        const placedRecords = this._computeContextLocations(alignmentRecords, visData);
         // First, merge the alignments by query genome coordinates
         let queryLocusMerges = ChromosomeInterval.mergeAdvanced(
-            alignmentRecords, mergeDistance, record => record.queryLocus // <-- Merging using the query locus
+            // Note that the third parameter gets query loci
+            placedRecords, mergeDistance, placement => placement.visiblePart.getQueryLocus()
         );
 
         // Sort so we place the largest query loci first in the next step
@@ -186,37 +188,31 @@ export class AlignmentViewCalculator {
         const drawData: PlacedMergedAlignment[] = [];
         for (const merge of queryLocusMerges) {
             const mergeLocus = merge.locus;
-            const recordsInMerge = merge.sources; // Records that made the merged locus
+            const placementsInMerge = merge.sources; // Placements that made the merged locus
             const mergeDrawWidth = drawModel.basesToXWidth(mergeLocus.getLength());
             const halfDrawWidth = 0.5 * mergeDrawWidth;
             if (mergeDrawWidth < MIN_MERGE_DRAW_WIDTH) {
                 continue;
             }
 
-            // Step 1: place target/primary genome segments 
-            const placementsInsideMerge = this._computeContextLocations(recordsInMerge, visData);
-            for (const placement of placementsInsideMerge) {
-                placement.targetXSpan = drawModel.baseSpanToXSpan(placement.contextSpan);
-                // We will set queryXSpan in a moment
-            }
-
-            // Step 2: using the centroid of the segments from step 1, place the merged query locus.
-            const drawCenter = computeCentroid(placementsInsideMerge.map(segment => segment.targetXSpan));
+            // Find the center of the primary segments, and try to center the merged query locus there too.
+            const drawCenter = computeCentroid(placementsInMerge.map(segment => segment.targetXSpan));
             const preferredStart = drawCenter - halfDrawWidth;
             const preferredEnd = drawCenter + halfDrawWidth;
+            // Place it so it doesn't overlap other segments
             const mergeXSpan = intervalPlacer.place(new OpenInterval(preferredStart, preferredEnd));
 
-            // Step 3: using the placed merge locus from step 2, place secondary/query genome segments
-            const lociInMerge = placementsInsideMerge.map(placement => placement.record.queryLocus);
-            const lociXSpans = this._placeInternalLoci(mergeLocus, lociInMerge, mergeXSpan.start, drawModel);
-            for (let i = 0; i < lociInMerge.length; i++) {
-                placementsInsideMerge[i].queryXSpan = lociXSpans[i];
+            // Put the actual secondary/query genome segments in the placed merged query locus from above
+            const queryLoci = placementsInMerge.map(placement => placement.record.queryLocus);
+            const lociXSpans = this._placeInternalLoci(mergeLocus, queryLoci, mergeXSpan.start, drawModel);
+            for (let i = 0; i < queryLoci.length; i++) {
+                placementsInMerge[i].queryXSpan = lociXSpans[i];
             }
 
             drawData.push({
                 queryFeature: new Feature(undefined, mergeLocus),
                 queryXSpan: mergeXSpan,
-                segments: placementsInsideMerge
+                segments: placementsInMerge
             });
         }
 
@@ -242,7 +238,7 @@ export class AlignmentViewCalculator {
                 record: placement.feature as AlignmentRecord,
                 visiblePart: AlignmentSegment.fromFeatureSegment(placement.visiblePart),
                 contextSpan: placement.contextLocation,
-                targetXSpan: null,
+                targetXSpan: placement.xSpan,
                 queryXSpan: null,
             };
         });
@@ -296,9 +292,9 @@ export class AlignmentViewCalculator {
             const querySeq = visiblePart.getQuerySequence();
             let baseLookup;
             if (isReverse) {
-                baseLookup = makeBaseNumberLookup(querySeq, visiblePart.getQueryLocus().end, true);
+                baseLookup = makeBaseNumberLookup(querySeq, visiblePart.getQueryLocusFine().end, true);
             } else {
-                baseLookup = makeBaseNumberLookup(querySeq, visiblePart.getQueryLocus().start);
+                baseLookup = makeBaseNumberLookup(querySeq, visiblePart.getQueryLocusFine().start);
             }
             const queryChr = record.queryLocus.chr;
 
