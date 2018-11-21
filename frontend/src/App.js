@@ -28,6 +28,7 @@ function mapStateToProps(state) {
         sessionFromUrl: state.browser.present.sessionFromUrl,
         trackLegendWidth: state.browser.present.trackLegendWidth,
         isShowingNavigator: state.browser.present.isShowingNavigator,
+        customTracksPool: state.browser.present.customTracksPool,
     };
 }
 
@@ -81,6 +82,9 @@ class App extends React.Component {
             this.setState({
                 publicHubs: this.props.genomeConfig.publicHubList.slice(),
             })
+        }
+        if (this.props.customTracksPool) {
+            this.setState({customTracksPool: this.props.customTracksPool});
         }
     }
 

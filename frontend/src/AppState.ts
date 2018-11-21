@@ -16,6 +16,8 @@ import firebase from 'firebase/app';
 import 'firebase/database';
 import querySting from "query-string";
 import _ from 'lodash';
+import Json5Fetcher from './model/Json5Fetcher';
+import DataHubParser from './model/DataHubParser';
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
@@ -183,6 +185,23 @@ function getInitialState() {
         if(query.genome) {
             newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
         }
+        if(query.hicUrl) {
+            const tmpState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
+            const urlComponets = query.hicUrl.split('/');
+            const track = TrackModel.deserialize(
+                {type: "hic", url: query.hicUrl, name: urlComponets[urlComponets.length - 1].split('.')[0]});
+            newState =  {...tmpState, tracks: [track]};
+        }
+        if(query.hub) {
+            const tmpState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
+            
+            const tracksToShow = tracks.filter(track => track.showOnHubLoad);
+            if (tracksToShow.length > 0) {
+                newState =  {...tmpState, tracks: tracksToShow};
+            } else {
+                newState =  {...tmpState};
+            }
+        }
         return newState || state;
     }
     const blob = STORAGE.getItem(SESSION_KEY);
@@ -258,6 +277,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
     }
 }
 
+async function getTracksFromHubURL = (url: string) => {
+    const json = await new Json5Fetcher().get(url);
+            const hubParser = new DataHubParser();
+            const tracks = await hubParser.getTracksInHub(json, 'URL hub', false, 0);
+}
 
 /**
  * Handles a change in region set view.  Causes a change in the displayed region as well as region set.
@@ -286,7 +310,7 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
 }
 
 const rootReducer = combineReducers({
-    browser: undoable(getNextState, {limit: 10} ),
+    browser: undoable(getNextState, {limit: 20} ),
     firebase: firebaseReducer,
 });
 
@@ -328,3 +352,4 @@ window.addEventListener("beforeunload", () => {
 });
 
 export default AppState;
+   
