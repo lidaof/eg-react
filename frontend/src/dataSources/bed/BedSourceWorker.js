@@ -46,7 +46,7 @@ class BedSourceWorker extends WorkerRunnableSource {
      * 
      * @param {string} url - the url of the bed-like file to fetch.
      */
-    constructor(url, dataLimit=50000) {
+    constructor(url, dataLimit=10000) {
         super();
         this.url = url;
         this.dataLimit = dataLimit;

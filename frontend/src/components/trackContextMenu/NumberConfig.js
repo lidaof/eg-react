@@ -14,6 +14,7 @@ class NumberConfig extends React.PureComponent {
         optionName: PropTypes.string.isRequired, // The prop to change of a TrackModel's options object.
         label: PropTypes.string, // Label of the input
         minValue: PropTypes.number, // Minimum value of the input
+        defaultValue: PropTypes.number, // Default value of the input
         isFloat: PropTypes.bool, // Expects a float when truthy, expects an int when falsy
         step: PropTypes.number, // Step attribute; legal number interval
         width: PropTypes.string, // Width of the input element.  Can use CSS units.
@@ -69,13 +70,13 @@ class NumberConfig extends React.PureComponent {
     }
 
     render() {
-        const {optionName, optionsObjects, label, minValue, hasSetButton} = this.props;
+        const {optionName, optionsObjects, label, defaultValue, hasSetButton} = this.props;
         const setButton = hasSetButton === undefined ? true : hasSetButton;
         return <SingleInputConfig
             optionName={optionName}
             optionsObjects={optionsObjects}
             label={label}
-            defaultValue={minValue}
+            defaultValue={defaultValue}
             hasSetButton={setButton}
             getInputElement={this.renderInputElement}
             onOptionSet={this.handleOptionSet}

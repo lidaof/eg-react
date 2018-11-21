@@ -16,12 +16,14 @@ function ScoreConfig(props) {
             label="Score max:" 
             isFloat={true} 
             hasSetButton={true}
+            defaultValue={10}
         />
         <NumberConfig {...props} 
             optionName="scoreMin" 
             label="Score min:" 
             isFloat={true} 
             hasSetButton={true}
+            defaultValue={0}
         />
     </React.Fragment> : null;
     return (
