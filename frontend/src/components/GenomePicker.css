@@ -2,7 +2,7 @@
     display: grid;
     grid-template-columns: auto auto auto;
     align-items: center;
-    height: 60vh;
+    /* height: 60vh; */
     grid-gap: 20px;
     width: 50%;
     margin: auto;

@@ -89,7 +89,7 @@ class GenomePicker extends React.PureComponent {
                     </li>
                     </ul> 
                 </div>
-                <hr style={{margin: 0}} />
+                <hr style={{marginTop: 0}} />
                 <div className="GenomePicker-main">
                     <div className="GenomePicker-species capitalize">
                         {this.renderTree()}

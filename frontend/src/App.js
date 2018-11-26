@@ -83,9 +83,6 @@ class App extends React.Component {
                 publicHubs: this.props.genomeConfig.publicHubList.slice(),
             })
         }
-        if (this.props.customTracksPool) {
-            this.setState({customTracksPool: this.props.customTracksPool});
-        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -95,6 +92,9 @@ class App extends React.Component {
                     publicHubs: nextProps.genomeConfig.publicHubList.slice(),
                 })
             }
+        }
+        if (nextProps.customTracksPool && nextProps.customTracksPool !== this.props.customTracksPool) {
+            this.setState({customTracksPool: nextProps.customTracksPool});
         }
     }
 
