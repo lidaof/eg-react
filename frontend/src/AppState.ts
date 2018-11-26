@@ -16,6 +16,8 @@ import firebase from 'firebase/app';
 import 'firebase/database';
 import querySting from "query-string";
 import _ from 'lodash';
+import Json5Fetcher from './model/Json5Fetcher';
+import DataHubParser from './model/DataHubParser';
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") { // jsdom doesn't support local storage.  Use a mock.
@@ -57,6 +59,7 @@ export interface AppState {
     bundleId: string;
     sessionFromUrl?: boolean;
     isShowingNavigator: boolean;
+    customTracksPool?: TrackModel[];
 }
 
 const bundleId = uuid.v1();
@@ -72,6 +75,7 @@ const initialState: AppState = {
     bundleId,
     sessionFromUrl: false,
     isShowingNavigator: true,
+    customTracksPool: [],
 };
 
 enum ActionType {
@@ -86,6 +90,8 @@ enum ActionType {
     RETRIEVE_BUNDLE = "RETRIEVE_BUNDLE",
     SET_GENOME_RESTORE_SESSION = "SET_GENOME_RESTORE_SESSION",
     TOGGLE_NAVIGATOR = "TOGGLE_NAVIGATOR",
+    SET_CUSTOM_TRACKS_POOL = "SET_CUSTOM_TRACKS_POOL",
+    SET_TRACKS_CUSTOM_TRACKS_POOL = "SET_TRACKS_CUSTOM_TRACKS_POOL",
 }
 
 interface AppAction {
@@ -155,7 +161,15 @@ export const ActionCreators = {
 
     toggleNavigator: () => {
         return {type: ActionType.TOGGLE_NAVIGATOR}
-    }
+    },
+
+    setCustomTracksPool: (customTracksPool: TrackModel[]) => {
+        return {type: ActionType.SET_CUSTOM_TRACKS_POOL, customTracksPool};
+    },
+
+    setTracksCustomTracksPool: (tracks: TrackModel[], customTracksPool: TrackModel[]) => {
+        return {type: ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL, tracks, customTracksPool};
+    },
 
 };
 
@@ -168,9 +182,6 @@ function getInitialState() {
         if (query.bundle) {
             newState = {...state, bundleId: query.bundle, sessionFromUrl: true};
         }
-        if(query.genome) {
-            newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
-        }
         if(query.session) {
             window.location.href = 
 `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&session=${query.session}&statusId=${query.statusId}`;
@@ -178,6 +189,20 @@ function getInitialState() {
         if(query.datahub) {
             window.location.href = 
 `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&datahub=${query.datahub}`;
+        }
+        if(query.publichub) {
+            window.location.href = 
+`http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&publichub=${query.publichub}`;
+        }
+        if(query.genome) {
+            newState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
+        }
+        if(query.hicUrl) {
+            const tmpState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
+            const urlComponets = query.hicUrl.split('/');
+            const track = TrackModel.deserialize(
+                {type: "hic", url: query.hicUrl, name: urlComponets[urlComponets.length - 1].split('.')[0]});
+            newState =  {...tmpState, tracks: [track]};
         }
         return newState || state;
     }
@@ -247,6 +272,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return {...state, genomeName: action.genomeName};
         case ActionType.TOGGLE_NAVIGATOR:
             return {...prevState, isShowingNavigator: !prevState.isShowingNavigator};
+        case ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL:
+            const tracks = [...prevState.tracks, ...action.tracks];
+            return { ...prevState, tracks, customTracksPool: action.customTracksPool };
+        case ActionType.SET_CUSTOM_TRACKS_POOL:
+            return { ...prevState, customTracksPool: action.customTracksPool };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);
@@ -254,6 +284,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
     }
 }
 
+async function getTracksFromHubURL(url: string): Promise<any> {
+    const json = await new Json5Fetcher().get(url);
+    const hubParser = new DataHubParser();
+    return await hubParser.getTracksInHub(json, 'URL hub', false, 0);
+}
 
 /**
  * Handles a change in region set view.  Causes a change in the displayed region as well as region set.
@@ -282,7 +317,7 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
 }
 
 const rootReducer = combineReducers({
-    browser: undoable(getNextState, {limit: 10} ),
+    browser: undoable(getNextState, {limit: 20} ),
     firebase: firebaseReducer,
 });
 
@@ -313,6 +348,25 @@ export const AppState = createStoreWithFirebase(
     (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__()
 );
 
+async function asyncInitState() {
+    const { query } = querySting.parseUrl(window.location.href);
+    if (!(_.isEmpty(query))) {
+        if(query.hub) {
+            const customTracksPool = await getTracksFromHubURL(query.hub);
+            if (customTracksPool) {
+                const tracks = customTracksPool.filter((track: any) => track.showOnHubLoad);
+                if (tracks.length > 0) {
+                    AppState.dispatch(ActionCreators.setTracksCustomTracksPool(tracks, customTracksPool));
+                } else {
+                    AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
+                }
+            }
+        }
+    }
+}
+
+asyncInitState();
+
 window.addEventListener("beforeunload", () => {
     if ( !STORAGE.getItem(NO_SAVE_SESSION) ){
         const state = AppState.getState();
@@ -324,3 +378,4 @@ window.addEventListener("beforeunload", () => {
 });
 
 export default AppState;
+   

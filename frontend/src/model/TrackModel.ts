@@ -60,6 +60,7 @@ export class TrackModel {
     metadata: ITrackModelMetadata;
     id: number;
     isSelected: boolean;
+    showOnHubLoad?: boolean;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);

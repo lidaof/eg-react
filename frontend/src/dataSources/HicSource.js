@@ -41,10 +41,17 @@ export class HicSource extends DataSource {
     * Returns the largest bin size such at least MIN_BINS_PER_REGION fit in a region of the provided length.  If no such
     * bin size exists, because the input was too small or invalid, returns the smallest bin size.
     *
-    * @param {number} regionLength - the length of the region
+    * @param {DisplayedRegionModel} region - the region
     * @returns {number} the index of the recommended bin size for the region
     */
-    getAutoBinSize(regionLength) {
+    getAutoBinSize(region) {
+        const regionLength = region.getWidth();
+        // const loci = region.getGenomeIntervals();
+        // if (loci.length > 1) {
+        //     if (loci[0].chr !== loci[loci.length - 1].chr) {
+        //         return 6000000; // 6Mb for different chroms
+        //     }
+        // }
         for (let binSize of BIN_SIZES) { // BIN_SIZES must be sorted from largest to smallest!
             if (MIN_BINS_PER_REGION * binSize < regionLength) {
                 return binSize;
@@ -85,7 +92,7 @@ export class HicSource extends DataSource {
      * @return {Promise<ContactRecord>} a Promise for the data
      */
     async getData(region, basesPerPixel, options) {
-        const binSize = options.binSize || this.getAutoBinSize(region.getWidth());
+        const binSize = options.binSize || this.getAutoBinSize(region);
         const promises = [];
         const loci = region.getGenomeIntervals();
         // for (const [index1,locus1] of loci.entries()) {
@@ -99,11 +106,11 @@ export class HicSource extends DataSource {
             }
         }
         const dataForEachSegment = await Promise.all(promises);
-        return _.flatMap(dataForEachSegment);
+        return ensureMaxListLength(_.flatMap(dataForEachSegment), 5000);
     }
 
     async getDataAll(region, options) {
-        const binSize = options.binSize || this.getAutoBinSize(region.getWidth());
+        const binSize = options.binSize || this.getAutoBinSize(region);
         const promises = [];
         const loci = region.getGenomeIntervals();
         // const locus2 = new ChromosomeInterval('chr7', 0, 145441459);
