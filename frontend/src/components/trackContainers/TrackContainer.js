@@ -104,7 +104,7 @@ class TrackContainer extends React.Component {
             trackForCircletView: null, // the trackmodel for circlet view
             circletColor: '#ff5722',
             panningAnimation: 'none',
-            // zoomAnimation: 0,
+            zoomAnimation: 0,
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -145,13 +145,13 @@ class TrackContainer extends React.Component {
     zoomOut(factor) {
         const { primaryView, onNewRegion } = this.props;
         const newRegion = primaryView.viewWindowRegion.clone().zoom(factor);
-        // this.setState({zoomAnimation: factor}, () => {
-        //     window.setTimeout(() => {
-        //         this.setState({zoomAnimation: 0});
-        //         onNewRegion(...newRegion.getContextCoordinates());
-        //     }, 1000);
-        // });
-        onNewRegion(...newRegion.getContextCoordinates());
+        this.setState({zoomAnimation: factor}, () => {
+            window.setTimeout(() => {
+                this.setState({zoomAnimation: 0});
+                onNewRegion(...newRegion.getContextCoordinates());
+            }, 1000);
+        });
+        // onNewRegion(...newRegion.getContextCoordinates());
     }
 
     onKeyDown(keyName, e, handle) {
@@ -305,7 +305,8 @@ class TrackContainer extends React.Component {
                     /> 
                 }
                 <ButtonGroup buttons={panLeftButton} />
-                <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} />
+                {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
+                <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
                 <ButtonGroup buttons={panRightButton} />
                 <div><UndoRedo /></div>
                 <div><History /></div>
@@ -331,7 +332,7 @@ class TrackContainer extends React.Component {
                 metadataTerms={metadataTerms}
                 xOffset={0}
                 panningAnimation={this.state.panningAnimation}
-                // zoomAnimation={this.state.zoomAnimation}
+                zoomAnimation={this.state.zoomAnimation}
                 index={index}
                 onContextMenu={this.handleContextMenu}
                 onClick={this.handleTrackClicked}

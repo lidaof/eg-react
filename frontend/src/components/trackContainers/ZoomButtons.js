@@ -26,7 +26,7 @@ function ZoomButtons(props) {
             className="btn btn-outline-dark"
             title={zoom.title}
             style={{fontFamily: "monospace"}}
-            onClick={() => zoomOut(zoom.factor)}
+            onClick={() => props.zoomOut(zoom.factor)}
         >
             {zoom.text}
         </button>
