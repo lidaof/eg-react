@@ -27,7 +27,7 @@ export interface PropsFromTrackContainer extends TrackData {
     options?: TrackOptions; // Track options
     style?: object; // optional style from each track file
     panningAnimation?: string;
-    zoomAnimation?: number;
+    // zoomAnimation?: number;
 
     /**
      * Callback for context menu events.
@@ -116,7 +116,7 @@ class Track extends React.Component<TrackProps> {
         const {
             trackModel, width, viewWindow, metadataTerms, xOffset, // Track container props
             legend, visualizer, message, isLoading, error, options, // Track subtype props
-            style, panningAnimation, zoomAnimation
+            style, panningAnimation // zoomAnimation
         } = this.props;
         return (
         <div
@@ -134,7 +134,7 @@ class Track extends React.Component<TrackProps> {
                         fullWidth={width}
                         xOffset={xOffset}
                         panningAnimation={panningAnimation}
-                        zoomAnimation={zoomAnimation}
+                        // zoomAnimation={zoomAnimation}
                     >
                         {visualizer}
                     </ViewWindow>
@@ -171,7 +171,7 @@ interface ViewWindowProps {
     children: JSX.Element;
     xOffset?: number;
     panningAnimation?: string;
-    zoomAnimation?: number;
+    // zoomAnimation?: number;
 }
 /**
  * A component that has a "window" that displays only a portion of its (presumably) wider children.  The window can be
@@ -193,10 +193,10 @@ function ViewWindow(props: ViewWindowProps): JSX.Element {
         position: "relative" as PositionProperty,
         // -viewWindow.start centers the view, rather than it starting at the leftmost part of the inner element.
         // transform: `translateX(${-viewWindow.start + xOffset}px)`,
-        transform: '',
+        transform: 'none',
         willChange: 'transform',
-        transition: '',
-        transformOrigin: '',
+        transition: 'none',
+        transformOrigin : 'none',
     };
 
     if (props.panningAnimation === "left") {
@@ -207,18 +207,18 @@ function ViewWindow(props: ViewWindowProps): JSX.Element {
         innerStyle.transition = "transform 1s";
     } else {
         innerStyle.transform = `translateX(${-viewWindow.start + xOffset}px)`;
-        innerStyle.transition = "";
+        innerStyle.transition = "none";
     }
 
-    if (props.zoomAnimation === 2){
-        innerStyle.transform = "scale(0.5, 1)";
-        innerStyle.transformOrigin = "center center";
-        innerStyle.transition = "transform 1s";
-    } else if (props.zoomAnimation === 0.5){
-        innerStyle.transform = "scale(2, 1)";
-        innerStyle.transformOrigin = "center center";
-        innerStyle.transition = "transform 1s";
-    }
+    // if (props.zoomAnimation === 2){
+    //     innerStyle.transform = "scale(0.5, 1)";
+    //     innerStyle.transformOrigin = "left";
+    //     innerStyle.transition = "transform 1s";
+    // } else if (props.zoomAnimation === 0.5){
+    //     innerStyle.transform = "scale(2, 1)";
+    //     innerStyle.transformOrigin = "left";
+    //     innerStyle.transition = "transform 1s";
+    // }
 
     return (
     <div style={outerStyle}>
