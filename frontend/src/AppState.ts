@@ -187,8 +187,14 @@ function getInitialState() {
 `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&session=${query.session}&statusId=${query.statusId}`;
         }
         if(query.datahub) {
-            window.location.href = 
-`http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&datahub=${query.datahub}`;
+            if(query.coordinate) {
+                window.location.href = 
+                `http://epigenomegateway.wustl.edu/legacy/?` +
+                `genome=${query.genome}&datahub=${query.datahub}&coordinate=${query.coordinate}`;
+            }else {
+                window.location.href = 
+                `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&datahub=${query.datahub}`;
+            }
         }
         if(query.publichub) {
             window.location.href = 

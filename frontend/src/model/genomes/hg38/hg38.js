@@ -123,6 +123,25 @@ const publicHubList = [
             'hub built notes': 'metadata information are obtained directly from ENCODE data portal, track files are hosted by ENCODE data portal as well'
         },
     },
+    {
+        collection: "International Human Epigenome Consortium (IHEC) ",
+        name: "International Human Epigenome Consortium (IHEC) epigenomic datasets",
+        numTracks: 6800,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/new/ihec-hg38-urls.json",
+        description: {
+            'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+            'hub built date': 'Nov 30 2018',
+            'hub built notes': 'track files are hosted by IHEC data portal'
+        },
+    },
+    {
+        collection: "HiC interaction from HiGlass",
+        name: "HiC interaction from HiGlass",
+        numTracks: 6,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/new/hg38_cool.json"
+    },
 ]
 
 const HG38 = {

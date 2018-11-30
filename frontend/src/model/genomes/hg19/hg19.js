@@ -290,9 +290,21 @@ const publicHubList = [
         url: "https://vizhub.wustl.edu/public/hg19/new/encode.md"
     },
     {
+        collection: "International Human Epigenome Consortium (IHEC) ",
+        name: "International Human Epigenome Consortium (IHEC) epigenomic datasets",
+        numTracks: 15097,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/ihec-hg19-urls.json",
+        description: {
+            'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+            'hub built date': 'Nov 30 2018',
+            'hub built notes': 'track files are hosted by IHEC data portal'
+        },
+    },
+    {
         collection: "Long-range chromatin interaction experiments",
         name: "Long-range chromatin interaction experiments",
-        numTracks: 156,
+        numTracks: 203,
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/hg19/new/longrange4"
     },
@@ -302,6 +314,13 @@ const publicHubList = [
         numTracks: 193,
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/hg19/new/hg19-juiceboxhub"
+    },
+    {
+        collection: "HiC interaction from HiGlass",
+        name: "HiC interaction from HiGlass",
+        numTracks: 41,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg19/new/hg19_cool.json"
     },
     {
         collection: "Human 450K and 27K array data from TCGA",
