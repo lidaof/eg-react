@@ -24,6 +24,8 @@ export const DEFAULT_OPTIONS = {
     color2: "darkorange",
     color2BelowMin: "darkgreen",
     yScale: ScaleChoices.AUTO,
+    yMax: 10,
+    yMin: 0,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 

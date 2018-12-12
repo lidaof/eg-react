@@ -19,6 +19,7 @@ import { withTrackView } from '../trackContainers/TrackViewManager';
 
 const COMPONENT_FOR_TRACK_TYPE = {
     bigwig: NumericalTrack3D,
+    bedgraph: NumericalTrack3D,
 };
 const withHicData = configStaticDataSource(props => new HicSource(props.trackModel.url, props.genomeConfig.genome));
 const InteractionTrack = withCurrentGenome(withHicData(InteractionTrack3D));

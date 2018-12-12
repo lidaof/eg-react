@@ -78,7 +78,11 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
             for (const track of addedTracks) {
                 this.fetchTrack(track);
             }
-
+            const tracksWithBinsizeChanged = _.differenceBy(this.props.tracks, 
+                prevTracks, track => track.options.binSize);
+            for (const track of tracksWithBinsizeChanged) {
+                this.fetchTrack(track);
+            }
             // Clean up the data sources and state of removed tracks
             const deletionUpdate = {};
             for (const track of removedTracks) {

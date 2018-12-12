@@ -92,7 +92,7 @@ export class HicSource extends DataSource {
      * @return {Promise<ContactRecord>} a Promise for the data
      */
     async getData(region, basesPerPixel, options) {
-        const binSize = options.binSize || this.getAutoBinSize(region);
+        const binSize = options.binSize && Number.parseInt(options.binSize) !== 0 ? Number.parseInt(options.binSize): this.getAutoBinSize(region);
         const promises = [];
         const loci = region.getGenomeIntervals();
         // for (const [index1,locus1] of loci.entries()) {
@@ -110,7 +110,7 @@ export class HicSource extends DataSource {
     }
 
     async getDataAll(region, options) {
-        const binSize = options.binSize || this.getAutoBinSize(region);
+        const binSize = options.binSize && Number.parseInt(options.binSize) !== 0 ? Number.parseInt(options.binSize): this.getAutoBinSize(region);
         const promises = [];
         const loci = region.getGenomeIntervals();
         // const locus2 = new ChromosomeInterval('chr7', 0, 145441459);

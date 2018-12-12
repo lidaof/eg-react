@@ -22,9 +22,10 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
     data: GenomeInteraction[];
     options: {
         color: string;
-        color2: string;
+        color2?: string;
         backgroundColor?: string;
         displayMode: InteractionDisplayMode;
+        binSize?: number;
         scoreScale?: string,
         scoreMax?: number,
         scoreMin?: number,
@@ -37,6 +38,8 @@ export const DEFAULT_OPTIONS = {
     backgroundColor: 'white',
     displayMode: InteractionDisplayMode.HEATMAP,
     scoreScale: ScaleChoices.AUTO,
+    scoreMax: 10,
+    scoreMin: 0,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -92,6 +95,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             width,
             opacityScale: this.makeOpacityScale(),
             color: options.color,
+            binSize: options.binSize,
             onInteractionHovered: this.showTooltip,
             onMouseOut: this.hideTooltip
         };

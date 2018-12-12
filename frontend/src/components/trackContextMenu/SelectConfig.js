@@ -14,8 +14,8 @@ class SelectConfig extends React.Component {
         /**
          * <option> choices.  Keys become choice names and values are those passed to the onOptionSet handler.
          */
-        choices: PropTypes.objectOf(PropTypes.string).isRequired,
-        defaultValue: PropTypes.string, // Default selected choice VALUE
+        choices: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])).isRequired,
+        defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // Default selected choice VALUE
 
         // For the following, see SingleInputConfig
         optionName: PropTypes.string.isRequired,
