@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== "test" && typeof window === "undefined") {
 } // else that script have better been included in a <script> tag!
 
 const MAX_GZIP_BLOCK_SIZE = 1 << 16;
-const DATA_FILTER_LIMIT_LENGTH = 30000;
+const DATA_FILTER_LIMIT_LENGTH = 300000;
 
 /**
  * Perform a network request for binary data.
@@ -46,7 +46,7 @@ class BedSourceWorker extends WorkerRunnableSource {
      * 
      * @param {string} url - the url of the bed-like file to fetch.
      */
-    constructor(url, dataLimit=10000) {
+    constructor(url, dataLimit=100000) {
         super();
         this.url = url;
         this.dataLimit = dataLimit;

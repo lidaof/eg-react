@@ -18,7 +18,7 @@ export class LongRangeSourceWorker extends WorkerRunnableSource {
                 const chr = regexMatch[1];
                 const start = Number.parseInt(regexMatch[2], 10);
                 const end = Number.parseInt(regexMatch[3], 10);
-                const score = Number.parseInt(regexMatch[4], 10);
+                const score = Number.parseFloat(regexMatch[4]);
                 const recordLocus1 = new ChromosomeInterval(record.chr, record.start, record.end);
                 const recordLocus2 = new ChromosomeInterval(chr, start, end);
                 interactions.push(new GenomeInteraction(recordLocus1, recordLocus2, score));

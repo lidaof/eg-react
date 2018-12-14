@@ -74,8 +74,8 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} ignoreMouse={true} >
                 <div>
-                    <div>{interaction.locus1.toString()}</div>
-                    <div>{interaction.locus2.toString()}</div>
+                    <div>Locus1: {interaction.locus1.toString()}</div>
+                    <div>Locus2: {interaction.locus2.toString()}</div>
                     <div>Score: {interaction.score}</div>
                 </div>
             </Tooltip>
