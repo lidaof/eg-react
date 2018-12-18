@@ -51,8 +51,14 @@ export class BigInteractTrackConfig extends TrackConfig {
      */
     formatData(data: any[]) {
         return data.map(record => {
-            const recordLocus1 = new ChromosomeInterval(record.region1Chrom, record.region1Start, record.region1End);
-            const recordLocus2 = new ChromosomeInterval(record.region2Chrom, record.region2Start, record.region2End);
+            let recordLocus1, recordLocus2;
+            if (record.hasOwnProperty('sourceChrom')) { // some bigBed use different -as options
+                recordLocus1 = new ChromosomeInterval(record.sourceChrom, record.sourceStart, record.sourceEnd);
+                recordLocus2 = new ChromosomeInterval(record.targetChrom, record.targetStart, record.targetEnd);
+            } else {
+                recordLocus1 = new ChromosomeInterval(record.region1Chrom, record.region1Start, record.region1End);
+                recordLocus2 = new ChromosomeInterval(record.region2Chrom, record.region2Start, record.region2End);
+            }
             return new GenomeInteraction(recordLocus1, recordLocus2, record.score);
         });
     }
