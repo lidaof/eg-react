@@ -271,8 +271,8 @@ class StrandVisualizer extends React.PureComponent {
             const currentRecord = data[x][strand];
             const nextRecord = data[x + 1][strand];
             if (currentRecord && nextRecord) {
-                if (nextRecord.depth < depthFilter) {
-                    return null;
+                if (currentRecord.depth < depthFilter) {
+                    continue;
                 }
                 const y1 = scales.depthToY(currentRecord.depth);
                 const y2 = scales.depthToY(nextRecord.depth);

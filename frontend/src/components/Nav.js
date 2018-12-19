@@ -252,9 +252,6 @@ class Nav extends React.Component {
                 <div className="Nav-center">
                     <DropdownOpener extraClassName="btn-warning" label="📖Help" />
                     <div className="dropdown-menu">
-                        <label className="dropdown-item">
-                            <a href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
-                        </label>
                         <ModalMenuItem itemLabel="Hotkeys" style={{content: {
                                                         left: "unset",
                                                         bottom: "unset",
@@ -264,7 +261,19 @@ class Nav extends React.Component {
                             <HotKeyInfo  />
                         </ModalMenuItem>
                         <label className="dropdown-item">
+                            <a href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
+                        </label>
+                        <label className="dropdown-item">
                             <a href="http://epigenomegateway.wustl.edu/legacy" target="_blank">The 'old' browser</a>
+                        </label>
+                        <label className="dropdown-item">
+                            <a href="https://plus.google.com/u/0/communities/104985851965529755092" target="_blank">Google+ forum</a>
+                        </label>
+                        <label className="dropdown-item">
+                            <a href="https://bit.ly/2T1OKmP" target="_blank">Join our Slack</a>
+                        </label>
+                        <label className="dropdown-item">
+                            <a href="https://github.com/lidaof/eg-react" target="_blank">Source code</a>
                         </label>
                     </div>
                 </div>
