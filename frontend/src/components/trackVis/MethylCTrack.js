@@ -34,6 +34,8 @@ export const DEFAULT_OPTIONS = {
     isCombineStrands: false,
     colorsForContext: DEFAULT_COLORS_FOR_CONTEXT,
     depthColor: "#525252",
+    depthFilter: 0,
+    maxMethyl: 1,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -72,7 +74,7 @@ class MethylCTrack extends React.PureComponent {
         return xToRecords.map(MethylCRecord.aggregateByStrand);
     }
 
-    computeScales(xMap, height) {
+    computeScales(xMap, height, maxMethyl) {
         /*
         xMap = returnValueOfAggregateRecords = [
             {
@@ -96,7 +98,7 @@ class MethylCTrack extends React.PureComponent {
         const maxDepthReverse = _.maxBy(reverseRecords, 'depth') || { depth: 0 };
         const maxDepth = Math.max(maxDepthForward.depth, maxDepthReverse.depth);
         return {
-            methylToY: scaleLinear().domain([1, 0]).range([VERTICAL_PADDING, height]).clamp(true),
+            methylToY: scaleLinear().domain([maxMethyl, 0]).range([VERTICAL_PADDING, height]).clamp(true),
             depthToY: scaleLinear().domain([maxDepth, 0]).range([VERTICAL_PADDING, height]).clamp(true)
         };
     }
@@ -122,10 +124,13 @@ class MethylCTrack extends React.PureComponent {
     }
 
     renderTooltipContentsForStrand(strandsAtPixel, strand) {
-        const {depthColor, colorsForContext} = this.props.options;
+        const {depthColor, colorsForContext, depthFilter} = this.props.options;
         const dataAtPixel = strandsAtPixel[strand];
         let details = null;
         if (dataAtPixel) {
+            if (dataAtPixel.depth < depthFilter) {
+                return null;
+            }
             let dataElements = [];
             // Sort alphabetically by context name first
             const contextValues = _.sortBy(dataAtPixel.contextValues, 'context');
@@ -154,10 +159,10 @@ class MethylCTrack extends React.PureComponent {
 
     renderVisualizer() {
         const {width, options, forceSvg} = this.props;
-        const {height, colorsForContext, depthColor, isCombineStrands} = options;
+        const {height, colorsForContext, depthColor, isCombineStrands, depthFilter} = options;
         const childProps = {
             data: this.aggregatedRecords, scales: this.scales, htmlType: forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS,
-            width, height, colorsForContext, depthColor
+            width, height, colorsForContext, depthColor, depthFilter
         };
         let strandRenderers, tooltipY;
         if (isCombineStrands) {
@@ -184,14 +189,14 @@ class MethylCTrack extends React.PureComponent {
     render() {
         const {data, trackModel, viewRegion, width, options} = this.props;
         this.aggregatedRecords = this.aggregateRecords(data, viewRegion, width);
-        this.scales = this.computeScales(this.aggregatedRecords, options.height);
+        this.scales = this.computeScales(this.aggregatedRecords, options.height, options.maxMethyl);
         return <Track
             {...this.props}
             legend={
                 <div>
                     <TrackLegend trackModel={trackModel} height={options.height} axisScale={this.scales.methylToY} 
                     noShiftFirstAxisLabel={!options.isCombineStrands} />
-                    {!options.isCombineStrands && <ReverseStrandLegend trackModel={trackModel} height={options.height} />}
+                    {!options.isCombineStrands && <ReverseStrandLegend trackModel={trackModel} height={options.height} maxMethyl={options.maxMethyl} />}
                 </div>
             }
             visualizer={this.renderVisualizer()}
@@ -211,6 +216,7 @@ class StrandVisualizer extends React.PureComponent {
         colorsForContext: PropTypes.object.isRequired,
         depthColor: PropTypes.string.isRequired,
         htmlType: PropTypes.any,
+        depthFilter: PropTypes.number,
     };
 
     getColorsForContext(contextName) {
@@ -218,12 +224,15 @@ class StrandVisualizer extends React.PureComponent {
     }
 
     renderBarElement(x) {
-        const {data, scales, strand, height} = this.props;
+        const {data, scales, strand, height, depthFilter} = this.props;
         const pixelData = data[x][strand];
         if (!pixelData) {
             return null;
         }
 
+        if (pixelData.depth < depthFilter) {
+            return null;
+        }
         
         let backgroundColor;
         if (pixelData.contextValues.length === 1) {
@@ -256,12 +265,15 @@ class StrandVisualizer extends React.PureComponent {
     }
 
     renderDepthPlot() {
-        const {data, scales, strand, depthColor, height} = this.props;
+        const {data, scales, strand, depthColor, height, depthFilter} = this.props;
         let elements = [];
         for (let x = 0; x < data.length - 1; x++) {
             const currentRecord = data[x][strand];
             const nextRecord = data[x + 1][strand];
             if (currentRecord && nextRecord) {
+                if (nextRecord.depth < depthFilter) {
+                    return null;
+                }
                 const y1 = scales.depthToY(currentRecord.depth);
                 const y2 = scales.depthToY(nextRecord.depth);
                 elements.push(<line key={x} x1={x} y1={y1} x2={x + 1} y2={y2} stroke={depthColor} />);
@@ -309,6 +321,6 @@ function ReverseStrandLegend(props) {
         trackModel={mockTrackModel}
         height={props.height}
         hideFirstAxisLabel={true}
-        axisScale={scaleLinear().domain([0, 1]).range([0, props.height - VERTICAL_PADDING])}
+        axisScale={scaleLinear().domain([0, props.maxMethyl]).range([0, props.height - VERTICAL_PADDING])}
     />;
 }
