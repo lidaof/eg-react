@@ -210,6 +210,10 @@ function getInitialState() {
                 {type: "hic", url: query.hicUrl, name: urlComponets[urlComponets.length - 1].split('.')[0]});
             newState =  {...tmpState, tracks: [track]};
         }
+        if(query.position) {
+            const interval = newState.viewRegion.getNavigationContext().parse(query.position);
+            newState = getNextState(newState, {type: ActionType.SET_VIEW_REGION, ...interval});
+        }
         return newState || state;
     }
     const blob = STORAGE.getItem(SESSION_KEY);
@@ -221,7 +225,6 @@ function getInitialState() {
             console.error(error);
         }
     }
-
     return state;
 }
 

@@ -11,11 +11,15 @@ import configOptionMerging from './commonComponents/configOptionMerging';
 
 import { RepeatMaskerFeature } from '../../model/RepeatMaskerFeature';
 import { AnnotationDisplayModes } from '../../model/DisplayModes';
+import { TranslatableG } from '../TranslatableG';
+import BackgroundedText from './commonComponents/BackgroundedText';
+import { getContrastingColor } from '../../util';
 
 import './commonComponents/tooltip/Tooltip.css';
 
 export const MAX_BASES_PER_PIXEL = 6000; // The higher this number, the more zooming out we support
 const TOP_PADDING = 2;
+const TEXT_HEIGHT = 9;
 export const DEFAULT_OPTIONS = {
     maxRows: 1,
     height: 40,
@@ -74,23 +78,48 @@ class RepeatTrack extends React.PureComponent {
 
             const categoryId = feature.getCategoryId();
             const color = categoryColors[categoryId];
-
+            const contrastColor = getContrastingColor(color);
             const y = this.state.valueToY(feature.value);
             const drawHeight = height - y;
+            const width = xSpan.getLength();
             if (drawHeight <= 0) {
                 return null;
             }
-
-            return <rect
-                key={i}
+            const mainBody = <rect
                 x={xSpan.start}
                 y={y}
-                width={xSpan.getLength()}
+                width={width}
                 height={drawHeight}
                 fill={color}
                 fillOpacity={0.75}
-                onClick={event => this.renderTooltip(event, feature)}
+                
             />;
+            let label = null;
+            const strandText = feature.strand === '+' ? '>' : '<';
+            const labelText = `${strandText} ${feature.getName()} ${strandText}`;
+            const estimatedLabelWidth = labelText.length * TEXT_HEIGHT;
+            if (estimatedLabelWidth < 0.9 * width) {
+                const centerX = xSpan.start+ 0.5 * width;
+                const centerY = (drawHeight - TEXT_HEIGHT + 1) * 0.8;
+                label = (
+                    <BackgroundedText
+                        x={centerX}
+                        y={centerY}
+                        height={TEXT_HEIGHT - 1}
+                        fill={contrastColor}
+                        dominantBaseline="hanging"
+                        textAnchor="middle"
+                    >
+                        {labelText}
+                    </BackgroundedText>
+                );
+            }
+            return (
+                <TranslatableG y={y} onClick={event => this.renderTooltip(event, feature)} key={i}>
+                    {mainBody}
+                    {label}
+                </TranslatableG>
+                );
         });
     }
 
