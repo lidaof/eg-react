@@ -2,13 +2,18 @@ import { NumericalTrackConfig } from './NumericalTrackConfig';
 import NumericalTrack from '../trackVis/commonComponents/numerical/NumericalTrack';
 
 import { BigWorker } from '../../dataSources/WorkerTSHook';
+import LocalBigSource from '../../dataSources/big/LocalBigSource';
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 import { NumericalFeature } from '../../model/Feature';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 
 export class BigWigTrackConfig extends NumericalTrackConfig {
     initDataSource() {
-        return new WorkerSource(BigWorker, this.trackModel.url);
+        if (this.trackModel.fileObj) {
+            return new LocalBigSource(this.trackModel.fileObj);
+        } else {
+            return new WorkerSource(BigWorker, this.trackModel.url);
+        }
     }
 
     /*

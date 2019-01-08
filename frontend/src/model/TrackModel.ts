@@ -34,6 +34,7 @@ interface ITrackModel {
     options: TrackOptions;
     url: string;
     metadata: ITrackModelMetadata;
+    fileObj?: Blob;
 }
 
 let nextId = 0;
@@ -61,6 +62,8 @@ export class TrackModel {
     id: number;
     isSelected: boolean;
     showOnHubLoad?: boolean;
+    fileObj?: null;
+    files?: null;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
@@ -74,6 +77,8 @@ export class TrackModel {
         this.url = this.url || "";
         this.metadata = this.metadata || {};
         this.metadata["Track type"] = this.type;
+        this.fileObj = this.fileObj;
+        this.files = this.files;
 
         // Other misc props
         this.id = nextId;

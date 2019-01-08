@@ -19,7 +19,9 @@ import FacetTableUI from "./FacetTableUI";
 import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "../AppState";
 import { HotKeyInfo } from "./HotKeyInfo";
 import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
+import { TrackUpload } from "./TrackUpload";
 import packageJson from '../../package.json';
+
 
 import './Nav.css';
 
@@ -176,6 +178,11 @@ class Nav extends React.Component {
                                 addTracktoAvailable={addTracktoAvailable}
                                 removeTrackFromAvailable={removeTrackFromAvailable}
                                 availableTrackSets={availableTrackSets}
+                            />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Upload Track">
+                            <TrackUpload 
+                                onTracksAdded={onTracksAdded}
                             />
                         </ModalMenuItem>
                     </div>

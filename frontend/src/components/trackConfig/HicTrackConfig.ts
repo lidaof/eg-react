@@ -17,7 +17,11 @@ export class HicTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
-        return new HicSource(this.trackModel.url);
+        if(this.trackModel.fileObj) {
+            return new HicSource(this.trackModel.fileObj);
+        } else {
+            return new HicSource(this.trackModel.url);
+        }
     }
 
     getComponent() {

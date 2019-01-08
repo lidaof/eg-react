@@ -30,7 +30,7 @@ export class AppStateSaver {
         const object = {
             genomeName: appState.genomeName,
             viewInterval: appState.viewRegion ? appState.viewRegion.getContextCoordinates().serialize() : null,
-            tracks: appState.tracks.map(track => track.serialize()),
+            tracks: appState.tracks.filter(track => !track.fileObj).map(track => track.serialize()),
             metadataTerms: appState.metadataTerms,
             regionSets: appState.regionSets.map(set => set.serialize()),
             regionSetViewIndex,

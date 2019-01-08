@@ -6,12 +6,17 @@ import { BedWorker } from '../../dataSources/WorkerTSHook';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import { NumericalFeature } from '../../model/Feature';
 import BedRecord from '../../dataSources/bed/BedRecord';
+import LocalBedSource from '../../dataSources/LocalBedSource';
 
 const VALUE_COLUMN_INDEX = 3;
 
 export class BedGraphTrackConfig extends NumericalTrackConfig {
     initDataSource() {
-        return new WorkerSource(BedWorker, this.trackModel.url);
+        if (this.trackModel.files) {
+            return new LocalBedSource(this.trackModel.files);
+        } else {
+            return new WorkerSource(BedWorker, this.trackModel.url);
+        }
     }
 
     /**

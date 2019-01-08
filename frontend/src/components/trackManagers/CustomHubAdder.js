@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import JSON5 from 'json5';
 import Json5Fetcher from '../../model/Json5Fetcher';
 import DataHubParser from '../../model/DataHubParser';
-import TrackList from './TrackList';
 
 /**
  * custom hub add UI
