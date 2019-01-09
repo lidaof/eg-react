@@ -8,6 +8,7 @@ import HeightConfig from '../trackContextMenu/HeightConfig';
 import { TrackConfig } from './TrackConfig';
 import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import { CategoryColorConfig } from '../trackContextMenu/CategoryColorConfig';
+import LocalBedSource from '../../dataSources/LocalBedSource';
 
 enum BedColumnIndex {
     CATEGORY=3,
@@ -16,7 +17,11 @@ enum BedColumnIndex {
 export class CategoricalTrackConfig extends TrackConfig {
     
     initDataSource() {
-        return new WorkerSource(BedWorker, this.trackModel.url);
+        if (this.trackModel.files) {
+            return new LocalBedSource(this.trackModel.files);
+        } else {
+            return new WorkerSource(BedWorker, this.trackModel.url);
+        }
     }
 
      /**

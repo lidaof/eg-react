@@ -6,6 +6,7 @@ import GeneAnnotationTrack from '../trackVis/geneAnnotationTrack/GeneAnnotationT
 import { DEFAULT_OPTIONS } from '../trackVis/geneAnnotationTrack/GeneAnnotation';
 import Gene, { IdbRecord } from '../../model/Gene';
 import { TrackModel } from '../../model/TrackModel';
+import LocalBedSource from '../../dataSources/LocalBedSource';
 
 export class RefBedTrackConfig extends AnnotationTrackConfig {
     constructor(trackModel: TrackModel) {
@@ -14,7 +15,11 @@ export class RefBedTrackConfig extends AnnotationTrackConfig {
     }
     
     initDataSource() {
-        return new WorkerSource(BedWorker, this.trackModel.url);
+        if (this.trackModel.files) {
+            return new LocalBedSource(this.trackModel.files);
+        } else {
+            return new WorkerSource(BedWorker, this.trackModel.url);
+        }
     }
 
     /**

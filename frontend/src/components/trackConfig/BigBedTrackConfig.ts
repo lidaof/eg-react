@@ -2,6 +2,7 @@ import { AnnotationTrackConfig } from './AnnotationTrackConfig';
 import { BedTrack } from '../trackVis/bedTrack/BedTrack';
 
 import { BigWorker } from '../../dataSources/WorkerTSHook';
+import LocalBigSource from '../../dataSources/big/LocalBigSource';
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 import Feature from '../../model/Feature';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
@@ -22,7 +23,11 @@ DASFeature {
 
 export class BigBedTrackConfig extends AnnotationTrackConfig {
     initDataSource() {
-        return new WorkerSource(BigWorker, this.trackModel.url);
+        if (this.trackModel.fileObj) {
+            return new LocalBigSource(this.trackModel.fileObj);
+        } else {
+            return new WorkerSource(BigWorker, this.trackModel.url);
+        }
     }
 
     /**

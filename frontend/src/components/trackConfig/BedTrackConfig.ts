@@ -6,6 +6,7 @@ import { BedWorker } from '../../dataSources/WorkerTSHook';
 import BedRecord from '../../dataSources/bed/BedRecord';
 import Feature from '../../model/Feature';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
+import LocalBedSource from '../../dataSources/LocalBedSource';
 
 enum BedColumnIndex {
     NAME=3,
@@ -15,7 +16,11 @@ enum BedColumnIndex {
 
 export class BedTrackConfig extends AnnotationTrackConfig {
     initDataSource() {
-        return new WorkerSource(BedWorker, this.trackModel.url);
+        if (this.trackModel.files) {
+            return new LocalBedSource(this.trackModel.files);
+        } else {
+            return new WorkerSource(BedWorker, this.trackModel.url);
+        }
     }
 
     /**

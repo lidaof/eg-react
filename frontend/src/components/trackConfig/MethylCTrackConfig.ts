@@ -11,7 +11,7 @@ import { MethylColorConfig, ReadDepthColorConfig } from '../trackContextMenu/Met
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 import { BedWorker } from '../../dataSources/WorkerTSHook';
 import BedRecord from '../../dataSources/bed/BedRecord';
-
+import LocalBedSource from '../../dataSources/LocalBedSource';
 import MethylCRecord from '../../model/MethylCRecord';
 import { TrackModel } from '../../model/TrackModel';
 
@@ -22,7 +22,11 @@ export class MethylCTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
-        return new WorkerSource(BedWorker, this.trackModel.url);
+        if (this.trackModel.files) {
+            return new LocalBedSource(this.trackModel.files);
+        } else {
+            return new WorkerSource(BedWorker, this.trackModel.url);
+        }
     }
 
     /**

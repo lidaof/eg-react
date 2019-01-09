@@ -42,17 +42,17 @@ export class TrackUpload extends React.Component {
             );
         } else {
             if (fileList.length !== 2) {
-                notify.show('Aborting, please only select 2 files, the track file and the index file', 'error', 3000);
+                notify.show('Aborting, please only select 2 files, the track file and the index file', 'error', 5000);
                 return null;
             }
-            if (fileList[0].name.replace(".tbi", "") !== fileList[0].name.replace(".tbi", "")) {
-                notify.show('Aborting, track file not match index file', 'error', 3000);
+            if (fileList[0].name.replace(".tbi", "") !== fileList[1].name.replace(".tbi", "")) {
+                notify.show('Aborting, track file not match index file', 'error', 5000);
                 return null;
             }
             tracks = [new TrackModel({
                 type: this.state.fileType,
                 url: null,
-                fileObj: null,
+                fileObj: fileList[0],
                 name: fileList[0].name,
                 label: fileList[0].name,
                 files: fileList,
@@ -67,7 +67,7 @@ export class TrackUpload extends React.Component {
                 <label>
                     <h3>1. Choose track file type:</h3> 
                     <select value={this.state.fileType} onChange={this.handleTypeChange}>
-                        <optgroup label="select only the track file (can select many)">
+                        <optgroup label="select only the track file (can select many of same type)">
                             <option value="bigWig">bigWig</option>
                             <option value="bigBed">bigBed</option>
                             <option value="hic">HiC</option>

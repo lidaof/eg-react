@@ -1,6 +1,7 @@
 import { TrackConfig } from './TrackConfig';
 import InteractionTrack, { DEFAULT_OPTIONS } from '../trackVis/interactionTrack/InteractionTrack';
 import { BigWorker } from '../../dataSources/WorkerTSHook';
+import LocalBigSource from '../../dataSources/big/LocalBigSource';
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import { GenomeInteraction } from '../../model/GenomeInteraction';
@@ -40,7 +41,11 @@ export class BigInteractTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
-        return new WorkerSource(BigWorker, this.trackModel.url);
+        if (this.trackModel.fileObj) {
+            return new LocalBigSource(this.trackModel.fileObj);
+        } else {
+            return new WorkerSource(BigWorker, this.trackModel.url);
+        }
     }
 
     /**

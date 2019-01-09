@@ -9,6 +9,7 @@ import { InteractionDisplayModeConfig } from '../trackContextMenu/DisplayModeCon
 import ScoreConfig from '../trackContextMenu/ScoreConfig';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import { GenomeInteraction } from '../../model/GenomeInteraction';
+import LocalBedSource from '../../dataSources/LocalBedSource';
 
 export class LongRangeTrackConfig extends TrackConfig {
     constructor(props: any) {
@@ -17,7 +18,11 @@ export class LongRangeTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
-        return new WorkerSource(BedWorker, this.trackModel.url);
+        if (this.trackModel.files) {
+            return new LocalBedSource(this.trackModel.files);
+        } else {
+            return new WorkerSource(BedWorker, this.trackModel.url);
+        }
     }
 
     /**

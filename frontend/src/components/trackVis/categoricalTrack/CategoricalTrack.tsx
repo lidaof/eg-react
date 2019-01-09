@@ -71,7 +71,8 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
                 xSpan={placement.xSpan}
                 y={0}
                 isMinimal={false}
-                color={this.props.options.category[placement.feature.getName()].color}
+                color={this.props.options.category ? 
+                    this.props.options.category[placement.feature.getName()].color: 'blue'}
                 onClick={this.renderTooltip}
                 category={this.props.options.category}
                 height={this.props.options.height}
