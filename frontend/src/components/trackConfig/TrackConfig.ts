@@ -34,6 +34,17 @@ export class TrackConfig {
         return Object.assign({}, this.defaultOptions, this.trackModel.options);
     }
 
+    /**
+     * Gets whether a change in options should cause a data fetch.
+     * 
+     * @param {TrackOptions} oldOptions - previous options of the track
+     * @param {TrackOptions} oldOptions - new options
+     * @return {boolean} whether a data fetch is suggested due to a change in options
+     */
+    shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
+        return false;
+    }
+
     getComponent(): React.ComponentType {
         return UnknownTrack;
     }
