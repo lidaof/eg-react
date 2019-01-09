@@ -8,6 +8,8 @@ import { ensureMaxListLength } from '../../util';
 import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment }
     from '../../model/alignment/AlignmentViewCalculator';
 
+import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
+
 const FINE_MODE_HEIGHT = 45;
 const ROUGH_MODE_HEIGHT = 80;
 const RECT_HEIGHT = 15;
@@ -73,6 +75,15 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                     height={RECT_HEIGHT}
                 />
             );
+            const Arrows = nonGaps.map((segment, i) =>
+                <AnnotationArrows
+                    startX={segment.xSpan.start}
+                    endX={segment.xSpan.end}
+                    height={RECT_HEIGHT}
+                    isToRight={placement.record.getIsForwardStrand}
+                    color={"whilte"}
+                />
+            );
 
             return <React.Fragment>
                 <line
@@ -84,6 +95,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                     strokeDasharray={4}
                 />
                 {rects}
+                {Arrows}
                 {letters}
             </React.Fragment>
         }
