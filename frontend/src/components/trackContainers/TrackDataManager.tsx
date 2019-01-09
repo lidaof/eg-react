@@ -53,14 +53,14 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
         }
 
         componentDidMount() {
-            this.fetchTracks();
+            this.fetchAllTracks();
         }
 
         componentDidUpdate(prevProps: DataManagerProps) {
             if (this.props.viewRegion !== prevProps.viewRegion) {
-                this.fetchTracks(); // Fetch all
+                this.fetchAllTracks();
             } else if (this.props.tracks !== prevProps.tracks) {
-                this.fetchTracks(prevProps.tracks); // Fetch some
+                this.detectChangedTracks(prevProps.tracks); // Fetch some
             }
         }
 
@@ -72,17 +72,29 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
             return region === this.props.viewRegion;
         }
 
-        fetchTracks(prevTracks: TrackModel[] = []) {
-            const addedTracks = _.differenceBy(this.props.tracks, prevTracks, track => track.getId());
-            const removedTracks = _.differenceBy(prevTracks, this.props.tracks, track => track.getId());
+        detectChangedTracks(prevTracks: TrackModel[]) {
+            const currentTracks = this.props.tracks;
+            const prevTrackForId = new Map();
+            for (const track of prevTracks) {
+                prevTrackForId.set(track.getId(), track);
+            }
+
+            const addedTracks = _.differenceBy(currentTracks, prevTracks, track => track.getId());
+            const removedTracks = _.differenceBy(prevTracks, currentTracks, track => track.getId());
+            const keptTracks = _.intersectionBy(currentTracks, prevTracks, track => track.getId());
             for (const track of addedTracks) {
                 this.fetchTrack(track);
             }
-            const tracksWithBinsizeChanged = _.differenceBy(this.props.tracks, 
-                prevTracks, track => track.options.binSize);
-            for (const track of tracksWithBinsizeChanged) {
-                this.fetchTrack(track);
+
+            for (const track of keptTracks) {
+                const prevTrack = prevTrackForId.get(track.getId());
+                const config = getTrackConfig(track);
+                const prevConfig = getTrackConfig(prevTrack);
+                if (config.shouldFetchBecauseOptionChange(prevConfig.getOptions(), config.getOptions())) {
+                    this.fetchTrack(track);
+                }
             }
+
             // Clean up the data sources and state of removed tracks
             const deletionUpdate = {};
             for (const track of removedTracks) {
@@ -91,6 +103,12 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
                 delete deletionUpdate[id];
             }
             this.setState(deletionUpdate);
+        }
+
+        fetchAllTracks() {
+            for (const track of this.props.tracks) {
+                this.fetchTrack(track);
+            }
         }
 
         async fetchTrack(track: TrackModel) {

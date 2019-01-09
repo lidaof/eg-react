@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import DataSource from './DataSource';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
+import { NormalizationMode, SORTED_BIN_SIZES, BinSize } from 'src/model/HicDataModes';
 import { GenomeInteraction } from '../model/GenomeInteraction';
 import { ensureMaxListLength } from '../util';
 
@@ -29,12 +30,13 @@ window.hic.Dataset.prototype.getChrIndexFromName = function(name) {
 }
 
 const MIN_BINS_PER_REGION = 50;
-const BIN_SIZES = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000];
 
 export class HicSource extends DataSource {
     constructor(url) {
         super();
         this.straw = new window.hic.Straw({ url: url });
+        this.normVectorsPromise = this.straw.reader.loadDataset({})
+            .then(dataset => this.straw.reader.readNormExpectedValuesAndNormVectorIndex(dataset))
     }
 
     /**
@@ -46,18 +48,24 @@ export class HicSource extends DataSource {
     */
     getAutoBinSize(region) {
         const regionLength = region.getWidth();
-        // const loci = region.getGenomeIntervals();
-        // if (loci.length > 1) {
-        //     if (loci[0].chr !== loci[loci.length - 1].chr) {
-        //         return 6000000; // 6Mb for different chroms
-        //     }
-        // }
-        for (let binSize of BIN_SIZES) { // BIN_SIZES must be sorted from largest to smallest!
+        for (const binSize of SORTED_BIN_SIZES) { // SORTED_BIN_SIZES must be sorted from largest to smallest!
             if (MIN_BINS_PER_REGION * binSize < regionLength) {
                 return binSize;
             }
-        }
-        return BIN_SIZES[BIN_SIZES.length - 1];
+        } 
+        return SORTED_BIN_SIZES[SORTED_BIN_SIZES.length - 1];
+    }
+
+    /**
+     * Gets the bin size to use during data fetch
+     * 
+     * @param {TrackOptions} options - HiC track options
+     * @param {DisplayedRegionModel} region - region to fetch, to be used in case of auto bin size
+     * @return {number} bin size to use during data fetch
+     */
+    getBinSize(options, region) {
+        const numberBinSize = Number(options.binSize) || 0;
+        return numberBinSize <= 0 ? this.getAutoBinSize(region) : numberBinSize;
     }
 
     /**
@@ -66,10 +74,14 @@ export class HicSource extends DataSource {
      * @param {ChromosomeInterval} queryLocus1 
      * @param {ChromosomeInterval} queryLocus2 
      * @param {number} binSize 
+     * @param {NormalizationMode} normalization
+     * @return {GenomeInteraction[]} 
      */
-    async getInteractionsBetweenLoci(queryLocus1, queryLocus2, binSize) {
-        // NONE/VC/VC_SQRT/KR  normalization
-        const records = await this.straw.getContactRecords('NONE', queryLocus1, queryLocus2, 'BP', binSize);
+    async getInteractionsBetweenLoci(queryLocus1, queryLocus2, binSize, normalization=NormalizationMode.NONE) {
+        if (normalization !== NormalizationMode.NONE) {
+            await this.normVectorsPromise;
+        }
+        const records = await this.straw.getContactRecords(normalization, queryLocus1, queryLocus2, 'BP', binSize);
         const interactions = [];
         for (const record of records) {
             const recordLocus1 = new ChromosomeInterval(
@@ -92,17 +104,12 @@ export class HicSource extends DataSource {
      * @return {Promise<ContactRecord>} a Promise for the data
      */
     async getData(region, basesPerPixel, options) {
-        const binSize = options.binSize && Number.parseInt(options.binSize) !== 0 ? Number.parseInt(options.binSize): this.getAutoBinSize(region);
+        const binSize = this.getBinSize(options, region);
         const promises = [];
         const loci = region.getGenomeIntervals();
-        // for (const [index1,locus1] of loci.entries()) {
-        //     for (const locus2 of loci.slice(index1)) {
-        //         promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
-        //     }
-        // }
         for (let i = 0; i < loci.length; i++) {
             for (let j = i; j < loci.length; j++) {
-                promises.push(this.getInteractionsBetweenLoci(loci[i], loci[j], binSize));
+                promises.push(this.getInteractionsBetweenLoci(loci[i], loci[j], binSize, options.normalization));
             }
         }
         const dataForEachSegment = await Promise.all(promises);
@@ -110,19 +117,19 @@ export class HicSource extends DataSource {
     }
 
     async getDataAll(region, options) {
-        const binSize = options.binSize && Number.parseInt(options.binSize) !== 0 ? Number.parseInt(options.binSize): this.getAutoBinSize(region);
+        const binSize = this.getBinSize(options, region);
         const promises = [];
         const loci = region.getGenomeIntervals();
-        // const locus2 = new ChromosomeInterval('chr7', 0, 145441459);
-        // const locus2 = {chr: "all"};
         const navContext = region.getNavigationContext();
-        navContext.getFeatures().forEach(feature => {
+        for (let feature of navContext.getFeatures()) {
             for (const locus1 of loci) {
                 const locus2 = feature.getLocus();
-                if(locus2.chr === 'chrM') {continue;}
+                if (locus2.chr === 'chrM') {
+                    continue;
+                }
                 promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
             }
-        });
+        }
         const dataForEachSegment = await Promise.all(promises);
         const allData =  _.flatMap(dataForEachSegment);
         const chrSets = new Set(loci.map(item => item.chr));
