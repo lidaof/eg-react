@@ -9,8 +9,8 @@ import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment }
     from '../../model/alignment/AlignmentViewCalculator';
 
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
-
-const FINE_MODE_HEIGHT = 45;
+const FINE_MODE_HEIGHT = 80;
+const ALI_MGN = 20; // The margin on top and bottom of alignment block
 const ROUGH_MODE_HEIGHT = 80;
 const RECT_HEIGHT = 15;
 const FONT_SIZE = 10;
@@ -49,11 +49,13 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         const querySequence = placement.visiblePart.getQuerySequence();
 
         return <React.Fragment key={i} >
-            {renderSequenceSegments(targetSequence, targetSegments, 0, PRIMARY_COLOR)}
-            {renderSequenceSegments(querySequence, querySegments, FINE_MODE_HEIGHT - RECT_HEIGHT, QUERY_COLOR)}
+            {renderSequenceSegments(targetSequence, targetSegments, ALI_MGN, PRIMARY_COLOR, false)}
+            {renderSequenceSegments(querySequence, querySegments, FINE_MODE_HEIGHT-RECT_HEIGHT-ALI_MGN, QUERY_COLOR, 
+                true)}
         </React.Fragment>;
 
-        function renderSequenceSegments(sequence: string, segments: PlacedSequenceSegment[], y: number, color: string) {
+        function renderSequenceSegments(sequence: string, segments: PlacedSequenceSegment[], y: number, color: string,
+            isQuery: boolean) {
             const nonGaps = segments.filter(segment => !segment.isGap);
             const rects = nonGaps.map((segment, i) =>
                 <rect
@@ -77,15 +79,24 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             );
             const Arrows = nonGaps.map((segment, i) =>
                 <AnnotationArrows
+                    key={i}
                     startX={segment.xSpan.start}
                     endX={segment.xSpan.end}
+                    y={FINE_MODE_HEIGHT - RECT_HEIGHT - ALI_MGN}
                     height={RECT_HEIGHT}
-                    isToRight={placement.record.getIsForwardStrand}
-                    color={"whilte"}
+                    isToRight={!placement.record.getIsReverseStrandQuery()}
+                    color={"white"}
                 />
             );
 
             return <React.Fragment>
+                <line
+                    x1={xStart}
+                    y1={isQuery?y + RECT_HEIGHT:y}
+                    x2={xStart + 10}
+                    y2={isQuery?y + RECT_HEIGHT + 10:y - 10}
+                    stroke={color}
+                />
                 <line
                     x1={xStart}
                     y1={y + 0.5 * RECT_HEIGHT}
@@ -97,6 +108,13 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 {rects}
                 {Arrows}
                 {letters}
+                <line
+                    x1={xEnd}
+                    y1={isQuery?y + RECT_HEIGHT:y}
+                    x2={xEnd - 10}
+                    y2={isQuery?y + RECT_HEIGHT + 10:y - 10}
+                    stroke={color}
+                />
             </React.Fragment>
         }
     }
