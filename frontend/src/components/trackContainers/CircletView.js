@@ -1,23 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { RadioGroup, RadioButton } from 'react-radio-buttons';
 import _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import { scaleLinear } from 'd3-scale';
+
+import { RadioGroup, RadioButton } from 'react-radio-buttons';
 import Circos, { CHORDS } from '../../react-circos/index';
+
 import TrackModel from '../../model/TrackModel';
-import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
-import { HicSource } from '../../dataSources/HicSource';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
+import { HicSource } from '../../dataSources/HicSource';
+import withCurrentGenome from '../withCurrentGenome';
+
 import ColorPicker from '../ColorPicker';
+import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
 
 import './CircletView.css';
+
+const DRAW_LIMIT = 5000;
 
 /**
  * a component to draw circlet view for long range tracks
  * @author Daofeng Li
  */
-
-export class CircletView extends React.Component {
+class CircletViewNoGenome extends React.Component {
     static propTypes = {
         size: PropTypes.number,
         primaryView: PropTypes.object,
@@ -25,6 +31,7 @@ export class CircletView extends React.Component {
         track: PropTypes.instanceOf(TrackModel),
         color: PropTypes.string,
         setCircletColor: PropTypes.func,
+        genomeConfig: PropTypes.object.isRequired
     };
 
     static defaultProps = {
@@ -33,7 +40,7 @@ export class CircletView extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state={
+        this.state= {
             isLoadingData: true,
             layoutKey: "currentRegion",
             layout: {},
@@ -45,32 +52,42 @@ export class CircletView extends React.Component {
             isChecked: false,
             flanking: 0,
         };
+        if (props.track.type === 'hic') {
+            this.hicSource = new HicSource(props.track.url);
+        }
         this.scale = null;
+        this.getChords = memoizeOne(this.getChords);
     }
 
     async componentDidMount(){
-        const { track, primaryView, trackData} = this.props;
+        const { track, primaryView, trackData, genomeConfig } = this.props;
         const layout = this.getLayout();
         const currentData = this.getCurrentData();
         const max2 = _.maxBy(currentData, 'value');
         const min2 = _.minBy(currentData, 'value');
         const max = max2 ? max2.value : 0;
         const min = min2 ? min2.value : 0;
-        this.setState( {
+        this.setState({
             layout,
             currentData,
-            scoreMin: min, 
+            scoreMin: min,
             scoreMax: max,
         });
+
         if (track.type === 'hic') { // only hic need load additional data
-            const dataSource = new HicSource(track.url);
-            const data = await dataSource.getDataAll(primaryView.visRegion, {});
-            this.setState( {
+            const interactions = await this.hicSource.getDataAll(genomeConfig.navContext);
+            const currentChromosomes = new Set(
+                primaryView.viewWindowRegion.getGenomeIntervals().map(locus => locus.chr)
+            );
+            const dataInView = interactions.filter(interaction =>
+                currentChromosomes.has(interaction.locus1.chr) && currentChromosomes.has(interaction.locus2.chr)
+            );
+            this.setState({
                 isLoadingData: false,
                 data: {
                     currentRegion: trackData[track.id].data,
-                    currentChromosome: data[0],
-                    wholeGenome: data[1],
+                    currentChromosome: dataInView,
+                    wholeGenome: interactions,
                 }
             });
         } else {
@@ -131,8 +148,8 @@ export class CircletView extends React.Component {
     }
 
     getLayout = () => {
-        const { primaryView, track, trackData } = this.props;
-        const navContext = primaryView.visRegion.getNavigationContext();
+        const { primaryView, track, trackData, genomeConfig } = this.props;
+        const navContext = genomeConfig.navContext;
         const chrSet = new Set();
         trackData[track.id].data.forEach(item => {
             chrSet.add(item.locus1.chr);
@@ -237,9 +254,9 @@ export class CircletView extends React.Component {
                 value: item.score
             };
         });
-        return chords;
+        chords.sort((a, b) => b.value - a.value);
+        return chords.slice(0, DRAW_LIMIT); // Only the DRAW_LIMIT highest scores
     };
-
 
     downloadSvg = () => {
         const box = document.querySelector('#circletViewContainer');
@@ -374,3 +391,5 @@ export class CircletView extends React.Component {
         );
     }
 }
+
+export const CircletView = withCurrentGenome(CircletViewNoGenome);
