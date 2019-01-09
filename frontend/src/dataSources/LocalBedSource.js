@@ -33,7 +33,7 @@ async function readLocalData(file, range) {
  * A DataSource that gets BedRecords from remote bed files.  Designed to run in webworker context.  Only indexed bed
  * files supported.
  * 
- * @author Silas Hsu
+ * @author Silas Hsu and Daofeng Li
  */
 class LocalBedSource extends DataSource {
     /**
@@ -45,8 +45,8 @@ class LocalBedSource extends DataSource {
     constructor(files, dataLimit=100000) {
         super();
         this.files = files;
-        this.indexFile = Array.from(files).filter(f => f.name.endsWith('.tbi'))[0];
-        this.dataFile = Array.from(files).filter(f => !f.name.endsWith('.tbi'))[0];
+        this.indexFile = files.filter(f => f.name.endsWith('.tbi'))[0];
+        this.dataFile = files.filter(f => !f.name.endsWith('.tbi'))[0];
         this.dataLimit = dataLimit;
         this.indexPromise = readLocalData(this.indexFile).then((rawData) => { // rawData is an ArrayBuffer
             let decompressor = new window.Zlib.Gunzip(new Uint8Array(rawData)); // eslint-disable-line no-restricted-globals
