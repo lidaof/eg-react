@@ -9,6 +9,7 @@ import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment }
     from '../../model/alignment/AlignmentViewCalculator';
 
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
+import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 const FINE_MODE_HEIGHT = 80;
 const ALI_MGN = 20; // The margin on top and bottom of alignment block
 const ROUGH_MODE_HEIGHT = 80;
@@ -78,6 +79,22 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         }
         function renderSequenceSegments(sequence: string, segments: PlacedSequenceSegment[], y: number, color: string,
             isQuery: boolean) {
+            const lastXend = 0;
+            const lastTargetChr = 'chr1'
+            const lastTargetEnd = 0;
+            const lastQueryChr = 'chr1'
+            const lastQueryEnd = 0;
+            const lastStrand = '+';
+            const targetChr = placement.record.locus.chr;
+            const targetStart = placement.record.locus.start;
+            const queryChr = placement.record.queryLocus.chr;
+            const queryStart = placement.record.queryLocus.start;
+            const queryStrand = placement.record.queryStrand;
+            const placementGapX = (lastXend + xStart) / 2;
+            const placementTargetGap = lastTargetChr === targetChr?targetStart - lastTargetEnd:"not connected";
+            const placementQueryGap = lastQueryChr === queryChr?queryStart - lastQueryEnd:"not connected";
+            const start = placement.targetXSpan[0];
+
             const nonGaps = segments.filter(segment => !segment.isGap);
             const rects = nonGaps.map((segment, i) =>
                 <rect
