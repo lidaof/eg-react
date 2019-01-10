@@ -4,6 +4,8 @@ import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import { NormalizationMode, SORTED_BIN_SIZES, BinSize } from 'src/model/HicDataModes';
 import { GenomeInteraction } from '../model/GenomeInteraction';
 import { ensureMaxListLength } from '../util';
+import hic from 'juicebox.js';
+// import igv from 'igv/dist/igv.esm.min';
 
 /**
  * First, some monkey patching for juicebox.js
@@ -14,7 +16,7 @@ import { ensureMaxListLength } from '../util';
  * @param {string} name - the chromosome name to find
  * @return {number} the index of the chromosome in the file, or `undefined` if not found.
  */
-window.hic.Dataset.prototype.getChrIndexFromName = function(name) {
+hic.Dataset.prototype.getChrIndexFromName = function(name) {
     if (!name) {
         return;
     }
@@ -34,7 +36,7 @@ const MIN_BINS_PER_REGION = 50;
 export class HicSource extends DataSource {
     constructor(url) {
         super();
-        this.straw = new window.hic.Straw({ url: url });
+        this.straw = new hic.Straw({ url: url });
         this.normVectorsPromise = this.straw.reader.loadDataset({})
             .then(dataset => this.straw.reader.readNormExpectedValuesAndNormVectorIndex(dataset))
     }

@@ -62,8 +62,8 @@ export class TrackModel {
     id: number;
     isSelected: boolean;
     showOnHubLoad?: boolean;
-    fileObj?: null;
-    files?: null;
+    fileObj?: any;
+    files?: any;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
@@ -77,8 +77,8 @@ export class TrackModel {
         this.url = this.url || "";
         this.metadata = this.metadata || {};
         this.metadata["Track type"] = this.type;
-        this.fileObj = this.fileObj;
-        this.files = this.files;
+        this.fileObj = this.fileObj || "";
+        this.files = this.files || [];
 
         // Other misc props
         this.id = nextId;

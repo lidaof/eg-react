@@ -1,6 +1,6 @@
 {
   "name": "epgg",
-  "version": "48.0.0",
+  "version": "48.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/lidaof/eg-react.git"
@@ -17,7 +17,7 @@
     "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules",
     "dev": "nf start",
     "electron": "electron .",
-    "ebuild":"npm run build && node_modules/.bin/build"
+    "ebuild": "npm run build && node_modules/.bin/build"
   },
   "dependencies": {},
   "peerDependencies": {
@@ -72,6 +72,7 @@
     "jquery.kinetic": "^2.2.4",
     "json5": "^1.0.1",
     "jsonschema": "^1.2.0",
+    "juicebox.js": "^0.9.8",
     "lodash": "^4.17.5",
     "memoize-one": "^3.1.1",
     "nightmare": "^2.10.0",
@@ -123,7 +124,7 @@
     "dist"
   ],
   "description": "WashU Epigenome Browser App",
-  "homepage": "./",
+  "homepage": "http://epigenomegateway.wustl.edu/browser/",
   "main": "electron/main.js",
   "build": {
     "productName": "WashU Epigenome Browser",
