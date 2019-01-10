@@ -82,7 +82,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                     key={i}
                     startX={segment.xSpan.start}
                     endX={segment.xSpan.end}
-                    y={FINE_MODE_HEIGHT - RECT_HEIGHT - ALI_MGN}
+                    y={y}
                     height={RECT_HEIGHT}
                     isToRight={!placement.record.getIsReverseStrandQuery()}
                     color={"white"}
@@ -90,6 +90,14 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             );
 
             return <React.Fragment>
+                <text
+                    x={xStart}
+                    y={isQuery?y + RECT_HEIGHT + 5:y - 5}
+                    dominantBaseline="middle"
+                    style={{textAnchor: "middle", fill: 'black', fontSize: 10}}
+                >
+                    {isQuery?placement.record.queryLocus.end:placement.record.locus.end}
+                </text>
                 <line
                     x1={xStart}
                     y1={isQuery?y + RECT_HEIGHT:y}
@@ -106,7 +114,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                     strokeDasharray={4}
                 />
                 {rects}
-                {Arrows}
+                {isQuery?Arrows:null}
                 {letters}
                 <line
                     x1={xEnd}
