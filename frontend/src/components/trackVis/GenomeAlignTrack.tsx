@@ -13,6 +13,7 @@ const FINE_MODE_HEIGHT = 80;
 const ALI_MGN = 20; // The margin on top and bottom of alignment block
 const ROUGH_MODE_HEIGHT = 80;
 const RECT_HEIGHT = 15;
+const TICK_HEIGHT = 10;
 const FONT_SIZE = 10;
 const PRIMARY_COLOR = 'darkblue';
 const QUERY_COLOR = '#B8008A';
@@ -50,10 +51,31 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
 
         return <React.Fragment key={i} >
             {renderSequenceSegments(targetSequence, targetSegments, ALI_MGN, PRIMARY_COLOR, false)}
+            {renderAlignTicks(targetSequence, querySequence, FINE_MODE_HEIGHT / 2, TICK_HEIGHT)}
             {renderSequenceSegments(querySequence, querySegments, FINE_MODE_HEIGHT-RECT_HEIGHT-ALI_MGN, QUERY_COLOR, 
                 true)}
         </React.Fragment>;
-
+        function renderAlignTicks(target: string, query: string, y: number, height: number) {
+            const baseWidth = targetXSpan.getLength() / targetSequence.length;
+            const ticks = [];
+            let x = targetXSpan.start;
+            for( i=0; i<targetSequence.length; i++) {
+                if( targetSequence.charAt(i).toUpperCase() === querySequence.charAt(i).toUpperCase()) {
+                    ticks.push(
+                        <line
+                            key={i}
+                            x1={x + baseWidth/2}
+                            y1={y - 0.5 * height + 1}
+                            x2={x + baseWidth/2}
+                            y2={y + 0.5 * height - 1}
+                            stroke={"black"}
+                        />
+                    );
+                }
+                x += baseWidth;
+            }
+            return <React.Fragment>{ticks}</React.Fragment>;
+        }
         function renderSequenceSegments(sequence: string, segments: PlacedSequenceSegment[], y: number, color: string,
             isQuery: boolean) {
             const nonGaps = segments.filter(segment => !segment.isGap);
