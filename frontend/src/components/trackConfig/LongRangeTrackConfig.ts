@@ -18,7 +18,7 @@ export class LongRangeTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
-        if (this.trackModel.files) {
+        if (this.trackModel.files.length > 0) {
             return new LocalBedSource(this.trackModel.files);
         } else {
             return new WorkerSource(BedWorker, this.trackModel.url);
