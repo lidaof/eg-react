@@ -67,6 +67,7 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "firebase": "^5.4.0",
     "foreman": "^3.0.1",
+    "igv": "^2.1.0",
     "jest-image-snapshot": "^1.0.1",
     "jquery": "^3.2.1",
     "jquery.kinetic": "^2.2.4",
