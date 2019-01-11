@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import DataSource from './DataSource';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
-import { NormalizationMode, SORTED_BIN_SIZES, BinSize } from 'src/model/HicDataModes';
+import { NormalizationMode, SORTED_BIN_SIZES } from 'src/model/HicDataModes';
 import { GenomeInteraction } from '../model/GenomeInteraction';
 import { ensureMaxListLength } from '../util';
 
@@ -25,18 +25,43 @@ window.hic.Dataset.prototype.getChrIndexFromName = function(name) {
 
     let modifiedName = name.replace("chrM", "MT");
     modifiedName = modifiedName.replace("chr", "");
-    found = this.chromosomes.findIndex(chromosome => chromosome.name === modifiedName);
+    found = this.chromosomes.findIndex(chromosome => chromosome.name.toUpperCase() === modifiedName.toUpperCase());
     return found !== -1 ? found : undefined;
 }
 
 const MIN_BINS_PER_REGION = 50;
 
+/**
+ * Data source that fetches data from .hic files.
+ * 
+ * @author Silas Hsu
+ */
 export class HicSource extends DataSource {
+    /**
+     * Makes a new instance specialized in serving data from one URL
+     *
+     * @param {string} url - the URL to fetch data from
+     */
     constructor(url) {
         super();
         this.straw = new window.hic.Straw({ url: url });
-        this.normVectorsPromise = this.straw.reader.loadDataset({})
-            .then(dataset => this.straw.reader.readNormExpectedValuesAndNormVectorIndex(dataset))
+        this.datasetPromise = this.straw.reader.loadDataset({});
+        this.normVectorsPromise = null;
+    }
+
+    /**
+     * Loading normalization data is an expensive operation that takes a long time.  In order for `getData()` to return
+     * normalized data, one must first call this method and wait for the returned promise to resolve.  The promise is
+     * cached, so there is no issue in calling this method multiple times.
+     * 
+     * @return {Promise<void>} a promise that resolves when normalization data is finished loading
+     */
+    fetchNormalizationData() {
+        if (!this.normVectorsPromise) {
+            this.normVectorsPromise = this.datasetPromise
+                .then(dataset => this.straw.reader.readNormExpectedValuesAndNormVectorIndex(dataset));
+        }
+        return this.normVectorsPromise;
     }
 
     /**
@@ -79,7 +104,7 @@ export class HicSource extends DataSource {
      */
     async getInteractionsBetweenLoci(queryLocus1, queryLocus2, binSize, normalization=NormalizationMode.NONE) {
         if (normalization !== NormalizationMode.NONE) {
-            await this.normVectorsPromise;
+            await this.fetchNormalizationData();
         }
         const records = await this.straw.getContactRecords(normalization, queryLocus1, queryLocus2, 'BP', binSize);
         const interactions = [];
@@ -101,7 +126,7 @@ export class HicSource extends DataSource {
      * @param {DisplayedRegionModel} region - region for which to fetch data
      * @param {number} basesPerPixel - bases per pixel.  Higher = more zoomed out
      * @param {Object} options - rendering options
-     * @return {Promise<ContactRecord>} a Promise for the data
+     * @return {Promise<GenomeInteraction[]>} a Promise for the data
      */
     async getData(region, basesPerPixel, options) {
         const binSize = this.getBinSize(options, region);
@@ -116,24 +141,30 @@ export class HicSource extends DataSource {
         return ensureMaxListLength(_.flatMap(dataForEachSegment), 5000);
     }
 
-    async getDataAll(region, options) {
-        const binSize = this.getBinSize(options, region);
-        const promises = [];
-        const loci = region.getGenomeIntervals();
-        const navContext = region.getNavigationContext();
-        for (let feature of navContext.getFeatures()) {
-            for (const locus1 of loci) {
-                const locus2 = feature.getLocus();
-                if (locus2.chr === 'chrM') {
-                    continue;
-                }
-                promises.push(this.getInteractionsBetweenLoci(locus1, locus2, binSize));
+    /**
+     * Gets the genome-wide interaction map from the HiC file.
+     * 
+     * @param {NavigationContext} genome - genome metadata
+     * @return {Promise<GenomeInteraction[]>} a Promise for the data
+     */
+    async getDataAll(genome) {
+        await this.datasetPromise;
+        const binSize = this.straw.reader.wholeGenomeChromosome.size * 2;
+        const allRecords = await this.straw.getContactRecords(NormalizationMode.NONE, {chr: "ALL"}, {chr: "ALL"}, "BP");
+        const interactions = []
+        for (const record of allRecords) {
+            const locus1 = binToLocus(record.bin1);
+            const locus2 = binToLocus(record.bin2);
+            if (locus1 && locus2) {
+                interactions.push(new GenomeInteraction(locus1, locus2, record.counts));
             }
         }
-        const dataForEachSegment = await Promise.all(promises);
-        const allData =  _.flatMap(dataForEachSegment);
-        const chrSets = new Set(loci.map(item => item.chr));
-        const chrData = allData.filter(item => chrSets.has(item.locus1.chr) && chrSets.has(item.locus2.chr));
-        return [ensureMaxListLength(chrData, 5000), ensureMaxListLength(allData, 5000)];
+        return interactions;
+
+        function binToLocus(bin) {
+            const absStart = bin * binSize;
+            const absEnd = (bin + 1) * binSize;
+            return genome.getLociInInterval(absStart, absEnd)[0];
+        }
     }
 }
