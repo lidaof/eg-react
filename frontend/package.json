@@ -107,7 +107,7 @@
     "script-loader": "^0.7.2",
     "shortid": "^2.2.13",
     "tcp-port-used": "^0.1.2",
-    "typescript": "^2.9.1",
+    "typescript": "^2.9.2",
     "underscore": "^1.8.3",
     "uuid": "^3.3.2",
     "worker-loader": "^1.1.1",
