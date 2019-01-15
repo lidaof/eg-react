@@ -1,6 +1,7 @@
 {
   "name": "epgg",
   "version": "48.1.1",
+  "author": "Ting Wang Lab @WUSTL",
   "repository": {
     "type": "git",
     "url": "https://github.com/lidaof/eg-react.git"
@@ -63,6 +64,7 @@
     "d3": "^4.12.0",
     "electron": "^4.0.1",
     "electron-builder": "^20.38.4",
+    "electron-debug": "^2.0.0",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "firebase": "^5.4.0",
@@ -128,12 +130,16 @@
   "homepage": "http://epigenomegateway.wustl.edu/browser/",
   "main": "electron/main.js",
   "build": {
-    "productName": "WashU Epigenome Browser",
+    "productName": "WashU-Epigenome-Browser",
     "appId": "edu.wustl.epigenomegateway",
     "electronVersion": "4.0.1",
     "files": [
-      "./build/*/*",
+      "./build/**/*",
       "./electron/*"
-    ]
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "target": "electron-renderer"
   }
 }

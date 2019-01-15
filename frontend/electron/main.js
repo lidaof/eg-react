@@ -1,9 +1,8 @@
-// import hic from 'juicebox.js';
-// import igv from 'igv/dist/igv.esm.min';
-
 const {app, BrowserWindow } = require('electron')
 const path = require('path')
 const url = require('url')
+
+// require('electron-debug')();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -19,7 +18,7 @@ function createWindow () {
      height: 900,
      minWidth: 1281,
      minHeight: 900,
-     icon: path.join(__dirname, '../build/assets/mac/icon.icns')
+     icon: path.join(__dirname, '../build/icon.icns')
   })
 
     const startUrl = process.env.ELECTRON_START_URL || url.format({
