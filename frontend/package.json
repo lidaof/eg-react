@@ -64,7 +64,6 @@
     "d3": "^4.12.0",
     "electron": "^4.0.1",
     "electron-builder": "^20.38.4",
-    "electron-debug": "^2.0.0",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "firebase": "^5.4.0",
@@ -127,7 +126,7 @@
     "dist"
   ],
   "description": "WashU Epigenome Browser App",
-  "homepage": "http://epigenomegateway.wustl.edu/browser/",
+  "homepage": "./",
   "main": "electron/main.js",
   "build": {
     "productName": "WashU-Epigenome-Browser",
@@ -139,6 +138,9 @@
     ],
     "mac": {
       "target": "dmg"
+    },
+    "win": {
+      "target": "portable"
     },
     "target": "electron-renderer"
   }

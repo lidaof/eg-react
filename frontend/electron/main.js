@@ -12,7 +12,8 @@ function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     webPreferences: {
-      nodeIntegration: false
+      nodeIntegration: false,
+      nodeIntegrationInWorker: true
     },
     width: 1281,
      height: 900,
@@ -28,7 +29,9 @@ function createWindow () {
     });
     win.loadURL(startUrl);
 
+    // win.loadURL('http://localhost:3000/browser');
 
+    win.webContents.openDevTools();
   // Emitted when the window is closed.
   win.on('closed', () => {
     win = null
@@ -49,3 +52,14 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+
+// require('electron-debug')({showDevTools: true, enabled: true});
+
+// const isDev = require('electron-is-dev');
+
+// if (isDev) {
+// 	console.log('Running in development');
+// } else {
+// 	console.log('Running in production');
+// }
