@@ -125,11 +125,11 @@
     "umd",
     "dist"
   ],
-  "description": "WashU Epigenome Browser App",
-  "homepage": "./",
+  "description": "WashU Epigenome Browser",
+  "homepage": "http://epigenomegateway.wustl.edu/browser/",
   "main": "electron/main.js",
   "build": {
-    "productName": "WashU-Epigenome-Browser",
+    "productName": "WashU Epigenome Browser",
     "appId": "edu.wustl.epigenomegateway",
     "electronVersion": "4.0.1",
     "files": [
