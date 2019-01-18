@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { ActionCreators } from '../AppState';
 import { treeOfLife } from '../model/genomes/allGenomes';
-import { Footer } from './Footer';
 
 import './GenomePicker.css';
 
@@ -109,8 +108,6 @@ class GenomePicker extends React.PureComponent {
                         }
                     </div>
                 </div>
-                <hr />
-                <Footer/>
             </div>
         
         );

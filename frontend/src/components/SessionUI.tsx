@@ -37,6 +37,7 @@ interface SessionUIProps extends CombinedAppState, HasBundleId {
     bundle?: SessionBundle;
     onRestoreSession: any;
     onRetrieveBundle: any;
+    withGenomePicker?: boolean;
 }
 
 interface SessionUIState {
@@ -120,10 +121,14 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
             await firebase.set(`sessions/${bundle.bundleId}`, newBundle);
         } catch (error) {
             console.error(error);
-            notify.show('Error while restoring session', 'error', 2000);
+            if (!this.props.withGenomePicker) {
+                notify.show('Error while restoring session', 'error', 2000);
+            }
         }
         this.props.onRestoreSession(bundle.sessionsInBundle[sessionId].state);
-        notify.show('Session restored.', 'success', 2000);
+        if (!this.props.withGenomePicker) {
+            notify.show('Session restored.', 'success', 2000);
+        }
     }
 
     deleteSession = async (sessionId: string) => {
@@ -194,22 +199,26 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                         onChange={this.setRetrieveId}/>
                 </label>
             <button className="SessionUI btn btn-info" onClick={this.retrieveSession}>Retrieve session</button></div>
-            <button className="SessionUI btn btn-primary" onClick={this.saveSession}>Save session</button>
-            <div>
-                <p>Session bundle Id: {this.props.bundleId}</p>
-                <label htmlFor="sessionLabel">
-                    Name your session: <input
-                        type="text"
-                        value={this.state.newSessionLabel}
-                        size={30}
-                        onChange={this.setSessionLabel}
-                    /> or use a <button
-                        type="button"
-                        className="SessionUI btn btn-warning btn-sm"
-                        onClick={this.setRandomLabel}
-                    > Random name</button>
-                </label>
-            </div>
+            {!this.props.withGenomePicker && 
+                <React.Fragment>
+                    <button className="SessionUI btn btn-primary" onClick={this.saveSession}>Save session</button>
+                    <div>
+                        <p>Session bundle Id: {this.props.bundleId}</p>
+                        <label htmlFor="sessionLabel">
+                            Name your session: <input
+                                type="text"
+                                value={this.state.newSessionLabel}
+                                size={30}
+                                onChange={this.setSessionLabel}
+                            /> or use a <button
+                                type="button"
+                                className="SessionUI btn btn-warning btn-sm"
+                                onClick={this.setRandomLabel}
+                            > Random name</button>
+                        </label>
+                    </div>
+                </React.Fragment>
+            }
             {this.renderSavedSessions()}
         </div>
         );

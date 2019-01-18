@@ -15,6 +15,7 @@ import Notifications from 'react-notify-toast';
 import LoadSession from './components/LoadSession';
 import { RegionExpander } from './model/RegionExpander';
 import { Footer } from './components/Footer';
+import { SessionUI } from "./components/SessionUI";
 
 import './App.css';
 
@@ -183,7 +184,13 @@ class App extends React.Component {
             return <div className="container-fluid"><LoadSession bundleId={bundleId} /></div>;
         }
         if (!genomeConfig) {
-            return <div className="container-fluid"><GenomePicker /></div>;
+            return <div className="container-fluid">
+                    <GenomePicker />
+                    <SessionUI bundleId={bundleId} withGenomePicker={true} />
+                    <hr />
+                    <Footer/>
+                    <Notifications />
+                </div>;
         }
         const tracksUrlSets = new Set([
                 ...tracks.filter(track => track.url).map(track => track.url),
