@@ -44,7 +44,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         this.renderFineAlignment = this.renderFineAlignment.bind(this);
     }
 
-    renderFineAlignment(placement: PlacedAlignment, i: number) {
+    renderFineAlignment(lastPlacement: PlacedAlignment, placement: PlacedAlignment, i: number) {
         const {targetXSpan, targetSegments, querySegments} = placement;
         const [xStart, xEnd] = targetXSpan;
         const targetSequence = placement.visiblePart.getTargetSequence();
@@ -52,10 +52,14 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
 
         return <React.Fragment key={i} >
             {renderSequenceSegments(targetSequence, targetSegments, ALI_MGN, PRIMARY_COLOR, false)}
+            {renderPlacementGaps()}
             {renderAlignTicks(targetSequence, querySequence, FINE_MODE_HEIGHT / 2, TICK_HEIGHT)}
             {renderSequenceSegments(querySequence, querySegments, FINE_MODE_HEIGHT-RECT_HEIGHT-ALI_MGN, QUERY_COLOR, 
                 true)}
         </React.Fragment>;
+        function renderPlacementGaps(){
+            
+        }
         function renderAlignTicks(target: string, query: string, y: number, height: number) {
             const baseWidth = targetXSpan.getLength() / targetSequence.length;
             const ticks = [];
@@ -234,7 +238,13 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         } else if (alignment.isFineMode) {
             height = FINE_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedAlignment[];
-            svgElements = drawData.map(this.renderFineAlignment);
+            // svgElements = drawData.map(this.renderFineAlignment);
+            svgElements = [];
+            svgElements.push(this.renderFineAlignment(drawData[0]，drawData[0],0))
+            for(let i=1; i<drawData.length; i++) {
+                const svgElement = this.renderFineAlignment(drawData[i-1]，drawData[i],i);
+                svgElements.push(svgElement);
+            }
         } else {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
