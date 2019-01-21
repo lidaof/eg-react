@@ -58,7 +58,21 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 true)}
         </React.Fragment>;
         function renderPlacementGaps(){
-
+            const lastXend = 0;
+            const lastTargetChr = 'chr1'
+            const lastTargetEnd = 0;
+            const lastQueryChr = 'chr1'
+            const lastQueryEnd = 0;
+            const lastStrand = '+';
+            const targetChr = placement.record.locus.chr;
+            const targetStart = placement.record.locus.start;
+            const queryChr = placement.record.queryLocus.chr;
+            const queryStart = placement.record.queryLocus.start;
+            const queryStrand = placement.record.queryStrand;
+            const placementGapX = (lastXend + xStart) / 2;
+            const placementTargetGap = lastTargetChr === targetChr?targetStart - lastTargetEnd:"not connected";
+            const placementQueryGap = lastQueryChr === queryChr?queryStart - lastQueryEnd:"not connected";
+            const start = placement.targetXSpan[0];
         }
         function renderAlignTicks(target: string, query: string, y: number, height: number) {
             const baseWidth = targetXSpan.getLength() / targetSequence.length;
@@ -83,21 +97,6 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         }
         function renderSequenceSegments(sequence: string, segments: PlacedSequenceSegment[], y: number, color: string,
             isQuery: boolean) {
-            const lastXend = 0;
-            const lastTargetChr = 'chr1'
-            const lastTargetEnd = 0;
-            const lastQueryChr = 'chr1'
-            const lastQueryEnd = 0;
-            const lastStrand = '+';
-            const targetChr = placement.record.locus.chr;
-            const targetStart = placement.record.locus.start;
-            const queryChr = placement.record.queryLocus.chr;
-            const queryStart = placement.record.queryLocus.start;
-            const queryStrand = placement.record.queryStrand;
-            const placementGapX = (lastXend + xStart) / 2;
-            const placementTargetGap = lastTargetChr === targetChr?targetStart - lastTargetEnd:"not connected";
-            const placementQueryGap = lastQueryChr === queryChr?queryStart - lastQueryEnd:"not connected";
-            const start = placement.targetXSpan[0];
 
             const nonGaps = segments.filter(segment => !segment.isGap);
             const rects = nonGaps.map((segment, i) =>
