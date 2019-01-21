@@ -58,7 +58,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 true)}
         </React.Fragment>;
         function renderPlacementGaps(){
-            
+
         }
         function renderAlignTicks(target: string, query: string, y: number, height: number) {
             const baseWidth = targetXSpan.getLength() / targetSequence.length;
@@ -240,9 +240,9 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             const drawData = alignment.drawData as PlacedAlignment[];
             // svgElements = drawData.map(this.renderFineAlignment);
             svgElements = [];
-            svgElements.push(this.renderFineAlignment(drawData[0]，drawData[0],0))
+            svgElements.push(this.renderFineAlignment(drawData[0],drawData[0],0))
             for(let i=1; i<drawData.length; i++) {
-                const svgElement = this.renderFineAlignment(drawData[i-1]，drawData[i],i);
+                const svgElement = this.renderFineAlignment(drawData[i-1],drawData[i],i);
                 svgElements.push(svgElement);
             }
         } else {
