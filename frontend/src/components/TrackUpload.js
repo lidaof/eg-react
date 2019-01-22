@@ -2,6 +2,9 @@ import React from "react";
 import PropTypes from 'prop-types';
 import { TrackModel } from "../model/TrackModel";
 import { notify } from 'react-notify-toast';
+import {Tabs, Tab} from 'react-bootstrap-tabs';
+import JSON5 from 'json5';
+import { readFileAsText } from "../util";
 
 const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract"]; // all lower case
 
@@ -19,6 +22,7 @@ export class TrackUpload extends React.Component {
         super(props);
         this.state = {
             fileType: "bigWig",
+            selectedTabIndex: 0,
         }
     }
 
@@ -61,7 +65,72 @@ export class TrackUpload extends React.Component {
         this.props.onTracksAdded(tracks);
     }
 
-    render() {
+    handleHubUpload = async (event) => {
+        const tracks = [];
+        const fileList = Array.from(event.target.files);
+        const hubFile = fileList.filter(f => f.name === 'hub.config.json');
+        const idxFiles = fileList.filter(f => f.name.endsWith('.tbi'));
+        const idxHash = {};
+        idxFiles.forEach(item => {
+            idxHash[item.name] = item;
+        })
+        if (hubFile.length !== 1) {
+            notify.show('Aborting, can not find `hub.config.json` file', 'error', 5000);
+            return null;
+        }
+        const hubContent = await readFileAsText(hubFile[0]);
+        const json = JSON5.parse(hubContent);
+        const trackTypes = {};
+        json.forEach(item => {
+            trackTypes[item.filename] = item.type;
+        });
+        for (const file of fileList) {
+            if (trackTypes.hasOwnProperty(file.name) ) {
+                // find a type in hub.config.json file
+                if (file.name.startsWith('.')) {
+                    continue; // skip hidden files like .DS_Store
+                }
+                if (file.name.endsWith('.tbi')) {
+                    continue; // skip index files
+                }
+                if (file.name === 'hub.config.json') {
+                    continue;
+                }
+                const trackType = trackTypes[file.name];
+                let track;
+                if (ONE_TRACK_FILE_LIST.includes(trackType)) {
+                    track = new TrackModel({
+                        type: trackType,
+                        url: null,
+                        fileObj: file,
+                        name: file.name,
+                        label: file.name,
+                        files: null,
+                    });
+                } else {
+                    track = new TrackModel({
+                        type: trackType,
+                        url: null,
+                        fileObj: file,
+                        name: file.name,
+                        label: file.name,
+                        files: [file, idxHash[file.name+'.tbi']],
+                    });
+                }
+                tracks.push(track);
+            } else {
+                notify.show('Skipping ' + file.name + ' not found in `hub.config.json`', 'warning', 3000);
+            }
+        }
+        if (tracks.length > 0) {
+            this.props.onTracksAdded(tracks);
+        } else {
+            notify.show('No local tracks could be found, please check your files and configuration', 'error', 5000);
+            return null;
+        }
+    }
+
+    renderTrackUpload = () => {
         return (
             <div>
                 <label>
@@ -89,6 +158,40 @@ export class TrackUpload extends React.Component {
                     <input type="file" id="trackFile" multiple onChange={this.handleFileUpload} />
                 </label>
             </div>
+        );
+    }
+
+    renderHubUpload = () => {
+        return (
+            <div>
+                <label htmlFor="hubFile">
+                    <p>Choose a folder contains a file named 'hub.config.json':</p> 
+                    <input type="file" 
+                        webkitdirectory="true" mozdirectory="true" directory="true" 
+                        id="hubFile" onChange={this.handleHubUpload} />
+                </label>
+                <br/>
+                <p className="lead">Or:</p>
+                <label htmlFor="hubFile2">
+                    <p>Choose many files contains a file named 'hub.config.json':</p> 
+                    <input type="file" 
+                        id="hubFile2" multiple onChange={this.handleHubUpload} />
+                </label>
+            </div>
+        );
+    }
+
+    render(){
+        return (
+            <div>
+                <Tabs onSelect={(index, label) => this.setState({selectedTabIndex: index})} 
+                    selected={this.state.selectedTabIndex}
+                    headerStyle={{fontWeight: 'bold'}} activeHeaderStyle={{color: 'blue'}}
+                >
+                    <Tab label="Add Local Track">{this.renderTrackUpload()}</Tab>
+                    <Tab label="Add Local Hub">{this.renderHubUpload()}</Tab>
+                </Tabs>
+            </div> 
         );
     }
 }

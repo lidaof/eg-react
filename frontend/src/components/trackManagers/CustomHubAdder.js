@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import JSON5 from 'json5';
 import Json5Fetcher from '../../model/Json5Fetcher';
 import DataHubParser from '../../model/DataHubParser';
+import { readFileAsText } from "../../util";
 
 /**
  * custom hub add UI
@@ -94,21 +95,11 @@ class FileHubAdder extends React.Component {
         this.handleFileUpload = this.handleFileUpload.bind(this);
     }
 
-    readFileAsText(file) {
-        const reader = new FileReader();
-        let promise = new Promise((resolve, reject) => {
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(reader.error);
-        });
-        reader.readAsText(file);
-        return promise;
-    }
-
     async handleFileUpload(event) {
         if (!this.props.onTracksAdded) {
             return;
         }
-        const contents = await this.readFileAsText(event.target.files[0]);
+        const contents = await readFileAsText(event.target.files[0]);
         const json = JSON5.parse(contents);
         const parser = new DataHubParser(0);
         const tracks = await parser.getTracksInHub(json, "Custom hub");

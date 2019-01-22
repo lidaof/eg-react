@@ -38,7 +38,7 @@ const THRESHOLD_HEIGHT = 3; // the bar tip height which represet value above max
  * 
  * @author Silas Hsu
  */
-class NumericalTrack extends React.Component {
+class NumericalTrack extends React.PureComponent {
     /**
      * Don't forget to look at NumericalFeatureProcessor's propTypes!
      */

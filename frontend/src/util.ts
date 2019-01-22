@@ -121,3 +121,13 @@ export function ceil(value: number, precision: number) {
     const multiplier = Math.pow(10, precision || 0);
     return Math.ceil(value * multiplier) / multiplier;
 }
+
+export function readFileAsText(file: Blob) {
+    const reader = new FileReader();
+    const promise = new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+    });
+    reader.readAsText(file);
+    return promise;
+}
