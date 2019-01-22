@@ -9,7 +9,7 @@ import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment }
     from '../../model/alignment/AlignmentViewCalculator';
 
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
-import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
+// import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 const FINE_MODE_HEIGHT = 80;
 const ALI_MGN = 20; // The margin on top and bottom of alignment block
 const ROUGH_MODE_HEIGHT = 80;
@@ -35,6 +35,7 @@ function swap(array: any[], i: number, j: number) {
 
 /**
  * 
+ * @author Xiaoyu Zhuo
  * @author Daofeng Li
  * @author Silas Hsu
  */
@@ -52,27 +53,62 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
 
         return <React.Fragment key={i} >
             {renderSequenceSegments(targetSequence, targetSegments, ALI_MGN, PRIMARY_COLOR, false)}
-            {renderPlacementGaps()}
+            {i > 0 ? renderPlacementGaps(lastPlacement, placement): null}
             {renderAlignTicks(targetSequence, querySequence, FINE_MODE_HEIGHT / 2, TICK_HEIGHT)}
             {renderSequenceSegments(querySequence, querySegments, FINE_MODE_HEIGHT-RECT_HEIGHT-ALI_MGN, QUERY_COLOR, 
                 true)}
         </React.Fragment>;
-        function renderPlacementGaps(){
-            const lastXend = 0;
-            const lastTargetChr = 'chr1'
-            const lastTargetEnd = 0;
-            const lastQueryChr = 'chr1'
-            const lastQueryEnd = 0;
-            const lastStrand = '+';
+        function renderPlacementGaps(lastPlacement: PlacedAlignment, placement: PlacedAlignment){
+            const lastXEnd = lastPlacement.targetXSpan.end;
+            const xStart = placement.targetXSpan.start;
+            const lastTargetChr = lastPlacement.record.locus.chr;
+            const lastTargetEnd = lastPlacement.record.locus.end;
+            const lastQueryChr = lastPlacement.record.queryLocus.chr;
+            const lastStrand = lastPlacement.record.queryStrand;
+            const lastQueryEnd = 
+                lastStrand === "+"?lastPlacement.record.queryLocus.end:lastPlacement.record.queryLocus.start;
             const targetChr = placement.record.locus.chr;
             const targetStart = placement.record.locus.start;
             const queryChr = placement.record.queryLocus.chr;
-            const queryStart = placement.record.queryLocus.start;
             const queryStrand = placement.record.queryStrand;
-            const placementGapX = (lastXend + xStart) / 2;
+            const queryStart = 
+                queryStrand === "+"?placement.record.queryLocus.start:placement.record.queryLocus.end;
+            let placementQueryGap: string | number;
+            if (lastQueryChr === queryChr){
+                if (lastStrand === "+" && queryStrand === "+") {
+                    placementQueryGap = queryStart - lastQueryEnd;
+                }
+                else if (lastStrand === "-" && queryStrand === "-") {
+                    placementQueryGap = lastQueryEnd - queryStart;
+                }
+                else {
+                    placementQueryGap = "reverse direction";
+                }
+            } else {
+                placementQueryGap = "not connected";
+            }
+            const placementGapX = (lastXEnd + xStart) / 2;
+            const queryPlacementGapX = (lastPlacement.queryXSpan.end + placement.queryXSpan.start) / 2
             const placementTargetGap = lastTargetChr === targetChr?targetStart - lastTargetEnd:"not connected";
-            const placementQueryGap = lastQueryChr === queryChr?queryStart - lastQueryEnd:"not connected";
-            const start = placement.targetXSpan[0];
+
+            return <React.Fragment>
+                <text
+                    x={placementGapX}
+                    y={ALI_MGN - 5}
+                    dominantBaseline="middle"
+                    style={{textAnchor: "middle", fill: 'black', fontSize: 10}}
+                    >
+                    {placementTargetGap}
+                </text>
+                <text
+                    x={queryPlacementGapX}
+                    y={FINE_MODE_HEIGHT-ALI_MGN + 5}
+                    dominantBaseline="middle"
+                    style={{textAnchor: "middle", fill: 'black', fontSize: 10}}
+                    >
+                    {placementQueryGap}
+                </text>
+            </React.Fragment>
         }
         function renderAlignTicks(target: string, query: string, y: number, height: number) {
             const baseWidth = targetXSpan.getLength() / targetSequence.length;
@@ -132,14 +168,6 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             );
 
             return <React.Fragment>
-                <text
-                    x={xStart}
-                    y={isQuery?y + RECT_HEIGHT + 5:y - 5}
-                    dominantBaseline="middle"
-                    style={{textAnchor: "middle", fill: 'black', fontSize: 10}}
-                >
-                    {isQuery?placement.record.queryLocus.end:placement.record.locus.end}
-                </text>
                 <line
                     x1={xStart}
                     y1={isQuery?y + RECT_HEIGHT:y}
@@ -239,7 +267,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             const drawData = alignment.drawData as PlacedAlignment[];
             // svgElements = drawData.map(this.renderFineAlignment);
             svgElements = [];
-            svgElements.push(this.renderFineAlignment(drawData[0],drawData[0],0))
+            svgElements.push(this.renderFineAlignment(drawData[0],drawData[0],0));
             for(let i=1; i<drawData.length; i++) {
                 const svgElement = this.renderFineAlignment(drawData[i-1],drawData[i],i);
                 svgElements.push(svgElement);
