@@ -93,7 +93,7 @@ export class AlignmentViewCalculator {
 
     alignFine(records: AlignmentRecord[], visData: ViewExpansion): Alignment {
         // There's a lot of steps, so bear with me...
-        const {visRegion, visWidth, viewWindow, viewWindowRegion} = visData;
+        const {visRegion, viewWindow, viewWindowRegion} = visData;
         const oldNavContext = visRegion.getNavigationContext();
         // const drawModel = new LinearDrawingModel(visRegion, visWidth);
         // const minGapLength = drawModel.xWidthToBases(MIN_GAP_DRAW_WIDTH);

@@ -20,14 +20,16 @@ class AnnotationArrows extends React.PureComponent {
         /**
          * Id for a clipPath element.  If valid, arrows will only appear in the clipPath's region.
          */
-        clipId: PropTypes.string
+        clipId: PropTypes.string,
+        opacity: PropTypes.number
     };
     static defaultProps = {
         y: 0,
+        opacity: 1,
     };
 
     render() {
-        const {startX, endX, y, height, isToRight, color, clipId} = this.props;
+        const {startX, endX, y, height, isToRight, color, clipId, opacity} = this.props;
         if (endX - startX < ARROW_WIDTH) {
             return null;
         }
@@ -58,6 +60,7 @@ class AnnotationArrows extends React.PureComponent {
                 fill="none"
                 stroke={color}
                 strokeWidth={1}
+                strokeOpacity={opacity}
                 clipPath={clipId ? `url(#${clipId})` : undefined}
             />);
         }

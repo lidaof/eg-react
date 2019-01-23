@@ -9,12 +9,17 @@ import { withTrackLegendWidth } from '../../components/withTrackLegendWidth';
 
 class VerticalDividerNotConnected extends React.Component {
     render() {
-        const { children, legendWidth, xOffset } = this.props;
+        const { children, legendWidth, xOffset, genomeRegion } = this.props;
         const {viewWindowRegion, viewWindow} = this.props.visData;
         const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
+        const genomeContext = genomeRegion.getNavigationContext();
         let boxesAndLabels = [];
         let x = 0;
         for (const segment of viewWindowRegion.getFeatureSegments()) {
+            if (!genomeContext.hasFeature(segment.feature)) {
+                // feature not in genome context, don't draw vertical line
+                continue;
+            }
             const drawWidth = drawModel.basesToXWidth(segment.getLength());
 
             if (x > 0) { // Thick line at boundaries of each feature, except the first one

@@ -399,7 +399,7 @@ class TrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView} = this.props;
+        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView, viewRegion} = this.props;
         const { selectedTool } = this.state;
         const contextMenu = <TrackContextMenu 
                                 tracks={tracks} 
@@ -418,7 +418,7 @@ class TrackContainer extends React.Component {
                 {this.renderControls()}
                 <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
                     <DivWithBullseye style={trackDivStyle} id="trackContainer">
-                        <div visData={primaryView}
+                        <VerticalDivider visData={primaryView} genomeRegion={viewRegion}
                                 xOffset={this.state.xOffset}>
                             <HighlightRegion 
                                 enteredRegion={enteredRegion}
@@ -428,7 +428,7 @@ class TrackContainer extends React.Component {
                                 >
                                 {this.renderSubContainer()}
                             </HighlightRegion>
-                        </div>
+                        </VerticalDivider>
                     </DivWithBullseye>
                 </ContextMenuManager>
             </OutsideClickDetector>
