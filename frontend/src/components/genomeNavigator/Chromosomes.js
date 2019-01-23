@@ -220,15 +220,15 @@ class Chromosomes extends React.PureComponent {
         let chromosomeNames = [];
         for (const segment of viewRegion.getFeatureSegments()) {
             const drawWidth = drawModel.basesToXWidth(segment.getLength());
-            boxesAndLabels.push(<rect // Box for feature
-                key={"rect" + x}
-                x={x}
-                y={TOP_PADDING}
-                width={drawWidth}
-                height={HEIGHT}
-                style={{stroke: "#000", fill: "#fff"}}
-                opacity="0.5"
-            />);
+            // boxesAndLabels.push(<rect // Box for feature
+            //     key={"rect" + x}
+            //     x={x}
+            //     y={TOP_PADDING}
+            //     width={drawWidth}
+            //     height={HEIGHT}
+            //     style={{stroke: "#000", fill: "#fff"}}
+            //     opacity="0.5"
+            // />);
 
             if (x > 0) { // Thick line at boundaries of each feature, except the first one
                 boxesAndLabels.push(<line
@@ -236,7 +236,8 @@ class Chromosomes extends React.PureComponent {
                     x1={x}
                     y1={0}
                     x2={x}
-                    y2={TOP_PADDING * 2 + HEIGHT}
+                    y2={TOP_PADDING}
+                    // y2={TOP_PADDING * 2 + HEIGHT}
                     stroke={"#000"}
                     strokeWidth={1}
                 />);
