@@ -81,40 +81,51 @@ export class TrackUpload extends React.Component {
         const hubContent = await readFileAsText(hubFile[0]);
         const json = JSON5.parse(hubContent);
         const trackTypes = {};
+        const trackNames = {};
+        const trackOptions = {};
         json.forEach(item => {
             trackTypes[item.filename] = item.type;
         });
+        json.forEach(item => {
+            trackNames[item.filename] = item.name;
+        });
+        json.forEach(item => {
+            trackOptions[item.filename] = item.options;
+        });
         for (const file of fileList) {
-            if (trackTypes.hasOwnProperty(file.name) ) {
-                // find a type in hub.config.json file
-                if (file.name.startsWith('.')) {
-                    continue; // skip hidden files like .DS_Store
-                }
-                if (file.name.endsWith('.tbi')) {
-                    continue; // skip index files
-                }
-                if (file.name === 'hub.config.json') {
-                    continue;
-                }
-                const trackType = trackTypes[file.name];
+            const fileName = file.name;
+            // find a type in hub.config.json file
+            if (fileName.startsWith('.')) {
+                continue; // skip hidden files like .DS_Store
+            }
+            if (fileName.endsWith('.tbi')) {
+                continue; // skip index files
+            }
+            if (fileName === 'hub.config.json') {
+                continue;
+            }
+            if (trackTypes.hasOwnProperty(fileName) ) {
+                const trackType = trackTypes[fileName];
                 let track;
                 if (ONE_TRACK_FILE_LIST.includes(trackType)) {
                     track = new TrackModel({
                         type: trackType,
                         url: null,
                         fileObj: file,
-                        name: file.name,
-                        label: file.name,
+                        name: trackNames[fileName] || fileName,
+                        label: trackNames[fileName] || fileName,
                         files: null,
+                        options: trackOptions[fileName] || {},
                     });
                 } else {
                     track = new TrackModel({
                         type: trackType,
                         url: null,
                         fileObj: file,
-                        name: file.name,
-                        label: file.name,
-                        files: [file, idxHash[file.name+'.tbi']],
+                        name: trackNames[fileName] || fileName,
+                        label: trackNames[fileName] || fileName,
+                        files: [file, idxHash[fileName+'.tbi']],
+                        options: trackOptions[fileName] || {},
                     });
                 }
                 tracks.push(track);
