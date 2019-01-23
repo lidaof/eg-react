@@ -418,7 +418,7 @@ class TrackContainer extends React.Component {
                 {this.renderControls()}
                 <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
                     <DivWithBullseye style={trackDivStyle} id="trackContainer">
-                        <VerticalDivider visData={primaryView}
+                        {/* <VerticalDivider visData={primaryView} */}
                                 xOffset={this.state.xOffset}>
                             <HighlightRegion 
                                 enteredRegion={enteredRegion}
@@ -428,7 +428,7 @@ class TrackContainer extends React.Component {
                                 >
                                 {this.renderSubContainer()}
                             </HighlightRegion>
-                        </VerticalDivider>
+                        {/* </VerticalDivider> */}
                     </DivWithBullseye>
                 </ContextMenuManager>
             </OutsideClickDetector>
