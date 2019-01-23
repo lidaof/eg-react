@@ -217,6 +217,7 @@ class Chromosomes extends React.PureComponent {
 
         let boxesAndLabels = [];
         let x = 0;
+        let chromosomeName;
         for (const segment of viewRegion.getFeatureSegments()) {
             const drawWidth = drawModel.basesToXWidth(segment.getLength());
             boxesAndLabels.push(<rect // Box for feature
@@ -241,23 +242,34 @@ class Chromosomes extends React.PureComponent {
                 />);
             }
 
-            const labelSize = this.getSizeForFeatureLabel(segment.getName(), drawWidth); 
-            if (labelSize && !NavigationContext.isGapFeature(segment.feature)) {
-                boxesAndLabels.push( // Label for feature, if it fits
-                    <text
-                        key={"text" + x}
-                        x={x + drawWidth/2}
-                        y={labelOffset || DEFAULT_LABEL_OFFSET}
-                        style={{textAnchor: "middle", fontWeight: "bold", fontSize: labelSize}}
-                    >
-                        {segment.getName()}
-                    </text>
-                );
+            // const labelSize = this.getSizeForFeatureLabel(segment.getName(), drawWidth); 
+            // if (labelSize && !NavigationContext.isGapFeature(segment.feature)) {
+            //     boxesAndLabels.push( // Label for feature, if it fits
+            //         <text
+            //             key={"text" + x}
+            //             x={x + drawWidth/2}
+            //             y={labelOffset || DEFAULT_LABEL_OFFSET}
+            //             style={{textAnchor: "middle", fontWeight: "bold", fontSize: labelSize}}
+            //         >
+            //             {segment.getName()}
+            //         </text>
+            //     );
+            // }
+            if (!NavigationContext.isGapFeature(segment.feature)) {
+                chromosomeName = segment.getName()
             }
-
             x += drawWidth;
         }
-
+        boxesAndLabels.push( // Label for feature, if it fits
+            <text
+                key={"text" + x}
+                x={x/2}
+                y={labelOffset || DEFAULT_LABEL_OFFSET}
+                style={{textAnchor: "middle", fontWeight: "bold", fontSize: 15}}
+            >
+                {chromosomeName}
+            </text>
+        );
         const cytobands = viewRegion.getGenomeIntervals().map(locus =>
             this.renderCytobandsInLocus(locus, drawModel)
         );

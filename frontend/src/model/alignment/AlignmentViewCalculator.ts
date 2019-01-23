@@ -52,7 +52,7 @@ export interface Alignment {
 
 const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
 const MARGIN = 5;
-const MIN_GAP_DRAW_WIDTH = 3;
+const MIN_GAP_DRAW_WIDTH = 0.5;
 const MERGE_PIXEL_DISTANCE = 200;
 const MIN_MERGE_DRAW_WIDTH = 5;
 const FEATURE_PLACER = new FeaturePlacer();
