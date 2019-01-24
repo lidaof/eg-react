@@ -13,17 +13,23 @@ class AnnotationArrows extends React.PureComponent {
     static propTypes = {
         startX: PropTypes.number.isRequired, // X location to start drawing arrows
         endX: PropTypes.number.isRequired, // X location to stop drawing arrows
+        y: PropTypes.number, // y location to draw arrows
         height: PropTypes.number.isRequired, // Height of arrows
         isToRight: PropTypes.bool, // Arrow point direction.  If true, point right; otherwise, point left.
         color: PropTypes.string, // Color of the arrows
         /**
          * Id for a clipPath element.  If valid, arrows will only appear in the clipPath's region.
          */
-        clipId: PropTypes.string
+        clipId: PropTypes.string,
+        opacity: PropTypes.number
+    };
+    static defaultProps = {
+        y: 0,
+        opacity: 1,
     };
 
     render() {
-        const {startX, endX, height, isToRight, color, clipId} = this.props;
+        const {startX, endX, y, height, isToRight, color, clipId, opacity} = this.props;
         if (endX - startX < ARROW_WIDTH) {
             return null;
         }
@@ -44,9 +50,9 @@ class AnnotationArrows extends React.PureComponent {
             // Is forward strand ? point to the right : point to the left 
             const arrowTailX = isToRight ? arrowTipX - ARROW_WIDTH : arrowTipX + ARROW_WIDTH;
             const arrowPoints = [
-                [arrowTailX, 1],
-                [arrowTipX, centerY],
-                [arrowTailX, bottomY - 1]
+                [arrowTailX, y + 1],
+                [arrowTipX, centerY + y],
+                [arrowTailX, bottomY + y - 1]
             ];
             children.push(<polyline
                 key={arrowTipX}
@@ -54,6 +60,7 @@ class AnnotationArrows extends React.PureComponent {
                 fill="none"
                 stroke={color}
                 strokeWidth={1}
+                strokeOpacity={opacity}
                 clipPath={clipId ? `url(#${clipId})` : undefined}
             />);
         }

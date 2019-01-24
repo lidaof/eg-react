@@ -301,6 +301,13 @@ class NavigationContext {
         const loci = featureSegments.map(interval => interval.getLocus());
         return ChromosomeInterval.mergeOverlaps(loci);
     }
+
+    /**
+     * check if a feature is in current context
+     */
+    hasFeatureWithName(queryFeature: Feature) {
+        return this._features.some(feature => feature.name === queryFeature.name);
+    }
 }
 
 export default NavigationContext;

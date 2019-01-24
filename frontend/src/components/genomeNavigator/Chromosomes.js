@@ -217,6 +217,7 @@ class Chromosomes extends React.PureComponent {
 
         let boxesAndLabels = [];
         let x = 0;
+        let chromosomeNames = [];
         for (const segment of viewRegion.getFeatureSegments()) {
             const drawWidth = drawModel.basesToXWidth(segment.getLength());
             boxesAndLabels.push(<rect // Box for feature
@@ -241,23 +242,33 @@ class Chromosomes extends React.PureComponent {
                 />);
             }
 
-            const labelSize = this.getSizeForFeatureLabel(segment.getName(), drawWidth); 
-            if (labelSize && !NavigationContext.isGapFeature(segment.feature)) {
-                boxesAndLabels.push( // Label for feature, if it fits
-                    <text
-                        key={"text" + x}
-                        x={x + drawWidth/2}
-                        y={labelOffset || DEFAULT_LABEL_OFFSET}
-                        style={{textAnchor: "middle", fontWeight: "bold", fontSize: labelSize}}
-                    >
-                        {segment.getName()}
-                    </text>
-                );
+            // const labelSize = this.getSizeForFeatureLabel(segment.getName(), drawWidth); 
+            if (!NavigationContext.isGapFeature(segment.feature)) {
+                if (chromosomeNames.length > 0 && segment.getName() === chromosomeNames[chromosomeNames.length - 1].name) {
+                    chromosomeNames[chromosomeNames.length - 1].end = x + drawWidth;
+                }
+                else {
+                    chromosomeNames.push({name:segment.getName(), start:x, end: x + drawWidth});
+                }
             }
 
             x += drawWidth;
         }
-
+        
+        chromosomeNames.forEach((chromosomeName) => {
+            const chrSize = this.getSizeForFeatureLabel(chromosomeName.name, 
+                drawModel.basesToXWidth(chromosomeName.end - chromosomeName.start));
+            boxesAndLabels.push( // Label for feature, if it fits
+                <text
+                    key={"text" + chromosomeName.start}
+                    x={(chromosomeName.start + chromosomeName.end) / 2}
+                    y={labelOffset || DEFAULT_LABEL_OFFSET}
+                    style={{textAnchor: "middle", fontWeight: "bold", fontSize: chrSize }}
+                >
+                    {chromosomeName.name}
+                </text>
+            )
+        })
         const cytobands = viewRegion.getGenomeIntervals().map(locus =>
             this.renderCytobandsInLocus(locus, drawModel)
         );
