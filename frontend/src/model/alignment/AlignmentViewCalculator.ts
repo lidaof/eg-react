@@ -40,6 +40,15 @@ export interface PlacedMergedAlignment extends QueryGenomePiece {
     segments: PlacedAlignment[];
 }
 
+export interface GapText {
+    targetGapText: string;
+    targetXSpan: OpenInterval;
+    targetTextXSpan: OpenInterval;
+    queryGapText: string;
+    queryXSpan: OpenInterval;
+    queryTextXSpan: OpenInterval;
+}
+
 export interface Alignment {
     isFineMode: boolean; // Display mode
     primaryVisData: ViewExpansion; // Primary genome view region data
@@ -48,6 +57,7 @@ export interface Alignment {
      * PlacedAlignment[] in fine mode; PlacedMergedAlignment in rough mode.
      */
     drawData: PlacedAlignment[] | PlacedMergedAlignment[];
+    drawGapText?: GapText[];  // An array holding gap size information between placedAlignments, fineMode only
 }
 
 const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
@@ -135,6 +145,77 @@ export class AlignmentViewCalculator {
             placement.querySegments = this._placeSequenceSegments(querySeq, minGapLength, xSpan.start, newDrawModel);
         }
 
+        const drawGapTexts = [];
+        const targetIntervalPlacer = new IntervalPlacer(MARGIN);
+        const queryIntervalPlacer = new IntervalPlacer(MARGIN);
+        for(let i=1; i<placements.length; i++) {
+            const lastPlacement = placements[i - 1];
+            const placement = placements[i];
+            const lastXEnd = lastPlacement.targetXSpan.end;
+            const xStart = placement.targetXSpan.start;
+            const lastTargetChr = lastPlacement.record.locus.chr;
+            const lastTargetEnd = lastPlacement.record.locus.end;
+            const lastQueryChr = lastPlacement.record.queryLocus.chr;
+            const lastStrand = lastPlacement.record.queryStrand;
+            const lastQueryEnd = 
+                lastStrand === "+" ? lastPlacement.record.queryLocus.end : lastPlacement.record.queryLocus.start;
+            const targetChr = placement.record.locus.chr;
+            const targetStart = placement.record.locus.start;
+            const queryChr = placement.record.queryLocus.chr;
+            const queryStrand = placement.record.queryStrand;
+            const queryStart = 
+                queryStrand === "+" ? placement.record.queryLocus.start : placement.record.queryLocus.end;
+            let placementQueryGap: string;
+            if (lastQueryChr === queryChr){
+                if (lastStrand === "+" && queryStrand === "+") {
+                    placementQueryGap = queryStart >= lastQueryEnd ? "" : "overlap ";
+                    placementQueryGap += niceBpCount(Math.abs(queryStart - lastQueryEnd));
+
+                }
+                else if (lastStrand === "-" && queryStrand === "-") {
+                    placementQueryGap = lastQueryEnd >= queryStart ? "" : "overlap ";
+                    placementQueryGap += niceBpCount(Math.abs(lastQueryEnd - queryStart));
+                }
+                else {
+                    placementQueryGap = "reverse direction";
+                }
+            } else {
+                placementQueryGap = "not connected";
+            }
+            const placementGapX = (lastXEnd + xStart) / 2;
+            const queryPlacementGapX = (lastPlacement.queryXSpan.end + placement.queryXSpan.start) / 2
+            const placementTargetGap = lastTargetChr === targetChr ? 
+                    niceBpCount(targetStart - lastTargetEnd) : "not connected";
+
+            const targetTextWidth = placementTargetGap.length * 5;  // use font size 10...
+            const halfTargetTextWidth = 0.5 * targetTextWidth;
+            const preferredTargetStart = placementGapX - halfTargetTextWidth;
+            const preferredTargetEnd = placementGapX + halfTargetTextWidth;
+            // shift text position only if the width of text is bigger than the gap size:
+            const targetGapTextXSpan = (preferredTargetStart <= lastXEnd || preferredTargetEnd >= xStart)?
+                targetIntervalPlacer.place(new OpenInterval(preferredTargetStart, preferredTargetEnd)):
+                new OpenInterval(preferredTargetStart, preferredTargetEnd);
+            const targetGapXSpan = new OpenInterval(lastXEnd, xStart);
+            
+            const queryTextWidth = placementQueryGap.length * 5;   // use font size 10...
+            const halfQueryTextWidth = 0.5 * queryTextWidth;
+            const preferredQueryStart = queryPlacementGapX - halfQueryTextWidth;
+            const preferredQueryEnd = queryPlacementGapX + halfQueryTextWidth;
+            // shift text position only if the width of text is bigger than the gap size:
+            const queryGapTextXSpan = (preferredQueryStart <= lastPlacement.queryXSpan.end 
+                || preferredQueryEnd >= placement.queryXSpan.start)?
+                queryIntervalPlacer.place(new OpenInterval(preferredQueryStart, preferredQueryEnd)):
+                new OpenInterval(preferredQueryStart, preferredQueryEnd);
+            const queryGapXSpan = new OpenInterval(lastPlacement.queryXSpan.end, placement.queryXSpan.start);
+            drawGapTexts.push({
+                targetGapText: placementTargetGap,
+                targetXSpan: targetGapXSpan,
+                targetTextXSpan: targetGapTextXSpan,
+                queryGapText: placementQueryGap,
+                queryXSpan: queryGapXSpan,
+                queryTextXSpan: queryGapTextXSpan
+            });
+        }
         // Finally, using the x coordinates, construct the query nav context
         const queryPieces = this._getQueryPieces(placements);
         const queryRegion = this._makeQueryGenomeRegion(queryPieces, newVisWidth, newDrawModel);
@@ -148,7 +229,8 @@ export class AlignmentViewCalculator {
                 viewWindow: newViewWindow,
             },
             queryRegion,
-            drawData: placements
+            drawData: placements,
+            drawGapText: drawGapTexts
         };
 
         function convertOldVisRegion(visRegion: DisplayedRegionModel) {
