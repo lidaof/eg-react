@@ -92,7 +92,8 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             }
             const placementGapX = (lastXEnd + xStart) / 2;
             const queryPlacementGapX = (lastPlacement.queryXSpan.end + placement.queryXSpan.start) / 2
-            const placementTargetGap = lastTargetChr === targetChr ? niceBpCount(targetStart - lastTargetEnd) : "not connected";
+            const placementTargetGap = lastTargetChr === targetChr ? 
+                    niceBpCount(targetStart - lastTargetEnd) : "not connected";
 
             return <React.Fragment>
                 <text
