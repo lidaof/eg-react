@@ -58,16 +58,16 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN - 5;
 
         return <React.Fragment key={"gap " + i}>
-            {shiftTargetText && renderLine(gap.targetXSpan.start, ALIGN_TRACK_MARGIN, gap.targetTextXSpan.start,
+            {renderLine(gap.targetXSpan.start, ALIGN_TRACK_MARGIN, gap.targetTextXSpan.start,
                 targetTickY, PRIMARY_COLOR)}
             {renderText(placementTargetGap, placementGapX, targetY, PRIMARY_COLOR)}
-            {shiftTargetText && renderLine(gap.targetXSpan.end, ALIGN_TRACK_MARGIN, gap.targetTextXSpan.end,
+            {renderLine(gap.targetXSpan.end, ALIGN_TRACK_MARGIN, gap.targetTextXSpan.end,
                 targetTickY, PRIMARY_COLOR)}
 
-            {shiftQueryText && renderLine(gap.queryXSpan.start, FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN,
+            {renderLine(gap.queryXSpan.start, FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN,
                 gap.queryTextXSpan.start, queryTickY, QUERY_COLOR)}
             {renderText(placementQueryGap, queryPlacementGapX, queryY, QUERY_COLOR)}
-            {shiftQueryText && renderLine(gap.queryXSpan.end, FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN,
+            {renderLine(gap.queryXSpan.end, FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN,
                 gap.queryTextXSpan.end, queryTickY, QUERY_COLOR)}
         </React.Fragment>
         function renderText(text: string, x: number, y: number, color: string){
