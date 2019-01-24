@@ -76,13 +76,13 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             let placementQueryGap: string;
             if (lastQueryChr === queryChr){
                 if (lastStrand === "+" && queryStrand === "+") {
-                    placementQueryGap = queryStart >= lastQueryEnd?"":"overlap ";
+                    placementQueryGap = queryStart >= lastQueryEnd ? "" : "overlap ";
                     placementQueryGap += niceBpCount(Math.abs(queryStart - lastQueryEnd));
 
                 }
                 else if (lastStrand === "-" && queryStrand === "-") {
-                    placementQueryGap = lastQueryEnd >= queryStart?"":"overlap ";
-                    placementQueryGap = niceBpCount(Math.abs(lastQueryEnd - queryStart));
+                    placementQueryGap = lastQueryEnd >= queryStart ? "" : "overlap ";
+                    placementQueryGap += niceBpCount(Math.abs(lastQueryEnd - queryStart));
                 }
                 else {
                     placementQueryGap = "reverse direction";
