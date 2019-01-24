@@ -48,72 +48,52 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         const placementQueryGap = gap.queryGapText;
         const placementGapX = (gap.targetTextXSpan.start + gap.targetTextXSpan.end) / 2;
         const queryPlacementGapX = (gap.queryTextXSpan.start + gap.queryTextXSpan.end) / 2;
-        let targetY: number;
-        let queryY: number;
-        let targetTickY: number;
-        let queryTickY: number;
-        if (gap.targetTextXSpan.start < gap.targetXSpan.start || gap.targetTextXSpan.end > gap.targetXSpan.end) {
-            targetY = ALIGN_TRACK_MARGIN - 10;
-            targetTickY = ALIGN_TRACK_MARGIN - 5;
-        }
-        else {
-            targetY = ALIGN_TRACK_MARGIN + 5;
-            targetTickY = ALIGN_TRACK_MARGIN + 5;
-        }
-        if (gap.queryTextXSpan.start < gap.queryXSpan.start || gap.queryTextXSpan.end > gap.queryXSpan.end) {
-            queryY = FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN + 10;
-            queryTickY = FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN + 5;
-        }
-        else {
-            queryY = FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN - 5;
-            queryTickY = FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN - 5;
-        }
+        const shiftTargetText = gap.shiftTarget;
+        const shiftQueryText = gap.shiftQuery;
+        const targetY = shiftTargetText ? ALIGN_TRACK_MARGIN - 10 : ALIGN_TRACK_MARGIN + 5;
+        const targetTickY = shiftTargetText ? ALIGN_TRACK_MARGIN - 5 : ALIGN_TRACK_MARGIN + 5;
+        const queryY = shiftQueryText ? FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN + 10 : 
+            FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN - 5;
+        const queryTickY = shiftQueryText ? FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN + 5 :
+            FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN - 5;
+
         return <React.Fragment key={"gap " + i}>
-            <line
-                x1={gap.targetXSpan.start}
-                y1={ALIGN_TRACK_MARGIN}
-                x2={gap.targetTextXSpan.start}
-                y2={targetTickY}
-                stroke={PRIMARY_COLOR}
-            />
-            <text
-                x={placementGapX}
-                y={targetY}
-                dominantBaseline="middle"
-                style={{textAnchor: "middle", fill: PRIMARY_COLOR, fontSize: 10}}
-                >
-                {placementTargetGap}
-            </text>
-            <line
-                x1={gap.targetXSpan.end}
-                y1={ALIGN_TRACK_MARGIN}
-                x2={gap.targetTextXSpan.end}
-                y2={targetTickY}
-                stroke={PRIMARY_COLOR}
-            />
-            <line
-                x1={gap.queryXSpan.start}
-                y1={FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN}
-                x2={gap.queryTextXSpan.start}
-                y2={queryTickY}
-                stroke={QUERY_COLOR}
-            />
-            <text
-                x={queryPlacementGapX}
-                y={queryY}
-                dominantBaseline="middle"
-                style={{textAnchor: "middle", fill: QUERY_COLOR, fontSize: 10}}
-                >
-                {placementQueryGap}
-            </text>
-            <line
-                x1={gap.queryXSpan.end}
-                y1={FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN}
-                x2={gap.queryTextXSpan.end}
-                y2={queryTickY}
-                stroke={QUERY_COLOR}
-            />
+            {shiftTargetText && renderLine(gap.targetXSpan.start, ALIGN_TRACK_MARGIN, gap.targetTextXSpan.start,
+                targetTickY, PRIMARY_COLOR)}
+            {renderText(placementTargetGap, placementGapX, targetY, PRIMARY_COLOR)}
+            {shiftTargetText && renderLine(gap.targetXSpan.end, ALIGN_TRACK_MARGIN, gap.targetTextXSpan.end,
+                targetTickY, PRIMARY_COLOR)}
+
+            {shiftQueryText && renderLine(gap.queryXSpan.start, FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN,
+                gap.queryTextXSpan.start, queryTickY, QUERY_COLOR)}
+            {renderText(placementQueryGap, queryPlacementGapX, queryY, QUERY_COLOR)}
+            {shiftQueryText && renderLine(gap.queryXSpan.end, FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN,
+                gap.queryTextXSpan.end, queryTickY, QUERY_COLOR)}
         </React.Fragment>
+        function renderText(text: string, x: number, y: number, color: string){
+            return <React.Fragment>
+                <text
+                    x={x}
+                    y={y}
+                    dominantBaseline="middle"
+                    style={{textAnchor: "middle", fill: color, fontSize: 10}}
+                    >
+                    {text}
+                </text>
+            </React.Fragment>
+        }
+        function renderLine(x1: number, y1: number, x2: number, y2: number, color: string){
+            return <React.Fragment>
+                <line
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke={color}
+                />
+            </React.Fragment>
+
+        }
     }
     renderFineAlignment(placement: PlacedAlignment, i: number) {
         const {targetXSpan, targetSegments, querySegments} = placement;
@@ -187,13 +167,6 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             );
 
             return <React.Fragment>
-                {/* <line
-                    x1={xStart}
-                    y1={isQuery ? y + RECT_HEIGHT : y}
-                    x2={xStart + 10}
-                    y2={isQuery ? y + RECT_HEIGHT + 10 : y - 10}
-                    stroke={color}
-                /> */}
                 <line
                     x1={xStart}
                     y1={y + 0.5 * RECT_HEIGHT}
@@ -205,13 +178,6 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 {rects}
                 {isQuery && arrows}
                 {letters}
-                {/* <line
-                    x1={xEnd}
-                    y1={isQuery ? y + RECT_HEIGHT : y}
-                    x2={xEnd - 10}
-                    y2={isQuery ? y + RECT_HEIGHT + 10 : y - 10}
-                    stroke={color}
-                /> */}
             </React.Fragment>
         }
     }
@@ -287,13 +253,6 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             svgElements = drawData.map(this.renderFineAlignment);
             const drawGapText = alignment.drawGapText as GapText[];
             svgElements.push(...drawGapText.map(this.renderGapText));
-            // if (drawData.length > 0) {
-            //     svgElements.push(this.renderFineAlignment(drawData[0],drawData[0],0));
-            //     for(let i=1; i<drawData.length; i++) {
-            //         const svg = this.renderFineAlignment(drawData[i-1],drawData[i],i);
-            //         svgElements.push(svg);
-            //     }
-            // }
         } else {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
