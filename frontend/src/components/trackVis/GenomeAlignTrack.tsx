@@ -2,7 +2,7 @@ import React from 'react';
 import Track, { PropsFromTrackContainer } from './commonComponents/Track';
 import TrackLegend from './commonComponents/TrackLegend';
 import { Sequence } from '../Sequence';
-import { ensureMaxListLength } from '../../util';
+import { ensureMaxListLength, niceBpCount } from '../../util';
 import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment }
     from '../../model/alignment/AlignmentViewCalculator';
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
@@ -73,13 +73,16 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             const queryStrand = placement.record.queryStrand;
             const queryStart = 
                 queryStrand === "+" ? placement.record.queryLocus.start : placement.record.queryLocus.end;
-            let placementQueryGap: string | number;
+            let placementQueryGap: string;
             if (lastQueryChr === queryChr){
                 if (lastStrand === "+" && queryStrand === "+") {
-                    placementQueryGap = queryStart - lastQueryEnd;
+                    placementQueryGap = queryStart >= lastQueryEnd?"":"overlap ";
+                    placementQueryGap += niceBpCount(Math.abs(queryStart - lastQueryEnd));
+
                 }
                 else if (lastStrand === "-" && queryStrand === "-") {
-                    placementQueryGap = lastQueryEnd - queryStart;
+                    placementQueryGap = lastQueryEnd >= queryStart?"":"overlap ";
+                    placementQueryGap = niceBpCount(Math.abs(lastQueryEnd - queryStart));
                 }
                 else {
                     placementQueryGap = "reverse direction";
@@ -94,7 +97,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             return <React.Fragment>
                 <text
                     x={placementGapX}
-                    y={ALIGN_TRACK_MARGIN - 5}
+                    y={ALIGN_TRACK_MARGIN - 10}
                     dominantBaseline="middle"
                     style={{textAnchor: "middle", fill: 'black', fontSize: 10}}
                     >
@@ -102,7 +105,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 </text>
                 <text
                     x={queryPlacementGapX}
-                    y={FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN + 5}
+                    y={FINE_MODE_HEIGHT-ALIGN_TRACK_MARGIN + 10}
                     dominantBaseline="middle"
                     style={{textAnchor: "middle", fill: 'black', fontSize: 10}}
                     >
