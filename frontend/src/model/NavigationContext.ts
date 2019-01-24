@@ -305,13 +305,8 @@ class NavigationContext {
     /**
      * check if a feature is in current context
      */
-    hasFeature(queryFeature: Feature) {
-        _.find(this._features, feature => {
-            if (feature.name === queryFeature.name) {
-                return true;
-            }
-            return false;
-        })
+    hasFeatureWithName(queryFeature: Feature) {
+        return this._features.some(feature => feature.name === queryFeature.name);
     }
 }
 
