@@ -47,6 +47,8 @@ export interface GapText {
     queryGapText: string;
     queryXSpan: OpenInterval;
     queryTextXSpan: OpenInterval;
+    shiftTarget: boolean; // Whether target txt width > gap width
+    shiftQuery: boolean; // Whether query txt width > gap width
 }
 
 export interface Alignment {
@@ -192,7 +194,8 @@ export class AlignmentViewCalculator {
             const preferredTargetStart = placementGapX - halfTargetTextWidth;
             const preferredTargetEnd = placementGapX + halfTargetTextWidth;
             // shift text position only if the width of text is bigger than the gap size:
-            const targetGapTextXSpan = (preferredTargetStart <= lastXEnd || preferredTargetEnd >= xStart)?
+            const shiftTargetTxt = (preferredTargetStart <= lastXEnd || preferredTargetEnd >= xStart);
+            const targetGapTextXSpan = shiftTargetTxt?
                 targetIntervalPlacer.place(new OpenInterval(preferredTargetStart, preferredTargetEnd)):
                 new OpenInterval(preferredTargetStart, preferredTargetEnd);
             const targetGapXSpan = new OpenInterval(lastXEnd, xStart);
@@ -202,8 +205,9 @@ export class AlignmentViewCalculator {
             const preferredQueryStart = queryPlacementGapX - halfQueryTextWidth;
             const preferredQueryEnd = queryPlacementGapX + halfQueryTextWidth;
             // shift text position only if the width of text is bigger than the gap size:
-            const queryGapTextXSpan = (preferredQueryStart <= lastPlacement.queryXSpan.end 
-                || preferredQueryEnd >= placement.queryXSpan.start)?
+            const shiftQueryTxt = (preferredQueryStart <= lastPlacement.queryXSpan.end || 
+                preferredQueryEnd >= placement.queryXSpan.start);
+            const queryGapTextXSpan = shiftQueryTxt?
                 queryIntervalPlacer.place(new OpenInterval(preferredQueryStart, preferredQueryEnd)):
                 new OpenInterval(preferredQueryStart, preferredQueryEnd);
             const queryGapXSpan = new OpenInterval(lastPlacement.queryXSpan.end, placement.queryXSpan.start);
@@ -213,7 +217,9 @@ export class AlignmentViewCalculator {
                 targetTextXSpan: targetGapTextXSpan,
                 queryGapText: placementQueryGap,
                 queryXSpan: queryGapXSpan,
-                queryTextXSpan: queryGapTextXSpan
+                queryTextXSpan: queryGapTextXSpan,
+                shiftTarget: shiftTargetTxt,
+                shiftQuery: shiftQueryTxt
             });
         }
         // Finally, using the x coordinates, construct the query nav context
