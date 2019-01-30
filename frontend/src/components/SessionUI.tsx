@@ -9,6 +9,7 @@ import { notify } from 'react-notify-toast';
 import { AppStateSaver } from '../model/AppSaveLoad';
 import { ActionCreators } from "../AppState";
 import LoadSession from "./LoadSession";
+import { CopyToClip } from './CopyToClipboard';
 
 import './SessionUI.css';
 
@@ -203,7 +204,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                 <React.Fragment>
                     <button className="SessionUI btn btn-primary" onClick={this.saveSession}>Save session</button>
                     <div>
-                        <p>Session bundle Id: {this.props.bundleId}</p>
+                        <p>Session bundle Id: {this.props.bundleId} <CopyToClip value={this.props.bundleId} /></p>
                         <label htmlFor="sessionLabel">
                             Name your session: <input
                                 type="text"
