@@ -59,7 +59,7 @@ export class AlignmentSegment extends FeatureSegment {
         return new ChromosomeInterval(
             queryLocus.chr,
             queryLocus.start + this.relativeStart,
-            queryLocus.end + this.relativeStart
+            queryLocus.start + this.relativeEnd
         );
     }
 
