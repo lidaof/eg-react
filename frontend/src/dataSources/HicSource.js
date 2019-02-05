@@ -1,11 +1,10 @@
 import _ from 'lodash';
+import Straw from 'hic-straw';
 import DataSource from './DataSource';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
-import { NormalizationMode, SORTED_BIN_SIZES } from 'src/model/HicDataModes';
+import { NormalizationMode, SORTED_BIN_SIZES } from '../model/HicDataModes';
 import { GenomeInteraction } from '../model/GenomeInteraction';
 import { ensureMaxListLength } from '../util';
-// import hic from 'juicebox.js';
-// import igv from 'igv/dist/igv.esm.min';
 
 /**
  * First, some monkey patching for juicebox.js
@@ -16,20 +15,20 @@ import { ensureMaxListLength } from '../util';
  * @param {string} name - the chromosome name to find
  * @return {number} the index of the chromosome in the file, or `undefined` if not found.
  */
-window.hic.Dataset.prototype.getChrIndexFromName = function(name) {
-    if (!name) {
-        return;
-    }
-    let found = this.chromosomes.findIndex(chromosome => chromosome.name === name);
-    if (found !== -1) {
-        return found.index;
-    }
+// window.hic.Dataset.prototype.getChrIndexFromName = function(name) {
+//     if (!name) {
+//         return;
+//     }
+//     let found = this.chromosomes.findIndex(chromosome => chromosome.name === name);
+//     if (found !== -1) {
+//         return found.index;
+//     }
 
-    let modifiedName = name.replace("chrM", "MT");
-    modifiedName = modifiedName.replace("chr", "");
-    found = this.chromosomes.findIndex(chromosome => chromosome.name.toUpperCase() === modifiedName.toUpperCase());
-    return found !== -1 ? found : undefined;
-}
+//     let modifiedName = name.replace("chrM", "MT");
+//     modifiedName = modifiedName.replace("chr", "");
+//     found = this.chromosomes.findIndex(chromosome => chromosome.name.toUpperCase() === modifiedName.toUpperCase());
+//     return found !== -1 ? found : undefined;
+// }
 
 const MIN_BINS_PER_REGION = 50;
 
@@ -46,9 +45,20 @@ export class HicSource extends DataSource {
      */
     constructor(url) {
         super();
-        this.straw = new window.hic.Straw({ url: url });
-        this.datasetPromise = this.straw.reader.loadDataset({});
-        this.normVectorsPromise = null;
+        this.straw = new Straw({ path: url });
+        // this.datasetPromise = this.straw.reader.loadDataset({});
+        // this.metadataPromise = null;
+        // this.normVectorsPromise = null;
+    }
+
+    /**
+     * get metadata for a hic file
+     */
+    getMetadata() {
+        if (!this.metadataPromise) {
+            this.metadataPromise = this.straw.getMetaData();
+        }
+        return this.metadataPromise;
     }
 
     /**
@@ -60,8 +70,7 @@ export class HicSource extends DataSource {
      */
     fetchNormalizationData() {
         if (!this.normVectorsPromise) {
-            this.normVectorsPromise = this.datasetPromise
-                .then(dataset => this.straw.reader.readNormExpectedValuesAndNormVectorIndex(dataset));
+            this.normVectorsPromise = this.straw.hicFile.readNormExpectedValuesAndNormVectorIndex();
         }
         return this.normVectorsPromise;
     }
@@ -105,9 +114,9 @@ export class HicSource extends DataSource {
      * @return {GenomeInteraction[]} 
      */
     async getInteractionsBetweenLoci(queryLocus1, queryLocus2, binSize, normalization=NormalizationMode.NONE) {
-        if (normalization !== NormalizationMode.NONE) {
-            await this.fetchNormalizationData();
-        }
+        // if (normalization !== NormalizationMode.NONE) {
+        //     await this.fetchNormalizationData();
+        // }
         const records = await this.straw.getContactRecords(normalization, queryLocus1, queryLocus2, 'BP', binSize);
         const interactions = [];
         for (const record of records) {
@@ -131,6 +140,7 @@ export class HicSource extends DataSource {
      * @return {Promise<GenomeInteraction[]>} a Promise for the data
      */
     async getData(region, basesPerPixel, options) {
+        // await this.straw.hicFile.init();
         const binSize = this.getBinSize(options, region);
         const promises = [];
         const loci = region.getGenomeIntervals();
@@ -150,8 +160,8 @@ export class HicSource extends DataSource {
      * @return {Promise<GenomeInteraction[]>} a Promise for the data
      */
     async getDataAll(genome) {
-        await this.datasetPromise;
-        const binSize = this.straw.reader.wholeGenomeChromosome.size * 2;
+        await this.getMetadata();
+        const binSize = this.straw.hicFile.wholeGenomeChromosome.size * 2;
         const allRecords = await this.straw.getContactRecords(NormalizationMode.NONE, {chr: "ALL"}, {chr: "ALL"}, "BP");
         const interactions = []
         for (const record of allRecords) {

@@ -4,7 +4,7 @@ import InteractionTrack, { DEFAULT_OPTIONS } from '../trackVis/interactionTrack/
 
 import { HicSource } from '../../dataSources/HicSource';
 import { TrackModel, TrackOptions } from '../../model/TrackModel';
-import { BinSize, NormalizationMode } from 'src/model/HicDataModes';
+import { BinSize, NormalizationMode } from '../..//model/HicDataModes';
 
 import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import { InteractionDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';

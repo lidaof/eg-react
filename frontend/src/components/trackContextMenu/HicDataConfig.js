@@ -1,6 +1,6 @@
 import React from 'react';
 import SelectConfig from './SelectConfig';
-import { BinSize, NormalizationMode } from 'src/model/HicDataModes';
+import { BinSize, NormalizationMode } from '../../model/HicDataModes';
 
 /**
  * A menu item for configuring bin sizes for hic tracks.
