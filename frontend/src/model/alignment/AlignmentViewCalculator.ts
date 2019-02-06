@@ -60,6 +60,7 @@ export interface Alignment {
      */
     drawData: PlacedAlignment[] | PlacedMergedAlignment[];
     drawGapText?: GapText[];  // An array holding gap size information between placedAlignments, fineMode only
+    plotStrand?: string; // rough mode plot positive or negative
 }
 
 const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
@@ -99,8 +100,12 @@ export class AlignmentViewCalculator {
         if (this._viewBeingFetched !== visData) {
             return Promise.reject(new Error('Alignment canceled due to another call to align()'));
         }
-
-        return isFineMode ? this.alignFine(records, visData) : this.alignRough(records, visData);
+        const aggregateStrandsNumber = records.reduce((aggregateStrand, record) => 
+        aggregateStrand + (record.getIsReverseStrandQuery()?
+        (-1 * record.getLength()):record.getLength()), 0
+        );
+        const plotStrand = aggregateStrandsNumber < 0?"-":"+";
+        return isFineMode ? this.alignFine(records, visData) : this.alignRough(records, visData, plotStrand);
     }
 
     alignFine(records: AlignmentRecord[], visData: ViewExpansion): Alignment {
@@ -258,7 +263,7 @@ export class AlignmentViewCalculator {
      * @param {number} width - view width of the primary genome
      * @return {PlacedMergedAlignment[]} placed merged alignments
      */
-    alignRough(alignmentRecords: AlignmentRecord[], visData: ViewExpansion): Alignment {
+    alignRough(alignmentRecords: AlignmentRecord[], visData: ViewExpansion, plotStrand: string): Alignment {
         const {visRegion, visWidth} = visData;
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
         const mergeDistance = drawModel.xWidthToBases(MERGE_PIXEL_DISTANCE);
@@ -293,13 +298,14 @@ export class AlignmentViewCalculator {
 
             // Put the actual secondary/query genome segments in the placed merged query locus from above
             const queryLoci = placementsInMerge.map(placement => placement.record.queryLocus);
-            const lociXSpans = this._placeInternalLoci(mergeLocus, queryLoci, mergeXSpan.start, drawModel);
+            const isReverse = plotStrand==="-"?true:false;
+            const lociXSpans = this._placeInternalLoci(mergeLocus, queryLoci, mergeXSpan, isReverse, drawModel);
             for (let i = 0; i < queryLoci.length; i++) {
                 placementsInMerge[i].queryXSpan = lociXSpans[i];
             }
 
             drawData.push({
-                queryFeature: new Feature(undefined, mergeLocus),
+                queryFeature: new Feature(undefined, mergeLocus, plotStrand),
                 queryXSpan: mergeXSpan,
                 segments: placementsInMerge
             });
@@ -310,6 +316,7 @@ export class AlignmentViewCalculator {
             primaryVisData: visData,
             queryRegion: this._makeQueryGenomeRegion(drawData, visWidth, drawModel),
             drawData,
+            plotStrand,
         };
     }
 
@@ -444,16 +451,27 @@ export class AlignmentViewCalculator {
         return new DisplayedRegionModel( new NavigationContext('', features) );
     }
 
-    _placeInternalLoci(parentLocus: ChromosomeInterval, internalLoci: ChromosomeInterval[], parentXStart: number,
-        drawModel: LinearDrawingModel)
+    _placeInternalLoci(parentLocus: ChromosomeInterval, internalLoci: ChromosomeInterval[], parentXSpan: OpenInterval,
+         drawReverse: boolean, drawModel: LinearDrawingModel)
     {
         const xSpans = [];
-        for (const locus of internalLoci) {
-            const distanceFromParent = locus.start - parentLocus.start;
-            const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
-            const xStart = parentXStart + xDistanceFromParent;
-            const xWidth = drawModel.basesToXWidth(locus.getLength());
-            xSpans.push(new OpenInterval(xStart, xStart + xWidth));
+        if (drawReverse) {
+            for (const locus of internalLoci) {
+                const distanceFromParent = locus.start - parentLocus.start;
+                const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
+                const xEnd = parentXSpan.end - xDistanceFromParent;
+                const xWidth = drawModel.basesToXWidth(locus.getLength());
+                xSpans.push(new OpenInterval(xEnd - xWidth, xEnd));
+            }
+        }
+        else {
+            for (const locus of internalLoci) {
+                const distanceFromParent = locus.start - parentLocus.start;
+                const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
+                const xStart = parentXSpan.start + xDistanceFromParent;
+                const xWidth = drawModel.basesToXWidth(locus.getLength());
+                xSpans.push(new OpenInterval(xStart, xStart + xWidth));
+            }
         }
         return xSpans;
     }

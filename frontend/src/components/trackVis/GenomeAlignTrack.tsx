@@ -6,6 +6,7 @@ import { ensureMaxListLength } from '../../util';
 import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment, GapText }
     from '../../model/alignment/AlignmentViewCalculator';
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
+import OpenInterval from 'src/model/interval/OpenInterval';
 // import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 
 const FINE_MODE_HEIGHT = 80;
@@ -29,6 +30,70 @@ function swap(array: any[], i: number, j: number) {
     const temp = array[j];
     array[j] = array[i];
     array[i] = temp;
+}
+
+/**
+ * render rough alignment with strand infomation
+ * 
+ * @param {PlacedMergedAlignment} placement - array of placed mergealignment
+ * @param {boolean} plotReverse - reverse or not
+ */
+function renderRoughAlignment(placement: PlacedMergedAlignment, plotReverse: boolean) {
+    const {queryFeature, queryXSpan, segments} = placement;
+    const queryRectTopY = ROUGH_MODE_HEIGHT - RECT_HEIGHT;
+    const queryGenomeRect = <rect
+        x={queryXSpan.start}
+        y={queryRectTopY}
+        width={queryXSpan.getLength()}
+        height={RECT_HEIGHT}
+        fill={QUERY_COLOR}
+        // tslint:disable-next-line:jsx-no-lambda
+        onClick={() => alert("You clicked on " + queryFeature.getLocus().toString())}
+    />;
+
+    const estimatedLabelWidth = queryFeature.toString().length * FONT_SIZE;
+    let label = null;
+    if (estimatedLabelWidth < queryXSpan.getLength()) {
+        label = <text
+            x={0.5 * (queryXSpan.start + queryXSpan.end)}
+            y={queryRectTopY + 0.5 * RECT_HEIGHT}
+            dominantBaseline="middle"
+            textAnchor="middle"
+            fill="white"
+            fontSize={12}
+        >
+            {queryFeature.getLocus().toString()}
+        </text>;
+    }
+
+    const segmentPolygons = segments.map((segment, i) => {
+        const points = [
+            [Math.floor(segment.targetXSpan.start), 0],
+            [Math.floor(segment.queryXSpan.start), queryRectTopY],
+            [Math.ceil(segment.queryXSpan.end), queryRectTopY],
+            [Math.ceil(segment.targetXSpan.end), 0],
+        ];
+        if ((!plotReverse && segment.record.queryStrand === '-') || 
+            (plotReverse && segment.record.queryStrand === '+')) {
+            swap(points, 1, 2);
+        }
+
+
+        return <polygon
+            key={i}
+            points={points as any} // Contrary to what Typescript thinks, you CAN pass a number[][].
+            fill={QUERY_COLOR}
+            fillOpacity={0.5}
+            // tslint:disable-next-line:jsx-no-lambda
+            onClick={() => alert("You clicked on " + segment.record.getLocus())}
+        />;
+    });
+
+    return <React.Fragment key={queryFeature.getLocus().toString()} >
+        {queryGenomeRect}
+        {label}
+        {ensureMaxListLength(segmentPolygons, MAX_POLYGONS)}
+    </React.Fragment>
 }
 
 /**
@@ -182,61 +247,29 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         }
     }
 
-    renderRoughAlignment(placement: PlacedMergedAlignment) {
-        const {queryFeature, queryXSpan, segments} = placement;
-        const queryRectTopY = ROUGH_MODE_HEIGHT - RECT_HEIGHT;
-        const queryGenomeRect = <rect
-            x={queryXSpan.start}
-            y={queryRectTopY}
-            width={queryXSpan.getLength()}
+    renderRoughStrand(strand: string, viewWindow: OpenInterval) {
+        const plotReverse = strand === '-'?true:false;
+        return    <AnnotationArrows
+            key={"roughArrow" + viewWindow.start}
+            startX={viewWindow.start}
+            endX={viewWindow.end}
+            y={ROUGH_MODE_HEIGHT - RECT_HEIGHT}
             height={RECT_HEIGHT}
-            fill={QUERY_COLOR}
-            // tslint:disable-next-line:jsx-no-lambda
-            onClick={() => alert("You clicked on " + queryFeature.getLocus().toString())}
+            opacity={0.75}
+            isToRight={!plotReverse}
+            color="white"
         />;
-
-        const estimatedLabelWidth = queryFeature.toString().length * FONT_SIZE;
-        let label = null;
-        if (estimatedLabelWidth < queryXSpan.getLength()) {
-            label = <text
-                x={0.5 * (queryXSpan.start + queryXSpan.end)}
-                y={queryRectTopY + 0.5 * RECT_HEIGHT}
-                dominantBaseline="middle"
-                textAnchor="middle"
-                fill="white"
-                fontSize={12}
-            >
-                {queryFeature.getLocus().toString()}
-            </text>;
-        }
-
-        const segmentPolygons = segments.map((segment, i) => {
-            const points = [
-                [Math.floor(segment.targetXSpan.start), 0],
-                [Math.floor(segment.queryXSpan.start), queryRectTopY],
-                [Math.ceil(segment.queryXSpan.end), queryRectTopY],
-                [Math.ceil(segment.targetXSpan.end), 0],
-            ];
-            if (segment.record.queryStrand === '-') {
-                swap(points, 1, 2);
-            }
-
-            return <polygon
-                key={i}
-                points={points as any} // Contrary to what Typescript thinks, you CAN pass a number[][].
-                fill={QUERY_COLOR}
-                fillOpacity={0.5}
-                // tslint:disable-next-line:jsx-no-lambda
-                onClick={() => alert("You clicked on " + segment.record.getLocus())}
-            />;
-        });
-
-        return <React.Fragment key={queryFeature.getLocus().toString()} >
-            {queryGenomeRect}
-            {label}
-            {ensureMaxListLength(segmentPolygons, MAX_POLYGONS)}
-        </React.Fragment>
     }
+    renderRoughAlignmentPositive (placement: PlacedMergedAlignment, i: number) {
+        const frag = renderRoughAlignment(placement, false);
+        return <React.Fragment key={i}>{frag}</React.Fragment>;
+    }
+    renderRoughAlignmentNegative (placement: PlacedMergedAlignment, i: number) {
+        const frag = renderRoughAlignment(placement, true);
+        return <React.Fragment key={i}>{frag}</React.Fragment>;
+    }
+
+
 
     /** 
      * @inheritdoc
@@ -256,7 +289,13 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         } else {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
-            svgElements = drawData.map(this.renderRoughAlignment);
+            const strand = alignment.plotStrand;
+            svgElements = strand === '+'?svgElements = drawData.map(this.renderRoughAlignmentPositive):
+                drawData.map(this.renderRoughAlignmentNegative);
+
+            const viewWindow = alignment.primaryVisData.viewWindow;
+            const arrow = this.renderRoughStrand(strand, viewWindow);
+            svgElements.push(arrow);
         }
 
         return <Track
