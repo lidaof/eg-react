@@ -100,11 +100,15 @@ export class AlignmentViewCalculator {
         if (this._viewBeingFetched !== visData) {
             return Promise.reject(new Error('Alignment canceled due to another call to align()'));
         }
+        
+        // Count how many bases are in positive strand and how many of them are in negative strand.
+        // More in negative strand (<0) => plotStrand = "-". 
         const aggregateStrandsNumber = records.reduce((aggregateStrand, record) => 
         aggregateStrand + (record.getIsReverseStrandQuery()?
         (-1 * record.getLength()):record.getLength()), 0
         );
         const plotStrand = aggregateStrandsNumber < 0?"-":"+";
+
         return isFineMode ? this.alignFine(records, visData) : this.alignRough(records, visData, plotStrand);
     }
 
