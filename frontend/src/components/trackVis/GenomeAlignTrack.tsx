@@ -209,7 +209,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             // tslint:disable-next-line:jsx-no-lambda
             onClick={() => alert("You clicked on " + queryFeature.getLocus().toString())}
         />;
-    
+
         const estimatedLabelWidth = queryFeature.toString().length * FONT_SIZE;
         let label = null;
         if (estimatedLabelWidth < queryXSpan.getLength()) {
@@ -224,7 +224,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 {queryFeature.getLocus().toString()}
             </text>;
         }
-    
+
         const segmentPolygons = segments.map((segment, i) => {
             const points = [
                 [Math.floor(segment.targetXSpan.start), 0],
@@ -236,8 +236,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 (plotReverse && segment.record.queryStrand === '+')) {
                 swap(points, 1, 2);
             }
-    
-    
+
             return <polygon
                 key={i}
                 points={points as any} // Contrary to what Typescript thinks, you CAN pass a number[][].
@@ -247,15 +246,13 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 onClick={() => alert("You clicked on " + segment.record.getLocus())}
             />;
         });
-    
+
         return <React.Fragment key={queryFeature.getLocus().toString()} >
             {queryGenomeRect}
             {label}
             {ensureMaxListLength(segmentPolygons, MAX_POLYGONS)}
         </React.Fragment>
     }
-
-
 
     /** 
      * @inheritdoc
