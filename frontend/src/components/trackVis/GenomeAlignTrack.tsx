@@ -273,7 +273,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
             const strand = alignment.plotStrand;
-            svgElements = drawData.map(arrayItem => this.renderRoughAlignment(arrayItem, strand==='-'));
+            svgElements = drawData.map(placement => this.renderRoughAlignment(placement, strand==='-'));
             const viewWindow = alignment.primaryVisData.viewWindow;
             const arrow = this.renderRoughStrand(strand, viewWindow);
             svgElements.push(arrow);
