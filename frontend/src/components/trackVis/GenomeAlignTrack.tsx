@@ -34,7 +34,8 @@ function swap(array: any[], i: number, j: number) {
 
 /**
  * render rough alignment with strand infomation
- * 
+ * I have to move it here because I can't use it with array.map()
+ * Maybe there is a better way?
  * @param {PlacedMergedAlignment} placement - array of placed mergealignment
  * @param {boolean} plotReverse - reverse or not
  */
@@ -246,7 +247,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             </React.Fragment>
         }
     }
-
+    // Add arrow to query region, arrow direction is determined by plotReverse.
     renderRoughStrand(strand: string, viewWindow: OpenInterval) {
         const plotReverse = strand === '-'?true:false;
         return    <AnnotationArrows

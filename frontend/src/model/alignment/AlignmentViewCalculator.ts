@@ -455,7 +455,7 @@ export class AlignmentViewCalculator {
          drawReverse: boolean, drawModel: LinearDrawingModel)
     {
         const xSpans = [];
-        if (drawReverse) {
+        if (drawReverse) {  // place segments from right to left if drawReverse
             for (const locus of internalLoci) {
                 const distanceFromParent = locus.start - parentLocus.start;
                 const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
