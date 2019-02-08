@@ -1,0 +1,8 @@
+.FetchSequence-seq {
+    font-family: monospace;
+    border: 1px gray dashed;
+    max-width: 100ch;
+    word-break: break-all;
+    margin-top: 20px;
+    empty-cells:hide;
+}

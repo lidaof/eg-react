@@ -11,7 +11,7 @@ export class CopyToClip extends React.Component {
       <span>
         <CopyToClipboard text={this.props.value}
           onCopy={() => this.setState({copied: true})}>
-          <button title="Copy to clipboard">Copy</button>
+          <button className="btn btn-sm btn-info" title="Copy to clipboard">Copy</button>
         </CopyToClipboard> {this.state.copied ? <span style={{color: 'red'}}>Copied</span> : null}
       </span>
     );

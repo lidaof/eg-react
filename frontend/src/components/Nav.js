@@ -20,6 +20,7 @@ import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "../AppState";
 import { HotKeyInfo } from "./HotKeyInfo";
 import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
 import { TrackUpload } from "./TrackUpload";
+import { FetchSequence } from "./FetchSequence";
 import packageJson from '../../package.json';
 
 
@@ -211,6 +212,9 @@ class Nav extends React.Component {
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Screenshot">
                             <ScreenshotUI expansionAmount={REGION_EXPANDER} needClip={hasInteractionTrack} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Fetch Sequence">
+                            <FetchSequence genomeConfig={genomeConfig} selectedRegion={selectedRegion} />
                         </ModalMenuItem>
                     </div>
                 </div>
