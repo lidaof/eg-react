@@ -131,3 +131,15 @@ export function readFileAsText(file: Blob) {
     reader.readAsText(file);
     return promise;
 }
+
+/** 
+ * find closest number in a number array (sorted or un-sorted)
+ */
+export function findClosestNumber(arr: number[], num: number) {
+    if (arr.includes(num)) {
+        return num;
+    }
+    return arr.reduce((prev, curr) => {
+        return (Math.abs(curr - num) < Math.abs(prev - num) ? curr : prev);
+      });
+}

@@ -6,3 +6,7 @@
     margin-top: 20px;
     empty-cells:hide;
 }
+
+.FetchSequence-seq:empty {
+    display: none;
+ }
