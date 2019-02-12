@@ -29,7 +29,7 @@ export class FetchSequence extends React.Component {
         this.state = {
             currentRegionSeq: '',
             queryList: `chr6:52425276-52425961
-chr1:90100-91000`,
+chr1:10001000-10001400`,
             listRegionSeq: '',
         };
         this.twoBitSource = props.genomeConfig.twoBitURL ? new TwoBitSource(props.genomeConfig.twoBitURL) : null;

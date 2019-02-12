@@ -290,9 +290,11 @@ class TrackContainer extends React.Component {
         const {metadataTerms, onMetadataTermsChanged, suggestedMetaSets, viewRegion, 
             onNewRegion, onToggleHighlight, onSetEnteredRegion} = this.props;
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
-        const panLeftButton = <button className="btn btn-outline-dark" title="Pan left"
+        const panLeftButton = <button className="btn btn-outline-dark" title="Pan left
+(Alt+Z)"
                                 style={{fontFamily: "monospace"}} onClick={() => this.panLeftOrRight(true)}>◀</button>;
-        const panRightButton = <button className="btn btn-outline-dark" title="Pan right"
+        const panRightButton = <button className="btn btn-outline-dark" title="Pan right
+(Alt+X)"
                                 style={{fontFamily: "monospace"}} onClick={() => this.panLeftOrRight(false)}>▶</button>;
         return <div style={{display: "flex", alignItems: "center"}}>
                 <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} />

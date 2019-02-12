@@ -111,6 +111,7 @@ export class HicSource extends DataSource {
         // if (normalization !== NormalizationMode.NONE) {
         //     await this.fetchNormalizationData();
         // }
+        console.log(this.normOptions, normalization);
         if (!this.normOptions.includes(normalization)) {
             return [];
         }

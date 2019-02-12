@@ -5,17 +5,20 @@ import ButtonGroup from './ButtonGroup';
 export const Tools = {
     DRAG: {
         buttonContent: "✋",
-        title: "Drag tool",
+        title: `Drag tool
+(Alt+H or Alt+D)`,
         cursor: "pointer",
     },
     REORDER: {
         buttonContent: "🔀",
-        title: "Reorder tool",
+        title: `Reorder tool
+(Alt+R or Alt+S)`,
         cursor: "all-scroll",
     },
     ZOOM_IN: {
         buttonContent: "⬚🔍+",
-        title: "Zoom-in tool",
+        title: `Zoom-in tool
+(Alt+M)`,
         cursor: "zoom-in",
     },
 };
