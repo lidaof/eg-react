@@ -463,18 +463,22 @@ export class AlignmentViewCalculator {
             for (const locus of internalLoci) {
                 const distanceFromParent = locus.start - parentLocus.start;
                 const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
-                const xEnd = parentXSpan.end - xDistanceFromParent;
+                const locusXEnd = parentXSpan.end - xDistanceFromParent;
                 const xWidth = drawModel.basesToXWidth(locus.getLength());
-                xSpans.push(new OpenInterval(xEnd - xWidth, xEnd));
+                const xEnd = locusXEnd<parentLocus.end?locusXEnd:parentXSpan.end;
+                const xStart = (locusXEnd - xWidth)> parentXSpan.start?(locusXEnd - xWidth):parentXSpan.start;
+                xSpans.push(new OpenInterval(xStart, xEnd));
             }
         }
         else {
             for (const locus of internalLoci) {
                 const distanceFromParent = locus.start - parentLocus.start;
                 const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
-                const xStart = parentXSpan.start + xDistanceFromParent;
+                const locusXStart = parentXSpan.start + xDistanceFromParent;
                 const xWidth = drawModel.basesToXWidth(locus.getLength());
-                xSpans.push(new OpenInterval(xStart, xStart + xWidth));
+                const xStart = locusXStart>parentXSpan.start?locusXStart:parentXSpan.start;
+                const xEnd = (locusXStart + xWidth)<parentXSpan.end?(locusXStart + xWidth):parentXSpan.end;
+                xSpans.push(new OpenInterval(xStart, xEnd));
             }
         }
         return xSpans;
