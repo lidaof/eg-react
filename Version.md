@@ -1,5 +1,12 @@
 # Version History
 
+## 48.2.1
+
+* use [hic-straw](https://github.com/igvteam/hic-straw) package for .hic data source, removed the dependency to igv.js and juicebox.js
+* added `FetchSequence` App to allow fetch sequence of current region or user specified regions
+* Fix a bug while upload file hub causing page freeze
+* Rough alignment enhanced by Xiaoyu
+
 ## 48.2.0
 
 * genome alignment track enhanced view, improved by Xiaoyu Zhuo
