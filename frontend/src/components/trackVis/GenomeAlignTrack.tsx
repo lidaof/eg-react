@@ -6,6 +6,7 @@ import { ensureMaxListLength } from '../../util';
 import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment, GapText }
     from '../../model/alignment/AlignmentViewCalculator';
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
+import OpenInterval from 'src/model/interval/OpenInterval';
 // import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 
 const FINE_MODE_HEIGHT = 80;
@@ -181,8 +182,22 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             </React.Fragment>
         }
     }
+    // Add arrow to query region, arrow direction is determined by plotReverse.
+    renderRoughStrand(strand: string, viewWindow: OpenInterval) {
+        const plotReverse = strand === '-'?true:false;
+        return    <AnnotationArrows
+            key={"roughArrow" + viewWindow.start}
+            startX={viewWindow.start}
+            endX={viewWindow.end}
+            y={ROUGH_MODE_HEIGHT - RECT_HEIGHT}
+            height={RECT_HEIGHT}
+            opacity={0.75}
+            isToRight={!plotReverse}
+            color="white"
+        />;
+    }
 
-    renderRoughAlignment(placement: PlacedMergedAlignment) {
+    renderRoughAlignment(placement: PlacedMergedAlignment, plotReverse: boolean) {
         const {queryFeature, queryXSpan, segments} = placement;
         const queryRectTopY = ROUGH_MODE_HEIGHT - RECT_HEIGHT;
         const queryGenomeRect = <rect
@@ -217,7 +232,8 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                 [Math.ceil(segment.queryXSpan.end), queryRectTopY],
                 [Math.ceil(segment.targetXSpan.end), 0],
             ];
-            if (segment.record.queryStrand === '-') {
+            if ((!plotReverse && segment.record.queryStrand === '-') || 
+                (plotReverse && segment.record.queryStrand === '+')) {
                 swap(points, 1, 2);
             }
 
@@ -256,7 +272,11 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         } else {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
-            svgElements = drawData.map(this.renderRoughAlignment);
+            const strand = alignment.plotStrand;
+            svgElements = drawData.map(placement => this.renderRoughAlignment(placement, strand==='-'));
+            const viewWindow = alignment.primaryVisData.viewWindow;
+            const arrow = this.renderRoughStrand(strand, viewWindow);
+            svgElements.push(arrow);
         }
 
         return <Track
