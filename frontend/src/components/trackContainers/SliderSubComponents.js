@@ -1,3 +1,6 @@
+/**
+ * this component is from first example at https://sghall.github.io/react-compound-slider/#/slider-demos/horizontal
+ */
 // @flow weak
 
 import React, { Fragment } from 'react'

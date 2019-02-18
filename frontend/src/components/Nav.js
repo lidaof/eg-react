@@ -6,6 +6,7 @@ import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from './genomeNavigator/TrackRegionController';
 import RegionSetSelector from './RegionSetSelector';
+import Geneplot from './Geneplot';
 import TrackList from "./trackManagers/TrackList";
 import { TrackModel } from '../model/TrackModel';
 import AnnotationTrackSelector from './trackManagers/AnnotationTrackSelector';
@@ -194,6 +195,9 @@ class Nav extends React.Component {
                         <ModalMenuItem itemLabel="Region Set View">
                             <RegionSetSelector genome={genomeConfig.genome} />
                         </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Geneplot">
+                            <Geneplot genome={genomeConfig.genome} />
+                        </ModalMenuItem>
                         <ModalMenuItem itemLabel="Session" style={{content: {
                                                         right: "unset",
                                                         bottom: "unset",
@@ -278,13 +282,16 @@ class Nav extends React.Component {
                             <a href="http://epigenomegateway.wustl.edu/legacy" target="_blank">The 'old' browser</a>
                         </label>
                         <label className="dropdown-item">
-                            <a href="https://plus.google.com/u/0/communities/104985851965529755092" target="_blank">Google+ forum</a>
+                            <a href="https://groups.google.com/forum/#!forum/epgg" target="_blank">Google groups</a>
                         </label>
                         <label className="dropdown-item">
                             <a href="https://bit.ly/2T1OKmP" target="_blank">Join our Slack</a>
                         </label>
                         <label className="dropdown-item">
                             <a href="https://github.com/lidaof/eg-react" target="_blank">Source code</a>
+                        </label>
+                        <label className="dropdown-item">
+                            <a href="https://plus.google.com/u/0/communities/104985851965529755092" target="_blank">Google+ forum</a>
                         </label>
                     </div>
                 </div>

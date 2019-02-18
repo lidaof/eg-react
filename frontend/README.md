@@ -1,8 +1,38 @@
-<div style="text-align:left;">
-  <a href="https://github.com/lidaof/eg-react" target="\_parent"><img src="https://eg.readthedocs.io/en/latest/_images/eg.png" alt="Browser Logo" style="width:300px;"/></a>
-</div>
-
 # WashU Epigenome Browser
+
+![WashU Epigenome Browser Logo](https://eg.readthedocs.io/en/latest/_images/eg.png "WashU Epigenome Browser")
+
+## Start the browser standalone
+
+Install [Node](https://nodejs.org/en/). Download the source code from our github repo: https://github.com/lidaof/eg-react
+
+1. Enter the `frontend` directory
+2. `npm install` (try `npm install --force` if getting error)
+3. `npm start`
+
+Your local browser is available at http://localhost:3000/browser/.
+
+## Use your own data API (optional)
+
+Enter the `backend` directory.  `npm install`, and then `npm run setup`.  MongoDB must be installed and running.
+
+## Documentation
+
+Please check all the documentaiton at [https://eg.rtfd.io/](https://eg.rtfd.io/).
+
+## Reporting Issues
+
+If you found an issue, please [report it](https://github.com/lidaof/eg-react/issues) along with any relevant details to reproduce it. Thanks.
+
+## Asking for help
+
+1. The [issue tracker](https://github.com/lidaof/eg-react/issues).
+2. The [Google groups](https://groups.google.com/forum/#!forum/epgg).
+3. The [Slack channel](https://bit.ly/2T1OKmP).
+
+## Contributions
+
+Yes please! Feature requests / pull requests are welcome.
 
 ## CDN
 
@@ -99,21 +129,3 @@ Create a HTML page with following contents: (the example shows how to embed a mo
 
 The key API is the function `renderBrowserInElement`, it accepts the `contents` array as first argument,
 and `container` as second argument which is a DOM element.
-
-## Start the browser standalone
-
-Download the source code from our github repo: https://github.com/lidaof/eg-react
-
-1. Enter the `frontend` directory
-2. `npm install`
-3. `npm start`
-
-Your local browser is available at http://localhost:3000/browser/.
-
-## Use your own data API (optional)
-
-Enter the `backend` directory.  `npm install`, and then `npm run setup`.  MongoDB must be installed and running.
-
-## Documentation
-
-Please check all the documentaiton at https://eg.rtfd.io/.

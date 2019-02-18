@@ -1,5 +1,8 @@
 # Version History
 
+* new function to re-order many tracks at one time by drap and drop
+* new hot key (Alt+G) to open the interface for re-order many function
+
 ## 48.2.1
 
 * use [hic-straw](https://github.com/igvteam/hic-straw) package for .hic data source, removed the dependency to igv.js and juicebox.js

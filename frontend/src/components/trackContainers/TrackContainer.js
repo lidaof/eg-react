@@ -103,6 +103,7 @@ class TrackContainer extends React.Component {
             selectedTool: Tools.DRAG,
             xOffset: 0,
             showModal: false,
+            showReorderManyModal: false,
             trackForCircletView: null, // the trackmodel for circlet view
             circletColor: '#ff5722',
             panningAnimation: 'none',
@@ -181,6 +182,9 @@ class TrackContainer extends React.Component {
             case "alt+o":
                 this.zoomOut(2);
                 break;
+            case "alt+g":
+                this.toggleReorderManyModal();
+                break;
         }
     }
     /**
@@ -211,6 +215,18 @@ class TrackContainer extends React.Component {
     setCircletColor(color) {
         this.setState({circletColor: color});
     }
+
+    openReorderManyModal = () => {
+        this.setState({showReorderManyModal: true});
+    }
+
+    closeReorderManyModal = () => {
+        this.setState({showReorderManyModal: false});
+    }
+
+    toggleReorderManyModal = () => {
+        this.setState(prevState => {return {showReorderManyModal: !prevState.showReorderManyModal}});
+    };
 
     /**
      * 
@@ -308,7 +324,13 @@ class TrackContainer extends React.Component {
                         onSetEnteredRegion={onSetEnteredRegion}
                     /> 
                 }
-                <div><ReorderMany /></div>
+                <div>
+                    <ReorderMany 
+                        onOpenReorderManyModal={this.openReorderManyModal} 
+                        onCloseReorderManyModal={this.closeReorderManyModal} 
+                        showReorderManyModal={this.state.showReorderManyModal} 
+                    />
+                </div>
                 <ButtonGroup buttons={panLeftButton} />
                 {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
                 <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
@@ -439,7 +461,7 @@ class TrackContainer extends React.Component {
             </OutsideClickDetector>
             {this.renderModal()}
             <Hotkeys 
-                keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o" 
+                keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o,alt+g" 
                 onKeyDown={this.onKeyDown.bind(this)}
             ></Hotkeys>
         </React.Fragment>
