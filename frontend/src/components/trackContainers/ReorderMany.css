@@ -1,0 +1,12 @@
+.ReorderMany ul{
+    background-color: #f3f3f3;
+    border: 1px solid #efefef;
+    border-radius: 3px;
+    outline: none;
+    list-style-type: none;
+}
+
+.ReorderMany li {
+    border-bottom: 1px solid #efefef;
+    background-color: white;
+}

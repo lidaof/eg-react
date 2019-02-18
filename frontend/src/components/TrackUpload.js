@@ -176,7 +176,7 @@ export class TrackUpload extends React.Component {
         return (
             <div>
                 <label htmlFor="hubFile">
-                    <p>Choose a folder contains a file named 'hub.config.json':</p> 
+                    <p>Choose a folder contains a file named 'hub.config.json': (<span><a href="https://eg.readthedocs.io/en/latest/local.html" target="_blank">local hub documentation</a></span>)</p> 
                     <input type="file" 
                         webkitdirectory="true" mozdirectory="true" directory="true" 
                         id="hubFile" onChange={this.handleHubUpload} />

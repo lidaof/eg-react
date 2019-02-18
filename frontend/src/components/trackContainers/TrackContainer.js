@@ -34,6 +34,8 @@ import { CircletView } from "./CircletView";
 import ButtonGroup from './ButtonGroup';
 import TrackRegionController from '../genomeNavigator/TrackRegionController';
 
+import ReorderMany from './ReorderMany';
+
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 
@@ -306,6 +308,7 @@ class TrackContainer extends React.Component {
                         onSetEnteredRegion={onSetEnteredRegion}
                     /> 
                 }
+                <div><ReorderMany /></div>
                 <ButtonGroup buttons={panLeftButton} />
                 {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
                 <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
