@@ -8,7 +8,7 @@ import FacetTable from './FacetTable';
 // Just add a new entry here to support adding a new track type.
 // const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'cool', 'bam'];
 
-const TRACK_TYPES = {
+export const TRACK_TYPES = {
     Numerical: ['bigWig', 'bedGraph'],
     Annotation: ['bed', 'bigBed', 'refBed'],
     Categorical: ['categorical'],
@@ -18,6 +18,8 @@ const TRACK_TYPES = {
     Alignment: ['bam'],
 
 };
+
+export const NUMERRICAL_TRACK_TYPES = ['bigwig', 'bedgraph']; // the front UI we allow any case of types, in TrackModel only lower case
 
 const TYPES_DESC = {
     bigWig: 'numerical data', 

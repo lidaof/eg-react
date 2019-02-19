@@ -6,7 +6,7 @@ import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from './genomeNavigator/TrackRegionController';
 import RegionSetSelector from './RegionSetSelector';
-import Geneplot from './Geneplot';
+import Geneplot from './Geneplot/Geneplot';
 import TrackList from "./trackManagers/TrackList";
 import { TrackModel } from '../model/TrackModel';
 import AnnotationTrackSelector from './trackManagers/AnnotationTrackSelector';
@@ -196,7 +196,7 @@ class Nav extends React.Component {
                             <RegionSetSelector genome={genomeConfig.genome} />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Geneplot">
-                            <Geneplot genome={genomeConfig.genome} />
+                            <Geneplot genome={genomeConfig.genome} selectedRegion={selectedRegion} />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Session" style={{content: {
                                                         right: "unset",

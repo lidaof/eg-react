@@ -116,7 +116,7 @@ class RegionSetSelector extends React.Component {
     renderItemForSet(set, index) {
         const isBackingView = set === this.props.selectedSet;
         const numRegions = set.features.length;
-        const name = set.name || "Unnamed set";
+        const name = set.name || `Unnamed set of ${numRegions} region(s)`;
         const text = `${name} (${numRegions} regions)`;
 
         let useSetButton;
