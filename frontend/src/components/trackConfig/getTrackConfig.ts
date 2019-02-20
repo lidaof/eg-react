@@ -1,6 +1,7 @@
 import { TrackConfig } from './TrackConfig';
 import { BamTrackConfig } from './BamTrackConfig';
 import { BedTrackConfig } from './BedTrackConfig';
+import { CallingCardTrackConfig } from './CallingCardTrackConfig';
 import { CategoricalTrackConfig } from './CategoricalTrackConfig';
 import { BigBedTrackConfig } from './BigBedTrackConfig';
 import { BedGraphTrackConfig } from './BedGraphTrackConfig';
@@ -22,6 +23,7 @@ export const INTERACTION_TYPES = ['hic', 'longrange', 'biginteract'];
 const TYPE_NAME_TO_CONFIG = {
     "bam": BamTrackConfig,
     "bed": BedTrackConfig,
+    "callingcard": CallingCardTrackConfig,
     "categorical": CategoricalTrackConfig,
     "bedgraph": BedGraphTrackConfig,
     "bigbed": BigBedTrackConfig,

@@ -16,6 +16,7 @@ export const TRACK_TYPES = {
     Interaction: ['hic','cool','bigInteract','longrange'],
     Repeats: ['repeatmasker'],
     Alignment: ['bam'],
+    Callingcard: ['callingcard'],
 
 };
 
@@ -35,6 +36,7 @@ const TYPES_DESC = {
     bigInteract: 'long range interaction data in bigInteract format',
     cool: 'long range interaction data in cool format, use data uuid instead of URL',
     bam: 'reads alignment data',
+    callingcard: 'calling card data'
 };
 
 /**

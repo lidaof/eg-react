@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import RegionSetSelector from '../RegionSetSelector';
+import NavigationContext from '../../model/NavigationContext';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 import { BigWorker } from '../../dataSources/WorkerTSHook';
@@ -62,7 +63,6 @@ class Geneplot extends React.Component {
 
     renderPlot = async () => {
         const {setName, trackName} = this.state;
-        const navContext = this.props.selectedRegion.getNavigationContext();
         if (!setName || !trackName) {
             this.setState({plotMsg: 'Please choose both a set and a track'});
             return;
@@ -72,13 +72,12 @@ class Geneplot extends React.Component {
         const set = this.getSetByName(setName);
         const dataSource = this.getDataSource(track);
         const setRegions = set.features.map(feature => {
-            const start = navContext.getFeatureStart(feature);
-            return new DisplayedRegionModel(navContext, start, start + feature.getLength())
+            const navContext = new NavigationContext(feature.name, [feature]);
+            return new DisplayedRegionModel(navContext);
         });
         const promises = setRegions.map(region => dataSource.getData(region));
         const data = await Promise.all(promises);
         console.log(data);
-
     }
 
     getTrackByName = (name) => {
