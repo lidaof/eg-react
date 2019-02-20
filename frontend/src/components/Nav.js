@@ -196,7 +196,7 @@ class Nav extends React.Component {
                             <RegionSetSelector genome={genomeConfig.genome} />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Geneplot">
-                            <Geneplot genome={genomeConfig.genome} selectedRegion={selectedRegion} />
+                            <Geneplot genome={genomeConfig.genome} />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Session" style={{content: {
                                                         right: "unset",
