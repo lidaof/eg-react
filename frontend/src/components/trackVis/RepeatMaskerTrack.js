@@ -118,8 +118,8 @@ class RepeatTrack extends React.PureComponent {
                 <AnnotationArrows
                     startX={xSpan.start}
                     endX={xSpan.end}
-                    y={height-y-10}
-                    height={10}
+                    y={height-y-TEXT_HEIGHT}
+                    height={TEXT_HEIGHT}
                     opacity={0.75}
                     isToRight={feature.strand === '+'}
                     color="white"
