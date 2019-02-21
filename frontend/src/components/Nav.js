@@ -353,7 +353,7 @@ function ModalCloseButton(props) {
     return (
         <span
             className="text-right" 
-            style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}}
+            style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px", zIndex: 2}}
             onClick={props.onClick}>
             ×
         </span>
