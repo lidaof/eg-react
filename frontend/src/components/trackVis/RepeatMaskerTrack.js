@@ -20,7 +20,7 @@ import './commonComponents/tooltip/Tooltip.css';
 
 export const MAX_BASES_PER_PIXEL = 6000; // The higher this number, the more zooming out we support
 const TOP_PADDING = 2;
-const TEXT_HEIGHT = 9;
+const TEXT_HEIGHT = 9; // height for both text label and arrows.
 export const DEFAULT_OPTIONS = {
     maxRows: 1,
     height: 40,
@@ -154,6 +154,7 @@ class RepeatTrack extends React.PureComponent {
                     </div>
                     <div>{feature.getLocus().toString()} ({feature.getLocus().getLength()}bp)</div>
                     <div>(1 - divergence%) = {feature.value.toFixed(2)}</div>
+                    <div>strand: {feature.strand}</div>
                     <div className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</div>
                 </div>
             </Tooltip>
