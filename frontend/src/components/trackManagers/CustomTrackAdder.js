@@ -4,6 +4,7 @@ import {Tabs, Tab} from 'react-bootstrap-tabs';
 import TrackModel from '../../model/TrackModel';
 import CustomHubAdder from './CustomHubAdder';
 import FacetTable from './FacetTable';
+import { HELP_LINKS } from '../../util';
 
 // Just add a new entry here to support adding a new track type.
 // const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'cool', 'bam'];
@@ -116,7 +117,7 @@ class CustomTrackAdder extends React.Component {
             <div className="form-group">
                 <label>Track type</label>
                 <span style={{marginLeft: "10px", fontStyle: "italic"}}>
-                    <a href="https://epigenomegateway.readthedocs.io/en/latest/tracks.html" target="_blank">track format documentation</a>
+                    <a href={HELP_LINKS.tracks} target="_blank">track format documentation</a>
                 </span>
                 <select className="form-control" value={type} onChange={event => this.setState({type: event.target.value})} >
                     {this.renderTypeOptions()}

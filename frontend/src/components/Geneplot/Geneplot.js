@@ -8,6 +8,7 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
 import PlotlyBoxplot from './PlotlyBoxplot';
+import { HELP_LINKS } from '../../util';
 
 function mapStateToProps(state) {
     return {
@@ -36,7 +37,7 @@ class Geneplot extends React.Component {
             plotType: 'box',
             plotMsg: '',
             dataPoints: 50,
-            data: [],
+            data: {},
             showlegend: false,
         };
     }
@@ -124,38 +125,42 @@ class Geneplot extends React.Component {
             return this.groupDataToBins(data[idx], bins, rights);
         });
         const plotData = _.zip(...binned);
-        let plotlyData;
-        if(plotType === 'box'){
-            plotlyData = plotData.map( (d, i) => ({
-                y: d,
-                type: 'box',
-                name: `${i+1}`,
-                marker:{
-                  color: 'rgb(214,12,140)'
-                }
-              })
-            );
-        } else if(plotType === 'line'){
-            plotlyData = binned.map( (d, i) => ( {
-                type: 'scatter',
-                x: _.range(1, d.length+1),
-                y: d,
-                mode: 'lines',
-                name: set.features[i].name,
-                line: {
-                    dash: 'solid',
-                    width: 2,
-                    color: COLORS[i],
-                }
-            }));
+        const boxData = plotData.map( (d, i) => ({
+            y: d,
+            type: 'box',
+            name: `${i+1}`,
+            marker:{
+                color: 'rgb(214,12,140)'
+            }
+            })
+        );
+        const lineData  = binned.map( (d, i) => ( {
+            type: 'scatter',
+            x: _.range(1, d.length+1),
+            y: d,
+            mode: 'lines',
+            name: set.features[i].name,
+            line: {
+                dash: 'solid',
+                width: 2,
+                color: COLORS[i],
+            }
+        }));
+        const heatmapData = [{
+            z: binned,
+            type: 'heatmap'
+        }];
+        if (plotType === 'line') {
             this.setState({showlegend: true});
-        } else if (plotType === 'heatmap') {
-            plotlyData = [{
-                z: binned,
-                type: 'heatmap'
-            }];
         }
-        this.setState({data: plotlyData, plotMsg: ''});
+        this.setState({
+            data: {
+                box: boxData,
+                line: lineData,
+                heatmap: heatmapData,
+            }, 
+            plotMsg: ''
+        });
     }
 
     /**
@@ -203,13 +208,14 @@ class Geneplot extends React.Component {
                 <RegionSetSelector genome={genome} />
             </div>
         }
+        const {data, plotType, showlegend, plotMsg} = this.state;
         return (
             <div>
                 <p className="lead">1. Choose a region set</p>
                 <div>
                     {this.renderRegionList()}
                 </div>
-                <p className="lead">2. Choose a <a href="https://eg.readthedocs.io/en/latest/tracks.html#numerical-tracks" target="_blank">numerial track</a>:</p>
+                <p className="lead">2. Choose a <a href={HELP_LINKS.numerical} target="_blank">numerial track</a>:</p>
                 <div>
                     {this.renderTrackList()}
                 </div>
@@ -217,13 +223,13 @@ class Geneplot extends React.Component {
                 <div>
                     {this.renderPlotTypes()} {this.renderDataPoints()}
                 </div>
-                <div className="font-italic">{PLOT_TYPE_DESC[this.state.plotType]}</div>
+                <div className="font-italic">{PLOT_TYPE_DESC[plotType]}</div>
                 <div>
                     <button onClick={this.getPlotData} className="btn btn-sm btn-success">Plot</button>
                     {' '}
-                    {this.state.plotMsg}
+                    {plotMsg}
                 </div>
-                <div><PlotlyBoxplot data={this.state.data} showlegend={this.state.showlegend} /></div>
+                <div><PlotlyBoxplot data={data[plotType]} showlegend={showlegend} /></div>
             </div>
         );
     }

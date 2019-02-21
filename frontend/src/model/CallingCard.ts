@@ -3,7 +3,7 @@ import ChromosomeInterval from './interval/ChromosomeInterval';
 import BedRecord from '../dataSources/bed/BedRecord';
 
 enum CallingCardColumnIndex {
-    COUNT=3,
+    VALUE=3,
     STRAND=4,
     BARCODE=5
 };
@@ -26,12 +26,12 @@ class CallingCard extends Feature {
      *
      */
     barcode: any;
-    count: number;
+    value: number;
     constructor(bedRecord: BedRecord) {
         const locus = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
         super('', locus, bedRecord[CallingCardColumnIndex.STRAND]);
         this.barcode = bedRecord[CallingCardColumnIndex.BARCODE]
-        this.count = Number.parseFloat(bedRecord[CallingCardColumnIndex.COUNT]);
+        this.value = Number.parseFloat(bedRecord[CallingCardColumnIndex.VALUE]);
     }
 }
 

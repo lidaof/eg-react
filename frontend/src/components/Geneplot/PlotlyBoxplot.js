@@ -9,7 +9,7 @@ import Plot from 'react-plotly.js';
 
 class PlotlyBoxplot extends Component {
   static propTypes = {
-    data: PropTypes.any.isRequired,
+    data: PropTypes.array,
     layout: PropTypes.object,
     config: PropTypes.object,
     showlegend: PropTypes.bool,
@@ -61,7 +61,7 @@ class PlotlyBoxplot extends Component {
   render() {
     const {data, layout, config, showlegend} = this.props;
     const layout2 = showlegend ? {...layout, showlegend: showlegend}: layout;
-    if(data.length === 0){
+    if(!data){
       return null;
     }
     return (

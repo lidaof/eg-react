@@ -143,3 +143,9 @@ export function findClosestNumber(arr: number[], num: number) {
         return (Math.abs(curr - num) < Math.abs(prev - num) ? curr : prev);
       });
 }
+
+export const HELP_LINKS = {
+    datahub: 'https://eg.readthedocs.io/en/latest/datahub.html',
+    numerical: 'https://eg.readthedocs.io/en/latest/tracks.html#numerical-tracks',
+    tracks: 'https://eg.readthedocs.io/en/latest/tracks.html',
+}

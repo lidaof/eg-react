@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import JSON5 from 'json5';
 import Json5Fetcher from '../../model/Json5Fetcher';
 import DataHubParser from '../../model/DataHubParser';
-import { readFileAsText } from "../../util";
+import { readFileAsText, HELP_LINKS } from "../../util";
 
 /**
  * custom hub add UI
@@ -69,7 +69,7 @@ class RemoteHubAdder extends React.Component {
                     Custom hub URL
                 </label>
                 <span style={{marginLeft: "10px", fontStyle: "italic"}}>
-                    <a href="https://epigenomegateway.readthedocs.io/en/latest/datahub.html" target="_blank">data hub documentation</a>
+                    <a href={HELP_LINKS.datahub} target="_blank">data hub documentation</a>
                 </span>
                 <input
                         type="text"
