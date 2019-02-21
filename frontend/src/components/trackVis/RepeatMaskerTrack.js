@@ -14,6 +14,7 @@ import { AnnotationDisplayModes } from '../../model/DisplayModes';
 import { TranslatableG } from '../TranslatableG';
 import BackgroundedText from './commonComponents/BackgroundedText';
 import { getContrastingColor } from '../../util';
+import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
 
 import './commonComponents/tooltip/Tooltip.css';
 
@@ -95,8 +96,7 @@ class RepeatTrack extends React.PureComponent {
                 
             />;
             let label = null;
-            const strandText = feature.strand === '+' ? '>' : '<';
-            const labelText = `${strandText} ${feature.getName()} ${strandText}`;
+            const labelText = feature.getName();
             const estimatedLabelWidth = labelText.length * TEXT_HEIGHT;
             if (estimatedLabelWidth < 0.9 * width) {
                 const centerX = xSpan.start+ 0.5 * width;
@@ -114,10 +114,24 @@ class RepeatTrack extends React.PureComponent {
                     </BackgroundedText>
                 );
             }
+            const arrows = 
+                <AnnotationArrows
+                    startX={xSpan.start}
+                    endX={xSpan.end}
+                    y={height-y-10}
+                    height={10}
+                    opacity={0.75}
+                    isToRight={feature.strand === '+'}
+                    color="white"
+                />;
+            // For Daofeng: Seems the "y" and "height" does not covert to html coordinates directly. 
+            // Try to fix y=0 for both mainBody and arrows and you will see. Seems it shifted down y from the top. 
+            // Is it by design?
             return (
                 <TranslatableG y={y} onClick={event => this.renderTooltip(event, feature)} key={i}>
                     {mainBody}
                     {label}
+                    {arrows}
                 </TranslatableG>
                 );
         });
