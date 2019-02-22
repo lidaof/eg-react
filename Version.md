@@ -1,7 +1,11 @@
 # Version History
 
+## 48.3.0
+
 * new function to re-order many tracks at one time by drap and drop
 * new hot key (Alt+G) to open the interface for re-order many function
+* new track type `callingcard` for displaying Calling card data
+* new function geneplot for plot overall signal from a numerical track over a gene/region set
 
 ## 48.2.1
 
