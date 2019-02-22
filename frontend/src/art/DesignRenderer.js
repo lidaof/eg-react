@@ -84,6 +84,13 @@ class CanvasDesignRenderer extends React.PureComponent {
                 context.lineTo(props.x2, props.y2);
                 context.stroke();
                 break;
+            case 'circle':
+                context.strokeStyle = props.stroke;
+                context.globalAlpha = props.strokeOpacity || 1;
+                context.beginPath();
+                context.arc(props.cx, props.cy, props.r, 0, 2 * Math.PI, false);
+                context.stroke();
+                break;
             case undefined:
                 break;
             default:

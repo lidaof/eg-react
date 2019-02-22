@@ -5,6 +5,8 @@ import { BedWorker } from '../../dataSources/WorkerTSHook';
 import LocalBedSource from '../../dataSources/LocalBedSource';
 import CallingCard from '../../model/CallingCard';
 import BedRecord from '../../dataSources/bed/BedRecord';
+import HeightConfig from '../trackContextMenu/HeightConfig';
+import { BackgroundColorConfig, PrimaryColorConfig } from '../trackContextMenu/ColorConfig';
 
 export class CallingCardTrackConfig extends TrackConfig {
     initDataSource() {
@@ -29,7 +31,7 @@ export class CallingCardTrackConfig extends TrackConfig {
         return CallingCardTrack;
     }
 
-    // getMenuComponents() {
-    //     return [...super.getMenuComponents(), HeightConfig, BackgroundColorConfig];
-    // }
+    getMenuComponents() {
+        return [...super.getMenuComponents(), HeightConfig, PrimaryColorConfig, BackgroundColorConfig];
+    }
 }

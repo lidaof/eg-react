@@ -44,7 +44,7 @@ const Grid = SortableContainer(({ items, colNum }) => {
     );
 });
 
-const defaultValues = [1]; // slider default values
+const defaultValues = [4]; // slider default values
 
 class ReorderMany extends React.Component {
     constructor() {
@@ -59,6 +59,12 @@ class ReorderMany extends React.Component {
     componentDidMount() {
         this.setState({ items: [].concat(this.props.tracks) });
     }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(prevProps.tracks !==this.props.tracks){
+          this.setState({items: [].concat(this.props.tracks) });
+        }
+      }
 
     onSortEnd = ({ oldIndex, newIndex }) => {
         this.setState(({ items }) => ({

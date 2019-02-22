@@ -179,14 +179,14 @@ class CallingCardPlot extends React.PureComponent {
         return value.map((card,idx) => {
             const y = scales.valueToY(card.value);
             const key = `${x}-${idx}`;
-            return <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={color} stroke-opacity="0.7"/>;
+            return <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={color} strokeOpacity="0.5"/>;
         });
         
     }
 
     render() {
         const {xToValue, height, forceSvg} = this.props;
-        return <DesignRenderer type={1 ? RenderTypes.SVG : RenderTypes.CANVAS} width={xToValue.length} height={height}>
+        return <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} width={xToValue.length} height={height}>
             {this.props.xToValue.map(this.renderPixel)}
         </DesignRenderer>
     }
