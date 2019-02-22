@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Plot from 'react-plotly.js';
+// simplest method: uses precompiled complete bundle from `plotly.js`
+// import Plot from 'react-plotly.js'; // this increases bundle size so much
+import Plotly from 'plotly.js-cartesian-dist';
+// customizable method: use your own `Plotly` object
+import createPlotlyComponent from 'react-plotly.js/factory';
+const Plot = createPlotlyComponent(Plotly);
 
 /**
  * this component uses plotly library for gene plotting

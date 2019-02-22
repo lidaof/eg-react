@@ -75,6 +75,7 @@
     "p": "^0.2.0",
     "parse-color": "^1.0.0",
     "plotly.js": "^1.44.4",
+    "plotly.js-cartesian-dist": "^1.44.4",
     "promise-worker": "^1.1.1",
     "prop-types": "^15.6.0",
     "query-string": "^6.1.0",
