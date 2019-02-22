@@ -8,7 +8,6 @@ import Track from './commonComponents/Track';
 import TrackLegend from './commonComponents/TrackLegend';
 import GenomicCoordinates from './commonComponents/GenomicCoordinates';
 import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
-import configOptionMerging from './commonComponents/configOptionMerging';
 import { RenderTypes, DesignRenderer } from '../../art/DesignRenderer';
 import { ScaleChoices } from '../../model/ScaleChoices';
 import { FeatureAggregator } from '../../model/FeatureAggregator';
@@ -19,31 +18,23 @@ export const DEFAULT_OPTIONS = {
     yScale: ScaleChoices.AUTO,
     yMax: 10,
     yMin: 0,
-    markerSize: 5,
+    markerSize: 3,
 };
-const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
-const TOP_PADDING = 3;
+const TOP_PADDING = 5;
 
 /**
- * Track specialized in showing numerical data.
+ * Track specialized in showing calling card data.
  * 
  * @author Silas Hsu and Daofeng Li
  */
 class CallingCardTrack extends React.PureComponent {
-    /**
-     * Don't forget to look at NumericalFeatureProcessor's propTypes!
-     */
     static propTypes = Object.assign({}, Track.propsFromTrackContainer,
         {
-        /**
-         * NumericalFeatureProcessor provides these.  Parents should provide an array of NumericalFeature.
-         */
-        data: PropTypes.array.isRequired, // PropTypes.arrayOf(Feature)
-        unit: PropTypes.string, // Unit to display after the number in tooltips
+        data: PropTypes.array.isRequired, // PropTypes.arrayOf(CallingCard)
         options: PropTypes.shape({
             height: PropTypes.number.isRequired, // Height of the track
-            color: PropTypes.string, // Color to draw bars, if using the default getBarElement
+            color: PropTypes.string, // Color to draw circle
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any, // If present, applies error styling
@@ -69,12 +60,6 @@ class CallingCardTrack extends React.PureComponent {
         if (yMin > yMax) {
             notify.show('Y-axis min must less than max', 'error', 2000);
         }
-        /*
-        All tracks get `PropsFromTrackContainer` (see `Track.ts`).
-
-        `props.viewWindow` contains the range of x that is visible when no dragging.  
-            It comes directly from the `ViewExpansion` object from `RegionExpander.ts`
-        */
         const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
         let max = _.max(_.flatten(visibleValues).map(x => x.value)) || 0; // in case undefined returned here, cause maxboth be undefined too
         let min = 0;
@@ -100,25 +85,33 @@ class CallingCardTrack extends React.PureComponent {
      * @return {JSX.Element} tooltip to render
      */
     renderTooltip(relativeX) {
-        const {trackModel, viewRegion, width, unit} = this.props;
+        const {trackModel, viewRegion, width} = this.props;
         const value = this.xToValue[Math.round(relativeX)];
-        const stringValue = typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : '(no data)';
+        const stringValue = value.length > 0 ? this.formatCards(value) : '(no data)';
         return (
         <div>
-            <div>
-                <span className="Tooltip-major-text" style={{marginRight: 3}}>{stringValue}</span>
-                {unit && <span className="Tooltip-minor-text">{unit}</span>}
-            </div>
             <div className="Tooltip-minor-text" >
                 <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
             </div>
             <div className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</div>
+            <div>{stringValue}</div>
         </div>
         );
     }
 
+    formatCards = (cards) => {
+        const head = (<thead>
+            <tr>
+              <th scope="col">Barcode</th>
+              <th scope="col">Count</th>
+            </tr>
+          </thead>);
+        const rows = cards.map((card,i) => <tr key={i}><td>{card.barcode}</td><td>{card.value}</td></tr>);
+        return <table className="table table-striped table-sm">{head}<tbody>{rows}</tbody></table>;
+    }
+
     render() {
-        const {data, viewRegion, width, trackModel, unit, options, forceSvg} = this.props;
+        const {data, viewRegion, width, trackModel, options, forceSvg} = this.props;
         const {height, color, colorAboveMax, markerSize} = options;
         this.xToValue = data.length > 0 ? this.aggregateFeatures(data, viewRegion, width) : [];
         this.scales = this.computeScales(this.xToValue, height);
@@ -126,7 +119,6 @@ class CallingCardTrack extends React.PureComponent {
             trackModel={trackModel}
             height={height}
             axisScale={this.scales.valueToY }
-            axisLegend={unit}
         />;
         const visualizer = 
         (
@@ -169,7 +161,7 @@ class CallingCardPlot extends React.PureComponent {
      * 
      * @param {number} value
      * @param {number} x
-     * @return {JSX.Element} bar element to render
+     * @return {JSX.Element} circle element to render
      */
     renderPixel(value, x) {
         if (value.length === 0) {
@@ -192,4 +184,4 @@ class CallingCardPlot extends React.PureComponent {
     }
 }
 
-export default withDefaultOptions(CallingCardTrack);
+export default CallingCardTrack;

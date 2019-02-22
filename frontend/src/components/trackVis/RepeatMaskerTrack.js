@@ -14,12 +14,13 @@ import { AnnotationDisplayModes } from '../../model/DisplayModes';
 import { TranslatableG } from '../TranslatableG';
 import BackgroundedText from './commonComponents/BackgroundedText';
 import { getContrastingColor } from '../../util';
+import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
 
 import './commonComponents/tooltip/Tooltip.css';
 
 export const MAX_BASES_PER_PIXEL = 6000; // The higher this number, the more zooming out we support
 const TOP_PADDING = 2;
-const TEXT_HEIGHT = 9;
+const TEXT_HEIGHT = 9; // height for both text label and arrows.
 export const DEFAULT_OPTIONS = {
     maxRows: 1,
     height: 40,
@@ -95,12 +96,11 @@ class RepeatTrack extends React.PureComponent {
                 
             />;
             let label = null;
-            const strandText = feature.strand === '+' ? '>' : '<';
-            const labelText = `${strandText} ${feature.getName()} ${strandText}`;
+            const labelText = feature.getName();
             const estimatedLabelWidth = labelText.length * TEXT_HEIGHT;
             if (estimatedLabelWidth < 0.9 * width) {
                 const centerX = xSpan.start+ 0.5 * width;
-                const centerY = (drawHeight - TEXT_HEIGHT + 1) * 0.8;
+                const centerY = (drawHeight - TEXT_HEIGHT - 2) * 0.8;
                 label = (
                     <BackgroundedText
                         x={centerX}
@@ -114,10 +114,21 @@ class RepeatTrack extends React.PureComponent {
                     </BackgroundedText>
                 );
             }
+            const arrows = 
+                <AnnotationArrows
+                    startX={xSpan.start}
+                    endX={xSpan.end}
+                    y={height-TEXT_HEIGHT}
+                    height={TEXT_HEIGHT}
+                    opacity={0.75}
+                    isToRight={feature.strand === '+'}
+                    color="white"
+                />;
             return (
-                <TranslatableG y={y} onClick={event => this.renderTooltip(event, feature)} key={i}>
+                <TranslatableG onClick={event => this.renderTooltip(event, feature)} key={i}>
                     {mainBody}
                     {label}
+                    {arrows}
                 </TranslatableG>
                 );
         });
@@ -140,6 +151,7 @@ class RepeatTrack extends React.PureComponent {
                     </div>
                     <div>{feature.getLocus().toString()} ({feature.getLocus().getLength()}bp)</div>
                     <div>(1 - divergence%) = {feature.value.toFixed(2)}</div>
+                    <div>strand: {feature.strand}</div>
                     <div className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</div>
                 </div>
             </Tooltip>
