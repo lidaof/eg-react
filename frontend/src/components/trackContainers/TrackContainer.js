@@ -35,6 +35,7 @@ import ButtonGroup from './ButtonGroup';
 import TrackRegionController from '../genomeNavigator/TrackRegionController';
 
 import ReorderMany from './ReorderMany';
+import { niceBpCount } from '../../util';
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
@@ -337,6 +338,7 @@ class TrackContainer extends React.Component {
                 <ButtonGroup buttons={panRightButton} />
                 <div><UndoRedo /></div>
                 <div><History /></div>
+                <div><PixelInfo basesPerPixel={this.props.basesPerPixel} viewRegion={viewRegion} /></div>
                 <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} suggestedMetaSets={suggestedMetaSets} />
             </div>;
     }
@@ -470,3 +472,10 @@ class TrackContainer extends React.Component {
 }
 
 export default withEnhancements(TrackContainer);
+
+function PixelInfo(props) {
+    const {basesPerPixel, viewRegion} = props;
+    const viewBp = niceBpCount(viewRegion.getWidth());
+    const span = niceBpCount(basesPerPixel);
+    return <span className="font-italic"> [Viewing {viewBp} region, 1 pixel spans {span}]</span>;
+}

@@ -112,8 +112,10 @@ export function niceBpCount(bases: number) {
         return `${(rounded/1000000).toFixed(1)} Mb`;
     } else if (rounded >= 10000) {
         return `${(rounded/1000).toFixed(1)} kb`;
-    } else {
+    } else if (rounded > 0) {
         return `${rounded} bp`;
+    } else {
+        return '<1 bp';
     }
 }
 
@@ -148,4 +150,5 @@ export const HELP_LINKS = {
     datahub: 'https://eg.readthedocs.io/en/latest/datahub.html',
     numerical: 'https://eg.readthedocs.io/en/latest/tracks.html#numerical-tracks',
     tracks: 'https://eg.readthedocs.io/en/latest/tracks.html',
+    localhub: 'https://eg.readthedocs.io/en/latest/local.html',
 }
