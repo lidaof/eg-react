@@ -477,5 +477,5 @@ function PixelInfo(props) {
     const {basesPerPixel, viewRegion} = props;
     const viewBp = niceBpCount(viewRegion.getWidth());
     const span = niceBpCount(basesPerPixel);
-    return <span className="font-italic"> [Viewing {viewBp} region, 1 pixel spans {span}]</span>;
+    return <span className="font-italic">Viewing {viewBp} region, 1 pixel spans {span}</span>;
 }

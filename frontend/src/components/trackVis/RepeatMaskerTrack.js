@@ -100,7 +100,7 @@ class RepeatTrack extends React.PureComponent {
             const estimatedLabelWidth = labelText.length * TEXT_HEIGHT;
             if (estimatedLabelWidth < 0.9 * width) {
                 const centerX = xSpan.start+ 0.5 * width;
-                const centerY = (drawHeight - TEXT_HEIGHT - 2) * 0.8;
+                const centerY = (height - TEXT_HEIGHT * 2);
                 label = (
                     <BackgroundedText
                         x={centerX}

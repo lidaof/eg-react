@@ -6,6 +6,8 @@
 * new hot key (Alt+G) to open the interface for re-order many function
 * new track type `callingcard` for displaying Calling card data
 * new function geneplot for plot overall signal from a numerical track over a gene/region set
+* function to download current session to local disk
+* accept session files uploaded from local disk
 
 ## 48.2.1
 
