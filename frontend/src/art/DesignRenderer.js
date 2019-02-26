@@ -56,6 +56,19 @@ class CanvasDesignRenderer extends React.PureComponent {
      * Redraws the canvas.
      */
     componentDidUpdate(prevProps) {
+        const pixelRatio = this.getPixelRatioSafely();
+        if (pixelRatio !== 1) {
+            const width = this.props.width;
+            const height = this.props.height;
+            // this.canvasNode.parentNode.style.width = width + 'px';
+            // this.canvasNode.parentNode.style.height = height + 'px';
+            this.canvasNode.style.width = width + 'px';
+            this.canvasNode.style.height = height + 'px';
+            this.canvasNode.setAttribute('width', width * pixelRatio);
+            this.canvasNode.setAttribute('height', height * pixelRatio);
+            const context = this.canvasNode.getContext("2d");
+            context.scale(pixelRatio, pixelRatio);
+        }
         this.draw(this.canvasNode);
     }
 
@@ -95,6 +108,20 @@ class CanvasDesignRenderer extends React.PureComponent {
                 break;
             default:
                 console.error(`Drawing '${element.type}'s is unsupported.  Ignoring...`);
+        }
+    }
+
+    /**
+     * Gets the device's pixel ratio.  Guaranteed to be a number greater than 0.
+     * 
+     * @return {number} this device's pixel ratio
+     */
+    getPixelRatioSafely = () => {
+        const pixelRatio = window.devicePixelRatio;
+        if (Number.isFinite(pixelRatio) && pixelRatio > 0) {
+            return pixelRatio;
+        } else {
+            return 1;
         }
     }
 
