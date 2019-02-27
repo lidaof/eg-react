@@ -1,5 +1,8 @@
 # Version History
 
+* retina screen display improved as track rendered in canvas
+* SNP search through Ensembl API
+
 ## 48.3.0
 
 * new function to re-order many tracks at one time by drap and drop
