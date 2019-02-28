@@ -2,10 +2,13 @@ import axios from 'axios';
 import _ from 'lodash';
 import DataSource from './DataSource';
 
+const SNP_REGION_API = {
+    'hg19': 'https://grch37.rest.ensembl.org/overlap/region/human',
+    'hg38': 'https://rest.ensembl.org/overlap/region/human',
+};
 
-export const AWS_API = "https://api.epigenomegateway.org";
 /**
- * A DataSource that calls our backend API for gene annotations.
+ * A DataSource that calls our Ensembl API for snp information.
  *
  * @author Daofeng Li
  */
@@ -30,23 +33,25 @@ class SnpSource extends DataSource {
         if (!this.trackModel) {
             return [];
         }
-
+        const genome = this.trackModel.getMetadata('genome') || this.trackModel.genome;
+        const api = SNP_REGION_API[genome] || null;
+        if (!api) {
+            return [];
+        }
+        const params = {
+            'content-type': 'application/json',
+            'feature': 'variation',
+        };
         let promises = region.getGenomeIntervals().map(locus => {
-            const params = {
-                chr: locus.chr,
-                start: locus.start,
-                end: locus.end
-            };
-            const genome = this.trackModel.getMetadata('genome') || this.trackModel.genome;
-
-            /**
-             * Gets an object that looks like {data: []}
-             */
-            return axios.get(`${AWS_API}/${genome}/genes/${this.trackModel.name}/queryRegion`, {
-                params: params
-            });
+            if (locus.getLength() <= 10000) {
+                /**
+                 * Gets an object that looks like {data: []}
+                 */
+                return axios.get(`${api}/${locus.chr.substr(3)}:${locus.start+1}-${locus.end}`, {
+                    params: params
+                });
+            }
         });
-
         const dataForEachSegment = await Promise.all(promises);
         return _.flatMap(dataForEachSegment, 'data');
     }

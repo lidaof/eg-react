@@ -1,9 +1,8 @@
 import { AnnotationTrackConfig } from './AnnotationTrackConfig';
-import { DEFAULT_OPTIONS } from '../trackVis/geneAnnotationTrack/GeneAnnotation';
-import GeneSource from '../../dataSources/GeneSource';
-import Gene from '../../model/Gene';
 import { TrackModel } from '../../model/TrackModel';
-import SnpTrack from '../trackVis/SnpTrack/SnpTrack';
+import {SnpTrack, DEFAULT_OPTIONS } from '../trackVis/SnpTrack/SnpTrack';
+import SnpSource from '../../dataSources/SnpSource';
+import Snp from '../../model/Snp';
 
 export class SnpTrackConfig extends AnnotationTrackConfig {
     constructor(trackModel: TrackModel) {
@@ -12,11 +11,11 @@ export class SnpTrackConfig extends AnnotationTrackConfig {
     }
 
     initDataSource() {
-        return new GeneSource(this.trackModel);
+        return new SnpSource(this.trackModel);
     }
 
     formatData(data: any[]) {
-        return data.map(record => new Gene(record));
+        return data.map(record => new Snp(record));
     }
 
     getComponent() {

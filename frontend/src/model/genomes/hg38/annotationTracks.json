@@ -55,6 +55,13 @@
             "filetype": "geneAnnotation"
         }
     ],
+    "Variation": [
+        {
+            "name": "Snp",
+            "label": "Snps from Ensembl",
+            "type": "snp"
+        }
+    ],
     "RepeatMasker": {
         "All Repeats": [
             {

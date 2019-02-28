@@ -1,7 +1,10 @@
 # Version History
 
+## 48.3.1
+
 * retina screen display improved as track rendered in canvas
-* SNP search through Ensembl API
+* SNP search through [Ensembl API](https://rest.ensembl.org)
+* SNP track added as well, data comes from Ensembl API
 
 ## 48.3.0
 
