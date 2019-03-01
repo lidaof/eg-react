@@ -7,12 +7,12 @@ const VALUE_PROP_NAME = 'value';
 /**
  * Available aggregators.  Note: SUM, MEAN, MIN, and MAX requires each record to have a `value` prop.
  */
-const AggregatorTypes = {
-    COUNT: 1, // Counts records
-    SUM: 2, // Sums values of records
-    MEAN: 3, // Computes averages of records
-    MIN: 4, // Computes value of min record
-    MAX: 5, // Computes value of max record
+export const AggregatorTypes = {
+    MEAN: "MEAN", // Computes averages of records
+    SUM: "SUM", // Sums values of records
+    COUNT: "COUNT", // Counts records
+    MIN: "MIN", // Computes value of min record
+    MAX: "MAX", // Computes value of max record
 };
 
 const aggregateFunctions = {};
@@ -22,12 +22,14 @@ aggregateFunctions[AggregatorTypes.SUM] = (records: any[]) => _.sumBy(records, V
 aggregateFunctions[AggregatorTypes.MEAN] = (
     (records: any[]) => records.length > 0 ? _.meanBy(records, VALUE_PROP_NAME) : null
 );
-aggregateFunctions[AggregatorTypes.MIN] = (records: any[]) => _.minBy(records, VALUE_PROP_NAME) || null;
-aggregateFunctions[AggregatorTypes.MAX] = (records: any[]) => _.maxBy(records, VALUE_PROP_NAME) || null;
+aggregateFunctions[AggregatorTypes.MIN] = (records: any[]) => 
+    _.minBy(records, VALUE_PROP_NAME)[VALUE_PROP_NAME] || null;
+aggregateFunctions[AggregatorTypes.MAX] = (records: any[]) => 
+    _.maxBy(records, VALUE_PROP_NAME)[VALUE_PROP_NAME] || null;
 
 export const DefaultAggregators = {
     types: AggregatorTypes,
-    fromId(id: number) {
+    fromId(id: string) {
         const aggregator = aggregateFunctions[id];
         if (!aggregator) {
             throw new Error(`Unknown aggregator id "${id}"`);

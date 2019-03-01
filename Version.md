@@ -5,6 +5,7 @@
 * retina screen display improved as track rendered in canvas
 * SNP search through [Ensembl API](https://rest.ensembl.org)
 * SNP track added as well, data comes from Ensembl API
+* Aggregate method is configurable for numerical tracks, `mean`, `sum`, `count`, `max`, `min` are supported, `mean` is default
 
 ## 48.3.0
 
