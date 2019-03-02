@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { scaleLinear } from 'd3-scale';
 import memoizeOne from 'memoize-one';
 import { notify } from 'react-notify-toast';
+import Smooth from 'array-smooth';
 import Track from '../Track';
 import TrackLegend from '../TrackLegend';
 import GenomicCoordinates from '../GenomicCoordinates';
@@ -26,6 +27,7 @@ export const DEFAULT_OPTIONS = {
     yScale: ScaleChoices.AUTO,
     yMax: 10,
     yMin: 0,
+    smooth: 0,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -168,18 +170,21 @@ class NumericalTrack extends React.PureComponent {
 
     render() {
         const {data, viewRegion, width, trackModel, unit, options, forceSvg} = this.props;
-        const {height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin} = options;
+        const {height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin, smooth} = options;
         const halfHeight = height * 0.5;
         const dataForward = data.filter(feature => feature.value === undefined || feature.value >= 0); // bed track to density mode
         const dataReverse = data.filter(feature => feature.value < 0);
+        let xToValue2BeforeSmooth;
         if (dataReverse.length > 0) {
             this.hasReverse = true;
-            this.xToValue2 = this.aggregateFeatures(dataReverse, viewRegion, width, aggregateMethod);
+            xToValue2BeforeSmooth = this.aggregateFeatures(dataReverse, viewRegion, width, aggregateMethod);
         } else {
-            this.xToValue2 = [];
+            xToValue2BeforeSmooth = [];
         }
+        this.xToValue2 = smooth === 0 ? xToValue2BeforeSmooth: Smooth(xToValue2BeforeSmooth, smooth);
         const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
-        this.xToValue = dataForward.length > 0 ? this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod) : [];
+        const xToValueBeforeSmooth = dataForward.length > 0 ? this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod) : [];
+        this.xToValue = smooth === 0 ? xToValueBeforeSmooth: Smooth(xToValueBeforeSmooth, smooth);
         this.scales = this.computeScales(this.xToValue, this.xToValue2, height);
         const legend = <TrackLegend
             trackModel={trackModel}
