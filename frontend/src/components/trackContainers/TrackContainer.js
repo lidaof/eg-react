@@ -347,7 +347,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const {tracks, trackData, primaryView, metadataTerms} = this.props;
+        const {tracks, trackData, primaryView, metadataTerms, viewRegion} = this.props;
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
@@ -366,6 +366,7 @@ class TrackContainer extends React.Component {
                 onContextMenu={this.handleContextMenu}
                 onClick={this.handleTrackClicked}
                 onMetadataClick={this.handleMetadataClicked}
+                selectedRegion={viewRegion}
             />
         });
         return trackElements;
@@ -477,5 +478,5 @@ function PixelInfo(props) {
     const {basesPerPixel, viewRegion} = props;
     const viewBp = niceBpCount(viewRegion.getWidth());
     const span = niceBpCount(basesPerPixel);
-    return <span className="font-italic">Viewing {viewBp} region, 1 pixel spans {span}</span>;
+    return <span className="font-italic">Viewing a {viewBp} region, 1 pixel spans {span}</span>;
 }

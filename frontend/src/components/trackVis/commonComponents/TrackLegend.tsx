@@ -24,6 +24,7 @@ interface TrackLegendProps {
     trackViewRegion?: DisplayedRegionModel;
     hideFirstAxisLabel?: boolean;
     noShiftFirstAxisLabel?: boolean;
+    selectedRegion?: DisplayedRegionModel; // the region for viewing, without expansion
 }
 
 // const NUM_TICKS_SUGGESTION = 2;
@@ -132,7 +133,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
 
     render() {
         const {trackModel, width, height, axisScale, style, axisScaleReverse,
-            trackViewRegion, trackWidth} = this.props;
+            trackViewRegion, trackWidth, selectedRegion} = this.props;
         if (height <= 0) {
             return null;
         }
@@ -143,6 +144,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             minWidth: width,
             height,
             backgroundColor: trackModel.isSelected ? "yellow" : undefined,
+            justifyContent: "space-between",
         }, style);
         const pStyle = {
             width: this.getLabelWidth(),
@@ -158,6 +160,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
 
         const label = trackModel.getDisplayLabel();
         let plotLegend = false;
+        let chromLabel = '';
         if(trackModel.type === 'ruler') {
             const drawModel = new LinearDrawingModel(trackViewRegion, trackWidth);
             if (drawModel.basesToXWidth(1) > Sequence.MIN_X_WIDTH_PER_BASE) {
@@ -165,12 +168,18 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             } else {
                 plotLegend = false;
             }
+            const segments = selectedRegion.getFeatureSegments();
+            chromLabel = segments[0].feature.getName();
+            if (segments.length > 1) {
+                chromLabel += `-${segments[segments.length - 1].feature.getName()}`;
+            }
         }
         return (
         <div style={divStyle} title={label}>
             <p className="TrackLegend-label" style={pStyle} >{label}</p>
             <div style={{display: "flex", alignItems: "center", fontSize: "12px"}}>
                 {plotLegend && this.plotATCGLegend()}</div>
+                <div style={{fontSize: "14px", alignSelf: "flex-end", backgroundColor: "white"}}>{chromLabel}</div>
             {axis}
         </div>
         );

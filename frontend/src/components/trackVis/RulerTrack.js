@@ -15,7 +15,7 @@ import { TrackModel } from '../../model/TrackModel';
 
 const CHROMOSOMES_Y = 60;
 const RULER_Y = 20;
-const HEIGHT = 65;
+const HEIGHT = 40;
 
 /**
  * A ruler display.
@@ -52,6 +52,7 @@ class RulerVisualizer extends React.PureComponent {
                     viewRegion={viewRegion}
                     width={width}
                     labelOffset={CHROMOSOMES_Y}
+                    hideChromName={true}
                 />
                 <Ruler viewRegion={viewRegion} width={width} y={RULER_Y} />
             </svg>
@@ -65,7 +66,9 @@ const Visualizer = withCurrentGenome(RulerVisualizer);
 function RulerTrack(props) {
     return <Track
         {...props}
-        legend={<TrackLegend height={HEIGHT} trackModel={props.trackModel} trackViewRegion={props.viewRegion} trackWidth={props.width} />}
+        legend={<TrackLegend height={HEIGHT} trackModel={props.trackModel} trackViewRegion={props.viewRegion}
+            selectedRegion={props.selectedRegion}
+            trackWidth={props.width} />}
         visualizer={<Visualizer viewRegion={props.viewRegion} width={props.width} trackModel={props.trackModel} />}
     />;
 }
