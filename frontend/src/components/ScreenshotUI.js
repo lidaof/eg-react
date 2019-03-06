@@ -132,7 +132,7 @@ class ScreenshotUINotConnected extends React.Component {
       }
 
     makeSvgTrackElements() {
-        const {tracks, trackData, primaryView, metadataTerms} = this.props;
+        const {tracks, trackData, primaryView, metadataTerms, viewRegion} = this.props;
         const trackSvgElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
@@ -147,6 +147,7 @@ class ScreenshotUINotConnected extends React.Component {
                 xOffset={0}
                 index={index}
                 forceSvg={true}
+                selectedRegion={viewRegion}
             />
         });
         
