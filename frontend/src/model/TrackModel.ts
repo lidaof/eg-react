@@ -64,6 +64,7 @@ export class TrackModel {
     showOnHubLoad?: boolean;
     fileObj?: any;
     files?: any;
+    tracks?: TrackModel[];  // for matplot
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
@@ -79,6 +80,7 @@ export class TrackModel {
         this.metadata["Track type"] = this.type;
         this.fileObj = this.fileObj || "";
         this.files = this.files || [];
+        this.tracks = this.tracks ? this.tracks.map(tk => new TrackModel(tk)) : [];
 
         // Other misc props
         this.id = nextId;

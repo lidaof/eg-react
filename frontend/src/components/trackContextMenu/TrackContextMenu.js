@@ -8,6 +8,7 @@ import { CopyToClip } from '../CopyToClipboard';
 
 
 import './TrackContextMenu.css';
+import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
 
 /**
  * Props that menu items will recieve.
@@ -127,6 +128,7 @@ class TrackContextMenu extends React.PureComponent {
             <DeselectOption numTracks={selectedTracks.length} onClick={this.props.deselectAllTracks} />
             <RemoveOption numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
             <TrackMoreInfo tracks={selectedTracks} />
+            <MatplotMenu tracks={selectedTracks} onApplyMatplot={this.props.onApplyMatplot} />
         </div>
         );
     }
@@ -147,7 +149,27 @@ function CircletViewConfig(props) {
     }
     return (
         <div className="TrackContextMenu-item">
-            <button onClick={() => props.onCircletRequested(track)}>Circlet view</button>
+            <button className="btn btn-info btn-sm btn-tight" onClick={() => props.onCircletRequested(track)}>Circlet view</button>
+        </div>
+        );
+}
+
+/**
+ * a menu that applys matplot for more than 1 numerical tracks
+ * @param {TrackModel[]} props 
+ */
+function MatplotMenu(props) {
+    const numTracks = props.tracks.length;
+    if (numTracks === 1) {
+        return null;
+    }
+    const trackTypes = props.tracks.map(tk => tk.type);
+    if (trackTypes.some(type => ! NUMERRICAL_TRACK_TYPES.includes(type))){
+        return null;
+    }
+    return (
+        <div className="TrackContextMenu-item">
+            <button className="btn btn-info btn-sm btn-tight" onClick={() => props.onApplyMatplot(props.tracks)}>Apply matplot</button>
         </div>
         );
 }

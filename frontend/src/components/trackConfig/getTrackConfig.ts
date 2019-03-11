@@ -18,6 +18,7 @@ import { RulerTrackConfig } from './RulerTrackConfig';
 import { TrackModel } from '../../model/TrackModel';
 import { RefBedTrackConfig } from './RefBedTrackConfig';
 import { SnpTrackConfig } from './SnpTrackConfig';
+import { MatplotTrackConfig } from './MatplotTrackConfig';
 
 export const INTERACTION_TYPES = ['hic', 'longrange', 'biginteract'];
 
@@ -40,6 +41,7 @@ const TYPE_NAME_TO_CONFIG = {
     "genomealign": GenomeAlignTrackConfig,
     "snp": SnpTrackConfig,
     "ruler": RulerTrackConfig,
+    "matplot": MatplotTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

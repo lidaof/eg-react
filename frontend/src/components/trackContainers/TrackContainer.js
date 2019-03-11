@@ -298,6 +298,22 @@ class TrackContainer extends React.Component {
         this.changeTrackSelection(Array(this.props.tracks.length).fill(false));
     }
 
+    /** 
+     * happens when user selects matplot
+     */
+    applyMatPlot = (tracks) => {
+        // console.log(tracks);
+        // const tracksLeft = this.props.tracks.filter(tk => !tk.isSelected);
+        const newTrack = new TrackModel({
+            type: 'matplot',
+            name: 'matplot wrap',
+            tracks,
+        });
+        // const newTracks = [...tracksLeft, newTrack];
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    }
+    
     // End callback methods
     ////////////////////
     // Render methods //
@@ -436,6 +452,7 @@ class TrackContainer extends React.Component {
                                 onTracksChanged={onTracksChanged} 
                                 deselectAllTracks={this.deselectAllTracks} 
                                 onCircletRequested={this.handleOpenModal}
+                                onApplyMatplot={this.applyMatPlot}
                             />;
         const trackDivStyle = {
                                 border: "1px solid black", 

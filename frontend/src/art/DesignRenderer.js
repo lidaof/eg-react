@@ -104,6 +104,22 @@ class CanvasDesignRenderer extends React.PureComponent {
                 context.arc(props.cx, props.cy, props.r, 0, 2 * Math.PI, false);
                 context.stroke();
                 break;
+            // case 'polyline':
+            //     context.strokeStyle = props.stroke;
+            //     context.lineWidth = props.strokeWidth;
+            //     context.beginPath();
+            //     const points = props.points.split(' ');
+            //     const [x1, y1] = points[0].split(',');
+            //     context.moveTo(x1, y1);
+            //     let x, y;
+            //     for (let i = 1; i++; i < points.length) {
+            //         if (points[i]) {
+            //             [x, y] = points[i].split(',');
+            //             context.lineTo(x, y);
+            //         }
+            //     }
+            //     context.stroke();
+            //     break;
             case undefined:
                 break;
             default:
