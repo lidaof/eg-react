@@ -494,6 +494,6 @@ export default withEnhancements(TrackContainer);
 function PixelInfo(props) {
     const {basesPerPixel, viewRegion} = props;
     const viewBp = niceBpCount(viewRegion.getWidth());
-    const span = niceBpCount(basesPerPixel);
+    const span = niceBpCount(basesPerPixel, true);
     return <span className="font-italic">Viewing a {viewBp} region, 1 pixel spans {span}</span>;
 }

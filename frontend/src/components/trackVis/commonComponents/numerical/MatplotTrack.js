@@ -105,15 +105,23 @@ class MatplotTrack extends React.PureComponent {
      */
     renderTooltip(relativeX) {
         const {trackModel, viewRegion, width, unit} = this.props;
-        const value = this.xToValue[Math.round(relativeX)];
-        const stringValue = typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : '(no data)';
-        return (
-        <div>
-            <div>
-                <span className="Tooltip-major-text" style={{marginRight: 3}}>
-                {stringValue}</span>
+        const values = this.xToValue.map(value => value[Math.round(relativeX)]);
+        const stringValues = values.map(value => {
+            return typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : '(no data)';
+        });
+        const divs = stringValues.map((value, i) => {
+            const color = trackModel.tracks[i].options.color || 'blue';
+            return (
+                <div key={i}>
+                <span style={{color: color}}>
+                {trackModel.tracks[i].label} {value}</span>
                 {unit && <span className="Tooltip-minor-text">{unit}</span>}
             </div>
+            );
+        });
+        return (
+        <div>
+            {divs}
             <div className="Tooltip-minor-text" >
                 <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
             </div>

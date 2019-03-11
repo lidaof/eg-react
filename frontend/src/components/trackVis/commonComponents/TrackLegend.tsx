@@ -174,11 +174,22 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                 chromLabel += `-${segments[segments.length - 1].feature.getName()}`;
             }
         }
+        let labelList = null;
+        if(trackModel.type === 'matplot') {
+            const labels = trackModel.tracks.map((track,i) => {
+                const color = track.options.color || 'blue';
+                return <div key={i} style={{color}}>{track.label}</div>;
+            });
+            labelList = <div style={{
+                display: 'grid', gridTemplateColumns: 'auto', alignItems: 'end', fontSize: '10px'}}>
+                {labels}</div>;
+        }
         return (
         <div style={divStyle} title={label}>
             <p className="TrackLegend-label" style={pStyle} >{label}</p>
             <div style={{display: "flex", alignItems: "center", fontSize: "12px"}}>
                 {plotLegend && this.plotATCGLegend()}</div>
+                {labelList}
                 <div style={{fontSize: "11px", alignSelf: "flex-end", backgroundColor: "white"}}>{chromLabel}</div>
             {axis}
         </div>

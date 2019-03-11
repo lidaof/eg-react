@@ -1,5 +1,10 @@
 # Version History
 
+## 48.4.0
+
+* matplot function is added
+* configuration for matplot track is added with `smooth`, `aggregate methods`, `line width` etc.
+
 ## 48.3.1
 
 * retina screen display improved as track rendered in canvas
