@@ -116,15 +116,17 @@ class Geneplot extends React.Component {
         });
         const promises = setRegions.map(region => dataSource.getData(region));
         const rawData = await Promise.all(promises);
-        const data = rawData.map(raw => trackConfig.formatData(raw));        
+        const data = rawData.map(raw => trackConfig.formatData(raw));
         const binned = set.features.map((feature,idx) => {
-            const step = Math.ceil((feature.locus.end - feature.locus.start)/dataPoints);
+            const step = Math.round((feature.locus.end - feature.locus.start)/dataPoints);
             const lefts = _.range(feature.locus.start, feature.locus.end, step);
             const rights = [...lefts.slice(0,-1).map(x=>x+step), feature.locus.end];
             const bins = _.unzip([lefts,rights]);
             return this.groupDataToBins(data[idx], bins, rights);
         });
-        const plotData = _.zip(...binned);
+        // reverse binned data for feature in - strand
+        const adjusted = binned.map( (d, i ) => set.features[i].getIsForwardStrand() ? d.slice() : _.reverse(d.slice()));
+        const plotData = _.zip(...adjusted);
         const boxData = plotData.map( (d, i) => ({
             y: d,
             type: 'box',
@@ -134,7 +136,7 @@ class Geneplot extends React.Component {
             }
             })
         );
-        const lineData  = binned.map( (d, i) => ( {
+        const lineData  = adjusted.map( (d, i) => ( {
             type: 'scatter',
             x: _.range(1, d.length+1),
             y: d,
@@ -147,7 +149,8 @@ class Geneplot extends React.Component {
             }
         }));
         const heatmapData = [{
-            z: binned,
+            x: set.features.map(feature => feature.getName()),
+            z: adjusted,
             type: 'heatmap'
         }];
         if (plotType === 'line') {
