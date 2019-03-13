@@ -22,14 +22,17 @@ class PlotlyBoxplot extends Component {
 
   static defaultProps = {
     layout: {
-      width: 800, height: 600, title: 'Geneplot', showlegend: false,
+      width: 900, height: 600, title: 'Geneplot', showlegend: false,
+      margin: {
+        l: 180
+      },
     },
     config: {
       toImageButtonOptions: {
         format: 'svg', // one of png, svg, jpeg, webp
         filename: 'gene_plot',
         height: 600,
-        width: 800,
+        width: 900,
         scale: 1, // Multiply title/legend/axis/canvas sizes by this factor
       },
       displaylogo: false,
