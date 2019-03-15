@@ -7,7 +7,7 @@ import NavigationContext from '../../model/NavigationContext';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
-import PlotlyBoxplot from './PlotlyBoxplot';
+import PlotlyPlot from './PlotlyPlot';
 import { HELP_LINKS } from '../../util';
 
 function mapStateToProps(state) {
@@ -126,9 +126,9 @@ class Geneplot extends React.Component {
         });
         // reverse binned data for feature in - strand
         const adjusted = binned.map( (d, i ) => set.features[i].getIsForwardStrand() ? d.slice() : _.reverse(d.slice()));
-        console.log(adjusted);
+        // console.log(adjusted);
         const featureNames = set.features.map(feature => feature.getName());
-        console.log(featureNames);
+        // console.log(featureNames);
         const plotData = _.zip(...adjusted);
         const boxData = plotData.map( (d, i) => ({
             y: d,
@@ -153,9 +153,11 @@ class Geneplot extends React.Component {
         }));
         const heatmapData = [{
             z: adjusted,
-            y: featureNames,
+            // x: _.range(1, adjusted[0].length+1),
+            // y: featureNames,
             type: 'heatmap'
         }];
+        // console.log(heatmapData);
         if (plotType === 'line') {
             this.setState({showlegend: true});
         }
@@ -235,7 +237,7 @@ class Geneplot extends React.Component {
                     {' '}
                     {plotMsg}
                 </div>
-                <div><PlotlyBoxplot data={data[plotType]} showlegend={showlegend} /></div>
+                <div><PlotlyPlot data={data[plotType]} showlegend={showlegend} /></div>
             </div>
         );
     }

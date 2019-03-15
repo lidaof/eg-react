@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 // simplest method: uses precompiled complete bundle from `plotly.js`
 // import Plot from 'react-plotly.js'; // this increases bundle size so much
-import Plotly from 'plotly.js-cartesian-dist';
+// import Plotly from 'plotly.js-cartesian-dist';
 // customizable method: use your own `Plotly` object
 import createPlotlyComponent from 'react-plotly.js/factory';
 const Plot = createPlotlyComponent(Plotly);
@@ -12,7 +12,7 @@ const Plot = createPlotlyComponent(Plotly);
  * @author Daofeng Li
  */
 
-class PlotlyBoxplot extends Component {
+class PlotlyPlot extends React.PureComponent {
   static propTypes = {
     data: PropTypes.array,
     layout: PropTypes.object,
@@ -82,4 +82,4 @@ class PlotlyBoxplot extends Component {
   }
 }
 
-export default PlotlyBoxplot;
+export default PlotlyPlot;

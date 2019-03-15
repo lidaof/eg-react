@@ -117,7 +117,7 @@ class RegionSetConfig extends React.Component {
                 });
                 const hits2 = hits.filter(hit => hit); // removes undefined
                 if ( hits2.length === 0 ) {return null;}
-                console.log(hits2);
+                // console.log(hits2);
                 return hits2[0] || null;
             } else {
                 return item;
