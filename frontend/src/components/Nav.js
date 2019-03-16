@@ -340,7 +340,11 @@ class ModalMenuItem extends React.Component {
                 ariaHideApp={false}
                 onRequestClose={this.toggleOpen}
                 shouldCloseOnOverlayClick={true}
-                style={this.props.style}
+                // style={this.props.style}
+                style={{
+                    overlay: {
+                        backgroundColor: 'rgba(111,107,101, 0.7)'
+                    }}}
             >
                 <ModalCloseButton onClick={this.toggleOpen} />
                 {this.props.children}

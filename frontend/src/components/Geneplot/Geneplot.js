@@ -9,6 +9,8 @@ import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
 import PlotlyPlot from './PlotlyPlot';
 import { HELP_LINKS } from '../../util';
+import HeatmapWidget from './HeatmapWidget';
+import { formatForHeatmap } from './utils';
 
 function mapStateToProps(state) {
     return {
@@ -154,7 +156,7 @@ class Geneplot extends React.Component {
         const heatmapData = [{
             z: adjusted,
             // x: _.range(1, adjusted[0].length+1),
-            // y: featureNames,
+            y: featureNames,
             type: 'heatmap'
         }];
         // console.log(heatmapData);
@@ -217,6 +219,10 @@ class Geneplot extends React.Component {
             </div>
         }
         const {data, plotType, showlegend, plotMsg} = this.state;
+        let heatmapData = null;
+        if (plotType === 'heatmap') {
+            heatmapData = formatForHeatmap(data);
+        }
         return (
             <div>
                 <p className="lead">1. Choose a region set</p>
@@ -237,7 +243,11 @@ class Geneplot extends React.Component {
                     {' '}
                     {plotMsg}
                 </div>
+                {(plotType !== 'heatmap')?
                 <div><PlotlyPlot data={data[plotType]} showlegend={showlegend} /></div>
+                : <div style={{ width: '900px', height: '500px' }}>
+                    { (heatmapData) ? <HeatmapWidget data={heatmapData}/> : null}
+                </div>}
             </div>
         );
     }

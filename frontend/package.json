@@ -17,7 +17,12 @@
     "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
     "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@nivo/core": "^0.42.1",
+    "@nivo/legends": "^0.42.0",
+    "@nivo/line": "^0.42.1",
+    "@nivo/heatmap": "^0.50.0"
+  },
   "peerDependencies": {
     "prop-types": "^15.6.0",
     "react": "^16.3.0",

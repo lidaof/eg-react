@@ -356,7 +356,7 @@ class FacetTable extends Component {
                contentLabel="track list"
                ariaHideApp={false}
                id={id}
-               style={{overlay: {zIndex: 3}}}
+               style={{overlay: {zIndex: 3, backgroundColor: 'rgba(111,107,101, 0.7)'}}}
             >
                 <span
                     className="text-right" 

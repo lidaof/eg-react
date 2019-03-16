@@ -15,7 +15,10 @@ const MODAL_STYLE = {
         overflow: "visible",
         padding: "5px",
         color: "black",
-    }
+    },
+    overlay: {
+            backgroundColor: 'rgba(111,107,101, 0.7)'
+        }
 };
 
 const X_BUTTON_STYLE = {
