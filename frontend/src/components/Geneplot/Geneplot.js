@@ -245,9 +245,8 @@ class Geneplot extends React.Component {
                 </div>
                 {(plotType !== 'heatmap')?
                 <div><PlotlyPlot data={data[plotType]} showlegend={showlegend} /></div>
-                : <div style={{ width: '900px', height: '500px' }}>
-                    { (heatmapData) ? <HeatmapWidget data={heatmapData}/> : null}
-                </div>}
+                : (heatmapData) ? <HeatmapWidget data={heatmapData}/> : null
+                }
             </div>
         );
     }
