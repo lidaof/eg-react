@@ -1,5 +1,13 @@
 # Version History
 
+## 48.4.1
+* use CND hosted plotly scripts to reduce script bundle size
+* fix a bug that screenshot app shows left expanded region when there is interaction track
+* use [nivo](https://github.com/plouc/nivo) library for heatmap in geneplot app
+* fix a bug that values for geneplot missed strand information
+* fix a bug certain gene symbol cannot be found in geneplot
+* fix a bug strand for region sets by default sets to `-`
+
 ## 48.4.0
 
 * matplot function is added

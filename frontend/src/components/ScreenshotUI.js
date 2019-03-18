@@ -148,6 +148,7 @@ class ScreenshotUINotConnected extends React.Component {
                 index={index}
                 forceSvg={true}
                 selectedRegion={viewRegion}
+                zoomAnimation={0}
             />
         });
         
