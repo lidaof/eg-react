@@ -112,14 +112,15 @@ class Geneplot extends React.Component {
         const trackConfig = getTrackConfig(track);
         const dataSource = trackConfig.initDataSource();
         const set = this.getSetByName(setName);
-        const setRegions = set.features.map(feature => {
+        const flankedFeatures = set.features.map(feature => set.flankingStrategy.makeFlankedFeature(feature, set.genome));
+        const setRegions = flankedFeatures.map(feature => {
             const navContext = new NavigationContext(feature.name, [feature]);
             return new DisplayedRegionModel(navContext);
         });
         const promises = setRegions.map(region => dataSource.getData(region));
         const rawData = await Promise.all(promises);
         const data = rawData.map(raw => trackConfig.formatData(raw));
-        const binned = set.features.map((feature,idx) => {
+        const binned = flankedFeatures.map((feature,idx) => {
             const step = Math.round((feature.locus.end - feature.locus.start)/dataPoints);
             const lefts = _.range(feature.locus.start, feature.locus.end - step/2, step); // to avoid last tiny bin
             const rights = [...(lefts.slice(0, -1).map(x=>x+step)), feature.locus.end];
@@ -127,9 +128,9 @@ class Geneplot extends React.Component {
             return this.groupDataToBins(data[idx], bins, rights);
         });
         // reverse binned data for feature in - strand
-        const adjusted = binned.map( (d, i ) => set.features[i].getIsForwardStrand() ? d.slice() : _.reverse(d.slice()));
+        const adjusted = binned.map( (d, i ) => flankedFeatures[i].getIsForwardStrand() ? d.slice() : _.reverse(d.slice()));
         // console.log(adjusted);
-        const featureNames = set.features.map(feature => feature.getName());
+        const featureNames = flankedFeatures.map(feature => feature.getName());
         // console.log(featureNames);
         const plotData = _.zip(...adjusted);
         const boxData = plotData.map( (d, i) => ({
@@ -181,9 +182,14 @@ class Geneplot extends React.Component {
      */
     groupDataToBins = (data, bins, rights) => {
         const indexes = data.map(d => Math.min(_.sortedIndex(rights, d.locus.end), bins.length - 1)); // assures data fall into bins
+        // return the area of region
         let results = Array.from({ length: bins.length }, () => 0);
         data.forEach((d,i) => results[indexes[i]] += (d.locus.getLength() * d.value) );
         return results.map((d,i) => d / (bins[i][1] - bins[i][0]));
+        // simple mean of data in region
+        // let results = Array.from({ length: bins.length }, () => []);
+        // data.forEach((d,i) => results[indexes[i]].push(d.value) );
+        // return results.map(d => _.mean(d));
     }
 
     getTrackByName = (name) => {

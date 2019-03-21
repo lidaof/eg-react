@@ -29,14 +29,18 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
             if (!score) {
                 continue;
             }
-
             const {xSpan1, xSpan2} = placedInteraction;
+            if (xSpan1.end < viewWindow.start && xSpan2.start > viewWindow.end) {
+                continue;
+            }
             const gapCenter = (xSpan1.end + xSpan2.start) / 2;
             const gapLength = xSpan2.start - xSpan1.end;
             const topX = gapCenter;
             const topY = 0.5 * gapLength;
-            const halfSpan1 = Math.max(0.5 * xSpan1.getLength(), 4);
-            const halfSpan2 = Math.max(0.5 * xSpan2.getLength(), 4);
+            const halfSpan1 = Math.max(0.5 * xSpan1.getLength(), 1);
+            const halfSpan2 = Math.max(0.5 * xSpan2.getLength(), 1);
+            // const halfSpan1 = 0.5 * xSpan1.getLength();
+            // const halfSpan2 = 0.5 * xSpan2.getLength();
             const bottomY = topY + halfSpan1 + halfSpan2;
             if(gapCenter > viewWindow.start && gapCenter < viewWindow.end) {
                 bootomYs.push(bottomY);
@@ -57,5 +61,6 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
         }
         const height = bootomYs.length > 0 ? Math.round(_.max(bootomYs)) : 50;
         return <svg width={width} height={height} onMouseOut={onMouseOut} >{diamonds}</svg>;
+        // return <svg width={width} height={Heatmap.getHeight(this.props)} onMouseOut={onMouseOut} >{diamonds}</svg>;
     }
 }
