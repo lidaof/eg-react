@@ -131,6 +131,14 @@ class CanvasDesignRenderer extends React.PureComponent {
                 context.closePath();
                 context.fill();
                 break;
+            case 'path':
+                context.fillStyle = props.fill;
+                context.globalAlpha = props.opacity || 1;
+                context.strokeStyle = props.stroke;
+                context.lineWidth = props.strokeWidth;
+                const path = new Path2D(props.d);
+                context.stroke(path);
+                break;
             case undefined:
                 break;
             default:
