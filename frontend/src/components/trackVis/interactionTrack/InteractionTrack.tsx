@@ -29,7 +29,8 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
         scoreScale?: string,
         scoreMax?: number,
         scoreMin?: number,
-    }
+    };
+    forceSvg?: boolean;
 }
 
 export const DEFAULT_OPTIONS = {
@@ -88,7 +89,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
     }
 
     render(): JSX.Element {
-        const {data, trackModel, visRegion, width, viewWindow, options} = this.props;
+        const {data, trackModel, visRegion, width, viewWindow, options, forceSvg} = this.props;
         const visualizerProps = {
             placedInteractions: this.featurePlacer.placeInteractions(data, visRegion, width),
             viewWindow,
@@ -97,7 +98,8 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             color: options.color,
             binSize: options.binSize,
             onInteractionHovered: this.showTooltip,
-            onMouseOut: this.hideTooltip
+            onMouseOut: this.hideTooltip,
+            forceSvg,
         };
         let visualizer; // , height;
         if (options.displayMode === InteractionDisplayMode.HEATMAP) {

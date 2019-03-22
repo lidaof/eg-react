@@ -120,6 +120,17 @@ class CanvasDesignRenderer extends React.PureComponent {
             //     }
             //     context.stroke();
             //     break;
+            case 'polygon':
+                context.fillStyle = props.fill;
+                context.globalAlpha = props.opacity || 1;
+                context.beginPath();
+                context.moveTo(props.points[0][0], props.points[0][1]);
+                context.lineTo(props.points[1][0], props.points[1][1]);
+                context.lineTo(props.points[2][0], props.points[2][1]);
+                context.lineTo(props.points[3][0], props.points[3][1]);
+                context.closePath();
+                context.fill();
+                break;
             case undefined:
                 break;
             default:

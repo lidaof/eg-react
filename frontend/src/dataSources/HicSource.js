@@ -149,7 +149,8 @@ export class HicSource extends DataSource {
             }
         }
         const dataForEachSegment = await Promise.all(promises);
-        return ensureMaxListLength(_.flatMap(dataForEachSegment), 5000);
+        return _.flatMap(dataForEachSegment);
+        // return ensureMaxListLength(_.flatMap(dataForEachSegment), 5000);
     }
 
     /**
