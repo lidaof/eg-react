@@ -311,7 +311,7 @@ const publicHubList = [
     {
         collection: "HiC interaction from Juicebox",
         name: "HiC interaction from Juicebox",
-        numTracks: 193,
+        numTracks: 192,
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/hg19/new/hg19-juiceboxhub"
     },

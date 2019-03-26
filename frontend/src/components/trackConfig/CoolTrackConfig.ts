@@ -4,6 +4,7 @@ import { CoolSource } from '../../dataSources/CoolSource';
 import { InteractionDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';
 import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import ScoreConfig from '../trackContextMenu/ScoreConfig';
+import HeightConfig from '../trackContextMenu/HeightConfig';
 
 export class CoolTrackConfig extends TrackConfig {
     constructor(props: any) {
@@ -20,7 +21,7 @@ export class CoolTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [InteractionDisplayModeConfig, ScoreConfig,
+        return [InteractionDisplayModeConfig, HeightConfig, ScoreConfig,
             PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
     }
 }

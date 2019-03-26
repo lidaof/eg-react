@@ -10,6 +10,7 @@ interface HeatmapProps {
     placedInteractions: PlacedInteraction[];
     viewWindow: OpenInterval;
     width: number;
+    height: number;
     opacityScale: ScaleLinear<number, number>;
     color: string;
     onInteractionHovered(event: React.MouseEvent, interaction: GenomeInteraction): void;
@@ -18,9 +19,9 @@ interface HeatmapProps {
 }
 
 export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
-    static getHeight(props: HeatmapProps) {
-        return 0.5 * props.viewWindow.getLength();
-    }
+    // static getHeight(props: HeatmapProps) {
+    //     return 0.5 * props.viewWindow.getLength();
+    // }
 
     renderRect = (placedInteraction: PlacedInteraction, index: number) => {
         const { opacityScale, color, onInteractionHovered, viewWindow} = this.props;
@@ -65,9 +66,9 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
     }
 
     render() {
-        const {placedInteractions, width, forceSvg} = this.props;
+        const {placedInteractions, width, forceSvg, height} = this.props;
         return <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} 
-                            width={width} height={Heatmap.getHeight(this.props)}>
+                            width={width} height={height}>
             {placedInteractions.map(this.renderRect)}
         </DesignRenderer>
     }

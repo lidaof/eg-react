@@ -23,7 +23,7 @@ import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
 import { TrackUpload } from "./TrackUpload";
 import { FetchSequence } from "./FetchSequence";
 import packageJson from '../../package.json';
-
+import ScatterPlot from "./Geneplot/ScatterPlot";
 
 import './Nav.css';
 
@@ -195,8 +195,11 @@ class Nav extends React.Component {
                         <ModalMenuItem itemLabel="Region Set View">
                             <RegionSetSelector genome={genomeConfig.genome} />
                         </ModalMenuItem>
-                        <ModalMenuItem itemLabel="Geneplot">
+                        <ModalMenuItem itemLabel="Gene plot">
                             <Geneplot genome={genomeConfig.genome} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Scatter plot">
+                            <ScatterPlot genome={genomeConfig.genome} />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Session" style={{content: {
                                                         right: "unset",

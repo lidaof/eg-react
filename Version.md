@@ -1,6 +1,13 @@
 # Version History
 
+## 48.4.2
+
+* added the scatter plot app
+* enabled canvas renderer for arc and heatmap display of chromatin interaction tracks
+* enabled height config for chromatin interaction tracks
+
 ## 48.4.1
+
 * use CND hosted plotly scripts to reduce script bundle size
 * fix a bug that screenshot app shows left expanded region when there is interaction track
 * use [nivo](https://github.com/plouc/nivo) library for heatmap in geneplot app

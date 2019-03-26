@@ -10,6 +10,7 @@ import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from 
 import { InteractionDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';
 import ScoreConfig from '../trackContextMenu/ScoreConfig';
 import { BinSizeConfig, HicNormalizationConfig } from '../trackContextMenu/HicDataConfig';
+import HeightConfig from '../trackContextMenu/HeightConfig';
 
 export class HicTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -41,7 +42,7 @@ export class HicTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [HicNormalizationConfig, InteractionDisplayModeConfig, ScoreConfig, BinSizeConfig,
+        return [HicNormalizationConfig, InteractionDisplayModeConfig, HeightConfig, ScoreConfig, BinSizeConfig,
             PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
     }
 }

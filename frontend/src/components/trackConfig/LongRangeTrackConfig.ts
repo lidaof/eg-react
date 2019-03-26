@@ -10,6 +10,7 @@ import ScoreConfig from '../trackContextMenu/ScoreConfig';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import { GenomeInteraction } from '../../model/GenomeInteraction';
 import LocalBedSource from '../../dataSources/LocalBedSource';
+import HeightConfig from '../trackContextMenu/HeightConfig';
 
 export class LongRangeTrackConfig extends TrackConfig {
     constructor(props: any) {
@@ -55,7 +56,7 @@ export class LongRangeTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [InteractionDisplayModeConfig, ScoreConfig,
+        return [InteractionDisplayModeConfig, HeightConfig, ScoreConfig,
             PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
     }
 }

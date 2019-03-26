@@ -22,7 +22,7 @@ class PlotlyPlot extends React.PureComponent {
 
   static defaultProps = {
     layout: {
-      width: 900, height: 600, title: 'Geneplot', showlegend: false,
+      width: 900, height: 600, showlegend: false,
       margin: {
         l: 180
       },

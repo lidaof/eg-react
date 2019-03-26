@@ -26,9 +26,10 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
         backgroundColor?: string;
         displayMode: InteractionDisplayMode;
         binSize?: number;
-        scoreScale?: string,
-        scoreMax?: number,
-        scoreMin?: number,
+        scoreScale?: string;
+        scoreMax?: number;
+        scoreMin?: number;
+        height: number;
     };
     forceSvg?: boolean;
 }
@@ -41,6 +42,7 @@ export const DEFAULT_OPTIONS = {
     scoreScale: ScaleChoices.AUTO,
     scoreMax: 10,
     scoreMin: 0,
+    height: 500,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -94,6 +96,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             placedInteractions: this.featurePlacer.placeInteractions(data, visRegion, width),
             viewWindow,
             width,
+            height: options.height,
             opacityScale: this.makeOpacityScale(),
             color: options.color,
             binSize: options.binSize,
@@ -112,8 +115,8 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
 
         return <Track
             {...this.props}
-            // legend={<TrackLegend trackModel={trackModel} height={height} />}
-            legend={<TrackLegend trackModel={trackModel} height={50} />}
+            legend={<TrackLegend trackModel={trackModel} height={options.height} />}
+            // legend={<TrackLegend trackModel={trackModel} height={50} />}
             visualizer={visualizer}
         />;
     }

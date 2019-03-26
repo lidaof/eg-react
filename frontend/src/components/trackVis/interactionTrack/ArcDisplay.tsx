@@ -12,6 +12,7 @@ interface ArcDisplayProps {
     placedInteractions: PlacedInteraction[];
     viewWindow: OpenInterval;
     width: number;
+    height: number;
     opacityScale: ScaleLinear<number, number>;
     color: string;
     onInteractionHovered(event: React.MouseEvent, interaction: GenomeInteraction): void;
@@ -24,10 +25,10 @@ const STROKE_WIDTH = 2;
 const ITEM_LIMIT = 1000;
 
 export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
-    static getHeight(props: ArcDisplayProps) {
-        // return HEIGHT;
-        return 0.5 * props.viewWindow.getLength();
-    }
+    // static getHeight(props: ArcDisplayProps) {
+    //     // return HEIGHT;
+    //     return 0.5 * props.viewWindow.getLength();
+    // }
     
 
     renderArc = (placedInteraction: PlacedInteraction, index: number) => {
@@ -69,11 +70,11 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         }
 
     render() {
-        const {placedInteractions, width, forceSvg} = this.props;
+        const {placedInteractions, width, forceSvg, height} = this.props;
         let sortedInteractions = placedInteractions.slice().sort((a, b) => b.interaction.score - a.interaction.score);
         sortedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
         return <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} 
-                            width={width} height={ArcDisplay.getHeight(this.props)}>
+                            width={width} height={height}>
             {sortedInteractions.map(this.renderArc)}
         </DesignRenderer>
     }
