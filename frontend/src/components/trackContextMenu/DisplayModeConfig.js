@@ -1,6 +1,7 @@
 import React from 'react';
 import SelectConfig from './SelectConfig';
 import { AnnotationDisplayModes, NumericalDisplayModes, InteractionDisplayMode } from '../../model/DisplayModes';
+import NumberConfig from './NumberConfig';
 
 /**
  * A menu item for configuring display modes of annotation tracks.
@@ -35,11 +36,25 @@ export function NumericalDisplayModeConfig(props) {
 }
 
 export function InteractionDisplayModeConfig(props) {
-    return <SelectConfig
-        {...props}
-        optionName="displayMode"
-        label="Display mode:"
-        defaultValue={InteractionDisplayMode.HEATMAP}
-        choices={InteractionDisplayMode}
-    />;
+    const lineWidthConfig = props.optionsObjects[0].displayMode === InteractionDisplayMode.HEATMAP ?
+        null : 
+        <NumberConfig 
+                {...props} 
+                optionName="lineWidth" 
+                label="Line width (pixels):" 
+                minValue={1} 
+                step={1} 
+                hasSetButton={false} 
+            />;
+    return <React.Fragment>
+        <SelectConfig
+            {...props}
+            optionName="displayMode"
+            label="Display mode:"
+            defaultValue={InteractionDisplayMode.HEATMAP}
+            choices={InteractionDisplayMode}
+        />
+        {lineWidthConfig}
+    </React.Fragment>
+    ;
 }

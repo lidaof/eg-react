@@ -30,6 +30,7 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
         scoreMax?: number;
         scoreMin?: number;
         height: number;
+        lineWidth?: number;
     };
     forceSvg?: boolean;
 }
@@ -43,6 +44,7 @@ export const DEFAULT_OPTIONS = {
     scoreMax: 10,
     scoreMin: 0,
     height: 500,
+    lineWidth: 2,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -99,6 +101,8 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             height: options.height,
             opacityScale: this.makeOpacityScale(),
             color: options.color,
+            color2: options.color2,
+            lineWidth: options.lineWidth,
             binSize: options.binSize,
             onInteractionHovered: this.showTooltip,
             onMouseOut: this.hideTooltip,

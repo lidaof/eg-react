@@ -1,5 +1,9 @@
 # Version History
 
+* fixed a bug for long-range track has negative score
+* add line width config for interaction track when displayed as arcs
+* updated to hic-straw 0.9.0 as suggested by Jim Robinson
+
 ## 48.4.2
 
 * added the scatter plot app

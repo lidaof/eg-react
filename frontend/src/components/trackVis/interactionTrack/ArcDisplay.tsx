@@ -13,15 +13,17 @@ interface ArcDisplayProps {
     viewWindow: OpenInterval;
     width: number;
     height: number;
+    lineWidth?: number;
     opacityScale: ScaleLinear<number, number>;
     color: string;
+    color2: string;
     onInteractionHovered(event: React.MouseEvent, interaction: GenomeInteraction): void;
     onMouseOut(event: React.MouseEvent): void;
     forceSvg?: boolean;
 }
 
 // const HEIGHT = 500;
-const STROKE_WIDTH = 2;
+// const STROKE_WIDTH = 2;
 const ITEM_LIMIT = 1000;
 
 export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
@@ -32,7 +34,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     
 
     renderArc = (placedInteraction: PlacedInteraction, index: number) => {
-        const {opacityScale, color, onInteractionHovered} = this.props;
+        const {opacityScale, color, color2, onInteractionHovered, lineWidth} = this.props;
         // const arcs = [], arcHeights = [];
         // const curveYScale = scaleLinear().domain([0, viewWindow.getLength()]).range([0, HEIGHT]).clamp(true);
         const score = placedInteraction.interaction.score;
@@ -53,7 +55,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         // if(spanCenter > viewWindow.start && spanCenter < viewWindow.end) {
         //     arcHeights.push(arcHeight);
         // }
-        const radius = Math.max(0, spanLength / Math.SQRT2 - STROKE_WIDTH / 2);
+        const radius = Math.max(0, spanLength / Math.SQRT2 - lineWidth / 2);
         return (<path
             key={placedInteraction.generateKey()+index}
             // d={moveTo(xSpan1Center, 0) + quadraticCurveTo(spanCenter, curveYScale(spanLength), xSpan2Center, 0)}
@@ -61,8 +63,8 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
             fill="none"
             opacity={opacityScale(score)}
             className="ArcDisplay-emphasize-on-hover"
-            stroke={color}
-            strokeWidth={STROKE_WIDTH}
+            stroke={score >=0 ? color: color2}
+            strokeWidth={lineWidth}
             onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
         />);
         // const height = arcHeights.length > 0 ? Math.round(_.max(arcHeights)) : 50;

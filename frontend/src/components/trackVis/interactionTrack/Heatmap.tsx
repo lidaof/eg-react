@@ -13,6 +13,7 @@ interface HeatmapProps {
     height: number;
     opacityScale: ScaleLinear<number, number>;
     color: string;
+    color2: string;
     onInteractionHovered(event: React.MouseEvent, interaction: GenomeInteraction): void;
     onMouseOut(event: React.MouseEvent): void;
     forceSvg?: boolean;
@@ -24,7 +25,7 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
     // }
 
     renderRect = (placedInteraction: PlacedInteraction, index: number) => {
-        const { opacityScale, color, onInteractionHovered, viewWindow} = this.props;
+        const { opacityScale, color, color2, onInteractionHovered, viewWindow} = this.props;
         const bootomYs = [];
         const score = placedInteraction.interaction.score;
         if (!score) {
@@ -55,7 +56,7 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
         return <polygon
             key={placedInteraction.generateKey()+index}
             points={points as any} // React can convert the array to a string
-            fill={color}
+            fill={score >=0 ? color : color2}
             opacity={opacityScale(score)}
             onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
         />;
