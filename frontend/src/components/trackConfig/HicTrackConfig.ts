@@ -11,6 +11,8 @@ import { InteractionDisplayModeConfig } from '../trackContextMenu/DisplayModeCon
 import ScoreConfig from '../trackContextMenu/ScoreConfig';
 import { BinSizeConfig, HicNormalizationConfig } from '../trackContextMenu/HicDataConfig';
 import HeightConfig from '../trackContextMenu/HeightConfig';
+import LineWidthConfig from '../trackContextMenu/LineWidthConfig';
+import { InteractionDisplayMode } from '../../model/DisplayModes';
 
 export class HicTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -42,7 +44,11 @@ export class HicTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [HicNormalizationConfig, InteractionDisplayModeConfig, HeightConfig, ScoreConfig, BinSizeConfig,
+        const items =  [HicNormalizationConfig, InteractionDisplayModeConfig, HeightConfig, ScoreConfig, BinSizeConfig,
             PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
+        if (this.getOptions().displayMode === InteractionDisplayMode.ARC) {
+            items.splice(2, 0, LineWidthConfig);
+        }
+        return items;
     }
 }

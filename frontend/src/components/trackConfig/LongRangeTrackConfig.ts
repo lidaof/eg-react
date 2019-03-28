@@ -1,3 +1,4 @@
+import { InteractionDisplayMode } from './../../model/DisplayModes';
 import { TrackConfig } from './TrackConfig';
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 // import { LongRangeWorker } from '../../dataSources/WorkerTSHook';
@@ -11,6 +12,7 @@ import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import { GenomeInteraction } from '../../model/GenomeInteraction';
 import LocalBedSource from '../../dataSources/LocalBedSource';
 import HeightConfig from '../trackContextMenu/HeightConfig';
+import LineWidthConfig from '../trackContextMenu/LineWidthConfig';
 
 export class LongRangeTrackConfig extends TrackConfig {
     constructor(props: any) {
@@ -57,7 +59,11 @@ export class LongRangeTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [InteractionDisplayModeConfig, HeightConfig, ScoreConfig,
+        const items =  [InteractionDisplayModeConfig, HeightConfig, ScoreConfig,
             PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
+        if (this.getOptions().displayMode === InteractionDisplayMode.ARC) {
+            items.splice(1, 0, LineWidthConfig);
+        }
+        return items;
     }
 }
