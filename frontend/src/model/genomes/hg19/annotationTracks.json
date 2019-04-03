@@ -130,7 +130,7 @@
             "name": "blacklist",
             "label": "hg19 Encode Blacklist",
             "filetype": "bed",
-            "url": "https://epgg-test.wustl.edu/d/hg39/hg19.blacklist.bed.gz",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19.blacklist.bed.gz",
             "height": 21,
             "options": {
                 "color": "#000000"

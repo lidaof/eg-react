@@ -1,6 +1,6 @@
 {
   "name": "epgg",
-  "version": "48.4.2",
+  "version": "48.4.3",
   "author": "Ting Wang Lab @WUSTL",
   "repository": {
     "type": "git",
@@ -67,7 +67,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "firebase": "^5.4.0",
-    "hic-straw": "^0.9.0",
+    "hic-straw": "^0.9.2",
     "igv": "^2.1.0",
     "jest-image-snapshot": "^1.0.1",
     "jquery": "^3.2.1",

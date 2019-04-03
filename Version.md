@@ -1,8 +1,12 @@
 # Version History
 
+## 48.4.3
+
 * fixed a bug for long-range track has negative score
 * add line width config for interaction track when displayed as arcs
 * updated to hic-straw 0.9.0 as suggested by Jim Robinson
+* fixed a bug when reading local file caused `data fetch error`
+* removed timeout mechanism for bigwig tracks
 
 ## 48.4.2
 

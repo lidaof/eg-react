@@ -50,6 +50,8 @@ class SnpSource extends DataSource {
                 return axios.get(`${api}/${locus.chr.substr(3)}:${locus.start+1}-${locus.end}`, {
                     params: params
                 });
+            } else {
+                return {data: []};
             }
         });
         const dataForEachSegment = await Promise.all(promises);

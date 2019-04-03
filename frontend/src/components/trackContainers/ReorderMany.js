@@ -155,7 +155,7 @@ class ReorderMany extends React.Component {
                     shouldCloseOnOverlayClick={true}
                 >
                     <div className="ReorderMany">
-                        <h5>Please drag and drop to re-order you tracks, press Apply button after done:</h5>
+                        <h5>Please drag and drop to re-order your tracks. Press the apply button after you are done.</h5>
                         <button
                             onClick={() => this.props.onTracksChanged(this.state.items)}
                             className="btn btn-sm btn-info"

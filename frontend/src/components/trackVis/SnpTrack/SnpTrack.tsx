@@ -80,10 +80,13 @@ class SnpTrackNoTooltip extends React.Component<SnpTrackProps> {
     }
 
     render() {
+        const message = this.props.data.length > 0 ? null : 
+            <div className="Track-message">Please zoom in to see track contents</div>;
         return <AnnotationTrack
             {...this.props}
             rowHeight={ROW_HEIGHT}
             getAnnotationElement={this.renderAnnotation}
+            message={message}
         />;
     }
 }

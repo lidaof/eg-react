@@ -195,10 +195,10 @@ class Nav extends React.Component {
                         <ModalMenuItem itemLabel="Region Set View">
                             <RegionSetSelector genome={genomeConfig.genome} />
                         </ModalMenuItem>
-                        <ModalMenuItem itemLabel="Gene plot">
+                        <ModalMenuItem itemLabel="Gene Plot">
                             <Geneplot genome={genomeConfig.genome} />
                         </ModalMenuItem>
-                        <ModalMenuItem itemLabel="Scatter plot">
+                        <ModalMenuItem itemLabel="Scatter Plot">
                             <ScatterPlot genome={genomeConfig.genome} />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Session" style={{content: {
@@ -253,7 +253,7 @@ class Nav extends React.Component {
                         </label>
                         <label className="dropdown-item" htmlFor="switch3D">
                             <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={onToggle3DScene} />
-                            <span style={{marginLeft: "1ch"}} >Show 3D scene</span>
+                            <span style={{marginLeft: "1ch"}} >VR mode</span>
                         </label>
                         <label className="dropdown-item" htmlFor="cacheToggle">
                             <input id="cacheToggle" type="checkbox" checked={this.state.isCacheEnabled} onChange={this.toggleCache} />
@@ -291,7 +291,7 @@ class Nav extends React.Component {
                             <a href="https://bit.ly/2T1OKmP" target="_blank">Join our Slack</a>
                         </label>
                         <label className="dropdown-item">
-                            <a href="https://github.com/lidaof/eg-react" target="_blank">Source code</a>
+                            <a href="https://github.com/lidaof/eg-react" target="_blank">Source code @ Github</a>
                         </label>
                         <label className="dropdown-item">
                             <a href="https://plus.google.com/u/0/communities/104985851965529755092" target="_blank">Google+ forum</a>
