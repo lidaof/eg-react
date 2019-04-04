@@ -19,6 +19,7 @@ import { TrackModel } from '../../model/TrackModel';
 import { RefBedTrackConfig } from './RefBedTrackConfig';
 import { SnpTrackConfig } from './SnpTrackConfig';
 import { MatplotTrackConfig } from './MatplotTrackConfig';
+import { HammockTrackConfig } from './HammockTrackConfig';
 
 export const INTERACTION_TYPES = ['hic', 'longrange', 'biginteract'];
 
@@ -42,6 +43,7 @@ const TYPE_NAME_TO_CONFIG = {
     "snp": SnpTrackConfig,
     "ruler": RulerTrackConfig,
     "matplot": MatplotTrackConfig,
+    "hammock": HammockTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

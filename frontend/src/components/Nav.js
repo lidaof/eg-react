@@ -2,8 +2,11 @@ import React from "react";
 import PropTypes from 'prop-types';
 import ReactModal from "react-modal";
 import _ from "lodash";
+import { connect } from 'react-redux';
+import {RadioGroup, Radio} from 'react-radio-group';
+import { ActionCreators } from '../AppState';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import { getSpeciesInfo } from "../model/genomes/allGenomes";
+import { getSpeciesInfo, allGenomes } from "../model/genomes/allGenomes";
 import TrackRegionController from './genomeNavigator/TrackRegionController';
 import RegionSetSelector from './RegionSetSelector';
 import Geneplot from './Geneplot/Geneplot';
@@ -30,6 +33,8 @@ import './Nav.css';
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
 
+const callbacks = { onGenomeSelected: ActionCreators.setGenome };
+
 /**
  * the top navigation bar for browser
  * @author Daofeng Li
@@ -50,12 +55,24 @@ class Nav extends React.Component {
         super(props);
         this.state = {
             isCacheEnabled: true,
+            genomeModal: false,
+            otherGenome: null,
         };
         this.debounced = _.debounce(this.props.onLegendWidthChange, 250);
+        this.renderOtherGenomes = this.renderOtherGenomes.bind(this);
+        this.handleOtherGenomeChange = this.handleOtherGenomeChange.bind(this);
     }
     
     componentDidMount(){
         this.enableCache();
+    }
+
+    handleGenomeOpenModal  = () => {
+        this.setState({ genomeModal: true });
+    }
+      
+    handleGenomeCloseModal = () => {
+        this.setState({ genomeModal: false });
     }
 
     changeLegendWidth = (e) => {
@@ -86,6 +103,34 @@ class Nav extends React.Component {
         }
     };
 
+    handleOtherGenomeChange (value) {
+        console.log(value);
+        this.setState({otherGenome: value});
+    }
+
+    renderOtherGenomes() {
+        const genomeName = this.props.genomeConfig.genome.getName();
+        const otherGenomes = allGenomes.map(g => g.genome.getName()).filter(g => g !== genomeName);
+        const radios = otherGenomes.map(g => {
+            const {name} = getSpeciesInfo(g);
+            return <label key={g}><Radio value={g} /> {name} {g}</label>
+        })
+        return (
+            <RadioGroup
+              name="otherGenome"
+              selectedValue={this.state.otherGenome}
+              onChange={this.handleOtherGenomeChange}
+              style={{display: "grid"}}
+            >
+              {radios}
+            </RadioGroup>
+          );
+    }
+
+    changeGenome = () => {
+        this.props.onGenomeSelected(this.state.otherGenome);
+        this.setState({otherGenome: null, genomeModal: false});
+    }
 
     render() {
         const {
@@ -100,6 +145,7 @@ class Nav extends React.Component {
         const {name, logo, color} = getSpeciesInfo(genomeName);
         const hasInteractionTrack = tracks.some(model => INTERACTION_TYPES.includes(model.type)) ? true : false;
         const REGION_EXPANDER = hasInteractionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
+        const {genomeModal, otherGenome} = this.state;
         return (
             <div className="Nav-container">
                 <div id="logoDiv">
@@ -109,7 +155,32 @@ class Nav extends React.Component {
                 </div>
                 <div className="Nav-genome Nav-center" 
                     style={{backgroundImage: `url(${logo})`, color: color, backgroundSize: "cover"}}>
-                    <div><span style={{textTransform: 'capitalize'}}>{name}</span> {genomeName}</div>
+                    <div onClick={this.handleGenomeOpenModal}><span style={{textTransform: 'capitalize'}}>{name}</span> {genomeName}</div>
+                    <ReactModal 
+                        isOpen={genomeModal}
+                        ariaHideApp={false}
+                        contentLabel="genomeModal"
+                        onRequestClose={this.handleGenomeCloseModal}
+                        shouldCloseOnOverlayClick={true}
+                        style={{content: {
+                                right: "unset",
+                                bottom: "unset",
+                                top: 0,
+                                left: 0,
+                                height: "100%",
+                            },
+                            overlay: {
+                                backgroundColor: 'rgba(111,107,101, 0.7)'}
+                            }
+                        }
+                    >
+                        {this.renderOtherGenomes()}
+                        <button className="btn btn-sm btn-danger" onClick={this.handleGenomeCloseModal}>Close</button>
+                        {' '}
+                        {otherGenome && 
+                            <button className="btn btn-sm btn-primary" onClick={this.changeGenome} >Go</button>
+                        }
+                    </ReactModal>
                 </div>
                 <div className="Nav-center">
                     <TrackRegionController
@@ -303,7 +374,7 @@ class Nav extends React.Component {
     }
 }
 
-export default Nav;
+export default connect(null, callbacks)(Nav);
 
 function DropdownOpener(props) {
     const {extraClassName, label} = props;
@@ -343,11 +414,13 @@ class ModalMenuItem extends React.Component {
                 ariaHideApp={false}
                 onRequestClose={this.toggleOpen}
                 shouldCloseOnOverlayClick={true}
-                // style={this.props.style}
-                style={{
-                    overlay: {
-                        backgroundColor: 'rgba(111,107,101, 0.7)'
-                    }}}
+                style={
+                    {
+                        ...this.props.style, 
+                        overlay: {
+                            backgroundColor: 'rgba(111,107,101, 0.7)'}
+                        }
+                    }
             >
                 <ModalCloseButton onClick={this.toggleOpen} />
                 {this.props.children}

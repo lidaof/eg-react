@@ -9,7 +9,7 @@ import { GenomeConfig } from './GenomeConfig';
 /**
  * All available genomes.
  */
-const allGenomes = [
+export const allGenomes = [
     HG19,
     HG38,
     MM10,
