@@ -2,6 +2,7 @@
 
 * `hammock` track type added with basic support
 * genome logo can now be clicked to change to another genome
+* mouse `mm9` and cow `bosTau8` added 
 
 ## 48.4.3
 

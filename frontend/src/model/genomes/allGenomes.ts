@@ -4,6 +4,8 @@ import MM10 from './mm10/mm10';
 import DAN_RER10 from './danRer10/danRer10';
 import PANTRO5 from './panTro5/panTro5';
 import RN6 from './rn6/rn6';
+import MM9 from './mm9/mm9';
+import BosTau8 from './bosTau8/bosTau8';
 import { GenomeConfig } from './GenomeConfig';
 
 /**
@@ -13,7 +15,9 @@ export const allGenomes = [
     HG19,
     HG38,
     MM10,
+    MM9,
     PANTRO5,
+    BosTau8,
     DAN_RER10,
     RN6,
 ];
@@ -47,7 +51,12 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
     },
     mouse: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Mouse.png',
-        assemblies: [ MM10.genome.getName() ],
+        assemblies: [ MM10.genome.getName(), MM9.genome.getName() ],
+        color: 'white',
+    },
+    cow: {
+        logoUrl: 'https://vizhub.wustl.edu/public/bosTau8/Cow.png',
+        assemblies: [ BosTau8.genome.getName() ],
         color: 'white',
     },
     rat: {

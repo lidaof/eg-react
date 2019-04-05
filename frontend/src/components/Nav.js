@@ -104,7 +104,6 @@ class Nav extends React.Component {
     };
 
     handleOtherGenomeChange (value) {
-        console.log(value);
         this.setState({otherGenome: value});
     }
 

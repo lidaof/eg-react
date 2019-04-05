@@ -38,7 +38,7 @@ async function main(argv) {
           };
           const PROD_CONFIG = {
               dbUrl: 'mongodb://localhost:27017',
-              host:'ec2-54-89-252-92.compute-1.amazonaws.com',
+              host:'ec2-3-86-222-39.compute-1.amazonaws.com',
               port: 443,
               tls: tls
           };          
@@ -50,7 +50,7 @@ async function main(argv) {
           };
             const API_CONFIG = {
                 dbUrl: 'mongodb://localhost:27017',
-                host: 'ec2-35-174-168-189.compute-1.amazonaws.com',
+              	host:'ec2-3-86-222-39.compute-1.amazonaws.com',
                 port: 443,
                 tls: tls,
                 routes: {

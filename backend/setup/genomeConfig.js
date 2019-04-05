@@ -113,6 +113,22 @@ const rn6 = [
     }
 ];
 
-const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6 };
+const mm9 = [
+    {
+        name: 'refGene',
+        file: 'refGene_load',
+        fieldsConfig: geneFieldsAndIndex
+    }
+];
+
+const bosTau8 = [
+    {
+        name: 'refGene',
+        file: 'refGene_load',
+        fieldsConfig: geneFieldsAndIndex
+    }
+];
+
+const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6, mm9, bosTau8 };
 
 module.exports = genomeConfig;
