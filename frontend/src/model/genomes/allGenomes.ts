@@ -52,12 +52,12 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
     mouse: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Mouse.png',
         assemblies: [ MM10.genome.getName(), MM9.genome.getName() ],
-        color: 'white',
+        color: 'yellow',
     },
     cow: {
         logoUrl: 'https://vizhub.wustl.edu/public/bosTau8/Cow.png',
         assemblies: [ BosTau8.genome.getName() ],
-        color: 'white',
+        color: 'yellow',
     },
     rat: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Rat.png',
