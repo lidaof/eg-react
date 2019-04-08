@@ -363,9 +363,6 @@ class Nav extends React.Component {
                         <label className="dropdown-item">
                             <a href="https://github.com/lidaof/eg-react" target="_blank">Source code @ Github</a>
                         </label>
-                        <label className="dropdown-item">
-                            <a href="https://plus.google.com/u/0/communities/104985851965529755092" target="_blank">Google+ forum</a>
-                        </label>
                     </div>
                 </div>
             </div>

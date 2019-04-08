@@ -129,6 +129,14 @@ const bosTau8 = [
     }
 ];
 
-const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6, mm9, bosTau8 };
+const araTha1 = [
+    {
+        name: 'gene',
+        file: 'tair10Gene_load',
+        fieldsConfig: geneFieldsAndIndex
+    }
+];
+
+const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6, mm9, bosTau8, araTha1 };
 
 module.exports = genomeConfig;
