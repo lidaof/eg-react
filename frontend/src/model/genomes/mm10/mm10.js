@@ -90,6 +90,7 @@ const publicHubData = {
         "(NHGRI). The goal of ENCODE is to build a comprehensive parts list of functional elements in the human " +
         "genome, including elements that act at the protein and RNA levels, and regulatory elements that control " +
         "cells and circumstances in which a gene is active.",
+    "Toxicant Exposures and Responses by Genomic and Epigenomic Regulators of Transcription (TaRGET)" : "The TaRGET(Toxicant Exposures and Responses by Genomic and Epigenomic Regulators of Transcription) program is a research consortium funded by the National Institute of Environmental Health Sciences (NIEHS). The goal of the collaboration is to address the role of environmental exposures in disease pathogenesis as a function of epigenome perturbation, including understanding the environmental control of epigenetic mechanisms and assessing the utility of surrogate tissue analysis in mouse models of disease-relevant environmental exposures.",
 };
 
 const publicHubList = [
@@ -112,6 +113,18 @@ const publicHubList = [
             'hub built date': 'Sep 1 2018',
             'hub built notes': 'metadata information are obtained directly from 4DN data portal'
         },
+    },
+    {
+        collection: "Toxicant Exposures and Responses by Genomic and Epigenomic Regulators of Transcription (TaRGET)",
+        name: "Mouse TaRGET",
+        numTracks: 965,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/mm10/new/20190130_TaRGET_datahub.json",
+        description: 
+            {
+                'hub built by': 'Wanqing Shao (wanqingshao@wustl.edu)',
+                'hub built date': 'Jan 30 2019',
+            }
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",

@@ -1,8 +1,12 @@
 # Version History
 
+## 48.4.4
+
 * `hammock` track type added with basic support
 * genome logo can now be clicked to change to another genome
-* mouse `mm9` and cow `bosTau8` added 
+* mouse `mm9` and cow `bosTau8` added
+* arabidopsis `araTha1` (same as TAIR10) added
+* session can either be downloaded as a session file or a datahub file
 
 ## 48.4.3
 

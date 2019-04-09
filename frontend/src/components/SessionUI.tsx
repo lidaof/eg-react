@@ -103,17 +103,27 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         this.setRandomLabel();
     }
 
-    downloadSession = (): any => {
+    downloadSession = (asHub = false): any => {
         const {browser} = this.props;
         const bundle = this.getBundle();
-        const sessionInJSON = new AppStateSaver().toJSON(browser.present);
-        const sessionString = "data:text/json;charset=utf-8," + encodeURIComponent(sessionInJSON);
+        const sessionInJSON = new AppStateSaver().toObject(browser.present);
+        const content = asHub ? (sessionInJSON as any).tracks : sessionInJSON;
+        const descriptor = asHub ? 'hub' : 'session';
+        const sessionString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(content));
         const dl = document.createElement("a");
         document.body.appendChild(dl); // This line makes it work in Firefox.
         dl.setAttribute("href", sessionString);
-        dl.setAttribute("download", `eg-session-${bundle.bundleId}.json`);
+        dl.setAttribute("download", `eg-${descriptor}-${bundle.currentId}-${bundle.bundleId}.json`);
         dl.click();
         notify.show('Session downloaded!', 'success', 2000);
+    }
+
+    downloadAsSession = () => {
+        this.downloadSession(false);
+    }
+
+    downloadAsHub = () => {
+        this.downloadSession(true);
     }
 
     setSessionLabel = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -246,8 +256,11 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                     </div>
                     <button className="SessionUI btn btn-primary" onClick={this.saveSession}>Save session</button>
                     {' '}
-                    <button className="SessionUI btn btn-success" onClick={this.downloadSession}>
-                        Download session</button>
+                    <button className="SessionUI btn btn-success" onClick={this.downloadAsSession}>
+                        Download current session</button>
+                    {' '}
+                    <button className="SessionUI btn btn-info" onClick={this.downloadAsHub}>
+                        Download as datahub</button>
                 </React.Fragment>
             }
             {this.renderSavedSessions()}

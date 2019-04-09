@@ -27,6 +27,7 @@ import { TrackUpload } from "./TrackUpload";
 import { FetchSequence } from "./FetchSequence";
 import packageJson from '../../package.json';
 import ScatterPlot from "./Geneplot/ScatterPlot";
+import ColorPicker from "./ColorPicker";
 
 import './Nav.css';
 
@@ -321,6 +322,14 @@ class Nav extends React.Component {
                                 checked={highlightEnteredRegion} onChange={onToggleHighlight} />
                             <span style={{marginLeft: "1ch"}} >Highlight entered region</span>
                         </label>
+                        <ModalMenuItem itemLabel="Change highlight color" style={{content: {
+                                                        left: "unset",
+                                                        bottom: "unset",
+                                                        overflow: "visible",
+                                                        padding: "5px",
+                                                    }}}>
+                            <HighlightColorChange color="red"/>
+                        </ModalMenuItem>
                         <label className="dropdown-item" htmlFor="switch3D">
                             <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={onToggle3DScene} />
                             <span style={{marginLeft: "1ch"}} >VR mode</span>
@@ -371,6 +380,14 @@ class Nav extends React.Component {
 }
 
 export default connect(null, callbacks)(Nav);
+
+function HighlightColorChange(props) {
+    const {color} = props;
+    return <React.Fragment>
+        <p>Click the button below to change<br/>the highlight color:</p>
+        <ColorPicker color={color} />
+    </React.Fragment>
+}
 
 function DropdownOpener(props) {
     const {extraClassName, label} = props;
