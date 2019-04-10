@@ -30,6 +30,11 @@ class ColorPicker extends React.PureComponent {
          * Called when the user picks a color.  See http://casesandberg.github.io/react-color/#api-onChange
          */
         onChange: PropTypes.func,
+        disableAlpha: PropTypes.bool,
+    };
+
+    static defaultProps = {
+        disableAlpha: true,
     };
 
     constructor(props) {
@@ -59,7 +64,7 @@ class ColorPicker extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const {color, label, onChange} = this.props;
+        const {color, label, onChange, disableAlpha} = this.props;
 
         const parsedColor = parseColor(color);
         let openerStyle = {
@@ -73,7 +78,7 @@ class ColorPicker extends React.PureComponent {
         if (this.state.isOpen) {
             pickerElement = (
                 <OutsideClickDetector onOutsideClick={this.closePicker}>
-                    <SketchPicker color={color} onChangeComplete={onChange} disableAlpha={true} />
+                    <SketchPicker color={color} onChangeComplete={onChange} disableAlpha={disableAlpha} />
                 </OutsideClickDetector>
             );
         } else {

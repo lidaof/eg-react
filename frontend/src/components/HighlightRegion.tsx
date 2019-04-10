@@ -14,6 +14,7 @@ interface HighlightRegionProps {
     visData: ViewExpansion;
     legendWidth: number;
     xOffset: number;
+    highlightColor: string;
 }
 
 /**
@@ -30,6 +31,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         visData: null,
         legendWidth: 120,
         xOffset: 0,
+        highlightColor: 'rgba(255, 255, 0, 0.3)',
     };
 
     /**
@@ -60,13 +62,14 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @inheritdoc
      */
     render(): JSX.Element {
-        const {height, y, children, enteredRegion, highlightEnteredRegion, xOffset } = this.props;
+        const {height, y, children, enteredRegion, highlightEnteredRegion, xOffset, highlightColor } = this.props;
         const highlight = enteredRegion ? this.getHiglightedXs(enteredRegion) : null;
         const style = highlight ? {
             left: highlight.start + xOffset + "px",
             top: y,
             width: highlight.getLength() + "px",
-            height
+            height,
+            backgroundColor: highlightColor,
         } : null;
         const className = highlightEnteredRegion ? "HighlightRegion-box" : "HighlightRegion-none";
         const theBox = <div className={className} style={style} />;

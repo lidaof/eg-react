@@ -61,6 +61,7 @@ class App extends React.Component {
             // isShowingNavigator: true,
             highlightEnteredRegion: true,
             enteredRegion: null,
+            highlightColor: "rgba(255, 255, 0, 0.3)", // light yellow
             publicHubs: [],
             publicTracksPool: [],
             customTracksPool: [],
@@ -176,6 +177,11 @@ class App extends React.Component {
         this.setState({enteredRegion: interval});
     }
 
+    setHighlightColor = (color) => {
+        const rgb = color.rgb;
+        this.setState({highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`});
+    }
+
     render() {
         const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, 
                 sessionFromUrl, trackLegendWidth, onLegendWidthChange, 
@@ -207,6 +213,7 @@ class App extends React.Component {
                 onToggle3DScene={this.toggle3DScene}
                 onToggleHighlight={this.toggleHighlight}
                 onSetEnteredRegion={this.setEnteredRegion}
+                onSetHighlightColor={this.setHighlightColor}
                 selectedRegion={viewRegion}
                 onRegionSelected={onNewViewRegion} 
                 tracks={tracks}
@@ -234,7 +241,8 @@ class App extends React.Component {
                 <ErrorBoundary><BrowserScene viewRegion={viewRegion} tracks={tracks} expansionAmount={REGION_EXPANDER} /></ErrorBoundary>
             }
             <TrackContainer 
-                enteredRegion={this.state.enteredRegion} 
+                enteredRegion={this.state.enteredRegion}
+                highlightColor={this.state.highlightColor}
                 highlightEnteredRegion={this.state.highlightEnteredRegion}
                 expansionAmount={REGION_EXPANDER}
                 suggestedMetaSets={this.state.suggestedMetaSets}

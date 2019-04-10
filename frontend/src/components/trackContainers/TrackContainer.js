@@ -445,7 +445,7 @@ class TrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView, viewRegion} = this.props;
+        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView, viewRegion, highlightColor} = this.props;
         const { selectedTool } = this.state;
         const contextMenu = <TrackContextMenu 
                                 tracks={tracks} 
@@ -469,6 +469,7 @@ class TrackContainer extends React.Component {
                                 xOffset={this.state.xOffset}>
                             <HighlightRegion 
                                 enteredRegion={enteredRegion}
+                                highlightColor={highlightColor}
                                 highlightEnteredRegion={highlightEnteredRegion}
                                 visData={primaryView}
                                 xOffset={this.state.xOffset}

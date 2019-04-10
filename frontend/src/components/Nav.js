@@ -50,6 +50,7 @@ class Nav extends React.Component {
         onTrackRemoved: PropTypes.func,
         trackLegendWidth: PropTypes.number,
         onLegendWidthChange: PropTypes.func,
+        onSetHighlightColor: PropTypes.func,
     };
 
     constructor(props) {
@@ -139,7 +140,7 @@ class Nav extends React.Component {
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
             onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs,
             publicTrackSets, customTrackSets, addedTrackSets, addTracktoAvailable, removeTrackFromAvailable,
-            availableTrackSets, addTermToMetaSets, embeddingMode
+            availableTrackSets, addTermToMetaSets, onSetHighlightColor, highlightColor
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName);
@@ -322,14 +323,16 @@ class Nav extends React.Component {
                                 checked={highlightEnteredRegion} onChange={onToggleHighlight} />
                             <span style={{marginLeft: "1ch"}} >Highlight entered region</span>
                         </label>
+                        <label className="dropdown-item">
                         <ModalMenuItem itemLabel="Change highlight color" style={{content: {
                                                         left: "unset",
                                                         bottom: "unset",
                                                         overflow: "visible",
                                                         padding: "5px",
                                                     }}}>
-                            <HighlightColorChange color="red"/>
+                            <HighlightColorChange color={highlightColor} onChange={onSetHighlightColor} />
                         </ModalMenuItem>
+                        </label>
                         <label className="dropdown-item" htmlFor="switch3D">
                             <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={onToggle3DScene} />
                             <span style={{marginLeft: "1ch"}} >VR mode</span>
@@ -382,10 +385,10 @@ class Nav extends React.Component {
 export default connect(null, callbacks)(Nav);
 
 function HighlightColorChange(props) {
-    const {color} = props;
+    const {color, onChange} = props;
     return <React.Fragment>
-        <p>Click the button below to change<br/>the highlight color:</p>
-        <ColorPicker color={color} />
+        <p style={{marginRight: "40px"}}>Click the button below to change<br/>the highlight color:</p>
+        <ColorPicker color={color} onChange={onChange} label="current highlight box color" disableAlpha={false} />
     </React.Fragment>
 }
 

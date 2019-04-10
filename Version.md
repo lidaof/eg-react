@@ -7,6 +7,7 @@
 * mouse `mm9` and cow `bosTau8` added
 * arabidopsis `araTha1` (same as TAIR10) added
 * session can either be downloaded as a session file or a datahub file
+* highlight box color could be configured now
 
 ## 48.4.3
 
