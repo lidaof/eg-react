@@ -7,10 +7,10 @@ import NavigationContext from '../../model/NavigationContext';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
-import PlotlyPlot from './PlotlyPlot';
 import { HELP_LINKS } from '../../util';
-import HeatmapWidget from './HeatmapWidget';
-import { formatForHeatmap } from './utils';
+import ColorPicker from '../ColorPicker';
+
+const Plot = createPlotlyComponent(Plotly);
 
 function mapStateToProps(state) {
     return {
@@ -41,6 +41,7 @@ class Geneplot extends React.Component {
             dataPoints: 50,
             data: {},
             showlegend: false,
+            boxColor: 'rgb(214,12,140)',
         };
     }
 
@@ -102,7 +103,7 @@ class Geneplot extends React.Component {
     }
 
     getPlotData = async () => {
-        const {setName, trackName, dataPoints, plotType} = this.state;
+        const {setName, trackName, dataPoints, boxColor} = this.state;
         if (!setName || !trackName) {
             this.setState({plotMsg: 'Please choose both a set and a track'});
             return;
@@ -138,7 +139,7 @@ class Geneplot extends React.Component {
             type: 'box',
             name: `${i+1}`,
             marker:{
-                color: 'rgb(214,12,140)'
+                color: boxColor
             }
             })
         );
@@ -156,14 +157,11 @@ class Geneplot extends React.Component {
         }));
         const heatmapData = [{
             z: adjusted,
-            // x: _.range(1, adjusted[0].length+1),
+            x: _.range(1, adjusted[0].length+1),
             y: featureNames,
             type: 'heatmap'
         }];
         // console.log(heatmapData);
-        if (plotType === 'line') {
-            this.setState({showlegend: true});
-        }
         this.setState({
             data: {
                 box: boxData,
@@ -209,11 +207,22 @@ class Geneplot extends React.Component {
     }
 
     handlePlotTypeChange = (event) => {
-        this.setState({plotType: event.target.value});
+        this.setState({plotType: event.target.value, showlegend: event.target.value === 'line'});
     }
 
     handleDataPointsChange = (event) => {
         this.setState({dataPoints: Number.parseInt(event.target.value)});
+    }
+
+    changeBoxColor = (color) => {
+        const { data } = this.state;
+        const boxData = data.box.map( d => ({...d, marker: {color: color.hex} }));
+        const updatedData = {...data, box: boxData};
+        this.setState( {boxColor: color.hex, data: updatedData});
+    }
+
+    renderBoxColorPicker = () => {
+        return <ColorPicker color={this.state.boxColor} label="box color" onChange={this.changeBoxColor} />;
     }
 
     render(){
@@ -225,10 +234,28 @@ class Geneplot extends React.Component {
             </div>
         }
         const {data, plotType, showlegend, plotMsg} = this.state;
-        let heatmapData = null;
-        if (plotType === 'heatmap') {
-            heatmapData = formatForHeatmap(data);
-        }
+        // let heatmapData = null;
+        // if (plotType === 'heatmap') {
+        //     heatmapData = formatForHeatmap(data);
+        // }
+        const layout = {
+            width: 900, height: 600, showlegend,
+            margin: {
+              l: 180
+            },
+          };
+        const config = {
+            toImageButtonOptions: {
+              format: 'svg', // one of png, svg, jpeg, webp
+              filename: 'gene_plot',
+              height: 600,
+              width: 900,
+              scale: 1, // Multiply title/legend/axis/canvas sizes by this factor
+            },
+            displaylogo: false,
+            responsive: true,
+            modeBarButtonsToRemove: ['select2d', 'lasso2d', 'toggleSpikelines'],
+          };
         return (
             <div>
                 <p className="lead">1. Choose a region set</p>
@@ -241,7 +268,7 @@ class Geneplot extends React.Component {
                 </div>
                 <p className="lead">3. Choose a plot type:</p>
                 <div>
-                    {this.renderPlotTypes()} {this.renderDataPoints()}
+                    {this.renderPlotTypes()} {this.renderDataPoints()} {plotType === 'box' && this.renderBoxColorPicker()}
                 </div>
                 <div className="font-italic">{PLOT_TYPE_DESC[plotType]}</div>
                 <div>
@@ -249,10 +276,11 @@ class Geneplot extends React.Component {
                     {' '}
                     {plotMsg}
                 </div>
-                {(plotType !== 'heatmap')?
+                <div><Plot data={data[plotType]} layout={layout} config={config} /></div>
+                {/* {(plotType !== 'heatmap')?
                 <div><PlotlyPlot data={data[plotType]} showlegend={showlegend} /></div>
                 : (heatmapData) ? <HeatmapWidget data={heatmapData}/> : null
-                }
+                } */}
             </div>
         );
     }

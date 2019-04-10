@@ -6,9 +6,10 @@ import { getTrackConfig } from '../trackConfig/getTrackConfig';
 import NavigationContext from '../../model/NavigationContext';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
-import PlotlyPlot from './PlotlyPlot';
 import { HELP_LINKS } from '../../util';
+import ColorPicker from '../ColorPicker';
 
+const Plot = createPlotlyComponent(Plotly);
 
 function mapStateToProps(state) {
     return {
@@ -32,6 +33,8 @@ class ScatterPlot extends React.Component {
             plotMsg: '',
             data: {},
             layout: {},
+            markerColor: 'blue',
+            markerSize: 12,
         };
     }
 
@@ -79,7 +82,7 @@ class ScatterPlot extends React.Component {
     }
 
     getScatterPlotData = async () => {
-        const {setName, trackNameX, trackNameY} = this.state;
+        const {setName, trackNameX, trackNameY, markerColor, markerSize} = this.state;
         if (!setName || !trackNameX || !trackNameY) {
             this.setState({plotMsg: 'Please choose both a set and 2 tracks'});
             return;
@@ -137,7 +140,7 @@ class ScatterPlot extends React.Component {
                 type: 'scatter',
                 name: setName,
                 text: featureNames,
-                marker: { size: 12 }
+                marker: { size: markerSize, color: markerColor }
             }, 
             plotMsg: '',
             layout,
@@ -166,6 +169,33 @@ class ScatterPlot extends React.Component {
         this.setState({trackNameY: event.target.value});
     }
 
+    changeMarkerColor = (color) => {
+        const { data } = this.state;
+        const marker = {...data.marker, color: color.hex};
+        const updatedData = {...data, marker};
+        this.setState( {markerColor: color.hex, data: updatedData});
+    }
+
+    renderMarkerColorPicker = () => {
+        return <ColorPicker color={this.state.markerColor} label="marker color" onChange={this.changeMarkerColor} />;
+    }
+
+    changeMarkerSize = (e) => {
+        const { data } = this.state;
+        const size = Number.parseInt(e.target.value);
+        const marker = {...data.marker, size};
+        const updatedData = {...data, marker};
+        this.setState( {markerSize: size, data: updatedData});
+    }
+    renderMarkerSizeInput = () => {
+        const {markerSize} = this.state;
+        return <label>
+            <input type="number" id="markerSize" step="1" min="1" max="50" 
+                                value={markerSize}
+                                onChange={this.changeMarkerSize} />
+        </label>;
+    }
+
     render(){
         const {sets, genome} = this.props;
         if(sets.length === 0) {
@@ -175,6 +205,18 @@ class ScatterPlot extends React.Component {
             </div>
         }
         const {data, plotMsg, layout} = this.state;
+        const config = {
+            toImageButtonOptions: {
+              format: 'svg', // one of png, svg, jpeg, webp
+              filename: 'scatter_plot',
+              height: 600,
+              width: 900,
+              scale: 1, // Multiply title/legend/axis/canvas sizes by this factor
+            },
+            displaylogo: false,
+            responsive: true,
+            modeBarButtonsToRemove: ['select2d', 'lasso2d', 'toggleSpikelines'],
+          };
         return (
             <div>
                 <p className="lead">1. Choose a region set</p>
@@ -189,13 +231,15 @@ class ScatterPlot extends React.Component {
                 <div>
                     {this.renderTrackYList()}
                 </div>
-                
+                <div>
+                    {this.renderMarkerSizeInput()} {this.renderMarkerColorPicker()}
+                </div>
                 <div>
                     <button onClick={this.getScatterPlotData} className="btn btn-sm btn-success">Plot</button>
                     {' '}
                     {plotMsg}
                 </div>
-                <div><PlotlyPlot data={[data]} layout={layout}/></div>
+                <div><Plot data={[data]} layout={layout} config={config} /></div>
             </div>
         );
     }

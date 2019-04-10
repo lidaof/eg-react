@@ -329,7 +329,10 @@ class Nav extends React.Component {
                                                         bottom: "unset",
                                                         overflow: "visible",
                                                         padding: "5px",
-                                                    }}}>
+                                                    },
+                                                    overlay: {
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                                                      }}}>
                             <HighlightColorChange color={highlightColor} onChange={onSetHighlightColor} />
                         </ModalMenuItem>
                         </label>
@@ -352,14 +355,16 @@ class Nav extends React.Component {
                 <div className="Nav-center">
                     <DropdownOpener extraClassName="btn-warning" label="📖Help" />
                     <div className="dropdown-menu">
-                        <ModalMenuItem itemLabel="Hotkeys" style={{content: {
-                                                        left: "unset",
-                                                        bottom: "unset",
-                                                        overflow: "visible",
-                                                        padding: "5px",
-                                                    }}}>
-                            <HotKeyInfo  />
-                        </ModalMenuItem>
+                        <label className="dropdown-item">
+                            <ModalMenuItem itemLabel="Hotkeys" style={{content: {
+                                                            left: "unset",
+                                                            bottom: "unset",
+                                                            overflow: "visible",
+                                                            padding: "5px",
+                                                        }}}>
+                                <HotKeyInfo  />
+                            </ModalMenuItem>
+                        </label>
                         <label className="dropdown-item">
                             <a href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
                         </label>
@@ -423,6 +428,12 @@ class ModalMenuItem extends React.Component {
     }
 
     render() {
+        const style = {
+            ...{ overlay: {
+                backgroundColor: 'rgba(111,107,101, 0.7)'}
+            },
+            ...this.props.style
+        };
         return <React.Fragment>
             <div className="dropdown-item" onClick={this.toggleOpen}>{this.props.itemLabel}</div>
             <ReactModal
@@ -430,13 +441,7 @@ class ModalMenuItem extends React.Component {
                 ariaHideApp={false}
                 onRequestClose={this.toggleOpen}
                 shouldCloseOnOverlayClick={true}
-                style={
-                    {
-                        ...this.props.style, 
-                        overlay: {
-                            backgroundColor: 'rgba(111,107,101, 0.7)'}
-                        }
-                    }
+                style={style}
             >
                 <ModalCloseButton onClick={this.toggleOpen} />
                 {this.props.children}
