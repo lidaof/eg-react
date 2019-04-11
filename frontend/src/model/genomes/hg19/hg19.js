@@ -304,14 +304,14 @@ const publicHubList = [
     {
         collection: "Long-range chromatin interaction experiments",
         name: "Long-range chromatin interaction experiments",
-        numTracks: 203,
+        numTracks: 156,
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/hg19/new/longrange4"
     },
     {
         collection: "HiC interaction from Juicebox",
         name: "HiC interaction from Juicebox",
-        numTracks: 192,
+        numTracks: 202,
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/hg19/new/hg19-juiceboxhub"
     },

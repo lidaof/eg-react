@@ -92,11 +92,27 @@ class App extends React.Component {
             if (nextProps.genomeConfig.publicHubList) {
                 this.setState({
                     publicHubs: nextProps.genomeConfig.publicHubList.slice(),
-                })
+                });
+            } else {  // when switch genome, need reset hub as well
+                this.setState({
+                    publicHubs: [],
+                });
+            }
+            this.setState({publicTracksPool: [], customTracksPool: []});
+        }
+        if (nextProps.publicTracksPool !== this.props.publicTracksPool) {
+            if (nextProps.publicTracksPool) {
+                this.setState({publicTracksPool: nextProps.publicTracksPool});
+            } else {
+                this.setState({publicTracksPool: []});
             }
         }
-        if (nextProps.customTracksPool && nextProps.customTracksPool !== this.props.customTracksPool) {
-            this.setState({customTracksPool: nextProps.customTracksPool});
+        if (nextProps.customTracksPool !== this.props.customTracksPool) {
+            if (nextProps.customTracksPool) {
+                this.setState({customTracksPool: nextProps.customTracksPool});
+            } else {
+                this.setState({customTracksPool: []});
+            }
         }
     }
 

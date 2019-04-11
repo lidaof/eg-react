@@ -37,7 +37,7 @@ class ScatterPlot extends React.Component {
             markerSize: 12,
         };
         this.changeMarkerColor = _.debounce(this.changeMarkerColor.bind(this), 250);
-        // this.changeMarkerSize = _.debounce(this.changeMarkerSize.bind(this), 250);
+        this.changeMarkerSize = _.debounce(this.changeMarkerSize.bind(this), 250);
     }
 
     renderRegionList = () => {
@@ -182,12 +182,15 @@ class ScatterPlot extends React.Component {
         return <ColorPicker color={this.state.markerColor} label="Marker color" onChange={this.changeMarkerColor} />;
     }
 
-    changeMarkerSize = (e) => {
-        const size = Number.parseInt(e.target.value);
+    changeMarkerSize = (size) => { // debounce this one
         const { data } = this.state;
         const marker = {...data.marker, size};
         const updatedData = {...data, marker};
         this.setState( {markerSize: size, data: updatedData});
+    }
+
+    handleMarkerChangeRequest = (e) => { // don't debounce this, it will cause the warning
+        this.changeMarkerSize(Number.parseInt(e.target.value) || 1)
     }
 
     renderMarkerSizeInput = () => {
@@ -195,7 +198,7 @@ class ScatterPlot extends React.Component {
         return <label> Marker size: {' '}
             <input type="number" id="markerSize" step="1" min="1" max="100" 
                                 value={markerSize}
-                                onChange={this.changeMarkerSize} />
+                                onChange={this.handleMarkerChangeRequest} />
         </label>;
     }
 
