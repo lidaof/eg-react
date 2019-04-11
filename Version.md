@@ -8,6 +8,9 @@
 * arabidopsis `araTha1` (same as TAIR10) added
 * session can either be downloaded as a session file or a datahub file
 * highlight box color could be configured now
+* color configurable for boxplot in geneplot
+* marker size and color configurable for scatter plot
+* heatmap type in geneplot switched back to using plotly.js as well
 
 ## 48.4.3
 

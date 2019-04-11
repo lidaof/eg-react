@@ -10,7 +10,7 @@ import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
 import { HELP_LINKS } from '../../util';
 import ColorPicker from '../ColorPicker';
 
-const Plot = createPlotlyComponent(Plotly);
+const Plot = createPlotlyComponent.default(Plotly);
 
 function mapStateToProps(state) {
     return {
@@ -43,6 +43,7 @@ class Geneplot extends React.Component {
             showlegend: false,
             boxColor: 'rgb(214,12,140)',
         };
+        this.changeBoxColor = _.debounce(this.changeBoxColor.bind(this), 250);
     }
 
     renderRegionList = () => {

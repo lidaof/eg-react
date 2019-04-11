@@ -9,7 +9,7 @@ import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
 import { HELP_LINKS } from '../../util';
 import ColorPicker from '../ColorPicker';
 
-const Plot = createPlotlyComponent(Plotly);
+const Plot = createPlotlyComponent.default(Plotly);
 
 function mapStateToProps(state) {
     return {
@@ -36,6 +36,8 @@ class ScatterPlot extends React.Component {
             markerColor: 'blue',
             markerSize: 12,
         };
+        this.changeMarkerColor = _.debounce(this.changeMarkerColor.bind(this), 250);
+        // this.changeMarkerSize = _.debounce(this.changeMarkerSize.bind(this), 250);
     }
 
     renderRegionList = () => {
@@ -177,20 +179,21 @@ class ScatterPlot extends React.Component {
     }
 
     renderMarkerColorPicker = () => {
-        return <ColorPicker color={this.state.markerColor} label="marker color" onChange={this.changeMarkerColor} />;
+        return <ColorPicker color={this.state.markerColor} label="Marker color" onChange={this.changeMarkerColor} />;
     }
 
     changeMarkerSize = (e) => {
-        const { data } = this.state;
         const size = Number.parseInt(e.target.value);
+        const { data } = this.state;
         const marker = {...data.marker, size};
         const updatedData = {...data, marker};
         this.setState( {markerSize: size, data: updatedData});
     }
+
     renderMarkerSizeInput = () => {
         const {markerSize} = this.state;
-        return <label>
-            <input type="number" id="markerSize" step="1" min="1" max="50" 
+        return <label> Marker size: {' '}
+            <input type="number" id="markerSize" step="1" min="1" max="100" 
                                 value={markerSize}
                                 onChange={this.changeMarkerSize} />
         </label>;
@@ -231,8 +234,10 @@ class ScatterPlot extends React.Component {
                 <div>
                     {this.renderTrackYList()}
                 </div>
+                <p className="lead">4. Plot configuration:</p>
                 <div>
-                    {this.renderMarkerSizeInput()} {this.renderMarkerColorPicker()}
+                    {this.renderMarkerColorPicker()}
+                    {this.renderMarkerSizeInput()}
                 </div>
                 <div>
                     <button onClick={this.getScatterPlotData} className="btn btn-sm btn-success">Plot</button>
