@@ -72,6 +72,11 @@ class BrowserSceneBasic extends React.Component {
                         options={trackModel.options}
                     />
                     <VrRuler viewRegion={expandedRegion} width={TRACK_WIDTH} z={z} />
+                    <a-text value={trackModel.label} 
+                            color={trackModel.options.color || 'black'}
+                            position={`${TRACK_WIDTH/2} 1.7 ${z}`}
+                            geometry="primitive: plane; height: auto; width: auto">
+                    </a-text>
                 </React.Fragment>
             );
             z -= TRACK_SEPARATION;
@@ -80,14 +85,21 @@ class BrowserSceneBasic extends React.Component {
         const numNormalTracks = tracksAndRulers.length;
         for (let trackModel of tracks) {
             if (trackModel.type === 'hic') {
-                tracksAndRulers.push(<InteractionTrack
-                    key={trackModel.getId()}
-                    trackModel={trackModel}
-                    options={{}}
-                    viewRegion={viewRegion}
-                    width={TRACK_WIDTH}
-                    depth={numNormalTracks * TRACK_SEPARATION}
-                />);
+                tracksAndRulers.push(
+                <React.Fragment key={trackModel.getId()}>
+                    <InteractionTrack
+                        trackModel={trackModel}
+                        options={{}}
+                        viewRegion={viewRegion}
+                        width={TRACK_WIDTH}
+                        depth={numNormalTracks * TRACK_SEPARATION}
+                    />
+                    <a-text value={trackModel.label} 
+                            color={trackModel.options.color || 'black'}
+                            position={`${TRACK_WIDTH/2} 1.8 0`}
+                            geometry="primitive: plane; height: auto; width: auto">
+                    </a-text>
+                </React.Fragment>);
             }
         }
 
