@@ -74,7 +74,9 @@ class BrowserSceneBasic extends React.Component {
                     <VrRuler viewRegion={expandedRegion} width={TRACK_WIDTH} z={z} />
                     <a-text value={trackModel.label} 
                             color={trackModel.options.color || 'black'}
-                            position={`${TRACK_WIDTH/2} 1.7 ${z}`}
+                            position={`${TRACK_WIDTH/2} 0.2 ${z}`}
+                            material='color: #eee'
+                            rotation="-45 0 0"
                             geometry="primitive: plane; height: auto; width: auto">
                     </a-text>
                 </React.Fragment>
@@ -96,7 +98,9 @@ class BrowserSceneBasic extends React.Component {
                     />
                     <a-text value={trackModel.label} 
                             color={trackModel.options.color || 'black'}
-                            position={`${TRACK_WIDTH/2} 1.8 0`}
+                            position={`${TRACK_WIDTH/2} 0.6 ${z/2}`}
+                            material='color: #eee'
+                            rotation="-45 0 0"
                             geometry="primitive: plane; height: auto; width: auto">
                     </a-text>
                 </React.Fragment>);
