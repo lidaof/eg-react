@@ -156,3 +156,22 @@ export const HELP_LINKS = {
     tracks: 'https://eg.readthedocs.io/en/latest/tracks.html',
     localhub: 'https://eg.readthedocs.io/en/latest/local.html',
 }
+
+// /**
+//  * react table column header filter, case insensitive
+//  * https://github.com/tannerlinsley/react-table/issues/335
+//  */
+// export const filterCaseInsensitive = (filter:any, row:any) => {
+//     const id = filter.pivotId || filter.id;
+//     if (row[id] !== null && typeof row[id] === 'string') {
+//         return (
+//             row[id] !== undefined ?
+//                 String(row[id].toLowerCase()).startsWith(filter.value.toLowerCase()) : true
+//         )
+//     }
+//     else {
+//         return (
+//             String(row[filter.id]) === filter.value
+//         )
+//     }
+// }

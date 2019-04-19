@@ -67,6 +67,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "firebase": "^5.4.0",
+    "fuse.js": "^3.4.4",
     "hic-straw": "^0.9.2",
     "igv": "^2.1.0",
     "jest-image-snapshot": "^1.0.1",

@@ -380,6 +380,9 @@ class Nav extends React.Component {
                         <label className="dropdown-item">
                             <a href="https://github.com/lidaof/eg-react" target="_blank">Source code @ Github</a>
                         </label>
+                        <label className="dropdown-item">
+                            <a href="https://www.youtube.com/channel/UCnGVWbxJv-DPDCAFDQ1oFQA" target="_blank">YouTube channel</a>
+                        </label> 
                     </div>
                 </div>
             </div>
