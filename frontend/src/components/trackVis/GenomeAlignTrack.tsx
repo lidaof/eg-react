@@ -7,7 +7,8 @@ import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment, GapText 
     from '../../model/alignment/AlignmentViewCalculator';
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
 import OpenInterval from 'src/model/interval/OpenInterval';
-// import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
+import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
+import GenomicCoordinates from './commonComponents/GenomicCoordinates';
 
 const FINE_MODE_HEIGHT = 80;
 const ALIGN_TRACK_MARGIN = 20; // The margin on top and bottom of alignment block
@@ -42,6 +43,7 @@ function swap(array: any[], i: number, j: number) {
 export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
     constructor(props: PropsFromTrackContainer) {
         super(props);
+        this.renderTooltip = this.renderTooltip.bind(this);
         this.renderFineAlignment = this.renderFineAlignment.bind(this);
     }
     renderGapText(gap: GapText, i: number) {
@@ -254,6 +256,17 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         </React.Fragment>
     }
 
+    renderTooltip(relativeX: number) {
+        // console.log(this);
+        const {alignment, width} = this.props;
+        const queryRegion=alignment.queryRegion;
+        const viewRegion=alignment.primaryVisData.visRegion
+        return <React.Fragment>
+            <div><GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} /></div>
+            <div><GenomicCoordinates viewRegion={queryRegion} width={width} x={relativeX} /></div>
+            </React.Fragment>;
+    }
+
     /** 
      * @inheritdoc
      */
@@ -278,10 +291,18 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             const arrow = this.renderRoughStrand(strand, viewWindow);
             svgElements.push(arrow);
         }
+        const hoverHeight = FINE_MODE_HEIGHT - ALIGN_TRACK_MARGIN;
+        const visualizer=(
+            <React.Fragment>
+                <HoverTooltipContext tooltipRelativeY={hoverHeight} getTooltipContents={this.renderTooltip} >
+                    <svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>
+                </HoverTooltipContext>
+            </React.Fragment>
+        )
 
         return <Track
-            {...this.props}
-            visualizer={<svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>}
+            {...this.props} 
+            visualizer={visualizer}
             legend={<TrackLegend trackModel={trackModel} height={height} />}
         />
     }
