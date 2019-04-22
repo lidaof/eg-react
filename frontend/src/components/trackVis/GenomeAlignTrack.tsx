@@ -260,10 +260,10 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         // console.log(this);
         const {alignment, width} = this.props;
         const queryRegion=alignment.queryRegion;
-        const viewRegion=alignment.primaryVisData.visRegion
+        const viewRegion=alignment.primaryVisData.visRegion;
         return <React.Fragment>
-            <div><GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} /></div>
-            <div><GenomicCoordinates viewRegion={queryRegion} width={width} x={relativeX} /></div>
+            <div><GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} halfRange={10} /></div>
+            <div><GenomicCoordinates viewRegion={queryRegion} width={width} x={relativeX} halfRange={10} /></div>
             </React.Fragment>;
     }
 
@@ -301,7 +301,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         )
 
         return <Track
-            {...this.props} 
+            {...this.props}
             visualizer={visualizer}
             legend={<TrackLegend trackModel={trackModel} height={height} />}
         />
