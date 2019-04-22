@@ -1,5 +1,9 @@
 # Version History
 
+* free text search for track in track table using [fuse.js](https://fusejs.io/)
+* pearson correlation value is added to scatter plot
+* add [YouTube channel](https://www.youtube.com/channel/UCnGVWbxJv-DPDCAFDQ1oFQA) link
+
 ## 48.4.4
 
 * `hammock` track type added with basic support

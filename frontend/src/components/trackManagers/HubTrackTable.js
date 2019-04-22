@@ -5,6 +5,8 @@ import TrackModel from '../../model/TrackModel';
 import TrackSearchBox from './TrackSearchBox';
 import 'react-table/react-table.css';
 import { UNUSED_META_KEY } from "./FacetTable";
+import Fuse from 'fuse.js';
+import _ from 'lodash';
 
 /**
  * Table that displays tracks available from loaded hubs.
@@ -25,6 +27,44 @@ class HubTrackTable extends React.PureComponent {
     constructor(props) {
         super(props);
         this.getAddTrackCell = this.getAddTrackCell.bind(this);
+        this.state = {
+            tracks: [],  // stores tracks after perform fuse search
+            fuse: null,  // fuse instance
+            option: null, // fuse search option, see https://fusejs.io/
+            searchText: '',
+        };
+        this.handleSearchChange = _.debounce(this.handleSearchChange.bind(this), 250);
+    }
+
+    componentDidMount() {
+        const metaKeys = this.props.tracks.map(tk => Object.keys(tk.metadata));
+        const uniqKeys = _.uniq(_.flatten(metaKeys));
+        const keys = ['label', ...uniqKeys.filter(k => k !== 'Track type').map(k=>`metadata.${k}`)]
+        const option = {
+            shouldSort: true,
+            threshold: 0.4,
+            location: 0,
+            distance: 100,
+            maxPatternLength: 32,
+            minMatchCharLength: 2,
+            keys,
+          };
+        const fuse = new Fuse(this.props.tracks, option);
+        this.setState({ fuse, option, tracks: [...this.props.tracks] });
+    }
+
+    handleSearchChange = (value) => {
+        if (value.length > 0) {
+            const result = this.state.fuse.search(value);
+            this.setState({tracks: result, searchText: value})
+        } else {
+            this.setState( {tracks: [...this.props.tracks] });
+        }
+    }
+
+    handleSearchChangeRequest = (event) => {
+        const search = event.target.value.trim(); // remove white space
+        this.handleSearchChange(search);
     }
 
     /**
@@ -44,7 +84,7 @@ class HubTrackTable extends React.PureComponent {
             return <span>✓</span>;
         }
 
-        return <button onClick={() => this.props.onTrackAdded(this.props.tracks[reactTableRow.index])}>+</button>;
+        return <button onClick={() => this.props.onTrackAdded(this.state.tracks[reactTableRow.index])}>+</button>;
     }
 
     /**
@@ -76,7 +116,7 @@ class HubTrackTable extends React.PureComponent {
                     accessor: data => data.getMetadataAsArray(rowHeader).join(' > '),
                     Filter: (cellInfo) => 
                         <TrackSearchBox
-                            tracks={this.props.tracks}
+                            tracks={this.state.tracks}
                             metadataPropToSearch={rowHeader}
                             onChange={cellInfo.onChange}
                         />,
@@ -92,7 +132,7 @@ class HubTrackTable extends React.PureComponent {
                     accessor: data => data.getMetadataAsArray(columnHeader).join(' > '),
                     Filter: (cellInfo) => 
                         <TrackSearchBox
-                            tracks={this.props.tracks}
+                            tracks={this.state.tracks}
                             metadataPropToSearch={columnHeader}
                             onChange={cellInfo.onChange}
                         /> ,
@@ -130,10 +170,18 @@ class HubTrackTable extends React.PureComponent {
         return (
             <React.Fragment>
                 <h1>Track table</h1>
+                <label htmlFor="searchTrack">Search tracks</label>
+                <input type="text" className="form-control" 
+                    placeholder="H1 or H3K4me3, etc..." 
+                    value={this.state.searchValue} 
+                    onChange={this.handleSearchChangeRequest}
+                />
+                <small id="searchTrackHelp" className="form-text text-muted">Free text search over track lables and metadata.</small>
+                <br/>
                 <ReactTable
                     filterable
                     defaultFilterMethod={defaultFilterMethod}
-                    data={this.props.tracks}
+                    data={this.state.tracks}
                     columns={columns}
                     className="-striped -highlight"
                 />
