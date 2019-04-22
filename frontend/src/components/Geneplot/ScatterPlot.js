@@ -6,7 +6,7 @@ import { getTrackConfig } from '../trackConfig/getTrackConfig';
 import NavigationContext from '../../model/NavigationContext';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
-import { HELP_LINKS } from '../../util';
+import { HELP_LINKS, pcorr } from '../../util';
 import ColorPicker from '../ColorPicker';
 
 const Plot = createPlotlyComponent.default(Plotly);
@@ -111,13 +111,14 @@ class ScatterPlot extends React.Component {
         const dataYall = rawDataY.map(raw => trackConfigY.formatData(raw));
         const dataY = dataYall.map(all => _.meanBy(all, 'value'))
         const featureNames = flankedFeatures.map(feature => feature.getName());
+        const pcor = pcorr(dataX, dataY);
         const layout = {
             width: 900, height: 600,
             xaxis: {
                 title: {
                   text: trackNameX,
                   font: {
-                    family: 'Courier New, monospace',
+                    family: 'Helvetica, Courier New, monospace',
                     size: 12,
                     color: trackX.options ? trackX.options.color : 'blue'
                   }
@@ -127,12 +128,27 @@ class ScatterPlot extends React.Component {
                 title: {
                   text: trackNameY,
                   font: {
-                    family: 'Courier New, monospace',
+                    family: 'Helvetica, Courier New, monospace',
                     size: 12,
                     color: trackY.options ? trackY.options.color : 'blue'
                   }
                 }
-              }
+              },
+              annotations: [{
+                xref: 'paper',
+                yref: 'paper',
+                x: 0.7,
+                xanchor: 'right',
+                y: 1,
+                yanchor: 'bottom',
+                text: `R = ${pcor.toFixed(4)}`,
+                showarrow: false,
+                font: {
+                    family: 'Helvetica, Courier New, monospace',
+                    size: 16,
+                    color: markerColor
+                  },
+              }]
         };
         this.setState({
             data: {

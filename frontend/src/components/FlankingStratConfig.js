@@ -26,14 +26,14 @@ class FlankingStratConfig extends React.Component {
                     type="number"
                     min={0}
                     value={this.props.strategy.upstream}
-                    onChange={event => this.inputChanged("upstream", Number.parseInt(event.target.value, 10))}
+                    onChange={event => this.inputChanged("upstream", Number.parseInt(event.target.value, 10) || 0)}
                 />
             </label> <label>
                 Downstream bases: <input
                     type="number"
                     min={0}
                     value={this.props.strategy.downstream}
-                    onChange={event => this.inputChanged("downstream", Number.parseInt(event.target.value, 10))}
+                    onChange={event => this.inputChanged("downstream", Number.parseInt(event.target.value, 10) || 0)}
                 />
             </label> <label>
                 Surrounding: <select

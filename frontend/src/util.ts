@@ -175,3 +175,28 @@ export const HELP_LINKS = {
 //         )
 //     }
 // }
+
+/**
+ * calculate pearson correlation
+ * from https://stackoverflow.com/questions/15886527/javascript-library-for-pearson-and-or-spearman-correlations#
+ */
+
+export const pcorr = (x: number[], y:number[]) => {
+    let sumX = 0,
+      sumY = 0,
+      sumXY = 0,
+      sumX2 = 0,
+      sumY2 = 0;
+    const minLength = x.length = y.length = Math.min(x.length, y.length),
+      reduce = (xi: number, idx: number) => {
+        const yi = y[idx];
+        sumX += xi;
+        sumY += yi;
+        sumXY += xi * yi;
+        sumX2 += xi * xi;
+        sumY2 += yi * yi;
+      }
+    x.forEach(reduce);
+    return (minLength * sumXY - sumX * sumY) / 
+        Math.sqrt((minLength * sumX2 - sumX * sumX) * (minLength * sumY2 - sumY * sumY));
+}
