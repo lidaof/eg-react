@@ -257,12 +257,31 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
     }
 
     renderTooltip(relativeX: number) {
-        // console.log(this);
         const {alignment, width} = this.props;
+        const drawData = alignment.drawData as PlacedAlignment[];
+        console.log(drawData);
+
+        // Which segment in drawData cusor lands on:
+        const indexOfCusorSegment = drawData.reduce(
+            (iCusor, x, i) => x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX  ? i : iCusor, 0);
+        const cusorSegment = drawData[indexOfCusorSegment];
+
+        // Do the following calculation with drawmodel?
+        const cusorLocus = Math.round((relativeX - cusorSegment.targetXSpan.start)
+            /(cusorSegment.targetXSpan.end - cusorSegment.targetXSpan.start)
+            * (cusorSegment.visiblePart.sequenceInterval.end - cusorSegment.visiblePart.sequenceInterval.start));
+
+        const cusorTargetSeq = cusorSegment.record.targetSeq.substr(
+            cusorSegment.visiblePart.sequenceInterval.start + cusorLocus - 10, 20);
+        const cusorQuerySeq = cusorSegment.record.querySeq.substr(
+            cusorSegment.visiblePart.sequenceInterval.start + cusorLocus - 10, 20);
+
         const queryRegion=alignment.queryRegion;
         const viewRegion=alignment.primaryVisData.visRegion;
         return <React.Fragment>
             <div><GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} halfRange={10} /></div>
+            <div>{cusorTargetSeq}</div>
+            <div>{cusorQuerySeq}</div>
             <div><GenomicCoordinates viewRegion={queryRegion} width={width} x={relativeX} halfRange={10} /></div>
             </React.Fragment>;
     }
@@ -273,6 +292,8 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
     render() {
         const {width, trackModel, alignment} = this.props;
         let height, svgElements = [];
+        const hoverHeight = FINE_MODE_HEIGHT - ALIGN_TRACK_MARGIN;
+        let visualizer;
         if (!alignment) {
             height = FINE_MODE_HEIGHT;
             svgElements = null;
@@ -282,6 +303,13 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             svgElements = drawData.map(this.renderFineAlignment);
             const drawGapText = alignment.drawGapText as GapText[];
             svgElements.push(...drawGapText.map(this.renderGapText));
+            visualizer=(
+                <React.Fragment>
+                    <HoverTooltipContext tooltipRelativeY={hoverHeight} getTooltipContents={this.renderTooltip} >
+                        <svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>
+                    </HoverTooltipContext>
+                </React.Fragment>
+            )
         } else {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
@@ -290,15 +318,12 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             const viewWindow = alignment.primaryVisData.viewWindow;
             const arrow = this.renderRoughStrand(strand, viewWindow);
             svgElements.push(arrow);
-        }
-        const hoverHeight = FINE_MODE_HEIGHT - ALIGN_TRACK_MARGIN;
-        const visualizer=(
-            <React.Fragment>
-                <HoverTooltipContext tooltipRelativeY={hoverHeight} getTooltipContents={this.renderTooltip} >
+            visualizer=(
+                <React.Fragment>
                     <svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>
-                </HoverTooltipContext>
-            </React.Fragment>
-        )
+                </React.Fragment>
+            )
+        }
 
         return <Track
             {...this.props}

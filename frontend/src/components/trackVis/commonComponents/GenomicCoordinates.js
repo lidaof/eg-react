@@ -28,8 +28,6 @@ class GenomicCoordinates extends React.Component {
             const halfWidth = drawModel.basesToXWidth(this.props.halfRange);
             const segmentStart = drawModel.xToSegmentCoordinate(x - halfWidth);
             const segmentEnd = drawModel.xToSegmentCoordinate(x + halfWidth);
-            console.log(segmentStart);
-            console.log(segmentEnd);
             const locusStart = segmentStart.getLocus();
             const locusEnd = segmentEnd.getLocus();
             return `${locusStart.chr}:${Math.floor(locusStart.start)}-${Math.floor(locusEnd.start)}`;
