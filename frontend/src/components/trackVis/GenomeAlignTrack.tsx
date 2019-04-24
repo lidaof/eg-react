@@ -9,6 +9,7 @@ import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
 import OpenInterval from 'src/model/interval/OpenInterval';
 import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 import GenomicCoordinates from './commonComponents/GenomicCoordinates';
+import { AlignmentCoordinates, AlignmentSequence } from './commonComponents/AlignmentCoordinates';
 
 const FINE_MODE_HEIGHT = 80;
 const ALIGN_TRACK_MARGIN = 20; // The margin on top and bottom of alignment block
@@ -259,30 +260,22 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
     renderTooltip(relativeX: number) {
         const {alignment, width} = this.props;
         const drawData = alignment.drawData as PlacedAlignment[];
-        console.log(drawData);
+        console.log(relativeX);
 
         // Which segment in drawData cusor lands on:
         const indexOfCusorSegment = drawData.reduce(
             (iCusor, x, i) => x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX  ? i : iCusor, 0);
         const cusorSegment = drawData[indexOfCusorSegment];
+        const sequenceHalfLength = 10; // The length of alignment in the hoberbox.
 
-        // Do the following calculation with drawmodel?
-        const cusorLocus = Math.round((relativeX - cusorSegment.targetXSpan.start)
-            /(cusorSegment.targetXSpan.end - cusorSegment.targetXSpan.start)
-            * (cusorSegment.visiblePart.sequenceInterval.end - cusorSegment.visiblePart.sequenceInterval.start));
 
-        const cusorTargetSeq = cusorSegment.record.targetSeq.substr(
-            cusorSegment.visiblePart.sequenceInterval.start + cusorLocus - 10, 20);
-        const cusorQuerySeq = cusorSegment.record.querySeq.substr(
-            cusorSegment.visiblePart.sequenceInterval.start + cusorLocus - 10, 20);
 
         const queryRegion=alignment.queryRegion;
         const viewRegion=alignment.primaryVisData.visRegion;
         return <React.Fragment>
-            <div><GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} halfRange={10} /></div>
-            <div>{cusorTargetSeq}</div>
-            <div>{cusorQuerySeq}</div>
-            <div><GenomicCoordinates viewRegion={queryRegion} width={width} x={relativeX} halfRange={10} /></div>
+                <div><AlignmentCoordinates viewRegion={viewRegion} width={width} x={relativeX} halfRange={10} /></div>
+                <div><AlignmentSequence alignment={cusorSegment} x={relativeX} halfLength={sequenceHalfLength} /></div>
+                <div><AlignmentCoordinates viewRegion={queryRegion} width={width} x={relativeX} halfRange={10} /></div>
             </React.Fragment>;
     }
 
