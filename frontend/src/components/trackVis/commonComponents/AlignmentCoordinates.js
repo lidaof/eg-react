@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import DisplayedRegionModel from '../../../model/DisplayedRegionModel';
 import LinearDrawingModel from '../../../model/LinearDrawingModel'
 import NavigationContext from '../../../model/NavigationContext';
-import { segmentSequence, makeBaseNumberLookup, countBases, SequenceSegment } from '../../../model/alignment/AlignmentStringUtils.ts';
+import { makeBaseNumberLookup } from '../../../model/alignment/AlignmentStringUtils.ts';
 // import { PlacedAlignment } from '../../../model/alignment/AlignmentViewCalculator'
 
 /**
@@ -13,43 +13,8 @@ import { segmentSequence, makeBaseNumberLookup, countBases, SequenceSegment } fr
  * 
  * @author Xiaoyu Zhuo
  */
-export class AlignmentCoordinates extends React.Component {
-    static propTypes = {
-        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-        width: PropTypes.number.isRequired,
-        x: PropTypes.number.isRequired,
-        halfRange: PropTypes.number,
-    }
 
-    /** 
-     * @inheritdoc
-     */
-    render() {
-        const {viewRegion, width, x, halfRange} = this.props;
-        const drawModel = new LinearDrawingModel(viewRegion, width);
-        if (this.props.halfRange) {
-            const halfWidth = drawModel.basesToXWidth(this.props.halfRange);
-            const segmentStart = drawModel.xToSegmentCoordinate(x - halfWidth);
-            const segmentEnd = drawModel.xToSegmentCoordinate(x + halfWidth);
-            const locusStart = segmentStart.getLocus();
-            const locusEnd = segmentEnd.getLocus();
-            const newRegion = viewRegion.setRegion(locusStart.start, locusEnd.start);
-            console.log(newRegion);
-            return `${locusStart.chr}:${Math.floor(locusStart.start)}-${Math.floor(locusEnd.start)}`;
-        }
-        else {
-            const segment = drawModel.xToSegmentCoordinate(x);
-            if (NavigationContext.isGapFeature(segment.feature)) {
-                return segment.getName();
-            } else {
-                const locus = segment.getLocus();
-                return `${locus.chr}:${Math.floor(locus.start)}`;
-            }
-        }
-    }
-}
-
-export class AlignmentSequence extends React.Component {
+class AlignmentSequence extends React.Component {
     static propTypes = {
         alignment: PropTypes.object.isRequired,
         x: PropTypes.number.isRequired,
@@ -61,34 +26,44 @@ export class AlignmentSequence extends React.Component {
      */
     render() {
         const {alignment, x, halfLength} = this.props;
-        console.log(alignment);
         const {visiblePart, record} = alignment;
         const [start, end] = visiblePart.sequenceInterval;
-        const cusorLocus = Math.round((x - alignment.targetXSpan.start)
+        const cusorLocus = Math.floor((x - alignment.targetXSpan.start)
             /(alignment.targetXSpan.end - alignment.targetXSpan.start)
             * (end - start));
-
+        const relativeDisplayStart = cusorLocus - halfLength > 0 ? cusorLocus - halfLength : 0;
+        const relativeDisplayEnd = cusorLocus + halfLength < (end - start) ? cusorLocus + halfLength : (end - start);
         const cusorTargetSeq = record.targetSeq.substr(
-            start + cusorLocus - halfLength, halfLength * 2 + 1);
+            start + relativeDisplayStart, relativeDisplayEnd - relativeDisplayStart).toUpperCase();
         const cusorQuerySeq = record.querySeq.substr(
-            start + cusorLocus - halfLength, halfLength * 2 + 1);
+            start + relativeDisplayStart, relativeDisplayEnd - relativeDisplayStart).toUpperCase();
+
         const targetBaseLookup = makeBaseNumberLookup(visiblePart.getTargetSequence(),visiblePart.relativeStart);
-        const targetStart = record.locus.start + visiblePart.relativeStart + targetBaseLookup[cusorLocus - halfLength];
-        const targetEnd = record.locus.start + visiblePart.relativeStart + targetBaseLookup[cusorLocus + halfLength];
+        const targetStart = record.locus.start + targetBaseLookup[relativeDisplayStart];
+        const targetEnd = record.locus.start + targetBaseLookup[relativeDisplayEnd - 1];
         const isReverse = record.getIsReverseStrandQuery();
-        const queryLookupStart = isReverse ? visiblePart.relativeEnd : visiblePart.relativeStart;
+        const queryLocus = visiblePart.getQueryLocusFine();
+        const queryLookupStart = isReverse ? queryLocus.end : queryLocus.start;
         const queryBaseLookup = makeBaseNumberLookup(visiblePart.getQuerySequence(),queryLookupStart,isReverse);
-        const queryStart = record.queryLocus.start + visiblePart.relativeStart + queryBaseLookup[cusorLocus - halfLength];
-        const queryEnd = record.queryLocus.start + visiblePart.relativeStart + queryBaseLookup[cusorLocus + halfLength];
+        const queryStart = queryBaseLookup[relativeDisplayStart];
+        const queryEnd = queryBaseLookup[relativeDisplayEnd - 1];
         const targetName = `${record.locus.chr}:${targetStart}-${targetEnd}`;
         const queryName = `${record.queryLocus.chr}:${queryStart}-${queryEnd}`;
+        const targetSeqArray = cusorTargetSeq.split("");
+        const querySeqArray = cusorQuerySeq.split("");
+        const tickArray = targetSeqArray.map(function(char,i) {
+            return char === querySeqArray[i] ? "|" : " ";
+        })
+        const tick = tickArray.join("");
 
         return <React.Fragment>
                 <div>{targetName}</div>
                 <div style={{fontFamily: "monospace",fontSize:16}}>{cusorTargetSeq}</div>
-                <pre style={{fontFamily: "monospace",fontSize:16,display:"inline"}} >{"|||||||||  ||||||||||"}</pre>
+                <pre style={{fontFamily: "monospace",fontSize:16,display:"inline"}} >{tick}</pre>
                 <div style={{fontFamily: "monospace",fontSize:16}}>{cusorQuerySeq}</div>
                 <div>{queryName}</div>
             </React.Fragment>
     }
 }
+
+export default AlignmentSequence;

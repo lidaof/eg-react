@@ -8,8 +8,7 @@ import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment, GapText 
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
 import OpenInterval from 'src/model/interval/OpenInterval';
 import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
-import GenomicCoordinates from './commonComponents/GenomicCoordinates';
-import { AlignmentCoordinates, AlignmentSequence } from './commonComponents/AlignmentCoordinates';
+import AlignmentSequence from './commonComponents/AlignmentCoordinates';
 
 const FINE_MODE_HEIGHT = 80;
 const ALIGN_TRACK_MARGIN = 20; // The margin on top and bottom of alignment block
@@ -258,9 +257,11 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
     }
 
     renderTooltip(relativeX: number) {
-        const {alignment, width} = this.props;
+        const {alignment, trackModel} = this.props;
         const drawData = alignment.drawData as PlacedAlignment[];
-        console.log(relativeX);
+        console.log(this);
+        // const targetGenome = trackModel.genome;
+        // const queryGenome = trackModel.querygenome;
 
         // Which segment in drawData cusor lands on:
         const indexOfCusorSegment = drawData.reduce(
@@ -268,14 +269,8 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         const cusorSegment = drawData[indexOfCusorSegment];
         const sequenceHalfLength = 10; // The length of alignment in the hoberbox.
 
-
-
-        const queryRegion=alignment.queryRegion;
-        const viewRegion=alignment.primaryVisData.visRegion;
         return <React.Fragment>
-                <div><AlignmentCoordinates viewRegion={viewRegion} width={width} x={relativeX} halfRange={10} /></div>
                 <div><AlignmentSequence alignment={cusorSegment} x={relativeX} halfLength={sequenceHalfLength} /></div>
-                <div><AlignmentCoordinates viewRegion={queryRegion} width={width} x={relativeX} halfRange={10} /></div>
             </React.Fragment>;
     }
 
