@@ -61,6 +61,8 @@ export interface Alignment {
     drawData: PlacedAlignment[] | PlacedMergedAlignment[];
     drawGapText?: GapText[];  // An array holding gap size information between placedAlignments, fineMode only
     plotStrand?: string; // rough mode plot positive or negative
+    primaryGenome: string;
+    queryGenome: string;
 }
 
 const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
@@ -245,7 +247,9 @@ export class AlignmentViewCalculator {
             },
             queryRegion,
             drawData: placements,
-            drawGapText: drawGapTexts
+            drawGapText: drawGapTexts,
+            primaryGenome: this._alignmentFetcher.primaryGenome,
+            queryGenome: this._alignmentFetcher.queryGenome
         };
 
         function convertOldVisRegion(visRegion: DisplayedRegionModel) {
@@ -321,6 +325,8 @@ export class AlignmentViewCalculator {
             queryRegion: this._makeQueryGenomeRegion(drawData, visWidth, drawModel),
             drawData,
             plotStrand,
+            primaryGenome: this._alignmentFetcher.primaryGenome,
+            queryGenome: this._alignmentFetcher.queryGenome
         };
     }
 

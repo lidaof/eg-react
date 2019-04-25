@@ -257,12 +257,10 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
     }
 
     renderTooltip(relativeX: number) {
-        const {alignment, trackModel} = this.props;
+        const {alignment} = this.props;
         const drawData = alignment.drawData as PlacedAlignment[];
-        console.log(this);
-        // const targetGenome = trackModel.genome;
-        // const queryGenome = trackModel.querygenome;
-
+        const targetGenome = alignment.primaryGenome;
+        const queryGenome = alignment.queryGenome;
         // Which segment in drawData cusor lands on:
         const indexOfCusorSegment = drawData.reduce(
             (iCusor, x, i) => x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX  ? i : iCusor, 0);
@@ -270,7 +268,13 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         const sequenceHalfLength = 10; // The length of alignment in the hoberbox.
 
         return <React.Fragment>
-                <div><AlignmentSequence alignment={cusorSegment} x={relativeX} halfLength={sequenceHalfLength} /></div>
+                <AlignmentSequence 
+                    alignment={cusorSegment}
+                    x={relativeX}
+                    halfLength={sequenceHalfLength}
+                    target={targetGenome}
+                    query={queryGenome}
+                />
             </React.Fragment>;
     }
 
