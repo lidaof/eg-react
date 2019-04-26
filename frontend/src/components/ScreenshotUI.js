@@ -41,6 +41,7 @@ class ScreenshotUINotConnected extends React.Component {
         svgElem.setAttributeNS(null, "viewBox", "0 0 " + boxWidth + " " + boxHeight);
         svgElem.setAttributeNS(null, "width", boxWidth + "");
         svgElem.setAttributeNS(null, "height", boxHeight + "");
+        svgElem.setAttributeNS(null,"font-family","Arial, Helvetica, sans-serif");
         svgElem.style.display = "block";
         const svgElemg = document.createElementNS (xmlns, "g"); // for labels, separate lines etc
         const svgElemg2 = document.createElementNS (xmlns, "g"); // for tracks contents
@@ -74,6 +75,7 @@ class ScreenshotUINotConnected extends React.Component {
                 });
             }
             // deal with track contents
+            const options = this.props.tracks[idx].options;
             const eleSvgs = ele.children[1].querySelectorAll('svg'); // bi-directional numerical track has 2 svgs!
             const trackG = document.createElementNS (xmlns, "g");
             if (eleSvgs.length > 0) {
@@ -82,6 +84,9 @@ class ScreenshotUINotConnected extends React.Component {
                     eleSvg.setAttribute("id", "svg"+idx+idx2);
                     eleSvg.setAttribute("x", x + "");
                     eleSvg.setAttribute("y", idx2 * eleSvg.clientHeight  + y + "");
+                    if (options && options.backgroundColor) {
+                        eleSvg.setAttribute("style", `background-color: ${options.backgroundColor};`);
+                    }
                     trackG.appendChild(eleSvg);    
                 }); 
             }
