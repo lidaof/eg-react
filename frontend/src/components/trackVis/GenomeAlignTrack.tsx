@@ -258,9 +258,9 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
 
     renderTooltip(relativeX: number) {
         const {alignment} = this.props;
+        const { basesPerPixel, primaryGenome, queryGenome } = alignment;
         const drawData = alignment.drawData as PlacedAlignment[];
-        const targetGenome = alignment.primaryGenome;
-        const queryGenome = alignment.queryGenome;
+
         // Which segment in drawData cusor lands on:
         const indexOfCusorSegment = drawData.reduce(
             (iCusor, x, i) => x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX  ? i : iCusor, 0);
@@ -272,8 +272,9 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                     alignment={cusorSegment}
                     x={relativeX}
                     halfLength={sequenceHalfLength}
-                    target={targetGenome}
+                    target={primaryGenome}
                     query={queryGenome}
+                    basesPerPixel={basesPerPixel}
                 />
             </React.Fragment>;
     }

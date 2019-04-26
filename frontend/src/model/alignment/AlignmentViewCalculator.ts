@@ -63,6 +63,7 @@ export interface Alignment {
     plotStrand?: string; // rough mode plot positive or negative
     primaryGenome: string;
     queryGenome: string;
+    basesPerPixel: number;
 }
 
 const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
@@ -249,7 +250,8 @@ export class AlignmentViewCalculator {
             drawData: placements,
             drawGapText: drawGapTexts,
             primaryGenome: this._alignmentFetcher.primaryGenome,
-            queryGenome: this._alignmentFetcher.queryGenome
+            queryGenome: this._alignmentFetcher.queryGenome,
+            basesPerPixel: newDrawModel.xWidthToBases(1)
         };
 
         function convertOldVisRegion(visRegion: DisplayedRegionModel) {
@@ -326,7 +328,8 @@ export class AlignmentViewCalculator {
             drawData,
             plotStrand,
             primaryGenome: this._alignmentFetcher.primaryGenome,
-            queryGenome: this._alignmentFetcher.queryGenome
+            queryGenome: this._alignmentFetcher.queryGenome,
+            basesPerPixel: drawModel.xWidthToBases(1)
         };
     }
 
