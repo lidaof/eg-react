@@ -38,6 +38,7 @@ interface QueryGenomePiece {
 
 export interface PlacedMergedAlignment extends QueryGenomePiece {
     segments: PlacedAlignment[];
+    targetXSpan: OpenInterval;
 }
 
 export interface GapText {
@@ -301,6 +302,9 @@ export class AlignmentViewCalculator {
 
             // Find the center of the primary segments, and try to center the merged query locus there too.
             const drawCenter = computeCentroid(placementsInMerge.map(segment => segment.targetXSpan));
+            const targetXStart = Math.min(...placementsInMerge.map(segment => segment.targetXSpan.start));
+            const targetEnd = Math.min(...placementsInMerge.map(segment => segment.targetXSpan.end));
+            const mergeTargetXSpan = new OpenInterval(targetXStart, targetEnd);
             const preferredStart = drawCenter - halfDrawWidth;
             const preferredEnd = drawCenter + halfDrawWidth;
             // Place it so it doesn't overlap other segments
@@ -316,6 +320,7 @@ export class AlignmentViewCalculator {
 
             drawData.push({
                 queryFeature: new Feature(undefined, mergeLocus, plotStrand),
+                targetXSpan: mergeTargetXSpan,
                 queryXSpan: mergeXSpan,
                 segments: placementsInMerge
             });

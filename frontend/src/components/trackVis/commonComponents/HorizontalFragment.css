@@ -1,0 +1,8 @@
+.Fragment-horizontal-line {
+    position: absolute;
+    pointer-events: none;
+    /* left: 0;
+    width: 100%; */
+    /* height: 0; */
+    border-top: 2px dotted grey;
+}

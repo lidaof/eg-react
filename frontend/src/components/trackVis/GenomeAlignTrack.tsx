@@ -9,6 +9,7 @@ import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
 import OpenInterval from 'src/model/interval/OpenInterval';
 import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 import AlignmentSequence from './commonComponents/AlignmentCoordinates';
+import HorizontalFragment from './commonComponents/HorizontalFragment';
 
 const FINE_MODE_HEIGHT = 80;
 const ALIGN_TRACK_MARGIN = 20; // The margin on top and bottom of alignment block
@@ -263,7 +264,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
 
         // Which segment in drawData cusor lands on:
         const indexOfCusorSegment = drawData.reduce(
-            (iCusor, x, i) => x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX  ? i : iCusor, 0);
+            (iCusor, x, i) => x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX  ? i : iCusor, NaN);
         const cusorSegment = drawData[indexOfCusorSegment];
         const sequenceHalfLength = 10; // The length of alignment in the hoberbox.
 
@@ -306,6 +307,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         } else {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
+            const xSpanList = drawData.map(placement => placement.targetXSpan) as OpenInterval[];
             const strand = alignment.plotStrand;
             svgElements = drawData.map(placement => this.renderRoughAlignment(placement, strand==='-'));
             const viewWindow = alignment.primaryVisData.viewWindow;
@@ -313,7 +315,9 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             svgElements.push(arrow);
             visualizer=(
                 <React.Fragment>
-                    <svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>
+‘                    <svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>
+                    {/* <HorizontalFragment relativeY={hoverHeight} xSpanList={xSpanList} >
+                    </HorizontalFragment> */}
                 </React.Fragment>
             )
         }
