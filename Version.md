@@ -1,8 +1,13 @@
 # Version History
 
+## 48.4.5
+
 * free text search for track in track table using [fuse.js](https://fusejs.io/)
 * pearson correlation value is added to scatter plot
 * add [YouTube channel](https://www.youtube.com/channel/UCnGVWbxJv-DPDCAFDQ1oFQA) link
+* fix a bug for screenshot app missed background color for tracks
+* cleaning package.json file
+* screenshot can now generate pdf as well using [svg2pdf.js](https://github.com/yWorks/svg2pdf.js), while the style may slight changed compared to SVG
 
 ## 48.4.4
 

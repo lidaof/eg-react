@@ -1,6 +1,6 @@
 {
   "name": "epgg",
-  "version": "48.4.4",
+  "version": "48.4.5",
   "author": "Ting Wang Lab @WUSTL",
   "repository": {
     "type": "git",
@@ -17,12 +17,7 @@
     "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
     "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules"
   },
-  "dependencies": {
-    "@nivo/core": "^0.42.1",
-    "@nivo/legends": "^0.42.0",
-    "@nivo/heatmap": "^0.50.0",
-    "react-to-print": "^1.0.11"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "prop-types": "^15.6.0",
     "react": "^16.3.0",
@@ -69,7 +64,6 @@
     "firebase": "^5.4.0",
     "fuse.js": "^3.4.4",
     "hic-straw": "^0.9.2",
-    "igv": "^2.1.0",
     "jest-image-snapshot": "^1.0.1",
     "jquery": "^3.2.1",
     "jquery.kinetic": "^2.2.4",
@@ -78,10 +72,7 @@
     "lodash": "^4.17.5",
     "memoize-one": "^3.1.1",
     "nightmare": "^2.10.0",
-    "p": "^0.2.0",
     "parse-color": "^1.0.0",
-    "plotly.js": "^1.47.0",
-    "plotly.js-cartesian-dist": "^1.44.4",
     "promise-worker": "^1.1.1",
     "prop-types": "^15.6.0",
     "query-string": "^6.1.0",
@@ -98,7 +89,6 @@
     "react-hot-keys": "^1.2.2",
     "react-modal": "^3.6.1",
     "react-notify-toast": "^0.5.0",
-    "react-plotly.js": "^2.3.0",
     "react-popper": "^0.8.2",
     "react-radio-buttons": "^1.2.2",
     "react-radio-group": "^3.0.3",
@@ -133,22 +123,5 @@
     "dist"
   ],
   "description": "WashU Epigenome Browser",
-  "homepage": "http://epigenomegateway.wustl.edu/browser/",
-  "main": "electron/main.js",
-  "build": {
-    "productName": "WashU Epigenome Browser",
-    "appId": "edu.wustl.epigenomegateway",
-    "electronVersion": "4.0.1",
-    "files": [
-      "./build/**/*",
-      "./electron/*"
-    ],
-    "mac": {
-      "target": "dmg"
-    },
-    "win": {
-      "target": "portable"
-    },
-    "target": "electron-renderer"
-  }
+  "homepage": "http://epigenomegateway.wustl.edu/browser/"
 }
