@@ -85,7 +85,14 @@ class ScreenshotUINotConnected extends React.Component {
                     eleSvg.setAttribute("x", x + "");
                     eleSvg.setAttribute("y", idx2 * eleSvg.clientHeight  + y + "");
                     if (options && options.backgroundColor) {
-                        eleSvg.setAttribute("style", `background-color: ${options.backgroundColor};`);
+                        const rect = document.createElementNS(xmlns, 'rect');
+                        rect.setAttribute('id', 'backRect'+idx);
+                        rect.setAttribute("x", x + "");
+                        rect.setAttribute("y", idx2 * eleSvg.clientHeight  + y + "");
+                        rect.setAttribute('width', eleSvg.clientWidth+'');
+                        rect.setAttribute('height', eleSvg.clientHeight+'');
+                        rect.setAttribute('fill', options.backgroundColor);
+                        trackG.appendChild(rect);
                     }
                     trackG.appendChild(eleSvg);    
                 }); 
