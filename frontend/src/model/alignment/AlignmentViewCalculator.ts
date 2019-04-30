@@ -303,7 +303,7 @@ export class AlignmentViewCalculator {
             // Find the center of the primary segments, and try to center the merged query locus there too.
             const drawCenter = computeCentroid(placementsInMerge.map(segment => segment.targetXSpan));
             const targetXStart = Math.min(...placementsInMerge.map(segment => segment.targetXSpan.start));
-            const targetEnd = Math.min(...placementsInMerge.map(segment => segment.targetXSpan.end));
+            const targetEnd = Math.max(...placementsInMerge.map(segment => segment.targetXSpan.end));
             const mergeTargetXSpan = new OpenInterval(targetXStart, targetEnd);
             const preferredStart = drawCenter - halfDrawWidth;
             const preferredEnd = drawCenter + halfDrawWidth;

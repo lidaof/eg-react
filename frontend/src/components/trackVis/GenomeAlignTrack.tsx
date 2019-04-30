@@ -307,7 +307,12 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         } else {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
-            const xSpanList = drawData.map(placement => placement.targetXSpan) as OpenInterval[];
+            const targetXSpanArrayArray = drawData.map(
+                placement => placement.segments.map(segment => segment.targetXSpan));
+            const targetXSpanArray = [].concat.apply([], targetXSpanArrayArray);
+            const queryXSpanArrayArray = drawData.map(
+                placement => placement.segments.map(segment => segment.queryXSpan));
+            const queryXSpanArray = [].concat.apply([], queryXSpanArrayArray);
             const strand = alignment.plotStrand;
             svgElements = drawData.map(placement => this.renderRoughAlignment(placement, strand==='-'));
             const viewWindow = alignment.primaryVisData.viewWindow;
@@ -315,9 +320,15 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             svgElements.push(arrow);
             visualizer=(
                 <React.Fragment>
-‘                    <svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>
-                    {/* <HorizontalFragment relativeY={hoverHeight} xSpanList={xSpanList} >
-                    </HorizontalFragment> */}
+                    <HorizontalFragment 
+                        height={ROUGH_MODE_HEIGHT-RECT_HEIGHT}
+                        primaryColor={PRIMARY_COLOR}
+                        queryColor={QUERY_COLOR}
+                        targetXSpanList={targetXSpanArray}
+                        queryXSpanList={queryXSpanArray}
+                    >
+                        <svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>
+                    </HorizontalFragment>
                 </React.Fragment>
             )
         }
