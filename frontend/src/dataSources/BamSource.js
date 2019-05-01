@@ -2,7 +2,8 @@ import _ from 'lodash';
 import DataSource from './DataSource';
 import bam from '../vendor/bbi-js/main/bam';
 import bin from '../vendor/bbi-js/utils/bin';
-
+// import { BamFile } from '@gmod/bam';
+// import { RemoteFile, BlobFile } from 'generic-filehandle';
 /*
 BamRecord {
     MD: "27",
@@ -32,12 +33,20 @@ class BamSource extends DataSource {
                 }
             });
         });
+        // this.bam = new BamFile({
+        //     bamUrl: url,
+        //     baiUrl: url + '.bai',
+        // });
+        // console.log(this.bam);
+        
     }
 
     async getData(region, basesPerPixel, options={}) {
         const bamObj = await this.bamPromise;
         let promises = region.getGenomeIntervals().map(locus => this._getDataInLocus(locus, bamObj));
+        // const promises = region.getGenomeIntervals().map(locus => this.bam.getRecordsForRange(locus.chr, locus.start, locus.end));
         const dataForEachSegment = await Promise.all(promises);
+        console.log(dataForEachSegment);
         return _.flatten(dataForEachSegment);
     }
 
