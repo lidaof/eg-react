@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getRelativeCoordinates } from '../../../util';
-import OpenInterval from 'src/model/interval/OpenInterval';
 import './HorizontalFragment.css';
-import { relative } from 'path';
 
+const LINE_MARGIN = 1; // margin between rough alignment segment and edge of polygon.
+const LINE_WIDTH = 2; // line height 2px in css file.
+const TRIANGLE_SIZE = 5; // triangle size 5px in css file.
 /**
  * Like a <div> in every way, except it a horizontal line at where the merged alignment segment is.
  * 
@@ -12,7 +13,6 @@ import { relative } from 'path';
  */
 class HorizontalFragment extends React.Component {
     static propTypes = {
-        innerRef: PropTypes.func, // Ref to the div
         relativeY: PropTypes.number,
         xSpanList: PropTypes.array,
     };
@@ -55,27 +55,31 @@ class HorizontalFragment extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {height, targetXSpanList, queryXSpanList, primaryColor, queryColor, innerRef, onMouseMove, onMouseLeave, style, children, ...otherProps} = this.props;
+        const {height, targetXSpanList, queryXSpanList, primaryColor, queryColor, onMouseMove, onMouseLeave, style, children, ...otherProps} = this.props;
         // Default `position: relative`
+        console.log(targetXSpanList);
+        console.log(queryXSpanList);
         const relativeX = this.state.relativeX;
+        console.log(relativeX);
         const xSpanIndex = targetXSpanList.reduce((iCusor, x, i) => x.start < relativeX && x.end >= relativeX  ? i : iCusor, NaN);
         const mergedStyle = Object.assign({position: 'relative'}, style);
         var lines;
-        if (xSpanIndex) {
+        if (isNaN(xSpanIndex)) {
+            lines = (<React.Fragment>{null}</React.Fragment>);
+        }
+        else {
             const targetXSpan = targetXSpanList[xSpanIndex];
             const queryXSpan = queryXSpanList[xSpanIndex];
             const queryX = queryXSpan.start + queryXSpan.getLength() * (relativeX - targetXSpan.start) / targetXSpan.getLength();
+            console.log(queryX);
             lines = (
                 <React.Fragment>
-                    {<HorizontalLine relativeY={1} xSpan={targetXSpan} color={primaryColor} />}
-                    {<Triangle relativeX={relativeX - 3} relativeY={1} color={primaryColor} direction={"down"}/>}
-                    {<Triangle relativeX={queryX - 3} relativeY={height - 3} color={queryColor} direction={"up"}/>}
-                    {<HorizontalLine relativeY={height - 3} xSpan={queryXSpan} color={queryColor} />}
+                    {<HorizontalLine relativeY={LINE_MARGIN} xSpan={targetXSpan} color={primaryColor} />}
+                    {<Triangle relativeX={relativeX - TRIANGLE_SIZE} relativeY={LINE_MARGIN + LINE_WIDTH} color={primaryColor} direction={"down"}/>}
+                    {<Triangle relativeX={queryX - TRIANGLE_SIZE} relativeY={height - LINE_MARGIN - LINE_WIDTH - TRIANGLE_SIZE} color={queryColor} direction={"up"}/>}
+                    {<HorizontalLine relativeY={height - LINE_MARGIN - LINE_WIDTH} xSpan={queryXSpan} color={queryColor} />}
                 </React.Fragment>
             )
-        }
-        else {
-            lines = (<React.Fragment>{null}</React.Fragment>);
         }
         return (
             <div
@@ -117,8 +121,6 @@ function HorizontalLine(props) {
 
 function Triangle(props) {
     const {relativeX, relativeY, color, direction} = props;
-    console.log(relativeX);
-    console.log(direction);
     const triangleStyle = {
         top: relativeY,
         left: relativeX,
