@@ -307,7 +307,12 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         } else {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
-            console.log(drawData);
+            // const targetLocusArrayArray = drawData.map(
+            //     placement => placement.segments.map(segment => segment.visiblePart.getLocus()));
+            // const targetLocusArray = [].concat.apply([], targetLocusArrayArray);
+            // const queryLocusArrayArray = drawData.map(
+            //     placement => placement.segments.map(segment => segment.visiblePart.getQueryLocus()));
+            // const queryLocusArray = [].concat.apply([], queryLocusArrayArray);
             const targetXSpanArrayArray = drawData.map(
                 placement => placement.segments.map(segment => segment.targetXSpan));
             const targetXSpanArray = [].concat.apply([], targetXSpanArrayArray);

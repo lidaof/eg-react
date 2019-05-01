@@ -479,7 +479,7 @@ export class AlignmentViewCalculator {
                 const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
                 const locusXEnd = parentXSpan.end - xDistanceFromParent;
                 const xWidth = drawModel.basesToXWidth(locus.getLength());
-                const xEnd = locusXEnd<parentLocus.end?locusXEnd:parentXSpan.end;
+                const xEnd = locusXEnd<parentXSpan.end?locusXEnd:parentXSpan.end;
                 const xStart = (locusXEnd - xWidth)> parentXSpan.start?(locusXEnd - xWidth):parentXSpan.start;
                 xSpans.push(new OpenInterval(xStart, xEnd));
             }

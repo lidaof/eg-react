@@ -57,10 +57,7 @@ class HorizontalFragment extends React.Component {
     render() {
         const {height, targetXSpanList, queryXSpanList, primaryColor, queryColor, onMouseMove, onMouseLeave, style, children, ...otherProps} = this.props;
         // Default `position: relative`
-        console.log(targetXSpanList);
-        console.log(queryXSpanList);
         const relativeX = this.state.relativeX;
-        console.log(relativeX);
         const xSpanIndex = targetXSpanList.reduce((iCusor, x, i) => x.start < relativeX && x.end >= relativeX  ? i : iCusor, NaN);
         const mergedStyle = Object.assign({position: 'relative'}, style);
         var lines;
@@ -70,8 +67,9 @@ class HorizontalFragment extends React.Component {
         else {
             const targetXSpan = targetXSpanList[xSpanIndex];
             const queryXSpan = queryXSpanList[xSpanIndex];
+            //1. The following is not accurate. Should use locus coordinates in alignment segment.
+            //2. Need to reverse the triangle position for reverse aligned segment.
             const queryX = queryXSpan.start + queryXSpan.getLength() * (relativeX - targetXSpan.start) / targetXSpan.getLength();
-            console.log(queryX);
             lines = (
                 <React.Fragment>
                     {<HorizontalLine relativeY={LINE_MARGIN} xSpan={targetXSpan} color={primaryColor} />}
