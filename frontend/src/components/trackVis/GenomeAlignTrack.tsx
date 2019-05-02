@@ -104,6 +104,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         const [xStart, xEnd] = targetXSpan;
         const targetSequence = placement.visiblePart.getTargetSequence();
         const querySequence = placement.visiblePart.getQuerySequence();
+        const baseWidth = targetXSpan.getLength() / targetSequence.length;
 
         return <React.Fragment key={i} >
                 {renderSequenceSegments(targetSequence, targetSegments, ALIGN_TRACK_MARGIN, PRIMARY_COLOR, false)}
@@ -113,7 +114,6 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             </React.Fragment>;
 
         function renderAlignTicks(y: number, height: number) {
-            const baseWidth = targetXSpan.getLength() / targetSequence.length;
             const ticks = [];
             let x = targetXSpan.start;
             for( i=0; i<targetSequence.length; i++) {
@@ -172,12 +172,12 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
 
             return <React.Fragment>
                 <line
-                    x1={xStart}
+                    x1={xStart + baseWidth/4}
                     y1={y + 0.5 * RECT_HEIGHT}
                     x2={xEnd}
                     y2={y + 0.5 * RECT_HEIGHT}
                     stroke={color}
-                    strokeDasharray={4}
+                    strokeDasharray={baseWidth/2}
                 />
                 {rects}
                 {isQuery && arrows}
