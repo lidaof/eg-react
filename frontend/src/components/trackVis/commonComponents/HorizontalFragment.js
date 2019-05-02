@@ -56,10 +56,10 @@ class HorizontalFragment extends React.Component {
      */
     render() {
         const {height, targetXSpanList, queryXSpanList, primaryColor, queryColor, onMouseMove, onMouseLeave, style, children, ...otherProps} = this.props;
-        // Default `position: relative`
+        // calculate xSpanIndex by comparing relativeX with tangetXSpan.
         const relativeX = this.state.relativeX;
         const xSpanIndex = targetXSpanList.reduce((iCusor, x, i) => x.start < relativeX && x.end >= relativeX  ? i : iCusor, NaN);
-        const mergedStyle = Object.assign({position: 'relative'}, style);
+        // const mergedStyle = Object.assign({position: 'relative'}, style);
         var lines;
         if (isNaN(xSpanIndex)) {
             lines = (<React.Fragment>{null}</React.Fragment>);
@@ -83,7 +83,7 @@ class HorizontalFragment extends React.Component {
             <div
                 onMouseMove={this.storeMouseCoordinates}
                 onMouseLeave={this.clearMouseCoordinates}
-                style={mergedStyle}
+                // style={mergedStyle}
                 {...otherProps} 
             >
                 {children}
