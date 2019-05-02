@@ -38,9 +38,9 @@ class AlignmentSequence extends React.Component {
                 /(alignment.targetXSpan.end - alignment.targetXSpan.start)
                 * length);
             const relativeDisplayStart = cusorLocus - halfLength > 0 ? cusorLocus - halfLength : 0;
-            const relativeDisplayEnd = cusorLocus + halfLength < length ? cusorLocus + halfLength : length;
+            const relativeDisplayEnd = cusorLocus + halfLength < length ? cusorLocus + halfLength : (length - 1);
             const relativeHighlightStart = cusorLocus - halfHighlightLength > 0 ? cusorLocus - halfHighlightLength : 0;
-            const relativeHighlightEnd = cusorLocus + halfHighlightLength < length ? cusorLocus + halfHighlightLength : length;
+            const relativeHighlightEnd = cusorLocus + halfHighlightLength < length ? cusorLocus + halfHighlightLength : (length - 1);
 
 
             const cusorTargetSeqLeft = record.targetSeq.substr(
@@ -56,17 +56,17 @@ class AlignmentSequence extends React.Component {
 
             const targetBaseLookup = makeBaseNumberLookup(visiblePart.getTargetSequence(),visiblePart.relativeStart);
             const targetStart = record.locus.start + targetBaseLookup[relativeDisplayStart];
-            const targetEnd = record.locus.start + targetBaseLookup[relativeDisplayEnd - 1];
+            const targetEnd = record.locus.start + targetBaseLookup[relativeDisplayEnd];
             const targetHighlightStart = record.locus.start + targetBaseLookup[relativeHighlightStart];
-            const targetHighlightEnd = record.locus.start + targetBaseLookup[relativeHighlightEnd - 1];
+            const targetHighlightEnd = record.locus.start + targetBaseLookup[relativeHighlightEnd];
             const isReverse = record.getIsReverseStrandQuery();
             const queryLocus = visiblePart.getQueryLocusFine();
             const queryLookupStart = isReverse ? queryLocus.end : queryLocus.start;
             const queryBaseLookup = makeBaseNumberLookup(visiblePart.getQuerySequence(),queryLookupStart,isReverse);
             const queryStart = queryBaseLookup[relativeDisplayStart];
-            const queryEnd = queryBaseLookup[relativeDisplayEnd - 1];
+            const queryEnd = queryBaseLookup[relativeDisplayEnd];
             const queryHighlightStart = queryBaseLookup[relativeHighlightStart];
-            const queryHighlightEnd = queryBaseLookup[relativeHighlightEnd - 1];
+            const queryHighlightEnd = queryBaseLookup[relativeHighlightEnd];
             
             const maxTextLength = Math.max(targetStart.toString().length, targetEnd.toString().length, 
                                             queryStart.toString().length, queryEnd.toString().length);
