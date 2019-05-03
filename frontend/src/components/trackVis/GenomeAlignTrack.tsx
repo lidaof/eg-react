@@ -167,6 +167,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                     opacity={0.75}
                     isToRight={!placement.record.getIsReverseStrandQuery()}
                     color="white"
+                    separation={baseWidth}
                 />
             );
 

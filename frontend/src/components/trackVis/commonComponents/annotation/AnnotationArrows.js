@@ -29,14 +29,14 @@ class AnnotationArrows extends React.PureComponent {
     };
 
     render() {
-        const {startX, endX, y, height, isToRight, color, clipId, opacity} = this.props;
+        const {startX, endX, y, height, isToRight, color, clipId, opacity, separation} = this.props;
         if (endX - startX < ARROW_WIDTH) {
             return null;
         }
-
+        const arrowSeparation = separation > 10 ? separation : ARROW_SEPARATION;
         const centerY = height / 2;
         const bottomY = height;
-        let placementStartX = startX;
+        let placementStartX = startX - ARROW_WIDTH / 2;
         let placementEndX = endX;
         if (isToRight) {
             placementStartX += ARROW_WIDTH;
@@ -46,7 +46,7 @@ class AnnotationArrows extends React.PureComponent {
 
         let children = [];
         // Naming: if our arrows look like '<', then the tip is on the left, and the two tails are on the right.
-        for (let arrowTipX = placementStartX; arrowTipX <= placementEndX; arrowTipX += ARROW_SEPARATION) {
+        for (let arrowTipX = placementStartX; arrowTipX <= placementEndX; arrowTipX += arrowSeparation) {
             // Is forward strand ? point to the right : point to the left 
             const arrowTailX = isToRight ? arrowTipX - ARROW_WIDTH : arrowTipX + ARROW_WIDTH;
             const arrowPoints = [
