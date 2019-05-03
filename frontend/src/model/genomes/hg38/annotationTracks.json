@@ -153,7 +153,7 @@
     "Genome Comparison": [
         {
             "name": "mm10tohg38",
-            "label": "Rat mm10 to hg38 blastz",
+            "label": "Mouse mm10 to hg38 blastz",
             "querygenome": "mm10",
             "metadata": {"genome": "mm10"},
             "filetype": "genomealign",
@@ -161,7 +161,7 @@
         },
         {
             "name": "panTro5tohg38",
-            "label": "Chimp panTro5 to hg38 blastz",
+            "label": "Chimpanzee panTro5 to hg38 blastz",
             "querygenome": "panTro5",
             "metadata": {"genome": "panTro5"},
             "filetype": "genomealign",
