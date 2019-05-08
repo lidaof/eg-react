@@ -5,7 +5,7 @@ import { BamRecord } from '../../../model/BamRecord';
 import { AlignmentIterator } from '../../../model/alignment/AlignmentStringUtils';
 
 const HEIGHT = 10;
-const MIN_DRAW_WIDTH = 0.5 // Pixels
+const MIN_DRAW_WIDTH = 0 // Pixels
 const FEATURE_PLACER = new FeaturePlacer();
 
 export interface BamAnnotationOptions {

@@ -12,7 +12,7 @@ import RegionSetSelector from './RegionSetSelector';
 import Geneplot from './Geneplot/Geneplot';
 import TrackList from "./trackManagers/TrackList";
 import { TrackModel } from '../model/TrackModel';
-import AnnotationTrackSelector from './trackManagers/AnnotationTrackSelector';
+import { AnnotationTrackUI } from './trackManagers/AnnotationTrackUI';
 import HubPane from './trackManagers/HubPane'
 import CustomTrackAdder from './trackManagers/CustomTrackAdder';
 import { SessionUI } from "./SessionUI";
@@ -198,10 +198,11 @@ class Nav extends React.Component {
                     <DropdownOpener extraClassName="btn-primary" label="🎹Tracks" />
                     <div className="dropdown-menu">
                         <ModalMenuItem itemLabel="Annotation Tracks">
-                            <AnnotationTrackSelector
+                            <AnnotationTrackUI
                                 addedTracks={tracks}
                                 onTracksAdded={onTracksAdded}
-                                addedTrackSets={addedTrackSets} 
+                                addedTrackSets={addedTrackSets}
+                                genomeConfig={genomeConfig}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Public Data Hubs">

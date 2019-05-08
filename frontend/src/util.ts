@@ -4,6 +4,7 @@
  * @author Silas Hsu
  */ 
 import parseColor from 'parse-color';
+import _ from 'lodash';
 
 interface Coordinate {
     x: number;
@@ -199,4 +200,24 @@ export const pcorr = (x: number[], y:number[]) => {
     x.forEach(reduce);
     return (minLength * sumXY - sumX * sumY) / 
         Math.sqrt((minLength * sumX2 - sumX * sumX) * (minLength * sumY2 - sumY * sumY));
+}
+
+/**
+ * 
+ * @param current {string} current genome
+ * @param tracks {trackModel[]} list of tracks
+ */
+export function getSecondaryGenomes(current: string, tracks: any[]) {
+    const genomes: string[] = [];
+    tracks.forEach(tk => {
+        if (tk.type === 'genomealign') {
+            if (tk.querygenome) {
+                genomes.push(tk.querygenome);
+            }
+            if (tk.metadata && tk.metadata.genome !== current) {
+                genomes.push(tk.metadata.genome);
+            }
+        }
+    });
+    return _.uniq(genomes);
 }
