@@ -65,6 +65,7 @@ export class TrackModel {
     fileObj?: any;
     files?: any;
     tracks?: TrackModel[];  // for matplot
+    querygenome?: string;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);

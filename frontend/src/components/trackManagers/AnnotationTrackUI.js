@@ -37,6 +37,7 @@ export class AnnotationTrackUI extends React.Component {
                 onTracksAdded={onTracksAdded}
                 addedTrackSets={addedTrackSets}
                 genomeConfig={config}
+                addGenomeLabel={true}
             />
             );
     }

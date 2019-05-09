@@ -198,6 +198,21 @@ class App extends React.Component {
         this.setState({highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`});
     }
 
+    groupTrackByGenome = (primaryGenomeName, tracks) => {
+        const grouped = {}; // key: genome name like `hg19`, value: a set of track name or url
+        tracks.forEach(track => {
+            if (track.type === 'genomealign') { return };
+            const gname = track.getMetadata('genome');
+            const targeName = gname ? gname : primaryGenomeName;
+            if (grouped[targeName]) {
+                grouped[targeName].push(track.url || track.name);
+            } else {
+                grouped[targeName] = [track.url || track.name];
+            }
+        });
+        return grouped;
+    }
+
     render() {
         const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, 
                 sessionFromUrl, trackLegendWidth, onLegendWidthChange, 
@@ -220,6 +235,9 @@ class App extends React.Component {
         ]);
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
+
+        const groupedTrackSets = this.groupTrackByGenome(genomeConfig.genome.getName(), tracks);
+        console.log(groupedTrackSets);
         return (
         <div className="App container-fluid">
             <Nav
@@ -247,6 +265,7 @@ class App extends React.Component {
                 addTracktoAvailable={this.addTracktoAvailable}
                 addTermToMetaSets={this.addTermToMetaSets}
                 embeddingMode={embeddingMode}
+                groupedTrackSets={groupedTrackSets}
             />
              <Notifications />
             {isShowingNavigator &&

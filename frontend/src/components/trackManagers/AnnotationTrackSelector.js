@@ -71,14 +71,17 @@ export class AnnotationTrackSelector extends React.Component {
 
     addLeafTrack(trackModel) {
         const genomeName = this.props.genomeConfig.genome.getName();
-        trackModel.genome = genomeName;
+        // trackModel.genome = genomeName;
+        const label = this.props.addGenomeLabel ? `${trackModel.label} (${genomeName})` : trackModel.label;
+        trackModel.options = {...trackModel.options, label};
         trackModel.metadata = {...trackModel.metadata, genome: genomeName};
         this.props.onTracksAdded(trackModel);
     }
 
     renderLeaf(trackModel) {
         const genomeName = this.props.genomeConfig.genome.getName();
-        const trackGenomeName = trackModel.genome || trackModel.metadata.genome;
+        const trackGenomeName = trackModel.getMetadata('genome');
+        console.log(genomeName, trackGenomeName);
         if (trackGenomeName === genomeName) {
             if (this.props.addedTrackSets.has(trackModel.name) || this.props.addedTrackSets.has(trackModel.url)) {
                 return <div>{trackModel.label} (Added)</div>;

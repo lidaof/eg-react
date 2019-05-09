@@ -115,7 +115,8 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
             this.dispatchTrackUpdate(track, { isLoading: true });
 
             const view = this.props.viewRegion;
-            const genome = track.getMetadata('genome');
+            // for genome align track, use the primay genome as genome
+            const genome = track.querygenome || track.getMetadata('genome');
             try {
                 let visRegion;
                 let alignment = null;
