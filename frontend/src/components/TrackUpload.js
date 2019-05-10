@@ -4,7 +4,7 @@ import { TrackModel } from "../model/TrackModel";
 import { notify } from 'react-notify-toast';
 import {Tabs, Tab} from 'react-bootstrap-tabs';
 import JSON5 from 'json5';
-import { readFileAsText } from "../util";
+import { readFileAsText, HELP_LINKS } from "../util";
 
 const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract"]; // all lower case
 
@@ -160,6 +160,7 @@ export class TrackUpload extends React.Component {
                             <option value="bed">bed</option>
                             <option value="refBed">refBed</option>
                             <option value="longrange">longrange</option>
+                            <option value="callingcard">callingcard</option>
                         </optgroup>
                     </select>
                 </label>
@@ -176,7 +177,7 @@ export class TrackUpload extends React.Component {
         return (
             <div>
                 <label htmlFor="hubFile">
-                    <p>Choose a folder contains a file named 'hub.config.json': (<span><a href="https://eg.readthedocs.io/en/latest/local.html" target="_blank">local hub documentation</a></span>)</p> 
+                    <p><strong>Choose a folder</strong> that contains a file named <strong>hub.config.json</strong>: (<span><a href={HELP_LINKS.localhub} target="_blank">local hub documentation</a></span>)</p> 
                     <input type="file" 
                         webkitdirectory="true" mozdirectory="true" directory="true" 
                         id="hubFile" onChange={this.handleHubUpload} />
@@ -184,7 +185,7 @@ export class TrackUpload extends React.Component {
                 <br/>
                 <p className="lead">Or:</p>
                 <label htmlFor="hubFile2">
-                    <p>Choose many files contains a file named 'hub.config.json':</p> 
+                    <p><strong>Choose multiple files</strong>  (including <strong>hub.config.json</strong>):</p> 
                     <input type="file" 
                         id="hubFile2" multiple onChange={this.handleHubUpload} />
                 </label>

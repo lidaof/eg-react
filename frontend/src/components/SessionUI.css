@@ -2,3 +2,14 @@ button.SessionUI {
     padding: 2px;
     margin: 0 0 2px 5px;
 }
+
+.SessionUI-upload-btn-wrapper {
+    position: relative;
+}
+
+.SessionUI-upload-btn-wrapper input[type=file] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}

@@ -34,7 +34,8 @@ interface FullDisplayModeProps extends PropsFromTrackContainer {
 
     legend?: JSX.Element; // Override for the default legend element
     featurePadding?: number | PaddingFunc; // Horizontal padding for features
-    getAnnotationElement?: AnnotationCallback
+    getAnnotationElement?: AnnotationCallback;
+    message?: JSX.Element;
 }
 
 /**
@@ -79,7 +80,11 @@ class FullDisplayMode extends React.Component<FullDisplayModeProps> {
             options={options} // FullVisualizer doesn't use options, but we pass to to cue rerenders.
             getAnnotationElement={getAnnotationElement}
         />;
-        const message = <HiddenItemsMessage numHidden={arrangeResult.numHidden} />;
+        // const message = <HiddenItemsMessage numHidden={arrangeResult.numHidden} />;
+        const message = <React.Fragment>
+                            <HiddenItemsMessage numHidden={arrangeResult.numHidden} />
+                            {this.props.message}
+                        </React.Fragment>;
         return <Track {...this.props} legend={legend} visualizer={visualizer} message={message}/>;
     }
 }

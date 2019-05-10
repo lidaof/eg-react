@@ -7,8 +7,10 @@ import NavigationContext from '../../model/NavigationContext';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
 import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
-import PlotlyBoxplot from './PlotlyBoxplot';
 import { HELP_LINKS } from '../../util';
+import ColorPicker from '../ColorPicker';
+
+const Plot = createPlotlyComponent.default(Plotly);
 
 function mapStateToProps(state) {
     return {
@@ -39,7 +41,9 @@ class Geneplot extends React.Component {
             dataPoints: 50,
             data: {},
             showlegend: false,
+            boxColor: 'rgb(214,12,140)',
         };
+        this.changeBoxColor = _.debounce(this.changeBoxColor.bind(this), 250);
     }
 
     renderRegionList = () => {
@@ -100,7 +104,7 @@ class Geneplot extends React.Component {
     }
 
     getPlotData = async () => {
-        const {setName, trackName, dataPoints, plotType} = this.state;
+        const {setName, trackName, dataPoints, boxColor} = this.state;
         if (!setName || !trackName) {
             this.setState({plotMsg: 'Please choose both a set and a track'});
             return;
@@ -110,36 +114,42 @@ class Geneplot extends React.Component {
         const trackConfig = getTrackConfig(track);
         const dataSource = trackConfig.initDataSource();
         const set = this.getSetByName(setName);
-        const setRegions = set.features.map(feature => {
+        const flankedFeatures = set.features.map(feature => set.flankingStrategy.makeFlankedFeature(feature, set.genome));
+        const setRegions = flankedFeatures.map(feature => {
             const navContext = new NavigationContext(feature.name, [feature]);
             return new DisplayedRegionModel(navContext);
         });
         const promises = setRegions.map(region => dataSource.getData(region));
         const rawData = await Promise.all(promises);
-        const data = rawData.map(raw => trackConfig.formatData(raw));        
-        const binned = set.features.map((feature,idx) => {
-            const step = Math.ceil((feature.locus.end - feature.locus.start)/dataPoints);
-            const lefts = _.range(feature.locus.start, feature.locus.end, step);
-            const rights = [...lefts.slice(0,-1).map(x=>x+step), feature.locus.end];
+        const data = rawData.map(raw => trackConfig.formatData(raw));
+        const binned = flankedFeatures.map((feature,idx) => {
+            const step = Math.round((feature.locus.end - feature.locus.start)/dataPoints);
+            const lefts = _.range(feature.locus.start, feature.locus.end - step/2, step); // to avoid last tiny bin
+            const rights = [...(lefts.slice(0, -1).map(x=>x+step)), feature.locus.end];
             const bins = _.unzip([lefts,rights]);
             return this.groupDataToBins(data[idx], bins, rights);
         });
-        const plotData = _.zip(...binned);
+        // reverse binned data for feature in - strand
+        const adjusted = binned.map( (d, i ) => flankedFeatures[i].getIsForwardStrand() ? d.slice() : _.reverse(d.slice()));
+        // console.log(adjusted);
+        const featureNames = flankedFeatures.map(feature => feature.getName());
+        // console.log(featureNames);
+        const plotData = _.zip(...adjusted);
         const boxData = plotData.map( (d, i) => ({
             y: d,
             type: 'box',
             name: `${i+1}`,
             marker:{
-                color: 'rgb(214,12,140)'
+                color: boxColor
             }
             })
         );
-        const lineData  = binned.map( (d, i) => ( {
+        const lineData  = adjusted.map( (d, i) => ( {
             type: 'scatter',
             x: _.range(1, d.length+1),
             y: d,
             mode: 'lines',
-            name: set.features[i].name,
+            name: featureNames[i],
             line: {
                 dash: 'solid',
                 width: 2,
@@ -147,12 +157,12 @@ class Geneplot extends React.Component {
             }
         }));
         const heatmapData = [{
-            z: binned,
+            z: adjusted,
+            x: _.range(1, adjusted[0].length+1),
+            y: featureNames,
             type: 'heatmap'
         }];
-        if (plotType === 'line') {
-            this.setState({showlegend: true});
-        }
+        // console.log(heatmapData);
         this.setState({
             data: {
                 box: boxData,
@@ -171,9 +181,14 @@ class Geneplot extends React.Component {
      */
     groupDataToBins = (data, bins, rights) => {
         const indexes = data.map(d => Math.min(_.sortedIndex(rights, d.locus.end), bins.length - 1)); // assures data fall into bins
+        // return the area of region
         let results = Array.from({ length: bins.length }, () => 0);
         data.forEach((d,i) => results[indexes[i]] += (d.locus.getLength() * d.value) );
         return results.map((d,i) => d / (bins[i][1] - bins[i][0]));
+        // simple mean of data in region
+        // let results = Array.from({ length: bins.length }, () => []);
+        // data.forEach((d,i) => results[indexes[i]].push(d.value) );
+        // return results.map(d => _.mean(d));
     }
 
     getTrackByName = (name) => {
@@ -193,11 +208,22 @@ class Geneplot extends React.Component {
     }
 
     handlePlotTypeChange = (event) => {
-        this.setState({plotType: event.target.value});
+        this.setState({plotType: event.target.value, showlegend: event.target.value === 'line'});
     }
 
     handleDataPointsChange = (event) => {
         this.setState({dataPoints: Number.parseInt(event.target.value)});
+    }
+
+    changeBoxColor = (color) => {
+        const { data } = this.state;
+        const boxData = data.box.map( d => ({...d, marker: {color: color.hex} }));
+        const updatedData = {...data, box: boxData};
+        this.setState( {boxColor: color.hex, data: updatedData});
+    }
+
+    renderBoxColorPicker = () => {
+        return <ColorPicker color={this.state.boxColor} label="box color" onChange={this.changeBoxColor} />;
     }
 
     render(){
@@ -209,6 +235,28 @@ class Geneplot extends React.Component {
             </div>
         }
         const {data, plotType, showlegend, plotMsg} = this.state;
+        // let heatmapData = null;
+        // if (plotType === 'heatmap') {
+        //     heatmapData = formatForHeatmap(data);
+        // }
+        const layout = {
+            width: 900, height: 600, showlegend,
+            margin: {
+              l: 180
+            },
+          };
+        const config = {
+            toImageButtonOptions: {
+              format: 'svg', // one of png, svg, jpeg, webp
+              filename: 'gene_plot',
+              height: 600,
+              width: 900,
+              scale: 1, // Multiply title/legend/axis/canvas sizes by this factor
+            },
+            displaylogo: false,
+            responsive: true,
+            modeBarButtonsToRemove: ['select2d', 'lasso2d', 'toggleSpikelines'],
+          };
         return (
             <div>
                 <p className="lead">1. Choose a region set</p>
@@ -221,7 +269,7 @@ class Geneplot extends React.Component {
                 </div>
                 <p className="lead">3. Choose a plot type:</p>
                 <div>
-                    {this.renderPlotTypes()} {this.renderDataPoints()}
+                    {this.renderPlotTypes()} {this.renderDataPoints()} {plotType === 'box' && this.renderBoxColorPicker()}
                 </div>
                 <div className="font-italic">{PLOT_TYPE_DESC[plotType]}</div>
                 <div>
@@ -229,7 +277,11 @@ class Geneplot extends React.Component {
                     {' '}
                     {plotMsg}
                 </div>
-                <div><PlotlyBoxplot data={data[plotType]} showlegend={showlegend} /></div>
+                <div><Plot data={data[plotType]} layout={layout} config={config} /></div>
+                {/* {(plotType !== 'heatmap')?
+                <div><PlotlyPlot data={data[plotType]} showlegend={showlegend} /></div>
+                : (heatmapData) ? <HeatmapWidget data={heatmapData}/> : null
+                } */}
             </div>
         );
     }

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ReactModal from 'react-modal';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import GeneSearchBox from './GeneSearchBox';
+import SnpSearchBox from './SnpSearchBox';
 import { CopyToClip } from '../CopyToClipboard';
 
 const MODAL_STYLE = {
@@ -14,7 +15,10 @@ const MODAL_STYLE = {
         overflow: "visible",
         padding: "5px",
         color: "black",
-    }
+    },
+    overlay: {
+            backgroundColor: 'rgba(111,107,101, 0.7)'
+        }
 };
 
 const X_BUTTON_STYLE = {
@@ -122,6 +126,14 @@ class TrackRegionController extends React.Component {
                 <span className="text-right" style={X_BUTTON_STYLE} onClick={this.handleCloseModal}>×</span>
                 <h6>Gene search</h6>
                 <GeneSearchBox
+                    navContext={this.props.selectedRegion.getNavigationContext()}
+                    onRegionSelected={this.props.onRegionSelected}
+                    handleCloseModal = {this.handleCloseModal}
+                    onToggleHighlight={this.props.onToggleHighlight}
+                    onSetEnteredRegion={this.props.onSetEnteredRegion}
+                />
+                <h6 style={{marginTop: "5px"}}>SNP search</h6>
+                <SnpSearchBox
                     navContext={this.props.selectedRegion.getNavigationContext()}
                     onRegionSelected={this.props.onRegionSelected}
                     handleCloseModal = {this.handleCloseModal}

@@ -100,7 +100,7 @@ class RegionSetConfig extends React.Component {
             try{
                 const locus = ChromosomeInterval.parse(symbol);
                 if (locus) {
-                    return new Feature(symbol, locus);
+                    return new Feature(symbol, locus, '+'); // coordinates default have + as strand
                 }
             }catch(error) {
             }
@@ -115,7 +115,10 @@ class RegionSetConfig extends React.Component {
                         return new Feature(gene.name, new ChromosomeInterval(gene.chrom, gene.txStart, gene.txEnd), gene.strand);
                     }
                 });
-                return hits[0] || null;
+                const hits2 = hits.filter(hit => hit); // removes undefined
+                if ( hits2.length === 0 ) {return null;}
+                // console.log(hits2);
+                return hits2[0] || null;
             } else {
                 return item;
             }
@@ -128,7 +131,7 @@ class RegionSetConfig extends React.Component {
         }
         this.setState({loadingMsg: ''});
         // return parsed2.filter(item => item !== null);
-        const set = new RegionSet("New set",parsed2.filter(item => item !== null), this.props.genome, new FlankingStrategy());
+        const set = new RegionSet("New set", parsed2.filter(item => item !== null), this.props.genome, new FlankingStrategy());
         this.setState({set});
     }
 
@@ -319,10 +322,10 @@ class RegionSetConfig extends React.Component {
                     onNewStrategy={this.changeSetStrategy}
                 />
                 <div>
-                <button className="btn btn-sm btn-primary"
+                <button className="btn btn-sm btn-success"
                     onClick={() => this.props.onSetConfigured(this.state.set)}
                     disabled={this.isSaveButtonDisabled()}
-                >Add Set
+                >Add set & Save changes
                 </button> <button className="btn btn-sm btn-secondary" onClick={this.cancelPressed}>Cancel</button>
                 </div>
             </React.Fragment>

@@ -10,6 +10,7 @@ import { AppStateSaver } from '../model/AppSaveLoad';
 import { ActionCreators } from "../AppState";
 import LoadSession from "./LoadSession";
 import { CopyToClip } from './CopyToClipboard';
+import { readFileAsText } from '../util';
 
 import './SessionUI.css';
 
@@ -102,6 +103,29 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         this.setRandomLabel();
     }
 
+    downloadSession = (asHub = false): any => {
+        const {browser} = this.props;
+        const bundle = this.getBundle();
+        const sessionInJSON = new AppStateSaver().toObject(browser.present);
+        const content = asHub ? (sessionInJSON as any).tracks : sessionInJSON;
+        const descriptor = asHub ? 'hub' : 'session';
+        const sessionString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(content));
+        const dl = document.createElement("a");
+        document.body.appendChild(dl); // This line makes it work in Firefox.
+        dl.setAttribute("href", sessionString);
+        dl.setAttribute("download", `eg-${descriptor}-${bundle.currentId}-${bundle.bundleId}.json`);
+        dl.click();
+        notify.show('Session downloaded!', 'success', 2000);
+    }
+
+    downloadAsSession = () => {
+        this.downloadSession(false);
+    }
+
+    downloadAsHub = () => {
+        this.downloadSession(true);
+    }
+
     setSessionLabel = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({newSessionLabel: event.target.value.trim()});
     }
@@ -190,6 +214,14 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         return <LoadSession bundleId={retrieveId} />;
     }
 
+    uploadSession = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const contents = await readFileAsText(event.target.files[0]);
+        this.props.onRestoreSession(JSON.parse(contents as string));
+        if (!this.props.withGenomePicker) {
+            notify.show('Session uploaded and restored.', 'success', 2000);
+        }
+    }
+
     render() {
         return (
         <div>
@@ -199,10 +231,14 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                         value={this.state.retrieveId}
                         onChange={this.setRetrieveId}/>
                 </label>
-            <button className="SessionUI btn btn-info" onClick={this.retrieveSession}>Retrieve session</button></div>
+                <button className="SessionUI btn btn-info" onClick={this.retrieveSession}>Retrieve session</button>
+                <div className="SessionUI-upload-btn-wrapper">
+                    <button className="SessionUI btn btn-success">Upload session</button>
+                    <input type="file" name="sessionfile" onChange={this.uploadSession} />
+                </div>
+            </div>
             {!this.props.withGenomePicker && 
                 <React.Fragment>
-                    <button className="SessionUI btn btn-primary" onClick={this.saveSession}>Save session</button>
                     <div>
                         <p>Session bundle Id: {this.props.bundleId} <CopyToClip value={this.props.bundleId} /></p>
                         <label htmlFor="sessionLabel">
@@ -218,6 +254,13 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                             > Random name</button>
                         </label>
                     </div>
+                    <button className="SessionUI btn btn-primary" onClick={this.saveSession}>Save session</button>
+                    {' '}
+                    <button className="SessionUI btn btn-success" onClick={this.downloadAsSession}>
+                        Download current session</button>
+                    {' '}
+                    <button className="SessionUI btn btn-info" onClick={this.downloadAsHub}>
+                        Download as datahub</button>
                 </React.Fragment>
             }
             {this.renderSavedSessions()}

@@ -55,6 +55,13 @@
             "filetype": "geneAnnotation"
         }
     ],
+    "Variation": [
+        {
+            "name": "Snp",
+            "label": "Snps from Ensembl",
+            "type": "snp"
+        }
+    ],
     "RepeatMasker": {
         "All Repeats": [
             {
@@ -155,7 +162,6 @@
             "name": "mm10tohg38",
             "label": "Mouse mm10 to hg38 blastz",
             "querygenome": "mm10",
-            "metadata": {"genome": "mm10"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_mm10_axt.gz"
         },
@@ -163,7 +169,6 @@
             "name": "panTro5tohg38",
             "label": "Chimpanzee panTro5 to hg38 blastz",
             "querygenome": "panTro5",
-            "metadata": {"genome": "panTro5"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_panTro5_axt.gz",
             "details": {
@@ -175,7 +180,6 @@
             "name": "rheMac3tohg38",
             "label": "Rhesus Macaque rheMac3 to hg38 blastz",
             "querygenome": "rheMac3",
-            "metadata": {"genome": "rheMac3"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rheMac3_axt.gz"
         },
@@ -183,7 +187,6 @@
             "name": "rn5tohg38",
             "label": "Rat rn5 to hg38 blastz",
             "querygenome": "rn5",
-            "metadata": {"genome": "rn5"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rn5_axt.gz"
         }

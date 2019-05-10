@@ -61,6 +61,7 @@ class App extends React.Component {
             // isShowingNavigator: true,
             highlightEnteredRegion: true,
             enteredRegion: null,
+            highlightColor: "rgba(255, 255, 0, 0.3)", // light yellow
             publicHubs: [],
             publicTracksPool: [],
             customTracksPool: [],
@@ -91,11 +92,27 @@ class App extends React.Component {
             if (nextProps.genomeConfig.publicHubList) {
                 this.setState({
                     publicHubs: nextProps.genomeConfig.publicHubList.slice(),
-                })
+                });
+            } else {  // when switch genome, need reset hub as well
+                this.setState({
+                    publicHubs: [],
+                });
+            }
+            this.setState({publicTracksPool: [], customTracksPool: []});
+        }
+        if (nextProps.publicTracksPool !== this.props.publicTracksPool) {
+            if (nextProps.publicTracksPool) {
+                this.setState({publicTracksPool: nextProps.publicTracksPool});
+            } else {
+                this.setState({publicTracksPool: []});
             }
         }
-        if (nextProps.customTracksPool && nextProps.customTracksPool !== this.props.customTracksPool) {
-            this.setState({customTracksPool: nextProps.customTracksPool});
+        if (nextProps.customTracksPool !== this.props.customTracksPool) {
+            if (nextProps.customTracksPool) {
+                this.setState({customTracksPool: nextProps.customTracksPool});
+            } else {
+                this.setState({customTracksPool: []});
+            }
         }
     }
 
@@ -176,6 +193,26 @@ class App extends React.Component {
         this.setState({enteredRegion: interval});
     }
 
+    setHighlightColor = (color) => {
+        const rgb = color.rgb;
+        this.setState({highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`});
+    }
+
+    groupTrackByGenome = () => {
+        const {genomeConfig, tracks} = this.props;
+        const grouped = {}; // key: genome name like `hg19`, value: a set of track name or url
+        tracks.forEach(track => {
+            const gname = track.getMetadata('genome');
+            const targeName = gname ? gname : genomeConfig.genome.getName();
+            if (grouped[targeName]) {
+                grouped[targeName].add(track.url || track.name);
+            } else {
+                grouped[targeName] = new Set([track.url || track.name]);
+            }
+        });
+        return grouped;
+    }
+
     render() {
         const {genomeConfig, viewRegion, tracks, onNewViewRegion, bundleId, 
                 sessionFromUrl, trackLegendWidth, onLegendWidthChange, 
@@ -198,6 +235,7 @@ class App extends React.Component {
         ]);
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
+        const groupedTrackSets = this.groupTrackByGenome();
         return (
         <div className="App container-fluid">
             <Nav
@@ -207,6 +245,7 @@ class App extends React.Component {
                 onToggle3DScene={this.toggle3DScene}
                 onToggleHighlight={this.toggleHighlight}
                 onSetEnteredRegion={this.setEnteredRegion}
+                onSetHighlightColor={this.setHighlightColor}
                 selectedRegion={viewRegion}
                 onRegionSelected={onNewViewRegion} 
                 tracks={tracks}
@@ -224,6 +263,7 @@ class App extends React.Component {
                 addTracktoAvailable={this.addTracktoAvailable}
                 addTermToMetaSets={this.addTermToMetaSets}
                 embeddingMode={embeddingMode}
+                groupedTrackSets={groupedTrackSets}
             />
              <Notifications />
             {isShowingNavigator &&
@@ -234,7 +274,8 @@ class App extends React.Component {
                 <ErrorBoundary><BrowserScene viewRegion={viewRegion} tracks={tracks} expansionAmount={REGION_EXPANDER} /></ErrorBoundary>
             }
             <TrackContainer 
-                enteredRegion={this.state.enteredRegion} 
+                enteredRegion={this.state.enteredRegion}
+                highlightColor={this.state.highlightColor}
                 highlightEnteredRegion={this.state.highlightEnteredRegion}
                 expansionAmount={REGION_EXPANDER}
                 suggestedMetaSets={this.state.suggestedMetaSets}

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Straw from 'hic-straw';
+import Straw from 'hic-straw/src/straw';
 import DataSource from './DataSource';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import { NormalizationMode } from '../model/HicDataModes';
@@ -45,7 +45,13 @@ export class HicSource extends DataSource {
      */
     constructor(url) {
         super();
-        this.straw = new Straw({ path: url });
+        let config;
+        if (typeof url === 'string') {
+            config = { path: url };
+        } else {
+            config = { blob: url };
+        }
+        this.straw = new Straw(config);
         // this.datasetPromise = this.straw.reader.loadDataset({});
         // this.metadataPromise = null;
         // this.normVectorsPromise = null;
@@ -149,7 +155,8 @@ export class HicSource extends DataSource {
             }
         }
         const dataForEachSegment = await Promise.all(promises);
-        return ensureMaxListLength(_.flatMap(dataForEachSegment), 5000);
+        return _.flatMap(dataForEachSegment);
+        // return ensureMaxListLength(_.flatMap(dataForEachSegment), 5000);
     }
 
     /**

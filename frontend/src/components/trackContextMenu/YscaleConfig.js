@@ -18,7 +18,7 @@ function YscaleConfig(props) {
             defaultValue={10}
             hasSetButton={true} // when type 0.5 before you type 5 browser trying to set the scale and get fail
         />
-        <PrimaryAboveColorConfig {...props} />
+        { props.optionsObjects[0].colorAboveMax && <PrimaryAboveColorConfig {...props} /> }
         <NumberConfig {...props} 
             optionName="yMin" 
             label="Y-axis min:" 
@@ -26,7 +26,7 @@ function YscaleConfig(props) {
             hasSetButton={true}
             defaultValue={0}
         />
-        <SecondaryBelowColorConfig {...props} />
+        { props.optionsObjects[0].color2BelowMin && <SecondaryBelowColorConfig {...props} /> }
     </React.Fragment> : null;
     return (
         <React.Fragment> 

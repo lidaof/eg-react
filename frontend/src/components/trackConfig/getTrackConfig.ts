@@ -17,6 +17,9 @@ import { GenomeAlignTrackConfig } from './GenomeAlignTrackConfig';
 import { RulerTrackConfig } from './RulerTrackConfig';
 import { TrackModel } from '../../model/TrackModel';
 import { RefBedTrackConfig } from './RefBedTrackConfig';
+import { SnpTrackConfig } from './SnpTrackConfig';
+import { MatplotTrackConfig } from './MatplotTrackConfig';
+import { HammockTrackConfig } from './HammockTrackConfig';
 
 export const INTERACTION_TYPES = ['hic', 'longrange', 'biginteract'];
 
@@ -37,7 +40,10 @@ const TYPE_NAME_TO_CONFIG = {
     "methylc": MethylCTrackConfig,
     "repeatmasker": RepeatMaskerTrackConfig,
     "genomealign": GenomeAlignTrackConfig,
+    "snp": SnpTrackConfig,
     "ruler": RulerTrackConfig,
+    "matplot": MatplotTrackConfig,
+    "hammock": HammockTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

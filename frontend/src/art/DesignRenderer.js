@@ -56,6 +56,19 @@ class CanvasDesignRenderer extends React.PureComponent {
      * Redraws the canvas.
      */
     componentDidUpdate(prevProps) {
+        const pixelRatio = this.getPixelRatioSafely();
+        if (pixelRatio !== 1) {
+            const width = this.props.width;
+            const height = this.props.height;
+            // this.canvasNode.parentNode.style.width = width + 'px';
+            // this.canvasNode.parentNode.style.height = height + 'px';
+            this.canvasNode.style.width = width + 'px';
+            this.canvasNode.style.height = height + 'px';
+            this.canvasNode.setAttribute('width', width * pixelRatio);
+            this.canvasNode.setAttribute('height', height * pixelRatio);
+            const context = this.canvasNode.getContext("2d");
+            context.scale(pixelRatio, pixelRatio);
+        }
         this.draw(this.canvasNode);
     }
 
@@ -91,10 +104,59 @@ class CanvasDesignRenderer extends React.PureComponent {
                 context.arc(props.cx, props.cy, props.r, 0, 2 * Math.PI, false);
                 context.stroke();
                 break;
+            // case 'polyline':
+            //     context.strokeStyle = props.stroke;
+            //     context.lineWidth = props.strokeWidth;
+            //     context.beginPath();
+            //     const points = props.points.split(' ');
+            //     const [x1, y1] = points[0].split(',');
+            //     context.moveTo(x1, y1);
+            //     let x, y;
+            //     for (let i = 1; i++; i < points.length) {
+            //         if (points[i]) {
+            //             [x, y] = points[i].split(',');
+            //             context.lineTo(x, y);
+            //         }
+            //     }
+            //     context.stroke();
+            //     break;
+            case 'polygon':
+                context.fillStyle = props.fill;
+                context.globalAlpha = props.opacity || 1;
+                context.beginPath();
+                context.moveTo(props.points[0][0], props.points[0][1]);
+                context.lineTo(props.points[1][0], props.points[1][1]);
+                context.lineTo(props.points[2][0], props.points[2][1]);
+                context.lineTo(props.points[3][0], props.points[3][1]);
+                context.closePath();
+                context.fill();
+                break;
+            case 'path':
+                context.fillStyle = props.fill;
+                context.globalAlpha = props.opacity || 1;
+                context.strokeStyle = props.stroke;
+                context.lineWidth = props.strokeWidth;
+                const path = new Path2D(props.d);
+                context.stroke(path);
+                break;
             case undefined:
                 break;
             default:
                 console.error(`Drawing '${element.type}'s is unsupported.  Ignoring...`);
+        }
+    }
+
+    /**
+     * Gets the device's pixel ratio.  Guaranteed to be a number greater than 0.
+     * 
+     * @return {number} this device's pixel ratio
+     */
+    getPixelRatioSafely = () => {
+        const pixelRatio = window.devicePixelRatio;
+        if (Number.isFinite(pixelRatio) && pixelRatio > 0) {
+            return pixelRatio;
+        } else {
+            return 1;
         }
     }
 

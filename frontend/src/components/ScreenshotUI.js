@@ -32,7 +32,7 @@ class ScreenshotUINotConnected extends React.Component {
       return "data:image/svg+xml," + encodeURIComponent(svgAsXML);
     }
 
-    downloadSvg = () => {
+    prepareSvg = () => {
         const tracks = Array.from(document.querySelector('#screenshotContainer').querySelectorAll('.Track'));
         const boxHeight = tracks.reduce( (acc, cur) => acc + cur.clientHeight, 11 * tracks.length );
         const boxWidth = tracks[0].clientWidth;
@@ -41,6 +41,7 @@ class ScreenshotUINotConnected extends React.Component {
         svgElem.setAttributeNS(null, "viewBox", "0 0 " + boxWidth + " " + boxHeight);
         svgElem.setAttributeNS(null, "width", boxWidth + "");
         svgElem.setAttributeNS(null, "height", boxHeight + "");
+        svgElem.setAttributeNS(null,"font-family","Arial, Helvetica, sans-serif");
         svgElem.style.display = "block";
         const svgElemg = document.createElementNS (xmlns, "g"); // for labels, separate lines etc
         const svgElemg2 = document.createElementNS (xmlns, "g"); // for tracks contents
@@ -74,6 +75,7 @@ class ScreenshotUINotConnected extends React.Component {
                 });
             }
             // deal with track contents
+            const options = this.props.tracks[idx].options;
             const eleSvgs = ele.children[1].querySelectorAll('svg'); // bi-directional numerical track has 2 svgs!
             const trackG = document.createElementNS (xmlns, "g");
             if (eleSvgs.length > 0) {
@@ -82,6 +84,16 @@ class ScreenshotUINotConnected extends React.Component {
                     eleSvg.setAttribute("id", "svg"+idx+idx2);
                     eleSvg.setAttribute("x", x + "");
                     eleSvg.setAttribute("y", idx2 * eleSvg.clientHeight  + y + "");
+                    if (options && options.backgroundColor) {
+                        const rect = document.createElementNS(xmlns, 'rect');
+                        rect.setAttribute('id', 'backRect'+idx);
+                        rect.setAttribute("x", x + "");
+                        rect.setAttribute("y", idx2 * eleSvg.clientHeight  + y + "");
+                        rect.setAttribute('width', eleSvg.clientWidth+'');
+                        rect.setAttribute('height', eleSvg.clientHeight+'');
+                        rect.setAttribute('fill', options.backgroundColor);
+                        trackG.appendChild(rect);
+                    }
                     trackG.appendChild(eleSvg);    
                 }); 
             }
@@ -89,7 +101,7 @@ class ScreenshotUINotConnected extends React.Component {
             svgElemg2.appendChild(trackG);
             // metadata ?
             y += trackHeight;
-            y += 2; //draw separare line
+            // y += 1; //draw separare line
             const sepLine = document.createElementNS(xmlns,'line');
             sepLine.setAttribute('id','line'+idx);
             sepLine.setAttribute('x1','0');
@@ -98,7 +110,7 @@ class ScreenshotUINotConnected extends React.Component {
             sepLine.setAttribute('y2',y + "");
             sepLine.setAttribute("stroke", "lightgray")
             svgElemg.appendChild(sepLine);
-            y += 2;
+            // y += 1;
             x = 0;
             clipX = legendWidth - 1;
         });
@@ -118,21 +130,55 @@ class ScreenshotUINotConnected extends React.Component {
         svgElem.appendChild(svgElemg);
         svgElem.appendChild(svgElemg2);
         svgElem.setAttribute("xmlns", xmlns);
-
+        return new XMLSerializer().serializeToString(svgElem);      
+    }
+    
+    downloadSvg = () => {
+        const svgContent = this.prepareSvg();
+        const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+        const svgBlob = new Blob([preface, svgContent], {type:"image/svg+xml;charset=utf-8"});
+        const svgUrl = URL.createObjectURL(svgBlob);
         const dl = document.createElement("a");
         document.body.appendChild(dl); // This line makes it work in Firefox.
         //dl.setAttribute("href", this.svgDataURL(svgElem)); //chrome network error on svg > 1MB
-        const preface = '<?xml version="1.0" standalone="no"?>\r\n';
-        const svgBlob = new Blob([preface, new XMLSerializer().serializeToString(svgElem)], {type:"image/svg+xml;charset=utf-8"});
-        const svgUrl = URL.createObjectURL(svgBlob);
         dl.setAttribute("href", svgUrl);
         dl.setAttribute("download", (new Date()).toISOString() + "_eg.svg");
         dl.click();
         this.setState({display: "none", buttonDisabled: "disabled"});
-      }
+        const pdfContainer = document.getElementById('pdfContainer');
+        pdfContainer.innerHTML = svgContent;
+    }
+    
+    downloadPdf = () => {
+        const svgContent = this.prepareSvg();
+        const tracks = Array.from(document.querySelector('#screenshotContainer').querySelectorAll('.Track'));
+        const boxHeight = tracks.reduce( (acc, cur) => acc + cur.clientHeight, 11 * tracks.length );
+        const boxWidth = tracks[0].clientWidth;
+        // create a new jsPDF instance
+        const pdf = new jsPDF('l', 'px', [boxWidth, boxHeight]);
+        const pdfContainer = document.getElementById('pdfContainer');
+        pdfContainer.innerHTML = svgContent;
+        // render the svg element
+        svg2pdf(pdfContainer.firstElementChild, pdf, {
+            xOffset: 0,
+            yOffset: 0,
+            scale: 1
+        });
+        // get the data URI
+        // const uri = pdf.output('datauristring');
+        // const pdfBlob = new Blob([uri], {type:"application/pdf"});
+        // const pdfUrl = URL.createObjectURL(pdfBlob);
+        // const dl = document.createElement("a");
+        // document.body.appendChild(dl); // This line makes it work in Firefox.
+        // dl.setAttribute("href", pdfUrl);
+        // dl.setAttribute("download", (new Date()).toISOString() + "_eg.pdf");
+        // dl.click();
+        pdf.save((new Date()).toISOString() + "_eg.pdf");
+        this.setState({display: "none", buttonDisabled: "disabled"});
+    }
 
     makeSvgTrackElements() {
-        const {tracks, trackData, primaryView, metadataTerms} = this.props;
+        const {tracks, trackData, primaryView, metadataTerms, viewRegion} = this.props;
         const trackSvgElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
@@ -147,9 +193,10 @@ class ScreenshotUINotConnected extends React.Component {
                 xOffset={0}
                 index={index}
                 forceSvg={true}
+                selectedRegion={viewRegion}
+                zoomAnimation={0}
             />
         });
-        
         return trackSvgElements;
     }
 
@@ -159,16 +206,28 @@ class ScreenshotUINotConnected extends React.Component {
             <div>
                 <p>Please wait the following browser view finish loading, <br />
                 then click the Download button below to download the browser view as a SVG file.</p>
+                <div className="font-italic">
+                    <strong>Download SVG</strong> is recommended.
+                </div>
                 <button 
-                    className="btn btn-success btn-sm" 
+                    className="btn btn-primary btn-sm" 
                     style={{marginBottom: "2ch"}}
                     onClick={this.downloadSvg} 
                     disabled={this.state.buttonDisabled}
                 >
-                    ⬇ Download</button>
+                    ⬇ Download SVG</button>
+                    {' '}
+                    <button 
+                    className="btn btn-success btn-sm" 
+                    style={{marginBottom: "2ch"}}
+                    onClick={this.downloadPdf} 
+                    disabled={this.state.buttonDisabled}
+                >
+                    ⬇ Download PDF</button>
                 <div id="screenshotContainer" style={{display: this.state.display}}>
                     {trackContents}
                 </div>
+                <div id="pdfContainer"></div>
             </div>
         );
     }

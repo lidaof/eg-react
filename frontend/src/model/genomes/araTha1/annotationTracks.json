@@ -1,0 +1,16 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "gene",
+            "label": "TAIR10 genes",
+            "filetype": "geneAnnotation"
+        }
+    ]
+}

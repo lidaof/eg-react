@@ -14,6 +14,10 @@
     padding: 8px 5px;
 }
 
+.TrackContextMenu-item label {
+    cursor: pointer;
+}
+
 .TrackContextMenu-hoverable-item:hover {
     background-color: #20a0ff;
 }
@@ -69,4 +73,8 @@
 
 .Collapsible__trigger.is-open:after {
     transform: rotate(0deg); 
+}
+
+.btn-tight {
+    padding: 0;
 }

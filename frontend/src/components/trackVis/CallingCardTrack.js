@@ -87,14 +87,14 @@ class CallingCardTrack extends React.PureComponent {
     renderTooltip(relativeX) {
         const {trackModel, viewRegion, width} = this.props;
         const value = this.xToValue[Math.round(relativeX)];
-        const stringValue = value.length > 0 ? this.formatCards(value) : '(no data)';
+        const stringValue = value !== undefined && value.length > 0 ? this.formatCards(value) : '(no data)';
         return (
         <div>
-            <div className="Tooltip-minor-text" >
+            <div className="Tooltip-minor-text">
                 <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
             </div>
-            <div className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</div>
-            <div>{stringValue}</div>
+            <div className="Tooltip-minor-text">{trackModel.getDisplayLabel()}</div>
+            <div className="Tooltip-minor-text">{stringValue}</div>
         </div>
         );
     }

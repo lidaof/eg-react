@@ -8,6 +8,8 @@ import unbgzf from '../../vendor/igv/bgzf';
 
 if (process.env.NODE_ENV !== "test" && typeof window === "undefined") {
     self.importScripts('js/zlib_and_gzip.min.js'); // eslint-disable-line no-restricted-globals
+    self.importScripts('js/encoding-indexes.js'); // eslint-disable-line no-restricted-globals
+    self.importScripts('js/encoding.js'); // eslint-disable-line no-restricted-globals
 } // else that script have better been included in a <script> tag!
 
 const MAX_GZIP_BLOCK_SIZE = 1 << 16;

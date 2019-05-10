@@ -1,0 +1,45 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "refGene",
+            "label": "RefSeq genes",
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://vizhub.wustl.edu/public/bosTau8/rmsk16.bb",
+                "height": 30
+            }
+        ]
+    },
+    "Genome Annotation": [
+        {
+            "type": "bed",
+            "name": "CpG Islands",
+            "url": "https://epgg-test.wustl.edu/d/bosTau8/cpgisland.gz",
+            "height": 30
+        }
+    ],
+    "Genome Comparison": [
+        {
+            "name": "mm10tobosTau8",
+            "label": "Mouse mm10 to bosTau8 blastz",
+            "querygenome": "mm10",
+            "metadata": {"genome": "mm10"},
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/bosTau8/weaver/bosTau8_mm10_axt.gz"
+        }
+    ]
+}

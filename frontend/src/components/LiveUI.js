@@ -59,9 +59,9 @@ class LiveUI extends React.Component {
                 <div>
                     <button className="btn btn-primary" onClick={this.goLive}>Go Live</button>
                     <p>
-                        How this works: Click the button above will navigate you to a new link, <br/>
+                        How this works: Clicking on the button above will navigate you to a new link, <br/>
                         which you can share with your PI, collaborators or friends. <br/>
-                        What you see on the screen will be seen by them too, at real time.
+                        What you see on the screen will be seen by them too, in real time.
                     </p>
                     <button className="btn btn-warning" onClick={this.endLive}>End Live</button>
                     { this.state.shouldGoHome &&

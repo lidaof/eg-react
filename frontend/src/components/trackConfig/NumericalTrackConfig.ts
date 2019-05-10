@@ -5,6 +5,8 @@ import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from 
 import HeightConfig from '../trackContextMenu/HeightConfig';
 import YscaleConfig from '../trackContextMenu/YscaleConfig';
 import { TrackModel } from '../../model/TrackModel';
+import AggregateConfig from '../trackContextMenu/AggregateConfig';
+import SmoothConfig from '../trackContextMenu/SmoothConfig';
 
 export class NumericalTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -14,6 +16,8 @@ export class NumericalTrackConfig extends TrackConfig {
 
     getMenuComponents() {
         return [...super.getMenuComponents(), NumericalDisplayModeConfig, HeightConfig, YscaleConfig, 
+            AggregateConfig,
+            SmoothConfig,
             PrimaryColorConfig,
             SecondaryColorConfig,
             BackgroundColorConfig];

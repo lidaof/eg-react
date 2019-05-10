@@ -136,7 +136,8 @@ class VrRulerTextFactory {
     }
 
     majorTickText(x, text) {
-        return this._makeTextGeometry(text, x, this.majorTextSize);
+        // return this._makeTextGeometry(text, x, this.majorTextSize);
+        return null;
     }
 
     minorTick(x) {

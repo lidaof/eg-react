@@ -35,6 +35,7 @@ import ButtonGroup from './ButtonGroup';
 import TrackRegionController from '../genomeNavigator/TrackRegionController';
 
 import ReorderMany from './ReorderMany';
+import { niceBpCount } from '../../util';
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
@@ -297,6 +298,22 @@ class TrackContainer extends React.Component {
         this.changeTrackSelection(Array(this.props.tracks.length).fill(false));
     }
 
+    /** 
+     * happens when user selects matplot
+     */
+    applyMatPlot = (tracks) => {
+        // console.log(tracks);
+        // const tracksLeft = this.props.tracks.filter(tk => !tk.isSelected);
+        const newTrack = new TrackModel({
+            type: 'matplot',
+            name: 'matplot wrap',
+            tracks,
+        });
+        // const newTracks = [...tracksLeft, newTrack];
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    }
+    
     // End callback methods
     ////////////////////
     // Render methods //
@@ -337,6 +354,7 @@ class TrackContainer extends React.Component {
                 <ButtonGroup buttons={panRightButton} />
                 <div><UndoRedo /></div>
                 <div><History /></div>
+                <div><PixelInfo basesPerPixel={this.props.basesPerPixel} viewRegion={viewRegion} /></div>
                 <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} suggestedMetaSets={suggestedMetaSets} />
             </div>;
     }
@@ -345,7 +363,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const {tracks, trackData, primaryView, metadataTerms} = this.props;
+        const {tracks, trackData, primaryView, metadataTerms, viewRegion} = this.props;
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
@@ -364,6 +382,7 @@ class TrackContainer extends React.Component {
                 onContextMenu={this.handleContextMenu}
                 onClick={this.handleTrackClicked}
                 onMetadataClick={this.handleMetadataClicked}
+                selectedRegion={viewRegion}
             />
         });
         return trackElements;
@@ -426,13 +445,14 @@ class TrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView, viewRegion} = this.props;
+        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView, viewRegion, highlightColor} = this.props;
         const { selectedTool } = this.state;
         const contextMenu = <TrackContextMenu 
                                 tracks={tracks} 
                                 onTracksChanged={onTracksChanged} 
                                 deselectAllTracks={this.deselectAllTracks} 
                                 onCircletRequested={this.handleOpenModal}
+                                onApplyMatplot={this.applyMatPlot}
                             />;
         const trackDivStyle = {
                                 border: "1px solid black", 
@@ -449,6 +469,7 @@ class TrackContainer extends React.Component {
                                 xOffset={this.state.xOffset}>
                             <HighlightRegion 
                                 enteredRegion={enteredRegion}
+                                highlightColor={highlightColor}
                                 highlightEnteredRegion={highlightEnteredRegion}
                                 visData={primaryView}
                                 xOffset={this.state.xOffset}
@@ -470,3 +491,10 @@ class TrackContainer extends React.Component {
 }
 
 export default withEnhancements(TrackContainer);
+
+function PixelInfo(props) {
+    const {basesPerPixel, viewRegion} = props;
+    const viewBp = niceBpCount(viewRegion.getWidth());
+    const span = niceBpCount(basesPerPixel, true);
+    return <span className="font-italic">Viewing a {viewBp} region, 1 pixel spans {span}</span>;
+}

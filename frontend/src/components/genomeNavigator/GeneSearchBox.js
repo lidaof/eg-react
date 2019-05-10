@@ -16,6 +16,7 @@ import SpeechRecognition from 'react-speech-recognition';
 import '../../autosuggest.css';
 import './GeneSearchBox.css';
 import { AWS_API } from '../../dataSources/GeneSource';
+import { notify } from 'react-notify-toast';
 
 const MIN_CHARS_FOR_SUGGESTIONS = 3; // Minimum characters to type before displaying suggestions
 const ENTER_KEY_CODE = 13;
@@ -110,7 +111,7 @@ class GeneSearchBox extends React.PureComponent {
             this.props.handleCloseModal();
             this.props.onSetEnteredRegion(interval);
         } else {
-            alert("Gene not available in current region set view"); // TODO better message
+            notify.show("Gene not available in current region set view",  'error', 2000);
         }
         this.setState({isShowingIsoforms: false});
     }

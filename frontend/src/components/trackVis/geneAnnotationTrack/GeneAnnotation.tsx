@@ -72,7 +72,7 @@ export class GeneAnnotation extends React.Component<GeneAnnotationProps> {
     _renderCenteredRects(placedSegments: PlacedSegment[], height: number, color: string) {
         return placedSegments.map(placedSegment => {
             const x = placedSegment.xSpan.start;
-            const width = placedSegment.xSpan.getLength();
+            const width = Math.max(placedSegment.xSpan.getLength(), 3); // min 3 px for exon
             return <rect key={x} x={x} y={(HEIGHT - height) / 2} width={width} height={height} fill={color} />;
         });
     }

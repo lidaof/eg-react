@@ -36,10 +36,10 @@ export function NumericalDisplayModeConfig(props) {
 
 export function InteractionDisplayModeConfig(props) {
     return <SelectConfig
-        {...props}
-        optionName="displayMode"
-        label="Display mode:"
-        defaultValue={InteractionDisplayMode.HEATMAP}
-        choices={InteractionDisplayMode}
-    />;
+            {...props}
+            optionName="displayMode"
+            label="Display mode:"
+            defaultValue={InteractionDisplayMode.HEATMAP}
+            choices={InteractionDisplayMode}
+        />;
 }

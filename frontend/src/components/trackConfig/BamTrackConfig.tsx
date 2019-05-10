@@ -2,7 +2,7 @@ import React from 'react';
 import { AnnotationTrackConfig } from './AnnotationTrackConfig';
 
 import BamSource from '../../dataSources/BamSource';
-import { BamRecord } from '../../model/BamRecord';
+import { BamAlignment } from '../../model/BamAlignment';
 import { TrackModel } from '../../model/TrackModel';
 
 import BamTrack from '../trackVis/bamTrack/BamTrack';
@@ -14,7 +14,7 @@ export class BamTrackConfig extends AnnotationTrackConfig {
         this.setDefaultOptions({
             mismatchColor: 'yellow',
             deletionColor: 'black',
-            insertionColor: 'green'
+            insertionColor: 'green',
         });
     }
 
@@ -23,7 +23,7 @@ export class BamTrackConfig extends AnnotationTrackConfig {
     }
 
     formatData(data: any[]) {
-        return BamRecord.makeBamRecords(data);
+        return BamAlignment.makeBamAlignments(data);
     }
 
     getComponent() {

@@ -4,18 +4,24 @@ import MM10 from './mm10/mm10';
 import DAN_RER10 from './danRer10/danRer10';
 import PANTRO5 from './panTro5/panTro5';
 import RN6 from './rn6/rn6';
+import MM9 from './mm9/mm9';
+import BosTau8 from './bosTau8/bosTau8';
+import AraTha1 from './araTha1/araTha1';
 import { GenomeConfig } from './GenomeConfig';
 
 /**
  * All available genomes.
  */
-const allGenomes = [
+export const allGenomes = [
     HG19,
     HG38,
     MM10,
+    MM9,
     PANTRO5,
+    BosTau8,
     DAN_RER10,
     RN6,
+    AraTha1,
 ];
 
 const genomeNameToConfig = {};
@@ -47,8 +53,13 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
     },
     mouse: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Mouse.png',
-        assemblies: [ MM10.genome.getName() ],
-        color: 'white',
+        assemblies: [ MM10.genome.getName(), MM9.genome.getName() ],
+        color: 'yellow',
+    },
+    cow: {
+        logoUrl: 'https://vizhub.wustl.edu/public/bosTau8/Cow.png',
+        assemblies: [ BosTau8.genome.getName() ],
+        color: 'yellow',
     },
     rat: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Rat.png',
@@ -58,6 +69,11 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
     zebrafish: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
         assemblies: [ DAN_RER10.genome.getName() ],
+        color: 'yellow',
+    },
+    arabidopsis: {
+        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png',
+        assemblies: [ AraTha1.genome.getName() ],
         color: 'yellow',
     },
 };

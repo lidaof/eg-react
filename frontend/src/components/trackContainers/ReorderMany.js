@@ -27,7 +27,10 @@ const gridItemStyles = {
     cursor: 'move'
 };
 
-const GridItem = SortableElement(({ value }) => <div style={gridItemStyles}>{value.label}</div>);
+const GridItem = SortableElement(({ value }) => {
+    const style = value.options ? {color: value.options.color} : null;
+    return <div style={gridItemStyles}><span style={style}>{value.label} ({value.type})</span></div>;
+});
 
 const Grid = SortableContainer(({ items, colNum }) => {
     const gridStyles = {
@@ -152,16 +155,19 @@ class ReorderMany extends React.Component {
                     shouldCloseOnOverlayClick={true}
                 >
                     <div className="ReorderMany">
-                        <h5>Please drag and drop to re-order you tracks, press Apply button after done:</h5>
+                        <h5>Please drag and drop to re-order your tracks. Press the apply button after you are done.</h5>
                         <button
                             onClick={() => this.props.onTracksChanged(this.state.items)}
                             className="btn btn-sm btn-info"
                         >
                             Apply
-                        </button>{' '}
-                        <button onClick={this.props.onCloseReorderManyModal} className="btn btn-sm btn-danger">
-                            Close
                         </button>
+                        <span
+                            className="text-right" 
+                            style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px", zIndex: 2}}
+                            onClick={this.props.onCloseReorderManyModal}>
+                            ×
+                        </span>
                         <p>You can adjust column numbers using the slider below:</p>
                         {this.renderSlider()}
                         <Grid

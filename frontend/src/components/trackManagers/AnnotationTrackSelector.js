@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import TrackModel from '../../model/TrackModel';
 import TreeView from './TreeView';
-import withCurrentGenome from '../withCurrentGenome';
 
 /**
  * 
@@ -44,7 +43,7 @@ function convertAnnotationJsonSchema(schemaNode, nodeLabel) {
  * 
  * @author Silas Hsu
  */
-class AnnotationTrackSelector extends React.Component {
+export class AnnotationTrackSelector extends React.Component {
     static propTypes = {
         genomeConfig: PropTypes.object.isRequired,
         addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
@@ -71,22 +70,32 @@ class AnnotationTrackSelector extends React.Component {
     }
 
     addLeafTrack(trackModel) {
-        trackModel.genome = this.props.genomeConfig.genome.getName();
+        const genomeName = this.props.genomeConfig.genome.getName();
+        // trackModel.genome = genomeName;
+        const label = this.props.addGenomeLabel ? `${trackModel.label} (${genomeName})` : trackModel.label;
+        trackModel.label = label; // fix the problem when refresh added genome label is gone
+        trackModel.options = {...trackModel.options, label};
+        trackModel.metadata = {...trackModel.metadata, genome: genomeName};
         this.props.onTracksAdded(trackModel);
     }
 
     renderLeaf(trackModel) {
-        if (this.props.addedTrackSets.has(trackModel.name) || this.props.addedTrackSets.has(trackModel.url)) {
-            return <div>{trackModel.label} (Added)</div>;
+        const { groupedTrackSets, genomeConfig } = this.props;
+        const genomeName = genomeConfig.genome.getName();
+        if (groupedTrackSets[genomeName]) {
+            if (groupedTrackSets[genomeName].has(trackModel.name) || groupedTrackSets[genomeName].has(trackModel.url)) {
+                return <div>{trackModel.label} (Added)</div>;
+            }
         }
-        
+        if (this.props.addGenomeLabel && trackModel.querygenome) {
+            return <div>{trackModel.label} (Can only be added to primary genome)</div>;
+        }
         return <div>{trackModel.label} <button onClick={() => this.addLeafTrack(trackModel) } 
-                                            className="btn btn-sm btn-success dense-button">Add</button></div>;
+                    className="btn btn-sm btn-success dense-button">Add</button>
+                </div>;
     }
 
     render() {
         return <TreeView data={this.data} onNodeToggled={this.nodeToggled} leafRenderer={this.renderLeaf} />;
     }
 }
-
-export default withCurrentGenome(AnnotationTrackSelector);

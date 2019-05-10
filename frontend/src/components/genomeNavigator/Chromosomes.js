@@ -212,7 +212,7 @@ class Chromosomes extends React.PureComponent {
      * @override
      */
     render() {
-        const {viewRegion, width, labelOffset} = this.props;
+        const {viewRegion, width, labelOffset, hideChromName} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
 
         let boxesAndLabels = [];
@@ -255,20 +255,23 @@ class Chromosomes extends React.PureComponent {
             x += drawWidth;
         }
         
-        chromosomeNames.forEach((chromosomeName) => {
-            const chrSize = this.getSizeForFeatureLabel(chromosomeName.name, 
-                drawModel.basesToXWidth(chromosomeName.end - chromosomeName.start));
-            boxesAndLabels.push( // Label for feature, if it fits
-                <text
-                    key={"text" + chromosomeName.start}
-                    x={(chromosomeName.start + chromosomeName.end) / 2}
-                    y={labelOffset || DEFAULT_LABEL_OFFSET}
-                    style={{textAnchor: "middle", fontWeight: "bold", fontSize: chrSize }}
-                >
-                    {chromosomeName.name}
-                </text>
-            )
-        })
+        if(!hideChromName) {
+            chromosomeNames.forEach((chromosomeName) => {
+                const chrSize = this.getSizeForFeatureLabel(chromosomeName.name, 
+                    drawModel.basesToXWidth(chromosomeName.end - chromosomeName.start));
+                boxesAndLabels.push( // Label for feature, if it fits
+                    <text
+                        key={"text" + chromosomeName.start}
+                        x={(chromosomeName.start + chromosomeName.end) / 2}
+                        y={labelOffset || DEFAULT_LABEL_OFFSET}
+                        style={{textAnchor: "middle", fontWeight: "bold", fontSize: chrSize }}
+                    >
+                        {chromosomeName.name}
+                    </text>
+                )
+            });
+        }
+        
         const cytobands = viewRegion.getGenomeIntervals().map(locus =>
             this.renderCytobandsInLocus(locus, drawModel)
         );

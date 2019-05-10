@@ -175,13 +175,13 @@ URLFetchable.prototype.fetch = function(callback, opts) {
 
   try {
     var timeout;
-    if (opts.timeout && !this.opts.credentials) {
-      timeout = setTimeout(function() {
-        console.log('timing out ' + url);
-        req.abort();
-        return callback(null, 'Timeout');
-      }, opts.timeout);
-    }
+    // if (opts.timeout && !this.opts.credentials) {
+    //   timeout = setTimeout(function() {
+    //     console.log('timing out ' + url);
+    //     req.abort();
+    //     return callback(null, 'Timeout');
+    //   }, opts.timeout);
+    // }
 
     var req = new XMLHttpRequest();
     var length;

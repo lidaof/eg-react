@@ -61,7 +61,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
         }
 
         getSecondaryGenomes(tracks: TrackModel[]) {
-            const genomeSet = new Set(tracks.map(track => track.getMetadata('genome')));
+            const genomeSet = new Set(tracks.map(track => track.querygenome || track.getMetadata('genome')));
             genomeSet.delete(this._primaryGenome);
             genomeSet.delete(undefined);
             return Array.from(genomeSet);

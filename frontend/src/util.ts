@@ -4,6 +4,7 @@
  * @author Silas Hsu
  */ 
 import parseColor from 'parse-color';
+import _ from 'lodash';
 
 interface Coordinate {
     x: number;
@@ -106,14 +107,20 @@ export function ensureMaxListLength<T>(list: T[], limit: number): T[] {
  * @param {number} bases - number of bases
  * @return {string} human-readable string representing that number of bases
  */
-export function niceBpCount(bases: number) {
+export function niceBpCount(bases: number, useMinus=false) {
     const rounded = Math.floor(bases);
     if (rounded >= 750000) {
         return `${(rounded/1000000).toFixed(1)} Mb`;
     } else if (rounded >= 10000) {
         return `${(rounded/1000).toFixed(1)} kb`;
-    } else {
+    } else if (rounded > 0) {
         return `${rounded} bp`;
+    } else {
+        if (useMinus) {
+            return '<1 bp';
+        } else {
+            return '0 bp';
+        }
     }
 }
 
@@ -148,4 +155,69 @@ export const HELP_LINKS = {
     datahub: 'https://eg.readthedocs.io/en/latest/datahub.html',
     numerical: 'https://eg.readthedocs.io/en/latest/tracks.html#numerical-tracks',
     tracks: 'https://eg.readthedocs.io/en/latest/tracks.html',
+    localhub: 'https://eg.readthedocs.io/en/latest/local.html',
+}
+
+// /**
+//  * react table column header filter, case insensitive
+//  * https://github.com/tannerlinsley/react-table/issues/335
+//  */
+// export const filterCaseInsensitive = (filter:any, row:any) => {
+//     const id = filter.pivotId || filter.id;
+//     if (row[id] !== null && typeof row[id] === 'string') {
+//         return (
+//             row[id] !== undefined ?
+//                 String(row[id].toLowerCase()).startsWith(filter.value.toLowerCase()) : true
+//         )
+//     }
+//     else {
+//         return (
+//             String(row[filter.id]) === filter.value
+//         )
+//     }
+// }
+
+/**
+ * calculate pearson correlation
+ * from https://stackoverflow.com/questions/15886527/javascript-library-for-pearson-and-or-spearman-correlations#
+ */
+
+export const pcorr = (x: number[], y:number[]) => {
+    let sumX = 0,
+      sumY = 0,
+      sumXY = 0,
+      sumX2 = 0,
+      sumY2 = 0;
+    const minLength = x.length = y.length = Math.min(x.length, y.length),
+      reduce = (xi: number, idx: number) => {
+        const yi = y[idx];
+        sumX += xi;
+        sumY += yi;
+        sumXY += xi * yi;
+        sumX2 += xi * xi;
+        sumY2 += yi * yi;
+      }
+    x.forEach(reduce);
+    return (minLength * sumXY - sumX * sumY) / 
+        Math.sqrt((minLength * sumX2 - sumX * sumX) * (minLength * sumY2 - sumY * sumY));
+}
+
+/**
+ * 
+ * @param current {string} current genome
+ * @param tracks {trackModel[]} list of tracks
+ */
+export function getSecondaryGenomes(current: string, tracks: any[]) {
+    const genomes: string[] = [];
+    tracks.forEach(tk => {
+        if (tk.type === 'genomealign') {
+            if (tk.querygenome) {
+                genomes.push(tk.querygenome);
+            }
+            if (tk.metadata && tk.metadata.genome !== current) {
+                genomes.push(tk.metadata.genome);
+            }
+        }
+    });
+    return _.uniq(genomes);
 }
