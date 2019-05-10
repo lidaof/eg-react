@@ -73,21 +73,23 @@ export class AnnotationTrackSelector extends React.Component {
         const genomeName = this.props.genomeConfig.genome.getName();
         // trackModel.genome = genomeName;
         const label = this.props.addGenomeLabel ? `${trackModel.label} (${genomeName})` : trackModel.label;
+        trackModel.label = label; // fix the problem when refresh added genome label is gone
         trackModel.options = {...trackModel.options, label};
         trackModel.metadata = {...trackModel.metadata, genome: genomeName};
         this.props.onTracksAdded(trackModel);
     }
 
     renderLeaf(trackModel) {
-        const genomeName = this.props.genomeConfig.genome.getName();
-        const trackGenomeName = trackModel.getMetadata('genome');
-        console.log(genomeName, trackGenomeName);
-        if (trackGenomeName === genomeName) {
-            if (this.props.addedTrackSets.has(trackModel.name) || this.props.addedTrackSets.has(trackModel.url)) {
+        const { groupedTrackSets, genomeConfig } = this.props;
+        const genomeName = genomeConfig.genome.getName();
+        if (groupedTrackSets[genomeName]) {
+            if (groupedTrackSets[genomeName].has(trackModel.name) || groupedTrackSets[genomeName].has(trackModel.url)) {
                 return <div>{trackModel.label} (Added)</div>;
             }
         }
-        
+        if (this.props.addGenomeLabel && trackModel.querygenome) {
+            return <div>{trackModel.label} (Can only be added to primary genome)</div>;
+        }
         return <div>{trackModel.label} <button onClick={() => this.addLeafTrack(trackModel) } 
                     className="btn btn-sm btn-success dense-button">Add</button>
                 </div>;

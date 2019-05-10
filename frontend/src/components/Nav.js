@@ -140,7 +140,7 @@ class Nav extends React.Component {
             onToggleHighlight, onSetEnteredRegion, highlightEnteredRegion, trackLegendWidth,
             onAddTracksToPool, publicTracksPool, customTracksPool, onHubUpdated, publicHubs,
             publicTrackSets, customTrackSets, addedTrackSets, addTracktoAvailable, removeTrackFromAvailable,
-            availableTrackSets, addTermToMetaSets, onSetHighlightColor, highlightColor
+            availableTrackSets, addTermToMetaSets, onSetHighlightColor, highlightColor, groupedTrackSets
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const {name, logo, color} = getSpeciesInfo(genomeName);
@@ -203,6 +203,7 @@ class Nav extends React.Component {
                                 onTracksAdded={onTracksAdded}
                                 addedTrackSets={addedTrackSets}
                                 genomeConfig={genomeConfig}
+                                groupedTrackSets={groupedTrackSets}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Public Data Hubs">

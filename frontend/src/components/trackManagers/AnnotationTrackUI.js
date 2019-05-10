@@ -16,6 +16,7 @@ export class AnnotationTrackUI extends React.Component {
         addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
         onTracksAdded: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
+        groupedTrackSets: PropTypes.object,
     }
 
     static defaultProps = {
@@ -29,7 +30,7 @@ export class AnnotationTrackUI extends React.Component {
     }
 
     renderSecondaryUI = () => {
-        const {addedTrackSets, addedTracks, onTracksAdded} = this.props;
+        const {addedTrackSets, addedTracks, onTracksAdded, groupedTrackSets} = this.props;
         return this.secondaryGenomeConfigs.map(config => 
             <AnnotationTrackSelector
                 key={config.genome.getName()}
@@ -38,18 +39,20 @@ export class AnnotationTrackUI extends React.Component {
                 addedTrackSets={addedTrackSets}
                 genomeConfig={config}
                 addGenomeLabel={true}
+                groupedTrackSets={groupedTrackSets}
             />
             );
     }
 
     render() {
-        const {addedTrackSets, addedTracks, onTracksAdded, genomeConfig} = this.props;
+        const {addedTrackSets, addedTracks, onTracksAdded, genomeConfig, groupedTrackSets} = this.props;
         return <React.Fragment>
                     <AnnotationTrackSelector
                         addedTracks={addedTracks}
                         onTracksAdded={onTracksAdded}
                         addedTrackSets={addedTrackSets}
                         genomeConfig={genomeConfig}
+                        groupedTrackSets={groupedTrackSets}
                     />
                     {this.renderSecondaryUI()}
                 </React.Fragment>;

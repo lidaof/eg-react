@@ -198,16 +198,16 @@ class App extends React.Component {
         this.setState({highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`});
     }
 
-    groupTrackByGenome = (primaryGenomeName, tracks) => {
+    groupTrackByGenome = () => {
+        const {genomeConfig, tracks} = this.props;
         const grouped = {}; // key: genome name like `hg19`, value: a set of track name or url
         tracks.forEach(track => {
-            if (track.type === 'genomealign') { return };
             const gname = track.getMetadata('genome');
-            const targeName = gname ? gname : primaryGenomeName;
+            const targeName = gname ? gname : genomeConfig.genome.getName();
             if (grouped[targeName]) {
-                grouped[targeName].push(track.url || track.name);
+                grouped[targeName].add(track.url || track.name);
             } else {
-                grouped[targeName] = [track.url || track.name];
+                grouped[targeName] = new Set([track.url || track.name]);
             }
         });
         return grouped;
@@ -235,9 +235,7 @@ class App extends React.Component {
         ]);
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
-
-        const groupedTrackSets = this.groupTrackByGenome(genomeConfig.genome.getName(), tracks);
-        console.log(groupedTrackSets);
+        const groupedTrackSets = this.groupTrackByGenome();
         return (
         <div className="App container-fluid">
             <Nav

@@ -31,7 +31,6 @@
             "name": "hg19tomm9",
             "label": "Human hg19 to mm9 blastz",
             "querygenome": "hg19",
-            "metadata": {"genome": "hg19"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm9/weaver/mm9_hg19_axt.gz"
         },
@@ -39,7 +38,6 @@
             "name": "hg38tomm9",
             "label": "Human hg38 to mm9 blastz",
             "querygenome": "hg38",
-            "metadata": {"genome": "hg38"},
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm9/weaver/mm9_hg38_axt.gz"
         }
