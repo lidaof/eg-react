@@ -7,7 +7,9 @@ import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment, GapText 
     from '../../model/alignment/AlignmentViewCalculator';
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
 import OpenInterval from 'src/model/interval/OpenInterval';
-// import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
+import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
+import AlignmentSequence from './commonComponents/AlignmentCoordinates';
+import HorizontalFragment from './commonComponents/HorizontalFragment';
 
 const FINE_MODE_HEIGHT = 80;
 const ALIGN_TRACK_MARGIN = 20; // The margin on top and bottom of alignment block
@@ -42,6 +44,7 @@ function swap(array: any[], i: number, j: number) {
 export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
     constructor(props: PropsFromTrackContainer) {
         super(props);
+        this.renderTooltip = this.renderTooltip.bind(this);
         this.renderFineAlignment = this.renderFineAlignment.bind(this);
     }
     renderGapText(gap: GapText, i: number) {
@@ -101,6 +104,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         const [xStart, xEnd] = targetXSpan;
         const targetSequence = placement.visiblePart.getTargetSequence();
         const querySequence = placement.visiblePart.getQuerySequence();
+        const baseWidth = targetXSpan.getLength() / targetSequence.length;
 
         return <React.Fragment key={i} >
                 {renderSequenceSegments(targetSequence, targetSegments, ALIGN_TRACK_MARGIN, PRIMARY_COLOR, false)}
@@ -110,7 +114,6 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             </React.Fragment>;
 
         function renderAlignTicks(y: number, height: number) {
-            const baseWidth = targetXSpan.getLength() / targetSequence.length;
             const ticks = [];
             let x = targetXSpan.start;
             for( i=0; i<targetSequence.length; i++) {
@@ -164,17 +167,18 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
                     opacity={0.75}
                     isToRight={!placement.record.getIsReverseStrandQuery()}
                     color="white"
+                    separation={baseWidth}
                 />
             );
 
             return <React.Fragment>
                 <line
-                    x1={xStart}
+                    x1={xStart + baseWidth/4}
                     y1={y + 0.5 * RECT_HEIGHT}
                     x2={xEnd}
                     y2={y + 0.5 * RECT_HEIGHT}
                     stroke={color}
-                    strokeDasharray={4}
+                    strokeDasharray={baseWidth/2}
                 />
                 {rects}
                 {isQuery && arrows}
@@ -254,12 +258,37 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         </React.Fragment>
     }
 
+    renderTooltip(relativeX: number) {
+        const {alignment} = this.props;
+        const { basesPerPixel, primaryGenome, queryGenome } = alignment;
+        const drawData = alignment.drawData as PlacedAlignment[];
+
+        // Which segment in drawData cusor lands on:
+        const indexOfCusorSegment = drawData.reduce(
+            (iCusor, x, i) => x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX  ? i : iCusor, NaN);
+        const cusorSegment = drawData[indexOfCusorSegment];
+        const sequenceHalfLength = 10; // The length of alignment in the hoberbox.
+
+        return <React.Fragment>
+                <AlignmentSequence 
+                    alignment={cusorSegment}
+                    x={relativeX}
+                    halfLength={sequenceHalfLength}
+                    target={primaryGenome}
+                    query={queryGenome}
+                    basesPerPixel={basesPerPixel}
+                />
+            </React.Fragment>;
+    }
+
     /** 
      * @inheritdoc
      */
     render() {
         const {width, trackModel, alignment} = this.props;
         let height, svgElements = [];
+        const hoverHeight = FINE_MODE_HEIGHT - ALIGN_TRACK_MARGIN;
+        let visualizer;
         if (!alignment) {
             height = FINE_MODE_HEIGHT;
             svgElements = null;
@@ -269,19 +298,51 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             svgElements = drawData.map(this.renderFineAlignment);
             const drawGapText = alignment.drawGapText as GapText[];
             svgElements.push(...drawGapText.map(this.renderGapText));
+            visualizer=(
+                <React.Fragment>
+                    <HoverTooltipContext tooltipRelativeY={hoverHeight} getTooltipContents={this.renderTooltip} >
+                        <svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>
+                    </HoverTooltipContext>
+                </React.Fragment>
+            )
         } else {
             height = ROUGH_MODE_HEIGHT;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
+            // const targetLocusArrayArray = drawData.map(
+            //     placement => placement.segments.map(segment => segment.visiblePart.getLocus()));
+            // const targetLocusArray = [].concat.apply([], targetLocusArrayArray);
+            // const queryLocusArrayArray = drawData.map(
+            //     placement => placement.segments.map(segment => segment.visiblePart.getQueryLocus()));
+            // const queryLocusArray = [].concat.apply([], queryLocusArrayArray);
+            const targetXSpanArrayArray = drawData.map(
+                placement => placement.segments.map(segment => segment.targetXSpan));
+            const targetXSpanArray = [].concat.apply([], targetXSpanArrayArray);
+            const queryXSpanArrayArray = drawData.map(
+                placement => placement.segments.map(segment => segment.queryXSpan));
+            const queryXSpanArray = [].concat.apply([], queryXSpanArrayArray);
             const strand = alignment.plotStrand;
             svgElements = drawData.map(placement => this.renderRoughAlignment(placement, strand==='-'));
             const viewWindow = alignment.primaryVisData.viewWindow;
             const arrow = this.renderRoughStrand(strand, viewWindow);
             svgElements.push(arrow);
+            visualizer=(
+                <React.Fragment>
+                    <HorizontalFragment 
+                        height={ROUGH_MODE_HEIGHT-RECT_HEIGHT}
+                        primaryColor={PRIMARY_COLOR}
+                        queryColor={QUERY_COLOR}
+                        targetXSpanList={targetXSpanArray}
+                        queryXSpanList={queryXSpanArray}
+                    >
+                        <svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>
+                    </HorizontalFragment>
+                </React.Fragment>
+            )
         }
 
         return <Track
             {...this.props}
-            visualizer={<svg width={width} height={height} style={{display: "block"}} >{svgElements}</svg>}
+            visualizer={visualizer}
             legend={<TrackLegend trackModel={trackModel} height={height} />}
         />
     }

@@ -72,7 +72,7 @@ class RepeatTrack extends React.PureComponent {
         const {categoryColors, height} = this.props.options;
 
         return placedGroup.placedFeatures.map((placement, i) => {
-            const {xSpan, feature} = placement;
+            const {xSpan, feature, isReverse} = placement;
             if (placement.xSpan.getLength <= 0) {
                 return null;
             }
@@ -121,14 +121,14 @@ class RepeatTrack extends React.PureComponent {
                     y={height-TEXT_HEIGHT}
                     height={TEXT_HEIGHT}
                     opacity={0.75}
-                    isToRight={feature.strand === '+'}
+                    isToRight={isReverse === (feature.strand === '-')}
                     color="white"
                 />;
             return (
                 <TranslatableG onClick={event => this.renderTooltip(event, feature)} key={i}>
                     {mainBody}
-                    {label}
                     {arrows}
+                    {label}
                 </TranslatableG>
                 );
         });

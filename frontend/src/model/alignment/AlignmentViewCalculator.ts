@@ -38,6 +38,7 @@ interface QueryGenomePiece {
 
 export interface PlacedMergedAlignment extends QueryGenomePiece {
     segments: PlacedAlignment[];
+    targetXSpan: OpenInterval;
 }
 
 export interface GapText {
@@ -61,6 +62,9 @@ export interface Alignment {
     drawData: PlacedAlignment[] | PlacedMergedAlignment[];
     drawGapText?: GapText[];  // An array holding gap size information between placedAlignments, fineMode only
     plotStrand?: string; // rough mode plot positive or negative
+    primaryGenome: string;
+    queryGenome: string;
+    basesPerPixel: number;
 }
 
 const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
@@ -245,7 +249,10 @@ export class AlignmentViewCalculator {
             },
             queryRegion,
             drawData: placements,
-            drawGapText: drawGapTexts
+            drawGapText: drawGapTexts,
+            primaryGenome: this._alignmentFetcher.primaryGenome,
+            queryGenome: this._alignmentFetcher.queryGenome,
+            basesPerPixel: newDrawModel.xWidthToBases(1)
         };
 
         function convertOldVisRegion(visRegion: DisplayedRegionModel) {
@@ -295,6 +302,9 @@ export class AlignmentViewCalculator {
 
             // Find the center of the primary segments, and try to center the merged query locus there too.
             const drawCenter = computeCentroid(placementsInMerge.map(segment => segment.targetXSpan));
+            const targetXStart = Math.min(...placementsInMerge.map(segment => segment.targetXSpan.start));
+            const targetEnd = Math.max(...placementsInMerge.map(segment => segment.targetXSpan.end));
+            const mergeTargetXSpan = new OpenInterval(targetXStart, targetEnd);
             const preferredStart = drawCenter - halfDrawWidth;
             const preferredEnd = drawCenter + halfDrawWidth;
             // Place it so it doesn't overlap other segments
@@ -310,6 +320,7 @@ export class AlignmentViewCalculator {
 
             drawData.push({
                 queryFeature: new Feature(undefined, mergeLocus, plotStrand),
+                targetXSpan: mergeTargetXSpan,
                 queryXSpan: mergeXSpan,
                 segments: placementsInMerge
             });
@@ -321,6 +332,9 @@ export class AlignmentViewCalculator {
             queryRegion: this._makeQueryGenomeRegion(drawData, visWidth, drawModel),
             drawData,
             plotStrand,
+            primaryGenome: this._alignmentFetcher.primaryGenome,
+            queryGenome: this._alignmentFetcher.queryGenome,
+            basesPerPixel: drawModel.xWidthToBases(1)
         };
     }
 
@@ -465,7 +479,7 @@ export class AlignmentViewCalculator {
                 const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
                 const locusXEnd = parentXSpan.end - xDistanceFromParent;
                 const xWidth = drawModel.basesToXWidth(locus.getLength());
-                const xEnd = locusXEnd<parentLocus.end?locusXEnd:parentXSpan.end;
+                const xEnd = locusXEnd<parentXSpan.end?locusXEnd:parentXSpan.end;
                 const xStart = (locusXEnd - xWidth)> parentXSpan.start?(locusXEnd - xWidth):parentXSpan.start;
                 xSpans.push(new OpenInterval(xStart, xEnd));
             }

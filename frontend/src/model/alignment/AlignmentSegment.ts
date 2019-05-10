@@ -55,11 +55,11 @@ export class AlignmentSegment extends FeatureSegment {
      * @return {ChromosomeInterval} the approximate locus in the query/secondary genome represented by this segment.
      */
     getQueryLocus() {
-        const queryLocus = this.feature.queryLocus;
+        const {queryStrand, queryLocus} = this.feature;
         return new ChromosomeInterval(
             queryLocus.chr,
-            queryLocus.start + this.relativeStart,
-            queryLocus.start + this.relativeEnd
+            queryStrand === "+" ? queryLocus.start + this.relativeStart : queryLocus.end - this.relativeEnd,
+            queryStrand === "+" ? queryLocus.start + this.relativeEnd : queryLocus.end - this.relativeStart
         );
     }
 

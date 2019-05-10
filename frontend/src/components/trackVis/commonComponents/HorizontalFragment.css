@@ -1,0 +1,23 @@
+.Fragment-horizontal-line {
+    position: absolute;
+    pointer-events: none;
+    border-top: 2px solid;
+}
+
+.arrow-up {
+    position: absolute;
+    width: 0; 
+    height: 0; 
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid;
+  }
+
+  .arrow-down {
+    position: absolute;
+    width: 0; 
+    height: 0; 
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid;
+  }
