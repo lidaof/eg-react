@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import { GuaranteeMap } from '../../model/GuaranteeMap';
 
 import { segmentSequence, makeBaseNumberLookup, countBases, SequenceSegment } from './AlignmentStringUtils';
 import { AlignmentRecord } from './AlignmentRecord';
@@ -12,6 +13,7 @@ import OpenInterval from '../interval/OpenInterval';
 import NavigationContext from '../NavigationContext';
 import LinearDrawingModel from '../LinearDrawingModel';
 import { Feature } from '../Feature';
+
 import { ViewExpansion } from '../RegionExpander';
 import { FeaturePlacer } from '../FeaturePlacer';
 import DisplayedRegionModel from '../DisplayedRegionModel';
@@ -67,6 +69,10 @@ export interface Alignment {
     basesPerPixel: number;
 }
 
+export interface MultiAlignment {
+    [genome: string]: Alignment
+}
+
 const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
 const MARGIN = 5;
 // const MIN_GAP_DRAW_WIDTH = 3;
@@ -74,38 +80,50 @@ const MERGE_PIXEL_DISTANCE = 200;
 const MIN_MERGE_DRAW_WIDTH = 5;
 const FEATURE_PLACER = new FeaturePlacer();
 
-export class AlignmentViewCalculator {
-    private _alignmentFetcher: AlignmentFetcher;
+export class MultiAlignmentViewCalculator {
+    private _alignmentFetcher: {};
     private _viewBeingFetched: ViewExpansion;
 
-    constructor(primaryGenome: string, queryGenome: string) {
-        this._alignmentFetcher = new AlignmentFetcher(primaryGenome, queryGenome);
+    constructor(primaryGenome: string, queryGenomes: string[]) {
+        this._alignmentFetcher = queryGenomes.reduce(
+            (obj, queryGenome) => ({ ...obj, [queryGenome]: new AlignmentFetcher(primaryGenome, queryGenome) }), {}
+        )
+        this._alignmentFetcher = queryGenomes.map(queryGenome =>
+            new AlignmentFetcher(primaryGenome, queryGenome));
         this._viewBeingFetched = null;
-        this.align = memoizeOne(this.align);
+        this.multiAlign = memoizeOne(this.multiAlign);
     }
 
     cleanUp() {
-        this._alignmentFetcher.cleanUp();
+        this._alignmentFetcher.map(fetcher => fetcher.cleanUp());
     }
-
-    async align(visData: ViewExpansion): Promise<Alignment> {
+    async multiAlign(visData: ViewExpansion): Promise<MultiAlignment> {
         const {visRegion, visWidth, viewWindowRegion} = visData;
         this._viewBeingFetched = visData;
 
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
         const isFineMode = drawModel.xWidthToBases(1) < MAX_FINE_MODE_BASES_PER_PIXEL;
-        let records;
+        let recordsArray;
         if (isFineMode) {
-            records = await this._alignmentFetcher.fetchAlignment(visRegion, visData, false);
+            recordsArray = await this._alignmentFetcher.map(
+                fetcher => fetcher.fetchAlignment(visRegion, visData, false)
+            );
         } else {
-            records = await this._alignmentFetcher.fetchAlignment(viewWindowRegion, visData, true);
+            recordsArray = await this._alignmentFetcher.map(
+                fetcher => fetcher.fetchAlignment(viewWindowRegion, visData, true)
+            );
+            console.log(recordsArray);
+            let multiAlign;
+            for (let i = 0; i < recordsArray.length; i++) {
+                const records = recordsArray[i];
+                const alignment = this.alignRough(records, visData);
+                multiAlign[queryGenomes[i]] = alignment;
+            }
         }
+        // manipulate recordsArray, feed each element to alignFine/alignRough.
 
-        if (this._viewBeingFetched !== visData) {
-            return Promise.reject(new Error('Alignment canceled due to another call to align()'));
-        }
-
-        return isFineMode ? this.alignFine(records, visData) : this.alignRough(records, visData);
+        return {};
+        // return isFineMode ? this.alignFine(records, visData) : this.alignRough(records, visData, plotStrand);
     }
 
     alignFine(records: AlignmentRecord[], visData: ViewExpansion): Alignment {
