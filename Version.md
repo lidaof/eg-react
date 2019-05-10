@@ -1,5 +1,11 @@
 # Version History
 
+## 48.4.6
+
+* tooltips on genome align track, both rough and fine mode (from Xiaoyu)
+* annotation tracks UI for genome align track
+* switched to latest [bam-js](https://github.com/GMOD/bam-js) from GMOD for bam file fetching
+
 ## 48.4.5
 
 * free text search for track in track table using [fuse.js](https://fusejs.io/)

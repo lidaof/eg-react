@@ -267,18 +267,16 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         const indexOfCusorSegment = drawData.reduce(
             (iCusor, x, i) => x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX  ? i : iCusor, NaN);
         const cusorSegment = drawData[indexOfCusorSegment];
-        const sequenceHalfLength = 10; // The length of alignment in the hoberbox.
+        const sequenceHalfLength = 10; // The length of alignment in the hoverbox.
 
-        return <React.Fragment>
-                <AlignmentSequence 
+        return <AlignmentSequence 
                     alignment={cusorSegment}
                     x={relativeX}
                     halfLength={sequenceHalfLength}
                     target={primaryGenome}
                     query={queryGenome}
                     basesPerPixel={basesPerPixel}
-                />
-            </React.Fragment>;
+                />;
     }
 
     /** 
