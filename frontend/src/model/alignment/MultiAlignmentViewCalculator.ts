@@ -115,17 +115,19 @@ export class MultiAlignmentViewCalculator {
         if (isFineMode) {
             recordsObj = await this._alignmentFetchers.reduce(
                 (obj, fetcher) =>
-                    ({...obj, [fetcher.queryGenome]: fetcher.fetchAlignment(visRegion, visData, false)}), {}
+                ({...obj, [fetcher.queryGenome]:
+                    fetcher.fetchAlignment(visRegion, visData, false)
+                }), {}
                 // (fetcher) => fetcher.fetchAlignment(visRegion, visData, false)
             );
             // manipulate recordsObj to insert primary gaps using all info. Feed each element to alignFine/alignRough.
-            fineRecordsObj = this.refineRecordsObj(recordsObj, visData);
+            const fineRecordsObj = this.refineRecordsObj(recordsObj, visData);
             return Object.keys(fineRecordsObj).reduce(
                 (multiAlign, queryGenome) =>
-                    ({...multiAlign, [queryGenome]:
-                        this.alignFine(queryGenome, recordsObj[queryGenome], visData)
-                    }), {}
-                );
+                ({...multiAlign, [queryGenome]:
+                    this.alignFine(queryGenome, recordsObj[queryGenome], visData)
+                }), {}
+            );
             // let multiAlign: MultiAlignment;
             // for (var queryGenome in fineRecordsObj) {
             //     if (fineRecordsObj.hasOwnProperty(queryGenome)) {
@@ -136,16 +138,18 @@ export class MultiAlignmentViewCalculator {
         } else {
             recordsObj = await this._alignmentFetchers.reduce(
                 (obj, fetcher) =>
-                    ({...obj, [fetcher.queryGenome]: fetcher.fetchAlignment(viewWindowRegion, visData, true)}), {}
+                ({...obj, [fetcher.queryGenome]:
+                    fetcher.fetchAlignment(viewWindowRegion, visData, true)
+                }), {}
                 // fetcher => fetcher.fetchAlignment(viewWindowRegion, visData, true)
             );
             // Don't need to change each records for rough alignment, directly loop through them:
             return Object.keys(recordsObj).reduce(
                 (multiAlign, queryGenome) =>
-                    ({...multiAlign, [queryGenome]:
-                        this.alignRough(queryGenome, recordsObj[queryGenome], visData)
-                    }), {}
-                );
+                ({...multiAlign, [queryGenome]:
+                    this.alignRough(queryGenome, recordsObj[queryGenome], visData)
+                }), {}
+            );
             // let multiAlign: MultiAlignment;
             // for (var queryGenome in recordsObj) {
             //     if (recordsObj.hasOwnProperty(queryGenome)) {
@@ -159,13 +163,22 @@ export class MultiAlignmentViewCalculator {
     }
     refineRecordsObj(recordsObj: RecordsObj, visData: ViewExpansion): RecordsObj {
         const {visRegion, visWidth} = visData;
-        FEATURE_PLACER.placeFeatures(records, visRegion, visWidth).map(placement => {
-            return {
-                visiblePart: AlignmentSegment.fromFeatureSegment(placement.visiblePart),
-            };
-        });
+        const visibleAlignObj = Object.keys(recordsObj).reduce(
+            (visibleAlignObj, queryGenome) =>
+            {
+                const placements = this._computeContextLocations(recordsObj[queryGenome], visData);
+                const visibleParts = placements.map(placement => placement.visiblePart);
+                return ({...visibleAlignObj, [queryGenome]: visibleParts})
+            }, {}
+        );
+
+
+        // Object.values(recordsObj).map( records =>
+        //     FEATURE_PLACER.placeFeatures(records, visRegion, visWidth).map(placement => 
+        //         AlignmentSegment.fromFeatureSegment(placement.visiblePart))
+        // );
     }
-    alignFine(queryGenome: string, records: AlignmentRecord[], visData: ViewExpansion): Alignment {
+    alignFine(query: string, records: AlignmentRecord[], visData: ViewExpansion): Alignment {
         // There's a lot of steps, so bear with me...
         const {visRegion, viewWindow, viewWindowRegion} = visData;
         const oldNavContext = visRegion.getNavigationContext();
@@ -300,7 +313,7 @@ export class MultiAlignmentViewCalculator {
             drawData: placements,
             drawGapText: drawGapTexts,
             primaryGenome: this.primaryGenome,
-            queryGenome: queryGenome,
+            queryGenome: query,
             basesPerPixel: newDrawModel.xWidthToBases(1)
         };
 
@@ -323,7 +336,7 @@ export class MultiAlignmentViewCalculator {
      * @param {number} width - view width of the primary genome
      * @return {PlacedMergedAlignment[]} placed merged alignments
      */
-    alignRough(queryGenome: string, alignmentRecords: AlignmentRecord[], visData: ViewExpansion): Alignment {
+    alignRough(query: string, alignmentRecords: AlignmentRecord[], visData: ViewExpansion): Alignment {
         const {visRegion, visWidth} = visData;
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
         const mergeDistance = drawModel.xWidthToBases(MERGE_PIXEL_DISTANCE);
@@ -392,7 +405,7 @@ export class MultiAlignmentViewCalculator {
             drawData,
             plotStrand,
             primaryGenome: this.primaryGenome,
-            queryGenome: queryGenome,
+            queryGenome: query,
             basesPerPixel: drawModel.xWidthToBases(1)
         };
     }
