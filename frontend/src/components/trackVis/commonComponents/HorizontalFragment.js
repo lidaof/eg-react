@@ -110,11 +110,7 @@ function HorizontalLine(props) {
         willChange: "top",
     };
 
-    return (
-        <React.Fragment>
-            {xSpan ? <div className="Fragment-horizontal-line" style={horizontalLineStyle} /> : null}
-        </React.Fragment>
-    );
+    return  xSpan ? <div className="Fragment-horizontal-line" style={horizontalLineStyle} /> : null;
 }
 
 function Triangle(props) {
@@ -124,14 +120,8 @@ function Triangle(props) {
         left: relativeX,
         color: color,
     }
-
-    return (
-        <React.Fragment>
-            {/* {<div className="arrow-up" style={triangleStyle} />} */}
-            {direction === "up" ?
-            <div className="arrow-up" style={triangleStyle} /> :
-            <div className="arrow-down" style={triangleStyle} />}
-        </React.Fragment>
-    );
+    const triangeClass = direction === "up" ? "arrow-up" : "arrow-down";
+    return <div className={triangeClass} style={triangleStyle} />;
 }
+
 export default HorizontalFragment;

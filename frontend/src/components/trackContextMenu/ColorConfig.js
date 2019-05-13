@@ -97,3 +97,24 @@ export function PrimaryAboveColorConfig(props) {
 export function SecondaryBelowColorConfig(props) {
     return <ColorConfig {...props} optionName="color2BelowMin" label="Secondary color below min" />;
 }
+
+
+/**
+ * A menu item that configures `trackModel.options.primaryColor`
+ * 
+ * @param {Object} props - object with shape ITEM_PROP_TYPES from TrackContextMenu
+ * @return {JSX.Element} element to render
+ */
+export function primaryGenomeColorConfig(props) {
+    return <ColorConfig {...props} optionName="primaryColor" label="Primary genome color" />;
+}
+
+/**
+ * A menu item that configures `trackModel.options.queryColor`
+ * 
+ * @param {Object} props - object with shape ITEM_PROP_TYPES from TrackContextMenu
+ * @return {JSX.Element} element to render
+ */
+export function queryGenomeColorConfig(props) {
+    return <ColorConfig {...props} optionName="queryColor" label="Query genome color" />;
+}

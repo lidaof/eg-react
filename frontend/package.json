@@ -65,7 +65,7 @@
     "firebase": "^5.4.0",
     "fuse.js": "^3.4.4",
     "generic-filehandle": "^1.0.8",
-    "hic-straw": "^0.9.3",
+    "hic-straw": "^0.9.4",
     "jest-image-snapshot": "^1.0.1",
     "jquery": "^3.2.1",
     "jquery.kinetic": "^2.2.4",
