@@ -121,8 +121,9 @@ export class MultiAlignmentViewCalculator {
                 // (fetcher) => fetcher.fetchAlignment(visRegion, visData, false)
             );
             // manipulate recordsObj to insert primary gaps using all info. Feed each element to alignFine/alignRough.
-            const fineRecordsObj = this.refineRecordsObj(recordsObj, visData);
-            return Object.keys(fineRecordsObj).reduce(
+            // const fineRecordsObj = this.refineRecordsObj(recordsObj, visData);
+            console.log(recordsObj);
+            return Object.keys(recordsObj).reduce(
                 (multiAlign, queryGenome) =>
                 ({...multiAlign, [queryGenome]:
                     this.alignFine(queryGenome, recordsObj[queryGenome], visData)
@@ -163,15 +164,26 @@ export class MultiAlignmentViewCalculator {
     }
     refineRecordsObj(recordsObj: RecordsObj, visData: ViewExpansion): RecordsObj {
         const {visRegion, visWidth} = visData;
-        const visibleAlignObj = Object.keys(recordsObj).reduce(
-            (visibleAlignObj, queryGenome) =>
-            {
-                const placements = this._computeContextLocations(recordsObj[queryGenome], visData);
-                const visibleParts = placements.map(placement => placement.visiblePart);
-                return ({...visibleAlignObj, [queryGenome]: visibleParts})
-            }, {}
-        );
+        const minGapLength = 0.99;
+        // const placementsObj = Object.keys(recordsObj).reduce(
+        //     (placementsObj, queryGenome) =>
+        //     {
+        //         const placements = this._computeContextLocations(recordsObj[queryGenome], visData);
+        //         const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
+        //         const placementSubObj = {'placements': placements, 'primaryGaps': primaryGaps};
+        //         return ({...placementsObj, [queryGenome]: placementSubObj});
+        //     }, {}
+        // );
 
+        // const allGaps = Object.values(placementsObj).reduce((gaps, subObj) => {
+        //     gaps.push(subObj.map(placement => placement.primaryGaps));
+        //     return gaps;
+        // }, []);
+        // const distinctCoordinates = [...new Set (Object.values(placementsObj).map(sub => sub['primaryGaps']))];
+
+
+        
+        return recordsObj;
 
         // Object.values(recordsObj).map( records =>
         //     FEATURE_PLACER.placeFeatures(records, visRegion, visWidth).map(placement => 
@@ -187,6 +199,7 @@ export class MultiAlignmentViewCalculator {
         const minGapLength = 0.99;
 
         // Calculate context coordinates of the records and gaps within.
+        console.log(records);
         const placements = this._computeContextLocations(records, visData);
         const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
 
