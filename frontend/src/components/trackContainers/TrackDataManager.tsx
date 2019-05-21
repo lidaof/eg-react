@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 
-import { AlignmentPromises } from './TrackViewManager';
+// import { AlignmentPromises } from './TrackViewManager';
 import { getTrackConfig } from '../trackConfig/getTrackConfig';
 import DataSource from '../../dataSources/DataSource';
 
@@ -21,7 +21,7 @@ interface DataManagerProps {
     tracks: TrackModel[]; // Tracks
     viewRegion: DisplayedRegionModel; // Region that the user requested
     basesPerPixel: number;
-    alignments: AlignmentPromises;
+    alignments: MultiAlignment;
     primaryViewPromise: Promise<ViewExpansion>;
 }
 
