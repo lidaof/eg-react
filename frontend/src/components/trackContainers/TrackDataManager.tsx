@@ -10,8 +10,8 @@ import { TrackModel } from '../../model/TrackModel';
 import NavigationContext from '../../model/NavigationContext';
 import { GuaranteeMap } from '../../model/GuaranteeMap';
 import { ViewExpansion } from '../../model/RegionExpander';
-import { Alignment } from '../../model/alignment/AlignmentViewCalculator';
-
+// import { Alignment } from '../../model/alignment/AlignmentViewCalculator';
+import { Alignment, MultiAlignment } from '../../model/alignment/MultiAlignmentViewCalculator';
 interface TrackDataMap {
     [id: number]: TrackData
 }

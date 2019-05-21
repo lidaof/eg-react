@@ -113,13 +113,24 @@ export class MultiAlignmentViewCalculator {
         const isFineMode = drawModel.xWidthToBases(1) < MAX_FINE_MODE_BASES_PER_PIXEL;
         let recordsObj: RecordsObj;
         if (isFineMode) {
-            recordsObj = await this._alignmentFetchers.reduce(
-                (obj, fetcher) =>
-                ({...obj, [fetcher.queryGenome]:
-                    fetcher.fetchAlignment(visRegion, visData, false)
-                }), {}
-                // (fetcher) => fetcher.fetchAlignment(visRegion, visData, false)
-            );
+            const recordsPromise = this._alignmentFetchers.map(async fetcher => {
+                const records = await fetcher.fetchAlignment(visRegion, visData, false);
+                return {"query": fetcher.queryGenome, "records": records};
+            });
+            const recordsArray = await Promise.all(recordsPromise);
+            for (const records of recordsArray) {
+                recordsObj[records.query] = records.records;
+            }
+            // for (const fetcher of this._alignmentFetchers) {
+            //     recordsObj[fetcher.queryGenome] = await fetcher.fetchAlignment(visRegion, visData, false);
+            // }
+            // recordsObj = await this._alignmentFetchers.reduce(
+            //     (obj, fetcher) =>
+            //     ({...obj, [fetcher.queryGenome]:
+            //         fetcher.fetchAlignment(visRegion, visData, false)
+            //     }), {}
+            //     // (fetcher) => fetcher.fetchAlignment(visRegion, visData, false)
+            // );
             // manipulate recordsObj to insert primary gaps using all info. Feed each element to alignFine/alignRough.
             // const fineRecordsObj = this.refineRecordsObj(recordsObj, visData);
             console.log(recordsObj);
