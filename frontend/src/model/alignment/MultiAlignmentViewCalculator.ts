@@ -74,26 +74,24 @@ export interface MultiAlignment {
 }
 
 interface RecordsObj {
-    [queryGenome: string]: AlignmentRecord[]
+    query: string;
+    records: AlignmentRecord[];
 }
 
 const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
 const MARGIN = 5;
 // const MIN_GAP_DRAW_WIDTH = 3;
+const MIN_GAP_LENGTH = 0.99;
 const MERGE_PIXEL_DISTANCE = 200;
 const MIN_MERGE_DRAW_WIDTH = 5;
 const FEATURE_PLACER = new FeaturePlacer();
 
 export class MultiAlignmentViewCalculator {
     private primaryGenome: string;
-    // private _alignmentFetcher: {[queryGenome: string]: AlignmentFetcher};
     private _alignmentFetchers: AlignmentFetcher[];
     private _viewBeingFetched: ViewExpansion;
 
     constructor(primaryGenome: string, queryGenomes: string[]) {
-        // this._alignmentFetcher = queryGenomes.reduce(
-        //     (obj, queryGenome) => ({ ...obj, [queryGenome]: new AlignmentFetcher(primaryGenome, queryGenome) }), {}
-        // );
         this._alignmentFetchers = queryGenomes.map(queryGenome =>
             new AlignmentFetcher(primaryGenome, queryGenome));
         this._viewBeingFetched = null;
@@ -102,7 +100,6 @@ export class MultiAlignmentViewCalculator {
     }
 
     cleanUp() {
-        // Object.values(this._alignmentFetcher).map(fetcher => fetcher.cleanUp());
         this._alignmentFetchers.map(fetcher => fetcher.cleanUp());
     }
     async multiAlign(visData: ViewExpansion): Promise<MultiAlignment> {
@@ -111,71 +108,73 @@ export class MultiAlignmentViewCalculator {
 
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
         const isFineMode = drawModel.xWidthToBases(1) < MAX_FINE_MODE_BASES_PER_PIXEL;
-        let recordsObj: RecordsObj;
+        let recordsArray: RecordsObj[];
         if (isFineMode) {
             const recordsPromise = this._alignmentFetchers.map(async fetcher => {
                 const records = await fetcher.fetchAlignment(visRegion, visData, false);
                 return {"query": fetcher.queryGenome, "records": records};
             });
-            const recordsArray = await Promise.all(recordsPromise);
-            for (const records of recordsArray) {
-                recordsObj[records.query] = records.records;
-            }
-            // for (const fetcher of this._alignmentFetchers) {
-            //     recordsObj[fetcher.queryGenome] = await fetcher.fetchAlignment(visRegion, visData, false);
-            // }
-            // recordsObj = await this._alignmentFetchers.reduce(
-            //     (obj, fetcher) =>
-            //     ({...obj, [fetcher.queryGenome]:
-            //         fetcher.fetchAlignment(visRegion, visData, false)
-            //     }), {}
-            //     // (fetcher) => fetcher.fetchAlignment(visRegion, visData, false)
-            // );
-            // manipulate recordsObj to insert primary gaps using all info. Feed each element to alignFine/alignRough.
-            // const fineRecordsObj = this.refineRecordsObj(recordsObj, visData);
-            console.log(recordsObj);
-            return Object.keys(recordsObj).reduce(
-                (multiAlign, queryGenome) =>
-                ({...multiAlign, [queryGenome]:
-                    this.alignFine(queryGenome, recordsObj[queryGenome], visData)
+            const oldRecordsArray = await Promise.all(recordsPromise);
+            recordsArray = this.refineRecordsArray(oldRecordsArray, visData);
+            return recordsArray.reduce(
+                (multiAlign, records) =>
+                ({...multiAlign, [records.query]:
+                    this.alignFine(records.query, records.records, visData)
                 }), {}
             );
-            // let multiAlign: MultiAlignment;
-            // for (var queryGenome in fineRecordsObj) {
-            //     if (fineRecordsObj.hasOwnProperty(queryGenome)) {
-            //         multiAlign[queryGenome] = this.alignFine(queryGenome, recordsObj[queryGenome], visData)
-            //     }
-            // }
-            // return multiAlign;
+
         } else {
-            recordsObj = await this._alignmentFetchers.reduce(
-                (obj, fetcher) =>
-                ({...obj, [fetcher.queryGenome]:
-                    fetcher.fetchAlignment(viewWindowRegion, visData, true)
-                }), {}
-                // fetcher => fetcher.fetchAlignment(viewWindowRegion, visData, true)
-            );
+            const recordsPromise = this._alignmentFetchers.map(async fetcher => {
+                const records = await fetcher.fetchAlignment(viewWindowRegion, visData, true);
+                return {"query": fetcher.queryGenome, "records": records};
+            });
+            recordsArray = await Promise.all(recordsPromise);
+
             // Don't need to change each records for rough alignment, directly loop through them:
-            return Object.keys(recordsObj).reduce(
-                (multiAlign, queryGenome) =>
-                ({...multiAlign, [queryGenome]:
-                    this.alignRough(queryGenome, recordsObj[queryGenome], visData)
+            return recordsArray.reduce(
+                (multiAlign, records) =>
+                ({...multiAlign, [records.query]:
+                    this.alignRough(records.query, records.records, visData)
                 }), {}
             );
-            // let multiAlign: MultiAlignment;
-            // for (var queryGenome in recordsObj) {
-            //     if (recordsObj.hasOwnProperty(queryGenome)) {
-            //         multiAlign[queryGenome] = this.alignRough(queryGenome, recordsObj[queryGenome], visData)
-            //     }
-            // }
-            // return multiAlign;
+        }
+    }
+    refineRecordsArray(recordsArray: RecordsObj[], visData: ViewExpansion): RecordsObj[] {
+        const {visRegion, visWidth} = visData;
+        const minGapLength = MIN_GAP_LENGTH;
+
+        // use a new array of objects to manipulate later, and
+        // Combine all gaps from all alignments into a new array:
+        const refineRecords = [];
+        const allGaps = [];
+        for (const recordsObj of recordsArray) {
+            // Calculate context coordinates of the records and gaps within.
+            const placements = this._computeContextLocations(recordsObj.records, visData);
+            const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
+            console.log(placements);
+            console.log(primaryGaps);
+            refineRecords.push({"recordsObj": recordsObj, "placements": placements, "primaryGaps": primaryGaps});
+            allGaps.push(...primaryGaps);
         }
 
-        // return isFineMode ? this.alignFine(records, visData) : this.alignRough(records, visData, plotStrand);
-    }
-    refineRecordsObj(recordsObj: RecordsObj, visData: ViewExpansion): RecordsObj {
-        const {visRegion, visWidth} = visData;
-        const minGapLength = 0.99;
+        // Combine allGaps to a allGapsSet with unique contextBase. For each of them, the longest length is chosen:
+        const allGapsSet = [];
+        const contextBaseSet = [...new Set(allGaps.map(i => i.contextBase))];
+        contextBaseSet.sort((a, b) => a - b);
+        for (const gapContextBase of contextBaseSet) {
+            const lengths = allGaps.reduce(
+                (lengths, {contextBase, length}) => [...lengths, ...contextBase===gapContextBase ? [length] : []], []
+            );
+            const maxLength = Math.max(...lengths);
+            allGapsSet.push({contextBase: gapContextBase, length: maxLength})
+        }
+
+        // For each records, insertion gaps to sequences if for contextBase only in allGapsSet:
+        console.log(allGapsSet);
+        for (const records of refineRecords) {
+            console.log(records.primaryGaps);
+
+        }
         // const placementsObj = Object.keys(recordsObj).reduce(
         //     (placementsObj, queryGenome) =>
         //     {
@@ -194,7 +193,7 @@ export class MultiAlignmentViewCalculator {
 
 
         
-        return recordsObj;
+        return recordsArray;
 
         // Object.values(recordsObj).map( records =>
         //     FEATURE_PLACER.placeFeatures(records, visRegion, visWidth).map(placement => 
@@ -207,10 +206,9 @@ export class MultiAlignmentViewCalculator {
         const oldNavContext = visRegion.getNavigationContext();
         // const drawModel = new LinearDrawingModel(visRegion, visWidth);
         // const minGapLength = drawModel.xWidthToBases(MIN_GAP_DRAW_WIDTH);
-        const minGapLength = 0.99;
+        const minGapLength = MIN_GAP_LENGTH;
 
         // Calculate context coordinates of the records and gaps within.
-        console.log(records);
         const placements = this._computeContextLocations(records, visData);
         const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
 
