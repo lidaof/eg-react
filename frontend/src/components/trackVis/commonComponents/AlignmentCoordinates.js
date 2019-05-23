@@ -29,7 +29,7 @@ class AlignmentSequence extends React.Component {
             return <div>{"No alignment available"}</div>;
         }
         else {
-            const highlightLength = Math.round(basesPerPixel);
+            const highlightLength = Math.ceil(basesPerPixel);
             const halfHighlightLength = Math.floor(highlightLength/2);
             const {visiblePart, record} = alignment;
             const [start, end] = visiblePart.sequenceInterval;
@@ -41,7 +41,6 @@ class AlignmentSequence extends React.Component {
             const relativeDisplayEnd = cusorLocus + halfLength < length ? cusorLocus + halfLength : (length - 1);
             const relativeHighlightStart = cusorLocus - halfHighlightLength > 0 ? cusorLocus - halfHighlightLength : 0;
             const relativeHighlightEnd = cusorLocus + halfHighlightLength < length ? cusorLocus + halfHighlightLength : (length - 1);
-
 
             const cusorTargetSeqLeft = record.targetSeq.substr(
                 start + relativeDisplayStart, relativeHighlightStart - relativeDisplayStart).toUpperCase();
