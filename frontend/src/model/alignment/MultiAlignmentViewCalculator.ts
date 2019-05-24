@@ -2,7 +2,7 @@ import _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import { GuaranteeMap } from '../../model/GuaranteeMap';
 
-import { segmentSequence, makeBaseNumberLookup, countBases, SequenceSegment } from './AlignmentStringUtils';
+import { segmentSequence, makeBaseNumberLookup, countBases, SequenceSegment, GAP_CHAR } from './AlignmentStringUtils';
 import { AlignmentRecord } from './AlignmentRecord';
 import { AlignmentSegment } from './AlignmentSegment';
 import { AlignmentFetcher } from './AlignmentFetcher';
@@ -36,12 +36,12 @@ export interface PlacedSequenceSegment extends SequenceSegment {
 
 interface QueryGenomePiece {
     queryFeature: Feature;
-    queryXSpan: OpenInterval;
+    queryXSpan: OpenInterval
 }
 
 export interface PlacedMergedAlignment extends QueryGenomePiece {
     segments: PlacedAlignment[];
-    targetXSpan: OpenInterval;
+    targetXSpan: OpenInterval
 }
 
 export interface GapText {
@@ -76,7 +76,12 @@ export interface MultiAlignment {
 
 interface RecordsObj {
     query: string;
-    records: AlignmentRecord[];
+    records: AlignmentRecord[]
+}
+
+interface RefinedObj {
+    newRecordsArray: RecordsObj[],
+    allGaps: Gap[]
 }
 
 const MAX_FINE_MODE_BASES_PER_PIXEL = 10;
@@ -116,12 +121,14 @@ export class MultiAlignmentViewCalculator {
                 return {"query": fetcher.queryGenome, "records": records};
             });
             const oldRecordsArray = await Promise.all(recordsPromise);
-            const {records, gaps} = this.refineRecordsArray(oldRecordsArray, visData);
-            recordsArray = records;
+            const {newRecordsArray, allGaps} = this.refineRecordsArray(oldRecordsArray, visData);
+            recordsArray = newRecordsArray; 
+
+            const primaryVisData = this.calculatePrimaryVis(allGaps, visData);
             return recordsArray.reduce(
                 (multiAlign, records) =>
                 ({...multiAlign, [records.query]:
-                    this.alignFine(records.query, records.records, visData)
+                    this.alignFine(records.query, records.records, visData, primaryVisData)
                 }), {}
             );
 
@@ -141,9 +148,40 @@ export class MultiAlignmentViewCalculator {
             );
         }
     }
-    refineRecordsArray(recordsArray: RecordsObj[], visData: ViewExpansion): {records: RecordsObj[], gaps: {}} {
+
+    calculatePrimaryVis(allGaps: Gap[], visData: ViewExpansion): ViewExpansion {
         const {visRegion, viewWindow, viewWindowRegion} = visData;
         const oldNavContext = visRegion.getNavigationContext();
+        const navContextBuilder = new NavContextBuilder(oldNavContext);
+        navContextBuilder.setGaps(allGaps);
+        const newNavContext = navContextBuilder.build();
+
+        // Calculate new DisplayedRegionModel and LinearDrawingModel from the new nav context
+        const newVisRegion = convertOldVisRegion(visRegion);
+        const newViewWindowRegion = convertOldVisRegion(viewWindowRegion);
+        const newPixelsPerBase = viewWindow.getLength() / newViewWindowRegion.getWidth();
+        const newVisWidth = newVisRegion.getWidth() * newPixelsPerBase;
+        const newDrawModel = new LinearDrawingModel(newVisRegion, newVisWidth);
+        const newViewWindow = newDrawModel.baseSpanToXSpan(newViewWindowRegion.getContextCoordinates());
+
+        return {
+            visRegion: newVisRegion,
+            visWidth: newVisWidth,
+            viewWindowRegion: newViewWindowRegion,
+            viewWindow: newViewWindow,
+        }
+
+        function convertOldVisRegion(visRegion: DisplayedRegionModel) {
+            const [contextStart, contextEnd] = visRegion.getContextCoordinates();
+            return new DisplayedRegionModel(
+                newNavContext,
+                navContextBuilder.convertOldCoordinates(contextStart),
+                navContextBuilder.convertOldCoordinates(contextEnd)
+            );
+        }
+    }
+    // return a new recordObj array with gaps inserted, and allGap contextBase.
+    refineRecordsArray(recordsArray: RecordsObj[], visData: ViewExpansion): RefinedObj {
         const minGapLength = MIN_GAP_LENGTH;
 
         // use a new array of objects to manipulate later, and
@@ -173,17 +211,6 @@ export class MultiAlignmentViewCalculator {
             allPrimaryGaps.push({"contextBase": Number(contextBase), "length": allGapsObj[contextBase]});
         }
         allPrimaryGaps.sort((a,b) => a.contextBase - b.contextBase);  // ascending.
-        const navContextBuilder = new NavContextBuilder(oldNavContext);
-        navContextBuilder.setGaps(allPrimaryGaps);
-        const newNavContext = navContextBuilder.build();
-
-        // Calculate new DisplayedRegionModel and LinearDrawingModel from the new nav context
-        const newVisRegion = convertOldVisRegion(visRegion);
-        const newViewWindowRegion = convertOldVisRegion(viewWindowRegion);
-        const newPixelsPerBase = viewWindow.getLength() / newViewWindowRegion.getWidth();
-        const newVisWidth = newVisRegion.getWidth() * newPixelsPerBase;
-        const newDrawModel = new LinearDrawingModel(newVisRegion, newVisWidth);
-        const newViewWindow = newDrawModel.baseSpanToXSpan(newViewWindowRegion.getContextCoordinates());
 
         // For each records, insertion gaps to sequences if for contextBase only in allGapsSet:
         for (const records of refineRecords) {
@@ -199,15 +226,15 @@ export class MultiAlignmentViewCalculator {
                 }
             }
             insertionContexts.sort((a, b) => b.contextBase - a.contextBase); // sort descending...
-
             for (const insertPosition of insertionContexts) {
                 const gapString = '-'.repeat(insertPosition.length);
                 const insertBase = insertPosition.contextBase;
                 const thePlacement = records.placements.filter(placement => 
                     placement.contextSpan.start < insertBase && placement.contextSpan.end > insertBase
                 )[0];  // There is only one placement
-                const relativePosition = thePlacement.visiblePart.relativeStart 
-                    + insertBase - thePlacement.contextSpan.start;
+                const visibleTargetSeq = thePlacement.visiblePart.getTargetSequence();
+                const insertIndex = indexLookup(visibleTargetSeq, insertBase - thePlacement.contextSpan.start);
+                const relativePosition = thePlacement.visiblePart.sequenceInterval.start + insertIndex;
                 const targetSeq = thePlacement.record.targetSeq;
                 const querySeq = thePlacement.record.querySeq;
                 thePlacement.record.targetSeq = 
@@ -219,61 +246,51 @@ export class MultiAlignmentViewCalculator {
             records.recordsObj.records = records.placements.map(placement => placement.record);
         }
         const newRecords = refineRecords.map(final => final.recordsObj);
-        return {records: newRecords, gaps: allPrimaryGaps};
+        return {newRecordsArray: newRecords, allGaps: allPrimaryGaps};
 
-        function convertOldVisRegion(visRegion: DisplayedRegionModel) {
-            const [contextStart, contextEnd] = visRegion.getContextCoordinates();
-            return new DisplayedRegionModel(
-                newNavContext,
-                navContextBuilder.convertOldCoordinates(contextStart),
-                navContextBuilder.convertOldCoordinates(contextEnd)
-            );
+        function indexLookup (sequence: string, base: number): number {
+            let index = 0;
+            for(const char of sequence) {
+                index++;
+                if (char !== GAP_CHAR) {
+                    base--;
+                }
+                if (base === 0){ break; }
+            }
+            return index;
         }
     }
-    alignFine(query: string, records: AlignmentRecord[], visData: ViewExpansion): Alignment {
+    alignFine(query: string, records: AlignmentRecord[], OldvisData: ViewExpansion, visData: ViewExpansion): Alignment {
         // There's a lot of steps, so bear with me...
-        const {visRegion, viewWindow, viewWindowRegion} = visData;
-        const oldNavContext = visRegion.getNavigationContext();
-        // const drawModel = new LinearDrawingModel(visRegion, visWidth);
+        const {visRegion, visWidth} = visData;
+        const drawModel = new LinearDrawingModel(visRegion, visWidth);
         // const minGapLength = drawModel.xWidthToBases(MIN_GAP_DRAW_WIDTH);
         const minGapLength = MIN_GAP_LENGTH;
         
         // Calculate context coordinates of the records and gaps within.
-        const placements = this._computeContextLocations(records, visData);
-        const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
-
-        // Build a new primary navigation context using the gaps
-        const navContextBuilder = new NavContextBuilder(oldNavContext);
-        navContextBuilder.setGaps(primaryGaps);
-        const newNavContext = navContextBuilder.build();
-
-        // Calculate new DisplayedRegionModel and LinearDrawingModel from the new nav context
-        const newVisRegion = convertOldVisRegion(visRegion);
-        const newViewWindowRegion = convertOldVisRegion(viewWindowRegion);
-        const newPixelsPerBase = viewWindow.getLength() / newViewWindowRegion.getWidth();
-        const newVisWidth = newVisRegion.getWidth() * newPixelsPerBase;
-        const newDrawModel = new LinearDrawingModel(newVisRegion, newVisWidth);
-        const newViewWindow = newDrawModel.baseSpanToXSpan(newViewWindowRegion.getContextCoordinates());
-
+        const navContext = visRegion.getNavigationContext();
+        const navContextBuilder = new NavContextBuilder(navContext);
+        const placements = this._computeContextLocations(records, OldvisData);
         // With the draw model, we can set x spans for each placed alignment
         for (const placement of placements) {
             const oldContextSpan = placement.contextSpan;
+            console.log(oldContextSpan)
             const visiblePart = placement.visiblePart;
             const newContextSpan = new OpenInterval(
                 navContextBuilder.convertOldCoordinates(oldContextSpan.start),
                 navContextBuilder.convertOldCoordinates(oldContextSpan.end)
             );
-            const xSpan = newDrawModel.baseSpanToXSpan(newContextSpan);
+            console.log(newContextSpan);
+            const xSpan = drawModel.baseSpanToXSpan(newContextSpan);
             const targetSeq = visiblePart.getTargetSequence();
             const querySeq = visiblePart.getQuerySequence();
-
+            
             placement.contextSpan = newContextSpan;
             placement.targetXSpan = xSpan;
             placement.queryXSpan = xSpan;
-            placement.targetSegments = this._placeSequenceSegments(targetSeq, minGapLength, xSpan.start, newDrawModel);
-            placement.querySegments = this._placeSequenceSegments(querySeq, minGapLength, xSpan.start, newDrawModel);
+            placement.targetSegments = this._placeSequenceSegments(targetSeq, minGapLength, xSpan.start, drawModel);
+            placement.querySegments = this._placeSequenceSegments(querySeq, minGapLength, xSpan.start, drawModel);
         }
-
         const drawGapTexts = [];
         const targetIntervalPlacer = new IntervalPlacer(MARGIN);
         const queryIntervalPlacer = new IntervalPlacer(MARGIN);
@@ -351,32 +368,18 @@ export class MultiAlignmentViewCalculator {
         }
         // Finally, using the x coordinates, construct the query nav context
         const queryPieces = this._getQueryPieces(placements);
-        const queryRegion = this._makeQueryGenomeRegion(queryPieces, newVisWidth, newDrawModel);
+        const queryRegion = this._makeQueryGenomeRegion(queryPieces, visWidth, drawModel);
 
         return {
             isFineMode: true,
-            primaryVisData: {
-                visRegion: newVisRegion,
-                visWidth: newVisWidth,
-                viewWindowRegion: newViewWindowRegion,
-                viewWindow: newViewWindow,
-            },
+            primaryVisData: visData,
             queryRegion,
             drawData: placements,
             drawGapText: drawGapTexts,
             primaryGenome: this.primaryGenome,
             queryGenome: query,
-            basesPerPixel: newDrawModel.xWidthToBases(1)
+            basesPerPixel: drawModel.xWidthToBases(1)
         };
-
-        function convertOldVisRegion(visRegion: DisplayedRegionModel) {
-            const [contextStart, contextEnd] = visRegion.getContextCoordinates();
-            return new DisplayedRegionModel(
-                newNavContext,
-                navContextBuilder.convertOldCoordinates(contextStart),
-                navContextBuilder.convertOldCoordinates(contextEnd)
-            );
-        }
     }
 
     /**
