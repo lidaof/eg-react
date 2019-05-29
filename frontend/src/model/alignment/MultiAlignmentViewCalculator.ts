@@ -155,8 +155,6 @@ export class MultiAlignmentViewCalculator {
         const navContextBuilder = new NavContextBuilder(oldNavContext);
         navContextBuilder.setGaps(allGaps);
         const newNavContext = navContextBuilder.build();
-        console.log(oldNavContext);
-        console.log(newNavContext);
         // Calculate new DisplayedRegionModel and LinearDrawingModel from the new nav context
         const newVisRegion = convertOldVisRegion(visRegion);
         const newViewWindowRegion = convertOldVisRegion(viewWindowRegion);
@@ -370,7 +368,6 @@ export class MultiAlignmentViewCalculator {
         // Finally, using the x coordinates, construct the query nav context
         const queryPieces = this._getQueryPieces(placements);
         const queryRegion = this._makeQueryGenomeRegion(queryPieces, visWidth, drawModel);
-        console.log(placements);
         return {
             isFineMode: true,
             primaryVisData: visData,
