@@ -155,7 +155,8 @@ export class MultiAlignmentViewCalculator {
         const navContextBuilder = new NavContextBuilder(oldNavContext);
         navContextBuilder.setGaps(allGaps);
         const newNavContext = navContextBuilder.build();
-
+        console.log(oldNavContext);
+        console.log(newNavContext);
         // Calculate new DisplayedRegionModel and LinearDrawingModel from the new nav context
         const newVisRegion = convertOldVisRegion(visRegion);
         const newViewWindowRegion = convertOldVisRegion(viewWindowRegion);
@@ -260,7 +261,7 @@ export class MultiAlignmentViewCalculator {
             return index;
         }
     }
-    alignFine(query: string, records: AlignmentRecord[], OldvisData: ViewExpansion, visData: ViewExpansion): Alignment {
+    alignFine(query: string, records: AlignmentRecord[], oldVisData: ViewExpansion, visData: ViewExpansion): Alignment {
         // There's a lot of steps, so bear with me...
         const {visRegion, visWidth} = visData;
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
@@ -268,19 +269,19 @@ export class MultiAlignmentViewCalculator {
         const minGapLength = MIN_GAP_LENGTH;
         
         // Calculate context coordinates of the records and gaps within.
-        const navContext = visRegion.getNavigationContext();
+        const navContext = oldVisData.visRegion.getNavigationContext();
+        const placements = this._computeContextLocations(records, oldVisData);
+        const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
         const navContextBuilder = new NavContextBuilder(navContext);
-        const placements = this._computeContextLocations(records, OldvisData);
+        navContextBuilder.setGaps(primaryGaps);
         // With the draw model, we can set x spans for each placed alignment
         for (const placement of placements) {
             const oldContextSpan = placement.contextSpan;
-            console.log(oldContextSpan)
             const visiblePart = placement.visiblePart;
             const newContextSpan = new OpenInterval(
                 navContextBuilder.convertOldCoordinates(oldContextSpan.start),
                 navContextBuilder.convertOldCoordinates(oldContextSpan.end)
             );
-            console.log(newContextSpan);
             const xSpan = drawModel.baseSpanToXSpan(newContextSpan);
             const targetSeq = visiblePart.getTargetSequence();
             const querySeq = visiblePart.getQuerySequence();
@@ -369,7 +370,7 @@ export class MultiAlignmentViewCalculator {
         // Finally, using the x coordinates, construct the query nav context
         const queryPieces = this._getQueryPieces(placements);
         const queryRegion = this._makeQueryGenomeRegion(queryPieces, visWidth, drawModel);
-
+        console.log(placements);
         return {
             isFineMode: true,
             primaryVisData: visData,
