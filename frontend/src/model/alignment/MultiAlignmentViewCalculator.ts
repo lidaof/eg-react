@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import { GuaranteeMap } from '../../model/GuaranteeMap';
+// import { GuaranteeMap } from '../../model/GuaranteeMap';
 
 import { segmentSequence, makeBaseNumberLookup, countBases, SequenceSegment, GAP_CHAR } from './AlignmentStringUtils';
 import { AlignmentRecord } from './AlignmentRecord';
@@ -18,7 +18,7 @@ import { ViewExpansion } from '../RegionExpander';
 import { FeaturePlacer } from '../FeaturePlacer';
 import DisplayedRegionModel from '../DisplayedRegionModel';
 import { niceBpCount } from '../../util';
-import { object } from 'prop-types';
+// import { object } from 'prop-types';
 
 export interface PlacedAlignment {
     record: AlignmentRecord;
@@ -95,12 +95,10 @@ const FEATURE_PLACER = new FeaturePlacer();
 export class MultiAlignmentViewCalculator {
     private primaryGenome: string;
     private _alignmentFetchers: AlignmentFetcher[];
-    private _viewBeingFetched: ViewExpansion;
 
     constructor(primaryGenome: string, queryGenomes: string[]) {
         this._alignmentFetchers = queryGenomes.map(queryGenome =>
             new AlignmentFetcher(primaryGenome, queryGenome));
-        this._viewBeingFetched = null;
         this.primaryGenome = primaryGenome;
         this.multiAlign = memoizeOne(this.multiAlign);
     }
@@ -110,7 +108,6 @@ export class MultiAlignmentViewCalculator {
     }
     async multiAlign(visData: ViewExpansion): Promise<MultiAlignment> {
         const {visRegion, visWidth, viewWindowRegion} = visData;
-        this._viewBeingFetched = visData;
 
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
         const isFineMode = drawModel.xWidthToBases(1) < MAX_FINE_MODE_BASES_PER_PIXEL;
