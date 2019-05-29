@@ -147,6 +147,7 @@ export class MultiAlignmentViewCalculator {
     }
 
     calculatePrimaryVis(allGaps: Gap[], visData: ViewExpansion): ViewExpansion {
+        // Calculate primary visData that have all the primary gaps from different alignemnts insertions.
         const {visRegion, viewWindow, viewWindowRegion} = visData;
         const oldNavContext = visRegion.getNavigationContext();
         const navContextBuilder = new NavContextBuilder(oldNavContext);
@@ -259,17 +260,20 @@ export class MultiAlignmentViewCalculator {
     alignFine(query: string, records: AlignmentRecord[], oldVisData: ViewExpansion, visData: ViewExpansion): Alignment {
         // There's a lot of steps, so bear with me...
         const {visRegion, visWidth} = visData;
+        // drawModel is derived from visData:
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
         // const minGapLength = drawModel.xWidthToBases(MIN_GAP_DRAW_WIDTH);
         const minGapLength = MIN_GAP_LENGTH;
         
         // Calculate context coordinates of the records and gaps within.
+        // calculate navContext and placements using oldVisData so small gaps won't seperate different features:
         const navContext = oldVisData.visRegion.getNavigationContext();
         const placements = this._computeContextLocations(records, oldVisData);
         const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
         const navContextBuilder = new NavContextBuilder(navContext);
         navContextBuilder.setGaps(primaryGaps);
         // With the draw model, we can set x spans for each placed alignment
+        // Adjust contextSpan and xSpan in placements using visData:
         for (const placement of placements) {
             const oldContextSpan = placement.contextSpan;
             const visiblePart = placement.visiblePart;
