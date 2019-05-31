@@ -108,7 +108,7 @@ export function ensureMaxListLength<T>(list: T[], limit: number): T[] {
  * @return {string} human-readable string representing that number of bases
  */
 export function niceBpCount(bases: number, useMinus=false) {
-    const rounded = Math.floor(bases);
+    const rounded = bases >= 1000 ? Math.floor(bases) : Math.round(bases);
     if (rounded >= 750000) {
         return `${(rounded/1000000).toFixed(1)} Mb`;
     } else if (rounded >= 10000) {

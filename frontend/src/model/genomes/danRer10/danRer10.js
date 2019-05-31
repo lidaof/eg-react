@@ -56,6 +56,30 @@ const defaultTracks = [
     }),
 ];
 
+
+// const publicHubData = {
+//     "Encyclopedia of DNA Elements (ENCODE)": "The Encyclopedia of DNA Elements (ENCODE) Consortium is an " +
+//         "international collaboration of research groups funded by the National Human Genome Research Institute " +
+//         "(NHGRI). The goal of ENCODE is to build a comprehensive parts list of functional elements in the human " +
+//         "genome, including elements that act at the protein and RNA levels, and regulatory elements that control " +
+//         "cells and circumstances in which a gene is active.",
+// };
+
+// const publicHubList = [
+//     {
+//         collection: "Encyclopedia of DNA Elements (ENCODE)",
+//         name: "Zebrafish ENCODE",
+//         numTracks: 66,
+//         oldHubFormat: false,
+//         url: "https://vizhub.wustl.edu/collaboratorsHubs/danRer10/YueLab/hub",
+//         description: {
+//             'hub built by': 'Daofeng Li (dli23@wustl.edu)',
+//             'hub built date': 'May 22 2019',
+//             'hub built notes': "Data and metadata information are obtained from Feng Yue's lab"
+//         },
+//     }
+// ]
+
 const DAN_RER10 = {
     genome,
     navContext,
@@ -64,6 +88,8 @@ const DAN_RER10 = {
     defaultTracks,
     twoBitURL: 'https://vizhub.wustl.edu/public/danRer10/danRer10.2bit',
     annotationTracks,
+    // publicHubData,
+    // publicHubList,
 };
 
 export default DAN_RER10;
