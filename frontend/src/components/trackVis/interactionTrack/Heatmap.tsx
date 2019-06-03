@@ -1,10 +1,12 @@
 import React from 'react';
 import { ScaleLinear } from 'd3-scale';
 // import _ from 'lodash';
+import PolygonLookup from 'polygon-lookup';
 import { GenomeInteraction } from '../../../model/GenomeInteraction';
 import { PlacedInteraction } from '../../../model/FeaturePlacer';
 import OpenInterval from '../../../model/interval/OpenInterval';
 import DesignRenderer, { RenderTypes } from '../../../art/DesignRenderer';
+import { getRelativeCoordinates } from '../../../util';
 
 interface HeatmapProps {
     placedInteractions: PlacedInteraction[];
@@ -23,6 +25,25 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
     // static getHeight(props: HeatmapProps) {
     //     return 0.5 * props.viewWindow.getLength();
     // }
+
+    polygonCollection: any;
+    lookup: any;
+    constructor(props: HeatmapProps){
+        super(props);
+        this.polygonCollection = {
+                features: []
+        };
+        // this.renderTooltip = _.debounce(this.renderTooltip.bind(this), 250);
+    }
+
+    componentDidMount(){
+        this.lookup = new PolygonLookup(this.polygonCollection);
+    }
+
+    componentDidUpdate(){
+        this.lookup = new PolygonLookup(this.polygonCollection);
+        console.log(this.polygonCollection.features);
+    }
 
     renderRect = (placedInteraction: PlacedInteraction, index: number) => {
         const { opacityScale, color, color2, onInteractionHovered, viewWindow} = this.props;
@@ -53,12 +74,19 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
             [topX - halfSpan1 + halfSpan2, bottomY], // Bottom = left + halfSpan2
             [topX + halfSpan2, topY + halfSpan2] // Right
         ];
+        this.polygonCollection.features.push({
+            interaction: placedInteraction.interaction,
+		    geometry: {
+                type: 'Polygon',
+                coordinates: [ points ]
+                }
+        });
         return <polygon
             key={placedInteraction.generateKey()+index}
             points={points as any} // React can convert the array to a string
             fill={score >=0 ? color : color2}
             opacity={opacityScale(score)}
-            onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
+            // onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
         />;
     
         // const height = bootomYs.length > 0 ? Math.round(_.max(bootomYs)) : 50;
@@ -66,11 +94,20 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
         // return <svg width={width} height={Heatmap.getHeight(this.props)} onMouseOut={onMouseOut} >{diamonds}</svg>;
     }
 
+    renderTooltip = (event: React.MouseEvent) => {
+        // console.log(event.currentTarget);
+        const {x, y} = getRelativeCoordinates(event);
+        console.log(x, y);
+        const polygon = this.lookup.search(x, y);
+        console.log(polygon);
+    }
+
     render() {
+        this.polygonCollection.features = [];
         const {placedInteractions, width, forceSvg, height} = this.props;
         return <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} 
-                            width={width} height={height}>
-            {placedInteractions.map(this.renderRect)}
-        </DesignRenderer>
+                                width={width} height={height} onMouseMove={this.renderTooltip}>
+                {placedInteractions.map(this.renderRect)}
+            </DesignRenderer>
     }
 }
