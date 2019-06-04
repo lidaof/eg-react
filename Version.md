@@ -1,5 +1,7 @@
 # Version History
 
+* tooltip on heatmap style of interaction track
+
 ## 48.4.6
 
 * tooltips on genome align track, both rough and fine mode (from Xiaoyu)

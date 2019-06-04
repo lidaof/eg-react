@@ -19,11 +19,13 @@ class HoverTooltipContext extends React.PureComponent {
          */
         getTooltipContents: PropTypes.func,
         // Remaining props get passed to the <div>
+        useRelativeY: PropTypes.bool, // if need use relative y for tooltip
     };
 
     static defaultProps = {
         tooltipRelativeY: 0,
-        getTooltipContents: relativeX => null
+        getTooltipContents: relativeX => null,
+        useRelativeY: false,
     };
 
     constructor(props) {
@@ -41,14 +43,17 @@ class HoverTooltipContext extends React.PureComponent {
      * @param {MouseEvent} event - mouse event that triggered this callback
      */
     showTooltip(event) {
-        const {tooltipRelativeY, getTooltipContents} = this.props;
-        const relativeX = getRelativeCoordinates(event).x;
-        const contents = getTooltipContents(relativeX);
+        const {tooltipRelativeY, getTooltipContents, useRelativeY} = this.props;
+        const {x, y} = getRelativeCoordinates(event);
+        const contents = useRelativeY ? getTooltipContents(x, y) : getTooltipContents(x);
         if (!contents) {
             this.closeTooltip();
             return;
         }
-        const pageY = getPageCoordinates(event.currentTarget, 0, tooltipRelativeY).y;
+        const pageY = useRelativeY ? 
+            getPageCoordinates(event.currentTarget, 0, y).y
+            :
+            getPageCoordinates(event.currentTarget, 0, tooltipRelativeY).y;
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={pageY} onClose={this.closeTooltip} ignoreMouse={true} >
                 {contents}
@@ -68,7 +73,7 @@ class HoverTooltipContext extends React.PureComponent {
      * @return {JSX.Element} children and the tooltip
      */
     render() {
-        const {tooltipRelativeY, getTooltipContents, children, ...otherProps} = this.props;
+        const {tooltipRelativeY, getTooltipContents, children, useRelativeY, ...otherProps} = this.props;
         return (
         <div onMouseMove={this.showTooltip} onMouseLeave={this.closeTooltip} {...otherProps} >
             {children}
