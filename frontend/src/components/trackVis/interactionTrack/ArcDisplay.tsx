@@ -3,8 +3,8 @@ import { ScaleLinear } from 'd3-scale';
 import { PlacedInteraction } from '../../../model/FeaturePlacer';
 import OpenInterval from '../../../model/interval/OpenInterval';
 import { GenomeInteraction } from '../../../model/GenomeInteraction';
-// import _ from 'lodash';
 import DesignRenderer, { RenderTypes } from '../../../art/DesignRenderer';
+import HoverTooltipContext from '../commonComponents/tooltip/HoverTooltipContext';
 
 import './ArcDisplay.css';
 
@@ -32,9 +32,14 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     //     return 0.5 * props.viewWindow.getLength();
     // }
     
+    arcData: any[];
+
+    componentDidUpdate() {
+        console.log(this.arcData);
+    }
 
     renderArc = (placedInteraction: PlacedInteraction, index: number) => {
-        const {opacityScale, color, color2, onInteractionHovered, lineWidth} = this.props;
+        const {opacityScale, color, color2, lineWidth} = this.props;
         // const arcs = [], arcHeights = [];
         // const curveYScale = scaleLinear().domain([0, viewWindow.getLength()]).range([0, HEIGHT]).clamp(true);
         const score = placedInteraction.interaction.score;
@@ -44,7 +49,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         const {xSpan1, xSpan2} = placedInteraction;
         const xSpan1Center = 0.5 * (xSpan1.start + xSpan1.end);
         const xSpan2Center = 0.5 * (xSpan2.start + xSpan2.end);
-        // const spanCenter = 0.5 * (xSpan1Center + xSpan2Center);
+        const spanCenter = 0.5 * (xSpan1Center + xSpan2Center);
         const spanLength = xSpan2Center - xSpan1Center;
         if (spanLength < 1) {
             return null;
@@ -56,6 +61,9 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         //     arcHeights.push(arcHeight);
         // }
         const radius = Math.max(0, spanLength / Math.SQRT2 - lineWidth / 2);
+        this.arcData.push([
+            spanCenter, 0, radius, placedInteraction.interaction
+        ]);
         return (<path
             key={placedInteraction.generateKey()+index}
             // d={moveTo(xSpan1Center, 0) + quadraticCurveTo(spanCenter, curveYScale(spanLength), xSpan2Center, 0)}
@@ -65,20 +73,47 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
             className="ArcDisplay-emphasize-on-hover"
             stroke={score >=0 ? color: color2}
             strokeWidth={lineWidth}
-            onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
+            // onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
         />);
         // const height = arcHeights.length > 0 ? Math.round(_.max(arcHeights)) : 50;
         // return <svg width={width} height={height} onMouseOut={onMouseOut}>{arcs}</svg>;
         }
 
+    renderTooltip = (relativeX: number, relativeY: number): JSX.Element => {
+        const arc = this.findArc(relativeX, relativeY);
+        if (arc) {
+            return <div>
+                    <div>Locus1: {arc[3].locus1.toString()}</div>
+                    <div>Locus2: {arc[3].locus2.toString()}</div>
+                    <div>Score: {arc[3].score}</div>
+                </div>;
+        } else {
+            return null;
+        }
+    }
+    /*
+    the findDecoritem_longrange_arc function from old browser code
+    */
+    findArc = (x: number, y: number): any => {
+        for (const item of this.arcData) {
+            if (Math.abs(Math.sqrt(Math.pow(x - item[0], 2) + Math.pow(y - item[1], 2)) - item[2]) <= 2) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     render() {
+        this.arcData = [];
         const {placedInteractions, width, forceSvg, height} = this.props;
         let sortedInteractions = placedInteractions.slice().sort((a, b) => b.interaction.score - a.interaction.score);
         sortedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
-        return <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} 
-                            width={width} height={height}>
-            {sortedInteractions.map(this.renderArc)}
-        </DesignRenderer>
+        return <HoverTooltipContext getTooltipContents={this.renderTooltip} useRelativeY={true}>
+                    <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} 
+                                        width={width} height={height}>
+                        {sortedInteractions.map(this.renderArc)}
+                    </DesignRenderer>
+                </HoverTooltipContext>
     }
 }
 

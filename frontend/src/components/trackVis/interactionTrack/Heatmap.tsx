@@ -1,8 +1,5 @@
 import React from 'react';
 import { ScaleLinear } from 'd3-scale';
-// import _ from 'lodash';
-// import PolygonLookup from 'polygon-lookup';
-// import whichPolygon from 'which-polygon';
 import pointInPolygon from 'point-in-polygon';
 import { GenomeInteraction } from '../../../model/GenomeInteraction';
 import { PlacedInteraction } from '../../../model/FeaturePlacer';
@@ -28,19 +25,10 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
     //     return 0.5 * props.viewWindow.getLength();
     // }
 
-    polygonCollection: any;
-    lookup: any;
-    hmdata: any[];
-    constructor(props: HeatmapProps){
-        super(props);
-        this.polygonCollection = {
-                features: []
-        };
-    }
+    hmData: any[];
 
     renderRect = (placedInteraction: PlacedInteraction, index: number) => {
         const { opacityScale, color, color2, viewWindow, height} = this.props;
-        // const bootomYs = [];
         const score = placedInteraction.interaction.score;
         if (!score) {
             return null;
@@ -55,12 +43,7 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
         const topY = 0.5 * gapLength;
         const halfSpan1 = Math.max(0.5 * xSpan1.getLength(), 1);
         const halfSpan2 = Math.max(0.5 * xSpan2.getLength(), 1);
-        // const halfSpan1 = 0.5 * xSpan1.getLength();
-        // const halfSpan2 = 0.5 * xSpan2.getLength();
         const bottomY = topY + halfSpan1 + halfSpan2;
-        // if(gapCenter > viewWindow.start && gapCenter < viewWindow.end) {
-        //     bootomYs.push(bottomY);
-        // }
         const points = [ // Going counterclockwise
             [topX, topY], // Top
             [topX - halfSpan1, topY + halfSpan1], // Left
@@ -70,15 +53,7 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
         const key = placedInteraction.generateKey()+index;
         // only push the points in screen
         if (topX + halfSpan2 > viewWindow.start && topX - halfSpan1 < viewWindow.end && topY < height) {
-            // this.polygonCollection.features.push({
-            //     properties: placedInteraction.interaction,
-            //     geometry: {
-            //         type: 'Polygon',
-            //         // key,
-            //         coordinates: [ points ],
-            //         }
-            // });
-            this.hmdata.push({
+            this.hmData.push({
                 points,
                 interaction: placedInteraction.interaction,
             })
@@ -105,8 +80,6 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
      * @return {JSX.Element} tooltip to render
      */
     renderTooltip = (relativeX: number, relativeY: number): JSX.Element => {
-        // const polygon = this.lookup.search(relativeX, relativeY);
-        // const polygon = this.lookup([relativeX, relativeY]);
         const polygon = this.findPolygon(relativeX, relativeY);
         if (polygon) {
             return <div>
@@ -119,9 +92,8 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
         }
     }
 
-
     findPolygon = (x: number, y: number): any => {
-        for (const item of this.hmdata) {
+        for (const item of this.hmData) {
             if(pointInPolygon([x, y], item.points)) {
                 return item;
             }
@@ -131,7 +103,7 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
 
     render() {
         // this.polygonCollection.features = [];
-        this.hmdata = []
+        this.hmData = []
         const {placedInteractions, width, forceSvg, height} = this.props;
         return <HoverTooltipContext getTooltipContents={this.renderTooltip} useRelativeY={true}>
                     <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} 
