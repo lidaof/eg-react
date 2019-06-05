@@ -1,6 +1,10 @@
 # Version History
 
+## 48.5.0
+
+* track height and color configuration enabled for genome align track
 * tooltip on heatmap style of interaction track
+* tooltip on arc style of interaction track
 
 ## 48.4.6
 

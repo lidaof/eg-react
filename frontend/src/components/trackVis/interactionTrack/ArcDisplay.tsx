@@ -22,9 +22,7 @@ interface ArcDisplayProps {
     forceSvg?: boolean;
 }
 
-// const HEIGHT = 500;
-// const STROKE_WIDTH = 2;
-const ITEM_LIMIT = 1000;
+// const ITEM_LIMIT = 1000;
 
 export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     // static getHeight(props: ArcDisplayProps) {
@@ -34,9 +32,6 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     
     arcData: any[];
 
-    componentDidUpdate() {
-        console.log(this.arcData);
-    }
 
     renderArc = (placedInteraction: PlacedInteraction, index: number) => {
         const {opacityScale, color, color2, lineWidth} = this.props;
@@ -47,22 +42,23 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
             return null;
         }
         const {xSpan1, xSpan2} = placedInteraction;
-        const xSpan1Center = 0.5 * (xSpan1.start + xSpan1.end);
-        const xSpan2Center = 0.5 * (xSpan2.start + xSpan2.end);
+        let xSpan1Center, xSpan2Center;
+        if (xSpan1.start === xSpan2.start && xSpan1.end === xSpan2.end) { // inter-region arc
+            xSpan1Center = xSpan1.start;
+            xSpan2Center = xSpan1.end;
+        } else {
+            xSpan1Center = 0.5 * (xSpan1.start + xSpan1.end);
+            xSpan2Center = 0.5 * (xSpan2.start + xSpan2.end);
+        }
         const spanCenter = 0.5 * (xSpan1Center + xSpan2Center);
         const spanLength = xSpan2Center - xSpan1Center;
+        const halfLength = 0.5 * spanLength;
         if (spanLength < 1) {
             return null;
         }
-        // const arcHeight = curveYScale(spanLength) * 0.5 + 10;
-        // const arcHeight =  Math.max(50, spanLength * ((1 / Math.SQRT2) - 0.5) + 22);
-        // const arcHeight = 0.375 * Math.abs( - xSpan1.start - xSpan2.start + 2 * spanCenter);
-        // if(spanCenter > viewWindow.start && spanCenter < viewWindow.end) {
-        //     arcHeights.push(arcHeight);
-        // }
-        const radius = Math.max(0, spanLength / Math.SQRT2 - lineWidth / 2);
+        const radius = Math.max(0, Math.SQRT2 * halfLength - lineWidth * 0.5);  
         this.arcData.push([
-            spanCenter, 0, radius, placedInteraction.interaction
+            spanCenter, - halfLength, radius, lineWidth, placedInteraction.interaction
         ]);
         return (<path
             key={placedInteraction.generateKey()+index}
@@ -83,20 +79,21 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         const arc = this.findArc(relativeX, relativeY);
         if (arc) {
             return <div>
-                    <div>Locus1: {arc[3].locus1.toString()}</div>
-                    <div>Locus2: {arc[3].locus2.toString()}</div>
-                    <div>Score: {arc[3].score}</div>
+                    <div>Locus1: {arc[4].locus1.toString()}</div>
+                    <div>Locus2: {arc[4].locus2.toString()}</div>
+                    <div>Score: {arc[4].score}</div>
                 </div>;
         } else {
             return null;
         }
     }
     /*
-    the findDecoritem_longrange_arc function from old browser code
+    calculate the distance for mouse point to center of arc, allow half [lineWidth]px tolerance
+    same logic as the findDecoritem_longrange_arc function from old browser code
     */
     findArc = (x: number, y: number): any => {
         for (const item of this.arcData) {
-            if (Math.abs(Math.sqrt(Math.pow(x - item[0], 2) + Math.pow(y - item[1], 2)) - item[2]) <= 2) {
+            if (Math.abs(Math.sqrt(Math.pow(x - item[0], 2) + Math.pow(y - item[1], 2)) - item[2]) <= 0.5 * item[3]) {
                 return item;
             }
         }
@@ -106,12 +103,13 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     render() {
         this.arcData = [];
         const {placedInteractions, width, forceSvg, height} = this.props;
-        let sortedInteractions = placedInteractions.slice().sort((a, b) => b.interaction.score - a.interaction.score);
-        sortedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
+        // const sortedInteractions = placedInteractions.slice().sort((a, b) 
+        //        => b.interaction.score - a.interaction.score);
+        // const slicedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
         return <HoverTooltipContext getTooltipContents={this.renderTooltip} useRelativeY={true}>
                     <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} 
                                         width={width} height={height}>
-                        {sortedInteractions.map(this.renderArc)}
+                        {placedInteractions.map(this.renderArc)}
                     </DesignRenderer>
                 </HoverTooltipContext>
     }

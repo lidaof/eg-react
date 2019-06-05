@@ -102,7 +102,6 @@ export class Heatmap extends React.PureComponent<HeatmapProps, {}> {
     }
 
     render() {
-        // this.polygonCollection.features = [];
         this.hmData = []
         const {placedInteractions, width, forceSvg, height} = this.props;
         return <HoverTooltipContext getTooltipContents={this.renderTooltip} useRelativeY={true}>
