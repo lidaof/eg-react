@@ -25,13 +25,27 @@ export class AnnotationTrackUI extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            secondConfigs: this.getSecondConfigs()
+        };
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(prevProps.addedTracks !== this.props.addedTracks) {
+            this.setState( {
+                secondConfigs: this.getSecondConfigs()
+            });
+        }
+    }
+
+    getSecondConfigs = () => {
         const secondaryGenomes = getSecondaryGenomes(this.props.genomeConfig.genome.getName(), this.props.addedTracks);
-        this.secondaryGenomeConfigs = secondaryGenomes.map(g => getGenomeConfig(g));
+        return secondaryGenomes.map(g => getGenomeConfig(g));
     }
 
     renderSecondaryUI = () => {
         const {addedTrackSets, addedTracks, onTracksAdded, groupedTrackSets} = this.props;
-        return this.secondaryGenomeConfigs.map(config => 
+        return this.state.secondConfigs.map(config => 
             <AnnotationTrackSelector
                 key={config.genome.getName()}
                 addedTracks={addedTracks}

@@ -3,8 +3,11 @@
 ## 48.5.0
 
 * track height and color configuration enabled for genome align track
-* tooltip on heatmap style of interaction track
-* tooltip on arc style of interaction track
+* tooltip on heatmap and heatmap style of interaction track
+* annotation tracks adding UI will be shown when corresponding genome align track is added
+* fixed a bug that intra-region arcs are not displayed
+* fixed an [Unable to preventDefault inside passive event listener](https://github.com/facebook/react/issues/6436) bug
+* fixed the bug highlight region error when genomealign track is added, related to [#104](https://github.com/lidaof/eg-react/issues/104)
 
 ## 48.4.6
 

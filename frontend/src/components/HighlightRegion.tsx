@@ -1,15 +1,16 @@
 import React from 'react';
-
-import './HighlightRegion.css';
 import OpenInterval from '../model/interval/OpenInterval';
 import LinearDrawingModel from '../model/LinearDrawingModel';
 import { withTrackLegendWidth } from './withTrackLegendWidth';
 import { ViewExpansion } from '../model/RegionExpander';
+import ChromosomeInterval from '../model/interval/ChromosomeInterval';
+
+import './HighlightRegion.css';
 
 interface HighlightRegionProps {
     y?: number | string; // Relative Y of the top of the selection box; how far from the top of this container
     height?: number | string; // Height of the selection box
-    enteredRegion: OpenInterval;
+    enteredRegion: ChromosomeInterval;
     highlightEnteredRegion: boolean;
     visData: ViewExpansion;
     legendWidth: number;
@@ -44,11 +45,14 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         super(props);
     }
 
-    getHiglightedXs(xSpan: OpenInterval): OpenInterval {
-        const {legendWidth} = this.props;
-        const {viewWindowRegion, viewWindow} = this.props.visData;
+    getHiglightedXs(chrInterval: ChromosomeInterval): OpenInterval {
+        const {legendWidth, visData} = this.props;
+        const {viewWindowRegion, viewWindow} = visData;
+        const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
+        // there will be many interval when there are gaps
         const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
-        const xRegion = drawModel.baseSpanToXSpan(xSpan);
+        const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
+        const xRegion = drawModel.baseSpanToXSpan(interval);
         let start = Math.max(legendWidth, xRegion.start + legendWidth);
         let end = xRegion.end + legendWidth;
         if (end <= start) {

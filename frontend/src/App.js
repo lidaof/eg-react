@@ -189,8 +189,8 @@ class App extends React.Component {
         this.setState(prevState => {return {highlightEnteredRegion: !prevState.highlightEnteredRegion}});
     };
 
-    setEnteredRegion = (interval) => {
-        this.setState({enteredRegion: interval});
+    setEnteredRegion = (chrInterval) => {
+        this.setState({enteredRegion: chrInterval});
     }
 
     setHighlightColor = (color) => {

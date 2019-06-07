@@ -20,7 +20,7 @@ export const DEFAULT_OPTIONS = {
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 // const FINE_MODE_HEIGHT = 80;
-const ALIGN_TRACK_MARGIN = 10; // The margin on top and bottom of alignment block
+const ALIGN_TRACK_MARGIN = 20; // The margin on top and bottom of alignment block
 // const ROUGH_MODE_HEIGHT = 80;
 const RECT_HEIGHT = 15;
 const TICK_MARGIN = 1;

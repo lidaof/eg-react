@@ -95,7 +95,7 @@ class SnpSearchBox extends React.PureComponent {
         if (interval) {
             this.props.onRegionSelected(...interval);
             this.props.handleCloseModal();
-            this.props.onSetEnteredRegion(interval);
+            this.props.onSetEnteredRegion(chrInterval);
         } else {
             notify.show("SNP not available in current region set view",  'error', 2000);
         }

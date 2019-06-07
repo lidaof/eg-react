@@ -78,6 +78,20 @@ class MainPane extends React.Component {
         this.mousewheel = this.mousewheel.bind(this);
     }
 
+    componentRef = React.createRef();
+
+    componentDidMount() {
+        if (this.componentRef.current) {
+            this.componentRef.current.addEventListener('wheel', this.mousewheel);
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.componentRef.current) {
+            this.componentRef.current.removeEventListener('wheel', this.mousewheel);
+        }
+    }
+
     /**
      * Zooms the view depending on the user's mousewheel action
      * 
@@ -127,8 +141,8 @@ class MainPane extends React.Component {
                     width="100%"
                     height={SVG_HEIGHT}
                     onContextMenu={event => event.preventDefault()}
-                    onWheel={this.mousewheel}
                     style={{border: "1px solid black"}}
+                    ref={this.componentRef}
                 >
                     <PrimaryGenomeChromosomes viewRegion={viewRegion} width={containerWidth} y={CHROMOSOME_Y} />
                     <Ruler viewRegion={viewRegion} width={containerWidth} y={RULER_Y} />

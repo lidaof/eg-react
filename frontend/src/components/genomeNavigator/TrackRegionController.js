@@ -5,6 +5,7 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import GeneSearchBox from './GeneSearchBox';
 import SnpSearchBox from './SnpSearchBox';
 import { CopyToClip } from '../CopyToClipboard';
+import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 
 const MODAL_STYLE = {
     content: {
@@ -97,7 +98,7 @@ class TrackRegionController extends React.Component {
             this.setState({badInputMessage: ""});
         }
         this.props.onRegionSelected(parsedRegion.start, parsedRegion.end);
-        this.props.onSetEnteredRegion(parsedRegion);
+        this.props.onSetEnteredRegion(ChromosomeInterval.parse(this.input.value));
         this.handleCloseModal();
     }
 

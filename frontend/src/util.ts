@@ -214,9 +214,9 @@ export function getSecondaryGenomes(current: string, tracks: any[]) {
             if (tk.querygenome) {
                 genomes.push(tk.querygenome);
             }
-            if (tk.metadata && tk.metadata.genome !== current) {
-                genomes.push(tk.metadata.genome);
-            }
+        }
+        if (tk.metadata && tk.metadata.genome && tk.metadata.genome !== current) {
+            genomes.push(tk.metadata.genome);
         }
     });
     return _.uniq(genomes);
