@@ -64,19 +64,23 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
      * @return {JSX.Element} element visualizing the feature
      */
     renderAnnotation(placedGroup: PlacedFeatureGroup, y: number, isLastRow: boolean, index: number) {
-        return placedGroup.placedFeatures.map((placement, i) =>
-            <CategoricalAnnotation
+        const {category, height} = this.props.options;
+        return placedGroup.placedFeatures.map((placement, i) => {
+            const featureName = placement.feature.getName();
+            const color = category && category[featureName] ? category[featureName].color: 'blue';
+            return <CategoricalAnnotation
                 key={i}
                 feature={placement.feature}
                 xSpan={placement.xSpan}
                 y={0}
                 isMinimal={false}
-                color={this.props.options.category ? 
-                    this.props.options.category[placement.feature.getName()].color: 'blue'}
+                color={color}
                 onClick={this.renderTooltip}
-                category={this.props.options.category}
-                height={this.props.options.height}
-            />
+                category={category}
+                height={height}
+                />;
+        }
+            
         );
     }
 

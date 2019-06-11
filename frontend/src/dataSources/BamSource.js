@@ -3,6 +3,7 @@ import DataSource from './DataSource';
 // import bam from '../vendor/bbi-js/main/bam';
 // import bin from '../vendor/bbi-js/utils/bin';
 import { BamFile } from '@gmod/bam';
+import { BlobFile } from 'generic-filehandle';
 
 /*
 BamRecord {
@@ -21,9 +22,10 @@ BamRecord {
 */
 
 class BamSource extends DataSource {
-    constructor(url) {
+    constructor(param) {
+        // is param is string, it's a url, otherwise a File Obj array
         super();
-        this.url = url;
+        this.bam = null;
         // this.bamPromise = new Promise((resolve, reject) => {
         //     bam.makeBam(new bin.URLFetchable(url), new bin.URLFetchable(url + ".bai"), null, (reader, error) => {
         //         if (error) {
@@ -33,13 +35,21 @@ class BamSource extends DataSource {
         //         }
         //     });
         // });
-        this.bam = new BamFile({
-            bamUrl: url,
-            baiUrl: url + '.bai',
-        });
-        this.header = null;
+        if (typeof param === "string") {
+            this.bam = new BamFile({
+                bamUrl: param,
+                baiUrl: param + '.bai',
+            });
+        } else {
+            const baiFilehandle = new BlobFile(param.filter(f => f.name.endsWith('.bai'))[0]);
+            const bamFilehandle = new BlobFile(param.filter(f => !f.name.endsWith('.bai'))[0]);
+            this.bam = new BamFile({
+                bamFilehandle,
+                baiFilehandle,
+            });
+        }
         // console.log(this.bam);
-        
+        this.header = null;
     }
 
     async getData(region, basesPerPixel, options={}) {

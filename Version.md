@@ -8,6 +8,9 @@
 * fixed a bug that intra-region arcs are not displayed
 * fixed an [Unable to preventDefault inside passive event listener](https://github.com/facebook/react/issues/6436) bug
 * fixed the bug highlight region error when genomealign track is added, related to [#104](https://github.com/lidaof/eg-react/issues/104)
+* fixed an issue that tracks order in local hub doesn't follow order in `hub.config.json` file
+* local track supports BAM track now
+* fixed a bug that categorytrack error when category not exists in hub file
 
 ## 48.4.6
 

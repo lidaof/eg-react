@@ -19,7 +19,11 @@ export class BamTrackConfig extends AnnotationTrackConfig {
     }
 
     initDataSource() {
-        return new BamSource(this.trackModel.url);
+        if (this.trackModel.files.length > 0) {
+            return new BamSource(this.trackModel.files);
+        } else {
+            return new BamSource(this.trackModel.url);
+        }
     }
 
     formatData(data: any[]) {
