@@ -55,7 +55,8 @@ class HorizontalFragment extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {height, targetXSpanList, queryXSpanList, primaryColor, queryColor, onMouseMove, onMouseLeave, style, children, ...otherProps} = this.props;
+        const {height, targetXSpanList, queryXSpanList, primaryColor, queryColor, 
+            onMouseMove, onMouseLeave, style, children, rectHeight, ...otherProps} = this.props;
         // calculate xSpanIndex by comparing relativeX with tangetXSpan.
         const relativeX = this.state.relativeX;
         const xSpanIndex = targetXSpanList.reduce((iCusor, x, i) => x.start < relativeX && x.end >= relativeX  ? i : iCusor, NaN);
@@ -73,8 +74,8 @@ class HorizontalFragment extends React.Component {
             lines = (
                 <React.Fragment>
                     {<HorizontalLine relativeY={LINE_MARGIN} xSpan={targetXSpan} color={primaryColor} />}
-                    {<Triangle relativeX={relativeX - TRIANGLE_SIZE} relativeY={LINE_MARGIN + LINE_WIDTH} color={primaryColor} direction={"down"}/>}
-                    {<Triangle relativeX={queryX - TRIANGLE_SIZE} relativeY={height - LINE_MARGIN - LINE_WIDTH - TRIANGLE_SIZE} color={queryColor} direction={"up"}/>}
+                    {<Triangle relativeX={relativeX - TRIANGLE_SIZE} relativeY={LINE_MARGIN + LINE_WIDTH + rectHeight} color={primaryColor} direction={"down"}/>}
+                    {<Triangle relativeX={queryX - TRIANGLE_SIZE} relativeY={height - rectHeight - LINE_MARGIN - LINE_WIDTH - TRIANGLE_SIZE} color={queryColor} direction={"up"}/>}
                     {<HorizontalLine relativeY={height - LINE_MARGIN - LINE_WIDTH} xSpan={queryXSpan} color={queryColor} />}
                 </React.Fragment>
             )

@@ -200,13 +200,13 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
     }
 
     // Add arrow to query region, arrow direction is determined by plotReverse.
-    renderRoughStrand(strand: string, viewWindow: OpenInterval, roughHeight: number) {
+    renderRoughStrand(strand: string, topY: number, viewWindow: OpenInterval, isPrimary: boolean) {
         const plotReverse = strand === '-' ? true : false;
         return <AnnotationArrows
-            key={"roughArrow" + viewWindow.start}
+            key={"roughArrow" + viewWindow.start + isPrimary}
             startX={viewWindow.start}
             endX={viewWindow.end}
-            y={roughHeight - RECT_HEIGHT}
+            y={topY}
             height={RECT_HEIGHT}
             opacity={0.75}
             isToRight={!plotReverse}
@@ -215,15 +215,24 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
     }
 
     renderRoughAlignment(placement: PlacedMergedAlignment, 
-            plotReverse: boolean, roughHeight: number, fillColor: string) {
-        const { queryFeature, queryXSpan, segments } = placement;
+            plotReverse: boolean, roughHeight: number) {
+        const { queryFeature, queryXSpan, segments, targetXSpan } = placement;
         const queryRectTopY = roughHeight - RECT_HEIGHT;
+        const targetGenomeRect = <rect
+            x={targetXSpan.start}
+            y={0}
+            width={targetXSpan.getLength()}
+            height={RECT_HEIGHT}
+            fill={this.props.options.primaryColor}
+            // tslint:disable-next-line:jsx-no-lambda
+            onClick={() => alert("You clicked on " + queryFeature.getLocus().toString())}
+        />;
         const queryGenomeRect = <rect
             x={queryXSpan.start}
             y={queryRectTopY}
             width={queryXSpan.getLength()}
             height={RECT_HEIGHT}
-            fill={fillColor}
+            fill={this.props.options.queryColor}
             // tslint:disable-next-line:jsx-no-lambda
             onClick={() => alert("You clicked on " + queryFeature.getLocus().toString())}
         />;
@@ -245,10 +254,10 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
 
         const segmentPolygons = segments.map((segment, i) => {
             const points = [
-                [Math.floor(segment.targetXSpan.start), 0],
+                [Math.floor(segment.targetXSpan.start), RECT_HEIGHT],
                 [Math.floor(segment.queryXSpan.start), queryRectTopY],
                 [Math.ceil(segment.queryXSpan.end), queryRectTopY],
-                [Math.ceil(segment.targetXSpan.end), 0],
+                [Math.ceil(segment.targetXSpan.end), RECT_HEIGHT],
             ];
             if ((!plotReverse && segment.record.queryStrand === '-') ||
                 (plotReverse && segment.record.queryStrand === '+')) {
@@ -258,7 +267,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
             return <polygon
                 key={i}
                 points={points as any} // Contrary to what Typescript thinks, you CAN pass a number[][].
-                fill={fillColor}
+                fill={this.props.options.queryColor}
                 fillOpacity={0.5}
                 // tslint:disable-next-line:jsx-no-lambda
                 onClick={() => alert("You clicked on " + segment.record.getLocus())}
@@ -266,6 +275,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
         });
 
         return <React.Fragment key={queryFeature.getLocus().toString()} >
+            {targetGenomeRect}
             {queryGenomeRect}
             {label}
             {ensureMaxListLength(segmentPolygons, MAX_POLYGONS)}
@@ -297,7 +307,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
      * @inheritdoc
      */
     render() {
-        const { width, trackModel, alignment, options } = this.props;
+        const { width, trackModel, alignment, options, viewWindow } = this.props;
         const { height, queryColor, primaryColor } = options;
         let drawheight, svgElements = [];
         const hoverHeight = height - ALIGN_TRACK_MARGIN;
@@ -331,12 +341,15 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
             const queryXSpanArray = [].concat.apply([], queryXSpanArrayArray);
             const strand = alignment.plotStrand;
             svgElements = drawData.map(placement => 
-                this.renderRoughAlignment(placement, strand === '-', height, queryColor));
-            const viewWindow = alignment.primaryVisData.viewWindow;
-            const arrow = this.renderRoughStrand(strand, viewWindow, height);
-            svgElements.push(arrow);
+                this.renderRoughAlignment(placement, strand === '-', height));
+            const arrows = this.renderRoughStrand("+", 0, viewWindow, false);
+            svgElements.push(arrows);
+            const primaryViewWindow = alignment.primaryVisData.viewWindow;
+            const primaryArrows = this.renderRoughStrand(strand, height - RECT_HEIGHT, primaryViewWindow, true);
+            svgElements.push(primaryArrows);
             visualizer = <HorizontalFragment
-                        height={height - RECT_HEIGHT}
+                        height={height}
+                        rectHeight={RECT_HEIGHT}
                         primaryColor={primaryColor}
                         queryColor={queryColor}
                         targetXSpanList={targetXSpanArray}
