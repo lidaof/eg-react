@@ -187,13 +187,13 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         }
     }
     // Add arrow to query region, arrow direction is determined by plotReverse.
-    renderRoughStrand(strand: string, viewWindow: OpenInterval) {
+    renderRoughStrand(strand: string, height: number, viewWindow: OpenInterval) {
         const plotReverse = strand === '-'?true:false;
         return    <AnnotationArrows
             key={"roughArrow" + viewWindow.start}
             startX={viewWindow.start}
             endX={viewWindow.end}
-            y={ROUGH_MODE_HEIGHT - RECT_HEIGHT}
+            y={height}
             height={RECT_HEIGHT}
             opacity={0.75}
             isToRight={!plotReverse}
@@ -202,8 +202,17 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
     }
 
     renderRoughAlignment(placement: PlacedMergedAlignment, plotReverse: boolean) {
-        const {queryFeature, queryXSpan, segments} = placement;
+        const {queryFeature, queryXSpan, segments,targetXSpan} = placement;
         const queryRectTopY = ROUGH_MODE_HEIGHT - RECT_HEIGHT;
+        const targetGenomeRect = <rect
+            x={targetXSpan.start}
+            y={0}
+            width={targetXSpan.getLength()}
+            height={RECT_HEIGHT}
+            fill={PRIMARY_COLOR}
+            // tslint:disable-next-line:jsx-no-lambda
+            onClick={() => alert("You clicked on " + queryFeature.getLocus().toString())}
+        />;
         const queryGenomeRect = <rect
             x={queryXSpan.start}
             y={queryRectTopY}
@@ -231,10 +240,10 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
 
         const segmentPolygons = segments.map((segment, i) => {
             const points = [
-                [Math.floor(segment.targetXSpan.start), 0],
+                [Math.floor(segment.targetXSpan.start), RECT_HEIGHT],
                 [Math.floor(segment.queryXSpan.start), queryRectTopY],
                 [Math.ceil(segment.queryXSpan.end), queryRectTopY],
-                [Math.ceil(segment.targetXSpan.end), 0],
+                [Math.ceil(segment.targetXSpan.end), RECT_HEIGHT],
             ];
             if ((!plotReverse && segment.record.queryStrand === '-') || 
                 (plotReverse && segment.record.queryStrand === '+')) {
@@ -252,6 +261,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
         });
 
         return <React.Fragment key={queryFeature.getLocus().toString()} >
+            {targetGenomeRect}
             {queryGenomeRect}
             {label}
             {ensureMaxListLength(segmentPolygons, MAX_POLYGONS)}
@@ -283,7 +293,7 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
      * @inheritdoc
      */
     render() {
-        const {width, trackModel, alignment} = this.props;
+        const {width, trackModel, alignment, viewWindow} = this.props;
         let height, svgElements = [];
         const hoverHeight = FINE_MODE_HEIGHT - ALIGN_TRACK_MARGIN;
         let visualizer;
@@ -320,9 +330,11 @@ export class GenomeAlignTrack extends React.Component<PropsFromTrackContainer> {
             const queryXSpanArray = [].concat.apply([], queryXSpanArrayArray);
             const strand = alignment.plotStrand;
             svgElements = drawData.map(placement => this.renderRoughAlignment(placement, strand==='-'));
-            const viewWindow = alignment.primaryVisData.viewWindow;
-            const arrow = this.renderRoughStrand(strand, viewWindow);
-            svgElements.push(arrow);
+            const arrows = this.renderRoughStrand("+", 0, viewWindow);
+            svgElements.push(arrows);
+            const primaryViewWindow = alignment.primaryVisData.viewWindow;
+            const primaryArrows = this.renderRoughStrand(strand, ROUGH_MODE_HEIGHT - RECT_HEIGHT, primaryViewWindow);
+            svgElements.push(primaryArrows);
             visualizer=(
                 <React.Fragment>
                     <HorizontalFragment 
