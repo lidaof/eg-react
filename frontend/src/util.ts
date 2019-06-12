@@ -108,7 +108,7 @@ export function ensureMaxListLength<T>(list: T[], limit: number): T[] {
  * @return {string} human-readable string representing that number of bases
  */
 export function niceBpCount(bases: number, useMinus=false) {
-    const rounded = Math.floor(bases);
+    const rounded = bases >= 1000 ? Math.floor(bases) : Math.round(bases);
     if (rounded >= 750000) {
         return `${(rounded/1000000).toFixed(1)} Mb`;
     } else if (rounded >= 10000) {
@@ -214,9 +214,9 @@ export function getSecondaryGenomes(current: string, tracks: any[]) {
             if (tk.querygenome) {
                 genomes.push(tk.querygenome);
             }
-            if (tk.metadata && tk.metadata.genome !== current) {
-                genomes.push(tk.metadata.genome);
-            }
+        }
+        if (tk.metadata && tk.metadata.genome && tk.metadata.genome !== current) {
+            genomes.push(tk.metadata.genome);
         }
     });
     return _.uniq(genomes);

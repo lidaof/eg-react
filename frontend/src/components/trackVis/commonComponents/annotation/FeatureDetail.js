@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Feature from '../../../../model/Feature';
 import '../../commonComponents/tooltip/Tooltip.css';
+import { CopyToClip } from '../../../../components/CopyToClipboard';
 
 /**
  * Box that contains feature details when a annotation is cdivcked.
@@ -27,7 +28,7 @@ class FeatureDetail extends React.PureComponent {
         
         return (
         <div>
-            {featureName ? <div className="Tooltip-major-text" >{featureName}</div> : null}
+            {featureName ? <div className="Tooltip-major-text" >{featureName} <CopyToClip value={featureName}/> </div> : null}
             {feature.id ? <div>{feature.id} {ncbiLink} {ensemblLink}</div> : null}
             <div>{feature.getLocus().toString()} ({feature.getLocus().getLength()}bp)</div>
             {feature.getHasStrand() ? <div>Strand: {feature.getStrand()}</div> : null}

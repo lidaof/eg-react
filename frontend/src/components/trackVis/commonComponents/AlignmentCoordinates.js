@@ -26,10 +26,10 @@ class AlignmentSequence extends React.Component {
     render() {
         const {alignment, x, halfLength, target, query, basesPerPixel} = this.props;
         if (!alignment) {
-            return <div>{"No alignment available"}</div>;
+            return <div>No alignment available</div>;
         }
         else {
-            const highlightLength = Math.ceil(basesPerPixel);
+            const highlightLength = Math.max(Math.round(basesPerPixel), 1);
             const halfHighlightLength = Math.floor(highlightLength/2);
             const {visiblePart, record} = alignment;
             const [start, end] = visiblePart.sequenceInterval;
