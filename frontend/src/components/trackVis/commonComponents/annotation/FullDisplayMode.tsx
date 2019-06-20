@@ -30,6 +30,7 @@ interface FullDisplayModeProps extends PropsFromTrackContainer {
     rowHeight: number; // Height of each row of annotations, in pixels
     options: {
         maxRows: number; // Max number of rows of annotations to render
+        hiddenPixels?: number;
     };
 
     legend?: JSX.Element; // Override for the default legend element
@@ -68,7 +69,8 @@ class FullDisplayMode extends React.Component<FullDisplayModeProps> {
     render() {
         const {data, featurePadding, visRegion, width, rowHeight, options, getAnnotationElement} = this.props;
         // Important: it is ok to arrange() every render only because we memoized the function in the constructor.
-        const arrangeResult = this.featureArranger.arrange(data, visRegion, width, featurePadding);
+        const arrangeResult = this.featureArranger.arrange(data, visRegion, width, 
+            featurePadding, options.hiddenPixels);
         const height = this.getHeight(arrangeResult.numRowsAssigned);
         const legend = this.props.legend || <TrackLegend height={height} trackModel={this.props.trackModel} />;
         const visualizer = <FullVisualizer

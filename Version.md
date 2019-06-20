@@ -1,5 +1,9 @@
 # Version History
 
+## 48.5.1
+
+* a new option `hiddenPixels` is added to control an item should be hidden for annotation tracks
+
 ## 48.5.0
 
 * track height and color configuration enabled for genome align track

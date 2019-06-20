@@ -14,6 +14,7 @@ export const DEFAULT_OPTIONS = {
     height: 20,
     color: "blue",
     maxRows: 1,
+    hiddenPixels: 0.5,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
