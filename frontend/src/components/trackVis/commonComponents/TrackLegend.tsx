@@ -190,7 +190,10 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             <div style={{display: "flex", alignItems: "center", fontSize: "12px"}}>
                 {plotLegend && this.plotATCGLegend()}</div>
                 {labelList}
-                <div style={{fontSize: "11px", alignSelf: "flex-end", backgroundColor: "white"}}>{chromLabel}</div>
+                <div style={{fontSize: "11px", alignSelf: "flex-end", backgroundColor: "white"}} 
+                        className="TrackLegend-chrLabel">
+                    {chromLabel}
+                </div>
             {axis}
         </div>
         );

@@ -3,6 +3,7 @@
 ## 48.5.1
 
 * a new option `hiddenPixels` is added to control an item should be hidden for annotation tracks
+* fixed a bug that screenshot missed chromosome label in Ruler track
 
 ## 48.5.0
 
@@ -14,7 +15,7 @@
 * fixed the bug highlight region error when genomealign track is added, related to [#104](https://github.com/lidaof/eg-react/issues/104)
 * fixed an issue that tracks order in local hub doesn't follow order in `hub.config.json` file
 * local track supports BAM track now
-* fixed a bug that categorytrack error when category not exists in hub file
+* fixed a bug that categorical track error when category not exists in hub file
 
 ## 48.4.6
 

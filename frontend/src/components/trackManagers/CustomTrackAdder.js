@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Tabs, Tab} from 'react-bootstrap-tabs';
+import JSON5 from 'json5';
+// import { notify } from 'react-notify-toast';
 import TrackModel from '../../model/TrackModel';
 import CustomHubAdder from './CustomHubAdder';
 import FacetTable from './FacetTable';
 import { HELP_LINKS } from '../../util';
+import {TrackOptionsUI} from './TrackOptionsUI';
 
 // Just add a new entry here to support adding a new track type.
 // const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'cool', 'bam'];
@@ -65,6 +68,7 @@ class CustomTrackAdder extends React.Component {
             urlError: "",
             trackAdded: false,
             selectedTabIndex: 0,
+            options: null, // custom track options
         };
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
     }
@@ -109,6 +113,16 @@ class CustomTrackAdder extends React.Component {
         }
     }
 
+    getOptions = (value) => {
+        let options = null;
+        try {
+            options = JSON5.parse(value);
+        } catch (error) {
+            // notify.show('Option syntax is not correct, ignored', 'error', 3000);
+        }
+        this.setState({options});
+    }
+
     renderCustomTrackAdder() {
         const {type, url, name, urlError} = this.state;
         return (
@@ -132,6 +146,7 @@ class CustomTrackAdder extends React.Component {
                 <label>Track label</label>
                 <input type="text" className="form-control" value={name} onChange={event => this.setState({name: event.target.value})}/>
             </div>
+            <TrackOptionsUI onGetOptions={(value)=>this.getOptions(value)} />
             {this.renderButtons()}
         </form>
         );
