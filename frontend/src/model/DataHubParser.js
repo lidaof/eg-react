@@ -3,10 +3,20 @@ import sampleDict from './genomes/hg19/samples.json';
 import assayDict from './genomes/hg19/assays.json';
 
 class HubParser {
-    getTracksInHub(parsedJson, hubName, oldHubFormat, tracksStartIndex=0) {
-        let tracks = [];
+    getTracksInHub(parsedJson, hubName, oldHubFormat, tracksStartIndex=0, hubBase="") {
+        let tracks = [], url;
         for (let plainObject of parsedJson.slice(tracksStartIndex)) {
-            let newTrack = new TrackModel(plainObject);
+            if(!plainObject.url.toLowerCase().startsWith('http')) {
+                // relative path
+                if (hubBase.length > 0) {
+                    url = `${hubBase}/${plainObject.url}`;
+                } else {
+                    continue;
+                }
+            } else {
+                url = plainObject.url;
+            }
+            let newTrack = new TrackModel({...plainObject, url});
             newTrack.datahub = hubName;
             if (oldHubFormat) {
                 let assay = assayDict[newTrack.metadata.Assay] || ["unknown"];

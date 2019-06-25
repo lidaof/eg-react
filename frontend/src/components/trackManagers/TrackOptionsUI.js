@@ -1,6 +1,6 @@
 import React from 'react';
 import {Controlled as CodeMirror} from 'react-codemirror2';
-import { HELP_LINKS } from 'src/util';
+import { HELP_LINKS } from '../../util';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 // import 'codemirror/theme/material.css';
@@ -20,7 +20,7 @@ export class TrackOptionsUI extends React.Component {
     }
 
     fillExample = () => {
-        const value = '{"height": 100,"color": "red"}';
+        const value = '{"height": 100, "color": "red"}';
         this.setState({ value });
         this.props.onGetOptions(value);
     }

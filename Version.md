@@ -4,6 +4,8 @@
 
 * a new option `hiddenPixels` is added to control an item should be hidden for annotation tracks
 * fixed a bug that screenshot missed chromosome label in Ruler track
+* user can input track options while submit a custom track or local track
+* `url` in track of a custom datahub can use relative path
 
 ## 48.5.0
 
