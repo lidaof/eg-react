@@ -210,37 +210,39 @@ export class MultiAlignmentViewCalculator {
         allPrimaryGaps.sort((a,b) => a.contextBase - b.contextBase);  // ascending.
 
         // For each records, insertion gaps to sequences if for contextBase only in allGapsSet:
-        for (const records of refineRecords) {
-            const insertionContexts = [];
-            for (const contextBase of Object.keys(allGapsObj)) {
-                if (contextBase in records.primaryGapsObj) {
-                    const lengthDiff = allGapsObj[contextBase] - records.primaryGapsObj[contextBase];
-                    if (lengthDiff > 0) {
-                        insertionContexts.push({"contextBase": Number(contextBase), "length": lengthDiff});
+        if (refineRecords.length > 1) {  // skip this part for pairwise alignment.
+            for (const records of refineRecords) {
+                const insertionContexts = [];
+                for (const contextBase of Object.keys(allGapsObj)) {
+                    if (contextBase in records.primaryGapsObj) {
+                        const lengthDiff = allGapsObj[contextBase] - records.primaryGapsObj[contextBase];
+                        if (lengthDiff > 0) {
+                            insertionContexts.push({"contextBase": Number(contextBase), "length": lengthDiff});
+                        }
+                    } else {
+                        insertionContexts.push({"contextBase": Number(contextBase), "length": allGapsObj[contextBase]});
                     }
-                } else {
-                    insertionContexts.push({"contextBase": Number(contextBase), "length": allGapsObj[contextBase]});
                 }
-            }
-            insertionContexts.sort((a, b) => b.contextBase - a.contextBase); // sort descending...
-            for (const insertPosition of insertionContexts) {
-                const gapString = '-'.repeat(insertPosition.length);
-                const insertBase = insertPosition.contextBase;
-                const thePlacement = records.placements.filter(placement => 
-                    placement.contextSpan.start < insertBase && placement.contextSpan.end > insertBase
-                )[0];  // There is only one placement
-                const visibleTargetSeq = thePlacement.visiblePart.getTargetSequence();
-                const insertIndex = indexLookup(visibleTargetSeq, insertBase - thePlacement.contextSpan.start);
-                const relativePosition = thePlacement.visiblePart.sequenceInterval.start + insertIndex;
-                const targetSeq = thePlacement.record.targetSeq;
-                const querySeq = thePlacement.record.querySeq;
-                thePlacement.record.targetSeq = 
-                    targetSeq.slice(0, relativePosition) + gapString + targetSeq.slice(relativePosition);
-                thePlacement.record.querySeq =
-                    querySeq.slice(0, relativePosition) + gapString + querySeq.slice(relativePosition);
-            }
+                insertionContexts.sort((a, b) => b.contextBase - a.contextBase); // sort descending...
+                for (const insertPosition of insertionContexts) {
+                    const gapString = '-'.repeat(insertPosition.length);
+                    const insertBase = insertPosition.contextBase;
+                    const thePlacement = records.placements.filter(placement => 
+                        placement.contextSpan.start < insertBase && placement.contextSpan.end > insertBase
+                    )[0];  // There is only one placement
+                    const visibleTargetSeq = thePlacement.visiblePart.getTargetSequence();
+                    const insertIndex = indexLookup(visibleTargetSeq, insertBase - thePlacement.contextSpan.start);
+                    const relativePosition = thePlacement.visiblePart.sequenceInterval.start + insertIndex;
+                    const targetSeq = thePlacement.record.targetSeq;
+                    const querySeq = thePlacement.record.querySeq;
+                    thePlacement.record.targetSeq = 
+                        targetSeq.slice(0, relativePosition) + gapString + targetSeq.slice(relativePosition);
+                    thePlacement.record.querySeq =
+                        querySeq.slice(0, relativePosition) + gapString + querySeq.slice(relativePosition);
+                }
 
-            records.recordsObj.records = records.placements.map(placement => placement.record);
+                records.recordsObj.records = records.placements.map(placement => placement.record);
+            }
         }
         const newRecords = refineRecords.map(final => final.recordsObj);
         return {newRecordsArray: newRecords, allGaps: allPrimaryGaps};
