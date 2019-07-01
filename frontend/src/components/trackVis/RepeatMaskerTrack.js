@@ -26,6 +26,7 @@ export const DEFAULT_OPTIONS = {
     height: 40,
     categoryColors: RepeatMaskerFeature.DEFAULT_CLASS_COLORS,
     displayMode: AnnotationDisplayModes.FULL,
+    hiddenPixels: 0.5,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 

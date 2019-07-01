@@ -9,6 +9,7 @@ import HeightConfig from '../trackContextMenu/HeightConfig';
 
 import { RepeatDASFeature, RepeatMaskerFeature } from '../../model/RepeatMaskerFeature';
 import { TrackModel } from '../../model/TrackModel';
+import HiddenPixelsConfig from '../trackContextMenu/HiddenPixelsConfig';
 
 export class RepeatMaskerTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -29,6 +30,7 @@ export class RepeatMaskerTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), AnnotationDisplayModeConfig, HeightConfig, BackgroundColorConfig];
+        return [...super.getMenuComponents(), AnnotationDisplayModeConfig, HeightConfig, 
+            BackgroundColorConfig, HiddenPixelsConfig];
     }
 }

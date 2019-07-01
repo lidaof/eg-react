@@ -7,6 +7,7 @@ import BedRecord from '../../dataSources/bed/BedRecord';
 import Feature from '../../model/Feature';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 import LocalBedSource from '../../dataSources/LocalBedSource';
+import HiddenPixelsConfig from '../trackContextMenu/HiddenPixelsConfig';
 
 enum BedColumnIndex {
     NAME=3,
@@ -40,5 +41,9 @@ export class BedTrackConfig extends AnnotationTrackConfig {
 
     getComponent() {
         return BedTrack;
+    }
+
+    getMenuComponents() {
+        return [...super.getMenuComponents(), HiddenPixelsConfig];
     }
 }

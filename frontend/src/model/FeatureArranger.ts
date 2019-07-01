@@ -101,13 +101,14 @@ export class FeatureArranger {
      * @param {DisplayedRegionModel} viewRegion - used to compute drawing coordinates 
      * @param {number} width - width of the visualization
      * @param {number | PaddingFunc} [padding] - horizontal padding for intervals.  Default 0.
+     * @param {number} [hiddenPixels] - hide an item when its length less than this value.  Default 0.5
      * @return {FeatureArrangementResult} suggested draw location info
      */
     arrange(features: Feature[], viewRegion: DisplayedRegionModel, width: number,
-            padding: number | PaddingFunc = 0): FeatureArrangementResult
+            padding: number | PaddingFunc = 0, hiddenPixels: number = 0.5): FeatureArrangementResult
     {
         const drawModel = new LinearDrawingModel(viewRegion, width);
-        const visibleFeatures = features.filter(feature => drawModel.basesToXWidth(feature.getLength()) >= 0.5);
+        const visibleFeatures = features.filter(feature => drawModel.basesToXWidth(feature.getLength())>=hiddenPixels);
 
         const results: PlacedFeatureGroup[] = [];
         for (const feature of visibleFeatures) {

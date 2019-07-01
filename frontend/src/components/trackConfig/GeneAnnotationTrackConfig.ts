@@ -4,6 +4,7 @@ import { DEFAULT_OPTIONS } from '../trackVis/geneAnnotationTrack/GeneAnnotation'
 import GeneSource from '../../dataSources/GeneSource';
 import Gene from '../../model/Gene';
 import { TrackModel } from '../../model/TrackModel';
+import HiddenPixelsConfig from '../trackContextMenu/HiddenPixelsConfig';
 
 export class GeneAnnotationTrackConfig extends AnnotationTrackConfig {
     constructor(trackModel: TrackModel) {
@@ -21,5 +22,9 @@ export class GeneAnnotationTrackConfig extends AnnotationTrackConfig {
 
     getComponent() {
         return GeneAnnotationTrack;
+    }
+
+    getMenuComponents() {
+        return [...super.getMenuComponents(), HiddenPixelsConfig];
     }
 }

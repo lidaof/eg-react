@@ -256,7 +256,7 @@ class Nav extends React.Component {
                                 availableTrackSets={availableTrackSets}
                             />
                         </ModalMenuItem>
-                        <ModalMenuItem itemLabel="Upload Local Track">
+                        <ModalMenuItem itemLabel="View Local Tracks">
                             <TrackUpload 
                                 onTracksAdded={onTracksAdded}
                             />

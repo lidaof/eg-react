@@ -64,6 +64,16 @@ class ScreenshotUINotConnected extends React.Component {
                 labelSvg.appendChild(textNode);
                 svgElemg.appendChild(labelSvg);
             }
+            const chrLabelText = ele.children[0].querySelector(".TrackLegend-chrLabel").textContent;
+            if (chrLabelText) {
+                const labelSvg = document.createElementNS(xmlns,"text");
+                labelSvg.setAttributeNS(null,"x",x+15 + "");     
+                labelSvg.setAttributeNS(null,"y",y+33 + ""); 
+                labelSvg.setAttributeNS(null,"font-size","12px");
+                const textNode = document.createTextNode(chrLabelText);
+                labelSvg.appendChild(textNode);
+                svgElemg.appendChild(labelSvg);
+            }
             const trackLegendAxisSvgs = ele.children[0].querySelectorAll("svg"); // methylC has 2 svgs in legend
             if (trackLegendAxisSvgs.length > 0) {
                 const x2 = x + legendWidth - trackLegendAxisSvgs[0].clientWidth ;

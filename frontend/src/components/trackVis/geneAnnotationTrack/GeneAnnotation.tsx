@@ -21,6 +21,7 @@ export const DEFAULT_OPTIONS = {
         polyA: 'rgb(237,127,2)',
         other:'rgb(128,128,128)'
     },
+    hiddenPixels: 0.5,
 }
 
 interface GeneDisplayOptions {

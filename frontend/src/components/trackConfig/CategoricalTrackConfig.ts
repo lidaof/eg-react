@@ -9,6 +9,7 @@ import { TrackConfig } from './TrackConfig';
 import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import { CategoryColorConfig } from '../trackContextMenu/CategoryColorConfig';
 import LocalBedSource from '../../dataSources/LocalBedSource';
+import HiddenPixelsConfig from '../trackContextMenu/HiddenPixelsConfig';
 
 enum BedColumnIndex {
     CATEGORY=3,
@@ -37,7 +38,8 @@ export class CategoricalTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), HeightConfig, CategoryColorConfig, BackgroundColorConfig];
+        return [...super.getMenuComponents(), HeightConfig, CategoryColorConfig, 
+            BackgroundColorConfig, HiddenPixelsConfig];
     }
 
     getComponent() {
