@@ -129,6 +129,14 @@ const bosTau8 = [
     }
 ];
 
+const rheMac8 = [
+    {
+        name: 'refGene',
+        file: 'refGene_load',
+        fieldsConfig: geneFieldsAndIndex
+    }
+];
+
 const araTha1 = [
     {
         name: 'gene',
@@ -137,6 +145,6 @@ const araTha1 = [
     }
 ];
 
-const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6, mm9, bosTau8, araTha1 };
+const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6, mm9, bosTau8, araTha1, rheMac8 };
 
 module.exports = genomeConfig;

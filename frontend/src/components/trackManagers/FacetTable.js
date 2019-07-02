@@ -343,7 +343,7 @@ class FacetTable extends Component {
             return;
         }
         const id = `modal-${row.name}-${col.name}`;
-        const addUrls = found.filter(tk => this.props.addedTrackSets.has(tk.url))
+        const addUrls = found.filter(tk => this.props.addedTrackSets.has(tk.url) || this.props.addedTrackSets.has(tk.name))
         return (
         <div>
             <button onClick={()=>this.handleOpenModal(id)} className="facet-item">

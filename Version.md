@@ -1,5 +1,10 @@
 # Version History
 
+## 48.5.2
+
+* fixed a bug that facet table shows error count of loaded tracks
+* Rhesus `rheMac8` genome is added
+
 ## 48.5.1
 
 * a new option `hiddenPixels` is added to control an item should be hidden for annotation tracks

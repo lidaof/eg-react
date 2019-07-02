@@ -4,19 +4,24 @@ import assayDict from './genomes/hg19/assays.json';
 
 class HubParser {
     getTracksInHub(parsedJson, hubName, oldHubFormat, tracksStartIndex=0, hubBase="") {
-        let tracks = [], url;
+        let tracks = [], url, newTrack;
         for (let plainObject of parsedJson.slice(tracksStartIndex)) {
-            if(!plainObject.url.toLowerCase().startsWith('http')) {
-                // relative path
-                if (hubBase.length > 0) {
-                    url = `${hubBase}/${plainObject.url}`;
+            if (plainObject.url) {
+                if(!plainObject.url.toLowerCase().startsWith('http')) {
+                    // relative path
+                    if (hubBase.length > 0) {
+                        url = `${hubBase}/${plainObject.url}`;
+                    } else {
+                        continue;
+                    }
                 } else {
-                    continue;
+                    url = plainObject.url;
                 }
+                newTrack = new TrackModel({...plainObject, url});
             } else {
-                url = plainObject.url;
+                // native track
+                newTrack = new TrackModel(plainObject);
             }
-            let newTrack = new TrackModel({...plainObject, url});
             newTrack.datahub = hubName;
             if (oldHubFormat) {
                 let assay = assayDict[newTrack.metadata.Assay] || ["unknown"];
