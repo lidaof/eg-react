@@ -46,7 +46,7 @@ export class AnnotationTrackUI extends React.Component {
     renderSecondaryUI = () => {
         const {addedTrackSets, addedTracks, onTracksAdded, groupedTrackSets} = this.props;
         return this.state.secondConfigs.map(config => 
-            <AnnotationTrackSelector
+            config ? <AnnotationTrackSelector
                 key={config.genome.getName()}
                 addedTracks={addedTracks}
                 onTracksAdded={onTracksAdded}
@@ -54,7 +54,7 @@ export class AnnotationTrackUI extends React.Component {
                 genomeConfig={config}
                 addGenomeLabel={true}
                 groupedTrackSets={groupedTrackSets}
-            />
+            /> : null
             );
     }
 
