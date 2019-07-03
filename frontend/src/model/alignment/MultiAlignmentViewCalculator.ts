@@ -229,16 +229,18 @@ export class MultiAlignmentViewCalculator {
                     const insertBase = insertPosition.contextBase;
                     const thePlacement = records.placements.filter(placement => 
                         placement.contextSpan.start < insertBase && placement.contextSpan.end > insertBase
-                    )[0];  // There is only one placement
-                    const visibleTargetSeq = thePlacement.visiblePart.getTargetSequence();
-                    const insertIndex = indexLookup(visibleTargetSeq, insertBase - thePlacement.contextSpan.start);
-                    const relativePosition = thePlacement.visiblePart.sequenceInterval.start + insertIndex;
-                    const targetSeq = thePlacement.record.targetSeq;
-                    const querySeq = thePlacement.record.querySeq;
-                    thePlacement.record.targetSeq = 
-                        targetSeq.slice(0, relativePosition) + gapString + targetSeq.slice(relativePosition);
-                    thePlacement.record.querySeq =
-                        querySeq.slice(0, relativePosition) + gapString + querySeq.slice(relativePosition);
+                    )[0];  // There could only be 0 or 1 placement pass the filter.
+                    if (thePlacement) {
+                        const visibleTargetSeq = thePlacement.visiblePart.getTargetSequence();
+                        const insertIndex = indexLookup(visibleTargetSeq, insertBase - thePlacement.contextSpan.start);
+                        const relativePosition = thePlacement.visiblePart.sequenceInterval.start + insertIndex;
+                        const targetSeq = thePlacement.record.targetSeq;
+                        const querySeq = thePlacement.record.querySeq;
+                        thePlacement.record.targetSeq = 
+                            targetSeq.slice(0, relativePosition) + gapString + targetSeq.slice(relativePosition);
+                        thePlacement.record.querySeq =
+                            querySeq.slice(0, relativePosition) + gapString + querySeq.slice(relativePosition);
+                    }
                 }
 
                 records.recordsObj.records = records.placements.map(placement => placement.record);
