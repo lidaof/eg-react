@@ -5,6 +5,7 @@
 * fixed a bug that facet table shows error count of loaded tracks
 * Rhesus `rheMac8` genome is added
 * fixed bug [#117](https://github.com/lidaof/eg-react/issues/117)
+* enabled multiple rows for categorical track when categories overlap
 
 ## 48.5.1
 

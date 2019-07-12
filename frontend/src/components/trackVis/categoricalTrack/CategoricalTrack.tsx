@@ -73,7 +73,7 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
                 key={i}
                 feature={placement.feature}
                 xSpan={placement.xSpan}
-                y={0}
+                y={y}
                 isMinimal={false}
                 color={color}
                 onClick={this.renderTooltip}
