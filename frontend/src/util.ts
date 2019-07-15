@@ -222,3 +222,7 @@ export function getSecondaryGenomes(current: string, tracks: any[]) {
     });
     return _.uniq(genomes);
 }
+
+export function variableIsObject(obj: any){
+    return obj !== null && (typeof obj === "object");
+}

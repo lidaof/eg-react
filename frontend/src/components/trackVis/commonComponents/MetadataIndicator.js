@@ -4,6 +4,7 @@ import { Manager, Target, Popper } from 'react-popper';
 import TrackModel from '../../../model/TrackModel';
 
 import './tooltip/Tooltip.css';
+import { variableIsObject } from '../../../util';
 
 /*
 const COLORS = [ // A long list of unique colors.  From the old browser.
@@ -90,15 +91,27 @@ class MetadataIndicator extends React.PureComponent {
      * @return {JSX.Element} － colored box for metadata term
      */
     renderBoxForTerm(term) {
-        let termValue = this.props.track.getMetadata(term);
-        const color = this.getColorForTermValue(termValue);
-        return <ColoredBox
-            key={term}
-            color={color}
-            term={term}
-            termValue={termValue}
-            onClick={event => this.props.onClick(event, term)}
-        />;
+        let termValue;
+        termValue = this.props.track.getMetadataAsis(term);
+        if (variableIsObject(termValue) && termValue.name && termValue.color) {
+            return <ColoredBox
+                key={term}
+                color={termValue.color}
+                term={term}
+                termValue={termValue.name}
+                onClick={event => this.props.onClick(event, term)}
+            />;
+        } else {
+            termValue = this.props.track.getMetadata(term);
+            const color = this.getColorForTermValue(termValue);
+            return <ColoredBox
+                key={term}
+                color={color}
+                term={term}
+                termValue={termValue}
+                onClick={event => this.props.onClick(event, term)}
+            />;
+        }
     }
 
     render() {

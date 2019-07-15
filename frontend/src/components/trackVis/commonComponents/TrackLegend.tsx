@@ -87,7 +87,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                 select(this.gNode).append("g").call(axis);
             }   
             select(this.gNode).selectAll("text")
-                .filter((d, i) => i === 0 && d !== 0 ).attr("dy", "0.6em");
+                .filter((d, i) => i === 0 ).attr("dy", "0.6em");
             select(this.gNode).selectAll("text")
                 .filter((d, i) => i === 1).attr("dy", dy0);
             if (this.props.hideFirstAxisLabel) {

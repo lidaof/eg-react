@@ -3,6 +3,8 @@
 ## 48.5.3
 
 * added chicked genome `galGal6` and `galGal5`
+* a `flatarc` mode added for chromatin interacion track:
+![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png "Flat arc mode]")
 
 ## 48.5.2
 

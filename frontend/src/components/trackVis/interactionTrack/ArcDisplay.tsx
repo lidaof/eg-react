@@ -115,14 +115,19 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     }
 }
 
-function moveTo(x: number, y: number) {
+export function moveTo(x: number, y: number) {
     return `M ${x} ${y} `;
 }
 
-// function quadraticCurveTo(controlX: number, controlY: number, x: number, y: number) {
+// export function quadraticCurveTo(controlX: number, controlY: number, x: number, y: number) {
 //     return `Q ${controlX} ${controlY}, ${x} ${y} `;
 // }
 
 function arcTo(radius: number, x: number) {
-    return `A ${radius} ${radius} 1 0 0 ${x} 0`;
+    return `A ${radius} ${radius} 1 0 0 ${x} 0 `;
+}
+
+export function cubicCurveTo(controlX1: number, controlY1: number, 
+        controlX2: number, controlY2: number, x: number, y: number){
+    return `C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${x} ${y} `;
 }

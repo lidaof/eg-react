@@ -145,6 +145,21 @@ const araTha1 = [
     }
 ];
 
-const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6, mm9, bosTau8, araTha1, rheMac8 };
+const galGal5 = [
+    {
+        name: 'refGene',
+        file: 'refGene_load',
+        fieldsConfig: geneFieldsAndIndex
+    }
+];
+const galGal6 = [
+    {
+        name: 'refGene',
+        file: 'refGene_load',
+        fieldsConfig: geneFieldsAndIndex
+    }
+];
+
+const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6, mm9, bosTau8, araTha1, rheMac8, galGal5, galGal6 };
 
 module.exports = genomeConfig;
