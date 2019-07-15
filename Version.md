@@ -1,5 +1,9 @@
 # Version History
 
+## 48.5.3
+
+* added chicked genome `galGal6` and `galGal5`
+
 ## 48.5.2
 
 * fixed a bug that facet table shows error count of loaded tracks

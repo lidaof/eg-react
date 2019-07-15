@@ -1,6 +1,6 @@
 {
   "name": "epgg",
-  "version": "48.5.2",
+  "version": "48.5.3",
   "author": "Ting Wang Lab @WUSTL",
   "repository": {
     "type": "git",
@@ -75,7 +75,7 @@
     "jquery.kinetic": "^2.2.4",
     "json5": "^1.0.1",
     "jsonschema": "^1.2.0",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.13",
     "memoize-one": "^3.1.1",
     "nightmare": "^2.10.0",
     "parse-color": "^1.0.0",
