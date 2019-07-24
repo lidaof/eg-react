@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { variableIsObject } from 'src/util';
 
 export interface TrackOptions {
     label?: string;
@@ -144,7 +145,11 @@ export class TrackModel {
         if (Array.isArray(value)) {
             return value;
         } else {
-            return [value];
+            if (variableIsObject(value)) {
+                return [value.name];
+            }else {
+                return [value];
+            }
         }
     }
 

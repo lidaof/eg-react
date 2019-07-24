@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import ReactModal from 'react-modal';
-
 import HubTrackTable from './HubTrackTable';
 import TrackModel from '../../model/TrackModel';
+import { variableIsObject } from '../../util';
 
 import './FacetTable.css';
 
@@ -99,9 +99,14 @@ class FacetTable extends Component {
                     parent2children[metaKey].add(metaValue[0]);
                     child2ancestor[metaValue[0]] = metaKey;
                 } else {
-                    // string metadata
-                    parent2children[metaKey].add(metaValue);
-                    child2ancestor[metaValue] = metaKey;
+                    if (variableIsObject(metaValue)) {
+                        parent2children[metaKey].add(metaValue.name);
+                        child2ancestor[metaValue.name] = metaKey;
+                    } else {
+                        // string metadata
+                        parent2children[metaKey].add(metaValue);
+                        child2ancestor[metaValue] = metaKey;
+                    }
                 }
                 metadata[metaKey] = metaValue;
             }
@@ -322,18 +327,20 @@ class FacetTable extends Component {
             if (!track.metadata[rowHeader]) {
                 continue;
             }
-            if (row.name === rowHeader || track.metadata[rowHeader].includes(row.name)) {
+            const tkRowInfo = variableIsObject(track.metadata[rowHeader]) ? track.metadata[rowHeader].name: track.metadata[rowHeader];
+            const tkColumnInfo = variableIsObject(track.metadata[columnHeader]) ? track.metadata[columnHeader].name: track.metadata[columnHeader];
+            if (row.name === rowHeader || tkRowInfo.includes(row.name)) {
                 // confusing code here, need to check if column was used
                 if (col === UNUSED_META_KEY) {
                     found.push(track);
                 } else {
-                    if (!track.metadata[columnHeader]) {
+                    if (!tkColumnInfo) {
                         if ( col.name === columnHeader ) {
                             found.push(track);
                         }
                         continue;
                     }
-                    if ( col.name === columnHeader || track.metadata[columnHeader].includes(col.name) ) {
+                    if ( col.name === columnHeader || tkColumnInfo.includes(col.name) ) {
                         found.push(track);
                     }
                 } 

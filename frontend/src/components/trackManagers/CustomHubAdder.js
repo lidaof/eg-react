@@ -43,8 +43,8 @@ class RemoteHubAdder extends React.Component {
         try {
             json = await new Json5Fetcher().get(this.state.inputUrl);
         } catch (error) {
-            console.error(error);
-            this.setState({isLoading: false, error: "Error: HTTP " + error.status});
+            // console.error(error);
+            this.setState({isLoading: false, error: "Cannot load the hub. Error: HTTP " + error.status});
             return;
         }
         const lastSlashIndex = this.state.inputUrl.lastIndexOf('/');

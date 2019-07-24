@@ -1,5 +1,9 @@
 # Version History
 
+## 48.5.4
+
+* fixed a metadata bug when define customized color
+
 ## 48.5.3
 
 * added chicked genome `galGal6` and `galGal5`
