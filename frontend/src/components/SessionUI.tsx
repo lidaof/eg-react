@@ -289,7 +289,7 @@ const enhance = compose(
     ),
 );
 
-export const SessionUI = enhance(SessionUINotConnected);
+export const SessionUI = enhance(SessionUINotConnected as any);
 
 function getFunName() {
     const adjectives = [

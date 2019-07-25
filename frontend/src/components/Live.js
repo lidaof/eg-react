@@ -4,6 +4,7 @@ import { compose } from 'redux';
 import { firebaseConnect, isLoaded, isEmpty, getVal } from 'react-redux-firebase';
 import { ActionCreators } from "../AppState";
 import { Link } from "react-router-dom";
+import { notify } from 'react-notify-toast';
 import App from "../App";
 import { AppStateSaver } from '../model/AppSaveLoad';
 

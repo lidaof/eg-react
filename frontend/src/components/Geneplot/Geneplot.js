@@ -10,7 +10,7 @@ import { COLORS } from '../trackVis/commonComponents/MetadataIndicator';
 import { HELP_LINKS } from '../../util';
 import ColorPicker from '../ColorPicker';
 
-const Plot = createPlotlyComponent.default(Plotly);
+const Plot = window.createPlotlyComponent.default(window.Plotly);
 
 function mapStateToProps(state) {
     return {

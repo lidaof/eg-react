@@ -7,7 +7,7 @@ import withCurrentGenome from '../withCurrentGenome';
 import NavigationContext from '../../model/NavigationContext';
 import { Genome } from '../../model/genomes/Genome';
 import { notify } from 'react-notify-toast';
-import ChromosomeInterval from 'src/model/interval/ChromosomeInterval';
+import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 
 const DEBOUNCE_INTERVAL = 250;
 /**

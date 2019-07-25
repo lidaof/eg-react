@@ -20,13 +20,13 @@ interface InteractionTrack3DProps {
     depth: number;
 }
 
-declare global {
-    namespace JSX {
-        interface IntrinsicElements {
-            'a-plane': any
-        }
-    }
-}
+// declare global {
+//     namespace JSX {
+//         interface IntrinsicElements {
+//             'a-plane': any
+//         }
+//     }
+// }
 
 function isNonAdjacentBin(interaction: GenomeInteraction) {
     const binSize = interaction.locus1.getLength();
@@ -70,7 +70,7 @@ export class InteractionTrack3D extends React.Component<InteractionTrack3DProps,
         };
         return <React.Fragment key={i}>
             <Arc startX={startX} endX={endX} height={height} depth={depth} z={-depth - 1} opacity={OPACITY} />;
-            <a-plane
+            {/* <a-plane
                 position={`${startX} 0 ${-depth/2 - 1}`}
                 width={placement.xSpan1.getLength()}
                 {...planeProps}
@@ -79,7 +79,7 @@ export class InteractionTrack3D extends React.Component<InteractionTrack3DProps,
                 position={`${endX} 0 ${-depth/2 - 1}`}
                 width={placement.xSpan2.getLength()}
                 {...planeProps}
-            />
+            /> */}
         </React.Fragment>
     }
 

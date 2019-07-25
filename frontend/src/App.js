@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 import { ActionCreators } from './AppState';
 import GenomePicker from './components/GenomePicker';
 import Nav from './components/Nav';

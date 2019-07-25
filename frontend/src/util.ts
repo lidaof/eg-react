@@ -224,5 +224,5 @@ export function getSecondaryGenomes(current: string, tracks: any[]) {
 }
 
 export function variableIsObject(obj: any){
-    return obj !== null && (typeof obj === "object");
+    return obj !== null && (obj.constructor.name === "Object");
 }

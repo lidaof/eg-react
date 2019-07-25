@@ -9,7 +9,7 @@ import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
 import { HELP_LINKS, pcorr } from '../../util';
 import ColorPicker from '../ColorPicker';
 
-const Plot = createPlotlyComponent.default(Plotly);
+const Plot = window.createPlotlyComponent.default(window.Plotly);
 
 function mapStateToProps(state) {
     return {
