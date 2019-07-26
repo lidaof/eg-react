@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { variableIsObject } from 'src/util';
 
 export interface TrackOptions {
     label?: string;
@@ -123,6 +124,7 @@ export class TrackModel {
      * @param {string} term
      * @returns {string}
      * @memberof TrackModel
+     * always return a string
      */
     getMetadata(term: string): string | undefined {
         const value = this.metadata[term];
@@ -133,13 +135,34 @@ export class TrackModel {
         }
     }
 
+    /**
+     * 
+     * @param term 
+     * always return an array
+     */
     getMetadataAsArray(term: string): string[] | undefined {
         const value = this.metadata[term];
         if (Array.isArray(value)) {
             return value;
         } else {
-            return [value];
+            if (variableIsObject(value)) {
+                return [value.name];
+            }else {
+                return [value];
+            }
         }
+    }
+
+    /**
+     * 
+     * @param term 
+     * @return return the meta value defined by user, maybe a string, an array or an object
+     * purpose of this is to allow users to customize metadata display, like defining colors
+     * in this way, for example
+     * Assay: {name: "ATAC-seq", color: "red"}
+     */
+    getMetadataAsis(term: string): any | undefined {
+        return this.metadata[term];
     }
 
     /**

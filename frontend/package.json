@@ -1,6 +1,6 @@
 {
   "name": "epgg",
-  "version": "48.5.1",
+  "version": "48.5.4",
   "author": "Ting Wang Lab @WUSTL",
   "repository": {
     "type": "git",
@@ -66,6 +66,7 @@
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "firebase": "^5.4.0",
+    "fsevents": "^2.0.7",
     "fuse.js": "^3.4.4",
     "generic-filehandle": "^2.0.0",
     "hic-straw": "^0.9.4",
@@ -74,7 +75,7 @@
     "jquery.kinetic": "^2.2.4",
     "json5": "^1.0.1",
     "jsonschema": "^1.2.0",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.13",
     "memoize-one": "^3.1.1",
     "nightmare": "^2.10.0",
     "parse-color": "^1.0.0",
@@ -95,7 +96,6 @@
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.3.0",
     "react-hot-keys": "^1.2.2",
-    "react-jsonschema-form": "^1.6.1",
     "react-modal": "^3.6.1",
     "react-notify-toast": "^0.5.0",
     "react-popper": "^0.8.2",

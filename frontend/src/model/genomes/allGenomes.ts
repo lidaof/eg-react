@@ -6,6 +6,9 @@ import PANTRO5 from './panTro5/panTro5';
 import RN6 from './rn6/rn6';
 import MM9 from './mm9/mm9';
 import BosTau8 from './bosTau8/bosTau8';
+import RheMac8 from './rheMac8/rheMac8';
+import GalGal6 from './galGal6/galGal6';
+import GalGal5 from './galGal5/galGal5';
 import AraTha1 from './araTha1/araTha1';
 import { GenomeConfig } from './GenomeConfig';
 
@@ -22,6 +25,9 @@ export const allGenomes = [
     DAN_RER10,
     RN6,
     AraTha1,
+    RheMac8,
+    GalGal6,
+    GalGal5,
 ];
 
 const genomeNameToConfig = {};
@@ -51,9 +57,9 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
         assemblies: [ PANTRO5.genome.getName() ],
         color: 'white',
     },
-    mouse: {
-        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Mouse.png',
-        assemblies: [ MM10.genome.getName(), MM9.genome.getName() ],
+    rhesus: {
+        logoUrl: 'https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png',
+        assemblies: [ RheMac8.genome.getName() ],
         color: 'yellow',
     },
     cow: {
@@ -61,10 +67,20 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
         assemblies: [ BosTau8.genome.getName() ],
         color: 'yellow',
     },
+    mouse: {
+        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Mouse.png',
+        assemblies: [ MM10.genome.getName(), MM9.genome.getName() ],
+        color: 'yellow',
+    },
     rat: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Rat.png',
         assemblies: [ RN6.genome.getName() ],
         color: 'white',
+    },
+    chicken: {
+        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Chicken.png',
+        assemblies: [ GalGal6.genome.getName(), GalGal5.genome.getName() ],
+        color: 'yellow',
     },
     zebrafish: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',

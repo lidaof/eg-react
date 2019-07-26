@@ -43,13 +43,14 @@ class RemoteHubAdder extends React.Component {
         try {
             json = await new Json5Fetcher().get(this.state.inputUrl);
         } catch (error) {
-            console.error(error);
-            this.setState({isLoading: false, error: "Error: HTTP " + error.status});
+            // console.error(error);
+            this.setState({isLoading: false, error: "Cannot load the hub. Error: HTTP " + error.status});
             return;
         }
-
+        const lastSlashIndex = this.state.inputUrl.lastIndexOf('/');
+        const hubBase = this.state.inputUrl.substring(0, lastSlashIndex).trimRight('/');
         const parser = new DataHubParser(0);
-        const tracks = await parser.getTracksInHub(json, "Custom hub");
+        const tracks = await parser.getTracksInHub(json, "Custom hub", false, 0, hubBase);
         if (tracks) {
             this.props.onAddTracksToPool(tracks, false);
             const tracksToShow = tracks.filter(track => track.showOnHubLoad);

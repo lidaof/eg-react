@@ -46,7 +46,7 @@ export class HicTrackConfig extends TrackConfig {
     getMenuComponents() {
         const items =  [HicNormalizationConfig, InteractionDisplayModeConfig, HeightConfig, ScoreConfig, BinSizeConfig,
             PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
-        if (this.getOptions().displayMode === InteractionDisplayMode.ARC) {
+        if (this.getOptions().displayMode !== InteractionDisplayMode.HEATMAP) {
             items.splice(2, 0, LineWidthConfig);
         }
         return items;

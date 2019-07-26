@@ -10,6 +10,9 @@ import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
 import { CategoryColorConfig } from '../trackContextMenu/CategoryColorConfig';
 import LocalBedSource from '../../dataSources/LocalBedSource';
 import HiddenPixelsConfig from '../trackContextMenu/HiddenPixelsConfig';
+import MaxRowsConfig from '../trackContextMenu/MaxRowsConfig';
+import TrackModel from '../../model/TrackModel';
+import { DEFAULT_OPTIONS } from '../trackVis/categoricalTrack/CategoricalTrack';
 
 enum BedColumnIndex {
     CATEGORY=3,
@@ -17,6 +20,11 @@ enum BedColumnIndex {
 
 export class CategoricalTrackConfig extends TrackConfig {
     
+    constructor(trackModel: TrackModel) {
+        super(trackModel);
+        this.setDefaultOptions(DEFAULT_OPTIONS);
+    }
+
     initDataSource() {
         if (this.trackModel.files.length > 0) {
             return new LocalBedSource(this.trackModel.files);
@@ -39,7 +47,7 @@ export class CategoricalTrackConfig extends TrackConfig {
 
     getMenuComponents() {
         return [...super.getMenuComponents(), HeightConfig, CategoryColorConfig, 
-            BackgroundColorConfig, HiddenPixelsConfig];
+            BackgroundColorConfig, MaxRowsConfig, HiddenPixelsConfig];
     }
 
     getComponent() {

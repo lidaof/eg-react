@@ -9,6 +9,7 @@ import { CopyToClip } from '../CopyToClipboard';
 
 import './TrackContextMenu.css';
 import { NUMERRICAL_TRACK_TYPES } from '../trackManagers/CustomTrackAdder';
+import { variableIsObject } from '../../util';
 
 /**
  * Props that menu items will recieve.
@@ -200,9 +201,14 @@ export function ObjectAsTable(props) {
     if (typeof content === 'string') {
         return <div>{content}</div>;
     }
-    const rows = Object.entries(content).map( (key, value) => <tr key={value}><td>{key[0]}</td><td>
-                    { Array.isArray(key[1]) ? key[1].join(' > ') : key[1] }
-                </td></tr>);
+    const rows = Object.entries(content).map( (values, idx) => {
+        let tdContent;
+        if(variableIsObject(values[1])) {
+            tdContent = <ObjectAsTable content={values[1]}/>;
+        } else {
+            tdContent =  Array.isArray(values[1]) ? values[1].join(' > ') : values[1];
+        }
+        return <tr key={idx}><td>{values[0]}</td><td>{tdContent}</td></tr>});
     const tableTitle = title ? <h6>{title}</h6> : '';
     return(
         <React.Fragment>

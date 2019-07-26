@@ -157,6 +157,13 @@ const publicHubList = [
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/mm10/new/mm10_cool.json"
     },
+    // {
+    //     collection: "Neural Epigenome Atlas",
+    //     name: "Neural Epigenome Atlas (R. L. Sears et al, in prep)",
+    //     numTracks: 76,
+    //     oldHubFormat: false,
+    //     url: "https://vizhub.wustl.edu/public/mm10/Neural_Epigenome_Atlas/Epigenome_Atlas_vizhub.json"
+    // },
 ]
 
 const MM10 = {

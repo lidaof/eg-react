@@ -5,6 +5,7 @@ import { notify } from 'react-notify-toast';
 import {Tabs, Tab} from 'react-bootstrap-tabs';
 import JSON5 from 'json5';
 import { readFileAsText, HELP_LINKS } from "../util";
+import { TrackOptionsUI } from "./trackManagers/TrackOptionsUI";
 
 const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract"]; // all lower case
 
@@ -25,6 +26,7 @@ export class TrackUpload extends React.Component {
             selectedTabIndex: 0,
             indexSuffix: '.tbi',
             msg: '',
+            options: null,
         }
     }
 
@@ -37,6 +39,7 @@ export class TrackUpload extends React.Component {
     handleFileUpload = async (event) => {
         this.setState({msg: "Uploading track..."});
         let tracks;
+        const {options} = this.state;
         const fileList = Array.from(event.target.files);
         const {indexSuffix} = this.state;
         if (ONE_TRACK_FILE_LIST.includes(this.state.fileType.toLocaleLowerCase())) {
@@ -48,6 +51,7 @@ export class TrackUpload extends React.Component {
                     name: file.name,
                     label: file.name,
                     files: null,
+                    options,
                 })
             );
         } else {
@@ -66,6 +70,7 @@ export class TrackUpload extends React.Component {
                 name: fileList[0].name,
                 label: fileList[0].name,
                 files: fileList,
+                options,
             })];
         }
         this.props.onTracksAdded(tracks);
@@ -143,6 +148,16 @@ export class TrackUpload extends React.Component {
         this.setState({msg: 'Hub uploaded.'});
     }
 
+    getOptions = (value) => {
+        let options = null;
+        try {
+            options = JSON5.parse(value);
+        } catch (error) {
+            // notify.show('Option syntax is not correct, ignored', 'error', 3000);
+        }
+        this.setState({options});
+    }
+
     renderTrackUpload = () => {
         return (
             <div>
@@ -168,6 +183,7 @@ export class TrackUpload extends React.Component {
                     </select>
                 </label>
                 <br />
+                <TrackOptionsUI onGetOptions={(value)=>this.getOptions(value)} />
                 <label htmlFor="trackFile">
                     <h3>2. Choose track file:</h3> 
                     <input type="file" id="trackFile" multiple onChange={this.handleFileUpload} />

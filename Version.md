@@ -1,9 +1,28 @@
 # Version History
 
+## 48.5.4
+
+* fixed a metadata bug when define customized color
+
+## 48.5.3
+
+* added chicked genome `galGal6` and `galGal5`
+* a `flatarc` mode added for chromatin interacion track:
+![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png "Flat arc mode]")
+
+## 48.5.2
+
+* fixed a bug that facet table shows error count of loaded tracks
+* Rhesus `rheMac8` genome is added
+* fixed bug [#117](https://github.com/lidaof/eg-react/issues/117)
+* enabled multiple rows for categorical track when categories overlap
+
 ## 48.5.1
 
 * a new option `hiddenPixels` is added to control an item should be hidden for annotation tracks
 * fixed a bug that screenshot missed chromosome label in Ruler track
+* user can input track options while submit a custom track or local track
+* `url` in track of a custom datahub can use relative path
 
 ## 48.5.0
 

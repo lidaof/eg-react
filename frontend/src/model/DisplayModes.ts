@@ -12,6 +12,7 @@ export const AnnotationDisplayModes = {
 export enum InteractionDisplayMode {
     HEATMAP = "heatmap",
     ARC = "arc",
+    FLATARC = "flatarc",
 };
 
 export const GenomeAlignDisplayModes = {
