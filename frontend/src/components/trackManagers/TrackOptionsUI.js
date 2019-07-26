@@ -33,7 +33,7 @@ export class TrackOptionsUI extends React.Component {
                     <button type="button" className="btn btn-link btn-sm" onClick={this.fillExample}>Example</button>
                 </span>
                 <span style={{marginLeft: "5px", fontStyle: "italic"}}>
-                    <a href={HELP_LINKS.trackOptions} target="_blank">available properties for tracks</a>
+                    <a href={HELP_LINKS.trackOptions} target="_blank" rel="noopener noreferrer">available properties for tracks</a>
                 </span>
                 <CodeMirror
                     value={this.state.value}

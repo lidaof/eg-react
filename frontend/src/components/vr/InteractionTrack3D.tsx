@@ -61,13 +61,13 @@ export class InteractionTrack3D extends React.Component<InteractionTrack3DProps,
         }
         const height = this.arcWidthToHeight(placement.getWidth());
         const depth = this.props.depth;
-        const planeProps = {
-            rotation: '-90 0 0',
-            height: depth,
-            color: '#B8008A',
-            transparent: true,
-            opacity: OPACITY,
-        };
+        // const planeProps = {
+        //     rotation: '-90 0 0',
+        //     height: depth,
+        //     color: '#B8008A',
+        //     transparent: true,
+        //     opacity: OPACITY,
+        // };
         return <React.Fragment key={i}>
             <Arc startX={startX} endX={endX} height={height} depth={depth} z={-depth - 1} opacity={OPACITY} />;
             {/* <a-plane

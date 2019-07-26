@@ -38,7 +38,7 @@ export function segmentSequence(sequence: string, minGapLength: number, onlyGaps
     const results: SequenceSegment[] = [];
     const gapRegex = new RegExp(GAP_CHAR + '+', 'g'); // One or more '-' chars
     let match;
-    while (match = gapRegex.exec(sequence)) { // Find gaps with the regex
+    while ((match = gapRegex.exec(sequence)) !== null) { // Find gaps with the regex
         pushSegment(true, match.index, match[0].length, minGapLength);
     }
     if (onlyGaps) {

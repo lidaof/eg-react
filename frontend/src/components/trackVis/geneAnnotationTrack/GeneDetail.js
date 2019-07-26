@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
 import Gene from '../../../model/Gene';
-import { DEFAULT_CATEGORY_COLORS, GeneAnnotation } from './GeneAnnotation';
+import { GeneAnnotation } from './GeneAnnotation';
 
 import '../commonComponents/tooltip/Tooltip.css';
 

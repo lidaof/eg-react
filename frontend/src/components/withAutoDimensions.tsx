@@ -28,7 +28,7 @@ function withAutoDimensions<P extends object>(
     ): React.ComponentType<P>
 {
     return class extends React.Component<P, MeasurerState> {
-        static displayName = `WithAutoDimensions(${getComponentName(WrappedComponent)})`;
+        static displayName = `WithAutoDimensions(${getComponentName(WrappedComponent as any)})`;
 
         private _node: Element;
 

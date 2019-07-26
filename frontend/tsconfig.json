@@ -7,7 +7,7 @@
     "target": "es6",
     "downlevelIteration": true,
     "lib": [
-      "es2017",
+      "es2018",
       "dom"
     ],
     "sourceMap": true,
@@ -37,7 +37,8 @@
     "acceptance-tests",
     "webpack",
     "jest",
-    "src/setupTests.ts"
+    "src/setupTests.ts",
+    "src/vendor/*"
   ],
   "include": [
     "src"

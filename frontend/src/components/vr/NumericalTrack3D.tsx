@@ -49,7 +49,7 @@ export class NumericalTrack3D extends React.Component<NumericalTrack3DProps, {}>
     }
 
     aggregateFeatures(data: NumericalFeature[], viewRegion: DisplayedRegionModel): number[] {
-        const aggregator = new FeatureAggregator;
+        const aggregator = new FeatureAggregator();
         const xToFeatures = aggregator.makeXMap(data, viewRegion, NUM_BOXES);
         return xToFeatures.map( DefaultAggregators.fromId(DefaultAggregators.types.MEAN) );
     }

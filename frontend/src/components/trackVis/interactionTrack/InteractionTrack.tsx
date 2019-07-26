@@ -168,4 +168,4 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
     }
 }
 
-export default withDefaultOptions(withTooltip(InteractionTrack));
+export default withDefaultOptions(withTooltip(InteractionTrack as any));

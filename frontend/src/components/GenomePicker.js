@@ -81,10 +81,10 @@ class GenomePicker extends React.PureComponent {
                 <div>
                     <ul className="nav justify-content-end">
                     <li className="nav-item">
-                        <a className="nav-link" href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
+                        <a className="nav-link" href="https://epigenomegateway.readthedocs.io/" target="_blank" rel="noopener noreferrer">Documentation</a>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link" href="http://epigenomegateway.wustl.edu/legacy/" target="_blank">The 'old' browser</a>
+                        <a className="nav-link" href="http://epigenomegateway.wustl.edu/legacy/" target="_blank" rel="noopener noreferrer">The 'old' browser</a>
                     </li>
                     </ul> 
                 </div>

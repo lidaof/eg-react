@@ -186,6 +186,7 @@ class LinePlot extends React.PureComponent {
      */
     renderLine(values, trackIndex) {
         const {scales, trackModel, lineWidth} = this.props;
+        // eslint-disable-next-line array-callback-return
         const points = values.map((value, x) => {
             if(value && !Number.isNaN(value)) {
                 const y = scales.valueToY(value);
@@ -197,7 +198,7 @@ class LinePlot extends React.PureComponent {
     }
 
     render() {
-        const {xToValue, height, forceSvg, width} = this.props;
+        const {xToValue, height, width} = this.props;
         return <DesignRenderer type={1 ? RenderTypes.SVG : RenderTypes.CANVAS} width={width} height={height}>
             {xToValue.map(this.renderLine)}
         </DesignRenderer>

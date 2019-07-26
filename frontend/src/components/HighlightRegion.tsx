@@ -41,9 +41,6 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * 
      * @param {Object} props - props as specified by React
      */
-    constructor(props: HighlightRegionProps) {
-        super(props);
-    }
 
     getHiglightedXs(chrInterval: ChromosomeInterval): OpenInterval {
         const {legendWidth, visData} = this.props;

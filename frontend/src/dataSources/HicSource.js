@@ -4,7 +4,7 @@ import DataSource from './DataSource';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import { NormalizationMode } from '../model/HicDataModes';
 import { GenomeInteraction } from '../model/GenomeInteraction';
-import { ensureMaxListLength, findClosestNumber } from '../util';
+import { findClosestNumber } from '../util';
 
 /**
  * First, some monkey patching for juicebox.js

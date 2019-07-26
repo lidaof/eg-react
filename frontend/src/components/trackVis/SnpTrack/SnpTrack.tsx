@@ -91,4 +91,4 @@ class SnpTrackNoTooltip extends React.Component<SnpTrackProps> {
     }
 }
 
-export const SnpTrack = withTooltip(SnpTrackNoTooltip);
+export const SnpTrack = withTooltip(SnpTrackNoTooltip as any);

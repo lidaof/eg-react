@@ -70,7 +70,7 @@ class RemoteHubAdder extends React.Component {
                     Custom hub URL
                 </label>
                 <span style={{marginLeft: "10px", fontStyle: "italic"}}>
-                    <a href={HELP_LINKS.datahub} target="_blank">data hub documentation</a>
+                    <a href={HELP_LINKS.datahub} target="_blank" rel="noopener noreferrer">data hub documentation</a>
                 </span>
                 <input
                         type="text"

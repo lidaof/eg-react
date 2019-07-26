@@ -223,7 +223,7 @@ export class BamAlignment extends Feature {
         
         const referenceIter = new AlignmentIterator(reference);
         let matchResult = null;
-        while (matchResult = MD_REGEX.exec(this.MD)) {
+        while ( (matchResult = MD_REGEX.exec(this.MD)) !== null) {
             const numMatchingBases = Number.parseInt(matchResult[1], 10);
             let unmatchingBases = matchResult[2];
             referenceIter.advanceN(numMatchingBases); // Skip matching sequence.  Nothing to do there.

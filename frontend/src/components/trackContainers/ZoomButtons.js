@@ -18,10 +18,10 @@ ZoomButtons.propTypes = {
     onNewRegion: PropTypes.func.isRequired,
 }
 function ZoomButtons(props) {
-    const zoomOut = factor => {
-        const newRegion = props.viewRegion.clone().zoom(factor);
-        props.onNewRegion(...newRegion.getContextCoordinates());
-    };
+    // const zoomOut = factor => {
+    //     const newRegion = props.viewRegion.clone().zoom(factor);
+    //     props.onNewRegion(...newRegion.getContextCoordinates());
+    // };
     const buttons = ZOOMS.map((zoom, index) =>
         <button
             key={index}

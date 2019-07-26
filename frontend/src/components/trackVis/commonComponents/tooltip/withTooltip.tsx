@@ -36,7 +36,7 @@ export function withTooltip<P extends object>(
     ): React.ComponentType<P>
 {
     return class extends React.Component<P, {tooltip: JSX.Element}> {
-        static displayName = `withTooltip(${getComponentName(WrappedComponent)})`;
+        static displayName = `withTooltip(${getComponentName(WrappedComponent as any)})`;
 
         constructor(props: P) {
             super(props);

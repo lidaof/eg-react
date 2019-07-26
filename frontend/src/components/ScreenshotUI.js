@@ -28,7 +28,7 @@ class ScreenshotUINotConnected extends React.Component {
     // https://stackoverflow.com/questions/39374157/angular-save-file-as-csv-result-in-failed-network-error-only-on-chrome
     
     svgDataURL = (svg) => {
-      const svgAsXML = (new XMLSerializer).serializeToString(svg);
+      const svgAsXML = (new XMLSerializer()).serializeToString(svg);
       return "data:image/svg+xml," + encodeURIComponent(svgAsXML);
     }
 

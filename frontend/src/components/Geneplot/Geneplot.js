@@ -263,7 +263,7 @@ class Geneplot extends React.Component {
                 <div>
                     {this.renderRegionList()}
                 </div>
-                <p className="lead">2. Choose a <a href={HELP_LINKS.numerical} target="_blank">numerial track</a>:</p>
+                <p className="lead">2. Choose a <a href={HELP_LINKS.numerical} target="_blank" rel="noopener noreferrer">numerial track</a>:</p>
                 <div>
                     {this.renderTrackList()}
                 </div>

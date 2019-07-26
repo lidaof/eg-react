@@ -16,13 +16,13 @@ import "react-table/react-table.css";
 /**
  * Placeholder genes for a new set
  */
-const GENES = [
-    new Feature("CYP2C8", new ChromosomeInterval("chr10", 96796528, 96829254), "-"),
-    new Feature("CYP4B1", new ChromosomeInterval("chr1", 47223509, 47276522), "+"),
-    new Feature("CYP11B2", new ChromosomeInterval("chr8", 143991974, 143999259), "-"),
-    new Feature("CYP26B1", new ChromosomeInterval("chr2", 72356366, 72375167), "-"),
-    new Feature("CYP51A1", new ChromosomeInterval("chr7", 91741462, 91764059), "-"),
-];
+// const GENES = [
+//     new Feature("CYP2C8", new ChromosomeInterval("chr10", 96796528, 96829254), "-"),
+//     new Feature("CYP4B1", new ChromosomeInterval("chr1", 47223509, 47276522), "+"),
+//     new Feature("CYP11B2", new ChromosomeInterval("chr8", 143991974, 143999259), "-"),
+//     new Feature("CYP26B1", new ChromosomeInterval("chr2", 72356366, 72375167), "-"),
+//     new Feature("CYP51A1", new ChromosomeInterval("chr7", 91741462, 91764059), "-"),
+// ];
 
 const DEFAULT_LIST = `CYP4A22
 chr10:96796528-96829254
@@ -110,6 +110,7 @@ class RegionSetConfig extends React.Component {
         const parsed2 = parsed.map((item, index) => {
             if (Array.isArray(item)) {
                 if ( item.length === 0 ) {return null;}
+                // eslint-disable-next-line array-callback-return
                 const hits = item.map(gene => {
                     if (gene.name.toLowerCase() === inputList[index].toLowerCase()) {
                         return new Feature(gene.name, new ChromosomeInterval(gene.chrom, gene.txStart, gene.txEnd), gene.strand);

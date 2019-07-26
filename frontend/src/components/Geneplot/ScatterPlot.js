@@ -245,7 +245,7 @@ class ScatterPlot extends React.Component {
                 <div>
                     {this.renderRegionList()}
                 </div>
-                <p className="lead">2. Choose a <a href={HELP_LINKS.numerical} target="_blank">numerial track</a> for X-axis:</p>
+                <p className="lead">2. Choose a <a href={HELP_LINKS.numerical} target="_blank" rel="noopener noreferrer">numerial track</a> for X-axis:</p>
                 <div>
                     {this.renderTrackXList()}
                 </div>
