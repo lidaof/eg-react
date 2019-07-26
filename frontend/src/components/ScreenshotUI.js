@@ -28,7 +28,7 @@ class ScreenshotUINotConnected extends React.Component {
     // https://stackoverflow.com/questions/39374157/angular-save-file-as-csv-result-in-failed-network-error-only-on-chrome
     
     svgDataURL = (svg) => {
-      const svgAsXML = (new XMLSerializer).serializeToString(svg);
+      const svgAsXML = (new XMLSerializer()).serializeToString(svg);
       return "data:image/svg+xml," + encodeURIComponent(svgAsXML);
     }
 
@@ -165,11 +165,11 @@ class ScreenshotUINotConnected extends React.Component {
         const boxHeight = tracks.reduce( (acc, cur) => acc + cur.clientHeight, 11 * tracks.length );
         const boxWidth = tracks[0].clientWidth;
         // create a new jsPDF instance
-        const pdf = new jsPDF('l', 'px', [boxWidth, boxHeight]);
+        const pdf = new window.jsPDF('l', 'px', [boxWidth, boxHeight]);
         const pdfContainer = document.getElementById('pdfContainer');
         pdfContainer.innerHTML = svgContent;
         // render the svg element
-        svg2pdf(pdfContainer.firstElementChild, pdf, {
+        window.svg2pdf(pdfContainer.firstElementChild, pdf, {
             xOffset: 0,
             yOffset: 0,
             scale: 1

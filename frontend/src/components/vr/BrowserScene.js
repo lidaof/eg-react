@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import memoizeOne from 'memoize-one';
+// import memoizeOne from 'memoize-one';
 import _ from 'lodash';
 
 import VrRuler from './VrRuler';
@@ -12,7 +12,7 @@ import { HicSource } from '../../dataSources/HicSource';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import TrackModel from '../../model/TrackModel';
-import { RegionExpander } from '../../model/RegionExpander';
+// import { RegionExpander } from '../../model/RegionExpander';
 import withCurrentGenome from '../withCurrentGenome';
 import { withTrackData } from '../trackContainers/TrackDataManager';
 import { withTrackView } from '../trackContainers/TrackViewManager';

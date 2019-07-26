@@ -186,6 +186,8 @@ class TrackContainer extends React.Component {
             case "alt+g":
                 this.toggleReorderManyModal();
                 break;
+            default:
+                break;
         }
     }
     /**

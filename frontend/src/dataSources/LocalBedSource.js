@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { ensureMaxListLength } from '../util';
-import ChromosomeInterval from '../model/interval/ChromosomeInterval';
+// import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import makeBamIndex from '../vendor/igv/BamIndex'; // This dependency is from IGV
 import unbgzf from '../vendor/igv/bgzf';
 import DataSource from './DataSource';

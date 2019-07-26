@@ -145,7 +145,7 @@ class ReorderMany extends React.Component {
 (Alt+G)"
                     className="btn btn-light"
                 >
-                    🔃
+                    <span role="img" aria-label="reorder">🔃</span>
                 </button>
                 <ReactModal
                     isOpen={this.props.showReorderManyModal}

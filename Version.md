@@ -1,14 +1,19 @@
 # Version History
 
-## 48.5.4
+## 50.0.0
 
-* fixed a metadata bug when define customized color
+* this release is not an update for browser function but related to dependent package
+* updated to use `webpack` 4 and `typescript` 3.4
+* removed deprecated package `react-scripts-ts`, use typescript support from `create-react-app`
+* updated `react-app-rewired` to 2.1
+* motivated by [an issue](https://github.com/facebook/react/issues/16211) that ArcDisplay is not working on build version byt development version
 
 ## 48.5.3
 
 * added chicked genome `galGal6` and `galGal5`
 * a `flatarc` mode added for chromatin interacion track:
 ![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png "Flat arc mode]")
+* fixed a metadata bug when define customized color
 
 ## 48.5.2
 

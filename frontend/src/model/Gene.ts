@@ -94,7 +94,7 @@ class Gene extends Feature {
         this._translated = [];
         this._utrs = [];
         // tslint:disable-next-line:triple-equals
-        if ([cdsStart, cdsEnd, exonStarts, exonEnds].some(value => value == undefined)) {
+        if ([cdsStart, cdsEnd, exonStarts, exonEnds].some(value => value === undefined)) {
             return;
         }
 

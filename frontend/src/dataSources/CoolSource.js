@@ -1,4 +1,5 @@
 import axios from "axios";
+import _ from 'lodash';
 import DataSource from './DataSource';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import { GenomeInteraction } from '../model/GenomeInteraction';

@@ -20,13 +20,13 @@ class HubPane extends React.PureComponent {
         publicTrackSets: PropTypes.instanceOf(Set),
     };
 
-    constructor(props) {
-        super(props);
-        // this.state = {
-        //     availableTracks: [],
-        // };
-        // this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
-    }
+    // constructor(props) {
+    //     super(props);
+    //     // this.state = {
+    //     //     availableTracks: [],
+    //     // };
+    //     // this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
+    // }
 
     /**
      * Adds a list of tracks to the list of all tracks available from a hub.

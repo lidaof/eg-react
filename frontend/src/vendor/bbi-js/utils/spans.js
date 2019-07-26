@@ -8,6 +8,7 @@
 // spans.js: JavaScript Intset/Location port.
 //
 
+// @ts-ignore 
 "use strict";
 
 

@@ -76,7 +76,9 @@ class History extends React.Component {
       render () {
         return (
           <React.Fragment>
-            <button onClick={this.handleOpenModal} title="Operation history" className="btn btn-light">📗</button>
+            <button onClick={this.handleOpenModal} title="Operation history" className="btn btn-light">
+                <span role="img" aria-label="History">📗</span> 
+                </button>
             <ReactModal 
                 isOpen={this.state.showModal}
                 contentLabel="History"

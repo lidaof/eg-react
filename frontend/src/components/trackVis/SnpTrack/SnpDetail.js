@@ -16,7 +16,7 @@ class SnpDetail extends React.PureComponent {
     render() {
         const {snp} = this.props;
         const ncbiURL = `https://www.ncbi.nlm.nih.gov/snp/?term=${snp.id}`;
-        const ncbiLink =  <a href={ncbiURL} target="_blank">dbSNP🔗</a>;
+        const ncbiLink =  <a href={ncbiURL} target="_blank" rel="noopener noreferrer">dbSNP<span role="img" aria-label="dbsnp">🔗</span></a>;
         
         return (
         <div>

@@ -253,7 +253,6 @@ class Nav extends React.Component {
                                 availableTrackSets={availableTrackSets}
                                 addTracktoAvailable={addTracktoAvailable}
                                 removeTrackFromAvailable={removeTrackFromAvailable}
-                                availableTrackSets={availableTrackSets}
                             />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="View Local Tracks">
@@ -310,7 +309,7 @@ class Nav extends React.Component {
                                 onChange={onToggleNavigator}
                             />
                             <span style={{marginLeft: "1ch"}} >Show genome-wide navigator</span>
-                            <span className="GenomeNavigator-tooltip">❓
+                            <span className="GenomeNavigator-tooltip" role="img" aria-label="genomenavigator">❓
                                 <div className="GenomeNavigator-tooltiptext">
                                     <ul style={{lineHeight: "1.2em", marginBottom: 0}}>
                                         <li>Left mouse drag: select</li>
@@ -368,22 +367,22 @@ class Nav extends React.Component {
                             </ModalMenuItem>
                         </label>
                         <label className="dropdown-item">
-                            <a href="https://epigenomegateway.readthedocs.io/" target="_blank">Documentation</a>
+                            <a href="https://epigenomegateway.readthedocs.io/" target="_blank" rel="noopener noreferrer">Documentation</a>
                         </label>
                         <label className="dropdown-item">
-                            <a href="http://epigenomegateway.wustl.edu/legacy" target="_blank">The 'old' browser</a>
+                            <a href="http://epigenomegateway.wustl.edu/legacy" target="_blank" rel="noopener noreferrer">The 'old' browser</a>
                         </label>
                         <label className="dropdown-item">
-                            <a href="https://groups.google.com/forum/#!forum/epgg" target="_blank">Google groups</a>
+                            <a href="https://groups.google.com/forum/#!forum/epgg" target="_blank" rel="noopener noreferrer">Google groups</a>
                         </label>
                         <label className="dropdown-item">
-                            <a href="https://bit.ly/2T1OKmP" target="_blank">Join our Slack</a>
+                            <a href="https://bit.ly/2T1OKmP" target="_blank" rel="noopener noreferrer">Join our Slack</a>
                         </label>
                         <label className="dropdown-item">
-                            <a href="https://github.com/lidaof/eg-react" target="_blank">Source code @ Github</a>
+                            <a href="https://github.com/lidaof/eg-react" target="_blank" rel="noopener noreferrer">Source code @ Github</a>
                         </label>
                         <label className="dropdown-item">
-                            <a href="https://www.youtube.com/channel/UCnGVWbxJv-DPDCAFDQ1oFQA" target="_blank">YouTube channel</a>
+                            <a href="https://www.youtube.com/channel/UCnGVWbxJv-DPDCAFDQ1oFQA" target="_blank" rel="noopener noreferrer">YouTube channel</a>
                         </label> 
                     </div>
                 </div>
