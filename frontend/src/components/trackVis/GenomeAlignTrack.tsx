@@ -6,7 +6,7 @@ import { ensureMaxListLength } from '../../util';
 import { PlacedMergedAlignment, PlacedAlignment, PlacedSequenceSegment, GapText }
     from '../../model/alignment/AlignmentViewCalculator';
 import AnnotationArrows from './commonComponents/annotation/AnnotationArrows';
-import OpenInterval from 'src/model/interval/OpenInterval';
+import OpenInterval from '../../model/interval/OpenInterval';
 import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 import AlignmentSequence from './commonComponents/AlignmentCoordinates';
 import HorizontalFragment from './commonComponents/HorizontalFragment';

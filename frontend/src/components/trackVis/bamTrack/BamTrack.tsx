@@ -84,4 +84,4 @@ class BamTrack extends React.Component<BamTrackProps> {
     }
 }
 
-export default withTooltip(BamTrack);
+export default withTooltip(BamTrack as any);

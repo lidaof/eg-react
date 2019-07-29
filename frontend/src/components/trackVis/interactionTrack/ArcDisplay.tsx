@@ -71,8 +71,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
             strokeWidth={lineWidth}
             // onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
         />);
-        // const height = arcHeights.length > 0 ? Math.round(_.max(arcHeights)) : 50;
-        // return <svg width={width} height={height} onMouseOut={onMouseOut}>{arcs}</svg>;
+  
         }
 
     renderTooltip = (relativeX: number, relativeY: number): JSX.Element => {

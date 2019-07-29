@@ -21,7 +21,8 @@
     "max-classes-per-file": [true, 5],
     "no-conditional-assignment": false,
     "no-unused-variable": { "severity": "warning" },
-    "jsx-no-lambda": { "severity": "warning" }
+    "jsx-no-lambda": { "severity": "warning" },
+    "no-namespace": false,
   },
   "jsRules": {
     "object-literal-sort-keys": false,

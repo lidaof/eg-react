@@ -70,6 +70,7 @@ chr1:10001000-10001400`,
             this.setState({listRegionSeq: ''});
             return null;
         }
+        // eslint-disable-next-line array-callback-return
         const promise = inputList.map((symbol) => {
             try{
                 const interval = context.parse(symbol);

@@ -83,4 +83,4 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
     }
 }
 
-export const BedTrack = withTooltip(BedTrackNoTooltip);
+export const BedTrack = withTooltip(BedTrackNoTooltip as any);

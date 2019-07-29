@@ -22,8 +22,8 @@ class FeatureDetail extends React.PureComponent {
         if (feature.id) {
             ncbiURL = `https://www.ncbi.nlm.nih.gov/gene/?term=${feature.id.split('.')[0]}`;
             ensemblURL = `http://www.ensembl.org/Multi/Search/Results?q=${feature.id}`;
-            ncbiLink =  <a href={ncbiURL} target="_blank">NCBI🔗</a>;
-            ensemblLink =  <a href={ensemblURL} target="_blank">Ensembl🔗</a>;
+            ncbiLink =  <a href={ncbiURL} target="_blank" rel="noopener noreferrer">NCBI<span role="img" aria-label="NCBI">🔗</span></a>;
+            ensemblLink =  <a href={ensemblURL} target="_blank" rel="noopener noreferrer">Ensembl<span role="img" aria-label="Ensembl">🔗</span></a>;
         }
         
         return (

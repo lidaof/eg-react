@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { variableIsObject } from 'src/util';
+import { variableIsObject } from '../util';
 
 export interface TrackOptions {
     label?: string;

@@ -131,7 +131,7 @@ class CustomTrackAdder extends React.Component {
             <div className="form-group">
                 <label>Track type</label>
                 <span style={{marginLeft: "10px", fontStyle: "italic"}}>
-                    <a href={HELP_LINKS.tracks} target="_blank">track format documentation</a>
+                    <a href={HELP_LINKS.tracks} target="_blank" rel="noopener noreferrer">track format documentation</a>
                 </span>
                 <select className="form-control" value={type} onChange={event => this.setState({type: event.target.value})} >
                     {this.renderTypeOptions()}

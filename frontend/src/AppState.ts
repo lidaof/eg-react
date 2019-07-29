@@ -173,7 +173,7 @@ export const ActionCreators = {
 
 };
 
-function getInitialState() {
+function getInitialState(): AppState {
     let state = initialState;
     
     const { query } = querySting.parseUrl(window.location.href);
@@ -205,16 +205,16 @@ function getInitialState() {
         }
         if(query.hicUrl) {
             const tmpState = getNextState(state, {type: ActionType.SET_GENOME, genomeName: query.genome});
-            const urlComponets = query.hicUrl.split('/');
+            const urlComponets = (query.hicUrl as string).split('/');
             const track = TrackModel.deserialize(
                 {type: "hic", url: query.hicUrl, name: urlComponets[urlComponets.length - 1].split('.')[0]});
             newState =  {...tmpState, tracks: [track]};
         }
         if(query.position) {
-            const interval = newState.viewRegion.getNavigationContext().parse(query.position);
-            newState = getNextState(newState, {type: ActionType.SET_VIEW_REGION, ...interval});
+            const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
+            newState = getNextState(newState as AppState, {type: ActionType.SET_VIEW_REGION, ...interval});
         }
-        return newState || state;
+        return newState as AppState || state as AppState;
     }
     const blob = STORAGE.getItem(SESSION_KEY);
     if (blob) {
@@ -361,7 +361,7 @@ async function asyncInitState() {
     const { query } = querySting.parseUrl(window.location.href);
     if (!(_.isEmpty(query))) {
         if(query.hub) {
-            const customTracksPool = await getTracksFromHubURL(query.hub);
+            const customTracksPool = await getTracksFromHubURL(query.hub as string);
             if (customTracksPool) {
                 const tracks = customTracksPool.filter((track: any) => track.showOnHubLoad);
                 if (tracks.length > 0) {

@@ -1,3 +1,4 @@
+var paths = require('react-scripts-ts/config/paths')
 
 module.exports = (config, env) => {
     // This should help with typescript source-maps
@@ -11,18 +12,12 @@ module.exports = (config, env) => {
     }
 
     config.module.rules.push({
+        include: paths.appSrc,
         loader: require.resolve('babel-loader'),
-        exclude: /node_modules/,
-        query: {
-          presets: [
-            "@babel/preset-typescript",
-            "@babel/preset-env",
-            "@babel/preset-react"
-        ],
-          plugins: [
-            "@babel/proposal-class-properties",
-            "@babel/proposal-object-rest-spread"
-        ]
+        options: {
+            babelrc: false,
+            presets: [require.resolve('babel-preset-react-app')],
+            cacheDirectory: true,
         },
         test: /\.(js|jsx)$/,
     });
@@ -34,10 +29,5 @@ module.exports = (config, env) => {
             // options: { inline: true }
         },       
     });
-
-    config.output = {
-        ...config.output, globalObject: 'this'
-    };
-    
     return config;
 }

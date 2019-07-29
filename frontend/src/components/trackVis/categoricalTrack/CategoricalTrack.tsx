@@ -94,4 +94,4 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
     }
 }
 
-export const CategoricalTrack = withDefaultOptions(withTooltip(CategoricalTrackNoTooltip));
+export const CategoricalTrack = withDefaultOptions(withTooltip(CategoricalTrackNoTooltip as any));
