@@ -84,6 +84,11 @@ export class TrackModel {
         this.files = this.files || [];
         this.tracks = this.tracks ? this.tracks.map(tk => new TrackModel(tk)) : [];
 
+        // in case user define height in string, like "25" instead of 25
+        if(this.options.height && typeof this.options.height === 'string') {
+            this.options.height = Number.parseFloat(this.options.height) || 20;
+        }
+
         // Other misc props
         this.id = nextId;
         nextId++;

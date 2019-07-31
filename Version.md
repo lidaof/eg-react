@@ -4,6 +4,8 @@
 
 * fixed a facet table bug when metadata is undefined
 * fixed a session saving bug due to updated firebase related packages
+* when user define height in string like `"25"` instead of `25`, the browser won't complain
+* fixed a bug that genome align track shows data fetch error
 
 ## 50.0.0
 
