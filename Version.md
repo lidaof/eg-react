@@ -1,8 +1,12 @@
 # Version History
 
+## 50.0.2
+
+* the browser can respond to window resize event now, thanks to Silas who stopped by and helped debug this function
+
 ## 50.0.1
 
-* fixed a facet table bug when metadata is undefined
+* fixed a facet table bug when metadata is undefined, cannot distinguish track type with substrings like `bed` and `bedgraph`
 * fixed a session saving bug due to updated firebase related packages
 * when user define height in string like `"25"` instead of `25`, the browser won't complain
 * fixed a bug that genome align track shows data fetch error
@@ -13,7 +17,7 @@
 * updated to use `webpack` 4 and `typescript` 3.4
 * removed deprecated package `react-scripts-ts`, use typescript support from `create-react-app`
 * updated `react-app-rewired` to 2.1
-* motivated by [an issue](https://github.com/facebook/react/issues/16211) that ArcDisplay is not working on build version byt development version
+* motivated by [an issue](https://github.com/facebook/react/issues/16211) that ArcDisplay is not working on build version but development version
 
 ## 48.5.3
 

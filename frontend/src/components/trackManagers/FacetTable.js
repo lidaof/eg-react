@@ -312,6 +312,14 @@ class FacetTable extends Component {
         return divs;
     }
 
+    trackMetadataBelongsTo = (tkMeta, metaType) => {
+        if(Array.isArray(tkMeta)) {
+            return tkMeta.includes(metaType);
+        } else {
+            return tkMeta === metaType;
+        }
+    }
+
     /**
      * 
      * @param {onject} row 
@@ -329,7 +337,7 @@ class FacetTable extends Component {
             }
             const tkRowInfo = variableIsObject(track.metadata[rowHeader]) ? track.metadata[rowHeader].name: track.metadata[rowHeader];
             const tkColumnInfo = variableIsObject(track.metadata[columnHeader]) ? track.metadata[columnHeader].name: track.metadata[columnHeader];
-            if (row.name === rowHeader || tkRowInfo.includes(row.name)) {
+            if ( row.name === rowHeader || this.trackMetadataBelongsTo(tkRowInfo, row.name) ) {
                 // confusing code here, need to check if column was used
                 if (col === UNUSED_META_KEY) {
                     found.push(track);
@@ -340,7 +348,7 @@ class FacetTable extends Component {
                         }
                         continue;
                     }
-                    if ( col.name === columnHeader || tkColumnInfo.includes(col.name) ) {
+                    if ( col.name === columnHeader || this.trackMetadataBelongsTo(tkColumnInfo, col.name) ) {
                         found.push(track);
                     }
                 } 
