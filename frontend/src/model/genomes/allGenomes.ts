@@ -2,6 +2,7 @@ import HG19 from './hg19/hg19';
 import HG38 from './hg38/hg38';
 import MM10 from './mm10/mm10';
 import DAN_RER10 from './danRer10/danRer10';
+import DAN_RER11 from './danRer11/danRer11';
 import PANTRO5 from './panTro5/panTro5';
 import RN6 from './rn6/rn6';
 import MM9 from './mm9/mm9';
@@ -23,6 +24,7 @@ export const allGenomes = [
     PANTRO5,
     BosTau8,
     DAN_RER10,
+    DAN_RER11,
     RN6,
     AraTha1,
     RheMac8,
@@ -84,7 +86,7 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
     },
     zebrafish: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
-        assemblies: [ DAN_RER10.genome.getName() ],
+        assemblies: [ DAN_RER11.genome.getName(), DAN_RER10.genome.getName() ],
         color: 'yellow',
     },
     arabidopsis: {

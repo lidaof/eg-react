@@ -105,6 +105,14 @@ const danRer10 = [
     },
 ];
 
+const danRer11 = [
+    {
+        name: 'refGene',
+        file: 'ncbiRefSeq_load',
+        fieldsConfig: geneFieldsAndIndex
+    }
+];
+
 const rn6 = [
     {
         name: 'refGene',
@@ -160,6 +168,6 @@ const galGal6 = [
     }
 ];
 
-const genomeConfig = { hg19, mm10, danRer10, hg38, panTro5, rn6, mm9, bosTau8, araTha1, rheMac8, galGal5, galGal6 };
+const genomeConfig = { hg19, mm10, danRer10, danRer11, hg38, panTro5, rn6, mm9, bosTau8, araTha1, rheMac8, galGal5, galGal6 };
 
 module.exports = genomeConfig;

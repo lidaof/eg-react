@@ -3,6 +3,7 @@
 ## 50.0.2
 
 * the browser can respond to window resize event now, thanks to Silas who stopped by and helped debug this function
+* add zebrafish genome `danRer11`
 
 ## 50.0.1
 
