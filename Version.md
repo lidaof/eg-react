@@ -4,6 +4,7 @@
 
 * the browser can respond to window resize event now, thanks to Silas who stopped by and helped debug this function
 * add zebrafish genome `danRer11`
+* from dicussion with Arnav for `callingcard` track, plot a single circle (per track) at the midpoint of the interval
 
 ## 50.0.1
 

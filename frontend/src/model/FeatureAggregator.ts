@@ -53,7 +53,7 @@ export class FeatureAggregator {
      * @param {number} width - width of the visualization
      * @return {Feature[][]} mapping from x coordinate to all Features overlapping that location
      */
-    makeXMap(features: Feature[], viewRegion: DisplayedRegionModel, width: number): Feature[][] {
+    makeXMap(features: Feature[], viewRegion: DisplayedRegionModel, width: number, useCenter: boolean=false): Feature[][] {
         width = Math.round(width); // Sometimes it's juuust a little bit off from being an int
 
         const xToFeatures = Array(width).fill(null);
@@ -62,7 +62,7 @@ export class FeatureAggregator {
         }
 
         const placer = new FeaturePlacer();
-        const placement = placer.placeFeatures(features, viewRegion, width);
+        const placement = placer.placeFeatures(features, viewRegion, width, useCenter);
         for (const placedFeature of placement) {
             const startX = Math.max(0, Math.floor(placedFeature.xSpan.start));
             const endX = Math.min(width - 1, Math.ceil(placedFeature.xSpan.end));
