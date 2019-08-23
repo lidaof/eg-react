@@ -11,6 +11,8 @@ import RheMac8 from './rheMac8/rheMac8';
 import GalGal6 from './galGal6/galGal6';
 import GalGal5 from './galGal5/galGal5';
 import AraTha1 from './araTha1/araTha1';
+import DM6 from './dm6/dm6';
+import CE11 from './ce11/ce11';
 import { GenomeConfig } from './GenomeConfig';
 
 /**
@@ -30,6 +32,8 @@ export const allGenomes = [
     RheMac8,
     GalGal6,
     GalGal5,
+    DM6,
+    CE11,
 ];
 
 const genomeNameToConfig = {};
@@ -88,6 +92,16 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
         assemblies: [ DAN_RER11.genome.getName(), DAN_RER10.genome.getName() ],
         color: 'yellow',
+    },
+    'fruit fly': {
+        logoUrl: 'https://epigenomegateway.wustl.edu/legacy/images/Fruit%20fly.png',
+        assemblies: [ DM6.genome.getName() ],
+        color: 'white',
+    },
+    'c.elegans': {
+        logoUrl: 'https://epigenomegateway.wustl.edu/legacy/images/C.elegans.png',
+        assemblies: [ CE11.genome.getName() ],
+        color: 'black',
     },
     arabidopsis: {
         logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png',

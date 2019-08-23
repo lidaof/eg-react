@@ -1,5 +1,10 @@
 # Version History
 
+## 50.0.3
+
+* add `sessionFile` URL param for loading a session file/state from URL
+* add new genome fruit fly `dm6` and C.elegans `ce11`
+
 ## 50.0.2
 
 * the browser can respond to window resize event now, thanks to Silas who stopped by and helped debug this function

@@ -114,7 +114,7 @@ class Nav extends React.Component {
         const otherGenomes = allGenomes.map(g => g.genome.getName()).filter(g => g !== genomeName);
         const radios = otherGenomes.map(g => {
             const {name} = getSpeciesInfo(g);
-            return <label key={g}><Radio value={g} /> {name} {g}</label>
+            return <label key={g}><Radio value={g} /> <span className="capitalize">{name}</span> <span className="italic">{g}</span></label>
         })
         return (
             <RadioGroup
@@ -156,7 +156,7 @@ class Nav extends React.Component {
                 </div>
                 <div className="Nav-genome Nav-center" 
                     style={{backgroundImage: `url(${logo})`, color: color, backgroundSize: "cover"}}>
-                    <div onClick={this.handleGenomeOpenModal}><span style={{textTransform: 'capitalize'}}>{name}</span> {genomeName}</div>
+                    <div onClick={this.handleGenomeOpenModal}><span className="capitalize">{name}</span> <span className="italic">{genomeName}</span></div>
                     <ReactModal 
                         isOpen={genomeModal}
                         ariaHideApp={false}

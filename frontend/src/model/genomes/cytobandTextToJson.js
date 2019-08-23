@@ -69,6 +69,7 @@ function makeCytobandObject(rawRecord) {
         return null;
     }
     const object = _.zipObject(CYTOBAND_PROPS, rawStringValues);
+    if (object.gieStain === 'n/a') { return null };
     object.chromStart = Number.parseInt(object.chromStart);
     object.chromEnd = Number.parseInt(object.chromEnd);
     if (!Number.isSafeInteger(object.chromStart) || !Number.isSafeInteger(object.chromEnd)) {
