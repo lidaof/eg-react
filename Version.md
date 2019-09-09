@@ -1,5 +1,9 @@
 # Version History
 
+## 50.0.4
+
+* fixed a sequence fetch bug
+
 ## 50.0.3
 
 * add `sessionFile` URL param for loading a session file/state from URL
