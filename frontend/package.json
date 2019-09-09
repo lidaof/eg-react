@@ -72,7 +72,7 @@
     "firebase": "^5.4.0",
     "fsevents": "^2.0.7",
     "fuse.js": "^3.4.4",
-    "g3djs": "^1.0.2",
+    "g3djs": "^1.1.0",
     "generic-filehandle": "^2.0.0",
     "hic-straw": "^0.9.4",
     "jest-image-snapshot": "^1.0.1",

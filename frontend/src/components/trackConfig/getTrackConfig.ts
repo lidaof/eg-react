@@ -20,6 +20,7 @@ import { RefBedTrackConfig } from './RefBedTrackConfig';
 import { SnpTrackConfig } from './SnpTrackConfig';
 import { MatplotTrackConfig } from './MatplotTrackConfig';
 import { HammockTrackConfig } from './HammockTrackConfig';
+import { G3dTrackConfig } from './G3dTrackConfig';
 
 export const INTERACTION_TYPES = ['hic', 'longrange', 'biginteract'];
 
@@ -44,6 +45,7 @@ const TYPE_NAME_TO_CONFIG = {
     "ruler": RulerTrackConfig,
     "matplot": MatplotTrackConfig,
     "hammock": HammockTrackConfig,
+    "g3d": G3dTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 
