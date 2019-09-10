@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import DataSource from './DataSource';
 import G3dFile from 'g3djs';
 
@@ -31,19 +30,16 @@ export class G3dSource extends DataSource {
      * @param {DisplayedRegionModel} region - region for which to fetch data
      * @param {number} basesPerPixel - bases per pixel.  Higher = more zoomed out
      * @param {Object} options - rendering options
-     * @return {Promise<GenomeInteraction[]>} a Promise for the data
+     * @return {Promise<structure data in string[]>} a Promise for the data
      */
     async getData(region, basesPerPixel, options) {
         this.metadata = await this.g3d.getMetaData();
-        console.log(this.metadata)
         const promises = [];
         const loci = region.getGenomeIntervals();
-        console.log(loci)
         for (let i = 0; i < loci.length; i++) {
             promises.push(this.g3d.readData(loci[i].chr));
         }
         const dataForEachSegment = await Promise.all(promises);
-        console.log(dataForEachSegment)
-        return _.flatMap(dataForEachSegment);
+        return dataForEachSegment;
     }
 }
