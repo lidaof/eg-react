@@ -27,14 +27,19 @@ class G3dTrack extends React.PureComponent {
 
 
     render() {
-        const {data, trackModel, width, options, } = this.props;
-        return <Track
+        const {data, trackModel, width, options } = this.props;
+        // const newProps = {
+        //         ...this.props, 
+        //         onContextMenu: () => null, 
+        //         onClick: () => null,
+        //     };
+        return <Track 
             {...this.props}
             legend={<TrackLegend 
                 trackModel={trackModel} height={options.height}
                 />}
         // legend={<TrackLegend trackModel={trackModel} height={50} />}
-            visualizer={<NglRender data={data[0]} width={width} height={options.height} /> }
+            visualizer={<NglRender data={data[0]} width={width} height={options.height} options={options} /> }
         />;
     }
 }

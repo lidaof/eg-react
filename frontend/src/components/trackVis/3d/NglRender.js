@@ -9,11 +9,10 @@ export class NglRender extends React.PureComponent {
     }
 
     componentDidMount() {
-        // const {backgroundColor} = this.props.options;
-        const backgroundColor = 'pink';
         this.node = this.myRef.current;
         // Create NGL Stage object
-        this.stage = new window.NGL.Stage(this.node, {backgroundColor});
+        this.stage = new window.NGL.Stage(this.node, {backgroundColor: 0xffffff});
+        // this.stage.viewer.renderer.setClearColor( 0xffffff, 1); // set stage backgraound to transparent
         this.stage.mouseControls.remove("hoverPick");
         // Handle window resizing
         window.addEventListener( "resize",  (event) => {
@@ -27,17 +26,24 @@ export class NglRender extends React.PureComponent {
         if(this.props.data !== prevProps.data) {
           this.renderStage();
         }
+        if(prevProps.options.height !== this.props.options.height) {
+            this.stage.handleResize();
+        }
+        if(prevProps.options.backgroundColor !== this.props.options.backgroundColor) {
+            this.stage.setParameters({backgroundColor: this.props.options.backgroundColor});
+        }
+        
     }
 
     renderStage = () => {
         const {data} = this.props;
         // console.log(data)
         const blob = new Blob( [ data ], { type: 'text/plain'} ); 
-        this.stage.loadFile(blob, {ext: "pdb", defaultRepresentation: true})
-        .then((o) => {
-            o.addRepresentation("cartoon", { color: "bfactor" })
-            o.autoView()
-        });
+        this.stage.loadFile(blob, {ext: "pdb", defaultRepresentation: true});
+        // .then((o) => {
+        //     o.addRepresentation("cartoon", { color: "bfactor" })
+        //     o.autoView()
+        // });
     }
 
     render() {

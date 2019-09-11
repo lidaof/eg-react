@@ -5,7 +5,6 @@ import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import GeneSearchBox from './GeneSearchBox';
 import SnpSearchBox from './SnpSearchBox';
 import { CopyToClip } from '../CopyToClipboard';
-import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
 
 const MODAL_STYLE = {
     content: {
@@ -82,8 +81,9 @@ class TrackRegionController extends React.Component {
      */
     parseRegion() {
         let parsedRegion = null;
+        const navContext = this.props.selectedRegion.getNavigationContext();
         try {
-            parsedRegion = this.props.selectedRegion.getNavigationContext().parse(this.input.value);
+            parsedRegion = navContext.parse(this.input.value);
         } catch (error) {
             if (error instanceof RangeError) {
                 this.setState({badInputMessage: error.message});
@@ -98,7 +98,7 @@ class TrackRegionController extends React.Component {
             this.setState({badInputMessage: ""});
         }
         this.props.onRegionSelected(parsedRegion.start, parsedRegion.end);
-        this.props.onSetEnteredRegion(ChromosomeInterval.parse(this.input.value));
+        this.props.onSetEnteredRegion(navContext.getLociInInterval(parsedRegion.start, parsedRegion.end)[0]);
         this.handleCloseModal();
     }
 
