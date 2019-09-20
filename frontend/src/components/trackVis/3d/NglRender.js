@@ -38,12 +38,16 @@ export class NglRender extends React.PureComponent {
     renderStage = () => {
         const {data} = this.props;
         // console.log(data)
-        const blob = new Blob( [ data ], { type: 'text/plain'} ); 
-        this.stage.loadFile(blob, {ext: "pdb", defaultRepresentation: true});
-        // .then((o) => {
-        //     o.addRepresentation("cartoon", { color: "bfactor" })
-        //     o.autoView()
-        // });
+        data.forEach(dat => {
+            const blob = new Blob( [ dat ], { type: 'text/plain'} ); 
+            this.stage.loadFile(blob, {ext: "pdb"}) //, defaultRepresentation: true
+            .then((o) => {
+                o.addRepresentation("ball+stick", {colorScheme: "atomindex"});
+                o.autoView();
+        });
+        });
+        
+        
     }
 
     render() {

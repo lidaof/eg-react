@@ -22,10 +22,11 @@ class LiveUI extends React.Component {
     goLive = async () => {
         const { firebase, browser} = this.props;
         const currentObj = new AppStateSaver().toObject(browser.present);
+        const cleanedObj = JSON.parse(JSON.stringify(currentObj));
         try {
             await firebase.set(`live/${liveId}/`, {
                     liveId, 
-                    present: {...currentObj, liveId},
+                    present: {...cleanedObj, liveId},
                 }
             );
         } catch (error) {

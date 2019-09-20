@@ -3,6 +3,7 @@
 ## 50.0.4
 
 * fixed a sequence fetch bug
+* fixed a 'browser content empty' error for `Go Live` function 
 
 ## 50.0.3
 

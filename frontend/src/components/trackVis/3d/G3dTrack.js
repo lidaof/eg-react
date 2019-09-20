@@ -39,7 +39,7 @@ class G3dTrack extends React.PureComponent {
                 trackModel={trackModel} height={options.height}
                 />}
         // legend={<TrackLegend trackModel={trackModel} height={50} />}
-            visualizer={<NglRender data={data[0]} width={width} height={options.height} options={options} /> }
+            visualizer={<NglRender data={data} width={width} height={options.height} options={options} /> }
         />;
     }
 }
