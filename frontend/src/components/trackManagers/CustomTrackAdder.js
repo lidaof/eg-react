@@ -21,7 +21,7 @@ export const TRACK_TYPES = {
     Repeats: ['repeatmasker'],
     Alignment: ['bam'],
     Callingcard: ['callingcard'],
-
+    Importance: ['importance']
 };
 
 export const NUMERRICAL_TRACK_TYPES = ['bigwig', 'bedgraph']; // the front UI we allow any case of types, in TrackModel only lower case
@@ -40,7 +40,8 @@ const TYPES_DESC = {
     bigInteract: 'long range interaction data in bigInteract format',
     cool: 'long range interaction data in cool format, use data uuid instead of URL',
     bam: 'reads alignment data',
-    callingcard: 'calling card data'
+    callingcard: 'calling card data',
+    importance: 'importance tracks by snair'
 };
 
 /**

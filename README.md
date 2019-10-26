@@ -1,3 +1,7 @@
+# Importance Tracks
+
+This fork will attempt to implement tracks for importance scores for the browser. Get in touch with Surag for the Firebase .env config file if interested in contributing.
+
 # WashU Epigenome Browser
 
 ![WashU Epigenome Browser Logo](https://eg.readthedocs.io/en/latest/_images/eg.png "WashU Epigenome Browser")

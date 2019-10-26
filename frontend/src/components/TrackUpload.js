@@ -7,7 +7,7 @@ import JSON5 from 'json5';
 import { readFileAsText, HELP_LINKS } from "../util";
 import { TrackOptionsUI } from "./trackManagers/TrackOptionsUI";
 
-const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract"]; // all lower case
+const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract", "importance"]; // all lower case
 
 /**
  * handles local track file upload using FileReader API
@@ -169,6 +169,7 @@ export class TrackUpload extends React.Component {
                             <option value="bigBed">bigBed</option>
                             <option value="hic">HiC</option>
                             <option value="bigInteract">bigInteract</option>
+                            <option value="importance">importance</option>
                         </optgroup>
                         <optgroup label="select both the track file and index file (only select 1 pair)">    
                             <option value="bedGraph">bedGraph</option>
