@@ -1,6 +1,6 @@
 # Importance Tracks
 
-This fork will attempt to implement tracks for importance scores for the browser. Get in touch with Surag for the Firebase .env config file if interested in contributing.
+This fork will attempt to implement tracks for importance scores for the browser. Get in touch with Surag for the Firebase .env config file if interested in contributing and place it in frontend/. Then run `npm install` from within frontend/ and then `npm start`. 
 
 # WashU Epigenome Browser
 
