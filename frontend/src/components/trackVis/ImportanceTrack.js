@@ -26,105 +26,81 @@ const HEIGHT = 40;
  * @author Silas Hsu
  */
 
-export const DEFAULT_OPTIONS = {
-    aggregateMethod: DefaultAggregators.types.MEAN,
-    displayMode: NumericalDisplayModes.AUTO,
-    height: 40,
-    color: "blue",
-    colorAboveMax: "red",
-    color2: "darkorange",
-    color2BelowMin: "darkgreen",
-    yScale: ScaleChoices.AUTO,
-    yMax: 10,
-    yMin: 0,
-    smooth: 0,
-};
-
-const AUTO_HEATMAP_THRESHOLD = 21; // If pixel height is less than this, automatically use heatmap
 
 class RulerVisualizer extends React.PureComponent {
     static propTypes = Object.assign({}, Track.propsFromTrackContainer, 
     {
-        data: PropTypes.array.isRequired, // PropTypes.arrayOf(Feature)
-        genomeConfig: PropTypes.object.isRequired,
+        genomeConfig: PropTypes.shape({cytobands: PropTypes.object}).isRequired, // Object with cytoband data
+        data: PropTypes.array.isRequired, // PropTypes.arrayOf(Feature)        
         trackModel: PropTypes.instanceOf(TrackModel).isRequired,
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
         width: PropTypes.number.isRequired,
+        unit: PropTypes.string, // Unit to display after the number in tooltips
         options: PropTypes.shape({
             aggregateMethod: PropTypes.oneOf(Object.values(DefaultAggregators.types)),
             displayMode: PropTypes.oneOf(Object.values(NumericalDisplayModes)).isRequired,
             height: PropTypes.number.isRequired, // Height of the track
             scaleType: PropTypes.any, // Unused for now
             scaleRange: PropTypes.array, // Unused for now
-            color: PropTypes.string, // Color to draw bars, if using the default getBarElement
+            color: PropTypes.string, // Color to draw bars, if using the default getBarElement            
         }).isRequired,
+        xToValue: PropTypes.array.isRequired,   
+        drawHeights: PropTypes.array.isRequired,
+        zeroLine: PropTypes.number.isRequired
     });
 
-    constructor(props) {
-        super(props);
-        console.debug("HELLO");
-        console.debug(props);
-
-        this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
-        this.computeScales = memoizeOne(this.computeScales);
-        
-        this.xToValue = null;
-        this.xToValue2 = null;
-        this.getTooltipContents = this.getTooltipContents.bind(this);
+    constructor(props) {        
+        super(props);        
+        this.renderTooltip = this.renderTooltip.bind(this);        
     }
 
-    aggregateFeatures(data, viewRegion, width, aggregatorId) {
-        const aggregator = new FeatureAggregator();
-        const xToFeatures = aggregator.makeXMap(data, viewRegion, width);
-        return xToFeatures.map( DefaultAggregators.fromId(aggregatorId) );
-    }
-
-    getEffectiveDisplayMode() {
-        const {displayMode, height} = this.props.options;
-        if (displayMode === NumericalDisplayModes.AUTO) {
-            return height < AUTO_HEATMAP_THRESHOLD ? NumericalDisplayModes.HEATMAP : NumericalDisplayModes.BAR;
-        } else {
-            return displayMode;
-        }
-    }
-
-
-    getTooltipContents(relativeX) {
-        const {viewRegion, width} = this.props;
-        return <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />;
+        /**
+     * Renders the default tooltip that is displayed on hover.
+     * 
+     * @param {number} relativeX - x coordinate of hover relative to the visualizer
+     * @param {number} value - 
+     * @return {JSX.Element} tooltip to render
+     */
+    renderTooltip(relativeX) {
+        const {trackModel, viewRegion, width, unit, xToValue} = this.props;
+        const value = xToValue[Math.round(relativeX)];        
+        const stringValue = typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : '(no data)';        
+        return (
+        <div>
+            <div>
+                <span className="Tooltip-major-text" style={{marginRight: 3}}>
+                {this.hasReverse && "Forward: "} {stringValue}</span>
+                {unit && <span className="Tooltip-minor-text">{unit}</span>}
+            </div>
+            <div className="Tooltip-minor-text" >
+                <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
+            </div>
+            <div className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</div>
+        </div>
+        );
     }
 
     render() {
-        const {data, trackModel, viewRegion, width, options} = this.props;
+        console.debug("Well hello");
+        const {data, trackModel, viewRegion, width, options, xToValue, zeroLine, drawHeights} = this.props;
         const {height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin, smooth} = options;
 
-        const genomeConfig = getGenomeConfig(trackModel.getMetadata('genome')) || this.props.genomeConfig;
-
-        const dataForward = data.filter(feature => feature.value === undefined || feature.value >= 0); // bed track to density mode
-        const dataReverse = data.filter(feature => feature.value < 0);
-        let xToValue2BeforeSmooth;
-        if (dataReverse.length > 0) {
-            this.hasReverse = true;
-            xToValue2BeforeSmooth = this.aggregateFeatures(dataReverse, viewRegion, width, aggregateMethod);
-        } else {
-            xToValue2BeforeSmooth = [];
-        }
-        this.xToValue2 = smooth === 0 ? xToValue2BeforeSmooth: Smooth(xToValue2BeforeSmooth, smooth);
-        const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
-        const xToValueBeforeSmooth = dataForward.length > 0 ? this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod) : [];
-        this.xToValue = smooth === 0 ? xToValueBeforeSmooth: Smooth(xToValueBeforeSmooth, smooth);
-
+        const genomeConfig = getGenomeConfig(trackModel.getMetadata('genome')) ||  this.props.genomeConfig;
+        console.debug(genomeConfig);
         return (
-        <HoverTooltipContext tooltipRelativeY={RULER_Y} getTooltipContents={this.getTooltipContents} >
+        <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
             {/* display: block prevents svg from taking extra bottom space */ }
-            <svg width={width} height={HEIGHT} style={{display: "block"}} >
+            <svg width={width} height={height} style={{display: "block"}} >
                 <Chromosomes
                     genomeConfig={genomeConfig}
                     viewRegion={viewRegion}
                     width={width}
                     labelOffset={CHROMOSOMES_Y}
                     hideChromName={true}
-                    xToValue={this.xToValue}
+                    xToValue={xToValue}
+                    drawHeights={drawHeights}
+                    zeroLine={zeroLine}
+                    height={height}
                 />                
             </svg>
         </HoverTooltipContext>
@@ -132,15 +108,16 @@ class RulerVisualizer extends React.PureComponent {
     }
 }
 
-const Visualizer = withCurrentGenome(RulerVisualizer);
+const RulerVisualizerWithGenome = withCurrentGenome(RulerVisualizer);
 
-function RulerTrack(props) {
+function RulerTrack(props, xToValue, drawHeights, zeroLine, legend) {
     return <Track
         {...props}
-        legend={<TrackLegend height={HEIGHT} trackModel={props.trackModel} trackViewRegion={props.viewRegion}
-            selectedRegion={props.selectedRegion}
-            trackWidth={props.width} />}
-        visualizer={<Visualizer data={props.data} viewRegion={props.viewRegion} width={props.width} trackModel={props.trackModel} options={props.options} />}
+        // legend={<TrackLegend height={HEIGHT} trackModel={props.trackModel} trackViewRegion={props.viewRegion}
+        //     selectedRegion={props.selectedRegion}
+        //     trackWidth={props.width} />}
+        legend={legend}
+        visualizer={<RulerVisualizerWithGenome data={props.data} viewRegion={props.viewRegion} width={props.width} trackModel={props.trackModel} options={props.options} xToValue={xToValue} drawHeights={drawHeights} zeroLine={zeroLine}/>}
     />;
 }
 

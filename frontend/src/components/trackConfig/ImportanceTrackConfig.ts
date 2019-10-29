@@ -1,27 +1,25 @@
 import { TrackModel } from './../../model/TrackModel';
-import { TrackConfig } from './TrackConfig';
-import RulerTrack, {DEFAULT_OPTIONS} from '../trackVis/ImportanceTrack';
+import { BigWigTrackConfig } from './BigWigTrackConfig';
 import { BigWorker } from '../../dataSources/WorkerTSHook';
 import LocalBigSource from '../../dataSources/big/LocalBigSource';
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 import { NumericalFeature } from '../../model/Feature';
 import ChromosomeInterval from '../../model/interval/ChromosomeInterval';
+import ImportanceNumericalTrack, { DEFAULT_OPTIONS } from '../trackVis/commonComponents/numerical/ImportanceNumericalTrack';
 
+export class ImportanceTrackConfig extends BigWigTrackConfig {
+    // constructor(trackModel: TrackModel) {
+    //     super(trackModel);
+    //     this.setDefaultOptions(DEFAULT_OPTIONS)
+    // }
 
-
-export class ImportanceTrackConfig extends TrackConfig {
-    constructor(trackModel: TrackModel) {
-        super(trackModel);
-        this.setDefaultOptions(DEFAULT_OPTIONS)
-    }
-
-    initDataSource() {
-        if (this.trackModel.fileObj) {
-            return new LocalBigSource(this.trackModel.fileObj);
-        } else {
-            return new WorkerSource(BigWorker, this.trackModel.url);
-        }
-    }
+    // initDataSource() {
+    //     if (this.trackModel.fileObj) {
+    //         return new LocalBigSource(this.trackModel.fileObj);
+    //     } else {
+    //         return new WorkerSource(BigWorker, this.trackModel.url);
+    //     }
+    // }
 
     /*
     Expected DASFeature schema
@@ -41,15 +39,15 @@ export class ImportanceTrackConfig extends TrackConfig {
      * @param {DASFeature[]} data - DASFeatures to convert
      * @return {NumericalFeature[]} NumericalFeatures made from the input
      */
-    formatData(data: any[]) {
-        console.debug("IM HERE");
-        return data.map(feature =>
-            new NumericalFeature("", new ChromosomeInterval(feature.segment, feature.min, feature.max))
-                .withValue(feature.score)
-        );
-    }
+    // formatData(data: any[]) {
+    //     console.debug("IM HERE");
+    //     return data.map(feature =>
+    //         new NumericalFeature("", new ChromosomeInterval(feature.segment, feature.min, feature.max))
+    //             .withValue(feature.score)
+    //     );
+    // }
 
     getComponent() {
-        return RulerTrack;
+        return ImportanceNumericalTrack;
     }
 }

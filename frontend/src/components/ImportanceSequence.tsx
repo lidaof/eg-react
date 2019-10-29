@@ -45,6 +45,8 @@ interface SequenceProps {
     letterSize?: number;
     isReverseComplement?: boolean;
     xToValue?: Float32Array;
+    drawHeights?: Float32Array;
+    zeroLine?: number;
 }
 
 /**
@@ -53,7 +55,7 @@ interface SequenceProps {
  * @author Silas Hsu
  */
 export class Sequence extends React.PureComponent<SequenceProps> {
-    static MIN_X_WIDTH_PER_BASE = 1;
+    static MIN_X_WIDTH_PER_BASE = 2;
 
     static defaultProps = {
         isDrawBackground: false,
@@ -63,7 +65,7 @@ export class Sequence extends React.PureComponent<SequenceProps> {
     };
 
     render() {
-        const {sequence, xSpan, y, isDrawBackground, height, letterSize, isReverseComplement, xToValue} = this.props;
+        const {sequence, xSpan, y, isDrawBackground, height, letterSize, isReverseComplement, xToValue, drawHeights, zeroLine} = this.props;
         if (!sequence) {
             return null;
         }
@@ -102,13 +104,16 @@ export class Sequence extends React.PureComponent<SequenceProps> {
             let x = xSpan.start;
             for (const base of sequenceToDraw) {
                 x_mid = x + baseWidth/2;
-                scale_fac = xToValue[Math.floor(x_mid)];
+                // this scale factor somehow miraculously works
+                // don't exactly know the height size fontsize = 1.4*baseWidth
+                scale_fac = drawHeights[Math.floor(x_mid)]/baseWidth;
+                
                 letters.push(
                     <text
                         key={x}       
                         dominantBaseline="baseline"
-                        style={{textAnchor: "middle", fill: BASE_COLORS[base.toUpperCase()],                          
-                                transform: `translate(${x_mid}px, ${y + height}px) scaleY(${200*scale_fac/baseWidth})`, 
+                        style={{textAnchor: "middle", fill: BASE_COLORS[base.toUpperCase()],
+                                transform: `translate(${x_mid}px, ${y + zeroLine}px) scaleY(${scale_fac})`,
                                 fontSize:  1.4*baseWidth}}                        
                     >
                         {base}

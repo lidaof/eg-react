@@ -47,7 +47,10 @@ class Chromosomes extends React.PureComponent {
         labelOffset: PropTypes.number, // Y offset of feature labels
         x: PropTypes.number, // X offset of the entire graphic
         y: PropTypes.number, // Y offset of the entire graphic
-        xToValue: PropTypes.array.isRequired
+        xToValue: PropTypes.array.isRequired,
+        drawHeights: PropTypes.array.isRequired,
+        zeroLine: PropTypes.number.isRequired,
+        height: PropTypes.number
     };
 
     constructor(props){
@@ -101,86 +104,6 @@ class Chromosomes extends React.PureComponent {
     }
 
     /**
-     * 
-     * @param {*} cytoband 
-     * @param {ChromosomeInterval} cytobandLocus 
-     * @param {LinearDrawingModel} drawModel 
-     */
-    renderOneCytoband(cytoband, cytobandLocus, drawModel) {
-        const contextIntervals = this.props.viewRegion.getNavigationContext()
-            .convertGenomeIntervalToBases(cytobandLocus);
-        const children = [];
-        for (const contextInterval of contextIntervals) {
-            const startX = Math.max(0, drawModel.baseToX(contextInterval.start));
-            const endX = Math.min(drawModel.baseToX(contextInterval.end), drawModel.getDrawWidth());
-            const drawWidth = endX - startX;
-            const colors = CYTOBAND_COLORS[cytoband.gieStain];
-            const name = cytoband.name;
-            if (drawWidth < Sequence.MIN_X_WIDTH_PER_BASE) {
-                continue;
-            }
-
-            if (colors.bandColor !== "white") { // Cytoband rectangle
-                const isCentromere = cytoband.gieStain === 'acen';
-                if (isCentromere) { // Cover up the outside border
-                    children.push(<rect
-                        key={name + startX + "-stroke-eraser"}
-                        x={startX}
-                        y={TOP_PADDING - 1}
-                        width={drawWidth}
-                        height={HEIGHT + 2}
-                        fill="white"
-                    />);
-                }
-                // Centromeres are 3/5 the height.  When drawing them, we add 1/5 to the y so there's 1/5 HEIGHT top and
-                // bottom padding
-                children.push(<rect
-                    key={name + startX + "-rect"}
-                    x={startX}
-                    y={isCentromere ? TOP_PADDING + 0.2 * HEIGHT : TOP_PADDING}
-                    width={drawWidth}
-                    height={isCentromere ? 0.6 * HEIGHT : HEIGHT}
-                    fill={colors.bandColor}
-                />);
-            }
-
-            const estimatedLabelWidth = name.length * CYTOBAND_LABEL_SIZE;
-            if (estimatedLabelWidth < drawWidth) { // Cytoband label, if it fits
-                children.push(
-                    <text
-                        key={name + startX + "-text"}
-                        x={startX + drawWidth/2}
-                        y={TOP_PADDING + HEIGHT/2 + 3}
-                        style={{textAnchor: "middle", fill: colors.textColor, fontSize: CYTOBAND_LABEL_SIZE}}
-                    >
-                        {name}
-                    </text>
-                );
-            }
-        }
-        return children;
-    }
-
-    /**
-     * Gets the cytoband elements to draw within a genomic interval.
-     * 
-     * @param {ChromosomeInterval} locus - genetic locus for which to draw cytobands
-     * @param {LinearDrawingModel} drawModel - draw model to use
-     * @return {JSX.Element[]} cytoband elements
-     */
-    renderCytobandsInLocus(locus, drawModel) {
-        const cytobandsForChr = this.props.genomeConfig.cytobands[locus.chr] || [];
-        let children = [];
-        for (let cytoband of cytobandsForChr) {
-            const cytobandLocus = new ChromosomeInterval(cytoband.chrom, cytoband.chromStart, cytoband.chromEnd);
-            if (cytobandLocus.getOverlap(locus)) {
-                children.push(this.renderOneCytoband(cytoband, cytobandLocus, drawModel));
-            }
-        }
-        return children;
-    }
-
-    /**
      * Tries to find a label size that fits within `maxWidth`.  Returns `undefined` if it cannot find one.
      * 
      * @param {string} label - the label contents
@@ -193,7 +116,7 @@ class Chromosomes extends React.PureComponent {
 
     renderSequences() {
         console.debug("TRYNA RENDER SEQ");
-        const {viewRegion, width} = this.props;
+        const {viewRegion, width, height} = this.props;
         const placedSequences = this.featurePlacer.placeFeatures(this.state.sequenceData, viewRegion, width);        
         return placedSequences.map((placement, i) => {
             const {feature, visiblePart, xSpan, isReverse} = placement;
@@ -202,9 +125,12 @@ class Chromosomes extends React.PureComponent {
                 key={i}
                 sequence={feature.sequence.substring(relativeStart, relativeEnd)}
                 xSpan={xSpan}
-                y={TOP_PADDING}
+                y={0}
                 isReverseComplement={isReverse}
                 xToValue={this.props.xToValue}
+                drawHeights={this.props.drawHeights}
+                zeroLine={this.props.zeroLine}
+                height={height}
             />;
         });
     }
@@ -217,67 +143,6 @@ class Chromosomes extends React.PureComponent {
     render() {
         const {viewRegion, width, labelOffset, hideChromName} = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
-
-        let boxesAndLabels = [];
-        let x = 0;
-        let chromosomeNames = [];
-        for (const segment of viewRegion.getFeatureSegments()) {
-            const drawWidth = drawModel.basesToXWidth(segment.getLength());
-            boxesAndLabels.push(<rect // Box for feature
-                key={"rect" + x}
-                x={x}
-                y={TOP_PADDING}
-                width={drawWidth}
-                height={HEIGHT}
-                style={{stroke: "#000", fill: "#fff"}}
-                opacity="0.5"
-            />);
-
-            if (x > 0) { // Thick line at boundaries of each feature, except the first one
-                boxesAndLabels.push(<line
-                    key={"line" + x}
-                    x1={x}
-                    y1={0}
-                    x2={x}
-                    y2={TOP_PADDING * 2 + HEIGHT}
-                    stroke={"#000"}
-                    strokeWidth={1}
-                />);
-            }
-
-            // const labelSize = this.getSizeForFeatureLabel(segment.getName(), drawWidth); 
-            if (!NavigationContext.isGapFeature(segment.feature)) {
-                if (chromosomeNames.length > 0 && segment.getName() === chromosomeNames[chromosomeNames.length - 1].name) {
-                    chromosomeNames[chromosomeNames.length - 1].end = x + drawWidth;
-                }
-                else {
-                    chromosomeNames.push({name:segment.getName(), start:x, end: x + drawWidth});
-                }
-            }
-
-            x += drawWidth;
-        }
-        
-        // if(!hideChromName) {
-        //     chromosomeNames.forEach((chromosomeName) => {
-        //         const chrSize = this.getSizeForFeatureLabel(chromosomeName.name, 
-        //             drawModel.basesToXWidth(chromosomeName.end - chromosomeName.start));
-        //         boxesAndLabels.push( // Label for feature, if it fits
-        //             <text
-        //                 key={"text" + chromosomeName.start}
-        //                 x={(chromosomeName.start + chromosomeName.end) / 2}
-        //                 y={labelOffset || DEFAULT_LABEL_OFFSET}
-        //                 style={{textAnchor: "middle", fontWeight: "bold", fontSize: chrSize }}
-        //             >
-        //                 {chromosomeName.name}
-        //             </text>
-        //         )
-        //     });
-        // }
-        
-        // const cytobands = viewRegion.getGenomeIntervals().map(locus =>
-        //     this.renderCytobandsInLocus(locus, drawModel)
-        // );
 
         return <TranslatableG x={this.props.x} y={this.props.y}>
             {drawModel.basesToXWidth(1) > Sequence.MIN_X_WIDTH_PER_BASE && this.renderSequences()}
