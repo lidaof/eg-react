@@ -373,10 +373,10 @@ class Nav extends React.Component {
                             <a href="http://epigenomegateway.wustl.edu/legacy" target="_blank" rel="noopener noreferrer">The 'old' browser</a>
                         </label>
                         <label className="dropdown-item">
-                            <a href="https://groups.google.com/forum/#!forum/epgg" target="_blank" rel="noopener noreferrer">Google groups</a>
+                            <a href="https://groups.google.com/d/forum/epgg" target="_blank" rel="noopener noreferrer">Google groups</a>
                         </label>
                         <label className="dropdown-item">
-                            <a href="https://bit.ly/2T1OKmP" target="_blank" rel="noopener noreferrer">Join our Slack</a>
+                            <a href="https://join.slack.com/t/epgg/shared_invite/enQtNTA5NDY5MDIwNjc4LTlhYjJlZWM4MmRlMTcyODEzMDI0ZTlmNmM2ZjIyYmY2NTU5ZTY2MWRmOWExMDg1N2U5ZWE3NzhkMjVkZDVhNTc" target="_blank" rel="noopener noreferrer">Join our Slack</a>
                         </label>
                         <label className="dropdown-item">
                             <a href="https://github.com/lidaof/eg-react" target="_blank" rel="noopener noreferrer">Source code @ Github</a>

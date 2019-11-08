@@ -1,4 +1,5 @@
-.Bullseye-horizontal-line, .Bullseye-vertical-line {
+.Bullseye-horizontal-line,
+.Bullseye-vertical-line {
     position: absolute;
     pointer-events: none;
 }
