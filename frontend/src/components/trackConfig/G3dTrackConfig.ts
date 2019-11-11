@@ -1,56 +1,55 @@
-import { TrackConfig } from "./TrackConfig";
-import { G3dSource } from "../../dataSources/G3dSource";
-import G3dTrack, { DEFAULT_OPTIONS } from "../trackVis/3d/G3dTrack";
+import { TrackConfig } from './TrackConfig';
+import { G3dSource } from '../../dataSources/G3dSource';
+import G3dTrack, { DEFAULT_OPTIONS } from '../trackVis/3d/G3dTrack';
 
-import HeightConfig from "../trackContextMenu/HeightConfig";
-import { BackgroundColorConfig } from "components/trackContextMenu/ColorConfig";
-import TrackModel, { TrackOptions } from "../../model/TrackModel";
-import {
-  G3dResolutionConfig,
-  G3dRegionConfig
-} from "components/trackContextMenu/G3dDataConfig";
+import HeightConfig from '../trackContextMenu/HeightConfig';
+import { BackgroundColorConfig } from 'components/trackContextMenu/ColorConfig';
+import TrackModel, { TrackOptions } from '../../model/TrackModel';
+import { G3dResolutionConfig, G3dRegionConfig } from 'components/trackContextMenu/G3dDataConfig';
+import DisplayedRegionModel from 'model/DisplayedRegionModel';
+import { RegionMode } from 'model/G3dDataModes';
 
 export class G3dTrackConfig extends TrackConfig {
-  constructor(trackModel: TrackModel) {
-    super(trackModel);
-    this.setDefaultOptions({
-      ...DEFAULT_OPTIONS
-    });
-  }
-
-  initDataSource() {
-    if (this.trackModel.fileObj) {
-      return new G3dSource(this.trackModel.fileObj);
-    } else {
-      return new G3dSource(this.trackModel.url);
+    constructor(trackModel: TrackModel) {
+        super(trackModel);
+        this.setDefaultOptions({
+            ...DEFAULT_OPTIONS
+        });
     }
-  }
 
-  /**
-   * @override
-   */
-  shouldFetchBecauseOptionChange(
-    oldOptions: TrackOptions,
-    newOptions: TrackOptions
-  ): boolean {
-    return (
-      oldOptions.region !== newOptions.region ||
-      oldOptions.resolution !== newOptions.resolution
-    );
-  }
+    initDataSource() {
+        if (this.trackModel.fileObj) {
+            return new G3dSource(this.trackModel.fileObj);
+        } else {
+            return new G3dSource(this.trackModel.url);
+        }
+    }
 
-  getComponent() {
-    return G3dTrack;
-  }
+    /**
+     * @override
+     */
+    shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
+        return oldOptions.region !== newOptions.region || oldOptions.resolution !== newOptions.resolution;
+    }
 
-  getMenuComponents() {
-    const items = [
-      G3dResolutionConfig,
-      G3dRegionConfig,
-      HeightConfig,
-      BackgroundColorConfig
-    ];
+    shouldFetchBecauseRegionChange(
+        currentOptions: TrackOptions,
+        oldRegion: DisplayedRegionModel,
+        newRegion: DisplayedRegionModel
+    ): boolean {
+        if (currentOptions.region === RegionMode.GENOME || currentOptions.region === RegionMode.CHROMOSOME) {
+            return false;
+        }
+        return oldRegion !== newRegion;
+    }
 
-    return items;
-  }
+    getComponent() {
+        return G3dTrack;
+    }
+
+    getMenuComponents() {
+        const items = [G3dResolutionConfig, G3dRegionConfig, HeightConfig, BackgroundColorConfig];
+
+        return items;
+    }
 }

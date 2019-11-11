@@ -18,6 +18,7 @@ export class ThreeScene extends React.PureComponent {
     componentDidMount() {
         this.container = this.myRef.current;
         this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(this.props.options.backgroundColor);
         this.createCamera();
         this.createControls();
         this.createLights();
@@ -86,7 +87,11 @@ export class ThreeScene extends React.PureComponent {
         this.labelRenderer.render(this.scene, this.camera);
     }
 
-    componentDidUpdate(prevProps, prevState) {}
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.options.backgroundColor !== this.props.options.backgroundColor) {
+            this.scene.background = new THREE.Color(this.props.options.backgroundColor);
+        }
+    }
 
     render() {
         const { width, height, data } = this.props;
