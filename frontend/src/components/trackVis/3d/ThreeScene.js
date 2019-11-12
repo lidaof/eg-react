@@ -2,6 +2,9 @@ import React from 'react';
 import * as THREE from 'three';
 import OrbitControls from 'three-orbitcontrols';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { getSplines, getTubeMesh } from '../../../util';
+
+import './ThreeScene.css';
 
 export class ThreeScene extends React.PureComponent {
     constructor(props) {
@@ -13,6 +16,7 @@ export class ThreeScene extends React.PureComponent {
         this.renderer = null;
         this.controls = null;
         this.labelRenderer = null;
+        this.meshes = {};
     }
 
     componentDidMount() {
@@ -28,6 +32,19 @@ export class ThreeScene extends React.PureComponent {
             this.updateScene();
             this.renderScene();
         });
+        this.container.addEventListener('resize', this.onWindowResize);
+        window.addEventListener('resize', this.onWindowResize);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.options.backgroundColor !== this.props.options.backgroundColor) {
+            this.scene.background = new THREE.Color(this.props.options.backgroundColor);
+        }
+        if (prevProps.data !== this.props.data && this.props.data.length) {
+            this.clearScene();
+            this.clearLabelDiv();
+            this.addShapes();
+        }
     }
 
     createCamera() {
@@ -80,6 +97,52 @@ export class ThreeScene extends React.PureComponent {
         // )
     }
 
+    clearLabelDiv() {
+        const labelDiv = this.labelRenderer.domElement;
+        while (labelDiv.firstChild) {
+            labelDiv.removeChild(labelDiv.firstChild);
+        }
+    }
+
+    disposeMesh(mesh) {
+        mesh.geometry.dispose();
+        if (mesh.material.isMaterial) {
+            mesh.material.dispose();
+        } else {
+            for (const material of mesh.material) {
+                material.dispose();
+            }
+        }
+    }
+    clearScene() {
+        if (Object.keys(this.meshes).length) {
+            Object.keys(this.meshes).forEach(chrom => {
+                const mesh = this.meshes[chrom];
+                this.scene.remove(mesh);
+                this.disposeMesh(mesh);
+            });
+        }
+    }
+
+    addShapes() {
+        const splines = getSplines(this.props.data);
+        Object.keys(splines).forEach(chrom => {
+            const { spline, color } = splines[chrom];
+            const mesh = getTubeMesh(spline, color);
+            this.scene.add(mesh);
+            // add label
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'label';
+            labelDiv.textContent = chrom;
+            labelDiv.style.marginTop = '-1em';
+            labelDiv.style.color = color;
+            const label = new CSS2DObject(labelDiv);
+            label.position.copy(spline.getPoint(0));
+            mesh.add(label);
+            this.meshes[chrom] = mesh;
+        });
+    }
+
     updateScene() {}
 
     renderScene() {
@@ -87,15 +150,20 @@ export class ThreeScene extends React.PureComponent {
         this.labelRenderer.render(this.scene, this.camera);
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (prevProps.options.backgroundColor !== this.props.options.backgroundColor) {
-            this.scene.background = new THREE.Color(this.props.options.backgroundColor);
-        }
+    onWindowResize() {
+        // set the aspect ratio to match the new browser window aspect ratio
+        this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+
+        // update the camera's frustum
+        this.camera.updateProjectionMatrix();
+
+        // update the size of the renderer AND the canvas
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.labelRenderer.setSize(this.container.clientWidth, this.container.clientHeight);
     }
 
     render() {
-        const { width, height, data } = this.props;
-        console.log(data);
+        const { width, height } = this.props;
         const style = { width: `${width}px`, height: `${height}px` };
         return <div style={style} ref={this.myRef}></div>;
     }

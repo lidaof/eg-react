@@ -85,7 +85,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
             for (const track of addedTracks) {
                 this.fetchTrack(track);
             }
-            console.log(addedTracks, keptTracks)
+
             for (const track of keptTracks) {
                 const prevTrack = prevTrackForId.get(track.getId());
                 const config = getTrackConfig(track);
