@@ -8,6 +8,8 @@ import TrackModel, { TrackOptions } from '../../model/TrackModel';
 import { G3dResolutionConfig, G3dRegionConfig } from 'components/trackContextMenu/G3dDataConfig';
 import DisplayedRegionModel from 'model/DisplayedRegionModel';
 import { RegionMode } from 'model/G3dDataModes';
+import G3dShowChromLabelsConfig from 'components/trackContextMenu/G3dShowChromLabelsConfig';
+import LabelConfig from 'components/trackContextMenu/LabelConfig';
 
 export class G3dTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -48,7 +50,14 @@ export class G3dTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        const items = [G3dResolutionConfig, G3dRegionConfig, HeightConfig, BackgroundColorConfig];
+        const items = [
+            LabelConfig,
+            G3dResolutionConfig,
+            G3dRegionConfig,
+            G3dShowChromLabelsConfig,
+            HeightConfig,
+            BackgroundColorConfig
+        ];
 
         return items;
     }

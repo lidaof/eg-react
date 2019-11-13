@@ -32,18 +32,25 @@ export class ThreeScene extends React.PureComponent {
             this.updateScene();
             this.renderScene();
         });
-        this.container.addEventListener('resize', this.onWindowResize);
+        this.toggleChromLabelDisplay();
         window.addEventListener('resize', this.onWindowResize);
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.options.backgroundColor !== this.props.options.backgroundColor) {
-            this.scene.background = new THREE.Color(this.props.options.backgroundColor);
+        const { options, data } = this.props;
+        if (prevProps.options.backgroundColor !== options.backgroundColor) {
+            this.scene.background = new THREE.Color(options.backgroundColor);
         }
-        if (prevProps.data !== this.props.data && this.props.data.length) {
+        if (prevProps.data !== data && data.length) {
             this.clearScene();
             this.clearLabelDiv();
             this.addShapes();
+        }
+        if (prevProps.options.showChromLabels !== options.showChromLabels) {
+            this.toggleChromLabelDisplay();
+        }
+        if (prevProps.options.height !== options.height) {
+            this.onWindowResize();
         }
     }
 
@@ -104,6 +111,11 @@ export class ThreeScene extends React.PureComponent {
         }
     }
 
+    toggleChromLabelDisplay() {
+        const labelDiv = this.labelRenderer.domElement;
+        labelDiv.style.display = this.props.options.showChromLabels ? 'block' : 'none';
+    }
+
     disposeMesh(mesh) {
         mesh.geometry.dispose();
         if (mesh.material.isMaterial) {
@@ -150,7 +162,7 @@ export class ThreeScene extends React.PureComponent {
         this.labelRenderer.render(this.scene, this.camera);
     }
 
-    onWindowResize() {
+    onWindowResize = () => {
         // set the aspect ratio to match the new browser window aspect ratio
         this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
 
@@ -160,7 +172,7 @@ export class ThreeScene extends React.PureComponent {
         // update the size of the renderer AND the canvas
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
         this.labelRenderer.setSize(this.container.clientWidth, this.container.clientHeight);
-    }
+    };
 
     render() {
         const { width, height } = this.props;

@@ -8,7 +8,8 @@ export const DEFAULT_OPTIONS = {
     height: 500,
     backgroundColor: 'black',
     region: 'region',
-    resolution: 200000
+    resolution: 200000,
+    showChromLabels: true
 };
 
 /**
