@@ -15,10 +15,10 @@ function aggregateOptions(optionsObjects, optionName, defaultValue, multiValue) 
 
     const firstOptionValue = optionsObjects[0][optionName];
     if (optionsObjects.every(options => options[optionName] === firstOptionValue)) {
-        if (firstOptionValue === false) {
-            return false;
+        if (firstOptionValue === undefined) {
+            return defaultValue;
         }
-        return firstOptionValue || defaultValue;
+        return firstOptionValue;
     } else {
         return multiValue;
     }
