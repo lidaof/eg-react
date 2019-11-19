@@ -85,6 +85,7 @@
     "lodash": "^4.17.13",
     "memoize-one": "^3.1.1",
     "nightmare": "^2.10.0",
+    "papaparse": "^5.1.0",
     "parse-color": "^1.0.0",
     "point-in-polygon": "^1.0.1",
     "polygon-lookup": "^2.5.0",
