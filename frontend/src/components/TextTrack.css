@@ -1,0 +1,18 @@
+.TextTrack-textForm {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.TextTrack-textFormDesc {
+    display: grid;
+    grid-template-columns: auto;
+}
+
+.TextTrack-textFormDesc pre {
+    background: lightgray;
+}
+
+.TextTrack-hint {
+    color: darkblue;
+    font-style: italic;
+}
