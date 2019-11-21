@@ -68,6 +68,7 @@ export class TrackModel {
     tracks?: TrackModel[]; // for matplot
     querygenome?: string;
     isText?: boolean;
+    isFileHuge?: boolean;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
@@ -85,6 +86,7 @@ export class TrackModel {
         this.files = this.files || [];
         this.tracks = this.tracks ? this.tracks.map(tk => new TrackModel(tk)) : [];
         this.isText = this.isText || false;
+        this.isFileHuge = this.isFileHuge || false;
 
         // in case user define height in string, like "25" instead of 25
         if (this.options.height && typeof this.options.height === 'string') {
