@@ -159,7 +159,8 @@ export const HELP_LINKS = {
     numerical: 'https://eg.readthedocs.io/en/latest/tracks.html#numerical-tracks',
     tracks: 'https://eg.readthedocs.io/en/latest/tracks.html',
     localhub: 'https://eg.readthedocs.io/en/latest/local.html',
-    trackOptions: 'https://eg.readthedocs.io/en/latest/datahub.html#track-properties'
+    trackOptions: 'https://eg.readthedocs.io/en/latest/datahub.html#track-properties',
+    textTrack: 'https://eg.readthedocs.io/en/latest/text.html'
 };
 
 // /**

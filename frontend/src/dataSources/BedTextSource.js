@@ -1,7 +1,7 @@
-import _ from "lodash";
-import DataSource from "./DataSource";
-import TextSource from "./TextSource";
-import { reg2bin, reg2bins } from "../model/binning";
+import _ from 'lodash';
+import DataSource from './DataSource';
+import TextSource from './TextSource';
+import BinIndexer from '../model/BinIndexer';
 
 /**
  * @author Daofeng Li
@@ -9,60 +9,51 @@ import { reg2bin, reg2bins } from "../model/binning";
  */
 
 class BedTextSource extends DataSource {
-  constructor(config) {
-    super();
-    this.source = new TextSource(config);
-  }
-
-  convertToBedRecord(item) {
-    const record = {
-      chr: item[0],
-      start: Number.parseInt(item[1], 10),
-      end: Number.parseInt(item[2], 10)
-    };
-    for (let i = 3; i < item.length; i++) {
-      record[i] = item[i];
+    constructor(config) {
+        super();
+        this.source = new TextSource(config);
+        this.textData = null;
+        this.indexer = null;
+        this.ready = false;
     }
-    return record;
-  }
-  indexData(data) {
-    const bin = {};
-    data.forEach(item => {
-      const record = this.convertToBedRecord(item);
-      if (!record.chr.length) {
-        return;
-      }
-      const binIndex = reg2bin(record.start, record.end);
-      if (!bin.hasOwnProperty(record.chr)) {
-        bin[record.chr] = {};
-      }
-      if (!bin[record.chr].hasOwnProperty(binIndex)) {
-        bin[record.chr][binIndex] = [];
-      }
-      bin[record.chr][binIndex].push(record);
-    });
-    return bin;
-  }
 
-  async getData(region) {
-    const textData = await this.source.init();
-    const trackData = this.indexData(textData.data);
-    const loci = region.getGenomeIntervals();
-    const data = loci.map(locus => {
-      const result = [];
-      if (!trackData.hasOwnProperty(locus.chr)) {
-        return result;
-      }
-      const indexes = reg2bins(locus.start, locus.end);
-      for (const index of indexes) {
-        if (trackData[locus.chr].hasOwnProperty(index)) {
-          trackData[locus.chr][index].forEach(ele => result.push(ele));
+    convertToBedRecord(item) {
+        const record = {
+            chr: item[0],
+            start: Number.parseInt(item[1], 10),
+            end: Number.parseInt(item[2], 10)
+        };
+        for (let i = 3; i < item.length; i++) {
+            record[i] = item[i];
         }
-      }
-      return result;
-    });
-    return _.flatten(data);
-  }
+        return record;
+    }
+
+    async initSource() {
+        if (!this.textData) {
+            this.textData = await this.source.init();
+        }
+    }
+
+    initIndex() {
+        this.indexer = new BinIndexer(this.textData.data, this.convertToBedRecord);
+    }
+
+    async init() {
+        await this.initSource();
+        this.initIndex();
+        this.indexer.init();
+        this.ready = true;
+    }
+
+    async getData(region) {
+        if (!this.ready) {
+            await this.init();
+        }
+        const loci = region.getGenomeIntervals();
+        const data = loci.map(locus => this.indexer.get(locus.chr, locus.start, locus.end));
+        return _.flatten(data);
+    }
 }
 
 export default BedTextSource;
