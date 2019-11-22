@@ -1,5 +1,13 @@
 # Version History
 
+## 50.2.0
+
+-   introducing the new support for text tracks, text files can be visualized directly in the browser, check the [documentation](https://eg.readthedocs.io/en/latest/text.html) for more details
+-   text in `bed` format supported
+-   text in `bedGraph` format supported
+-   text in `longrange` format supported
+-   please contact us for customized format
+
 ## 50.1.0
 
 -   introduce a new track type `g3d` for genomic 3D stucture display, see more at the [docs](https://eg.readthedocs.io/en/latest/tracks.html#d-genomic-structure-track)
