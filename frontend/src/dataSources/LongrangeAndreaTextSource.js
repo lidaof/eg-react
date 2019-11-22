@@ -8,26 +8,31 @@ import { reg2bin, reg2bins } from "../model/binning";
  * get data from TextSource, index it and return by region querying
  */
 
-class BedTextSource extends DataSource {
+class LongrangeAndreaTextSource extends DataSource {
   constructor(config) {
     super();
     this.source = new TextSource(config);
   }
 
   convertToBedRecord(item) {
+    //"chr20:49368733-49369493<->chr20:50528173-50533850"	FALSE	FALSE	1161898.5	309	79.7857303792859
+    const list = item[0].split(/\W+/);
+    //> Array ["chr20", "49368733", "49369493", "chr20", "50528173", "50533850"]
     const record = {
-      chr: item[0],
-      start: Number.parseInt(item[1], 10),
-      end: Number.parseInt(item[2], 10)
+      chr: list[0],
+      start: Number.parseInt(list[1], 10),
+      end: Number.parseInt(list[2], 10)
     };
-    for (let i = 3; i < item.length; i++) {
-      record[i] = item[i];
-    }
+    record[3] = `${list[3]}:${list[4]}-${list[5]},${item[5]}`;
     return record;
   }
+
   indexData(data) {
     const bin = {};
-    data.forEach(item => {
+    data.forEach((item, itemIndex) => {
+      if (itemIndex < 1) {
+        return;
+      }
       const record = this.convertToBedRecord(item);
       if (!record.chr.length) {
         return;
@@ -65,4 +70,4 @@ class BedTextSource extends DataSource {
   }
 }
 
-export default BedTextSource;
+export default LongrangeAndreaTextSource;
