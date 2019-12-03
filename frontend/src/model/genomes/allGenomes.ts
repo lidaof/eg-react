@@ -13,6 +13,7 @@ import GalGal5 from './galGal5/galGal5';
 import AraTha1 from './araTha1/araTha1';
 import DM6 from './dm6/dm6';
 import CE11 from './ce11/ce11';
+import APLCAL3 from './aplCal3/aplCal3';
 import { GenomeConfig } from './GenomeConfig';
 
 /**
@@ -34,6 +35,7 @@ export const allGenomes = [
     GalGal5,
     DM6,
     CE11,
+    APLCAL3
 ];
 
 const genomeNameToConfig = {};
@@ -108,6 +110,11 @@ export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
         assemblies: [ AraTha1.genome.getName() ],
         color: 'yellow',
     },
+    seahare:{
+        logoUrl: 'https://wangftp.wustl.edu/~xzhuo/aplCal3/seaHare.png',
+        assemblies: [ APLCAL3.genome.getName() ],
+        color: 'white',
+    }
 };
 
 /**

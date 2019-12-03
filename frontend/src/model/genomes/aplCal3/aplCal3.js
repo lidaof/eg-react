@@ -1,6 +1,7 @@
 import Chromosome from '../Chromosome';
 import Genome from '../Genome';
 import TrackModel from '../../TrackModel';
+import cytobands from './cytoBand.json';
 import annotationTracks from "./annotationTracks.json";
 import chromSize from "./chromSize.json";
 
@@ -8,13 +9,8 @@ const allSize = chromSize.map(genom => new Chromosome(genom.chr, genom.size));
 const genome = new Genome("aplCal3", allSize);
 
 const navContext = genome.makeNavContext();
-const defaultRegion = navContext.parse("chr6:52425276-52425961");
+const defaultRegion = navContext.parse("NW_004797271.1:2535-6935");
 const defaultTracks = [
-    new TrackModel({
-        type: "geneAnnotation",
-        name: "refGene",
-        genome: "aplCal3",
-    }),
     new TrackModel({
         type: "ruler",
         name: "Ruler",
@@ -22,7 +18,7 @@ const defaultTracks = [
     new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
-        url: 'https://vizhub.wustl.edu/public/mm10/rmsk16.bb',
+        url: 'https://wangftp.wustl.edu/~xzhuo/aplCal3/aplCal3.bb',
     })
 ];
 
@@ -30,9 +26,10 @@ const defaultTracks = [
 const aplCal3 = {
     genome: genome,
     navContext: navContext,
+    cytobands: cytobands,
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
-    twoBitURL: "https://vizhub.wustl.edu/public/mm10/mm10.2bit",
+    twoBitURL: "https://wangftp.wustl.edu/~xzhuo/aplCal3/aplCal3.2bit",
     annotationTracks,
 };
 
