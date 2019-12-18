@@ -18,7 +18,7 @@ Enter the `backend` directory. `npm install`, and then `npm run setup`. MongoDB 
 
 ## Documentation
 
-Please check all the documentaiton at [https://eg.rtfd.io/](https://eg.rtfd.io/).
+Please check all the documentation at [https://eg.rtfd.io/](https://eg.rtfd.io/).
 
 ## Reporting Issues
 

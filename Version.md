@@ -21,7 +21,7 @@
 
 ## 50.1.0
 
--   introduce a new track type `g3d` for genomic 3D stucture display, see more at the [docs](https://eg.readthedocs.io/en/latest/tracks.html#d-genomic-structure-track)
+-   introduce a new track type `g3d` for genomic 3D structure display, see more at the [docs](https://eg.readthedocs.io/en/latest/tracks.html#d-genomic-structure-track)
 -   fixed link to slack invitation
 
 ## 50.0.4
@@ -37,8 +37,8 @@
 ## 50.0.2
 
 -   the browser can respond to window resize event now, thanks to Silas who stopped by and helped debug this function
--   add zebrafish genome `danRer11`
--   from dicussion with Arnav for `callingcard` track, plot a single circle (per track) at the midpoint of the interval
+-   add Zebrafish genome `danRer11`
+-   from discussion with Arnav for `callingcard` track, plot a single circle (per track) at the midpoint of the interval
 
 ## 50.0.1
 
@@ -57,7 +57,7 @@
 
 ## 48.5.3
 
--   added chicked genome `galGal6` and `galGal5`
+-   added chicken genome `galGal6` and `galGal5`
 -   a `flatarc` mode added for chromatin interacion track:
     ![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png 'Flat arc mode]')
 -   fixed a metadata bug when define customized color
