@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 
 import AppRouter from './AppRouter';
 import AppState from './AppState';
-import registerServiceWorker from './registerServiceWorker';
+import * as serviceWorker from './serviceWorker';
 
 import HG19 from './model/genomes/hg19/hg19';
 import DisplayedRegionModel from './model/DisplayedRegionModel';
@@ -19,7 +19,7 @@ import './index.css';
 const root = document.getElementById('root');
 if (root) {
     ReactDOM.render(<Provider store={AppState} ><AppRouter /></Provider>, root);
-    registerServiceWorker();
+    serviceWorker.register();
 } else {
     (window as any).React = React;
     (window as any).ReactDOM = ReactDOM;
@@ -30,6 +30,6 @@ if (root) {
     (window as any).mergeGeometries = mergeGeometries;
 }
 
-(window as any).renderBrowserInElement = (contents: any, container: any) => 
-ReactDOM.render(<Provider store={AppState} ><EmbeddedContainer contents={contents} /></Provider>, 
-    container);
+(window as any).renderBrowserInElement = (contents: any, container: any) =>
+    ReactDOM.render(<Provider store={AppState} ><EmbeddedContainer contents={contents} /></Provider>,
+        container);
