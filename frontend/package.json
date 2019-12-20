@@ -102,6 +102,7 @@
     "react-color": "^2.14.0",
     "react-compound-slider": "^0.20.1",
     "react-copy-to-clipboard": "^5.0.1",
+    "react-detect-offline": "^2.4.0",
     "react-dom": "^16.8.6",
     "react-hot-keys": "^1.2.2",
     "react-modal": "^3.6.1",
