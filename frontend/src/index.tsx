@@ -19,7 +19,7 @@ import './index.css';
 const root = document.getElementById('root');
 if (root) {
     ReactDOM.render(<Provider store={AppState} ><AppRouter /></Provider>, root);
-    serviceWorker.register();
+    serviceWorker.register({ onUpdate: () => ReactDOM.render(<ReloadNotification />, document.getElementById('newVersionNotification')) });
 } else {
     (window as any).React = React;
     (window as any).ReactDOM = ReactDOM;
@@ -33,3 +33,10 @@ if (root) {
 (window as any).renderBrowserInElement = (contents: any, container: any) =>
     ReactDOM.render(<Provider store={AppState} ><EmbeddedContainer contents={contents} /></Provider>,
         container);
+
+
+function ReloadNotification(props: {}): JSX.Element {
+    return <div>
+        A new version of the browser is available. Please reload the page.
+    </div>;
+}
