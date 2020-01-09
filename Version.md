@@ -1,5 +1,10 @@
 # Version History
 
+## 50.0.1
+
+* fixed a facet table bug when metadata is undefined
+* fixed a session saving bug due to updated firebase related packages
+
 ## 50.0.0
 
 * this release is not an update for browser function but related to dependent package

@@ -93,7 +93,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
             currentId: sessionId,
         };
         try {
-            await firebase.set(`sessions/${bundle.bundleId}`, newBundle);
+            await firebase.set(`sessions/${bundle.bundleId}`, JSON.parse(JSON.stringify(newBundle)));
         } catch (error) {
             console.error(error);
             notify.show('Error while saving session', 'error', 2000);
