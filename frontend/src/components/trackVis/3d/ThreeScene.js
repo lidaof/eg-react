@@ -42,8 +42,8 @@ export class ThreeScene extends React.PureComponent {
             this.scene.background = new THREE.Color(options.backgroundColor);
         }
         if (prevProps.data !== data && data.length) {
-            this.clearScene();
-            this.clearLabelDiv();
+            // this.clearScene();
+            // this.clearLabelDiv();
             this.addShapes();
         }
         if (prevProps.options.showChromLabels !== options.showChromLabels) {
@@ -137,6 +137,8 @@ export class ThreeScene extends React.PureComponent {
     }
 
     addShapes() {
+        this.clearScene();
+        this.clearLabelDiv();
         const splines = getSplines(this.props.data);
         Object.keys(splines).forEach(chrom => {
             const { spline, color } = splines[chrom];

@@ -9,6 +9,7 @@ import './TextTrack.css';
 
 const TEXT_TYPE_DESC = {
     bed: {
+        label: 'bed',
         desc: 'text file in BED format, each column is separated by tab',
         example: `chr1	13041	13106	reg1	1	+
 chr1	753329	753698	reg2	2	+
@@ -22,6 +23,7 @@ chr1	787470	787560	reg9	9	+
 chr1	791123	791197	reg10	10	+`
     },
     bedGraph: {
+        label: 'bedGraph',
         desc: 'text file in bedGraph format, 4 columns bed file, each column is chromosome, start, end and value',
         example: `chr6	52155366	52155379	14
 chr6	52155379	52155408	13
@@ -34,7 +36,22 @@ chr6	52155472	52155475	9
 chr6	52155475	52155499	8
 chr6	52155499	52155501	7`
     },
+    refBed: {
+        label: 'refBed gene annotation',
+        desc: 'gene annotation track in refBed format',
+        example: `chr1	11868	14409	11868	11868	+	DDX11L1	ENST00000456328.2	pseudo	11868,12612,13220,	12227,12721,14409,	Homo sapiens DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1 (DDX11L1), non-coding RNA.
+chr1	29553	31097	29553	29553	+	MIR1302-11	ENST00000473358.1	nonCoding	29553,30563,30975,	30039,30667,31097,	
+chr1	30266	31109	30266	30266	+	MIR1302-11	ENST00000469289.1	nonCoding	30266,30975,	30667,31109,	
+chr1	30365	30503	30365	30365	+	MIR1302-11	ENST00000607096.1	nonCoding	30365,	30503,	
+chr1	34553	36081	34553	34553	-	FAM138A	ENST00000417324.1	nonCoding	34553,35276,35720,	35174,35481,36081,	
+chr1	35244	36073	35244	35244	-	FAM138A	ENST00000461467.1	nonCoding	35244,35720,	35481,36073,	
+chr1	69090	70008	69090	70008	+	OR4F5	ENST00000335137.3	coding	69090,	70008,	Homo sapiens olfactory receptor, family 4, subfamily F, member 5 (OR4F5), mRNA.
+chr1	89294	120932	89294	89294	-	RP11-34P13.7	ENST00000466430.1	nonCoding	89294,92090,112699,120774,	91629,92240,112804,120932,	
+chr1	89550	91105	89550	89550	-	RP11-34P13.8	ENST00000495576.1	nonCoding	89550,90286,	90050,91105,	
+chr1	92229	129217	92229	92229	-	RP11-34P13.7	ENST00000477740.1	nonCoding	92229,112699,120720,129054,	92240,112804,120932,129217,	`
+    },
     longrange: {
+        label: 'long-range text',
         desc: 'the long-range interaction in text format',
         example: `chr1    713605  715737  chr1:720589-722848,2    8165    +
 chr1    717172  720090  chr1:761197-762811,2    8167    +
@@ -48,6 +65,7 @@ chr1    766545  768738  chr8:275760-277262,2    1       .
 chr1    791044  793910  chr8:248210-251154,2    7       .`
     },
     'longrange-AndreaGillespie': {
+        label: 'long-range format by Andrea Gillespie',
         desc: 'a long-range interaction format by Andrea Gillespie',
         example: `"id"	"trans"	"b2b"	"distance"	"count"	"score"
 "chr20:49368733-49369493<->chr20:50528173-50533850"	FALSE	FALSE	1161898.5	309	79.7857303792859
@@ -130,10 +148,11 @@ export class TextTrack extends React.Component {
                 <div>
                     <label>
                         <select value={this.state.textType} onChange={this.handleTypeChange}>
-                            <option value="bed">bed</option>
-                            <option value="bedGraph">bedGraph</option>
-                            <option value="longrange">long-range text</option>
-                            <option value="longrange-AndreaGillespie">long-range format by Andrea Gillespie</option>
+                            {Object.keys(TEXT_TYPE_DESC).map(key => (
+                                <option value={key} key={key}>
+                                    {TEXT_TYPE_DESC[key].label}
+                                </option>
+                            ))}
                         </select>
                     </label>
                 </div>
