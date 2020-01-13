@@ -16,10 +16,15 @@ const defaultTracks = [
         name: "Ruler",
     }),
     new TrackModel({
+        type: "refbed",
+        name: "ncbiGene",
+        url: "https://wangftp.wustl.edu/~xzhuo/aplCal3/AplCal3.sort.refbed.gz",
+    }),
+    new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
         url: 'https://wangftp.wustl.edu/~xzhuo/aplCal3/aplCal3.bb',
-    })
+    }),
 ];
 
 
