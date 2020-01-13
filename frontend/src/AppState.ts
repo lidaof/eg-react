@@ -371,6 +371,12 @@ async function asyncInitState() {
                 }
             }
         }
+        if(query.sessionFile) {
+            const json = await new Json5Fetcher().get(query.sessionFile as string);
+            if (json) {
+                AppState.dispatch(ActionCreators.restoreSession(json));
+            }
+        }
     }
 }
 

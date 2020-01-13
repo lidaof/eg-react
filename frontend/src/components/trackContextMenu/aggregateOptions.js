@@ -1,7 +1,7 @@
 /**
  * Aggregates a single option of multiple track options.  If all tracks have the same value for an option, returns that
  * value; otherwise, returns the `multiValue` parameter.
- * 
+ *
  * @param {Object[]} optionsObjects - options of all the track models to aggregate
  * @param {string} optionName - the option property to examine in each track
  * @param {any} defaultValue - default option value if a track doesn't already have a default for its subtype
@@ -15,7 +15,10 @@ function aggregateOptions(optionsObjects, optionName, defaultValue, multiValue) 
 
     const firstOptionValue = optionsObjects[0][optionName];
     if (optionsObjects.every(options => options[optionName] === firstOptionValue)) {
-        return firstOptionValue || defaultValue;
+        if (firstOptionValue === undefined) {
+            return defaultValue;
+        }
+        return firstOptionValue;
     } else {
         return multiValue;
     }

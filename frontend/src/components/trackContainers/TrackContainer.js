@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import connect from 'react-redux/lib/connect/connect';
-import ReactModal from "react-modal";
+import ReactModal from 'react-modal';
 import Hotkeys from 'react-hot-keys';
 
 import { ActionCreators } from '../../AppState';
@@ -25,12 +25,12 @@ import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
 import TrackModel from '../../model/TrackModel';
 import TrackSelectionBehavior from '../../model/TrackSelectionBehavior';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import UndoRedo from "./UndoRedo";
-import History from "./History";
+import UndoRedo from './UndoRedo';
+import History from './History';
 
-import HighlightRegion from "../HighlightRegion";
+import HighlightRegion from '../HighlightRegion';
 import { VerticalDivider } from './VerticalDivider';
-import { CircletView } from "./CircletView";
+import { CircletView } from './CircletView';
 import ButtonGroup from './ButtonGroup';
 import TrackRegionController from '../genomeNavigator/TrackRegionController';
 
@@ -39,7 +39,6 @@ import { niceBpCount } from '../../util';
 
 const DEFAULT_CURSOR = 'crosshair';
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
-
 
 ///////////
 // HOC's //
@@ -56,7 +55,7 @@ function mapStateToProps(state) {
 const callbacks = {
     onNewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
-    onMetadataTermsChanged: ActionCreators.setMetadataTerms,
+    onMetadataTermsChanged: ActionCreators.setMetadataTerms
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -64,7 +63,7 @@ const withEnhancements = _.flowRight(withAppState, withAutoDimensions, withTrack
 
 /**
  * Container for holding all the tracks, and an avenue for manipulating state common to all tracks.
- * 
+ *
  * @author Silas Hsu
  */
 class TrackContainer extends React.Component {
@@ -89,13 +88,13 @@ class TrackContainer extends React.Component {
          * Callback requesting a change in the metadata terms.  Signature: (newTerms: string[]): void
          */
         onMetadataTermsChanged: PropTypes.func,
-        suggestedMetaSets: PropTypes.instanceOf(Set),
+        suggestedMetaSets: PropTypes.instanceOf(Set)
     };
 
     static defaultProps = {
         tracks: [],
         onNewRegion: () => undefined,
-        onTracksChanged: () => undefined,
+        onTracksChanged: () => undefined
     };
 
     constructor(props) {
@@ -108,7 +107,7 @@ class TrackContainer extends React.Component {
             trackForCircletView: null, // the trackmodel for circlet view
             circletColor: '#ff5722',
             panningAnimation: 'none',
-            zoomAnimation: 0,
+            zoomAnimation: 0
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -126,7 +125,7 @@ class TrackContainer extends React.Component {
         this.zoomOut = this.zoomOut.bind(this);
     }
 
-    panLeftOrRight(left=true) {
+    panLeftOrRight(left = true) {
         const { primaryView, onNewRegion } = this.props;
         let newRegion, panning;
         if (left) {
@@ -136,9 +135,9 @@ class TrackContainer extends React.Component {
             panning = 'right';
             newRegion = primaryView.viewWindowRegion.clone().panRight();
         }
-        this.setState({panningAnimation: panning}, () => {
+        this.setState({ panningAnimation: panning }, () => {
             window.setTimeout(() => {
-                this.setState({panningAnimation: 'none'});
+                this.setState({ panningAnimation: 'none' });
                 // this.pan(-width); // Changes DRM
                 onNewRegion(...newRegion.getContextCoordinates());
             }, 1000);
@@ -149,9 +148,9 @@ class TrackContainer extends React.Component {
     zoomOut(factor) {
         const { primaryView, onNewRegion } = this.props;
         const newRegion = primaryView.viewWindowRegion.clone().zoom(factor);
-        this.setState({zoomAnimation: factor}, () => {
+        this.setState({ zoomAnimation: factor }, () => {
             window.setTimeout(() => {
-                this.setState({zoomAnimation: 0});
+                this.setState({ zoomAnimation: 0 });
                 onNewRegion(...newRegion.getContextCoordinates());
             }, 1000);
         });
@@ -159,31 +158,31 @@ class TrackContainer extends React.Component {
     }
 
     onKeyDown(keyName, e, handle) {
-        switch(keyName){
-            case "alt+h":
-            case "alt+d":
+        switch (keyName) {
+            case 'alt+h':
+            case 'alt+d':
                 this.toggleTool(Tools.DRAG);
                 break;
-            case "alt+s":
-            case "alt+r":
+            case 'alt+s':
+            case 'alt+r':
                 this.toggleTool(Tools.REORDER);
                 break;
-            case "alt+m":
+            case 'alt+m':
                 this.toggleTool(Tools.ZOOM_IN);
                 break;
-            case "alt+z":
+            case 'alt+z':
                 this.panLeftOrRight(true);
                 break;
-            case "alt+x":
+            case 'alt+x':
                 this.panLeftOrRight(false);
                 break;
-            case "alt+i":
+            case 'alt+i':
                 this.zoomOut(0.5);
                 break;
-            case "alt+o":
+            case 'alt+o':
                 this.zoomOut(2);
                 break;
-            case "alt+g":
+            case 'alt+g':
                 this.toggleReorderManyModal();
                 break;
             default:
@@ -192,48 +191,50 @@ class TrackContainer extends React.Component {
     }
     /**
      * Toggles the selection of a tool, or switches tool.
-     * 
+     *
      * @param {Tool} tool - tool to toggle or to switch to
      */
     toggleTool(tool) {
         if (this.state.selectedTool === tool) {
-            this.setState({selectedTool: null});
+            this.setState({ selectedTool: null });
         } else {
-            this.setState({selectedTool: tool});
+            this.setState({ selectedTool: tool });
         }
     }
 
     changeXOffset(xOffset) {
-        this.setState({xOffset});
+        this.setState({ xOffset });
     }
 
     handleOpenModal(track) {
         this.setState({ showModal: true, trackForCircletView: track });
     }
-      
+
     handleCloseModal() {
         this.setState({ showModal: false, trackForCircletView: null });
     }
 
     setCircletColor(color) {
-        this.setState({circletColor: color});
+        this.setState({ circletColor: color });
     }
 
     openReorderManyModal = () => {
-        this.setState({showReorderManyModal: true});
-    }
+        this.setState({ showReorderManyModal: true });
+    };
 
     closeReorderManyModal = () => {
-        this.setState({showReorderManyModal: false});
-    }
+        this.setState({ showReorderManyModal: false });
+    };
 
     toggleReorderManyModal = () => {
-        this.setState(prevState => {return {showReorderManyModal: !prevState.showReorderManyModal}});
+        this.setState(prevState => {
+            return { showReorderManyModal: !prevState.showReorderManyModal };
+        });
     };
 
     /**
-     * 
-     * @param {boolean[]} newSelections 
+     *
+     * @param {boolean[]} newSelections
      */
     changeTrackSelection(newSelections) {
         if (!newSelections) {
@@ -264,7 +265,7 @@ class TrackContainer extends React.Component {
 
     /**
      * Handles selection behavior when a track is clicked.
-     * 
+     *
      * @param {MouseEvent} event - click event
      * @param {number} index - index of the clicked track
      */
@@ -274,7 +275,7 @@ class TrackContainer extends React.Component {
 
     /**
      * Handles selection behavior when a track's context menu is opened.
-     * 
+     *
      * @param {MouseEvent} event - context menu event.  Unused.
      * @param {number} index - index of the track where the context menu event originated
      */
@@ -284,7 +285,7 @@ class TrackContainer extends React.Component {
 
     /**
      * Handles selection behavior when a track's metadata indicator is clicked.
-     * 
+     *
      * @param {MouseEvent} event - click event
      * @param {string} term - the metadata term that was clicked
      * @param {number} index - index of the clicked track
@@ -300,22 +301,22 @@ class TrackContainer extends React.Component {
         this.changeTrackSelection(Array(this.props.tracks.length).fill(false));
     }
 
-    /** 
+    /**
      * happens when user selects matplot
      */
-    applyMatPlot = (tracks) => {
+    applyMatPlot = tracks => {
         // console.log(tracks);
         // const tracksLeft = this.props.tracks.filter(tk => !tk.isSelected);
         const newTrack = new TrackModel({
             type: 'matplot',
             name: 'matplot wrap',
-            tracks,
+            tracks
         });
         // const newTracks = [...tracksLeft, newTrack];
         const newTracks = [...this.props.tracks, newTrack];
         this.props.onTracksChanged(newTracks);
-    }
-    
+    };
+
     // End callback methods
     ////////////////////
     // Render methods //
@@ -324,170 +325,232 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element}
      */
     renderControls() {
-        const {metadataTerms, onMetadataTermsChanged, suggestedMetaSets, viewRegion, 
-            onNewRegion, onToggleHighlight, onSetEnteredRegion} = this.props;
+        const {
+            metadataTerms,
+            onMetadataTermsChanged,
+            suggestedMetaSets,
+            viewRegion,
+            onNewRegion,
+            onToggleHighlight,
+            onSetEnteredRegion,
+            primaryView
+        } = this.props;
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
-        const panLeftButton = <button className="btn btn-outline-dark" title="Pan left
+        const panLeftButton = (
+            <button
+                className="btn btn-outline-dark"
+                title="Pan left
 (Alt+Z)"
-                                style={{fontFamily: "monospace"}} onClick={() => this.panLeftOrRight(true)}>◀</button>;
-        const panRightButton = <button className="btn btn-outline-dark" title="Pan right
+                style={{ fontFamily: 'monospace' }}
+                onClick={() => this.panLeftOrRight(true)}
+            >
+                ◀
+            </button>
+        );
+        const panRightButton = (
+            <button
+                className="btn btn-outline-dark"
+                title="Pan right
 (Alt+X)"
-                                style={{fontFamily: "monospace"}} onClick={() => this.panLeftOrRight(false)}>▶</button>;
-        return <div style={{display: "flex", alignItems: "center"}}>
+                style={{ fontFamily: 'monospace' }}
+                onClick={() => this.panLeftOrRight(false)}
+            >
+                ▶
+            </button>
+        );
+        return (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
                 <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} />
-                { this.props.embeddingMode && 
-                    <TrackRegionController 
+                {this.props.embeddingMode && (
+                    <TrackRegionController
                         selectedRegion={viewRegion}
                         onRegionSelected={onNewRegion}
                         onToggleHighlight={onToggleHighlight}
                         onSetEnteredRegion={onSetEnteredRegion}
-                    /> 
-                }
+                    />
+                )}
                 <div>
-                    <ReorderMany 
-                        onOpenReorderManyModal={this.openReorderManyModal} 
-                        onCloseReorderManyModal={this.closeReorderManyModal} 
-                        showReorderManyModal={this.state.showReorderManyModal} 
+                    <ReorderMany
+                        onOpenReorderManyModal={this.openReorderManyModal}
+                        onCloseReorderManyModal={this.closeReorderManyModal}
+                        showReorderManyModal={this.state.showReorderManyModal}
                     />
                 </div>
                 <ButtonGroup buttons={panLeftButton} />
                 {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
                 <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
                 <ButtonGroup buttons={panRightButton} />
-                <div><UndoRedo /></div>
-                <div><History /></div>
-                <div><PixelInfo basesPerPixel={this.props.basesPerPixel} viewRegion={viewRegion} /></div>
-                <MetadataHeader terms={metadataTerms} onNewTerms={onMetadataTermsChanged} suggestedMetaSets={suggestedMetaSets} />
-            </div>;
+                <div>
+                    <UndoRedo />
+                </div>
+                <div>
+                    <History />
+                </div>
+                <div>
+                    <PixelInfo
+                        basesPerPixel={this.props.basesPerPixel}
+                        viewRegion={viewRegion}
+                        primaryView={primaryView}
+                    />
+                </div>
+                <MetadataHeader
+                    terms={metadataTerms}
+                    onNewTerms={onMetadataTermsChanged}
+                    suggestedMetaSets={suggestedMetaSets}
+                />
+            </div>
+        );
     }
 
     /**
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const {tracks, trackData, primaryView, metadataTerms, viewRegion} = this.props;
+        const { tracks, trackData, primaryView, metadataTerms, viewRegion } = this.props;
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
-            return <TrackHandle
-                key={trackModel.getId()}
-                trackModel={trackModel}
-                {...data}
-                viewRegion={data.visRegion}
-                width={primaryView.visWidth}
-                viewWindow={primaryView.viewWindow}
-                metadataTerms={metadataTerms}
-                xOffset={0}
-                panningAnimation={this.state.panningAnimation}
-                zoomAnimation={this.state.zoomAnimation}
-                index={index}
-                onContextMenu={this.handleContextMenu}
-                onClick={this.handleTrackClicked}
-                onMetadataClick={this.handleMetadataClicked}
-                selectedRegion={viewRegion}
-            />
+            return (
+                <TrackHandle
+                    key={trackModel.getId()}
+                    trackModel={trackModel}
+                    {...data}
+                    viewRegion={data.visRegion}
+                    width={primaryView.visWidth}
+                    viewWindow={primaryView.viewWindow}
+                    metadataTerms={metadataTerms}
+                    xOffset={0}
+                    panningAnimation={this.state.panningAnimation}
+                    zoomAnimation={this.state.zoomAnimation}
+                    index={index}
+                    onContextMenu={this.handleContextMenu}
+                    onClick={this.handleTrackClicked}
+                    onMetadataClick={this.handleMetadataClicked}
+                    selectedRegion={viewRegion}
+                />
+            );
         });
         return trackElements;
     }
 
     /**
      * Renders a subcontainer that provides specialized track manipulation, depending on the selected tool.
-     * 
+     *
      * @return {JSX.Element} - subcontainer that renders tracks
      */
     renderSubContainer() {
-        const {tracks, primaryView, onNewRegion, onTracksChanged} = this.props;
+        const { tracks, primaryView, onNewRegion, onTracksChanged } = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
-                return <ReorderableTrackContainer
-                    trackElements={trackElements}
-                    trackModels={tracks}
-                    onTracksChanged={onTracksChanged}
-                />;
+                return (
+                    <ReorderableTrackContainer
+                        trackElements={trackElements}
+                        trackModels={tracks}
+                        onTracksChanged={onTracksChanged}
+                    />
+                );
             case Tools.ZOOM_IN:
-                return <ZoomableTrackContainer
-                    trackElements={trackElements}
-                    visData={primaryView}
-                    onNewRegion={onNewRegion}
-                />;
+                return (
+                    <ZoomableTrackContainer
+                        trackElements={trackElements}
+                        visData={primaryView}
+                        onNewRegion={onNewRegion}
+                    />
+                );
             case Tools.DRAG:
-                return <PannableTrackContainer
-                    trackElements={trackElements}
-                    visData={primaryView}
-                    onNewRegion={onNewRegion}
-                    xOffset={this.state.xOffset}
-                    onXOffsetChanged={this.changeXOffset}
-                />;
+                return (
+                    <PannableTrackContainer
+                        trackElements={trackElements}
+                        visData={primaryView}
+                        onNewRegion={onNewRegion}
+                        xOffset={this.state.xOffset}
+                        onXOffsetChanged={this.changeXOffset}
+                    />
+                );
             default:
                 return trackElements;
         }
     }
 
     renderModal() {
-        const {primaryView, trackData} = this.props;
+        const { primaryView, trackData } = this.props;
         const { trackForCircletView, circletColor } = this.state;
-        return <ReactModal 
-                isOpen={this.state.showModal}
-                contentLabel="circlet-opener"
-                ariaHideApp={false}
-                >
+        return (
+            <ReactModal isOpen={this.state.showModal} contentLabel="circlet-opener" ariaHideApp={false}>
                 <button onClick={this.handleCloseModal}>Close</button>
-                <CircletView 
-                    primaryView={primaryView} 
-                    trackData={trackData} 
+                <CircletView
+                    primaryView={primaryView}
+                    trackData={trackData}
                     track={trackForCircletView}
                     color={circletColor}
                     setCircletColor={this.setCircletColor}
                 />
-            </ReactModal>;
+            </ReactModal>
+        );
     }
 
     /**
      * @inheritdoc
      */
     render() {
-        const {tracks, onTracksChanged, enteredRegion, highlightEnteredRegion, primaryView, viewRegion, highlightColor} = this.props;
+        const {
+            tracks,
+            onTracksChanged,
+            enteredRegion,
+            highlightEnteredRegion,
+            primaryView,
+            viewRegion,
+            highlightColor
+        } = this.props;
         const { selectedTool } = this.state;
-        const contextMenu = <TrackContextMenu 
-                                tracks={tracks} 
-                                onTracksChanged={onTracksChanged} 
-                                deselectAllTracks={this.deselectAllTracks} 
-                                onCircletRequested={this.handleOpenModal}
-                                onApplyMatplot={this.applyMatPlot}
-                            />;
+        const contextMenu = (
+            <TrackContextMenu
+                tracks={tracks}
+                onTracksChanged={onTracksChanged}
+                deselectAllTracks={this.deselectAllTracks}
+                onCircletRequested={this.handleOpenModal}
+                onApplyMatplot={this.applyMatPlot}
+            />
+        );
         const trackDivStyle = {
-                                border: "1px solid black", 
-                                paddingBottom: "3px",
-                                cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR
-                            };
+            border: '1px solid black',
+            paddingBottom: '3px',
+            cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR
+        };
         return (
-        <React.Fragment>
-            <OutsideClickDetector onOutsideClick={this.deselectAllTracks} >
-                {this.renderControls()}
-                <ContextMenuManager menuElement={contextMenu} shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)} >
-                    <DivWithBullseye style={trackDivStyle} id="trackContainer">
-                        <VerticalDivider visData={primaryView} genomeRegion={viewRegion}
-                                xOffset={this.state.xOffset}>
-                            <HighlightRegion 
-                                enteredRegion={enteredRegion}
-                                highlightColor={highlightColor}
-                                highlightEnteredRegion={highlightEnteredRegion}
+            <React.Fragment>
+                <OutsideClickDetector onOutsideClick={this.deselectAllTracks}>
+                    {this.renderControls()}
+                    <ContextMenuManager
+                        menuElement={contextMenu}
+                        shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)}
+                    >
+                        <DivWithBullseye style={trackDivStyle} id="trackContainer">
+                            <VerticalDivider
                                 visData={primaryView}
+                                genomeRegion={viewRegion}
                                 xOffset={this.state.xOffset}
+                            >
+                                <HighlightRegion
+                                    enteredRegion={enteredRegion}
+                                    highlightColor={highlightColor}
+                                    highlightEnteredRegion={highlightEnteredRegion}
+                                    visData={primaryView}
+                                    xOffset={this.state.xOffset}
                                 >
-                                {this.renderSubContainer()}
-                            </HighlightRegion>
-                        </VerticalDivider>
-                    </DivWithBullseye>
-                </ContextMenuManager>
-            </OutsideClickDetector>
-            {this.renderModal()}
-            <Hotkeys 
-                keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o,alt+g" 
-                onKeyDown={this.onKeyDown.bind(this)}
-            ></Hotkeys>
-        </React.Fragment>
+                                    {this.renderSubContainer()}
+                                </HighlightRegion>
+                            </VerticalDivider>
+                        </DivWithBullseye>
+                    </ContextMenuManager>
+                </OutsideClickDetector>
+                {this.renderModal()}
+                <Hotkeys
+                    keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o,alt+g"
+                    onKeyDown={this.onKeyDown.bind(this)}
+                ></Hotkeys>
+            </React.Fragment>
         );
     }
 }
@@ -495,8 +558,13 @@ class TrackContainer extends React.Component {
 export default withEnhancements(TrackContainer);
 
 function PixelInfo(props) {
-    const {basesPerPixel, viewRegion} = props;
+    const { basesPerPixel, viewRegion, primaryView } = props;
     const viewBp = niceBpCount(viewRegion.getWidth());
+    const windowWidth = primaryView.viewWindow.getLength();
     const span = niceBpCount(basesPerPixel, true);
-    return <span className="font-italic">Viewing a {viewBp} region, 1 pixel spans {span}</span>;
+    return (
+        <span className="font-italic">
+            Viewing a {viewBp} region in {Math.round(windowWidth)}px, 1 pixel spans {span}
+        </span>
+    );
 }

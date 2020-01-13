@@ -51,7 +51,7 @@ class CallingCardTrack extends React.PureComponent {
 
     aggregateFeatures(data, viewRegion, width) {
         const aggregator = new FeatureAggregator();
-        const xToFeatures = aggregator.makeXMap(data, viewRegion, width);
+        const xToFeatures = aggregator.makeXMap(data, viewRegion, width, true);
         return xToFeatures;
     }
 
@@ -106,7 +106,7 @@ class CallingCardTrack extends React.PureComponent {
               <th scope="col">Count</th>
             </tr>
           </thead>);
-        const rows = cards.map((card,i) => <tr key={i}><td>{card.barcode}</td><td>{card.value}</td></tr>);
+        const rows = cards.slice(0, 10).map((card,i) => <tr key={i}><td>{card.barcode}</td><td>{card.value}</td></tr>);
         return <table className="table table-striped table-sm">{head}<tbody>{rows}</tbody></table>;
     }
 

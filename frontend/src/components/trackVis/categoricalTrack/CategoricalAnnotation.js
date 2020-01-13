@@ -54,25 +54,28 @@ class CategoricalAnnotation extends React.Component {
         
         let label = null;
         const labelText = category && category[feature.getName()] ? category[feature.getName()].name : feature.getName();
-        const estimatedLabelWidth = labelText.length * TEXT_HEIGHT;
-        if (estimatedLabelWidth < 0.9 * width) {
-            const centerX = startX + 0.5 * width;
-            const centerY = (height - TEXT_HEIGHT + 1) * 0.5;
-            label = (
-                <BackgroundedText
-                    x={centerX}
-                    y={centerY}
-                    height={TEXT_HEIGHT - 1}
-                    fill={contrastColor}
-                    dominantBaseline="hanging"
-                    textAnchor="middle"
-                    backgroundColor={color}
-                    backgroundOpacity={1}
-                >
-                    {labelText}
-                </BackgroundedText>
-            );
+        if (labelText) {
+            const estimatedLabelWidth = labelText.length * TEXT_HEIGHT;
+            if (estimatedLabelWidth < 0.9 * width) {
+                const centerX = startX + 0.5 * width;
+                const centerY = (height - TEXT_HEIGHT + 1) * 0.5;
+                label = (
+                    <BackgroundedText
+                        x={centerX}
+                        y={centerY}
+                        height={TEXT_HEIGHT - 1}
+                        fill={contrastColor}
+                        dominantBaseline="hanging"
+                        textAnchor="middle"
+                        backgroundColor={color}
+                        backgroundOpacity={1}
+                    >
+                        {labelText}
+                    </BackgroundedText>
+                );
+            }
         }
+        
 
         return (
         <TranslatableG y={y} onClick={event => onClick(event, feature)} >

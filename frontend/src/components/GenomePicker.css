@@ -14,8 +14,8 @@
     grid-gap: 10px;
 }
 
-.capitalize {
-    text-transform: capitalize;
+.capitalize:first-letter {
+    text-transform: uppercase;
 }
 
 .GenomePicker-one-species label {

@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import getComponentName from './getComponentName';
 
 interface MeasurerState {
@@ -45,14 +46,24 @@ function withAutoDimensions<P extends object>(
                 height: 0,
             };
             this._node = null;
+            this.setDimensions = _.debounce(this.setDimensions, 100);
+        }
+
+        setDimensions = () => {
+            this.setState({isMounted: true, width: this._node.clientWidth, height: this._node.clientHeight});
         }
 
         /**
          * Measures width.
          */
         componentDidMount() {
-            this.setState({isMounted: true, width: this._node.clientWidth, height: this._node.clientHeight});
+            this.setDimensions();
+            window.addEventListener("resize", this.setDimensions);
         }
+
+        componentWillUnmount() {
+            window.removeEventListener("resize", this.setDimensions);
+          }
 
         /**
          * @inheritdoc

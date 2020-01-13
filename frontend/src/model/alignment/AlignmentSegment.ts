@@ -34,6 +34,7 @@ export class AlignmentSegment extends FeatureSegment {
      */
     constructor(record: AlignmentRecord, start?: number, end?: number) {
         super(record, start, end);
+        this.feature = record; // this line should be non-necessary since super() already set it...
         const alignIter = new AlignmentIterator(record.targetSeq);
         // +1 because AlignmentIterator starts on string index -1.
         const substringStart = alignIter.advanceN(this.relativeStart + 1);

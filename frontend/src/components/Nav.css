@@ -146,3 +146,15 @@
 #legendWidth {
     width: 6ch;
 }
+
+.capitalize {
+    display: inline-block;
+}
+
+.capitalize:first-letter {
+    text-transform: uppercase;
+}
+
+.italic {
+    font-style: italic
+}

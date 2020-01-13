@@ -7,6 +7,7 @@ import { notify } from 'react-notify-toast';
 import { Heatmap } from './Heatmap';
 import { ArcDisplay } from './ArcDisplay';
 import { CubicCurveDisplay } from './CubicCurveDisplay';
+import { SquareDisplay } from './SquareDisplay';
 
 import Track, { PropsFromTrackContainer } from '../commonComponents/Track';
 import TrackLegend from '../commonComponents/TrackLegend';
@@ -68,13 +69,13 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
 
 
     computeScale = () => {
-        const {scoreScale, scoreMin, scoreMax, height} = this.props.options;
+        const { scoreScale, scoreMin, scoreMax, height } = this.props.options;
         const visibleValues = this.props.data.slice(this.props.viewWindow.start, this.props.viewWindow.end);
         if (scoreScale === ScaleChoices.AUTO) {
             const maxScore = visibleValues.length > 0 ? _.maxBy(visibleValues, 'score').score : 0;
             return {
                 opacityScale: scaleLinear().domain([0, maxScore]).range([0, 1]).clamp(true),
-                heightScale: scaleLinear().domain([0, maxScore]).range([0, height-TOP_PADDING]).clamp(true),
+                heightScale: scaleLinear().domain([0, maxScore]).range([0, height - TOP_PADDING]).clamp(true),
                 min: 0,
                 max: maxScore,
             };
@@ -82,16 +83,16 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             if (scoreMin >= scoreMax) {
                 notify.show('Score min cannot be greater than Score max', 'error', 2000);
                 return {
-                    opacityScale: scaleLinear().domain([scoreMax-1, scoreMax]).range([0, 1]).clamp(true),
-                    heightScale: 
-                    scaleLinear().domain([scoreMax-1, scoreMax]).range([0, height-TOP_PADDING]).clamp(true),
-                    min: scoreMax-1,
+                    opacityScale: scaleLinear().domain([scoreMax - 1, scoreMax]).range([0, 1]).clamp(true),
+                    heightScale:
+                        scaleLinear().domain([scoreMax - 1, scoreMax]).range([0, height - TOP_PADDING]).clamp(true),
+                    min: scoreMax - 1,
                     max: scoreMax,
                 };
             }
             return {
                 opacityScale: scaleLinear().domain([scoreMin, scoreMax]).range([0, 1]).clamp(true),
-                heightScale: scaleLinear().domain([scoreMin, scoreMax]).range([0, height-TOP_PADDING]).clamp(true),
+                heightScale: scaleLinear().domain([scoreMin, scoreMax]).range([0, height - TOP_PADDING]).clamp(true),
                 min: scoreMin,
                 max: scoreMax,
             };
@@ -116,7 +117,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
     }
 
     render(): JSX.Element {
-        const {data, trackModel, visRegion, width, viewWindow, options, forceSvg} = this.props;
+        const { data, trackModel, visRegion, width, viewWindow, options, forceSvg } = this.props;
         this.scales = this.computeScale();
         const visualizerProps = {
             placedInteractions: this.featurePlacer.placeInteractions(data, visRegion, width),
@@ -146,10 +147,13 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
                 visualizer = <Heatmap {...visualizerProps} />;
                 break;
             case InteractionDisplayMode.FLATARC:
-                visualizer = <CubicCurveDisplay {...visualizerProps}/>;
+                visualizer = <CubicCurveDisplay {...visualizerProps} />;
                 break;
             case InteractionDisplayMode.ARC:
                 visualizer = <ArcDisplay {...visualizerProps} />;
+                break;
+            case InteractionDisplayMode.SQUARE:
+                visualizer = <SquareDisplay {...visualizerProps} />;
                 break;
             default:
                 visualizer = <ArcDisplay {...visualizerProps} />;
@@ -157,11 +161,11 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
 
         return <Track
             {...this.props}
-            legend={<TrackLegend 
-                    trackModel={trackModel} height={options.height}
-                    axisScale={options.displayMode === InteractionDisplayMode.FLATARC ? 
-                            this.scales.heightScale: undefined}
-                    />}
+            legend={<TrackLegend
+                trackModel={trackModel} height={options.height}
+                axisScale={options.displayMode === InteractionDisplayMode.FLATARC ?
+                    this.scales.heightScale : undefined}
+            />}
             // legend={<TrackLegend trackModel={trackModel} height={50} />}
             visualizer={visualizer}
         />;
