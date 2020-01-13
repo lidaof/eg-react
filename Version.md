@@ -1,5 +1,9 @@
 # Version History
 
+## 50.3.6
+
+-   added sea hare genome (aplCal3) by Xiaoyu Zhuo
+
 ## 50.3.5
 
 -   this version we implemented the PWA design

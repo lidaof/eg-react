@@ -1,20 +1,20 @@
-import HG19 from './hg19/hg19';
-import HG38 from './hg38/hg38';
-import MM10 from './mm10/mm10';
-import DAN_RER10 from './danRer10/danRer10';
-import DAN_RER11 from './danRer11/danRer11';
-import PANTRO5 from './panTro5/panTro5';
-import RN6 from './rn6/rn6';
-import MM9 from './mm9/mm9';
-import BosTau8 from './bosTau8/bosTau8';
-import RheMac8 from './rheMac8/rheMac8';
-import GalGal6 from './galGal6/galGal6';
-import GalGal5 from './galGal5/galGal5';
-import AraTha1 from './araTha1/araTha1';
-import DM6 from './dm6/dm6';
-import CE11 from './ce11/ce11';
-import APLCAL3 from './aplCal3/aplCal3';
-import { GenomeConfig } from './GenomeConfig';
+import HG19 from "./hg19/hg19";
+import HG38 from "./hg38/hg38";
+import MM10 from "./mm10/mm10";
+import DAN_RER10 from "./danRer10/danRer10";
+import DAN_RER11 from "./danRer11/danRer11";
+import PANTRO5 from "./panTro5/panTro5";
+import RN6 from "./rn6/rn6";
+import MM9 from "./mm9/mm9";
+import BosTau8 from "./bosTau8/bosTau8";
+import RheMac8 from "./rheMac8/rheMac8";
+import GalGal6 from "./galGal6/galGal6";
+import GalGal5 from "./galGal5/galGal5";
+import AraTha1 from "./araTha1/araTha1";
+import DM6 from "./dm6/dm6";
+import CE11 from "./ce11/ce11";
+import APLCAL3 from "./aplCal3/aplCal3";
+import { GenomeConfig } from "./GenomeConfig";
 
 /**
  * All available genomes.
@@ -54,66 +54,66 @@ interface SpeciesConfig {
     color: string;
 }
 
-export const treeOfLife: {[speciesName: string]: SpeciesConfig} = {
+export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     human: {
-        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Human.png',
-        assemblies: [ HG19.genome.getName(), HG38.genome.getName() ],
-        color: 'white',
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
+        assemblies: [HG19.genome.getName(), HG38.genome.getName()],
+        color: "white"
     },
     chimp: {
-        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Chimp.png',
-        assemblies: [ PANTRO5.genome.getName() ],
-        color: 'white',
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
+        assemblies: [PANTRO5.genome.getName()],
+        color: "white"
     },
     rhesus: {
-        logoUrl: 'https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png',
-        assemblies: [ RheMac8.genome.getName() ],
-        color: 'yellow',
+        logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
+        assemblies: [RheMac8.genome.getName()],
+        color: "yellow"
     },
     cow: {
-        logoUrl: 'https://vizhub.wustl.edu/public/bosTau8/Cow.png',
-        assemblies: [ BosTau8.genome.getName() ],
-        color: 'yellow',
+        logoUrl: "https://vizhub.wustl.edu/public/bosTau8/Cow.png",
+        assemblies: [BosTau8.genome.getName()],
+        color: "yellow"
     },
     mouse: {
-        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Mouse.png',
-        assemblies: [ MM10.genome.getName(), MM9.genome.getName() ],
-        color: 'yellow',
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Mouse.png",
+        assemblies: [MM10.genome.getName(), MM9.genome.getName()],
+        color: "yellow"
     },
     rat: {
-        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Rat.png',
-        assemblies: [ RN6.genome.getName() ],
-        color: 'white',
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Rat.png",
+        assemblies: [RN6.genome.getName()],
+        color: "white"
     },
     chicken: {
-        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Chicken.png',
-        assemblies: [ GalGal6.genome.getName(), GalGal5.genome.getName() ],
-        color: 'yellow',
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chicken.png",
+        assemblies: [GalGal6.genome.getName(), GalGal5.genome.getName()],
+        color: "yellow"
     },
     zebrafish: {
-        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png',
-        assemblies: [ DAN_RER11.genome.getName(), DAN_RER10.genome.getName() ],
-        color: 'yellow',
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
+        assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName()],
+        color: "yellow"
     },
-    'fruit fly': {
-        logoUrl: 'https://epigenomegateway.wustl.edu/legacy/images/Fruit%20fly.png',
-        assemblies: [ DM6.genome.getName() ],
-        color: 'white',
+    "fruit fly": {
+        logoUrl: "https://epigenomegateway.wustl.edu/legacy/images/Fruit%20fly.png",
+        assemblies: [DM6.genome.getName()],
+        color: "white"
     },
-    'c.elegans': {
-        logoUrl: 'https://epigenomegateway.wustl.edu/legacy/images/C.elegans.png',
-        assemblies: [ CE11.genome.getName() ],
-        color: 'black',
+    "c.elegans": {
+        logoUrl: "https://epigenomegateway.wustl.edu/legacy/images/C.elegans.png",
+        assemblies: [CE11.genome.getName()],
+        color: "black"
     },
     arabidopsis: {
-        logoUrl: 'https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png',
-        assemblies: [ AraTha1.genome.getName() ],
-        color: 'yellow',
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png",
+        assemblies: [AraTha1.genome.getName()],
+        color: "yellow"
     },
-    seahare:{
-        logoUrl: 'https://wangftp.wustl.edu/~xzhuo/aplCal3/seaHare.png',
-        assemblies: [ APLCAL3.genome.getName() ],
-        color: 'white',
+    seahare: {
+        logoUrl: "https://vizhub.wustl.edu/public/aplCal3/seaHare.png",
+        assemblies: [APLCAL3.genome.getName()],
+        color: "white"
     }
 };
 
@@ -126,10 +126,10 @@ export function getGenomeConfig(genomeName: string): GenomeConfig {
 }
 
 export function getSpeciesInfo(genomeName: string) {
-    for (const [species, details] of Object.entries(treeOfLife) ) {
+    for (const [species, details] of Object.entries(treeOfLife)) {
         if (details.assemblies.includes(genomeName)) {
             return { name: species, logo: details.logoUrl, color: details.color };
         }
     }
-    return {name: '', logo: '', color: ''};
+    return { name: "", logo: "", color: "" };
 }
