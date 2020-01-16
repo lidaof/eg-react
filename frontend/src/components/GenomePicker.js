@@ -46,7 +46,7 @@ class GenomePicker extends React.PureComponent {
                         <input type="radio" id={species} value={species} 
                             checked={this.state.species === species} 
                             onChange={this.chooseSpecies} />
-                        <div>{species}</div>
+                        <div className="capitalize">{species}</div>
                         <div><img src={details.logoUrl} alt={species}/></div>
                     </label>
                 </div>
@@ -90,7 +90,7 @@ class GenomePicker extends React.PureComponent {
                 </div>
                 <hr style={{marginTop: 0}} />
                 <div className="GenomePicker-main">
-                    <div className="GenomePicker-species capitalize">
+                    <div className="GenomePicker-species">
                         {this.renderTree()}
                     </div> 
                     <div className="GenomePicker-assembly">

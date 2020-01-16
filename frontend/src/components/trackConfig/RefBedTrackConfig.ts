@@ -7,25 +7,34 @@ import { DEFAULT_OPTIONS } from '../trackVis/geneAnnotationTrack/GeneAnnotation'
 import Gene, { IdbRecord } from '../../model/Gene';
 import { TrackModel } from '../../model/TrackModel';
 import LocalBedSource from '../../dataSources/LocalBedSource';
+import BedTextSource from '../../dataSources/BedTextSource';
 
 export class RefBedTrackConfig extends AnnotationTrackConfig {
     constructor(trackModel: TrackModel) {
         super(trackModel);
         this.setDefaultOptions(DEFAULT_OPTIONS);
     }
-    
+
     initDataSource() {
-        if (this.trackModel.files.length > 0) {
-            return new LocalBedSource(this.trackModel.files);
+        if (this.trackModel.isText) {
+            return new BedTextSource({
+                url: this.trackModel.url,
+                blob: this.trackModel.fileObj,
+                textConfig: this.trackModel.textConfig
+            });
         } else {
-            return new WorkerSource(BedWorker, this.trackModel.url);
+            if (this.trackModel.files.length > 0) {
+                return new LocalBedSource(this.trackModel.files);
+            } else {
+                return new WorkerSource(BedWorker, this.trackModel.url);
+            }
         }
     }
 
     /**
      * Converts raw bed records to NumericalFeatures.  If we cannot parse a numerical value from a
      * record, the resulting NumericalFeature will have a value of 0.
-     * 
+     *
      * 3: "52313844"
      * 4: "52317097"
      * 5: "+"
@@ -38,7 +47,7 @@ export class RefBedTrackConfig extends AnnotationTrackConfig {
      * chr: "chr6"
      * end: 52318378
      * start: 52313498
-     * 
+     *
      * @param {Object[]} data - BED records
      * @return {Gene[]} Genes
      */

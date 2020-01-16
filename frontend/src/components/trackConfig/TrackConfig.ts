@@ -2,9 +2,10 @@ import UnknownTrack from '../trackVis/UnknownTrack';
 import LabelConfig from '../trackContextMenu/LabelConfig';
 import { TrackModel, TrackOptions } from '../../model/TrackModel';
 import DataSource from '../../dataSources/DataSource';
+import DisplayedRegionModel from 'model/DisplayedRegionModel';
 
 export class TrackConfig {
-    public defaultOptions: TrackOptions
+    public defaultOptions: TrackOptions;
 
     constructor(public trackModel: TrackModel) {
         this.trackModel = trackModel;
@@ -14,7 +15,7 @@ export class TrackConfig {
     /**
      * Merge an object into this instance's default options, which are used in `getOptions()`.  If keys already exist in
      * the default options, this method overrides them.
-     * 
+     *
      * @param {Object} defaults - object that will be merged into this track's default options
      * @return {Object} - new default options
      */
@@ -36,13 +37,27 @@ export class TrackConfig {
 
     /**
      * Gets whether a change in options should cause a data fetch.
-     * 
+     *
      * @param {TrackOptions} oldOptions - previous options of the track
      * @param {TrackOptions} oldOptions - new options
      * @return {boolean} whether a data fetch is suggested due to a change in options
      */
     shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
         return false;
+    }
+
+    /**
+     *
+     * @param oldRegion
+     * @param newRegion
+     * @return {boolean} whether do data fetch due to region change
+     */
+    shouldFetchBecauseRegionChange(
+        currentOptions: TrackOptions,
+        oldRegion: DisplayedRegionModel,
+        newRegion: DisplayedRegionModel
+    ): boolean {
+        return oldRegion !== newRegion;
     }
 
     getComponent(): React.ComponentType {

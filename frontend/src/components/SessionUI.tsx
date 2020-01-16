@@ -231,9 +231,9 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                         value={this.state.retrieveId}
                         onChange={this.setRetrieveId}/>
                 </label>
-                <button className="SessionUI btn btn-info" onClick={this.retrieveSession}>Retrieve session</button>
+                <button className="SessionUI btn btn-info" onClick={this.retrieveSession}>Retrieve</button>
                 <div className="SessionUI-upload-btn-wrapper">
-                    <button className="SessionUI btn btn-success">Upload session</button>
+                    Or use a session file: <button className="SessionUI btn btn-success">Upload</button>
                     <input type="file" name="sessionfile" onChange={this.uploadSession} />
                 </div>
             </div>

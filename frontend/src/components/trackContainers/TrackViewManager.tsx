@@ -5,7 +5,8 @@ import { withTrackLegendWidth } from '../withTrackLegendWidth';
 
 import { TrackModel } from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import { ViewExpansion } from '../../model/RegionExpander';
+import { ViewExpansion, RegionExpander } from '../../model/RegionExpander';
+import { GuaranteeMap } from '../../model/GuaranteeMap';
 import { MultiAlignmentViewCalculator, MultiAlignment } from '../../model/alignment/MultiAlignmentViewCalculator';
 
 interface DataManagerProps {
@@ -14,7 +15,7 @@ interface DataManagerProps {
     viewRegion: DisplayedRegionModel; // Region that the user requests to view
     legendWidth: number;
     containerWidth: number;
-    expansionAmount: any;
+    expansionAmount: RegionExpander;
 }
 
 interface DataManagerState {
@@ -58,8 +59,10 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             return Array.from(genomeSet);
         }
 
-        async fetchPrimaryView(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<ViewExpansion> {
-            const visData = this.props.expansionAmount.calculateExpansion(viewRegion, this.getVisualizationWidth());
+        async fetchPrimaryView(viewRegion: DisplayedRegionModel, tracks: TrackModel[],
+            visWidth: number): Promise<ViewExpansion>
+        {
+            const visData = this.props.expansionAmount.calculateExpansion(viewRegion, visWidth);
             const secondaryGenomes = this.getSecondaryGenomes(tracks);
             if (!secondaryGenomes) {
                 return visData;
@@ -86,8 +89,13 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
         }
 
         async componentDidUpdate(prevProps: DataManagerProps) {
-            if (this.props.viewRegion !== prevProps.viewRegion || this.props.tracks !== prevProps.tracks) {
-                const primaryView = await this.fetchPrimaryView(this.props.viewRegion, this.props.tracks);
+            if (this.props.viewRegion !== prevProps.viewRegion ||
+                this.props.tracks !== prevProps.tracks ||
+                this.props.containerWidth !== prevProps.containerWidth)
+            {
+                const primaryView = await this.fetchPrimaryView(
+                    this.props.viewRegion, this.props.tracks, this.getVisualizationWidth()
+                );
                 this.setState({primaryView});
             }
         }
@@ -101,7 +109,9 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             return <WrappedComponent
                 alignments={this.fetchAlignments(this.props.viewRegion, this.props.tracks)}
                 basesPerPixel={this.props.viewRegion.getWidth() / this.getVisualizationWidth()}
-                primaryViewPromise={this.fetchPrimaryView(this.props.viewRegion, this.props.tracks)}
+                primaryViewPromise={
+                    this.fetchPrimaryView(this.props.viewRegion, this.props.tracks, this.getVisualizationWidth())
+                }
                 primaryView={this.state.primaryView}
                 {...this.props}
             />;

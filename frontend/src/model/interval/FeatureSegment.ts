@@ -22,7 +22,7 @@ export class FeatureSegment {
      * @param {number} [end] - end base of the interval, relative to the feature's start
      * @throws {RangeError} if end is before start or the interval lies outside the feature
      */
-    constructor(public readonly feature: Feature, start=0, end?: number) {
+    constructor(public readonly feature: Feature, start: number=0, end?: number) {
         if (end === undefined) {
             end = feature.getLength();
         }

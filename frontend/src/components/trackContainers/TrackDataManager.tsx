@@ -38,7 +38,7 @@ const INITIAL_TRACK_DATA: TrackData = {
     error: null
 };
 
-export function withTrackData(WrappedComponent: React.ComponentType<{trackData: TrackDataMap}>) {
+export function withTrackData(WrappedComponent: React.ComponentType<{ trackData: TrackDataMap }>) {
     return class TrackDataManager extends React.Component<DataManagerProps, TrackDataMap> {
         private _dataSourceManager: DataSourceManager;
         private _primaryGenome: string;
@@ -51,14 +51,14 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
         }
 
         componentDidMount() {
-            this.fetchAllTracks();
+            this.initTracksFetch();
         }
 
         componentDidUpdate(prevProps: DataManagerProps) {
             if (this.props.viewRegion !== prevProps.viewRegion) {
-                this.fetchAllTracks();
+                this.fetchAllTracks(prevProps.viewRegion, this.props.viewRegion);
             } else if (this.props.tracks !== prevProps.tracks) {
-                this.detectChangedTracks(prevProps.tracks); // Fetch some
+                this.detectChangedTracks(prevProps.tracks, prevProps.viewRegion); // Fetch some
             }
         }
 
@@ -70,7 +70,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
             return region === this.props.viewRegion;
         }
 
-        detectChangedTracks(prevTracks: TrackModel[]) {
+        detectChangedTracks(prevTracks: TrackModel[], prevRegion: DisplayedRegionModel) {
             const currentTracks = this.props.tracks;
             const prevTrackForId = new Map();
             for (const track of prevTracks) {
@@ -90,6 +90,8 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
                 const prevConfig = getTrackConfig(prevTrack);
                 if (config.shouldFetchBecauseOptionChange(prevConfig.getOptions(), config.getOptions())) {
                     this.fetchTrack(track);
+                } else if (config.shouldFetchBecauseRegionChange(config.getOptions(), prevRegion, this.props.viewRegion)) {
+                    this.fetchTrack(track);
                 }
             }
 
@@ -103,9 +105,18 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
             this.setState(deletionUpdate);
         }
 
-        fetchAllTracks() {
+        initTracksFetch() {
             for (const track of this.props.tracks) {
                 this.fetchTrack(track);
+            }
+        }
+
+        fetchAllTracks(prevRegion: DisplayedRegionModel, currRegion: DisplayedRegionModel) {
+            for (const track of this.props.tracks) {
+                const config = getTrackConfig(track);
+                if (config.shouldFetchBecauseRegionChange(config.getOptions(), prevRegion, currRegion)) {
+                    this.fetchTrack(track);
+                }
             }
         }
 
@@ -134,7 +145,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{trackData: 
                 const trackConfig = getTrackConfig(track);
                 const dataSource = this._dataSourceManager.getDataSource(track);
                 const rawData = await dataSource.getData(visRegion, this.props.basesPerPixel, trackConfig.getOptions());
-                
+
                 if (this.isViewStillFresh(view)) {
                     this.dispatchTrackUpdate(track, {
                         alignment,

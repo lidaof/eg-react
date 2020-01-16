@@ -8,8 +8,9 @@ import _ from 'lodash';
  */
 export function mergeGeometries(geometries) {
     const nonIndexedInput = geometries.map(geometry =>
-        geometry.getAttribute('index') === null ? geometry : geometry.toNonIndexed()
+        geometry.index === null ? geometry : geometry.toNonIndexed()
     );
+    // getAttribute('index') somehow not working
     const totalVertices = _.sumBy(nonIndexedInput, geometry => geometry.getAttribute('position').count);
 
     let mergedGeometry = new window.THREE.BufferGeometry();
