@@ -7,7 +7,10 @@ import LocalBedSource from '../../dataSources/LocalBedSource';
 import CallingCard from '../../model/CallingCard';
 import BedRecord from '../../dataSources/bed/BedRecord';
 import HeightConfig from '../trackContextMenu/HeightConfig';
+import YscaleConfig from '../trackContextMenu/YscaleConfig';
+import LogScaleConfig from '../trackContextMenu/LogScaleConfig';
 import { BackgroundColorConfig, PrimaryColorConfig } from '../trackContextMenu/ColorConfig';
+import OpacitySliderConfig from '../trackContextMenu/OpacitySilderConfig';
 import MarkerSizeConfig from '../trackContextMenu/MarkerSizeConfig';
 
 export class CallingCardTrackConfig extends TrackConfig {
@@ -39,7 +42,8 @@ export class CallingCardTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), HeightConfig, MarkerSizeConfig, 
-            PrimaryColorConfig, BackgroundColorConfig];
+        return [...super.getMenuComponents(),
+            HeightConfig, YscaleConfig, LogScaleConfig, OpacitySliderConfig,
+            MarkerSizeConfig, PrimaryColorConfig, BackgroundColorConfig];
     }
 }

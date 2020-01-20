@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { scaleLinear } from 'd3-scale';
+import { scaleLinear, scaleLog } from 'd3-scale';
 import memoizeOne from 'memoize-one';
 import { notify } from 'react-notify-toast';
 import Track from './commonComponents/Track';
@@ -10,12 +10,15 @@ import GenomicCoordinates from './commonComponents/GenomicCoordinates';
 import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 import { RenderTypes, DesignRenderer } from '../../art/DesignRenderer';
 import { ScaleChoices } from '../../model/ScaleChoices';
+import { LogChoices } from '../../model/LogChoices';
 import { FeatureAggregator } from '../../model/FeatureAggregator';
 
 export const DEFAULT_OPTIONS = {
     height: 40,
     color: "blue",
     yScale: ScaleChoices.AUTO,
+    logScale: LogChoices.AUTO,
+    alpha: 100,
     yMax: 10,
     yMin: 0,
     markerSize: 3,
@@ -26,7 +29,7 @@ const TOP_PADDING = 5;
 /**
  * Track specialized in showing calling card data.
  * 
- * @author Silas Hsu and Daofeng Li
+ * @author Silas Hsu, Daofeng Li, and Arnav Moudgil
  */
 class CallingCardTrack extends React.PureComponent {
     static propTypes = Object.assign({}, Track.propsFromTrackContainer,
@@ -35,6 +38,10 @@ class CallingCardTrack extends React.PureComponent {
         options: PropTypes.shape({
             height: PropTypes.number.isRequired, // Height of the track
             color: PropTypes.string, // Color to draw circle
+            scaleType: PropTypes.any, // Unused for now
+            scaleRange: PropTypes.array, // Unused for now
+            logScale: PropTypes.string, // For log-scaling y-axis
+            alpha: PropTypes.number, // For track opacity
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any, // If present, applies error styling
@@ -56,7 +63,7 @@ class CallingCardTrack extends React.PureComponent {
     }
 
     computeScales(xToValue, height) {
-        const {yScale, yMin, yMax} = this.props.options;
+        const {yScale, yMin, yMax, logScale} = this.props.options;
         if (yMin > yMax) {
             notify.show('Y-axis min must less than max', 'error', 2000);
         }
@@ -70,8 +77,23 @@ class CallingCardTrack extends React.PureComponent {
         if (min > max) {
             min = max;
         }
+        // Define transformation function for log scaling
+        let transformer = null;
+        switch (logScale) {
+            case LogChoices.AUTO:
+                transformer = scaleLinear;
+                break;
+            case LogChoices.BASE10:
+                transformer = scaleLog;
+                // Set valid minimum value to one;
+                // after log-transforming, it will be zero
+                min = 1;
+                break;
+            default:
+                notify.show('Invalid logarithm base', 'error', 2000);
+        }
         return {
-            valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
+            valueToY: transformer().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
             min,
             max,
         };
@@ -102,17 +124,20 @@ class CallingCardTrack extends React.PureComponent {
     formatCards = (cards) => {
         const head = (<thead>
             <tr>
-              <th scope="col">Barcode</th>
-              <th scope="col">Count</th>
+              <th scope="col">Value</th>
+              <th scope="col">Strand</th>
+              <th scope="col">String</th>
             </tr>
           </thead>);
-        const rows = cards.slice(0, 10).map((card,i) => <tr key={i}><td>{card.barcode}</td><td>{card.value}</td></tr>);
+        const rows = cards.slice(0, 10).map((card,i) => <tr key={i}><td>{card.value}</td><td>{card.strand}</td><td>{card.string}</td></tr>);
         return <table className="table table-striped table-sm">{head}<tbody>{rows}</tbody></table>;
     }
 
     render() {
+        // console.log(this.props.options);
         const {data, viewRegion, width, trackModel, options, forceSvg} = this.props;
-        const {height, color, colorAboveMax, markerSize} = options;
+        const {height, color, colorAboveMax, markerSize, alpha} = options;
+        console.log(options);
         this.xToValue = data.length > 0 ? this.aggregateFeatures(data, viewRegion, width) : [];
         this.scales = this.computeScales(this.xToValue, height);
         const legend = <TrackLegend
@@ -131,6 +156,7 @@ class CallingCardTrack extends React.PureComponent {
                     colorOut={colorAboveMax}
                     forceSvg={forceSvg}
                     markerSize={markerSize}
+                    opacity={alpha/100}
                 />
             </HoverTooltipContext>
         );
@@ -167,11 +193,12 @@ class CallingCardPlot extends React.PureComponent {
         if (value.length === 0) {
             return null;
         }
-        const {scales, color, markerSize} = this.props;
+        const {scales, color, markerSize, opacity} = this.props;
         return value.map((card,idx) => {
             const y = scales.valueToY(card.value);
             const key = `${x}-${idx}`;
-            return <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={color} strokeOpacity="0.5"/>;
+            // const alpha = opacity[0] / 100;
+            return <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={color} strokeOpacity={opacity} />;
         });
         
     }
