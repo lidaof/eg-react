@@ -43,7 +43,7 @@ export class CallingCardTrackConfig extends TrackConfig {
 
     getMenuComponents() {
         return [...super.getMenuComponents(),
-            HeightConfig, YscaleConfig, LogScaleConfig, OpacitySliderConfig,
+            HeightConfig, YscaleConfig, LogScaleConfig, //OpacitySliderConfig,
             MarkerSizeConfig, PrimaryColorConfig, BackgroundColorConfig];
     }
 }

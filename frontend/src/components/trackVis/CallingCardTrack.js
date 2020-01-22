@@ -106,19 +106,25 @@ class CallingCardTrack extends React.PureComponent {
      * @param {number} value - 
      * @return {JSX.Element} tooltip to render
      */
-    renderTooltip(relativeX) {
+    renderTooltip(relativeX, relativeY) {
         const {trackModel, viewRegion, width} = this.props;
-        const value = this.xToValue[Math.round(relativeX)];
-        const stringValue = value !== undefined && value.length > 0 ? this.formatCards(value) : '(no data)';
-        return (
-        <div>
-            <div className="Tooltip-minor-text">
-                <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
-            </div>
-            <div className="Tooltip-minor-text">{trackModel.getDisplayLabel()}</div>
-            <div className="Tooltip-minor-text">{stringValue}</div>
-        </div>
-        );
+        const values = this.xToValue[Math.round(relativeX)];
+        // Draw tooltip only if there are values
+        if (values !== undefined && values.length > 0) {
+            // Find closest calling cards to the cursor along y-axis
+            const nearestY = this.nearestCards(values, relativeY);
+            if (nearestY.length > 0) {
+                return (
+                    <div>
+                        <div className="Tooltip-minor-text">
+                            <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
+                        </div>
+                        <div className="Tooltip-minor-text">{trackModel.getDisplayLabel()}</div>
+                        <div className="Tooltip-minor-text">{this.formatCards(nearestY)}</div>
+                    </div>
+                );
+            };
+        };
     }
 
     formatCards = (cards) => {
@@ -133,11 +139,28 @@ class CallingCardTrack extends React.PureComponent {
         return <table className="table table-striped table-sm">{head}<tbody>{rows}</tbody></table>;
     }
 
+    // Return closest calling cards to the cursor
+    nearestCards = (cards, relativeY) => {
+        const {height} = this.props.options;
+        const distances = cards.map((x) => this.scales.valueToY(x.value)).map((x) => {return x - relativeY});
+        const absdistances = distances.map((x) => {return Math.abs(x)});
+        const mindist = Math.min(...absdistances);
+        if (mindist < height * 0.03) {
+            var returnCards = [];
+            for (var i = 0; i < distances.length; i++) {
+                if (Math.abs(distances[i]) === mindist) returnCards.push(cards[i]);
+            }
+            return returnCards;
+        } else {
+            return [];
+        };
+    }
+
     render() {
         // console.log(this.props.options);
         const {data, viewRegion, width, trackModel, options, forceSvg} = this.props;
         const {height, color, colorAboveMax, markerSize, alpha} = options;
-        console.log(options);
+        // console.log(options);
         this.xToValue = data.length > 0 ? this.aggregateFeatures(data, viewRegion, width) : [];
         this.scales = this.computeScales(this.xToValue, height);
         const legend = <TrackLegend
@@ -147,7 +170,7 @@ class CallingCardTrack extends React.PureComponent {
         />;
         const visualizer = 
         (
-            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
+            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} useRelativeY={true} >
                 <CallingCardPlot
                     xToValue={this.xToValue}
                     scales={this.scales}
