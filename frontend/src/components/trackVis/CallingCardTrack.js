@@ -18,7 +18,7 @@ export const DEFAULT_OPTIONS = {
     color: "blue",
     yScale: ScaleChoices.AUTO,
     logScale: LogChoices.AUTO,
-    alpha: 100,
+    opacity: [100],
     yMax: 10,
     yMin: 0,
     markerSize: 3,
@@ -41,7 +41,7 @@ class CallingCardTrack extends React.PureComponent {
             scaleType: PropTypes.any, // Unused for now
             scaleRange: PropTypes.array, // Unused for now
             logScale: PropTypes.string, // For log-scaling y-axis
-            alpha: PropTypes.number, // For track opacity
+            opacity: PropTypes.array, // For track opacity
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any, // If present, applies error styling
@@ -51,9 +51,10 @@ class CallingCardTrack extends React.PureComponent {
         super(props);
         this.xToValue = null;
         this.scales = null;
-        this.computeScales = memoizeOne(this.computeScales);
+        // this.computeScales = memoizeOne(this.computeScales); // for some reason computeScales doesn't work when memoized
         this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
         this.renderTooltip = this.renderTooltip.bind(this);
+        console.log(props.options);
     }
 
     aggregateFeatures(data, viewRegion, width) {
@@ -109,7 +110,7 @@ class CallingCardTrack extends React.PureComponent {
     renderTooltip(relativeX, relativeY) {
         const {trackModel, viewRegion, width} = this.props;
         const values = this.xToValue[Math.round(relativeX)];
-        // Draw tooltip only if there are values
+        // Draw tooltip only if there are values at this x position
         if (values !== undefined && values.length > 0) {
             // Find closest calling cards to the cursor along y-axis
             const nearestY = this.nearestCards(values, relativeY);
@@ -157,16 +158,14 @@ class CallingCardTrack extends React.PureComponent {
     }
 
     render() {
-        // console.log(this.props.options);
         const {data, viewRegion, width, trackModel, options, forceSvg} = this.props;
-        const {height, color, colorAboveMax, markerSize, alpha} = options;
-        // console.log(options);
+        const {height, color, colorAboveMax, markerSize, opacity} = options;
         this.xToValue = data.length > 0 ? this.aggregateFeatures(data, viewRegion, width) : [];
         this.scales = this.computeScales(this.xToValue, height);
         const legend = <TrackLegend
             trackModel={trackModel}
             height={height}
-            axisScale={this.scales.valueToY }
+            axisScale={this.scales.valueToY}
         />;
         const visualizer = 
         (
@@ -179,7 +178,7 @@ class CallingCardTrack extends React.PureComponent {
                     colorOut={colorAboveMax}
                     forceSvg={forceSvg}
                     markerSize={markerSize}
-                    opacity={alpha/100}
+                    alpha={opacity[0]/100}
                 />
             </HoverTooltipContext>
         );
@@ -198,6 +197,7 @@ class CallingCardPlot extends React.PureComponent {
         height: PropTypes.number.isRequired,
         color: PropTypes.string,
         markerSize: PropTypes.number,
+        alpha: PropTypes.number,
     }
 
     constructor(props) {
@@ -216,12 +216,11 @@ class CallingCardPlot extends React.PureComponent {
         if (value.length === 0) {
             return null;
         }
-        const {scales, color, markerSize, opacity} = this.props;
+        const {scales, color, markerSize, alpha} = this.props;
         return value.map((card,idx) => {
             const y = scales.valueToY(card.value);
             const key = `${x}-${idx}`;
-            // const alpha = opacity[0] / 100;
-            return <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={color} strokeOpacity={opacity} />;
+            return <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={color} strokeOpacity={alpha} />;
         });
         
     }
