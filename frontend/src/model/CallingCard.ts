@@ -27,6 +27,8 @@ class CallingCard extends Feature {
      */
     string: any;
     value: number;
+    relativeX: number; // Store relative position of CallingCard in visualizer
+    relativeY: number; // Used to find nearest CallingCard to cursor for tooltip; also for downsampling
     constructor(bedRecord: BedRecord) {
         const locus = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
         super('', locus, bedRecord[CallingCardColumnIndex.STRAND]);
