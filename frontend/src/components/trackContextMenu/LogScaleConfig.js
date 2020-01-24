@@ -13,8 +13,8 @@ function LogScaleConfig(props) {
                 optionName="logScale" 
                 label="Logarithm:" 
                 choices={{
-                    None: LogChoices.AUTO,
-                    log10: LogChoices.BASE10,
+                    NONE: LogChoices.AUTO,
+                    LOG10: LogChoices.BASE10,
                     // log2: LogChoices.BASE2,
                     // ln: LogChoices.NATURAL,
                 }}
