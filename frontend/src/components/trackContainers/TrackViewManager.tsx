@@ -6,7 +6,7 @@ import { withTrackLegendWidth } from '../withTrackLegendWidth';
 import { TrackModel } from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { ViewExpansion, RegionExpander } from '../../model/RegionExpander';
-import { GuaranteeMap } from '../../model/GuaranteeMap';
+// import { GuaranteeMap } from '../../model/GuaranteeMap';
 import { MultiAlignmentViewCalculator, MultiAlignment } from '../../model/alignment/MultiAlignmentViewCalculator';
 
 interface DataManagerProps {
@@ -71,7 +71,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             try {
                 const alignment = await this._multialignmentCalculator.multiAlign(visData);
                 // All the primaryVisData in alignment should be the same:
-                const primaryVisData = await Object.values(alignment)[0].primaryVisData;
+                const primaryVisData = Object.values(alignment).length ? Object.values(alignment)[0].primaryVisData: visData;
                 this.setState({ primaryView: primaryVisData });
                 return primaryVisData;
             } catch (error) {

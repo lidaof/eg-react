@@ -2,7 +2,10 @@
 
 ## 50.3.6
 
--   added sea hare genome (aplCal3) by Xiaoyu Zhuo
+-   added sea hare genome (aplCal3) by Xiaoyu
+-   added yeast sacCer3 genome
+-   calling card track update by Arnav
+-   multiple alignment track update by Xiaoyu
 
 ## 50.3.5
 
