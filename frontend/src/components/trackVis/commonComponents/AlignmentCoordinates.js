@@ -42,7 +42,6 @@ class AlignmentSequence extends React.Component {
             const relativeHighlightStart = cusorLocus - halfHighlightLength > 0 ? cusorLocus - halfHighlightLength : 0;
             const relativeHighlightEnd = cusorLocus + halfHighlightLength < length ? cusorLocus + halfHighlightLength : (length - 1);
 
-
             const cusorTargetSeqLeft = record.targetSeq.substr(
                 start + relativeDisplayStart, relativeHighlightStart - relativeDisplayStart).toUpperCase();
             const cusorTargetSeqMid = record.targetSeq.substr(start + relativeHighlightStart, highlightLength).toUpperCase();
