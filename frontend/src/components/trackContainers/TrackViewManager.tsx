@@ -7,7 +7,7 @@ import { TrackModel } from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { ViewExpansion, RegionExpander } from '../../model/RegionExpander';
 import { GuaranteeMap } from '../../model/GuaranteeMap';
-import { AlignmentViewCalculator, Alignment } from '../../model/alignment/AlignmentViewCalculator';
+import { MultiAlignmentViewCalculator, MultiAlignment } from '../../model/alignment/MultiAlignmentViewCalculator';
 
 interface DataManagerProps {
     genome: string; // The primary genome
@@ -22,12 +22,9 @@ interface DataManagerState {
     primaryView: ViewExpansion;
 }
 
-export interface AlignmentPromises {
-    [genome: string]: Promise<Alignment>
-}
-
 interface WrappedComponentProps {
-    alignments: AlignmentPromises;
+    alignments: Promise<MultiAlignment>
+    // alignments: AlignmentPromises;
     basesPerPixel: number;
     primaryViewPromise: Promise<ViewExpansion>;
     primaryView: ViewExpansion;
@@ -36,14 +33,14 @@ interface WrappedComponentProps {
 export function withTrackView(WrappedComponent: React.ComponentType<WrappedComponentProps>) {
     class TrackViewManager extends React.Component<DataManagerProps, DataManagerState> {
         private _primaryGenome: string;
-        private _alignmentCalculatorForGenome: GuaranteeMap<string, AlignmentViewCalculator>
+        private _multialignmentCalculator: MultiAlignmentViewCalculator
 
         constructor(props: DataManagerProps) {
             super(props);
             this._primaryGenome = props.genome;
-            this._alignmentCalculatorForGenome = new GuaranteeMap(
-                queryGenome => new AlignmentViewCalculator(this._primaryGenome, queryGenome)
-            );
+            const queryGenomes = this.getSecondaryGenomes(props.tracks);
+            this._multialignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
+
             this.state = {
                 primaryView: 
                     this.props.expansionAmount.calculateExpansion(props.viewRegion, this.getVisualizationWidth())
@@ -66,16 +63,17 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             visWidth: number): Promise<ViewExpansion>
         {
             const visData = this.props.expansionAmount.calculateExpansion(viewRegion, visWidth);
-            const secondaryGenome = this.getSecondaryGenomes(tracks)[0]; // Just the first one
-            if (!secondaryGenome) {
+            const secondaryGenomes = this.getSecondaryGenomes(tracks);
+            if (!secondaryGenomes) {
                 return visData;
             }
 
-            const alignmentCalculator = this._alignmentCalculatorForGenome.get(secondaryGenome);
             try {
-                const alignment = await alignmentCalculator.align(visData);
-                this.setState({ primaryView: alignment.primaryVisData });
-                return alignment.primaryVisData;
+                const alignment = await this._multialignmentCalculator.multiAlign(visData);
+                // All the primaryVisData in alignment should be the same:
+                const primaryVisData = await Object.values(alignment)[0].primaryVisData;
+                this.setState({ primaryView: primaryVisData });
+                return primaryVisData;
             } catch (error) {
                 console.error(error);
                 console.error("Falling back to nonaligned primary view");
@@ -84,15 +82,10 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             }
         }
 
-        fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): AlignmentPromises {
-            const secondaryGenomes = this.getSecondaryGenomes(tracks);
+        fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<MultiAlignment> {
             const visData = this.props.expansionAmount.calculateExpansion(viewRegion, this.getVisualizationWidth());
-            const alignmentForGenome: AlignmentPromises = {};
-            for (const genome of secondaryGenomes) {
-                const alignmentCalculator = this._alignmentCalculatorForGenome.get(genome);
-                alignmentForGenome[genome] = alignmentCalculator.align(visData);
-            }
-            return alignmentForGenome;
+            const alignmentCalculator = this._multialignmentCalculator;
+            return alignmentCalculator.multiAlign(visData);
         }
 
         async componentDidUpdate(prevProps: DataManagerProps) {
