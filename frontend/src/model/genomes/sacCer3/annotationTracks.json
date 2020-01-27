@@ -1,0 +1,21 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "sgdGene",
+            "label": "SGD genes",
+            "filetype": "geneAnnotation"
+        },
+        {
+            "name": "refGene",
+            "label": "NCBI RefSeq genes",
+            "filetype": "geneAnnotation"
+        }
+    ]
+}

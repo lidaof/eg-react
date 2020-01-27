@@ -14,6 +14,7 @@ import AraTha1 from "./araTha1/araTha1";
 import DM6 from "./dm6/dm6";
 import CE11 from "./ce11/ce11";
 import APLCAL3 from "./aplCal3/aplCal3";
+import SACCER3 from "./sacCer3/sacCer3";
 import { GenomeConfig } from "./GenomeConfig";
 
 /**
@@ -35,7 +36,8 @@ export const allGenomes = [
     GalGal5,
     DM6,
     CE11,
-    APLCAL3
+    APLCAL3,
+    SACCER3
 ];
 
 const genomeNameToConfig = {};
@@ -114,6 +116,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         logoUrl: "https://vizhub.wustl.edu/public/aplCal3/seaHare.png",
         assemblies: [APLCAL3.genome.getName()],
         color: "white"
+    },
+    yeast: {
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Yeast.png",
+        assemblies: [SACCER3.genome.getName()],
+        color: "black"
     }
 };
 

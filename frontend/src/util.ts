@@ -4,10 +4,10 @@
  * @author Silas Hsu
  */
 
-import parseColor from 'parse-color';
-import _ from 'lodash';
-import iwanthue from 'iwanthue';
-import * as THREE from 'three';
+import parseColor from "parse-color";
+import _ from "lodash";
+import iwanthue from "iwanthue";
+import * as THREE from "three";
 
 interface Coordinate {
     x: number;
@@ -73,14 +73,14 @@ export function getPageCoordinates(relativeTo: Element, relativeX: number, relat
 export function getContrastingColor(color: string): string {
     const parsedColor = parseColor(color);
     if (!parsedColor.rgb) {
-        return 'black';
+        return "black";
     }
     const [r, g, b] = parsedColor.rgb;
     const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     if (brightness < 0.5) {
-        return 'white';
+        return "white";
     } else {
-        return 'black';
+        return "black";
     }
 }
 
@@ -120,9 +120,9 @@ export function niceBpCount(bases: number, useMinus = false) {
         return `${rounded} bp`;
     } else {
         if (useMinus) {
-            return '<1 bp';
+            return "<1 bp";
         } else {
-            return '0 bp';
+            return "0 bp";
         }
     }
 }
@@ -155,12 +155,12 @@ export function findClosestNumber(arr: number[], num: number) {
 }
 
 export const HELP_LINKS = {
-    datahub: 'https://eg.readthedocs.io/en/latest/datahub.html',
-    numerical: 'https://eg.readthedocs.io/en/latest/tracks.html#numerical-tracks',
-    tracks: 'https://eg.readthedocs.io/en/latest/tracks.html',
-    localhub: 'https://eg.readthedocs.io/en/latest/local.html',
-    trackOptions: 'https://eg.readthedocs.io/en/latest/datahub.html#track-properties',
-    textTrack: 'https://eg.readthedocs.io/en/latest/text.html'
+    datahub: "https://eg.readthedocs.io/en/latest/datahub.html",
+    numerical: "https://eg.readthedocs.io/en/latest/tracks.html#numerical-tracks",
+    tracks: "https://eg.readthedocs.io/en/latest/tracks.html",
+    localhub: "https://eg.readthedocs.io/en/latest/local.html",
+    trackOptions: "https://eg.readthedocs.io/en/latest/datahub.html#track-properties",
+    textTrack: "https://eg.readthedocs.io/en/latest/text.html"
 };
 
 // /**
@@ -217,7 +217,7 @@ export const pcorr = (x: number[], y: number[]) => {
 export function getSecondaryGenomes(current: string, tracks: any[]) {
     const genomes: string[] = [];
     tracks.forEach(tk => {
-        if (tk.type === 'genomealign') {
+        if (tk.type === "genomealign") {
             if (tk.querygenome) {
                 genomes.push(tk.querygenome);
             }
@@ -230,7 +230,7 @@ export function getSecondaryGenomes(current: string, tracks: any[]) {
 }
 
 export function variableIsObject(obj: any) {
-    return obj !== null && obj !== undefined && obj.constructor.name === 'Object';
+    return obj !== null && obj !== undefined && obj.constructor.name === "Object";
 }
 
 function reformatData(data: any) {
@@ -245,12 +245,13 @@ function reformatData(data: any) {
 
 export function getSplines(data: any) {
     if (!data.length) {
-        console.error('error: data for splines is empty');
+        console.error("error: data for splines is empty");
         return null;
     }
     const splines = {};
     const palette = iwanthue(data.length * 2);
     data.forEach((dat: any, datIndex: number) => {
+        if (!dat) return;
         const formatted = reformatData(dat.data);
         Object.keys(formatted).forEach((key, keyIndex) => {
             const tubeData = formatted[key];
