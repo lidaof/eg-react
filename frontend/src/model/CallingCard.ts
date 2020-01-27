@@ -5,14 +5,14 @@ import BedRecord from '../dataSources/bed/BedRecord';
 enum CallingCardColumnIndex {
     VALUE=3,
     STRAND=4,
-    BARCODE=5
+    STRING=5
 };
 
 
 /**
  * A data container for a calling card.
  * 
- * @author Daofeng Li
+ * @author Daofeng Li and Arnav Moudgil
  */
 class CallingCard extends Feature {
     /*
@@ -25,13 +25,15 @@ class CallingCard extends Feature {
      * Constructs a new CallingCard, given a string from tabix
      *
      */
-    barcode: any;
+    string: any;
     value: number;
+    relativeX: number; // Store relative position of CallingCard in visualizer
+    relativeY: number; // Used to find nearest CallingCard to cursor for tooltip; also for downsampling
     constructor(bedRecord: BedRecord) {
         const locus = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
         super('', locus, bedRecord[CallingCardColumnIndex.STRAND]);
-        this.barcode = bedRecord[CallingCardColumnIndex.BARCODE]
         this.value = Number.parseFloat(bedRecord[CallingCardColumnIndex.VALUE]);
+        this.string = bedRecord[CallingCardColumnIndex.STRING];
     }
 }
 

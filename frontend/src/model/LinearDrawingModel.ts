@@ -94,11 +94,12 @@ class LinearDrawingModel {
      */
     baseSpanToXCenter(baseInterval: OpenInterval): OpenInterval {
         const span = this.baseSpanToXSpan(baseInterval);
-        const centerX = (span.start + span.end) / 2;
+        const centerX = Math.round((span.start + span.end) / 2);
         // const startX = this.baseToX(baseInterval.start);
         // const endX = this.baseToX(baseInterval.end);
         // const centerX = (startX + endX) / 2;
-        return new OpenInterval(centerX, centerX+1);
+        // Round centerx and return (centerX, centerX) to plot a single marker
+        return new OpenInterval(centerX, centerX);
     }
 
     /**

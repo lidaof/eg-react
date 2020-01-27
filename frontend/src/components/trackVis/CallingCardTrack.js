@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { scaleLinear } from 'd3-scale';
+import { scaleLinear, scaleLog } from 'd3-scale';
 import memoizeOne from 'memoize-one';
 import { notify } from 'react-notify-toast';
 import Track from './commonComponents/Track';
@@ -10,12 +10,18 @@ import GenomicCoordinates from './commonComponents/GenomicCoordinates';
 import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
 import { RenderTypes, DesignRenderer } from '../../art/DesignRenderer';
 import { ScaleChoices } from '../../model/ScaleChoices';
+import { LogChoices } from '../../model/LogChoices';
+import { DownsamplingChoices } from '../../model/DownsamplingChoices';
 import { FeatureAggregator } from '../../model/FeatureAggregator';
 
 export const DEFAULT_OPTIONS = {
     height: 40,
     color: "blue",
     yScale: ScaleChoices.AUTO,
+    logScale: LogChoices.AUTO,
+    show: "all",
+    sampleSize: 1000,
+    opacity: [100],
     yMax: 10,
     yMin: 0,
     markerSize: 3,
@@ -26,7 +32,7 @@ const TOP_PADDING = 5;
 /**
  * Track specialized in showing calling card data.
  * 
- * @author Silas Hsu and Daofeng Li
+ * @author Silas Hsu, Daofeng Li, and Arnav Moudgil
  */
 class CallingCardTrack extends React.PureComponent {
     static propTypes = Object.assign({}, Track.propsFromTrackContainer,
@@ -35,6 +41,11 @@ class CallingCardTrack extends React.PureComponent {
         options: PropTypes.shape({
             height: PropTypes.number.isRequired, // Height of the track
             color: PropTypes.string, // Color to draw circle
+            scaleType: PropTypes.any, // Unused for now
+            scaleRange: PropTypes.array, // Unused for now
+            logScale: PropTypes.string, // For log-scaling y-axis
+            opacity: PropTypes.array, // For track opacity
+            show: PropTypes.string, // For downsampling
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any, // If present, applies error styling
@@ -44,7 +55,7 @@ class CallingCardTrack extends React.PureComponent {
         super(props);
         this.xToValue = null;
         this.scales = null;
-        this.computeScales = memoizeOne(this.computeScales);
+        // this.computeScales = memoizeOne(this.computeScales); // for some reason computeScales doesn't work when memoized
         this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
         this.renderTooltip = this.renderTooltip.bind(this);
     }
@@ -56,7 +67,7 @@ class CallingCardTrack extends React.PureComponent {
     }
 
     computeScales(xToValue, height) {
-        const {yScale, yMin, yMax} = this.props.options;
+        const {yScale, yMin, yMax, logScale} = this.props.options;
         if (yMin > yMax) {
             notify.show('Y-axis min must less than max', 'error', 2000);
         }
@@ -70,8 +81,23 @@ class CallingCardTrack extends React.PureComponent {
         if (min > max) {
             min = max;
         }
+        // Define transformation function for log scaling
+        let transformer = null;
+        switch (logScale) {
+            case LogChoices.AUTO:
+                transformer = scaleLinear;
+                break;
+            case LogChoices.BASE10:
+                transformer = scaleLog;
+                // Set valid minimum value to one;
+                // after log-transforming, it will be zero
+                min = 1;
+                break;
+            default:
+                notify.show('Invalid logarithm base', 'error', 2000);
+        }
         return {
-            valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
+            valueToY: transformer().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
             min,
             max,
         };
@@ -81,48 +107,126 @@ class CallingCardTrack extends React.PureComponent {
      * Renders the default tooltip that is displayed on hover.
      * 
      * @param {number} relativeX - x coordinate of hover relative to the visualizer
+     * @param {number} relativeY - y coordinate of hover relative to the visualizer
      * @param {number} value - 
      * @return {JSX.Element} tooltip to render
      */
-    renderTooltip(relativeX) {
+    renderTooltip(relativeX, relativeY) {
         const {trackModel, viewRegion, width} = this.props;
-        const value = this.xToValue[Math.round(relativeX)];
-        const stringValue = value !== undefined && value.length > 0 ? this.formatCards(value) : '(no data)';
-        return (
-        <div>
-            <div className="Tooltip-minor-text">
-                <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
-            </div>
-            <div className="Tooltip-minor-text">{trackModel.getDisplayLabel()}</div>
-            <div className="Tooltip-minor-text">{stringValue}</div>
-        </div>
-        );
+        const {markerSize} = this.props.options;
+        // const radius = height * tooltipRadius;
+        var cards = [];
+        // Get nearest CallingCards to cursor along x-axis
+        for (let i = relativeX - markerSize; i <= relativeX + markerSize; i++) {
+            cards = cards.concat(this.xToValue[i]);
+        }
+        // Draw tooltip only if there are values near this x position
+        if (cards !== undefined && cards.length > 0) {
+            // Now find nearest CallingCards to the cursor along y-axis
+            const nearest = this.nearestCards(cards, relativeX, relativeY, markerSize);
+            if (nearest.length > 0) {
+                return (
+                    <div>
+                        <div className="Tooltip-minor-text">
+                            <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
+                        </div>
+                        <div className="Tooltip-minor-text">{trackModel.getDisplayLabel()}</div>
+                        <div className="Tooltip-minor-text">{this.formatCards(nearest)}</div>
+                    </div>
+                );
+            };
+        };
     }
 
     formatCards = (cards) => {
         const head = (<thead>
             <tr>
-              <th scope="col">Barcode</th>
-              <th scope="col">Count</th>
+              <th scope="col">Value</th>
+              <th scope="col">Strand</th>
+              <th scope="col">String</th>
             </tr>
           </thead>);
-        const rows = cards.slice(0, 10).map((card,i) => <tr key={i}><td>{card.barcode}</td><td>{card.value}</td></tr>);
+        const rows = cards.slice(0, 10).map((card,i) => <tr key={i}><td>{card.value}</td><td>{card.strand}</td><td>{card.string}</td></tr>);
         return <table className="table table-striped table-sm">{head}<tbody>{rows}</tbody></table>;
+    }
+
+    // Return closest calling cards to the cursor
+    nearestCards = (cards, relativeX, relativeY, radius) => {
+        const distances = cards.map((card) => Math.pow(relativeX - card.relativeX, 2) + Math.pow(relativeY - card.relativeY, 2));
+        // Avoid taking square roots if possible; compare to radius^2
+        const mindist = Math.min(...distances);
+        if (mindist < radius * radius) {
+            var returnCards = [];
+            for (var i = 0; i < distances.length; i++) {
+                if (Math.abs(distances[i]) === mindist) returnCards.push(cards[i]);
+            }
+            return returnCards;
+        } else {
+            return [];
+        };
+    }
+    
+    /**
+    * Shuffles array in place (Fisher-Yates algorithm)
+    * @param {Array} a items An array containing the items.
+    */
+    shuffleArray = (a) => {
+        var j, x, i;
+        for (i = a.length - 1; i > 0; i--) {
+            j = Math.floor(Math.random() * (i + 1));
+            x = a[i];
+            a[i] = a[j];
+            a[j] = x;
+        }
+        return a;
+    }
+ 
+    randomCards = (cards, n) => {
+        return this.shuffleArray(cards).slice(0, n);
+    }
+
+    downSample(xToValue, sampleSize) {
+        if (xToValue.length === 0) return [];
+        // Initialize return value
+        var sampled_xToValue = [];
+        sampled_xToValue.length = xToValue.length;
+        sampled_xToValue.fill([]);
+        // Draw random downsample
+        const randomSample = this.randomCards(xToValue.flat(), sampleSize);
+        for (let i = 0; i < randomSample.length; i++) {
+            var j = randomSample[i].relativeX;
+            sampled_xToValue[j] = sampled_xToValue[j].concat([randomSample[i]]);
+        }
+        return sampled_xToValue;
     }
 
     render() {
         const {data, viewRegion, width, trackModel, options, forceSvg} = this.props;
-        const {height, color, colorAboveMax, markerSize} = options;
+        const {height, color, colorAboveMax, markerSize, opacity, show, sampleSize} = options;
         this.xToValue = data.length > 0 ? this.aggregateFeatures(data, viewRegion, width) : [];
         this.scales = this.computeScales(this.xToValue, height);
+        // Set relative coordinates for each CallingCard (used for tooltip)
+        for (let i = 0; i < this.xToValue.length; i++) {
+            for (let j = 0; j < this.xToValue[i].length; j++) {
+                this.xToValue[i][j].relativeX = i;
+                this.xToValue[i][j].relativeY = this.scales.valueToY(this.xToValue[i][j].value);
+            }
+        }
+        // Downsample if necessary
+        if (show === DownsamplingChoices.SAMPLE && data.length > sampleSize) {
+            // Store original data structure
+            this.xToValueOriginal = this.xToValue;
+            // Set to the downsampled dataset
+            this.xToValue = this.downSample(this.xToValue, sampleSize);
+        }
         const legend = <TrackLegend
             trackModel={trackModel}
             height={height}
-            axisScale={this.scales.valueToY }
+            axisScale={this.scales.valueToY}
         />;
         const visualizer = 
         (
-            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} >
+            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip} useRelativeY={true} >
                 <CallingCardPlot
                     xToValue={this.xToValue}
                     scales={this.scales}
@@ -131,6 +235,9 @@ class CallingCardTrack extends React.PureComponent {
                     colorOut={colorAboveMax}
                     forceSvg={forceSvg}
                     markerSize={markerSize}
+                    alpha={opacity[0]/100}
+                    show={show}
+                    sampleSize={sampleSize}
                 />
             </HoverTooltipContext>
         );
@@ -149,6 +256,9 @@ class CallingCardPlot extends React.PureComponent {
         height: PropTypes.number.isRequired,
         color: PropTypes.string,
         markerSize: PropTypes.number,
+        alpha: PropTypes.number,
+        show: PropTypes.string,
+        sampleSize: PropTypes.number,
     }
 
     constructor(props) {
@@ -167,11 +277,11 @@ class CallingCardPlot extends React.PureComponent {
         if (value.length === 0) {
             return null;
         }
-        const {scales, color, markerSize} = this.props;
+        const {scales, color, markerSize, alpha} = this.props;
         return value.map((card,idx) => {
             const y = scales.valueToY(card.value);
             const key = `${x}-${idx}`;
-            return <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={color} strokeOpacity="0.5"/>;
+            return <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={color} strokeOpacity={alpha} />;
         });
         
     }
@@ -179,7 +289,7 @@ class CallingCardPlot extends React.PureComponent {
     render() {
         const {xToValue, height, forceSvg} = this.props;
         return <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} width={xToValue.length} height={height}>
-            {this.props.xToValue.map(this.renderPixel)}
+            {xToValue.map(this.renderPixel)}
         </DesignRenderer>
     }
 }
