@@ -5,7 +5,7 @@ import BedRecord from '../dataSources/bed/BedRecord';
 enum CallingCardColumnIndex {
     VALUE=3,
     STRAND=4,
-    STRING=5
+    ANNOTATION=5
 };
 
 
@@ -25,7 +25,7 @@ class CallingCard extends Feature {
      * Constructs a new CallingCard, given a string from tabix
      *
      */
-    string: any;
+    annotation: any;
     value: number;
     relativeX: number; // Store relative position of CallingCard in visualizer
     relativeY: number; // Used to find nearest CallingCard to cursor for tooltip; also for downsampling
@@ -33,7 +33,7 @@ class CallingCard extends Feature {
         const locus = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
         super('', locus, bedRecord[CallingCardColumnIndex.STRAND]);
         this.value = Number.parseFloat(bedRecord[CallingCardColumnIndex.VALUE]);
-        this.string = bedRecord[CallingCardColumnIndex.STRING];
+        this.annotation = bedRecord[CallingCardColumnIndex.ANNOTATION];
     }
 }
 

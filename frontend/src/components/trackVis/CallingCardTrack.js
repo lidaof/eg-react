@@ -143,10 +143,10 @@ class CallingCardTrack extends React.PureComponent {
             <tr>
               <th scope="col">Value</th>
               <th scope="col">Strand</th>
-              <th scope="col">String</th>
+              <th scope="col">Annotation</th>
             </tr>
           </thead>);
-        const rows = cards.slice(0, 10).map((card,i) => <tr key={i}><td>{card.value}</td><td>{card.strand}</td><td>{card.string}</td></tr>);
+        const rows = cards.slice(0, 10).map((card,i) => <tr key={i}><td>{card.value}</td><td>{card.strand}</td><td>{card.annotation}</td></tr>);
         return <table className="table table-striped table-sm">{head}<tbody>{rows}</tbody></table>;
     }
 
