@@ -1,52 +1,52 @@
-import Feature from "../Feature";
-import NavigationContext from "../NavigationContext";
-import ChromosomeInterval from "../interval/ChromosomeInterval";
-// import OpenInterval from '../interval/OpenInterval';
-// import TrackModel from '../TrackModel';
-import Chromosome from "./Chromosome";
-
-// export interface GenomeConfig {
-//     genome: Genome;
-//     navContext: NavigationContext;
-//     cytobands: any;
-//     defaultRegion: OpenInterval;
-//     defaultTracks: TrackModel[];
-//     twoBitUrl: string;
-// }
-
+import Feature from "../../model/Feature";
+import NavigationContext from "../../model/NavigationContext";
+import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
+import Chromosome from "../../model/genomes/Chromosome";
+import axios from "axios";
+import readFASTA from "fasta-to-object-parser";
 /**
  * A named set of chromosomes.
  *
- * @author Silas Hsu
+ * @author Daofeng Li
  */
-export class Genome {
-    private _name: string;
-    private _chromosomes: Chromosome[];
-    private _nameToChromosome: { [chrName: string]: Chromosome };
-
+class VirusGenome {
     /**
      * Makes a new instance, with name and list of chromosomes.  For best results, chromosomes should have unique names.
      *
      * @param {string} name - name of the genome
      * @param {Chromosome[]} chromosomes - list of chromosomes in the genome
      */
-    constructor(name: string, chromosomes: Chromosome[]) {
+    constructor(name, fastaUrl) {
         this._name = name;
-        this._chromosomes = chromosomes;
+        this.fastaUrl = fastaUrl;
+        this._fastaObject = null;
+        this._chromosomes = [];
         this._nameToChromosome = {};
-        for (const chromosome of chromosomes) {
-            const chrName = chromosome.getName();
-            if (this._nameToChromosome[chrName] !== undefined) {
-                console.warn(`Duplicate chromosome name "${chrName}" in genome "${name}"`);
-            }
-            this._nameToChromosome[chrName] = chromosome;
+    }
+
+    /**
+     * init the fasta sequence by async parse the data
+     */
+    async init() {
+        try {
+            const content = await axios.get(this.fastaUrl);
+            const fastaObj = readFASTA(content.data)[0];
+            this._fastaObject = fastaObj;
+            this._seq = fastaObj.sequence;
+            this._length = fastaObj.sequence.length;
+            this._description = fastaObj.description;
+            this._seqId = fastaObj.description.split(" ")[0];
+            this._chromosomes = [new Chromosome(this._seqId, this._length)];
+            this._nameToChromosome[this._seqId] = this._chromosomes[0];
+        } catch (error) {
+            console.error(error);
         }
     }
 
     /**
      * @return {string} this genome's name
      */
-    getName(): string {
+    getName() {
         return this._name;
     }
 
@@ -56,7 +56,7 @@ export class Genome {
      * @param {string} name - chromosome name to look up
      * @return {Chromosome} chromosome with the query name, or null if not found
      */
-    getChromosome(name: string): Chromosome {
+    getChromosome(name) {
         return this._nameToChromosome[name] || null;
     }
 
@@ -68,7 +68,7 @@ export class Genome {
      * @param {ChromosomeInterval} chrInterval - genomic location to intersect with the genome
      * @return {ChromosomeInterval} intersection result, or null if there is no overlap at all
      */
-    intersectInterval(chrInterval: ChromosomeInterval): ChromosomeInterval {
+    intersectInterval(chrInterval) {
         const chrName = chrInterval.chr;
         const matchingChr = this.getChromosome(chrName);
         if (!matchingChr) {
@@ -83,7 +83,7 @@ export class Genome {
      *
      * @return {NavigationContext} NavigationContext representing this genome
      */
-    makeNavContext(): NavigationContext {
+    makeNavContext() {
         const features = this._chromosomes.map(chr => {
             const name = chr.getName();
             return new Feature(name, new ChromosomeInterval(name, 0, chr.getLength()));
@@ -92,4 +92,4 @@ export class Genome {
     }
 }
 
-export default Genome;
+export default VirusGenome;
