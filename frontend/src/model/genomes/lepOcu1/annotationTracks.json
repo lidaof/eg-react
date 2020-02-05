@@ -1,0 +1,36 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "ensembl_gene",
+            "label": "ensembl genes",
+            "options": {
+                "categoryColors": {
+                    "coding": "rgb(0,60,179)",
+                    "nonCoding": "rgb(0,128,0)",
+                    "pseudogene": "rgb(230,0,172)",
+                    "problem": "rgb(255,0,0)",
+                    "polyA": "rgb(0,0,51)"
+                }
+            },
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://wangftp.wustl.edu/~xzhuo/lepOcu1/lepOcu1.bb",
+                "height": 30
+            }
+        ]
+    }
+}

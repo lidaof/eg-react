@@ -15,6 +15,7 @@ import DM6 from "./dm6/dm6";
 import CE11 from "./ce11/ce11";
 import APLCAL3 from "./aplCal3/aplCal3";
 import SACCER3 from "./sacCer3/sacCer3";
+import LEPOCU1 from "./lepOcu1/lepOcu1";
 import { GenomeConfig } from "./GenomeConfig";
 
 /**
@@ -37,6 +38,7 @@ export const allGenomes = [
     DM6,
     CE11,
     APLCAL3,
+    LEPOCU1,
     SACCER3
 ];
 
@@ -96,6 +98,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
         assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName()],
         color: "yellow"
+    },
+    "spotted Gar":{
+        logoUrl: "https://wangftp.wustl.edu/~xzhuo/lepOcu1/SpottedGar.png",
+        assemblies: [LEPOCU1.genome.getName()],
+        color: "white"
     },
     "fruit fly": {
         logoUrl: "https://epigenomegateway.wustl.edu/legacy/images/Fruit%20fly.png",

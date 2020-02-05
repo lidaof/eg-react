@@ -23,6 +23,15 @@
                 "height": 30
             }
         ]
-    }
+    },
+    "Genome Comparison": [
+        {
+            "name": "querylepOcu1 to danRer11",
+            "label": "spotted gar to zebrafish lastz ensembl",
+            "querygenome": "lepOcu1",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/lepOcu1/danRer11.lepocu1.gz"
+        }
+    ]
 }
         
