@@ -6,8 +6,9 @@ import { withTrackLegendWidth } from '../withTrackLegendWidth';
 import { TrackModel } from '../../model/TrackModel';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import { ViewExpansion, RegionExpander } from '../../model/RegionExpander';
-// import { GuaranteeMap } from '../../model/GuaranteeMap';
-import { MultiAlignmentViewCalculator, MultiAlignment } from '../../model/alignment/MultiAlignmentViewCalculator';
+import { GuaranteeMap } from '../../model/GuaranteeMap';
+import { AlignmentViewCalculator, Alignment } from '../../model/alignment/AlignmentViewCalculator';
+import { GenomeConfig } from 'model/genomes/GenomeConfig';
 
 interface DataManagerProps {
     genome: string; // The primary genome
@@ -16,15 +17,19 @@ interface DataManagerProps {
     legendWidth: number;
     containerWidth: number;
     expansionAmount: RegionExpander;
+    genomeConfig: GenomeConfig;
 }
 
 interface DataManagerState {
     primaryView: ViewExpansion;
 }
 
+export interface AlignmentPromises {
+    [genome: string]: Promise<Alignment>
+}
+
 interface WrappedComponentProps {
-    alignments: Promise<MultiAlignment>
-    // alignments: AlignmentPromises;
+    alignments: AlignmentPromises;
     basesPerPixel: number;
     primaryViewPromise: Promise<ViewExpansion>;
     primaryView: ViewExpansion;
@@ -33,16 +38,16 @@ interface WrappedComponentProps {
 export function withTrackView(WrappedComponent: React.ComponentType<WrappedComponentProps>) {
     class TrackViewManager extends React.Component<DataManagerProps, DataManagerState> {
         private _primaryGenome: string;
-        private _multialignmentCalculator: MultiAlignmentViewCalculator
+        private _alignmentCalculatorForGenome: GuaranteeMap<string, AlignmentViewCalculator>
 
         constructor(props: DataManagerProps) {
             super(props);
             this._primaryGenome = props.genome;
-            const queryGenomes = this.getSecondaryGenomes(props.tracks);
-            this._multialignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
-
+            this._alignmentCalculatorForGenome = new GuaranteeMap(
+                queryGenome => new AlignmentViewCalculator(props.genomeConfig, queryGenome)
+            );
             this.state = {
-                primaryView: 
+                primaryView:
                     this.props.expansionAmount.calculateExpansion(props.viewRegion, this.getVisualizationWidth())
             };
             this.fetchPrimaryView = memoizeOne(this.fetchPrimaryView);
@@ -60,20 +65,18 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
         }
 
         async fetchPrimaryView(viewRegion: DisplayedRegionModel, tracks: TrackModel[],
-            visWidth: number): Promise<ViewExpansion>
-        {
+            visWidth: number): Promise<ViewExpansion> {
             const visData = this.props.expansionAmount.calculateExpansion(viewRegion, visWidth);
-            const secondaryGenomes = this.getSecondaryGenomes(tracks);
-            if (!secondaryGenomes) {
+            const secondaryGenome = this.getSecondaryGenomes(tracks)[0]; // Just the first one
+            if (!secondaryGenome) {
                 return visData;
             }
 
+            const alignmentCalculator = this._alignmentCalculatorForGenome.get(secondaryGenome);
             try {
-                const alignment = await this._multialignmentCalculator.multiAlign(visData);
-                // All the primaryVisData in alignment should be the same:
-                const primaryVisData = Object.values(alignment).length ? Object.values(alignment)[0].primaryVisData: visData;
-                this.setState({ primaryView: primaryVisData });
-                return primaryVisData;
+                const alignment = await alignmentCalculator.align(visData);
+                this.setState({ primaryView: alignment.primaryVisData });
+                return alignment.primaryVisData;
             } catch (error) {
                 console.error(error);
                 console.error("Falling back to nonaligned primary view");
@@ -82,21 +85,25 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             }
         }
 
-        fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<MultiAlignment> {
+        fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): AlignmentPromises {
+            const secondaryGenomes = this.getSecondaryGenomes(tracks);
             const visData = this.props.expansionAmount.calculateExpansion(viewRegion, this.getVisualizationWidth());
-            const alignmentCalculator = this._multialignmentCalculator;
-            return alignmentCalculator.multiAlign(visData);
+            const alignmentForGenome: AlignmentPromises = {};
+            for (const genome of secondaryGenomes) {
+                const alignmentCalculator = this._alignmentCalculatorForGenome.get(genome);
+                alignmentForGenome[genome] = alignmentCalculator.align(visData);
+            }
+            return alignmentForGenome;
         }
 
         async componentDidUpdate(prevProps: DataManagerProps) {
             if (this.props.viewRegion !== prevProps.viewRegion ||
                 this.props.tracks !== prevProps.tracks ||
-                this.props.containerWidth !== prevProps.containerWidth)
-            {
+                this.props.containerWidth !== prevProps.containerWidth) {
                 const primaryView = await this.fetchPrimaryView(
                     this.props.viewRegion, this.props.tracks, this.getVisualizationWidth()
                 );
-                this.setState({primaryView});
+                this.setState({ primaryView });
             }
         }
 

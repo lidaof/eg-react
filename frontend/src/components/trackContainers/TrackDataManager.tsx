@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 
+import { AlignmentPromises } from './TrackViewManager';
 import { getTrackConfig } from '../trackConfig/getTrackConfig';
 import DataSource from '../../dataSources/DataSource';
 
@@ -9,7 +10,8 @@ import { TrackModel } from '../../model/TrackModel';
 import NavigationContext from '../../model/NavigationContext';
 import { GuaranteeMap } from '../../model/GuaranteeMap';
 import { ViewExpansion } from '../../model/RegionExpander';
-import { Alignment, MultiAlignment } from '../../model/alignment/MultiAlignmentViewCalculator';
+import { Alignment } from '../../model/alignment/AlignmentViewCalculator';
+
 interface TrackDataMap {
     [id: number]: TrackData
 }
@@ -19,7 +21,7 @@ interface DataManagerProps {
     tracks: TrackModel[]; // Tracks
     viewRegion: DisplayedRegionModel; // Region that the user requested
     basesPerPixel: number;
-    alignments: MultiAlignment;
+    alignments: AlignmentPromises;
     primaryViewPromise: Promise<ViewExpansion>;
 }
 
@@ -133,8 +135,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
                     const primaryView = await this.props.primaryViewPromise;
                     visRegion = primaryView.visRegion;
                 } else {
-                    const alignments = await this.props.alignments;
-                    alignment = alignments[genome];
+                    alignment = await this.props.alignments[genome];
                     visRegion = alignment.queryRegion;
                 }
 

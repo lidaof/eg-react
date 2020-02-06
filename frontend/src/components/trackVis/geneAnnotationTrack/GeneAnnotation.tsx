@@ -19,7 +19,7 @@ export const DEFAULT_OPTIONS = {
         pseudo: 'rgb(230,0,172)',
         problem: 'rgb(224,2,2)',
         polyA: 'rgb(237,127,2)',
-        other:'rgb(128,128,128)'
+        other: 'rgb(128,128,128)'
     },
     hiddenPixels: 0.5,
 }
@@ -27,7 +27,7 @@ export const DEFAULT_OPTIONS = {
 interface GeneDisplayOptions {
     color?: string;
     backgroundColor?: string;
-    categoryColors?: {[category: string]: string};
+    categoryColors?: { [category: string]: string };
 }
 
 interface GeneAnnotationProps {
@@ -74,7 +74,7 @@ export class GeneAnnotation extends React.Component<GeneAnnotationProps> {
         return placedSegments.map(placedSegment => {
             const x = placedSegment.xSpan.start;
             const width = Math.max(placedSegment.xSpan.getLength(), 3); // min 3 px for exon
-            return <rect key={x} x={x} y={(HEIGHT - height) / 2} width={width} height={height} fill={color} />;
+            return <rect key={x + width} x={x} y={(HEIGHT - height) / 2} width={width} height={height} fill={color} />;
         });
     }
 
@@ -87,13 +87,13 @@ export class GeneAnnotation extends React.Component<GeneAnnotationProps> {
         const placedGene = this.props.placedGene;
         const gene = placedGene.feature as Gene;
         const [xStart, xEnd] = placedGene.xSpan;
-        const {color, backgroundColor} = GeneAnnotation.getDrawColors(gene, this.props.options);
+        const { color, backgroundColor } = GeneAnnotation.getDrawColors(gene, this.props.options);
 
         const centerY = HEIGHT / 2;
         const centerLine = <line x1={xStart} y1={centerY} x2={xEnd} y2={centerY} stroke={color} strokeWidth={2} />;
 
         // Exons, which are split into translated and non-translated ones (i.e. utrs)
-        const {translated, utrs} = gene.getExonsAsFeatureSegments();
+        const { translated, utrs } = gene.getExonsAsFeatureSegments();
         const placedTranslated = FEATURE_PLACER.placeFeatureSegments(placedGene, translated);
         const placedUtrs = FEATURE_PLACER.placeFeatureSegments(placedGene, utrs);
         const exonRects = this._renderCenteredRects(placedTranslated, HEIGHT, color); // These are the translated exons
@@ -124,15 +124,15 @@ export class GeneAnnotation extends React.Component<GeneAnnotationProps> {
         const utrRects = this._renderCenteredRects(placedUtrs, UTR_HEIGHT, color);
 
         return (
-        <React.Fragment>
-            {centerLine}
-            {exonRects}
-            {exonClip}
-            {intronArrows}
-            {exonArrows}
-            {utrArrowCover}
-            {utrRects}
-        </React.Fragment>
+            <React.Fragment>
+                {centerLine}
+                {exonRects}
+                {exonClip}
+                {intronArrows}
+                {exonArrows}
+                {utrArrowCover}
+                {utrRects}
+            </React.Fragment>
         );
     }
 }

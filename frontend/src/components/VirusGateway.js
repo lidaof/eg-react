@@ -13,26 +13,55 @@ import TrackModel from "../model/TrackModel";
 const virusGateway = {
     "2019-nCov": {
         fullName: "2019 Novel Coronavirus",
-        fastaUrl: "https://wangftp.wustl.edu/~dli/virusGateway/MN985325.1",
-        tracks: [
-            new TrackModel({
-                type: "ruler",
-                name: "Ruler"
-            })
-        ]
-    },
-    sars: {
-        fullName: "SARS",
-        fastaUrl: "https://wangftp.wustl.edu/~dli/virusGateway/AP006561.1",
+        fastaUrl: "https://wangftp.wustl.edu/~dli/virusGateway/ncov_refGenome.fa",
         tracks: [
             new TrackModel({
                 type: "ruler",
                 name: "Ruler"
             }),
             new TrackModel({
-                type: "bed",
-                name: "Test",
-                url: "http://target.wustl.edu/sars/AP006561.1.bed.gz"
+                type: "refbed",
+                name: "ncbi genes",
+                url: "https://wangftp.wustl.edu/~dli/virusGateway/ncov_refGenome_annotations.gff3.refbed.gz"
+            })
+        ],
+        annotationTracks: {
+            Ruler: [
+                {
+                    type: "ruler",
+                    label: "Ruler",
+                    name: "Ruler"
+                }
+            ],
+            Genes: [
+                {
+                    type: "refbed",
+                    name: "ncbi genes",
+                    url: "https://wangftp.wustl.edu/~dli/virusGateway/ncov_refGenome_annotations.gff3.refbed.gz"
+                }
+            ],
+            "Genome Comparison": [
+                {
+                    name: "MN985325.1 genome alignment",
+                    querygenome: "MN985325",
+                    type: "genomealign",
+                    url: "https://wangftp.wustl.edu/~dli/virusGateway/MN985325.1.aligned.fa.genomealign.gz"
+                }
+            ]
+        }
+    },
+    sars: {
+        fullName: "SARS",
+        fastaUrl: "https://wangftp.wustl.edu/~dli/virusGateway/sars_refGenome.fa",
+        tracks: [
+            new TrackModel({
+                type: "ruler",
+                name: "Ruler"
+            }),
+            new TrackModel({
+                type: "refbed",
+                name: "ncbi genes",
+                url: "https://wangftp.wustl.edu/~dli/virusGateway/sars_refGenome_annotations.gff3.refbed.gz"
             })
         ]
     }
@@ -79,18 +108,31 @@ class VirusGateway extends React.Component {
                       name: "Ruler"
                   })
               ];
+        const annTracks = virusGateway[genome._name]
+            ? virusGateway[genome._name].annotationTracks
+            : {
+                  Ruler: [
+                      {
+                          type: "ruler",
+                          label: "Ruler",
+                          name: "Ruler"
+                      }
+                  ]
+              };
         const genomeConfig = {
             genome,
             navContext,
             defaultRegion,
             cytobands: {},
-            defaultTracks: []
+            defaultTracks: tracks,
+            annotationTracks: annTracks
         };
         this.props.onCustomVirusGenome(
             virus._name,
             virus._seqId,
             virus._seq,
-            tracks.filter(track => !track.fileObj).map(track => track.serialize())
+            tracks.filter(track => !track.fileObj).map(track => track.serialize()),
+            JSON.stringify(annTracks)
         );
         this.setState({ genomeConfig: { ...genomeConfig } });
     };
@@ -98,7 +140,7 @@ class VirusGateway extends React.Component {
     fillExample = () => {
         this.setState({
             customName: "custom-virus",
-            customURL: "https://wangftp.wustl.edu/~dli/virusGateway/MN985325.1"
+            customURL: "https://wangftp.wustl.edu/~dli/virusGateway/ncov_refGenome.fa"
         });
     };
 

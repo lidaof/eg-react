@@ -214,8 +214,8 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
         />;
     }
 
-    renderRoughAlignment(placement: PlacedMergedAlignment, 
-            plotReverse: boolean, roughHeight: number) {
+    renderRoughAlignment(placement: PlacedMergedAlignment,
+        plotReverse: boolean, roughHeight: number) {
         const { queryFeature, queryXSpan, segments, targetXSpan } = placement;
         const queryRectTopY = roughHeight - RECT_HEIGHT;
         const targetGenomeRect = <rect
@@ -225,7 +225,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
             height={RECT_HEIGHT}
             fill={this.props.options.primaryColor}
             // tslint:disable-next-line:jsx-no-lambda
-            onClick={() => alert("You clicked on " + queryFeature.getLocus().toString())}
+            onClick={() => console.log("You clicked on " + queryFeature.getLocus().toString())}
         />;
         const queryGenomeRect = <rect
             x={queryXSpan.start}
@@ -234,7 +234,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
             height={RECT_HEIGHT}
             fill={this.props.options.queryColor}
             // tslint:disable-next-line:jsx-no-lambda
-            onClick={() => alert("You clicked on " + queryFeature.getLocus().toString())}
+            onClick={() => console.log("You clicked on " + queryFeature.getLocus().toString())}
         />;
 
         const estimatedLabelWidth = queryFeature.toString().length * FONT_SIZE;
@@ -270,7 +270,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
                 fill={this.props.options.queryColor}
                 fillOpacity={0.5}
                 // tslint:disable-next-line:jsx-no-lambda
-                onClick={() => alert("You clicked on " + segment.record.getLocus())}
+                onClick={() => console.log("You clicked on " + segment.record.getLocus())}
             />;
         });
 
@@ -322,8 +322,8 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
             const drawGapText = alignment.drawGapText as GapText[];
             svgElements.push(...drawGapText.map(this.renderGapText));
             visualizer = <HoverTooltipContext tooltipRelativeY={hoverHeight} getTooltipContents={this.renderTooltip} >
-                        <svg width={width} height={drawheight} style={{ display: "block" }} >{svgElements}</svg>
-                    </HoverTooltipContext>;
+                <svg width={width} height={drawheight} style={{ display: "block" }} >{svgElements}</svg>
+            </HoverTooltipContext>;
         } else {
             drawheight = height;
             const drawData = alignment.drawData as PlacedMergedAlignment[];
@@ -340,7 +340,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
                 placement => placement.segments.map(segment => segment.queryXSpan));
             const queryXSpanArray = [].concat.apply([], queryXSpanArrayArray);
             const strand = alignment.plotStrand;
-            svgElements = drawData.map(placement => 
+            svgElements = drawData.map(placement =>
                 this.renderRoughAlignment(placement, strand === '-', height));
             const arrows = this.renderRoughStrand("+", 0, viewWindow, false);
             svgElements.push(arrows);
@@ -348,14 +348,14 @@ class GenomeAlignTrackWithoutOptions extends React.Component<PropsFromTrackConta
             const primaryArrows = this.renderRoughStrand(strand, height - RECT_HEIGHT, primaryViewWindow, true);
             svgElements.push(primaryArrows);
             visualizer = <HorizontalFragment
-                        height={height}
-                        rectHeight={RECT_HEIGHT}
-                        primaryColor={primaryColor}
-                        queryColor={queryColor}
-                        targetXSpanList={targetXSpanArray}
-                        queryXSpanList={queryXSpanArray}>
-                        <svg width={width} height={drawheight} style={{ display: "block" }} >{svgElements}</svg>
-                    </HorizontalFragment>;
+                height={height}
+                rectHeight={RECT_HEIGHT}
+                primaryColor={primaryColor}
+                queryColor={queryColor}
+                targetXSpanList={targetXSpanArray}
+                queryXSpanList={queryXSpanArray}>
+                <svg width={width} height={drawheight} style={{ display: "block" }} >{svgElements}</svg>
+            </HorizontalFragment>;
         }
 
         return <Track

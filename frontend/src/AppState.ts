@@ -184,8 +184,8 @@ export const ActionCreators = {
         };
     },
 
-    setCustomVirusGenome: (name: string, seqId: string, seq: string, tracks: any[]) => {
-        return { type: ActionType.SET_CUSTOM_VIRUS_GENOME, name, seqId, seq, tracks };
+    setCustomVirusGenome: (name: string, seqId: string, seq: string, tracks: any[], annTracks: any) => {
+        return { type: ActionType.SET_CUSTOM_VIRUS_GENOME, name, seqId, seq, tracks, annTracks };
     }
 };
 
@@ -279,6 +279,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             const navContext = genome.makeNavContext();
             const virusViewRegion = new DisplayedRegionModel(navContext);
             const defaultRegion = new OpenInterval(0, action.seq.length);
+            const annotationTracks = JSON.parse(action.annTracks);
             const virusGenomeConfig = {
                 genome,
                 navContext,
@@ -286,7 +287,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 cytobands: {},
                 defaultTracks: virusTracks,
                 twoBitURL: "",
-                fastaSeq: action.seq
+                fastaSeq: action.seq,
+                annotationTracks
             };
             return {
                 ...initialState,
