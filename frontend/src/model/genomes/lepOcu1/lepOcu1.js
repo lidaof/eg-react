@@ -9,7 +9,7 @@ import chromSize from "./chromSize.json";
 const allSize = chromSize.map(genom => new Chromosome(genom.chr, genom.size));
 const genome = new Genome("lepOcu1", allSize);
 const navContext = genome.makeNavContext();
-const defaultRegion = navContext.parse("CM001404.1:52425276-52425961");
+const defaultRegion = navContext.parse("CM001404.1:52254369-52596869");
 const defaultTracks = [
     new TrackModel({
         type: "ruler",
@@ -18,7 +18,7 @@ const defaultTracks = [
     new TrackModel({
         type: "refbed",
         name: "ensembl_gene",
-        url: "https://wangftp.wustl.edu/~xzhuo/lepOcu1/lepOcu1.refbed.gz",
+        url: "https://wangftp.wustl.edu/~xzhuo/lepOcu1/lepOcu1_Gene.bed.gz",
     }),
     new TrackModel({
         type: 'repeatmasker',

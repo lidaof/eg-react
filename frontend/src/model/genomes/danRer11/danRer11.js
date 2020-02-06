@@ -50,7 +50,7 @@ const defaultTracks = [
     new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
-        url: 'https://vizhub.wustl.edu/public/bosTau8/rmsk16.bb',
+        url: 'https://vizhub.wustl.edu/public/danRer11/rmsk16.bb',
     }),
 ];
 
