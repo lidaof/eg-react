@@ -20,44 +20,46 @@ import { RefBedTrackConfig } from "./RefBedTrackConfig";
 import { SnpTrackConfig } from "./SnpTrackConfig";
 import { MatplotTrackConfig } from "./MatplotTrackConfig";
 import { HammockTrackConfig } from "./HammockTrackConfig";
-import { PairwiseTrackConfig } from "./PairwiseTrackConfig";
+import { PairwiseSegmentTrackConfig } from "./PairwiseSegmentTrackConfig";
 import { G3dTrackConfig } from "./G3dTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 
 const TYPE_NAME_TO_CONFIG = {
-    bam: BamTrackConfig,
-    bed: BedTrackConfig,
-    callingcard: CallingCardTrackConfig,
-    categorical: CategoricalTrackConfig,
-    bedgraph: BedGraphTrackConfig,
-    bigbed: BigBedTrackConfig,
-    bigwig: BigWigTrackConfig,
-    hic: HicTrackConfig,
-    longrange: LongRangeTrackConfig,
-    biginteract: BigInteractTrackConfig,
-    cool: CoolTrackConfig,
-    geneannotation: GeneAnnotationTrackConfig,
-    refbed: RefBedTrackConfig,
-    methylc: MethylCTrackConfig,
-    repeatmasker: RepeatMaskerTrackConfig,
-    genomealign: GenomeAlignTrackConfig,
-    snp: SnpTrackConfig,
-    ruler: RulerTrackConfig,
-    matplot: MatplotTrackConfig,
-    hammock: HammockTrackConfig,
-    g3d: G3dTrackConfig,
-    pairwise: PairwiseTrackConfig
+  bam: BamTrackConfig,
+  bed: BedTrackConfig,
+  callingcard: CallingCardTrackConfig,
+  categorical: CategoricalTrackConfig,
+  bedgraph: BedGraphTrackConfig,
+  bigbed: BigBedTrackConfig,
+  bigwig: BigWigTrackConfig,
+  hic: HicTrackConfig,
+  longrange: LongRangeTrackConfig,
+  biginteract: BigInteractTrackConfig,
+  cool: CoolTrackConfig,
+  geneannotation: GeneAnnotationTrackConfig,
+  refbed: RefBedTrackConfig,
+  methylc: MethylCTrackConfig,
+  repeatmasker: RepeatMaskerTrackConfig,
+  genomealign: GenomeAlignTrackConfig,
+  snp: SnpTrackConfig,
+  ruler: RulerTrackConfig,
+  matplot: MatplotTrackConfig,
+  hammock: HammockTrackConfig,
+  g3d: G3dTrackConfig,
+  pairwise: PairwiseSegmentTrackConfig
 };
 const DefaultConfig = TrackConfig;
 
 if (process.env.NODE_ENV !== "production") {
-    // Check if all the subtypes are clean
-    for (const subtypeName in TYPE_NAME_TO_CONFIG) {
-        if (subtypeName.toLowerCase() !== subtypeName) {
-            throw new TypeError(`Type names may not contain uppercase letters.  Offender: "${subtypeName}"`);
-        }
+  // Check if all the subtypes are clean
+  for (const subtypeName in TYPE_NAME_TO_CONFIG) {
+    if (subtypeName.toLowerCase() !== subtypeName) {
+      throw new TypeError(
+        `Type names may not contain uppercase letters.  Offender: "${subtypeName}"`
+      );
     }
+  }
 }
 
 /**
@@ -68,12 +70,12 @@ if (process.env.NODE_ENV !== "production") {
  * @return {TrackConfig} renderer for that track model
  */
 export function getTrackConfig(trackModel: TrackModel): TrackConfig {
-    let type = trackModel.type || trackModel.filetype || "";
-    type = type.toLowerCase();
-    const TrackConfigSubtype = TYPE_NAME_TO_CONFIG[type];
-    if (TrackConfigSubtype) {
-        return new TrackConfigSubtype(trackModel);
-    } else {
-        return new DefaultConfig(trackModel);
-    }
+  let type = trackModel.type || trackModel.filetype || "";
+  type = type.toLowerCase();
+  const TrackConfigSubtype = TYPE_NAME_TO_CONFIG[type];
+  if (TrackConfigSubtype) {
+    return new TrackConfigSubtype(trackModel);
+  } else {
+    return new DefaultConfig(trackModel);
+  }
 }
