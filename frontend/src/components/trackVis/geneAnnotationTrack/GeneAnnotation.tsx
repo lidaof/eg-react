@@ -5,6 +5,7 @@ import AnnotationArrows from '../commonComponents/annotation/AnnotationArrows';
 
 import Gene from '../../../model/Gene';
 import { FeaturePlacer, PlacedFeature, PlacedSegment } from '../../../model/FeaturePlacer';
+import shortid from 'shortid';
 
 const FEATURE_PLACER = new FeaturePlacer();
 const HEIGHT = 9;
@@ -74,7 +75,7 @@ export class GeneAnnotation extends React.Component<GeneAnnotationProps> {
         return placedSegments.map(placedSegment => {
             const x = placedSegment.xSpan.start;
             const width = Math.max(placedSegment.xSpan.getLength(), 3); // min 3 px for exon
-            return <rect key={x + width} x={x} y={(HEIGHT - height) / 2} width={width} height={height} fill={color} />;
+            return <rect key={x + shortid.generate()} x={x} y={(HEIGHT - height) / 2} width={width} height={height} fill={color} />;
         });
     }
 

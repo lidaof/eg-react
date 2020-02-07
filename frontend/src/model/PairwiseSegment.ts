@@ -5,7 +5,7 @@ import BedRecord from "../dataSources/bed/BedRecord";
 const HEIGHT = 9;
 
 enum PairwiseSegmentColumnIndex {
-  SEGMENT = 3
+    SEGMENT = 3
 }
 
 /**
@@ -14,8 +14,8 @@ enum PairwiseSegmentColumnIndex {
  * @author Daofeng Li
  */
 class PairwiseSegment extends Feature {
-  static HEIGHT = HEIGHT;
-  /*
+    static HEIGHT = HEIGHT;
+    /*
     Input， strings like following
     NC_004718.3     3059    3060    deletion: A
     NC_004718.3     3060    3061    deletion: G
@@ -40,17 +40,13 @@ class PairwiseSegment extends Feature {
     }
      }
      */
-  segment: object;
-  constructor(bedRecord: BedRecord) {
-    const locus = new ChromosomeInterval(
-      bedRecord.chr,
-      bedRecord.start,
-      bedRecord.end
-    );
-    super("", locus, "+");
-    const content = bedRecord[PairwiseSegmentColumnIndex.SEGMENT].split(":");
-    this.segment = { [content[0].trim()]: content[1].trim() };
-  }
+    segment: object;
+    constructor(bedRecord: BedRecord) {
+        const locus = new ChromosomeInterval(bedRecord.chr, bedRecord.start, bedRecord.end);
+        super("", locus, "+");
+        const content = bedRecord[PairwiseSegmentColumnIndex.SEGMENT].split(":");
+        this.segment = { type: content[0].trim(), value: content[1].trim() };
+    }
 }
 
 export default PairwiseSegment;

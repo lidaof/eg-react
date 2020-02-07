@@ -3,7 +3,6 @@ import React from "react";
 import PairwiseAnnotation from "./PairwiseAnnotation";
 import { PropsFromTrackContainer } from "./commonComponents/Track";
 import AnnotationTrack from "./commonComponents/annotation/AnnotationTrack";
-import FeatureDetail from "./commonComponents/annotation/FeatureDetail";
 import Tooltip from "./commonComponents/tooltip/Tooltip";
 import {
   withTooltip,
@@ -16,9 +15,15 @@ import configOptionMerging from "./commonComponents/configOptionMerging";
 export const DEFAULT_OPTIONS = {
   hiddenPixels: 0,
   segmentColors: {
-    deletion: "black",
-    insertion: "pink",
-    mismatch: "orange"
+    deletion: "#bc8f8f",
+    insertion: "blue",
+    mismatch: {
+      A: '#89c738',
+      T: '#9238c7',
+      C: '#e05144',
+      G: '#3899c7',
+      N: '#858585'
+    }
   }
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
@@ -28,7 +33,7 @@ const ROW_HEIGHT = PairwiseAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
 
 interface PairwiseSegmentTrackProps
   extends PropsFromTrackContainer,
-    TooltipCallbacks {
+  TooltipCallbacks {
   data: Feature[];
   options: {
     segmentColors?: object;
@@ -42,7 +47,7 @@ interface PairwiseSegmentTrackProps
  */
 class PairwiseSegmentTrackNoTooltip extends React.Component<
   PairwiseSegmentTrackProps
-> {
+  > {
   static displayName = "PairwiseSegmentTrack";
 
   constructor(props: PairwiseSegmentTrackProps) {
@@ -64,7 +69,13 @@ class PairwiseSegmentTrackNoTooltip extends React.Component<
         pageY={event.pageY}
         onClose={this.props.onHideTooltip}
       >
-        <FeatureDetail feature={feature} />
+        <div>
+          <div>{feature.getLocus().toString()} </div>
+          <div>
+            {(feature as any).segment.type}: {(feature as any).segment.value}
+          </div>
+        </div>
+
       </Tooltip>
     );
     this.props.onShowTooltip(tooltip);
