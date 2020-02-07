@@ -115,6 +115,7 @@ class PairwiseSegmentTrackNoTooltip extends React.Component<
         {...this.props}
         rowHeight={ROW_HEIGHT}
         getAnnotationElement={this.renderAnnotation}
+        featurePadding={-1}
       />
     );
   }

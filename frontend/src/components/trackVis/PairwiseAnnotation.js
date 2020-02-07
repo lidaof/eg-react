@@ -3,8 +3,10 @@ import PropTypes from "prop-types";
 import { TranslatableG } from "../TranslatableG";
 import Feature from "../../model/Feature";
 import OpenInterval from "../../model/interval/OpenInterval";
+import BackgroundedText from "./commonComponents/BackgroundedText";
+import { getContrastingColor } from "../../util";
 
-const HEIGHT = 9;
+const HEIGHT = 19;
 
 /**
  * Visualizer for Feature objects.
@@ -19,7 +21,6 @@ class PairwiseAnnotation extends React.Component {
         xSpan: PropTypes.instanceOf(OpenInterval).isRequired, // x span the annotation will occupy
         y: PropTypes.number, // Y offset
         color: PropTypes.string, // Primary color to draw
-        reverseStrandColor: PropTypes.string, // Color of reverse strand annotations
         isMinimal: PropTypes.bool, // Whether to just render a plain box
         /**
          * Callback for click events.  Signature: (event: MouseEvent, feature: Feature): void
@@ -42,6 +43,7 @@ class PairwiseAnnotation extends React.Component {
         } else {
             drawColor = segmentColors[feature.segment.type];
         }
+        const contrastColor = getContrastingColor(drawColor);
         const [startX, endX] = xSpan;
         const width = endX - startX;
         if (width <= 0) {
@@ -57,9 +59,30 @@ class PairwiseAnnotation extends React.Component {
             );
         }
 
+        let label = null;
+        const estimatedLabelWidth = feature.segment.value.length * HEIGHT;
+        if (estimatedLabelWidth < 0.5 * width) {
+            const centerX = startX + 0.5 * width;
+            label = (
+                <BackgroundedText
+                    x={centerX}
+                    y={0}
+                    height={HEIGHT - 1}
+                    fill={contrastColor}
+                    dominantBaseline="hanging"
+                    textAnchor="middle"
+                    backgroundColor={drawColor}
+                    backgroundOpacity={1}
+                >
+                    {feature.segment.value}
+                </BackgroundedText>
+            );
+        }
+
         return (
             <TranslatableG y={y} onClick={event => onClick(event, feature)}>
                 {mainBody}
+                {label}
             </TranslatableG>
         );
     }
