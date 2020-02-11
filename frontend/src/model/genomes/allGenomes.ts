@@ -15,6 +15,10 @@ import DM6 from "./dm6/dm6";
 import CE11 from "./ce11/ce11";
 import APLCAL3 from "./aplCal3/aplCal3";
 import SACCER3 from "./sacCer3/sacCer3";
+import Ebola from "./virus/ebola";
+import SARS from "./virus/sars";
+import MERS from "./virus/mers";
+import COVID19 from "./virus/covid19";
 import { GenomeConfig } from "./GenomeConfig";
 
 /**
@@ -37,7 +41,11 @@ export const allGenomes = [
     DM6,
     CE11,
     APLCAL3,
-    SACCER3
+    SACCER3,
+    Ebola,
+    SARS,
+    MERS,
+    COVID19
 ];
 
 const genomeNameToConfig = {};
@@ -121,6 +129,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Yeast.png",
         assemblies: [SACCER3.genome.getName()],
         color: "black"
+    },
+    virus: {
+        logoUrl: "https://vizhub.wustl.edu/public/virus/virus.png",
+        assemblies: [COVID19.genome.getName(), MERS.genome.getName(), SARS.genome.getName(), Ebola.genome.getName()],
+        color: "yellow"
     }
 };
 
