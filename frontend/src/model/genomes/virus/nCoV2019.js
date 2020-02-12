@@ -2,16 +2,16 @@ import Chromosome from "../Chromosome";
 import Genome from "../Genome";
 import TrackModel from "../../TrackModel";
 
-const genome = new Genome("MERS", [new Chromosome("NC_019843.3", 30119)]);
+const genome = new Genome("nCoV2019", [new Chromosome("NC_045512.2", 29903)]);
 
 const navContext = genome.makeNavContext();
-const defaultRegion = navContext.parse("NC_019843.3:0-30119");
+const defaultRegion = navContext.parse("NC_045512.2:0-29903");
 const defaultTracks = [
   new TrackModel({
     type: "geneAnnotation",
     name: "ncbiGene",
     label: "NCBI genes",
-    genome: "MERS"
+    genome: "nCoV2019"
   }),
   new TrackModel({
     type: "ruler",
@@ -20,7 +20,7 @@ const defaultTracks = [
   new TrackModel({
     type: "bedgraph",
     name: "GC Percentage",
-    url: "https://vizhub.wustl.edu/public/virus/mers_CGpct.bedgraph.sort.gz"
+    url: "https://vizhub.wustl.edu/public/virus/ncov_CGpct.bedgraph.sort.gz"
   })
 ];
 
@@ -43,35 +43,35 @@ const annotationTracks = {
     {
       type: "bedgraph",
       name: "GC Percentage",
-      url: "https://vizhub.wustl.edu/public/virus/mers_CGpct.bedgraph.sort.gz"
+      url: "https://vizhub.wustl.edu/public/virus/ncov_CGpct.bedgraph.sort.gz"
     }
   ],
   "Genome Comparison": [
     {
-      name: "nCoV2019tomers",
-      label: "nCoV2019 to MERS alignment",
-      querygenome: "nCoV2019",
+      name: "merstonCoV2019",
+      label: "MERS to nCoV2019 alignment",
+      querygenome: "MERS",
       filetype: "genomealign",
-      url: "https://vizhub.wustl.edu/public/virus/mers_ncov.genomealign.gz"
+      url: "https://vizhub.wustl.edu/public/virus/ncov_mers.genomealign.gz"
     },
     {
-      name: "sarstomers",
-      label: "SARS to MERS alignment",
+      name: "sarstonCoV2019",
+      label: "SARS to nCoV2019 alignment",
       querygenome: "SARS",
       filetype: "genomealign",
-      url: "https://vizhub.wustl.edu/public/virus/mers_sars.genomealign.gz"
+      url: "https://vizhub.wustl.edu/public/virus/ncov_sars.genomealign.gz"
     }
   ]
 };
 
-const MERS = {
+const nCoV2019 = {
   genome: genome,
   navContext: navContext,
   cytobands: {},
   defaultRegion: defaultRegion,
   defaultTracks: defaultTracks,
-  twoBitURL: "https://vizhub.wustl.edu/public/virus/MERS.2bit",
+  twoBitURL: "https://vizhub.wustl.edu/public/virus/nCoV2019.2bit",
   annotationTracks
 };
 
-export default MERS;
+export default nCoV2019;
