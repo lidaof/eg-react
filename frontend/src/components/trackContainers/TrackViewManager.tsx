@@ -38,8 +38,8 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
         constructor(props: DataManagerProps) {
             super(props);
             this._primaryGenome = props.genome;
-            const queryGenomes = this.getSecondaryGenomes(props.tracks);
-            this._multialignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
+            // const queryGenomes = this.getSecondaryGenomes(props.tracks);
+            // this._multialignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
 
             this.state = {
                 primaryView: 
@@ -84,8 +84,11 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
 
         fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<MultiAlignment> {
             const visData = this.props.expansionAmount.calculateExpansion(viewRegion, this.getVisualizationWidth());
+            const queryGenomes = this.getSecondaryGenomes(this.props.tracks);
+            this._multialignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
             const alignmentCalculator = this._multialignmentCalculator;
-            return alignmentCalculator.multiAlign(visData);
+            const fetchedAlignment = alignmentCalculator.multiAlign(visData);
+            return fetchedAlignment;
         }
 
         async componentDidUpdate(prevProps: DataManagerProps) {
