@@ -19,6 +19,7 @@ import Ebola from "./virus/ebola";
 import SARS from "./virus/sars";
 import MERS from "./virus/mers";
 import nCoV2019 from "./virus/nCoV2019";
+import LEPOCU1 from "./lepOcu1/lepOcu1";
 import { GenomeConfig } from "./GenomeConfig";
 
 /**
@@ -45,7 +46,8 @@ export const allGenomes = [
   Ebola,
   SARS,
   MERS,
-  nCoV2019
+  nCoV2019,
+  LEPOCU1
 ];
 
 const genomeNameToConfig = {};
@@ -106,6 +108,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
     assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName()],
     color: "yellow"
+  },
+  "spotted Gar": {
+    logoUrl: "https://vizhub.wustl.edu/public/lepOcu1/SpottedGar.png",
+    assemblies: [LEPOCU1.genome.getName()],
+    color: "white"
   },
   "fruit fly": {
     logoUrl: "https://epigenomegateway.wustl.edu/legacy/images/Fruit%20fly.png",
