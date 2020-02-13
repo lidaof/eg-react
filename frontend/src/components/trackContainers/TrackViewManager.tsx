@@ -82,12 +82,12 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             }
         }
 
-        fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<MultiAlignment> {
+        async fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<MultiAlignment> {
             const visData = this.props.expansionAmount.calculateExpansion(viewRegion, this.getVisualizationWidth());
             const queryGenomes = this.getSecondaryGenomes(this.props.tracks);
             this._multialignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
             const alignmentCalculator = this._multialignmentCalculator;
-            const fetchedAlignment = alignmentCalculator.multiAlign(visData);
+            const fetchedAlignment = await alignmentCalculator.multiAlign(visData);
             return fetchedAlignment;
         }
 
