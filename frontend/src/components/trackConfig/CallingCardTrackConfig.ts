@@ -6,6 +6,7 @@ import { BedWorker } from '../../dataSources/WorkerTSHook';
 import LocalBedSource from '../../dataSources/LocalBedSource';
 import CallingCard from '../../model/CallingCard';
 import BedRecord from '../../dataSources/bed/BedRecord';
+import BedTextSource from "../../dataSources/BedTextSource";
 import HeightConfig from '../trackContextMenu/HeightConfig';
 import YscaleConfig from '../trackContextMenu/YscaleConfig';
 import LogScaleConfig from '../trackContextMenu/LogScaleConfig';
@@ -22,10 +23,18 @@ export class CallingCardTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
-        if (this.trackModel.files.length > 0) {
-            return new LocalBedSource(this.trackModel.files);
+        if (this.trackModel.isText) {
+            return new BedTextSource({
+                url: this.trackModel.url,
+                blob: this.trackModel.fileObj,
+                textConfig: this.trackModel.textConfig
+            });
         } else {
-            return new WorkerSource(BedWorker, this.trackModel.url);
+            if (this.trackModel.files.length > 0) {
+                return new LocalBedSource(this.trackModel.files);
+            } else {
+                return new WorkerSource(BedWorker, this.trackModel.url);
+            }
         }
     }
 

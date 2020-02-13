@@ -77,6 +77,20 @@ chr1    791044  793910  chr8:248210-251154,2    7       .`
 "chr5:1270279-1272416<->SV40:5172-5243"	TRUE	FALSE	NA	35	37.2369416773403
 "chr8:128109053-128110360<->chr8:129534833-129536039"	FALSE	FALSE	1425729.5	100	34.8639202860754
 "chr20:49345639-49354229<->chr20:50511129-50512012"	FALSE	FALSE	1161636.5	129	30.5556940820741`
+    },
+    callingcard: {
+        label: 'callingcard',
+        desc: 'Text file in CCF format, comprising 4-6 columns: chrom, start, end, value; and, optionally, strand and annotation',
+        example: `chr1    51441754        51441758        1       -       CTAGAGACTGGC
+chr1    51441754        51441758        21      -       CTTTCCTCCCCA
+chr1    51982564        51982568        3       +       CGCGATCGCGAC
+chr1    52196476        52196480        1       +       AGAATATCTTCA
+chr1    52341019        52341023        1       +       TACGAAACACTA
+chr1    59951043        59951047        1       +       ACAAGACCCCAA
+chr1    59951043        59951047        1       +       ACAAGAGAGACT
+chr1    61106283        61106287        1       -       ATGCACTACTTC
+chr1    61106283        61106287        7       -       CGTTTTTCACCT
+chr1    61542006        61542010        1       -       CTGAGAGACTGG`
     }
 };
 

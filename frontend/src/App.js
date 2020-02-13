@@ -322,6 +322,7 @@ class App extends React.Component {
                     highlightEnteredRegion={this.state.highlightEnteredRegion}
                     expansionAmount={REGION_EXPANDER}
                     suggestedMetaSets={this.state.suggestedMetaSets}
+                    genomeConfig={genomeConfig}
                 />
                 {!embeddingMode && <Footer />}
             </div>
@@ -330,3 +331,5 @@ class App extends React.Component {
 }
 
 export default withEnhancements(App);
+
+export const AppWithoutGenome = withAppState(App);

@@ -30,7 +30,7 @@ interface TrackLegendProps {
 // const NUM_TICKS_SUGGESTION = 2;
 const AXIS_WIDTH = 30;
 
-const mapStateToProps = (state: {browser: StateWithHistory<AppState>}) => {
+const mapStateToProps = (state: { browser: StateWithHistory<AppState> }) => {
     return {
         width: state.browser.present.trackLegendWidth
     };
@@ -60,7 +60,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
     }
 
     componentDidUpdate(nextProps: TrackLegendProps) {
-        if (this.props.axisScale !== nextProps.axisScale || 
+        if (this.props.axisScale !== nextProps.axisScale ||
             this.props.noShiftFirstAxisLabel !== nextProps.noShiftFirstAxisLabel) {
             this.drawAxis();
         }
@@ -72,7 +72,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
 
     drawAxis() {
         if (this.gNode && this.props.axisScale) {
-            while(this.gNode.hasChildNodes()) { // Believe it not, there's no function that removes all child nodes.
+            while (this.gNode.hasChildNodes()) { // Believe it not, there's no function that removes all child nodes.
                 (this.gNode.lastChild as Element).remove();
             }
 
@@ -82,35 +82,35 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             if (!axisDomain.includes(NaN)) {
                 axis.tickValues(axisDomain);
             }
-            const dy0 = this.props.axisScaleReverse || this.props.noShiftFirstAxisLabel ? "0.32em" : "-0.1em"; 
-            if(axisDomain[0] !== axisDomain[1]) {
+            const dy0 = this.props.axisScaleReverse || this.props.noShiftFirstAxisLabel ? "0.32em" : "-0.1em";
+            if (axisDomain[0] !== axisDomain[1]) {
                 select(this.gNode).append("g").call(axis);
-            }   
+            }
             select(this.gNode).selectAll("text")
-                .filter((d, i) => i === 0 ).attr("dy", "0.6em");
+                .filter((d, i) => i === 0).attr("dy", "0.6em");
             select(this.gNode).selectAll("text")
                 .filter((d, i) => i === 1).attr("dy", dy0);
             if (this.props.hideFirstAxisLabel) {
                 select(this.gNode).selectAll(".tick")
-                        .filter( (d, i) =>  i === 0 )
-                        .remove();
+                    .filter((d, i) => i === 0)
+                    .remove();
             }
             if (this.props.axisScaleReverse) {
                 const axis2 = axisLeft(this.props.axisScaleReverse);
                 // axis2.ticks(NUM_TICKS_SUGGESTION);
                 const axis2Domain = this.props.axisScaleReverse.domain();
-                if(!axis2Domain.includes(NaN)) {
+                if (!axis2Domain.includes(NaN)) {
                     axis2.tickValues(axis2Domain);
                 }
-                if(axis2Domain[0] !== axis2Domain[1]) {
+                if (axis2Domain[0] !== axis2Domain[1]) {
                     select(this.gNode).append("g")
                         .attr("transform", "translate(" + 0 + "," + this.props.height * 0.5 + ")")
                         .call(axis2).selectAll(".tick")
-                        .filter( d =>  d === 0 )
+                        .filter(d => d === 0)
                         .remove();
                 }
                 select(this.gNode).selectAll("text")
-                    .filter((d, i) => i === 2 ).attr("dy", "-0.1em");  
+                    .filter((d, i) => i === 2).attr("dy", "-0.1em");
             }
         }
     }
@@ -125,15 +125,15 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
 
     plotATCGLegend() {
         const divs = Object.entries(BASE_COLORS).map(base => {
-            return <div key={base[0]} 
-                style={{backgroundColor: base[1],color:"white"}}>{base[0]}</div>;
+            return <div key={base[0]}
+                style={{ backgroundColor: base[1], color: "white" }}>{base[0]}</div>;
         });
         return divs;
     }
 
     render() {
-        const {trackModel, width, height, axisScale, style, axisScaleReverse,
-            trackViewRegion, trackWidth, selectedRegion} = this.props;
+        const { trackModel, width, height, axisScale, style, axisScaleReverse,
+            trackViewRegion, trackWidth, selectedRegion } = this.props;
         if (height <= 0) {
             return null;
         }
@@ -153,49 +153,54 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
 
         let axis = null;
         if (axisScale) {
-            axis = <svg width={AXIS_WIDTH} height={axisHeight} style={{overflow: "visible"}} >
-                <TranslatableG innerRef={this.handleRef} x={AXIS_WIDTH-1} />
+            axis = <svg width={AXIS_WIDTH} height={axisHeight} style={{ overflow: "visible" }} >
+                <TranslatableG innerRef={this.handleRef} x={AXIS_WIDTH - 1} />
             </svg>;
         }
 
         const label = trackModel.getDisplayLabel();
         let plotLegend = false;
         let chromLabel = '';
-        if(trackModel.type === 'ruler') {
+        if (trackModel.type === 'ruler') {
             const drawModel = new LinearDrawingModel(trackViewRegion, trackWidth);
             if (drawModel.basesToXWidth(1) > Sequence.MIN_X_WIDTH_PER_BASE) {
                 plotLegend = true;
             } else {
                 plotLegend = false;
             }
-            const segments = selectedRegion.getFeatureSegments();
-            chromLabel = segments[0].feature.getName();
+            const segmentsAll = selectedRegion.getFeatureSegments();
+            // not showing Gap
+            const segments = segmentsAll.filter(s => s.feature.getName() !== 'Gap');
+            if (segments.length === 1) {
+                chromLabel = segments[0].feature.getName();
+            }
             if (segments.length > 1) {
                 chromLabel += `-${segments[segments.length - 1].feature.getName()}`;
             }
         }
         let labelList = null;
-        if(trackModel.type === 'matplot') {
-            const labels = trackModel.tracks.map((track,i) => {
+        if (trackModel.type === 'matplot') {
+            const labels = trackModel.tracks.map((track, i) => {
                 const color = track.options.color || 'blue';
-                return <div key={i} style={{color}}>{track.label}</div>;
+                return <div key={i} style={{ color }}>{track.label}</div>;
             });
             labelList = <div style={{
-                display: 'grid', gridTemplateColumns: 'auto', alignItems: 'end', fontSize: '10px'}}>
+                display: 'grid', gridTemplateColumns: 'auto', alignItems: 'end', fontSize: '10px'
+            }}>
                 {labels}</div>;
         }
         return (
-        <div style={divStyle} title={label}>
-            <p className="TrackLegend-label" style={pStyle} >{label}</p>
-            <div style={{display: "flex", alignItems: "center", fontSize: "12px"}}>
-                {plotLegend && this.plotATCGLegend()}</div>
+            <div style={divStyle} title={label}>
+                <p className="TrackLegend-label" style={pStyle} >{label}</p>
+                <div style={{ display: "flex", alignItems: "center", fontSize: "12px" }}>
+                    {plotLegend && this.plotATCGLegend()}</div>
                 {labelList}
-                <div style={{fontSize: "11px", alignSelf: "flex-end", backgroundColor: "white"}} 
-                        className="TrackLegend-chrLabel">
+                <div style={{ fontSize: "11px", alignSelf: "flex-end", backgroundColor: "white" }}
+                    className="TrackLegend-chrLabel">
                     {chromLabel}
                 </div>
-            {axis}
-        </div>
+                {axis}
+            </div>
         );
     }
 }
