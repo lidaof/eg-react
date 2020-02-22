@@ -22,6 +22,7 @@ import { MatplotTrackConfig } from "./MatplotTrackConfig";
 import { HammockTrackConfig } from "./HammockTrackConfig";
 import { PairwiseSegmentTrackConfig } from "./PairwiseSegmentTrackConfig";
 import { G3dTrackConfig } from "./G3dTrackConfig";
+import { ProteinTrackConfig } from "./ProteinTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 
@@ -47,7 +48,8 @@ const TYPE_NAME_TO_CONFIG = {
   matplot: MatplotTrackConfig,
   hammock: HammockTrackConfig,
   g3d: G3dTrackConfig,
-  pairwise: PairwiseSegmentTrackConfig
+  pairwise: PairwiseSegmentTrackConfig,
+  protein: ProteinTrackConfig
 };
 const DefaultConfig = TrackConfig;
 

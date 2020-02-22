@@ -66,8 +66,8 @@ class PairwiseAnnotation extends React.Component {
             label = (
                 <BackgroundedText
                     x={centerX}
-                    y={0}
-                    height={HEIGHT - 1}
+                    y={4}
+                    height={(HEIGHT - 3) / 2}
                     fill={contrastColor}
                     dominantBaseline="hanging"
                     textAnchor="middle"
