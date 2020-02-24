@@ -32,7 +32,8 @@ function mapStateToProps(state) {
         sessionFromUrl: state.browser.present.sessionFromUrl,
         trackLegendWidth: state.browser.present.trackLegendWidth,
         isShowingNavigator: state.browser.present.isShowingNavigator,
-        customTracksPool: state.browser.present.customTracksPool
+        customTracksPool: state.browser.present.customTracksPool,
+        virusBrowserMode: state.browser.present.virusBrowserMode
     };
 }
 
@@ -238,7 +239,8 @@ class App extends React.Component {
             onLegendWidthChange,
             isShowingNavigator,
             onToggleNavigator,
-            embeddingMode
+            embeddingMode,
+            virusBrowserMode
         } = this.props;
         if (sessionFromUrl) {
             return (
@@ -293,6 +295,7 @@ class App extends React.Component {
                     addTermToMetaSets={this.addTermToMetaSets}
                     embeddingMode={embeddingMode}
                     groupedTrackSets={groupedTrackSets}
+                    virusBrowserMode={virusBrowserMode}
                 />
                 <Notifications />
                 {isShowingNavigator && (

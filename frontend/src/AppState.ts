@@ -64,6 +64,7 @@ export interface AppState {
     isShowingNavigator: boolean;
     customTracksPool?: TrackModel[];
     genomeConfig?: object;
+    virusBrowserMode?: boolean;
 }
 
 const bundleId = uuid.v1();
@@ -96,7 +97,8 @@ enum ActionType {
     TOGGLE_NAVIGATOR = "TOGGLE_NAVIGATOR",
     SET_CUSTOM_TRACKS_POOL = "SET_CUSTOM_TRACKS_POOL",
     SET_TRACKS_CUSTOM_TRACKS_POOL = "SET_TRACKS_CUSTOM_TRACKS_POOL",
-    SET_CUSTOM_VIRUS_GENOME = "SET_CUSTOM_VIRUS_GENOME"
+    SET_CUSTOM_VIRUS_GENOME = "SET_CUSTOM_VIRUS_GENOME",
+    SET_VIRUS_BROWSER_MODE = "SET_VIRUS_BROWSER_MODE"
 }
 
 interface AppAction {
@@ -186,6 +188,10 @@ export const ActionCreators = {
 
     setCustomVirusGenome: (name: string, seqId: string, seq: string, tracks: any[], annTracks: any) => {
         return { type: ActionType.SET_CUSTOM_VIRUS_GENOME, name, seqId, seq, tracks, annTracks };
+    },
+
+    setVirusBrowserMode: () => {
+        return { type: ActionType.SET_VIRUS_BROWSER_MODE };
     }
 };
 
@@ -237,6 +243,11 @@ function getInitialState(): AppState {
             newState = getNextState(newState as AppState, {
                 type: ActionType.SET_VIEW_REGION,
                 ...interval
+            });
+        }
+        if (query.virusBrowserMode) {
+            newState = getNextState(newState as AppState, {
+                type: ActionType.SET_VIRUS_BROWSER_MODE
             });
         }
         return (newState as AppState) || (state as AppState);
@@ -342,6 +353,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             };
         case ActionType.SET_CUSTOM_TRACKS_POOL:
             return { ...prevState, customTracksPool: action.customTracksPool };
+        case ActionType.SET_VIRUS_BROWSER_MODE:
+            return {
+                ...prevState,
+                virusBrowserMode: true
+            };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);
