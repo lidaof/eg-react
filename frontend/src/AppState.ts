@@ -246,7 +246,7 @@ function getInitialState(): AppState {
             });
         }
         if (query.virusBrowserMode) {
-            newState = getNextState(newState as AppState, {
+            newState = getNextState(state, {
                 type: ActionType.SET_VIRUS_BROWSER_MODE
             });
         }
