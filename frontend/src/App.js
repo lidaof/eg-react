@@ -303,7 +303,12 @@ class App extends React.Component {
                 )}
                 {this.state.isShowing3D && (
                     <ErrorBoundary>
-                        <BrowserScene viewRegion={viewRegion} tracks={tracks} expansionAmount={REGION_EXPANDER} />
+                        <BrowserScene
+                            viewRegion={viewRegion}
+                            tracks={tracks}
+                            expansionAmount={REGION_EXPANDER}
+                            genomeConfig={genomeConfig}
+                        />
                     </ErrorBoundary>
                 )}
                 <Offline>
