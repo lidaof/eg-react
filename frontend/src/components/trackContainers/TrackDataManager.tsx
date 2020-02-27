@@ -13,6 +13,7 @@ import {
   Alignment,
   MultiAlignment
 } from "../../model/alignment/MultiAlignmentViewCalculator";
+import { GenomeConfig } from "../../model/genomes/GenomeConfig";
 interface TrackDataMap {
   [id: number]: TrackData;
 }
@@ -24,6 +25,7 @@ interface DataManagerProps {
   basesPerPixel: number;
   alignments: MultiAlignment;
   primaryViewPromise: Promise<ViewExpansion>;
+  genomeConfig: GenomeConfig;
 }
 
 export interface TrackData {
@@ -49,13 +51,15 @@ export function withTrackData(
   return class TrackDataManager extends React.Component<
     DataManagerProps,
     TrackDataMap
-  > {
+    > {
     private _dataSourceManager: DataSourceManager;
     private _primaryGenome: string;
+    private _primaryGenomeConfig: GenomeConfig;
 
     constructor(props: DataManagerProps) {
       super(props);
       this._primaryGenome = props.genome;
+      this._primaryGenomeConfig = props.genomeConfig;
       this._dataSourceManager = new DataSourceManager();
       this.state = {};
     }

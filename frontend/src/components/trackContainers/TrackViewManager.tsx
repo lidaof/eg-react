@@ -11,7 +11,7 @@ import {
   MultiAlignmentViewCalculator,
   MultiAlignment
 } from "../../model/alignment/MultiAlignmentViewCalculator";
-import { GenomeConfig } from "model/genomes/GenomeConfig";
+import { GenomeConfig } from "../../model/genomes/GenomeConfig";
 
 interface DataManagerProps {
   genome: string; // The primary genome
@@ -41,17 +41,17 @@ export function withTrackView(
   class TrackViewManager extends React.Component<
     DataManagerProps,
     DataManagerState
-  > {
+    > {
     private _primaryGenome: string;
     private _primaryGenomeConfig: GenomeConfig;
-    private _multialignmentCalculator: MultiAlignmentViewCalculator;
+    private _multiAlignmentCalculator: MultiAlignmentViewCalculator;
 
     constructor(props: DataManagerProps) {
       super(props);
       this._primaryGenome = props.genome;
       this._primaryGenomeConfig = props.genomeConfig;
       // const queryGenomes = this.getSecondaryGenomes(props.tracks);
-      // this._multialignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
+      // this._multiAlignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
 
       this.state = {
         primaryView: this.props.expansionAmount.calculateExpansion(
@@ -90,7 +90,7 @@ export function withTrackView(
       }
 
       try {
-        const alignment = await this._multialignmentCalculator.multiAlign(
+        const alignment = await this._multiAlignmentCalculator.multiAlign(
           visData
         );
         // All the primaryVisData in alignment should be the same:
@@ -116,11 +116,11 @@ export function withTrackView(
         this.getVisualizationWidth()
       );
       const queryGenomes = this.getSecondaryGenomes(this.props.tracks);
-      this._multialignmentCalculator = new MultiAlignmentViewCalculator(
+      this._multiAlignmentCalculator = new MultiAlignmentViewCalculator(
         this._primaryGenomeConfig,
         queryGenomes
       );
-      const alignmentCalculator = this._multialignmentCalculator;
+      const alignmentCalculator = this._multiAlignmentCalculator;
       const fetchedAlignment = alignmentCalculator.multiAlign(visData);
       return fetchedAlignment;
     }
