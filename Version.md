@@ -1,5 +1,11 @@
 # Version History
 
+## 50.4.0
+
+-   added 4 virus genomes for aiding virus research
+-   global URL parameter `virusBrowserMode` added
+-   VR freeze issue fixed
+
 ## 50.3.6
 
 -   added sea hare genome (aplCal3) by Xiaoyu
