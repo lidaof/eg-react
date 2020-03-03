@@ -144,8 +144,8 @@ export class NumericalArrayFeature extends Feature {
      * @param {number[]} values - value to attach to this instance.
      * @return {this}
      */
-    withValues(values: number[]): this {
-        this.values = [...values];
+    withValues(values: readonly number[]): this {
+        this.values = values.slice();
         return this;
     }
 }

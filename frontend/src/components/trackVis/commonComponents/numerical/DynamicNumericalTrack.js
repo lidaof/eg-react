@@ -1,13 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
-import { scaleLinear } from "d3-scale";
 import memoizeOne from "memoize-one";
-import { notify } from "react-notify-toast";
 import Smooth from "array-smooth";
 import Track from "../Track";
 import TrackLegend from "../TrackLegend";
-import GenomicCoordinates from "../GenomicCoordinates";
 import HoverTooltipContext from "../tooltip/HoverTooltipContext";
 import configOptionMerging from "../configOptionMerging";
 
@@ -18,16 +15,8 @@ import { ScaleChoices } from "../../../../model/ScaleChoices";
 
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN,
-    displayMode: NumericalDisplayModes.AUTO,
-    height: 40,
-    color: "blue",
-    colorAboveMax: "red",
-    color2: "darkorange",
-    color2BelowMin: "darkgreen",
-    yScale: ScaleChoices.AUTO,
-    yMax: 10,
-    yMin: 0,
-    smooth: 0
+    height: 80,
+    color: "blue"
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -52,10 +41,8 @@ class DynamicNumericalTrack extends React.PureComponent {
         unit: PropTypes.string, // Unit to display after the number in tooltips
         options: PropTypes.shape({
             aggregateMethod: PropTypes.oneOf(Object.values(DefaultAggregators.types)),
-            displayMode: PropTypes.oneOf(Object.values(NumericalDisplayModes)).isRequired,
             height: PropTypes.number.isRequired, // Height of the track
-            scaleType: PropTypes.any, // Unused for now
-            scaleRange: PropTypes.array, // Unused for now
+
             color: PropTypes.string // Color to draw bars, if using the default getBarElement
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
@@ -65,13 +52,8 @@ class DynamicNumericalTrack extends React.PureComponent {
     constructor(props) {
         super(props);
         this.xToValue = null;
-        this.xToValue2 = null;
-        this.scales = null;
-        this.hasReverse = false;
 
         this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
-        this.computeScales = memoizeOne(this.computeScales);
-        this.renderTooltip = this.renderTooltip.bind(this);
     }
 
     aggregateFeatures(data, viewRegion, width, aggregatorId) {
@@ -80,116 +62,8 @@ class DynamicNumericalTrack extends React.PureComponent {
         return xToFeatures.map(DefaultAggregators.fromId(aggregatorId));
     }
 
-    computeScales(xToValue, xToValue2, height) {
-        const { yScale, yMin, yMax } = this.props.options;
-        if (yMin > yMax) {
-            notify.show("Y-axis min must less than max", "error", 2000);
-        }
-        /*
-        All tracks get `PropsFromTrackContainer` (see `Track.ts`).
-
-        `props.viewWindow` contains the range of x that is visible when no dragging.  
-            It comes directly from the `ViewExpansion` object from `RegionExpander.ts`
-        */
-        const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
-        let max = _.max(visibleValues) || 0; // in case undefined returned here, cause maxboth be undefined too
-        const xValues2 = this.xToValue2.filter(x => x);
-        let min =
-            (xValues2.length ? _.min(xToValue2.slice(this.props.viewWindow.start, this.props.viewWindow.end)) : 0) || 0;
-        const maxBoth = Math.max(Math.abs(max), Math.abs(min));
-        max = maxBoth;
-        min = xValues2.length ? -maxBoth : 0;
-        if (yScale === ScaleChoices.FIXED) {
-            max = yMax ? yMax : max;
-            min = yMin ? yMin : min;
-        }
-        if (min > max) {
-            min = max;
-        }
-        if (xValues2.length) {
-            return {
-                valueToY: scaleLinear()
-                    .domain([max, 0])
-                    .range([TOP_PADDING, height * 0.5])
-                    .clamp(true),
-                valueToYReverse: scaleLinear()
-                    .domain([0, min])
-                    .range([0, height * 0.5 - TOP_PADDING])
-                    .clamp(true),
-                valueToOpacity: scaleLinear()
-                    .domain([0, max])
-                    .range([0, 1])
-                    .clamp(true),
-                valueToOpacityReverse: scaleLinear()
-                    .domain([0, min])
-                    .range([0, 1])
-                    .clamp(true),
-                min,
-                max
-            };
-        } else {
-            return {
-                valueToY: scaleLinear()
-                    .domain([max, min])
-                    .range([TOP_PADDING, height])
-                    .clamp(true),
-                valueToOpacity: scaleLinear()
-                    .domain([min, max])
-                    .range([0, 1])
-                    .clamp(true),
-                min,
-                max
-            };
-        }
-    }
-
-    getEffectiveDisplayMode() {
-        const { displayMode, height } = this.props.options;
-        if (displayMode === NumericalDisplayModes.AUTO) {
-            return height < AUTO_HEATMAP_THRESHOLD ? NumericalDisplayModes.HEATMAP : NumericalDisplayModes.BAR;
-        } else {
-            return displayMode;
-        }
-    }
-
-    /**
-     * Renders the default tooltip that is displayed on hover.
-     *
-     * @param {number} relativeX - x coordinate of hover relative to the visualizer
-     * @param {number} value -
-     * @return {JSX.Element} tooltip to render
-     */
-    renderTooltip(relativeX) {
-        const { trackModel, viewRegion, width, unit } = this.props;
-        const value = this.xToValue[Math.round(relativeX)];
-        const value2 = this.hasReverse ? this.xToValue2[Math.round(relativeX)] : null;
-        const stringValue = typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : "(no data)";
-        const stringValue2 = typeof value2 === "number" && !Number.isNaN(value2) ? value2.toFixed(2) : "(no data)";
-        return (
-            <div>
-                <div>
-                    <span className="Tooltip-major-text" style={{ marginRight: 3 }}>
-                        {this.hasReverse && "Forward: "} {stringValue}
-                    </span>
-                    {unit && <span className="Tooltip-minor-text">{unit}</span>}
-                </div>
-                {this.hasReverse && (
-                    <div>
-                        <span className="Tooltip-major-text" style={{ marginRight: 3 }}>
-                            Reverse: {stringValue2}
-                        </span>
-                        {unit && <span className="Tooltip-minor-text">{unit}</span>}
-                    </div>
-                )}
-                <div className="Tooltip-minor-text">
-                    <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
-                </div>
-                <div className="Tooltip-minor-text">{trackModel.getDisplayLabel()}</div>
-            </div>
-        );
-    }
-
     render() {
+        console.log(this.props);
         const { data, viewRegion, width, trackModel, unit, options, forceSvg } = this.props;
         const { height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin, smooth } = options;
         const halfHeight = height * 0.5;
