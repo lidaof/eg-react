@@ -4,6 +4,7 @@ import DisplayedRegionModel from './DisplayedRegionModel';
 import { FeaturePlacer } from './FeaturePlacer';
 
 const VALUE_PROP_NAME = 'value';
+const VALUES_PROP_NAME = 'values';
 /**
  * Available aggregators.  Note: SUM, MEAN, MIN, and MAX requires each record to have a `value` prop.
  */
@@ -13,6 +14,7 @@ export const AggregatorTypes = {
     COUNT: "COUNT", // Counts records
     MIN: "MIN", // Computes value of min record
     MAX: "MAX", // Computes value of max record
+    MEAN_ARRAY: "MEAN_ARRAY", //computers average of each element in the array from multiple arrays
 };
 
 const aggregateFunctions = {};
@@ -26,6 +28,22 @@ aggregateFunctions[AggregatorTypes.MIN] = (records: any[]) =>
     _.minBy(records, VALUE_PROP_NAME)[VALUE_PROP_NAME] || null;
 aggregateFunctions[AggregatorTypes.MAX] = (records: any[]) => 
     _.maxBy(records, VALUE_PROP_NAME)[VALUE_PROP_NAME] || null;
+
+aggregateFunctions[AggregatorTypes.MEAN_ARRAY] = ( (records: any[]) => {
+    const valuesArray = records.map(record => record[VALUES_PROP_NAME]);
+    const maxLen = _.max(valuesArray.map(v => v.length));
+    const results = Array(valuesArray.length).fill(null);
+    let i = 0, j = 0;
+    for (; i< valuesArray.length; i++){
+        let tmp = []
+        for(; j< maxLen; j++) {
+            if(j <= valuesArray[i].length)
+            tmp.push(valuesArray[j][i])
+        }
+        results[i] = tmp.slice();
+    }
+    return results.map(v => _.mean(v));
+});
 
 export const DefaultAggregators = {
     types: AggregatorTypes,
