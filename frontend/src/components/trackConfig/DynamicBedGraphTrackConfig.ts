@@ -1,4 +1,4 @@
-import { NumericalTrackConfig } from "./NumericalTrackConfig";
+import { TrackConfig } from "./TrackConfig";
 import DynamicNumericalTrack from "../trackVis/commonComponents/numerical/DynamicNumericalTrack";
 
 import WorkerSource from "../../dataSources/worker/WorkerSource";
@@ -11,7 +11,7 @@ import BedTextSource from "../../dataSources/BedTextSource";
 
 const VALUE_COLUMN_INDEX = 3;
 
-export class DynamicBedGraphTrackConfig extends NumericalTrackConfig {
+export class DynamicBedGraphTrackConfig extends TrackConfig {
     initDataSource() {
         if (this.trackModel.isText) {
             return new BedTextSource({
