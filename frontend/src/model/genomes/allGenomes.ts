@@ -20,6 +20,12 @@ import SARS from "./virus/sars";
 import MERS from "./virus/mers";
 import nCoV2019 from "./virus/nCoV2019";
 import LEPOCU1 from "./lepOcu1/lepOcu1";
+import panTro4 from "./panTro4/panTro4";
+import gorGor3 from "./gorGor3/gorGor3";
+import nomLeu3 from "./nomLeu3/nomLeu3";
+import papAnu2 from "./papAnu2/papAnu2";
+import rheMac3 from "./rheMac3/rheMac3";
+import calJac3 from "./calJac3/calJac3";
 import { GenomeConfig } from "./GenomeConfig";
 
 /**
@@ -47,7 +53,13 @@ export const allGenomes = [
   SARS,
   MERS,
   nCoV2019,
-  LEPOCU1
+  LEPOCU1,
+  panTro4,
+  gorGor3,
+  nomLeu3,
+  papAnu2,
+  rheMac3,
+  calJac3
 ];
 
 const genomeNameToConfig = {};
@@ -76,13 +88,33 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   chimp: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
-    assemblies: [PANTRO5.genome.getName()],
+    assemblies: [PANTRO5.genome.getName(), panTro4.genome.getName()],
     color: "white"
+  },
+  gorilla: {
+    logoUrl: "",
+    assemblies: [gorGor3.genome.getName()],
+    color: "red"
+  },
+  gibbon: {
+    logoUrl: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/nomLeu3/nomleu.jpg",
+    assemblies: [nomLeu3.genome.getName()],
+    color: "red"
+  },
+  baboon: {
+    logoUrl: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/papanu.jpg",
+    assemblies: [papAnu2.genome.getName()],
+    color: "red"
   },
   rhesus: {
     logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
-    assemblies: [RheMac8.genome.getName()],
+    assemblies: [RheMac8.genome.getName(), rheMac3.genome.getName()],
     color: "yellow"
+  },
+  marmoset: {
+    logoUrl: "",
+    assemblies: [calJac3.genome.getName()],
+    color: "red"
   },
   cow: {
     logoUrl: "https://vizhub.wustl.edu/public/bosTau8/Cow.png",

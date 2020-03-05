@@ -1,0 +1,36 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "ensembl",
+            "label": "Ensembl genes",
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/gorGor3/gorGor3_rmsk.bb",
+                "height": 30
+            }
+        ]
+    },
+    "Genome Comparison": [
+        {
+            "name": "hg19togorGor3",
+            "label": "Human hg19 to gorGor3 blastz",
+            "querygenome": "hg19",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/gorGor3/gorGor3_hg19.gz"
+        }
+    ]
+}

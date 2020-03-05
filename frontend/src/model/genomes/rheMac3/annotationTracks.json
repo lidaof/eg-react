@@ -1,0 +1,36 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "refGene",
+            "label": "RefSeq genes",
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/rheMac3/rheMac3_rmsk.bb",
+                "height": 30
+            }
+        ]
+    },
+    "Genome Comparison": [
+        {
+            "name": "hg19torheMac3",
+            "label": "Human hg19 to rheMac3 blastz",
+            "querygenome": "hg19",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/rheMac3/rheMac3_hg19.gz"
+        }
+    ]
+}
