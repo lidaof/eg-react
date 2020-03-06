@@ -17,13 +17,21 @@ import withCurrentGenome from "../withCurrentGenome";
 import { withTrackData } from "../trackContainers/TrackDataManager";
 import { withTrackView } from "../trackContainers/TrackViewManager";
 import withAutoDimensions from "components/withAutoDimensions";
+// import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 
 const COMPONENT_FOR_TRACK_TYPE = {
     bigwig: NumericalTrack3D,
     bedgraph: NumericalTrack3D
 };
+
 const withHicData = configStaticDataSource(props => new HicSource(props.trackModel.url, props.genomeConfig.genome));
 const InteractionTrack = withCurrentGenome(withHicData(InteractionTrack3D));
+
+// const withInteractionData = configStaticDataSource(props => {
+//     const trackConfig = getTrackConfig(props.trackModel);
+//     return trackConfig.initDataSource();
+// });
+// const InteractionTrack = withCurrentGenome(withInteractionData(InteractionTrack3D));
 
 const TRACK_SEPARATION = 1; // In meters
 const TRACK_WIDTH = 100;
@@ -97,7 +105,7 @@ class BrowserSceneBasic extends React.PureComponent {
 
         const numNormalTracks = tracksAndRulers.length;
         for (let trackModel of tracks) {
-            if (trackModel.type === "hic") {
+            if (trackModel.type === "hic" || trackModel.type === "longrange") {
                 tracksAndRulers.push(
                     <React.Fragment key={trackModel.getId()}>
                         <InteractionTrack

@@ -19,7 +19,7 @@ export const DEFAULT_OPTIONS = {
     backgroundColor: 0xffffff
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
-const TOP_PADDING = 2;
+export const TOP_PADDING = 2;
 
 /**
  * Track specialized in showing animations of numerical data array.
