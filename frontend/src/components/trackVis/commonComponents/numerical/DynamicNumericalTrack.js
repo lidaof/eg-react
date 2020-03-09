@@ -9,8 +9,10 @@ import configOptionMerging from "../configOptionMerging";
 
 import { FeatureAggregator, DefaultAggregators } from "../../../../model/FeatureAggregator";
 
-import { Graphics } from "pixi.js";
-import { PixiComponent, Stage, AppConsumer } from "@inlet/react-pixi";
+// import { Graphics } from "pixi.js";
+// import { PixiComponent, Stage, AppConsumer } from "@inlet/react-pixi";
+
+import { PixiScene } from "./PixiScene";
 
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN_ARRAY,
@@ -80,7 +82,7 @@ class DynamicNumericalTrack extends React.PureComponent {
         this.scales = this.computeScales(this.xToValue, height);
         const legend = <TrackLegend trackModel={trackModel} height={height} axisLegend={unit} />;
         const visualizer = (
-            <PiXiApp
+            <PixiScene
                 xToValue={this.xToValue}
                 scales={this.scales}
                 width={width}
@@ -101,75 +103,75 @@ class DynamicNumericalTrack extends React.PureComponent {
     }
 }
 
-const Rectangle = PixiComponent("Rectangle", {
-    create: props => new Graphics(),
-    applyProps: (instance, _, props) => {
-        const { x, y, width, height, fill } = props;
-        instance.clear();
-        instance.beginFill(fill);
-        instance.drawRect(x, y, width, height);
-        instance.endFill();
-    }
-});
+// const Rectangle = PixiComponent("Rectangle", {
+//     create: props => new Graphics(),
+//     applyProps: (instance, _, props) => {
+//         const { x, y, width, height, fill } = props;
+//         instance.clear();
+//         instance.beginFill(fill);
+//         instance.drawRect(x, y, width, height);
+//         instance.endFill();
+//     }
+// });
 
-class PixiPlot extends React.PureComponent {
-    static propTypes = {
-        xToValue: PropTypes.array.isRequired,
-        scales: PropTypes.object.isRequired,
-        height: PropTypes.number.isRequired,
-        width: PropTypes.number.isRequired,
-        currentIndex: PropTypes.number.isRequired,
-        color: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        backgroundColor: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-    };
+// class PixiPlot extends React.PureComponent {
+//     static propTypes = {
+//         xToValue: PropTypes.array.isRequired,
+//         scales: PropTypes.object.isRequired,
+//         height: PropTypes.number.isRequired,
+//         width: PropTypes.number.isRequired,
+//         currentIndex: PropTypes.number.isRequired,
+//         color: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+//         backgroundColor: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+//     };
 
-    constructor(props) {
-        super(props);
-        this.renderPixel = this.renderPixel.bind(this);
-        this.state = {
-            currentIndex: 0
-        };
-        this.count = 0;
-        this.count2 = 0;
-    }
+//     constructor(props) {
+//         super(props);
+//         this.renderPixel = this.renderPixel.bind(this);
+//         this.state = {
+//             currentIndex: 0
+//         };
+//         this.count = 0;
+//         this.count2 = 0;
+//     }
 
-    componentDidMount() {
-        this.props.app.ticker.add(this.tick);
-    }
+//     componentDidMount() {
+//         this.props.app.ticker.add(this.tick);
+//     }
 
-    componentWillUnmount() {
-        this.props.app.ticker.remove(this.tick);
-    }
+//     componentWillUnmount() {
+//         this.props.app.ticker.remove(this.tick);
+//     }
 
-    renderPixel(value, x) {
-        if (Number.isNaN(value[0])) {
-            return null;
-        }
-        const { scales, color } = this.props;
-        const drawHeight = scales.valueToY(value[this.state.currentIndex]);
-        return <Rectangle key={x} x={x} y={TOP_PADDING} width={1} height={drawHeight} fill={color} />;
-    }
-    tick = delta => {
-        this.count += 0.05;
-        if (this.count > 9) {
-            this.count = 0;
-        }
-        this.setState({ currentIndex: Math.round(this.count) });
-    };
+//     renderPixel(value, x) {
+//         if (Number.isNaN(value[0])) {
+//             return null;
+//         }
+//         const { scales, color } = this.props;
+//         const drawHeight = scales.valueToY(value[this.state.currentIndex]);
+//         return <Rectangle key={x} x={x} y={TOP_PADDING} width={1} height={drawHeight} fill={color} />;
+//     }
+//     tick = delta => {
+//         this.count += 0.05;
+//         if (this.count > 9) {
+//             this.count = 0;
+//         }
+//         this.setState({ currentIndex: Math.round(this.count) });
+//     };
 
-    render() {
-        const { xToValue } = this.props;
-        return xToValue.map(this.renderPixel);
-    }
-}
+//     render() {
+//         const { xToValue } = this.props;
+//         return xToValue.map(this.renderPixel);
+//     }
+// }
 
-const PiXiApp = props => {
-    const { height, width, backgroundColor } = props;
-    return (
-        <Stage width={width} height={height} options={{ backgroundColor }}>
-            <AppConsumer>{app => <PixiPlot app={app} {...props} />}</AppConsumer>
-        </Stage>
-    );
-};
+// const PiXiApp = props => {
+//     const { height, width, backgroundColor } = props;
+//     return (
+//         <Stage width={width} height={height} options={{ backgroundColor }}>
+//             <AppConsumer>{app => <PixiPlot app={app} {...props} />}</AppConsumer>
+//         </Stage>
+//     );
+// };
 
 export default withDefaultOptions(DynamicNumericalTrack);
