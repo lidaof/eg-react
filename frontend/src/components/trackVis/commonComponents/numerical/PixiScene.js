@@ -7,6 +7,7 @@ export class PixiScene extends React.PureComponent {
         super(props);
         this.myRef = React.createRef();
         this.container = null;
+        this.particles = null;
         this.app = null;
         this.state = {
             currentIndex: 0
@@ -20,7 +21,13 @@ export class PixiScene extends React.PureComponent {
         this.container = this.myRef.current;
         const { height, width, backgroundColor } = this.props;
         this.app = new PIXI.Application({ width, height, backgroundColor });
-        // this.particles = new PIXI.ParticleContainer();
+        this.particles = new PIXI.ParticleContainer(width, {
+            scale: true,
+            position: true,
+            rotation: true,
+            uvs: true,
+            alpha: true
+        });
         this.container.appendChild(this.app.view);
         this.app.ticker.add(this.tick);
         // this.g = new PIXI.Graphics();
@@ -32,16 +39,17 @@ export class PixiScene extends React.PureComponent {
         g.beginFill(this.props.color, 1);
         g.drawRect(0, 0, 1, 1);
         g.endFill();
-        const t = PIXI.RenderTexture.create(g.width, g.height);
+        // const t = PIXI.RenderTexture.create(g.width, g.height);
+        const t = this.app.renderer.generateTexture(g);
         this.app.renderer.render(g, t);
         for (let i = 0; i < width; i++) {
             // this.graphics.push(new PIXI.Graphics());
             const s = new PIXI.Sprite(t);
             this.sprites.push(s);
-            // this.particles.addChild(s);
-            this.app.stage.addChild(s);
+            this.particles.addChild(s);
+            // this.app.stage.addChild(s);
         }
-        // this.app.stage.addChild(this.particles);
+        this.app.stage.addChild(this.particles);
     }
 
     componentWillUnmount() {
