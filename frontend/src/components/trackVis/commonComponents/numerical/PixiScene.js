@@ -12,27 +12,47 @@ export class PixiScene extends React.PureComponent {
             currentIndex: 0
         };
         this.count = 0;
+        // this.graphics = [];
+        this.sprites = [];
     }
 
     componentDidMount() {
         this.container = this.myRef.current;
         const { height, width, backgroundColor } = this.props;
         this.app = new PIXI.Application({ width, height, backgroundColor });
+        // this.particles = new PIXI.ParticleContainer();
         this.container.appendChild(this.app.view);
         this.app.ticker.add(this.tick);
-        this.g = new PIXI.Graphics();
-        this.app.stage.addChild(this.g);
+        // this.g = new PIXI.Graphics();
+        // this.app.stage.addChild(this.g);
+        // this.graphics.forEach(g => this.app.stage.addChild(g));
+        // this.draw();
+        const g = new PIXI.Graphics();
+        g.lineStyle(0);
+        g.beginFill(this.props.color, 1);
+        g.drawRect(0, 0, 1, 1);
+        g.endFill();
+        const t = PIXI.RenderTexture.create(g.width, g.height);
+        this.app.renderer.render(g, t);
+        for (let i = 0; i < width; i++) {
+            // this.graphics.push(new PIXI.Graphics());
+            const s = new PIXI.Sprite(t);
+            this.sprites.push(s);
+            // this.particles.addChild(s);
+            this.app.stage.addChild(s);
+        }
+        // this.app.stage.addChild(this.particles);
     }
 
     componentWillUnmount() {
         this.app.ticker.remove(this.tick);
     }
 
-    // componentDidUpdate(prevProps, prevState) {
-    //     if (prevProps.xToValue !== this.props.prevProps || prevState.currentIndex !== this.state.currentIndex) {
-    //         this.draw();
-    //     }
-    // }
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.xToValue !== this.props.prevProps || prevState.currentIndex !== this.state.currentIndex) {
+            this.draw();
+        }
+    }
 
     tick = () => {
         this.count += 0.05;
@@ -43,18 +63,22 @@ export class PixiScene extends React.PureComponent {
     };
 
     draw = () => {
-        this.g.lineStyle(0);
-        const { scales, color, backgroundColor, height } = this.props;
+        const { scales } = this.props;
+        // this.graphics.forEach(g => g.clear());
+        this.sprites.forEach(s => s.scale.set(0));
         this.props.xToValue.forEach((value, x) => {
             if (Number.isNaN(value[0])) {
                 return;
             }
             const drawHeight = scales.valueToY(value[this.state.currentIndex]);
-            this.g.beginFill(backgroundColor, 0);
-            this.g.drawRect(x, TOP_PADDING, 1, height);
-            this.g.beginFill(color, 1);
-            this.g.drawRect(x, TOP_PADDING, 1, drawHeight);
-            this.g.endFill();
+            // const g = this.graphics[x];
+            // g.lineStyle(0);
+            // g.beginFill(color, 1);
+            // g.drawRect(x, TOP_PADDING, 1, drawHeight);
+            // g.endFill();
+            const s = this.sprites[x];
+            s.position.set(x, TOP_PADDING);
+            s.scale.set(1, drawHeight);
         });
     };
 
