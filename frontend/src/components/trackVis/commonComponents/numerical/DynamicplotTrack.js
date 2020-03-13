@@ -190,7 +190,7 @@ class LinePlot extends React.PureComponent {
      */
     renderLine(values, trackIndex) {
         const { scales, trackModel, lineWidth } = this.props;
-        // eslint-disable-next-line array-callback-return
+        /* eslint-disable array-callback-return */
         const points = values
             .map((value, x) => {
                 if (value && !Number.isNaN(value)) {
@@ -199,6 +199,7 @@ class LinePlot extends React.PureComponent {
                 }
             })
             .filter(value => value); // removes null from original
+        /* eslint-enable array-callback-return */
         const color = trackModel.tracks[trackIndex].options.color || "blue";
         return (
             <polyline key={trackIndex} points={points.join(" ")} stroke={color} strokeWidth={lineWidth} fill="none" />
