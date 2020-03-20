@@ -5,6 +5,8 @@
 -   added 4 virus genomes for aiding virus research
 -   global URL parameter `virusBrowserMode` added
 -   VR freeze issue fixed
+-   VR mode supports `longrange` track type now, thanks Silas for the help
+-   certain public hubs added to 2019-nCoV by Changxu Fan
 
 ## 50.3.6
 

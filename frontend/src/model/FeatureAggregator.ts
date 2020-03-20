@@ -28,8 +28,23 @@ aggregateFunctions[AggregatorTypes.MIN] = (records: any[]) =>
 aggregateFunctions[AggregatorTypes.MAX] = (records: any[]) =>
     _.maxBy(records, VALUE_PROP_NAME)[VALUE_PROP_NAME] || null;
 
-aggregateFunctions[AggregatorTypes.MEAN_ARRAY] = (records: any[]) => {
-    const valuesArray = records.map(record => record[VALUES_PROP_NAME]);
+aggregateFunctions[AggregatorTypes.MEAN_ARRAY] = (records: any[]) =>
+    calMeanOfArrays(records, VALUES_PROP_NAME) || [null];
+/**
+ * calculate mean value of each array elements and save to a new array
+ * [
+ *  [1,2,3],
+ *  [4,5,6]
+ * ]
+ * to
+ * [2.5, 3.5, 4.5]
+ * missing number is any position is filled with 0 in original array
+ *
+ * @param records array of value objest, data stored in values property
+ * @param dataKeyName default to `values`
+ */
+export function calMeanOfArrays(records: any[], dataKeyName: string) {
+    const valuesArray = records.map(record => record[dataKeyName]);
     const maxLen = _.max(valuesArray.map(v => v.length));
     let i, j, tmp;
     const results = Array(maxLen).fill(null);
@@ -44,8 +59,8 @@ aggregateFunctions[AggregatorTypes.MEAN_ARRAY] = (records: any[]) => {
         }
         results[i] = tmp.slice();
     }
-    return results.map(v => _.mean(v)) || [null];
-};
+    return results.map(v => _.mean(v));
+}
 
 export const DefaultAggregators = {
     types: AggregatorTypes,

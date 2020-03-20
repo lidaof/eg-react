@@ -60,21 +60,21 @@ const annotationTracks = {
             querygenome: "SARS",
             filetype: "genomealign",
             url: "https://vizhub.wustl.edu/public/virus/ncov_sars.genomealign.gz"
-        },
-        {
-            name: "pangolinCoVtonCoV2019",
-            label: "pangolin CoV to nCoV2019 alignment",
-            querygenome: "pangolin",
-            filetype: "genomealign",
-            url: "https://wangftp.wustl.edu/~dli/virusGateway/nCoV-pangolin.fa.genomealign1.gz"
-        },
-        {
-            name: "batCoVtonCoV2019",
-            label: "bat CoV to nCoV2019 alignment",
-            querygenome: "bat",
-            filetype: "genomealign",
-            url: "https://wangftp.wustl.edu/~dli/virusGateway/nCoV-RaTG13.fa.genomealign1.gz"
         }
+        // {
+        //     name: "pangolinCoVtonCoV2019",
+        //     label: "pangolin CoV to nCoV2019 alignment",
+        //     querygenome: "pangolin",
+        //     filetype: "genomealign",
+        //     url: "https://wangftp.wustl.edu/~dli/virusGateway/nCoV-pangolin.fa.genomealign1.gz"
+        // },
+        // {
+        //     name: "batCoVtonCoV2019",
+        //     label: "bat CoV to nCoV2019 alignment",
+        //     querygenome: "bat",
+        //     filetype: "genomealign",
+        //     url: "https://wangftp.wustl.edu/~dli/virusGateway/nCoV-RaTG13.fa.genomealign1.gz"
+        // }
     ]
 };
 

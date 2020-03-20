@@ -1,5 +1,5 @@
 import { TrackConfig } from "./TrackConfig";
-import DynamicNumericalTrack from "../trackVis/commonComponents/numerical/DynamicNumericalTrack";
+import DynamicNumericalTrack, { DEFAULT_OPTIONS } from "../trackVis/commonComponents/numerical/DynamicNumericalTrack";
 
 import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { BedWorker } from "../../dataSources/WorkerTSHook";
@@ -8,10 +8,19 @@ import { NumericalArrayFeature } from "../../model/Feature";
 import BedRecord from "../../dataSources/bed/BedRecord";
 import LocalBedSource from "../../dataSources/LocalBedSource";
 import BedTextSource from "../../dataSources/BedTextSource";
+import LabelConfig from "components/trackContextMenu/LabelConfig";
+import PlayingConfig from "components/trackContextMenu/PlayingConfig";
+import HeightConfig from "components/trackContextMenu/HeightConfig";
+import { BackgroundColorConfig, PrimaryColorConfig } from "components/trackContextMenu/ColorConfig";
+import TrackModel from "model/TrackModel";
 
 const VALUE_COLUMN_INDEX = 3;
 
 export class DynamicBedGraphTrackConfig extends TrackConfig {
+    constructor(trackModel: TrackModel) {
+        super(trackModel);
+        this.setDefaultOptions(DEFAULT_OPTIONS);
+    }
     initDataSource() {
         if (this.trackModel.isText) {
             return new BedTextSource({
@@ -51,5 +60,11 @@ export class DynamicBedGraphTrackConfig extends TrackConfig {
 
     getComponent() {
         return DynamicNumericalTrack;
+    }
+
+    getMenuComponents() {
+        const items = [LabelConfig, PlayingConfig, HeightConfig, PrimaryColorConfig, BackgroundColorConfig];
+
+        return items;
     }
 }

@@ -8,6 +8,7 @@ import parseColor from "parse-color";
 import _ from "lodash";
 import iwanthue from "iwanthue";
 import * as THREE from "three";
+import rgba from "color-rgba";
 
 interface Coordinate {
     x: number;
@@ -271,4 +272,9 @@ export function getTubeMesh(spline: any, color: any) {
     const material = new THREE.MeshBasicMaterial({ color });
     const mesh = new THREE.Mesh(geometry, material);
     return mesh;
+}
+
+export function colorString2number(color: string): number {
+    const [r, g, b] = rgba(color); //alpha not spreaded
+    return (r << 16) + (g << 8) + b;
 }

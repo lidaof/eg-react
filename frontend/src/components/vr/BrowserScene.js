@@ -8,7 +8,7 @@ import { NumericalTrack3D } from "./NumericalTrack3D";
 import { InteractionTrack3D } from "./InteractionTrack3D";
 
 import { configStaticDataSource } from "../trackConfig/configDataFetch";
-import { HicSource } from "../../dataSources/HicSource";
+// import { HicSource } from "../../dataSources/HicSource";
 
 import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import TrackModel from "../../model/TrackModel";
@@ -17,21 +17,27 @@ import withCurrentGenome from "../withCurrentGenome";
 import { withTrackData } from "../trackContainers/TrackDataManager";
 import { withTrackView } from "../trackContainers/TrackViewManager";
 import withAutoDimensions from "components/withAutoDimensions";
-// import { getTrackConfig } from "components/trackConfig/getTrackConfig";
+import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 
 const COMPONENT_FOR_TRACK_TYPE = {
     bigwig: NumericalTrack3D,
     bedgraph: NumericalTrack3D
 };
 
-const withHicData = configStaticDataSource(props => new HicSource(props.trackModel.url, props.genomeConfig.genome));
-const InteractionTrack = withCurrentGenome(withHicData(InteractionTrack3D));
+// const withHicData = configStaticDataSource(props => new HicSource(props.trackModel.url, props.genomeConfig.genome));
+// const InteractionTrack = withCurrentGenome(withHicData(InteractionTrack3D));
 
-// const withInteractionData = configStaticDataSource(props => {
-//     const trackConfig = getTrackConfig(props.trackModel);
-//     return trackConfig.initDataSource();
-// });
-// const InteractionTrack = withCurrentGenome(withInteractionData(InteractionTrack3D));
+const withInteractionData = configStaticDataSource(
+    props => {
+        const trackConfig = getTrackConfig(props.trackModel);
+        return trackConfig.initDataSource();
+    },
+    props => {
+        const trackConfig = getTrackConfig(props.trackModel);
+        return trackConfig.formatData;
+    }
+);
+const InteractionTrack = withCurrentGenome(withInteractionData(InteractionTrack3D));
 
 const TRACK_SEPARATION = 1; // In meters
 const TRACK_WIDTH = 100;

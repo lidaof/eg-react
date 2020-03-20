@@ -6,7 +6,6 @@ import YscaleConfig from "../trackContextMenu/YscaleConfig";
 import AggregateConfig from "../trackContextMenu/AggregateConfig";
 import SmoothConfig from "../trackContextMenu/SmoothConfig";
 import { BackgroundColorConfig } from "../trackContextMenu/ColorConfig";
-import LineWidthConfig from "../trackContextMenu/LineWidthConfig";
 import TrackModel from "../../model/TrackModel";
 
 export class DynamicplotTrackConfig extends TrackConfig {
@@ -29,7 +28,6 @@ export class DynamicplotTrackConfig extends TrackConfig {
             HeightConfig,
             YscaleConfig,
             AggregateConfig,
-            LineWidthConfig,
             SmoothConfig,
             BackgroundColorConfig
         ];

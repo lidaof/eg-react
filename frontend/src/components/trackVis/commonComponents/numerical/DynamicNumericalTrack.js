@@ -17,8 +17,9 @@ import { PixiScene } from "./PixiScene";
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN_ARRAY,
     height: 80,
-    color: 0x0000ff,
-    backgroundColor: 0xffffff
+    color: "blue",
+    backgroundColor: "white",
+    playing: true
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 export const TOP_PADDING = 2;
@@ -42,7 +43,7 @@ class DynamicNumericalTrack extends React.PureComponent {
             aggregateMethod: PropTypes.oneOf(Object.values(DefaultAggregators.types)),
             height: PropTypes.number.isRequired, // Height of the track
 
-            color: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+            color: PropTypes.string
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any // If present, applies error styling
@@ -77,7 +78,7 @@ class DynamicNumericalTrack extends React.PureComponent {
 
     render() {
         const { data, viewRegion, width, trackModel, unit, options } = this.props;
-        const { height, aggregateMethod, color, backgroundColor } = options;
+        const { height, aggregateMethod, color, backgroundColor, playing } = options;
         this.xToValue = this.aggregateFeatures(data, viewRegion, width, aggregateMethod);
         this.scales = this.computeScales(this.xToValue, height);
         const legend = <TrackLegend trackModel={trackModel} height={height} axisLegend={unit} />;
@@ -90,6 +91,7 @@ class DynamicNumericalTrack extends React.PureComponent {
                 color={color}
                 backgroundColor={backgroundColor}
                 currentIndex={9}
+                playing={playing}
             />
         );
         return (

@@ -1,43 +1,43 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import connect from 'react-redux/lib/connect/connect';
-import ReactModal from 'react-modal';
-import Hotkeys from 'react-hot-keys';
+import React from "react";
+import PropTypes from "prop-types";
+import _ from "lodash";
+import connect from "react-redux/lib/connect/connect";
+import ReactModal from "react-modal";
+import Hotkeys from "react-hot-keys";
 
-import { ActionCreators } from '../../AppState';
+import { ActionCreators } from "../../AppState";
 
-import { withTrackData } from './TrackDataManager';
-import { withTrackView } from './TrackViewManager';
-import TrackHandle from './TrackHandle';
-import { PannableTrackContainer } from './PannableTrackContainer';
-import ReorderableTrackContainer from './ReorderableTrackContainer';
-import { ZoomableTrackContainer } from './ZoomableTrackContainer';
-import MetadataHeader from './MetadataHeader';
-import { Tools, ToolButtons } from './Tools';
-import ZoomButtons from './ZoomButtons';
-import OutsideClickDetector from '../OutsideClickDetector';
-import ContextMenuManager from '../ContextMenuManager';
-import DivWithBullseye from '../DivWithBullseye';
-import withAutoDimensions from '../withAutoDimensions';
-import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
+import { withTrackData } from "./TrackDataManager";
+import { withTrackView } from "./TrackViewManager";
+import TrackHandle from "./TrackHandle";
+import { PannableTrackContainer } from "./PannableTrackContainer";
+import ReorderableTrackContainer from "./ReorderableTrackContainer";
+import { ZoomableTrackContainer } from "./ZoomableTrackContainer";
+import MetadataHeader from "./MetadataHeader";
+import { Tools, ToolButtons } from "./Tools";
+import ZoomButtons from "./ZoomButtons";
+import OutsideClickDetector from "../OutsideClickDetector";
+import ContextMenuManager from "../ContextMenuManager";
+import DivWithBullseye from "../DivWithBullseye";
+import withAutoDimensions from "../withAutoDimensions";
+import TrackContextMenu from "../trackContextMenu/TrackContextMenu";
 
-import TrackModel from '../../model/TrackModel';
-import TrackSelectionBehavior from '../../model/TrackSelectionBehavior';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import UndoRedo from './UndoRedo';
-import History from './History';
+import TrackModel from "../../model/TrackModel";
+import TrackSelectionBehavior from "../../model/TrackSelectionBehavior";
+import DisplayedRegionModel from "../../model/DisplayedRegionModel";
+import UndoRedo from "./UndoRedo";
+import History from "./History";
 
-import HighlightRegion from '../HighlightRegion';
-import { VerticalDivider } from './VerticalDivider';
-import { CircletView } from './CircletView';
-import ButtonGroup from './ButtonGroup';
-import TrackRegionController from '../genomeNavigator/TrackRegionController';
+import HighlightRegion from "../HighlightRegion";
+import { VerticalDivider } from "./VerticalDivider";
+import { CircletView } from "./CircletView";
+import ButtonGroup from "./ButtonGroup";
+import TrackRegionController from "../genomeNavigator/TrackRegionController";
 
-import ReorderMany from './ReorderMany';
-import { niceBpCount } from '../../util';
+import ReorderMany from "./ReorderMany";
+import { niceBpCount } from "../../util";
 
-const DEFAULT_CURSOR = 'crosshair';
+const DEFAULT_CURSOR = "crosshair";
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 
 ///////////
@@ -105,8 +105,8 @@ class TrackContainer extends React.Component {
             showModal: false,
             showReorderManyModal: false,
             trackForCircletView: null, // the trackmodel for circlet view
-            circletColor: '#ff5722',
-            panningAnimation: 'none',
+            circletColor: "#ff5722",
+            panningAnimation: "none",
             zoomAnimation: 0
         };
 
@@ -129,15 +129,15 @@ class TrackContainer extends React.Component {
         const { primaryView, onNewRegion } = this.props;
         let newRegion, panning;
         if (left) {
-            panning = 'left';
+            panning = "left";
             newRegion = primaryView.viewWindowRegion.clone().panLeft();
         } else {
-            panning = 'right';
+            panning = "right";
             newRegion = primaryView.viewWindowRegion.clone().panRight();
         }
         this.setState({ panningAnimation: panning }, () => {
             window.setTimeout(() => {
-                this.setState({ panningAnimation: 'none' });
+                this.setState({ panningAnimation: "none" });
                 // this.pan(-width); // Changes DRM
                 onNewRegion(...newRegion.getContextCoordinates());
             }, 1000);
@@ -159,30 +159,30 @@ class TrackContainer extends React.Component {
 
     onKeyDown(keyName, e, handle) {
         switch (keyName) {
-            case 'alt+h':
-            case 'alt+d':
+            case "alt+h":
+            case "alt+d":
                 this.toggleTool(Tools.DRAG);
                 break;
-            case 'alt+s':
-            case 'alt+r':
+            case "alt+s":
+            case "alt+r":
                 this.toggleTool(Tools.REORDER);
                 break;
-            case 'alt+m':
+            case "alt+m":
                 this.toggleTool(Tools.ZOOM_IN);
                 break;
-            case 'alt+z':
+            case "alt+z":
                 this.panLeftOrRight(true);
                 break;
-            case 'alt+x':
+            case "alt+x":
                 this.panLeftOrRight(false);
                 break;
-            case 'alt+i':
+            case "alt+i":
                 this.zoomOut(0.5);
                 break;
-            case 'alt+o':
+            case "alt+o":
                 this.zoomOut(2);
                 break;
-            case 'alt+g':
+            case "alt+g":
                 this.toggleReorderManyModal();
                 break;
             default:
@@ -242,7 +242,7 @@ class TrackContainer extends React.Component {
         }
         const tracks = this.props.tracks;
         if (tracks.length !== newSelections.length) {
-            console.error('Cannot apply track selection array with different length than existing tracks.');
+            console.error("Cannot apply track selection array with different length than existing tracks.");
             console.error(newSelections);
         }
 
@@ -308,8 +308,24 @@ class TrackContainer extends React.Component {
         // console.log(tracks);
         // const tracksLeft = this.props.tracks.filter(tk => !tk.isSelected);
         const newTrack = new TrackModel({
-            type: 'matplot',
-            name: 'matplot wrap',
+            type: "matplot",
+            name: "matplot wrap",
+            tracks
+        });
+        // const newTracks = [...tracksLeft, newTrack];
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    };
+
+    /**
+     * happens when user selects matplot
+     */
+    applyDynamicPlot = tracks => {
+        // console.log(tracks);
+        // const tracksLeft = this.props.tracks.filter(tk => !tk.isSelected);
+        const newTrack = new TrackModel({
+            type: "dynamic",
+            name: "dynamic plot wrap",
             tracks
         });
         // const newTracks = [...tracksLeft, newTrack];
@@ -341,7 +357,7 @@ class TrackContainer extends React.Component {
                 className="btn btn-outline-dark"
                 title="Pan left
 (Alt+Z)"
-                style={{ fontFamily: 'monospace' }}
+                style={{ fontFamily: "monospace" }}
                 onClick={() => this.panLeftOrRight(true)}
             >
                 ◀
@@ -352,14 +368,14 @@ class TrackContainer extends React.Component {
                 className="btn btn-outline-dark"
                 title="Pan right
 (Alt+X)"
-                style={{ fontFamily: 'monospace' }}
+                style={{ fontFamily: "monospace" }}
                 onClick={() => this.panLeftOrRight(false)}
             >
                 ▶
             </button>
         );
         return (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
                 <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} />
                 {this.props.embeddingMode && (
                     <TrackRegionController
@@ -511,11 +527,12 @@ class TrackContainer extends React.Component {
                 deselectAllTracks={this.deselectAllTracks}
                 onCircletRequested={this.handleOpenModal}
                 onApplyMatplot={this.applyMatPlot}
+                onApplyDynamicplot={this.applyDynamicPlot}
             />
         );
         const trackDivStyle = {
-            border: '1px solid black',
-            paddingBottom: '3px',
+            border: "1px solid black",
+            paddingBottom: "3px",
             cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR
         };
         return (

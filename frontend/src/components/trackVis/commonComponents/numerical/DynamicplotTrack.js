@@ -11,25 +11,26 @@ import GenomicCoordinates from "../GenomicCoordinates";
 import HoverTooltipContext from "../tooltip/HoverTooltipContext";
 import configOptionMerging from "../configOptionMerging";
 
-import { RenderTypes, DesignRenderer } from "../../../../art/DesignRenderer";
 import { FeatureAggregator, DefaultAggregators } from "../../../../model/FeatureAggregator";
 import { ScaleChoices } from "../../../../model/ScaleChoices";
+import { PixiScene } from "./PixiScene";
 
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN,
-    height: 60,
+    height: 80,
     yScale: ScaleChoices.AUTO,
     yMax: 10,
     yMin: 0,
     smooth: 0,
-    lineWidth: 2
+    backgroundColor: "white",
+    playing: true
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 const TOP_PADDING = 2;
 
 /**
- * Track specialized in showing numerical data in matplot style, aka. lineplot
+ * Track specialized in showing numerical data for dynamic plot
  *
  * @author Daofeng Li
  */
@@ -136,24 +137,26 @@ class DynamicplotTrack extends React.PureComponent {
     }
 
     render() {
-        const { data, viewRegion, width, trackModel, unit, options, forceSvg } = this.props;
-        const { height, aggregateMethod, smooth, lineWidth } = options;
+        const { data, viewRegion, width, trackModel, unit, options } = this.props;
+        const { height, aggregateMethod, smooth, backgroundColor, color, playing } = options;
         const aggreagatedData = data.map(d => this.aggregateFeatures(d, viewRegion, width, aggregateMethod));
         this.xToValue = smooth === 0 ? aggreagatedData : aggreagatedData.map(d => Smooth(d, smooth));
         this.scales = this.computeScales(this.xToValue, height);
+        this.xToValueZipped = _.zip(...this.xToValue);
         const legend = (
             <TrackLegend trackModel={trackModel} height={height} axisScale={this.scales.valueToY} axisLegend={unit} />
         );
         const visualizer = (
             <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip}>
-                <LinePlot
-                    trackModel={trackModel}
-                    xToValue={this.xToValue}
+                <PixiScene
+                    xToValue={this.xToValueZipped}
                     scales={this.scales}
-                    height={height}
-                    forceSvg={forceSvg}
-                    lineWidth={lineWidth}
                     width={width}
+                    height={height}
+                    color={color}
+                    backgroundColor={backgroundColor}
+                    currentIndex={0}
+                    playing={playing}
                 />
             </HoverTooltipContext>
         );
@@ -164,54 +167,6 @@ class DynamicplotTrack extends React.PureComponent {
                 legend={legend}
                 visualizer={visualizer}
             />
-        );
-    }
-}
-
-class LinePlot extends React.PureComponent {
-    static propTypes = {
-        xToValue: PropTypes.array.isRequired,
-        scales: PropTypes.object.isRequired,
-        height: PropTypes.number.isRequired,
-        lineWidth: PropTypes.number.isRequired,
-        width: PropTypes.number.isRequired
-    };
-
-    constructor(props) {
-        super(props);
-        this.renderLine = this.renderLine.bind(this);
-    }
-
-    /**
-     * draw a line for an array of numbers.
-     *
-     * @param {number[]} values
-     * @return {JSX.Element} line element to render
-     */
-    renderLine(values, trackIndex) {
-        const { scales, trackModel, lineWidth } = this.props;
-        /* eslint-disable array-callback-return */
-        const points = values
-            .map((value, x) => {
-                if (value && !Number.isNaN(value)) {
-                    const y = scales.valueToY(value);
-                    return `${x},${y}`;
-                }
-            })
-            .filter(value => value); // removes null from original
-        /* eslint-enable array-callback-return */
-        const color = trackModel.tracks[trackIndex].options.color || "blue";
-        return (
-            <polyline key={trackIndex} points={points.join(" ")} stroke={color} strokeWidth={lineWidth} fill="none" />
-        );
-    }
-
-    render() {
-        const { xToValue, height, width } = this.props;
-        return (
-            <DesignRenderer type={1 ? RenderTypes.SVG : RenderTypes.CANVAS} width={width} height={height}>
-                {xToValue.map(this.renderLine)}
-            </DesignRenderer>
         );
     }
 }
