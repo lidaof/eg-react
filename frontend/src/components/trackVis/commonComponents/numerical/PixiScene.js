@@ -1,9 +1,31 @@
 import React from "react";
+import PropTypes from "prop-types";
+import _ from "lodash";
 import * as PIXI from "pixi.js";
-import { TOP_PADDING } from "./DynamicNumericalTrack";
 import { colorString2number } from "../../../../util";
 
 export class PixiScene extends React.PureComponent {
+    static propTypes = {
+        xToValue: PropTypes.array.isRequired,
+        scales: PropTypes.object.isRequired,
+        height: PropTypes.number.isRequired,
+        width: PropTypes.number.isRequired,
+        backgroundColor: PropTypes.string,
+        color: PropTypes.string,
+        // colors: PropTypes.array,
+        speed: PropTypes.array, //playing speed, 1-10, 1 is slowest, 10 is fastest
+        steps: PropTypes.number, //total steps of animation
+        currentStep: PropTypes.number //current playing step, default is first step 0
+    };
+
+    static defaultProps = {
+        currentStep: 0,
+        speed: [5], //react-compound-slider require an array, to be FIXED
+        // colors: [],
+        color: "blue",
+        backgroundColor: "white"
+    };
+
     constructor(props) {
         super(props);
         this.myRef = React.createRef();
@@ -11,11 +33,18 @@ export class PixiScene extends React.PureComponent {
         this.particles = null;
         this.app = null;
         this.state = {
-            currentIndex: 0
+            currentStep: 0
         };
         this.count = 0;
         // this.graphics = [];
         this.sprites = [];
+        // this.colors = props.colors.length ? [...props.colors] : [];
+        // if (props.steps) {
+        //     if (this.colors.length < props.steps) {
+        //         this.colors = repeatArray(this.colors, props.steps);
+        //     }
+        // }
+        this.steps = this.getMaxSteps();
     }
 
     componentDidMount() {
@@ -42,6 +71,12 @@ export class PixiScene extends React.PureComponent {
         // this.app.stage.addChild(this.g);
         // this.graphics.forEach(g => this.app.stage.addChild(g));
         // this.draw();
+        // let color;
+        // if(this.colors.length){
+        //     color = colorString2number(this.colors[this.state.currentStep])
+        // } else {
+        //     color = colorString2number(this.props.color);
+        // }
         const color = colorString2number(this.props.color);
         const g = new PIXI.Graphics();
         g.lineStyle(0);
@@ -70,7 +105,8 @@ export class PixiScene extends React.PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.xToValue !== this.props.xToValue || prevState.currentIndex !== this.state.currentIndex) {
+        if (prevProps.xToValue !== this.props.xToValue || prevState.currentStep !== this.state.currentStep) {
+            this.steps = this.getMaxSteps();
             this.draw();
         }
         if (prevProps.color !== this.props.color) {
@@ -97,30 +133,38 @@ export class PixiScene extends React.PureComponent {
     };
 
     tick = () => {
-        this.count += 0.05;
-        if (this.count > 2) {
+        // const useSpeed = Array.isArray(this.props.speed) ? this.props.speed[0] : this.props.speed;
+        this.count += 0.005 * this.props.speed[0];
+        if (this.count >= this.steps) {
             this.count = 0;
         }
-        this.setState({ currentIndex: Math.round(this.count) });
+        this.setState({ currentStep: Math.round(this.count) });
+    };
+
+    getMaxSteps = () => {
+        const max = this.props.steps ? this.props.steps : _.max(this.props.xToValue.map(v => v.length));
+        return max;
     };
 
     draw = () => {
-        const { scales } = this.props;
+        const { scales, height } = this.props;
+        const { currentStep } = this.state;
         // this.graphics.forEach(g => g.clear());
         this.sprites.forEach(s => s.scale.set(0));
         this.props.xToValue.forEach((value, x) => {
-            if (Number.isNaN(value[0])) {
+            const valueIndex = currentStep < value.length ? currentStep : currentStep % value.length;
+            if (Number.isNaN(value[valueIndex])) {
                 return;
             }
-            const drawHeight = scales.valueToY(value[this.state.currentIndex]);
+            const scaleHeight = scales.valueToY(value[valueIndex]) - height;
             // const g = this.graphics[x];
             // g.lineStyle(0);
             // g.beginFill(color, 1);
-            // g.drawRect(x, TOP_PADDING, 1, drawHeight);
+            // g.drawRect(x, TOP_PADDING, 1, scaleHeight);
             // g.endFill();
             const s = this.sprites[x];
-            s.position.set(x, TOP_PADDING);
-            s.scale.set(1, drawHeight);
+            s.position.set(x, height);
+            s.scale.set(1, scaleHeight);
         });
     };
 

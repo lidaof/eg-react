@@ -131,6 +131,7 @@ class TrackContextMenu extends React.PureComponent {
                 <TrackMoreInfo tracks={selectedTracks} />
                 <MatplotMenu tracks={selectedTracks} onApplyMatplot={this.props.onApplyMatplot} />
                 <DynamicplotMenu tracks={selectedTracks} onApplyDynamicplot={this.props.onApplyDynamicplot} />
+                <DynamicHicMenu tracks={selectedTracks} onApplyDynamicHic={this.props.onApplyDynamicHic} />
             </div>
         );
     }
@@ -196,6 +197,28 @@ function DynamicplotMenu(props) {
     return (
         <div className="TrackContextMenu-item">
             <button className="btn btn-info btn-sm btn-tight" onClick={() => props.onApplyDynamicplot(props.tracks)}>
+                Dynamic plot
+            </button>
+        </div>
+    );
+}
+
+/**
+ * a menu that applys dynamic plot for more than 1 numerical tracks
+ * @param {TrackModel[]} props
+ */
+function DynamicHicMenu(props) {
+    const numTracks = props.tracks.length;
+    if (numTracks === 1) {
+        return null;
+    }
+    const trackTypes = props.tracks.map(tk => tk.type);
+    if (trackTypes.some(type => type !== "hic")) {
+        return null;
+    }
+    return (
+        <div className="TrackContextMenu-item">
+            <button className="btn btn-info btn-sm btn-tight" onClick={() => props.onApplyDynamicHic(props.tracks)}>
                 Dynamic plot
             </button>
         </div>

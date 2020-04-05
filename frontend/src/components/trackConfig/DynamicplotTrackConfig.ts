@@ -5,8 +5,9 @@ import HeightConfig from "../trackContextMenu/HeightConfig";
 import YscaleConfig from "../trackContextMenu/YscaleConfig";
 import AggregateConfig from "../trackContextMenu/AggregateConfig";
 import SmoothConfig from "../trackContextMenu/SmoothConfig";
-import { BackgroundColorConfig } from "../trackContextMenu/ColorConfig";
+import { BackgroundColorConfig, PrimaryColorConfig } from "../trackContextMenu/ColorConfig";
 import TrackModel from "../../model/TrackModel";
+import SpeedConfig from "components/trackContextMenu/SpeedConfig";
 
 export class DynamicplotTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -26,9 +27,11 @@ export class DynamicplotTrackConfig extends TrackConfig {
         return [
             ...super.getMenuComponents(),
             HeightConfig,
+            SpeedConfig,
             YscaleConfig,
             AggregateConfig,
             SmoothConfig,
+            PrimaryColorConfig,
             BackgroundColorConfig
         ];
     }

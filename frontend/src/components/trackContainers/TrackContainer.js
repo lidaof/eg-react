@@ -37,6 +37,8 @@ import TrackRegionController from "../genomeNavigator/TrackRegionController";
 import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
 
+import { DEFAULT_OPTIONS as DYNAMMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack.js";
+
 const DEFAULT_CURSOR = "crosshair";
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 
@@ -318,14 +320,37 @@ class TrackContainer extends React.Component {
     };
 
     /**
-     * happens when user selects matplot
+     * happens when user selects dynamic plot
      */
     applyDynamicPlot = tracks => {
-        // console.log(tracks);
-        // const tracksLeft = this.props.tracks.filter(tk => !tk.isSelected);
+        // const colors = [];
+        // tracks.forEach(tk => {
+        //     if (tk.options && tk.options.color) {
+        //         colors.push(tk.options.color);
+        //     }
+        // });
         const newTrack = new TrackModel({
             type: "dynamic",
             name: "dynamic plot wrap",
+            tracks,
+            options: {
+                steps: tracks.length,
+                ...DYNAMMIC_OPTIONS
+                // colors
+            }
+        });
+        // const newTracks = [...tracksLeft, newTrack];
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    };
+
+    /**
+     * happens when user selects dynamic hic plot
+     */
+    applyDynamicHic = tracks => {
+        const newTrack = new TrackModel({
+            type: "dynamichic",
+            name: "dynamic hic wrap",
             tracks
         });
         // const newTracks = [...tracksLeft, newTrack];
@@ -528,6 +553,7 @@ class TrackContainer extends React.Component {
                 onCircletRequested={this.handleOpenModal}
                 onApplyMatplot={this.applyMatPlot}
                 onApplyDynamicplot={this.applyDynamicPlot}
+                onApplyDynamicHic={this.applyDynamicHic}
             />
         );
         const trackDivStyle = {

@@ -4,7 +4,7 @@ import DisplayedRegionModel from "./DisplayedRegionModel";
 import { FeaturePlacer } from "./FeaturePlacer";
 
 const VALUE_PROP_NAME = "value";
-const VALUES_PROP_NAME = "values";
+
 /**
  * Available aggregators.  Note: SUM, MEAN, MIN, and MAX requires each record to have a `value` prop.
  */
@@ -13,8 +13,7 @@ export const AggregatorTypes = {
     SUM: "SUM", // Sums values of records
     COUNT: "COUNT", // Counts records
     MIN: "MIN", // Computes value of min record
-    MAX: "MAX", // Computes value of max record
-    MEAN_ARRAY: "MEAN_ARRAY" //computers average of each element in the array from multiple arrays
+    MAX: "MAX" // Computes value of max record
 };
 
 const aggregateFunctions = {};
@@ -28,7 +27,17 @@ aggregateFunctions[AggregatorTypes.MIN] = (records: any[]) =>
 aggregateFunctions[AggregatorTypes.MAX] = (records: any[]) =>
     _.maxBy(records, VALUE_PROP_NAME)[VALUE_PROP_NAME] || null;
 
-aggregateFunctions[AggregatorTypes.MEAN_ARRAY] = (records: any[]) =>
+/**
+ * aggregator utils for array data
+ */
+const VALUES_PROP_NAME = "values";
+
+export const ArrayAggregatorTypes = {
+    MEAN: "MEAN" //computers average of each element in the array from multiple arrays
+};
+
+const arrayAggregateFunctions = {};
+arrayAggregateFunctions[ArrayAggregatorTypes.MEAN] = (records: any[]) =>
     calMeanOfArrays(records, VALUES_PROP_NAME) || [null];
 /**
  * calculate mean value of each array elements and save to a new array
@@ -66,6 +75,17 @@ export const DefaultAggregators = {
     types: AggregatorTypes,
     fromId(id: string) {
         const aggregator = aggregateFunctions[id];
+        if (!aggregator) {
+            throw new Error(`Unknown aggregator id "${id}"`);
+        }
+        return aggregator;
+    }
+};
+
+export const DefaultArrayAggregators = {
+    types: ArrayAggregatorTypes,
+    fromId(id: string) {
+        const aggregator = arrayAggregateFunctions[id];
         if (!aggregator) {
             throw new Error(`Unknown aggregator id "${id}"`);
         }

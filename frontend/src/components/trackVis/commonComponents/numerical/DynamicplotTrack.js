@@ -22,8 +22,10 @@ export const DEFAULT_OPTIONS = {
     yMax: 10,
     yMin: 0,
     smooth: 0,
+    color: "blue",
     backgroundColor: "white",
-    playing: true
+    playing: true,
+    speed: [10]
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -44,10 +46,7 @@ class DynamicplotTrack extends React.PureComponent {
          */
         data: PropTypes.array.isRequired, // PropTypes.arrayOf(Feature)
         unit: PropTypes.string, // Unit to display after the number in tooltips
-        options: PropTypes.shape({
-            aggregateMethod: PropTypes.oneOf(Object.values(DefaultAggregators.types)),
-            height: PropTypes.number.isRequired // Height of the track
-        }).isRequired,
+        options: PropTypes.object.isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
         error: PropTypes.any // If present, applies error styling
     });
@@ -138,7 +137,7 @@ class DynamicplotTrack extends React.PureComponent {
 
     render() {
         const { data, viewRegion, width, trackModel, unit, options } = this.props;
-        const { height, aggregateMethod, smooth, backgroundColor, color, playing } = options;
+        const { height, aggregateMethod, smooth, color, backgroundColor, playing, speed, steps } = options;
         const aggreagatedData = data.map(d => this.aggregateFeatures(d, viewRegion, width, aggregateMethod));
         this.xToValue = smooth === 0 ? aggreagatedData : aggreagatedData.map(d => Smooth(d, smooth));
         this.scales = this.computeScales(this.xToValue, height);
@@ -153,10 +152,11 @@ class DynamicplotTrack extends React.PureComponent {
                     scales={this.scales}
                     width={width}
                     height={height}
+                    steps={steps}
                     color={color}
                     backgroundColor={backgroundColor}
-                    currentIndex={0}
                     playing={playing}
+                    speed={speed}
                 />
             </HoverTooltipContext>
         );

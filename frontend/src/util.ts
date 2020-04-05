@@ -278,3 +278,12 @@ export function colorString2number(color: string): number {
     const [r, g, b] = rgba(color); //alpha not spreaded
     return (r << 16) + (g << 8) + b;
 }
+
+export function repeatArray(arr: any[], count: number): any[] {
+    const ln = arr.length;
+    const b = [];
+    for (let i = 0; i < count; i++) {
+        b.push(arr[i % ln]);
+    }
+    return b;
+}

@@ -25,6 +25,8 @@ import { PairwiseSegmentTrackConfig } from "./PairwiseSegmentTrackConfig";
 import { G3dTrackConfig } from "./G3dTrackConfig";
 import { ProteinTrackConfig } from "./ProteinTrackConfig";
 import { DynamicBedGraphTrackConfig } from "./DynamicBedGraphTrackConfig";
+import { DynamicHicTrackConfig } from "./DynamicHicTrackConfig";
+
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 
 const TYPE_NAME_TO_CONFIG = {
@@ -52,7 +54,8 @@ const TYPE_NAME_TO_CONFIG = {
     g3d: G3dTrackConfig,
     pairwise: PairwiseSegmentTrackConfig,
     protein: ProteinTrackConfig,
-    dbedgraph: DynamicBedGraphTrackConfig
+    dbedgraph: DynamicBedGraphTrackConfig,
+    dynamichic: DynamicHicTrackConfig
 };
 const DefaultConfig = TrackConfig;
 

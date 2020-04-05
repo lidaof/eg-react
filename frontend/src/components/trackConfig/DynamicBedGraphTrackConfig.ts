@@ -13,6 +13,8 @@ import PlayingConfig from "components/trackContextMenu/PlayingConfig";
 import HeightConfig from "components/trackContextMenu/HeightConfig";
 import { BackgroundColorConfig, PrimaryColorConfig } from "components/trackContextMenu/ColorConfig";
 import TrackModel from "model/TrackModel";
+import SpeedConfig from "components/trackContextMenu/SpeedConfig";
+import ArrayAggregateConfig from "components/trackContextMenu/ArrayAggregateConfig";
 
 const VALUE_COLUMN_INDEX = 3;
 
@@ -63,7 +65,15 @@ export class DynamicBedGraphTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        const items = [LabelConfig, PlayingConfig, HeightConfig, PrimaryColorConfig, BackgroundColorConfig];
+        const items = [
+            LabelConfig,
+            PlayingConfig,
+            SpeedConfig,
+            HeightConfig,
+            ArrayAggregateConfig,
+            PrimaryColorConfig,
+            BackgroundColorConfig
+        ];
 
         return items;
     }

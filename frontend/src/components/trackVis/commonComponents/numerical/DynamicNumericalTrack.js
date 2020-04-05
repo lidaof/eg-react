@@ -7,22 +7,25 @@ import Track from "../Track";
 import TrackLegend from "../TrackLegend";
 import configOptionMerging from "../configOptionMerging";
 
-import { FeatureAggregator, DefaultAggregators } from "../../../../model/FeatureAggregator";
+import { FeatureAggregator, DefaultArrayAggregators } from "../../../../model/FeatureAggregator";
 
 // import { Graphics } from "pixi.js";
 // import { PixiComponent, Stage, AppConsumer } from "@inlet/react-pixi";
 
 import { PixiScene } from "./PixiScene";
+import HoverTooltipContext from "../tooltip/HoverTooltipContext";
+import GenomicCoordinates from "../GenomicCoordinates";
 
 export const DEFAULT_OPTIONS = {
-    aggregateMethod: DefaultAggregators.types.MEAN_ARRAY,
+    arrayAggregateMethod: DefaultArrayAggregators.types.MEAN,
     height: 80,
     color: "blue",
     backgroundColor: "white",
-    playing: true
+    playing: true,
+    speed: [10]
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
-export const TOP_PADDING = 2;
+const TOP_PADDING = 2;
 
 /**
  * Track specialized in showing animations of numerical data array.
@@ -40,7 +43,7 @@ class DynamicNumericalTrack extends React.PureComponent {
         data: PropTypes.array.isRequired, // PropTypes.arrayOf(Feature)
         unit: PropTypes.string, // Unit to display after the number in tooltips
         options: PropTypes.shape({
-            aggregateMethod: PropTypes.oneOf(Object.values(DefaultAggregators.types)),
+            arrayAggregateMethod: PropTypes.oneOf(Object.values(DefaultArrayAggregators.types)),
             height: PropTypes.number.isRequired, // Height of the track
 
             color: PropTypes.string
@@ -59,7 +62,7 @@ class DynamicNumericalTrack extends React.PureComponent {
     aggregateFeatures(data, viewRegion, width, aggregatorId) {
         const aggregator = new FeatureAggregator();
         const xToFeatures = aggregator.makeXMap(data, viewRegion, width);
-        return xToFeatures.map(DefaultAggregators.fromId(aggregatorId));
+        return xToFeatures.map(DefaultArrayAggregators.fromId(aggregatorId));
     }
 
     computeScales(xToValue, height) {
@@ -76,23 +79,46 @@ class DynamicNumericalTrack extends React.PureComponent {
         };
     }
 
+    /**
+     * Renders the default tooltip that is displayed on hover.
+     *
+     * @param {number} relativeX - x coordinate of hover relative to the visualizer
+     * @return {JSX.Element} tooltip to render
+     */
+    renderTooltip = relativeX => {
+        const { trackModel, viewRegion, width } = this.props;
+        const value = this.xToValue[Math.round(relativeX)];
+        const stringValues = _.compact(value).length ? JSON.stringify(value) : "(no data)";
+        return (
+            <div>
+                {stringValues}
+                <div className="Tooltip-minor-text">
+                    <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
+                </div>
+                <div className="Tooltip-minor-text">{trackModel.getDisplayLabel()}</div>
+            </div>
+        );
+    };
+
     render() {
         const { data, viewRegion, width, trackModel, unit, options } = this.props;
-        const { height, aggregateMethod, color, backgroundColor, playing } = options;
-        this.xToValue = this.aggregateFeatures(data, viewRegion, width, aggregateMethod);
+        const { height, arrayAggregateMethod, color, backgroundColor, playing, speed } = options;
+        this.xToValue = this.aggregateFeatures(data, viewRegion, width, arrayAggregateMethod);
         this.scales = this.computeScales(this.xToValue, height);
         const legend = <TrackLegend trackModel={trackModel} height={height} axisLegend={unit} />;
         const visualizer = (
-            <PixiScene
-                xToValue={this.xToValue}
-                scales={this.scales}
-                width={width}
-                height={height}
-                color={color}
-                backgroundColor={backgroundColor}
-                currentIndex={9}
-                playing={playing}
-            />
+            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip}>
+                <PixiScene
+                    xToValue={this.xToValue}
+                    scales={this.scales}
+                    width={width}
+                    height={height}
+                    color={color}
+                    backgroundColor={backgroundColor}
+                    playing={playing}
+                    speed={speed}
+                />
+            </HoverTooltipContext>
         );
         return (
             <Track
