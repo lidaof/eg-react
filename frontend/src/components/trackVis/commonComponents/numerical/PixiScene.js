@@ -15,7 +15,7 @@ export class PixiScene extends React.PureComponent {
         // colors: PropTypes.array,
         speed: PropTypes.array, //playing speed, 1-10, 1 is slowest, 10 is fastest
         steps: PropTypes.number, //total steps of animation
-        currentStep: PropTypes.number //current playing step, default is first step 0
+        currentStep: PropTypes.number, //current playing step, default is first step 0
     };
 
     static defaultProps = {
@@ -23,7 +23,7 @@ export class PixiScene extends React.PureComponent {
         speed: [5], //react-compound-slider require an array, to be FIXED
         // colors: [],
         color: "blue",
-        backgroundColor: "white"
+        backgroundColor: "white",
     };
 
     constructor(props) {
@@ -33,7 +33,8 @@ export class PixiScene extends React.PureComponent {
         this.particles = null;
         this.app = null;
         this.state = {
-            currentStep: 0
+            currentStep: 0,
+            isPlaying: true,
         };
         this.count = 0;
         // this.graphics = [];
@@ -56,14 +57,14 @@ export class PixiScene extends React.PureComponent {
             height,
             backgroundColor: bgColor,
             autoResize: true,
-            resolution: window.devicePixelRatio
+            resolution: window.devicePixelRatio,
         });
         this.particles = new PIXI.ParticleContainer(width, {
             scale: true,
             position: true,
             rotation: true,
             uvs: true,
-            alpha: true
+            alpha: true,
         });
         this.container.appendChild(this.app.view);
         this.app.ticker.add(this.tick);
@@ -97,6 +98,7 @@ export class PixiScene extends React.PureComponent {
         }
         this.app.stage.addChild(this.particles);
         window.addEventListener("resize", this.onWindowResize);
+        this.app.renderer.plugins.interaction.on("pointerdown", this.onPointerDown);
     }
 
     componentWillUnmount() {
@@ -111,7 +113,7 @@ export class PixiScene extends React.PureComponent {
         }
         if (prevProps.color !== this.props.color) {
             const color = colorString2number(this.props.color);
-            this.sprites.forEach(s => (s.tint = color));
+            this.sprites.forEach((s) => (s.tint = color));
         }
         if (prevProps.backgroundColor !== this.props.backgroundColor) {
             this.app.renderer.backgroundColor = colorString2number(this.props.backgroundColor);
@@ -132,6 +134,21 @@ export class PixiScene extends React.PureComponent {
         this.app.renderer.resize(width, height);
     };
 
+    onPointerDown = (event) => {
+        // console.log(event, event.data.originalEvent.which);
+        if (event.data.originalEvent.which === 1) {
+            // only left click
+            this.setState((prevState) => {
+                return { isPlaying: !prevState.isPlaying };
+            });
+            if (this.state.isPlaying) {
+                this.app.ticker.start();
+            } else {
+                this.app.ticker.stop();
+            }
+        }
+    };
+
     tick = () => {
         // const useSpeed = Array.isArray(this.props.speed) ? this.props.speed[0] : this.props.speed;
         this.count += 0.005 * this.props.speed[0];
@@ -142,7 +159,7 @@ export class PixiScene extends React.PureComponent {
     };
 
     getMaxSteps = () => {
-        const max = this.props.steps ? this.props.steps : _.max(this.props.xToValue.map(v => v.length));
+        const max = this.props.steps ? this.props.steps : _.max(this.props.xToValue.map((v) => v.length));
         return max;
     };
 
@@ -150,7 +167,7 @@ export class PixiScene extends React.PureComponent {
         const { scales, height } = this.props;
         const { currentStep } = this.state;
         // this.graphics.forEach(g => g.clear());
-        this.sprites.forEach(s => s.scale.set(0));
+        this.sprites.forEach((s) => s.scale.set(0));
         this.props.xToValue.forEach((value, x) => {
             const valueIndex = currentStep < value.length ? currentStep : currentStep % value.length;
             if (Number.isNaN(value[valueIndex])) {

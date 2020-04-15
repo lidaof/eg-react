@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === "test") {
         key(i: number) {
             const keys = Object.keys(storage);
             return keys[i] || null;
-        }
+        },
     };
 }
 export const SESSION_KEY = "eg-react-session";
@@ -80,7 +80,7 @@ const initialState: AppState = {
     bundleId,
     sessionFromUrl: false,
     isShowingNavigator: true,
-    customTracksPool: []
+    customTracksPool: [],
 };
 
 enum ActionType {
@@ -98,7 +98,7 @@ enum ActionType {
     SET_CUSTOM_TRACKS_POOL = "SET_CUSTOM_TRACKS_POOL",
     SET_TRACKS_CUSTOM_TRACKS_POOL = "SET_TRACKS_CUSTOM_TRACKS_POOL",
     SET_CUSTOM_VIRUS_GENOME = "SET_CUSTOM_VIRUS_GENOME",
-    SET_VIRUS_BROWSER_MODE = "SET_VIRUS_BROWSER_MODE"
+    SET_VIRUS_BROWSER_MODE = "SET_VIRUS_BROWSER_MODE",
 }
 
 interface AppAction {
@@ -166,7 +166,7 @@ export const ActionCreators = {
         return {
             type: ActionType.SET_GENOME_RESTORE_SESSION,
             genomeName,
-            sessionState
+            sessionState,
         };
     },
 
@@ -182,7 +182,7 @@ export const ActionCreators = {
         return {
             type: ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL,
             tracks,
-            customTracksPool
+            customTracksPool,
         };
     },
 
@@ -192,7 +192,7 @@ export const ActionCreators = {
 
     setVirusBrowserMode: () => {
         return { type: ActionType.SET_VIRUS_BROWSER_MODE };
-    }
+    },
 };
 
 function getInitialState(): AppState {
@@ -222,19 +222,19 @@ function getInitialState(): AppState {
         if (query.genome) {
             newState = getNextState(state, {
                 type: ActionType.SET_GENOME,
-                genomeName: query.genome
+                genomeName: query.genome,
             });
         }
         if (query.hicUrl) {
             const tmpState = getNextState(state, {
                 type: ActionType.SET_GENOME,
-                genomeName: query.genome
+                genomeName: query.genome,
             });
             const urlComponets = (query.hicUrl as string).split("/");
             const track = TrackModel.deserialize({
                 type: "hic",
                 url: query.hicUrl,
-                name: urlComponets[urlComponets.length - 1].split(".")[0]
+                name: urlComponets[urlComponets.length - 1].split(".")[0],
             });
             newState = { ...tmpState, tracks: [track] };
         }
@@ -242,12 +242,16 @@ function getInitialState(): AppState {
             const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
             newState = getNextState(newState as AppState, {
                 type: ActionType.SET_VIEW_REGION,
-                ...interval
+                ...interval,
             });
         }
         if (query.virusBrowserMode) {
-            newState = getNextState(state, {
-                type: ActionType.SET_VIRUS_BROWSER_MODE
+            const tmpState = getNextState(state, {
+                type: ActionType.SET_GENOME,
+                genomeName: query.genome,
+            });
+            newState = getNextState(tmpState, {
+                type: ActionType.SET_VIRUS_BROWSER_MODE,
             });
         }
         return (newState as AppState) || (state as AppState);
@@ -282,7 +286,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 ...initialState,
                 genomeName: action.genomeName,
                 viewRegion: nextViewRegion,
-                tracks: nextTracks
+                tracks: nextTracks,
             };
         case ActionType.SET_CUSTOM_VIRUS_GENOME: // Setting virus genome.
             const virusTracks = action.tracks.map((data: any) => TrackModel.deserialize(data));
@@ -299,14 +303,14 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 defaultTracks: virusTracks,
                 twoBitURL: "",
                 fastaSeq: action.seq,
-                annotationTracks
+                annotationTracks,
             };
             return {
                 ...initialState,
                 genomeName: action.name,
                 viewRegion: virusViewRegion,
                 tracks: virusTracks,
-                genomeConfig: virusGenomeConfig
+                genomeConfig: virusGenomeConfig,
             };
         case ActionType.SET_VIEW_REGION:
             if (!prevState.viewRegion) {
@@ -342,21 +346,21 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         case ActionType.TOGGLE_NAVIGATOR:
             return {
                 ...prevState,
-                isShowingNavigator: !prevState.isShowingNavigator
+                isShowingNavigator: !prevState.isShowingNavigator,
             };
         case ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL:
             const tracks = [...prevState.tracks, ...action.tracks];
             return {
                 ...prevState,
                 tracks,
-                customTracksPool: action.customTracksPool
+                customTracksPool: action.customTracksPool,
             };
         case ActionType.SET_CUSTOM_TRACKS_POOL:
             return { ...prevState, customTracksPool: action.customTracksPool };
         case ActionType.SET_VIRUS_BROWSER_MODE:
             return {
                 ...prevState,
-                virusBrowserMode: true
+                virusBrowserMode: true,
             };
         default:
             // console.warn("Unknown change state action; ignoring.");
@@ -383,7 +387,7 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
         return {
             ...prevState,
             regionSetView: nextSet,
-            viewRegion: new DisplayedRegionModel(nextSet.makeNavContext())
+            viewRegion: new DisplayedRegionModel(nextSet.makeNavContext()),
         };
     } else {
         const genomeConfig = getGenomeConfig(prevState.genomeName);
@@ -393,14 +397,14 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
         return {
             ...prevState,
             regionSetView: null,
-            viewRegion: nextViewRegion
+            viewRegion: nextViewRegion,
         };
     }
 }
 
 const rootReducer = combineReducers({
     browser: undoable(getNextState, { limit: 20 }),
-    firebase: firebaseReducer
+    firebase: firebaseReducer,
 });
 
 // Firebase config
@@ -408,14 +412,14 @@ const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_KEY,
     authDomain: process.env.REACT_APP_FIREBASE_DOMAIN,
     databaseURL: process.env.REACT_APP_FIREBASE_DATABASE,
-    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
 };
 firebase.initializeApp(firebaseConfig);
 
 // react-redux-firebase options
 const config = {
     userProfile: "users", // firebase root where user profiles are stored
-    enableLogging: false // enable/disable Firebase's database logging
+    enableLogging: false, // enable/disable Firebase's database logging
 };
 
 // Add redux Firebase to compose

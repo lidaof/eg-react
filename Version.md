@@ -1,5 +1,16 @@
 # Version History
 
+## 51.0.0
+
+-   added dynamic numerical track
+-   added dynamic plot menu for >=2 numerical tracks
+-   fixed a `virusBrowserMode` bug (redirected to main page) introduced in last few commits
+-   fixed a bug long-range track data cannot have dot in chromosome names
+-   added an option `zoomLevel` for `bigwig` track
+-   changed custom track menu to remote track for better distinguish from local track
+-   added dynamic hic plot track/menu
+-   updated public hubs for nCoV2019
+
 ## 50.4.0
 
 -   added 4 virus genomes for aiding virus research

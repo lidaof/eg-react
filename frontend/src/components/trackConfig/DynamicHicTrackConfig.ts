@@ -3,7 +3,7 @@ import { TrackConfig } from "./TrackConfig";
 
 import DynamicInteractionTrack, { DEFAULT_OPTIONS } from "../trackVis/interactionTrack/DynamicInteractionTrack";
 
-import { HicSource } from "../../dataSources/HicSource";
+// import { HicSource } from "../../dataSources/HicSource";
 import { TrackModel, TrackOptions } from "../../model/TrackModel";
 import { BinSize, NormalizationMode } from "../../model/HicDataModes";
 
@@ -11,23 +11,23 @@ import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from 
 import ScoreConfig from "../trackContextMenu/ScoreConfig";
 import { BinSizeConfig, HicNormalizationConfig } from "../trackContextMenu/HicDataConfig";
 import HeightConfig from "../trackContextMenu/HeightConfig";
+import MatplotSource from "../../dataSources/MatplotSource";
+import PlayingConfig from "components/trackContextMenu/PlayingConfig";
+import SpeedConfig from "components/trackContextMenu/SpeedConfig";
 
 export class DynamicHicTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
         super(trackModel);
-        this.setDefaultOptions({
+        const options = {
             ...DEFAULT_OPTIONS,
             binSize: BinSize.AUTO,
-            normalization: NormalizationMode.NONE
-        });
+            normalization: NormalizationMode.NONE,
+        };
+        this.setDefaultOptions(options);
     }
 
     initDataSource() {
-        if (this.trackModel.fileObj) {
-            return new HicSource(this.trackModel.fileObj);
-        } else {
-            return new HicSource(this.trackModel.url);
-        }
+        return new MatplotSource(this.trackModel);
     }
 
     /**
@@ -44,13 +44,15 @@ export class DynamicHicTrackConfig extends TrackConfig {
     getMenuComponents() {
         const items = [
             LabelConfig,
+            PlayingConfig,
+            SpeedConfig,
             HicNormalizationConfig,
             HeightConfig,
             ScoreConfig,
             BinSizeConfig,
             PrimaryColorConfig,
             SecondaryColorConfig,
-            BackgroundColorConfig
+            BackgroundColorConfig,
         ];
         return items;
     }

@@ -37,7 +37,7 @@ import TrackRegionController from "../genomeNavigator/TrackRegionController";
 import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
 
-import { DEFAULT_OPTIONS as DYNAMMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack.js";
+// import { DEFAULT_OPTIONS as DYNAMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack";
 
 const DEFAULT_CURSOR = "crosshair";
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
@@ -50,14 +50,14 @@ function mapStateToProps(state) {
         genome: state.browser.present.genomeName,
         viewRegion: state.browser.present.viewRegion,
         tracks: state.browser.present.tracks,
-        metadataTerms: state.browser.present.metadataTerms
+        metadataTerms: state.browser.present.metadataTerms,
     };
 }
 
 const callbacks = {
     onNewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
-    onMetadataTermsChanged: ActionCreators.setMetadataTerms
+    onMetadataTermsChanged: ActionCreators.setMetadataTerms,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -90,13 +90,13 @@ class TrackContainer extends React.Component {
          * Callback requesting a change in the metadata terms.  Signature: (newTerms: string[]): void
          */
         onMetadataTermsChanged: PropTypes.func,
-        suggestedMetaSets: PropTypes.instanceOf(Set)
+        suggestedMetaSets: PropTypes.instanceOf(Set),
     };
 
     static defaultProps = {
         tracks: [],
         onNewRegion: () => undefined,
-        onTracksChanged: () => undefined
+        onTracksChanged: () => undefined,
     };
 
     constructor(props) {
@@ -109,7 +109,7 @@ class TrackContainer extends React.Component {
             trackForCircletView: null, // the trackmodel for circlet view
             circletColor: "#ff5722",
             panningAnimation: "none",
-            zoomAnimation: 0
+            zoomAnimation: 0,
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -229,7 +229,7 @@ class TrackContainer extends React.Component {
     };
 
     toggleReorderManyModal = () => {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             return { showReorderManyModal: !prevState.showReorderManyModal };
         });
     };
@@ -306,13 +306,13 @@ class TrackContainer extends React.Component {
     /**
      * happens when user selects matplot
      */
-    applyMatPlot = tracks => {
+    applyMatPlot = (tracks) => {
         // console.log(tracks);
         // const tracksLeft = this.props.tracks.filter(tk => !tk.isSelected);
         const newTrack = new TrackModel({
             type: "matplot",
             name: "matplot wrap",
-            tracks
+            tracks,
         });
         // const newTracks = [...tracksLeft, newTrack];
         const newTracks = [...this.props.tracks, newTrack];
@@ -322,7 +322,7 @@ class TrackContainer extends React.Component {
     /**
      * happens when user selects dynamic plot
      */
-    applyDynamicPlot = tracks => {
+    applyDynamicPlot = (tracks) => {
         // const colors = [];
         // tracks.forEach(tk => {
         //     if (tk.options && tk.options.color) {
@@ -331,15 +331,14 @@ class TrackContainer extends React.Component {
         // });
         const newTrack = new TrackModel({
             type: "dynamic",
-            name: "dynamic plot wrap",
+            name: "dynamic plot",
             tracks,
             options: {
                 steps: tracks.length,
-                ...DYNAMMIC_OPTIONS
+                //...DYNAMIC_OPTIONS,
                 // colors
-            }
+            },
         });
-        // const newTracks = [...tracksLeft, newTrack];
         const newTracks = [...this.props.tracks, newTrack];
         this.props.onTracksChanged(newTracks);
     };
@@ -347,13 +346,17 @@ class TrackContainer extends React.Component {
     /**
      * happens when user selects dynamic hic plot
      */
-    applyDynamicHic = tracks => {
+    applyDynamicHic = (tracks) => {
         const newTrack = new TrackModel({
             type: "dynamichic",
-            name: "dynamic hic wrap",
-            tracks
+            name: "dynamic hic",
+            tracks,
+            // options: {
+            //     ...DYNAMIC_HIC_OPTIONS,
+            //     binSize: BinSize.AUTO,
+            //     normalization: NormalizationMode.NONE,
+            // },
         });
-        // const newTracks = [...tracksLeft, newTrack];
         const newTracks = [...this.props.tracks, newTrack];
         this.props.onTracksChanged(newTracks);
     };
@@ -374,7 +377,7 @@ class TrackContainer extends React.Component {
             onNewRegion,
             onToggleHighlight,
             onSetEnteredRegion,
-            primaryView
+            primaryView,
         } = this.props;
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
         const panLeftButton = (
@@ -542,7 +545,7 @@ class TrackContainer extends React.Component {
             highlightEnteredRegion,
             primaryView,
             viewRegion,
-            highlightColor
+            highlightColor,
         } = this.props;
         const { selectedTool } = this.state;
         const contextMenu = (
@@ -559,7 +562,7 @@ class TrackContainer extends React.Component {
         const trackDivStyle = {
             border: "1px solid black",
             paddingBottom: "3px",
-            cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR
+            cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR,
         };
         return (
             <React.Fragment>
@@ -567,7 +570,7 @@ class TrackContainer extends React.Component {
                     {this.renderControls()}
                     <ContextMenuManager
                         menuElement={contextMenu}
-                        shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)}
+                        shouldMenuClose={(event) => !SELECTION_BEHAVIOR.isToggleEvent(event)}
                     >
                         <DivWithBullseye style={trackDivStyle} id="trackContainer">
                             <VerticalDivider

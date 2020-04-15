@@ -1,10 +1,10 @@
 import React from "react";
 import _ from "lodash";
-import memoizeOne from "memoize-one";
+// import memoizeOne from "memoize-one";
 import { scaleLinear } from "d3-scale";
 import { notify } from "react-notify-toast";
 
-import { DynamicHeatmap } from "./DynamicHeatmap";
+import { PixiHeatmap } from "./PixiHeatmap";
 
 import Track, { PropsFromTrackContainer } from "../commonComponents/Track";
 import TrackLegend from "../commonComponents/TrackLegend";
@@ -16,10 +16,8 @@ import { FeaturePlacer } from "../../../model/FeaturePlacer";
 import { GenomeInteraction } from "../../../model/GenomeInteraction";
 import { ScaleChoices } from "../../../model/ScaleChoices";
 
-const TOP_PADDING = 2;
-
 interface DynamicInteractionTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
-    data: GenomeInteraction[];
+    data: GenomeInteraction[][];
     options: {
         color: string;
         color2?: string;
@@ -29,6 +27,8 @@ interface DynamicInteractionTrackProps extends PropsFromTrackContainer, TooltipC
         scoreMax?: number;
         scoreMin?: number;
         height: number;
+        playing?: boolean;
+        speed?: number[];
     };
 }
 
@@ -39,7 +39,9 @@ export const DEFAULT_OPTIONS = {
     scoreScale: ScaleChoices.AUTO,
     scoreMax: 10,
     scoreMin: 0,
-    height: 500
+    height: 500,
+    playing: true,
+    speed: [5],
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -52,28 +54,21 @@ class DynamicInteractionTrack extends React.PureComponent<DynamicInteractionTrac
         super(props);
         this.scales = null;
         this.featurePlacer = new FeaturePlacer();
-        this.featurePlacer.placeInteractions = memoizeOne(this.featurePlacer.placeInteractions);
+        // this.featurePlacer.placeInteractions = memoizeOne(this.featurePlacer.placeInteractions);
         // this.computeScale = memoizeOne(this.computeScale);
         this.showTooltip = this.showTooltip.bind(this);
         this.hideTooltip = this.hideTooltip.bind(this);
     }
 
     computeScale = () => {
-        const { scoreScale, scoreMin, scoreMax, height } = this.props.options;
-        const visibleValues = this.props.data.slice(this.props.viewWindow.start, this.props.viewWindow.end);
+        const { scoreScale, scoreMin, scoreMax } = this.props.options;
+        const maxValues = this.props.data.map((d) => _.maxBy(d, "score").score);
+        const maxScore = _.max(maxValues);
         if (scoreScale === ScaleChoices.AUTO) {
-            const maxScore = visibleValues.length > 0 ? _.maxBy(visibleValues, "score").score : 0;
             return {
-                opacityScale: scaleLinear()
-                    .domain([0, maxScore])
-                    .range([0, 1])
-                    .clamp(true),
-                heightScale: scaleLinear()
-                    .domain([0, maxScore])
-                    .range([0, height - TOP_PADDING])
-                    .clamp(true),
+                opacityScale: scaleLinear().domain([0, maxScore]).range([0, 1]).clamp(true),
                 min: 0,
-                max: maxScore
+                max: maxScore,
             };
         } else {
             if (scoreMin >= scoreMax) {
@@ -83,25 +78,14 @@ class DynamicInteractionTrack extends React.PureComponent<DynamicInteractionTrac
                         .domain([scoreMax - 1, scoreMax])
                         .range([0, 1])
                         .clamp(true),
-                    heightScale: scaleLinear()
-                        .domain([scoreMax - 1, scoreMax])
-                        .range([0, height - TOP_PADDING])
-                        .clamp(true),
                     min: scoreMax - 1,
-                    max: scoreMax
+                    max: scoreMax,
                 };
             }
             return {
-                opacityScale: scaleLinear()
-                    .domain([scoreMin, scoreMax])
-                    .range([0, 1])
-                    .clamp(true),
-                heightScale: scaleLinear()
-                    .domain([scoreMin, scoreMax])
-                    .range([0, height - TOP_PADDING])
-                    .clamp(true),
+                opacityScale: scaleLinear().domain([scoreMin, scoreMax]).range([0, 1]).clamp(true),
                 min: scoreMin,
-                max: scoreMax
+                max: scoreMax,
             };
         }
     };
@@ -127,18 +111,21 @@ class DynamicInteractionTrack extends React.PureComponent<DynamicInteractionTrac
         const { data, trackModel, visRegion, width, viewWindow, options } = this.props;
         this.scales = this.computeScale();
         const visualizerProps = {
-            placedInteractions: this.featurePlacer.placeInteractions(data, visRegion, width),
+            placedInteractionsArray: data.map((d) => this.featurePlacer.placeInteractions(d, visRegion, width)),
             viewWindow,
             width,
             height: options.height,
             opacityScale: this.scales.opacityScale,
             color: options.color,
             color2: options.color2,
+            backgroundColor: options.backgroundColor,
             binSize: options.binSize,
             onInteractionHovered: this.showTooltip,
-            onMouseOut: this.hideTooltip
+            onMouseOut: this.hideTooltip,
+            playing: options.playing,
+            speed: options.speed,
         };
-        const visualizer = <DynamicHeatmap {...visualizerProps} />;
+        const visualizer = <PixiHeatmap {...visualizerProps} />;
 
         return (
             <Track

@@ -51,7 +51,7 @@ class Nav extends React.Component {
         onTrackRemoved: PropTypes.func,
         trackLegendWidth: PropTypes.number,
         onLegendWidthChange: PropTypes.func,
-        onSetHighlightColor: PropTypes.func
+        onSetHighlightColor: PropTypes.func,
     };
 
     constructor(props) {
@@ -59,7 +59,7 @@ class Nav extends React.Component {
         this.state = {
             isCacheEnabled: true,
             genomeModal: false,
-            otherGenome: null
+            otherGenome: null,
         };
         this.debounced = _.debounce(this.props.onLegendWidthChange, 250);
         this.renderOtherGenomes = this.renderOtherGenomes.bind(this);
@@ -78,7 +78,7 @@ class Nav extends React.Component {
         this.setState({ genomeModal: false });
     };
 
-    changeLegendWidth = e => {
+    changeLegendWidth = (e) => {
         const width = Number.parseFloat(e.currentTarget.value);
         //const debounced = _.debounce(this.props.onLegendWidthChange, 250);
         if (width >= 60 && width <= 200) {
@@ -112,8 +112,8 @@ class Nav extends React.Component {
 
     renderOtherGenomes() {
         const genomeName = this.props.genomeConfig.genome.getName();
-        const otherGenomes = allGenomes.map(g => g.genome.getName()).filter(g => g !== genomeName);
-        const radios = otherGenomes.map(g => {
+        const otherGenomes = allGenomes.map((g) => g.genome.getName()).filter((g) => g !== genomeName);
+        const radios = otherGenomes.map((g) => {
             const { name } = getSpeciesInfo(g);
             return (
                 <label key={g}>
@@ -170,11 +170,11 @@ class Nav extends React.Component {
             onSetHighlightColor,
             highlightColor,
             groupedTrackSets,
-            virusBrowserMode
+            virusBrowserMode,
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const { name, logo, color } = getSpeciesInfo(genomeName);
-        const hasInteractionTrack = tracks.some(model => INTERACTION_TYPES.includes(model.type)) ? true : false;
+        const hasInteractionTrack = tracks.some((model) => INTERACTION_TYPES.includes(model.type)) ? true : false;
         const REGION_EXPANDER = hasInteractionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
         const { genomeModal, otherGenome } = this.state;
         return (
@@ -197,7 +197,7 @@ class Nav extends React.Component {
                         style={{
                             backgroundImage: `url(${logo})`,
                             color: color,
-                            backgroundSize: "cover"
+                            backgroundSize: "cover",
                         }}
                     >
                         <div onClick={this.handleGenomeOpenModal}>
@@ -215,11 +215,11 @@ class Nav extends React.Component {
                                     bottom: "unset",
                                     top: 0,
                                     left: 0,
-                                    height: "100%"
+                                    height: "100%",
                                 },
                                 overlay: {
-                                    backgroundColor: "rgba(111,107,101, 0.7)"
-                                }
+                                    backgroundColor: "rgba(111,107,101, 0.7)",
+                                },
                             }}
                         >
                             {this.renderOtherGenomes()}
@@ -284,7 +284,7 @@ class Nav extends React.Component {
                                 addTermToMetaSets={addTermToMetaSets}
                             />
                         </ModalMenuItem>
-                        <ModalMenuItem itemLabel="Custom Tracks">
+                        <ModalMenuItem itemLabel="Remote Tracks">
                             <CustomTrackAdder
                                 addedTracks={tracks}
                                 onTracksAdded={onTracksAdded}
@@ -296,6 +296,12 @@ class Nav extends React.Component {
                                 addTermToMetaSets={addTermToMetaSets}
                             />
                         </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Local Tracks">
+                            <TrackUpload onTracksAdded={onTracksAdded} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Local Text Tracks">
+                            <TextTrack onTracksAdded={onTracksAdded} />
+                        </ModalMenuItem>
                         <ModalMenuItem itemLabel="Track List">
                             <TrackList
                                 addedTracks={tracks}
@@ -306,12 +312,6 @@ class Nav extends React.Component {
                                 addTracktoAvailable={addTracktoAvailable}
                                 removeTrackFromAvailable={removeTrackFromAvailable}
                             />
-                        </ModalMenuItem>
-                        <ModalMenuItem itemLabel="View Local Tracks">
-                            <TrackUpload onTracksAdded={onTracksAdded} />
-                        </ModalMenuItem>
-                        <ModalMenuItem itemLabel="Text Tracks">
-                            <TextTrack onTracksAdded={onTracksAdded} />
                         </ModalMenuItem>
                     </div>
                 </div>
@@ -334,8 +334,8 @@ class Nav extends React.Component {
                                     right: "unset",
                                     bottom: "unset",
                                     overflow: "visible",
-                                    padding: "5px"
-                                }
+                                    padding: "5px",
+                                },
                             }}
                         >
                             <SessionUI bundleId={bundleId} />
@@ -347,8 +347,8 @@ class Nav extends React.Component {
                                     right: "unset",
                                     bottom: "unset",
                                     overflow: "visible",
-                                    padding: "5px"
-                                }
+                                    padding: "5px",
+                                },
                             }}
                         >
                             <LiveUI />
@@ -404,11 +404,11 @@ class Nav extends React.Component {
                                         left: "unset",
                                         bottom: "unset",
                                         overflow: "visible",
-                                        padding: "5px"
+                                        padding: "5px",
                                     },
                                     overlay: {
-                                        backgroundColor: "rgba(255, 255, 255, 0.1)"
-                                    }
+                                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                    },
                                 }}
                             >
                                 <HighlightColorChange color={highlightColor} onChange={onSetHighlightColor} />
@@ -455,8 +455,8 @@ class Nav extends React.Component {
                                             left: "unset",
                                             bottom: "unset",
                                             overflow: "visible",
-                                            padding: "5px"
-                                        }
+                                            padding: "5px",
+                                        },
                                     }}
                                 >
                                     <HotKeyInfo />
@@ -553,19 +553,19 @@ function DropdownOpener(props) {
 
 class ModalMenuItem extends React.Component {
     static propTypes = {
-        itemLabel: PropTypes.string
+        itemLabel: PropTypes.string,
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            isOpen: false
+            isOpen: false,
         };
         this.toggleOpen = this.toggleOpen.bind(this);
     }
 
     toggleOpen() {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             return { isOpen: !prevState.isOpen };
         });
     }
@@ -574,10 +574,10 @@ class ModalMenuItem extends React.Component {
         const style = {
             ...{
                 overlay: {
-                    backgroundColor: "rgba(111,107,101, 0.7)"
-                }
+                    backgroundColor: "rgba(111,107,101, 0.7)",
+                },
             },
-            ...this.props.style
+            ...this.props.style,
         };
         return (
             <React.Fragment>
@@ -610,7 +610,7 @@ function ModalCloseButton(props) {
                 position: "absolute",
                 top: "-5px",
                 right: "15px",
-                zIndex: 2
+                zIndex: 2,
             }}
             onClick={props.onClick}
         >

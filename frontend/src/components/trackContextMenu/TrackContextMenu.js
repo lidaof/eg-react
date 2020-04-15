@@ -24,7 +24,7 @@ export const ITEM_PROP_TYPES = {
      *     `optionName` - key of options objects to set
      *     `value` - new value for the option
      */
-    onOptionSet: PropTypes.func.isRequired
+    onOptionSet: PropTypes.func.isRequired,
 };
 
 /**
@@ -46,13 +46,13 @@ class TrackContextMenu extends React.PureComponent {
          *         `nextTracks` - array of TrackModel derived from the `tracks` prop
          */
         onTracksChanged: PropTypes.func,
-        deselectAllTracks: PropTypes.func
+        deselectAllTracks: PropTypes.func,
     };
 
     static defaultProps = {
         tracks: [],
         onTracksChanged: () => undefined,
-        deselectAllTracks: () => undefined
+        deselectAllTracks: () => undefined,
     };
 
     constructor(props) {
@@ -68,7 +68,7 @@ class TrackContextMenu extends React.PureComponent {
      * @return {JSX.Element[]} menu elements to render
      */
     renderTrackSpecificItems() {
-        const selectedTracks = this.props.tracks.filter(track => track.isSelected);
+        const selectedTracks = this.props.tracks.filter((track) => track.isSelected);
         const trackConfigs = selectedTracks.map(getTrackConfig);
         let menuComponents = []; // Array of arrays, one for each track
         let optionsObjects = [];
@@ -94,7 +94,7 @@ class TrackContextMenu extends React.PureComponent {
      *
      */
     changeSelectedTracks(optionName, value) {
-        const nextTracks = this.props.tracks.map(track => {
+        const nextTracks = this.props.tracks.map((track) => {
             if (track.isSelected) {
                 return track.cloneAndSetOption(optionName, value);
             } else {
@@ -108,7 +108,7 @@ class TrackContextMenu extends React.PureComponent {
      * Requests a removal of all selected tracks.
      */
     removeSelectedTracks() {
-        const unselectedTracks = this.props.tracks.filter(track => !track.isSelected);
+        const unselectedTracks = this.props.tracks.filter((track) => !track.isSelected);
         this.props.onTracksChanged(unselectedTracks);
     }
 
@@ -116,7 +116,7 @@ class TrackContextMenu extends React.PureComponent {
      * @inheritdoc
      */
     render() {
-        const selectedTracks = this.props.tracks.filter(track => track.isSelected);
+        const selectedTracks = this.props.tracks.filter((track) => track.isSelected);
         if (selectedTracks.length === 0) {
             return null;
         }
@@ -168,8 +168,8 @@ function MatplotMenu(props) {
     if (numTracks === 1) {
         return null;
     }
-    const trackTypes = props.tracks.map(tk => tk.type);
-    if (trackTypes.some(type => !NUMERRICAL_TRACK_TYPES.includes(type))) {
+    const trackTypes = props.tracks.map((tk) => tk.type);
+    if (trackTypes.some((type) => !NUMERRICAL_TRACK_TYPES.includes(type))) {
         return null;
     }
     return (
@@ -190,8 +190,8 @@ function DynamicplotMenu(props) {
     if (numTracks === 1) {
         return null;
     }
-    const trackTypes = props.tracks.map(tk => tk.type);
-    if (trackTypes.some(type => !NUMERRICAL_TRACK_TYPES.includes(type))) {
+    const trackTypes = props.tracks.map((tk) => tk.type);
+    if (trackTypes.some((type) => !NUMERRICAL_TRACK_TYPES.includes(type))) {
         return null;
     }
     return (
@@ -212,14 +212,14 @@ function DynamicHicMenu(props) {
     if (numTracks === 1) {
         return null;
     }
-    const trackTypes = props.tracks.map(tk => tk.type);
-    if (trackTypes.some(type => type !== "hic")) {
+    const trackTypes = props.tracks.map((tk) => tk.type);
+    if (trackTypes.some((type) => type !== "hic")) {
         return null;
     }
     return (
         <div className="TrackContextMenu-item">
             <button className="btn btn-info btn-sm btn-tight" onClick={() => props.onApplyDynamicHic(props.tracks)}>
-                Dynamic plot
+                Dynamic HiC
             </button>
         </div>
     );
