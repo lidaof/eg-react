@@ -351,9 +351,9 @@ mimos@4.x.x:
     hoek "5.x.x"
     mime-db "1.x.x"
 
-minimist@~0.0.1:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.10.tgz#de3f98543dbf96082be48ad1a0c7cda836301dcf"
+minimist^0.2.1:
+  version "^0.2.1"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.2.1.tgz"
 
 moment@2.20.x:
   version "2.20.1"
@@ -409,7 +409,7 @@ optimist@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.6.1.tgz#da3ea74686fa21a19a111c326e90eb15a0196686"
   dependencies:
-    minimist "~0.0.1"
+    minimist "^0.2.1"
     wordwrap "~0.0.2"
 
 pez@4.x.x:
