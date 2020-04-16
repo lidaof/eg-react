@@ -124,6 +124,7 @@ class DynamicInteractionTrack extends React.PureComponent<DynamicInteractionTrac
             onMouseOut: this.hideTooltip,
             playing: options.playing,
             speed: options.speed,
+            trackModel,
         };
         const visualizer = <PixiHeatmap {...visualizerProps} />;
 
