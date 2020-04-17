@@ -81,22 +81,23 @@ const annotationTracks = {
 
 const publicHubData = {
     "NCBI database":
-        "A database consisting all SARS-CoV-2 strains on NCBI Genbank as well as sequence diversity across all strains at each base pair",
-    Primers: "CDC/non-CDC primers for detecting SARS-CoV-2",
-    "nextstrain database":
-        "SNV tracks of all SARS-CoV-2 strains from nextstrain, displaying their sequence variation from the reference",
+        "SNV tracks of all SARS-CoV-2 strains on NCBI Genbank displaying their sequence variation from reference",
+    "Nextstrain database":
+        "SNV tracks of all SARS-CoV-2 strains from Nextstrain, displaying their sequence variation from the reference",
     "GISAID database":
-        "SNV tracks of all SARS-CoV-2 strains from GISAID, displaying their sequence variation from the reference",
+        "SNV tracks of SARS-CoV-2 strains from GISAID, displaying their sequence variation from the reference",
+    Primers: "CDC/non-CDC primers for detecting SARS-CoV-2",
+    "Epitope predictions": "SARS-CoV-2 Epitope Predictions Across HLA-1 Alleles",
     "Recombination events": "Recombination events detected by junction-spanning RNA-seq",
-    "SARS-CoV-2 Epitope Predictions Across HLA-1 Alleles (Campbell, et al. 2020) Database":
-        "A database consisting of predicted epitope sequences in the SARS-CoV-2 genome that bind HLA-1 proteins.",
+    "Viral RNA modifications": "RNA modifications detected using Nanopore direct RNA sequencing",
+    "Viral RNA expression": "Viral RNA expression measured by Nanopore",
 };
 
 const publicHubList = [
     {
         collection: "NCBI database",
-        name: "All NCBI Strains",
-        numTracks: "keep updating",
+        name: "All NCBI SARS-CoV-2 isolates",
+        numTracks: "Updating",
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/updates/latest/browser_strains.json",
         description: {
@@ -111,49 +112,22 @@ const publicHubList = [
         },
     },
     {
-        collection: "Primers",
-        name: "Primers",
-        numTracks: "keep updating",
+        collection: "Nextstrain database",
+        name: "All Nextstrain SARS-CoV-2 isolates",
+        numTracks: "Updating",
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/primers/primers.json",
-        description: {
-            "hub built by": "Changxu Fan (fanc@wustl.edu)",
-            "hub info": "CDC primers and WHO non-CDC primers",
-            "data source:":
-                "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/technical-guidance/laboratory-guidance",
-        },
-    },
-    {
-        collection: "NCBI database",
-        name: "Sequence Diversity",
-        numTracks: 2,
-        oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/public_viralBrowser/ncov/daily_updates/latest/diversity.json",
-        description: {
-            "hub built by": "Changxu Fan (fanc@wustl.edu)",
-            "Diversity track":
-                "The sequence diversity of each base pair on the genome across all the strains available on NCBI measured by Shannon entropy. Updated daily",
-            "Mutation alert track":
-                "If a base pair is mutated from the reference genome in any of the available strains, it will be marked by a black bar.",
-        },
-    },
-    {
-        collection: "nextstrain database",
-        name: "All nextstrain SARS-CoV-2 isolates",
-        numTracks: "keep updating",
-        oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/nextstrain/latest/browser_strains.json",
+        url: "https://wangftp.wustl.edu/~cfan/Nextstrain/latest/browser_strains.json",
         description: {
             "hub built by": "Changxu Fan (fanc@wustl.edu)",
             "track type":
-                "SNV tracks of all SARS-CoV-2 strains from nextstrain, displaying their sequence variation from the reference",
-            "data source": "http://data.nextstrain.org/ncov.json",
+                "SNV tracks of all SARS-CoV-2 strains from Nextstrain, displaying their sequence variation from the reference",
+            "data source": "http://data.Nextstrain.org/ncov.json",
         },
     },
     {
         collection: "GISAID database",
         name: "All GISAID SARS-CoV-2 isolates",
-        numTracks: "keep updating",
+        numTracks: "Updating",
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/browser_strains.json",
         description: {
@@ -167,8 +141,34 @@ const publicHubList = [
         },
     },
     {
+        collection: "Primers",
+        name: "Primers",
+        numTracks: "Updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/primers/primers.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "hub info": "CDC primers and WHO non-CDC primers",
+            "data source:":
+                "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/technical-guidance/laboratory-guidance",
+        },
+    },
+    {
+        collection: "Epitope Predictions",
+        name: "Epitope Predictions (Campbell, et al. 2020)",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/Campbell_et_al/campbell_et_al.json",
+        description: {
+            "hub built by": "Jennifer Flynn (jaflynn@wustl.edu)",
+            "hub info": "Predicted SARS-CoV-2 epitopes that bind to class 1 HLA proteins.",
+            values:
+                "Values represent number of strains with the predicted epitope. Only epitope predictions with 100% sequence identity in SARS-CoV-2 are displayed.",
+        },
+    },
+    {
         collection: "Recombination events",
-        name: "Recombination events",
+        name: "Recombination events (Kim et al., 2020)",
         numTracks: 2,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/recombinationEvents.json",
@@ -181,16 +181,28 @@ const publicHubList = [
         },
     },
     {
-        collection: "SARS-CoV-2 HLA-1 Epitope Predictions (Campbell, et al. 2020) Database",
-        name: "Epitope Predictions",
-        numTracks: "1",
+        collection: "Viral RNA modifications",
+        name: "Viral RNA modifications (Kim et al., 2020)",
+        numTracks: 10,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/Campbell_et_al/campbell_et_al.json",
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/studies/kim-2020/rnamodifications.json",
         description: {
-            "hub built by": "Jennifer Flynn (jaflynn@wustl.edu)",
-            "hub info": "Predicted SARS-CoV-2 epitopes that bind to class 1 HLA proteins.",
-            values:
-                "Values represent number of strains with the predicted epitope. Only epitope predictions with 100% sequence identity in SARS-CoV-2 are displayed.",
+            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
+            "hub info":
+                "RNA modifications detected using Nanopore direct RNA sequencing (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011). Values are displayed as fractions",
+            "data source": "Supplementary Table 5, Kim et al 2020",
+        },
+    },
+    {
+        collection: "Viral RNA expression",
+        name: "Viral RNA expression (Kim et al., 2020)",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~xzhuo/viralBrowser/nanoporeBW.json",
+        description: {
+            "hub built by": "Xiaoyu Zhuo (xzhuo@wustl.edu)",
+            "hub info":
+                "a bigwig track displaying nanopore expression from SARS-CoV-2 infected Vero cells (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011).",
         },
     },
 ];

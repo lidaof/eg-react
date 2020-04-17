@@ -43,6 +43,7 @@ class BigSourceWorker extends WorkerRunnableSource {
             options.zoomLevel === undefined || options.zoomLevel === BigWigZoomLevels.AUTO
                 ? this._getMatchingZoomLevel(bigWigObj, basesPerPixel)
                 : Number.parseInt(options.zoomLevel);
+        // console.log(bigWigObj, basesPerPixel, zoomLevel);
         let promises = loci.map((locus) => this._getDataForChromosome(locus, bigWigObj, zoomLevel));
         const dataForEachLocus = await Promise.all(promises);
         const combinedData = _.flatten(dataForEachLocus);
@@ -65,6 +66,10 @@ class BigSourceWorker extends WorkerRunnableSource {
     _getMatchingZoomLevel(bigWigObj, basesPerPixel) {
         if (!basesPerPixel) {
             return -1;
+        }
+        if (bigWigObj.zoomLevels.length === 1) {
+            // just one zoom level
+            return 0;
         }
         // Sort zoom levels from largest to smallest
         let sortedZoomLevels = bigWigObj.zoomLevels

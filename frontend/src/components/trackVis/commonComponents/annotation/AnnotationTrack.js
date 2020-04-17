@@ -1,13 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import FullDisplayMode from './FullDisplayMode';
-import Track from '../Track';
-import NumericalTrack from '../numerical/NumericalTrack';
+import FullDisplayMode from "./FullDisplayMode";
+import Track from "../Track";
+import NumericalTrack from "../numerical/NumericalTrack";
 
-import { DefaultAggregators } from '../../../../model/FeatureAggregator';
-import { AnnotationDisplayModes, NumericalDisplayModes } from '../../../../model/DisplayModes';
-import configOptionMerging from '../configOptionMerging';
+import { DefaultAggregators } from "../../../../model/FeatureAggregator";
+import { AnnotationDisplayModes, NumericalDisplayModes } from "../../../../model/DisplayModes";
+import configOptionMerging from "../configOptionMerging";
 
 export const DEFAULT_OPTIONS = {
     displayMode: AnnotationDisplayModes.FULL,
@@ -20,7 +20,7 @@ const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 /**
  * A component that visualizes annotations or Features.
- * 
+ *
  * @author Silas Hsu
  */
 class AnnotationTrack extends React.PureComponent {
@@ -35,20 +35,27 @@ class AnnotationTrack extends React.PureComponent {
         }).isRequired,
     });
 
+    paddingFunc = (feature, xSpan) => {
+        const width = xSpan.endX - xSpan.startX;
+        const estimatedLabelWidth = feature.getName().length * 9;
+        if (estimatedLabelWidth < 0.5 * width) {
+            return 5;
+        } else {
+            return 9 + estimatedLabelWidth;
+        }
+    };
+
     render() {
         if (this.props.options.displayMode === AnnotationDisplayModes.DENSITY) {
             const numericalOptions = {
                 ...this.props.options,
                 displayMode: NumericalDisplayModes.AUTO,
-                aggregateMethod: DefaultAggregators.types.COUNT
+                aggregateMethod: DefaultAggregators.types.COUNT,
             };
-            return <NumericalTrack
-                {...this.props}
-                unit="feature density"
-                options={numericalOptions}
-            />;
-        } else { // Assume FULL display mode
-            return <FullDisplayMode {...this.props} />;
+            return <NumericalTrack {...this.props} unit="feature density" options={numericalOptions} />;
+        } else {
+            // Assume FULL display mode
+            return <FullDisplayMode {...this.props} featurePadding={this.paddingFunc} />;
         }
     }
 }
