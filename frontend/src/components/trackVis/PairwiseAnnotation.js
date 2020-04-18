@@ -28,11 +28,11 @@ class PairwiseAnnotation extends React.Component {
          *     `feature`: the same Feature as the one passed via props
          */
         segmentColors: PropTypes.object,
-        onClick: PropTypes.func
+        onClick: PropTypes.func,
     };
 
     static defaultProps = {
-        onClick: (event, feature) => undefined
+        onClick: (event, feature) => undefined,
     };
 
     render() {
@@ -49,11 +49,11 @@ class PairwiseAnnotation extends React.Component {
         if (width <= 0) {
             return null;
         }
-        const drawWidth = Math.max(width, 1);
+        const drawWidth = Math.max(width, 2);
         const mainBody = <rect x={startX} y={0} width={drawWidth} height={HEIGHT} fill={drawColor} />;
         if (isMinimal) {
             return (
-                <TranslatableG y={y} onClick={event => onClick(event, feature)}>
+                <TranslatableG y={y} onClick={(event) => onClick(event, feature)}>
                     {mainBody}
                 </TranslatableG>
             );
@@ -80,7 +80,7 @@ class PairwiseAnnotation extends React.Component {
         }
 
         return (
-            <TranslatableG y={y} onClick={event => onClick(event, feature)}>
+            <TranslatableG y={y} onClick={(event) => onClick(event, feature)}>
                 {mainBody}
                 {label}
             </TranslatableG>

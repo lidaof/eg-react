@@ -22,7 +22,7 @@ export const DEFAULT_OPTIONS = {
     color: "blue",
     backgroundColor: "white",
     playing: true,
-    speed: [10]
+    speed: [10],
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 const TOP_PADDING = 2;
@@ -46,10 +46,10 @@ class DynamicNumericalTrack extends React.PureComponent {
             arrayAggregateMethod: PropTypes.oneOf(Object.values(DefaultArrayAggregators.types)),
             height: PropTypes.number.isRequired, // Height of the track
 
-            color: PropTypes.string
+            color: PropTypes.string,
         }).isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
-        error: PropTypes.any // If present, applies error styling
+        error: PropTypes.any, // If present, applies error styling
     });
 
     constructor(props) {
@@ -67,15 +67,12 @@ class DynamicNumericalTrack extends React.PureComponent {
 
     computeScales(xToValue, height) {
         const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
-        const max = _.max(visibleValues.map(x => _.max(x))) || 0; // in case undefined returned here, cause maxboth be undefined too
+        const max = _.max(visibleValues.map((x) => _.max(x))) || 0; // in case undefined returned here, cause maxboth be undefined too
         const min = 0;
         return {
-            valueToY: scaleLinear()
-                .domain([max, min])
-                .range([TOP_PADDING, height])
-                .clamp(true),
+            valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
             min,
-            max
+            max,
         };
     }
 
@@ -85,7 +82,7 @@ class DynamicNumericalTrack extends React.PureComponent {
      * @param {number} relativeX - x coordinate of hover relative to the visualizer
      * @return {JSX.Element} tooltip to render
      */
-    renderTooltip = relativeX => {
+    renderTooltip = (relativeX) => {
         const { trackModel, viewRegion, width } = this.props;
         const value = this.xToValue[Math.round(relativeX)];
         const stringValues = _.compact(value).length ? JSON.stringify(value) : "(no data)";
@@ -101,11 +98,13 @@ class DynamicNumericalTrack extends React.PureComponent {
     };
 
     render() {
-        const { data, viewRegion, width, trackModel, unit, options } = this.props;
-        const { height, arrayAggregateMethod, color, backgroundColor, playing, speed } = options;
+        const { data, viewRegion, width, trackModel, unit, options, viewWindow } = this.props;
+        const { height, arrayAggregateMethod, color, backgroundColor, playing, speed, dynamicLabels } = options;
         this.xToValue = this.aggregateFeatures(data, viewRegion, width, arrayAggregateMethod);
         this.scales = this.computeScales(this.xToValue, height);
-        const legend = <TrackLegend trackModel={trackModel} height={height} axisLegend={unit} />;
+        const legend = (
+            <TrackLegend trackModel={trackModel} height={height} axisScale={this.scales.valueToY} axisLegend={unit} />
+        );
         const visualizer = (
             <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip}>
                 <PixiScene
@@ -117,6 +116,8 @@ class DynamicNumericalTrack extends React.PureComponent {
                     backgroundColor={backgroundColor}
                     playing={playing}
                     speed={speed}
+                    dynamicLabels={dynamicLabels}
+                    viewWindow={viewWindow}
                 />
             </HoverTooltipContext>
         );

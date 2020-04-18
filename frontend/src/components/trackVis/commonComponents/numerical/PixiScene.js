@@ -35,10 +35,12 @@ export class PixiScene extends React.PureComponent {
         this.state = {
             currentStep: 0,
             isPlaying: true,
+            prevStep: 0,
         };
         this.count = 0;
         // this.graphics = [];
         this.sprites = [];
+        this.labels = [];
         // this.colors = props.colors.length ? [...props.colors] : [];
         // if (props.steps) {
         //     if (this.colors.length < props.steps) {
@@ -99,6 +101,21 @@ export class PixiScene extends React.PureComponent {
         this.app.stage.addChild(this.particles);
         window.addEventListener("resize", this.onWindowResize);
         this.app.renderer.plugins.interaction.on("pointerdown", this.onPointerDown);
+        const style = new PIXI.TextStyle({
+            fontFamily: "Arial",
+            fontSize: 16,
+        });
+        if (this.props.dynamicLabels && this.props.dynamicLabels.length) {
+            this.props.dynamicLabels.forEach((label) => {
+                const t = new PIXI.Text(label, style);
+                t.position.set(this.props.viewWindow.start + 5, 5);
+                t.visible = false;
+                this.labels.push(t);
+            });
+        }
+        if (this.labels.length) {
+            this.labels.forEach((t) => this.app.stage.addChild(t));
+        }
     }
 
     componentWillUnmount() {
@@ -107,9 +124,16 @@ export class PixiScene extends React.PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.xToValue !== this.props.xToValue || prevState.currentStep !== this.state.currentStep) {
+        const { currentStep, prevStep } = this.state;
+        if (prevProps.xToValue !== this.props.xToValue || prevState.currentStep !== currentStep) {
             this.steps = this.getMaxSteps();
             this.draw();
+            if (this.labels.length) {
+                if (currentStep < this.labels.length && prevStep < this.labels.length) {
+                    this.labels[currentStep].visible = true;
+                    this.labels[prevStep].visible = false;
+                }
+            }
         }
         if (prevProps.color !== this.props.color) {
             const color = colorString2number(this.props.color);
@@ -152,10 +176,15 @@ export class PixiScene extends React.PureComponent {
     tick = () => {
         // const useSpeed = Array.isArray(this.props.speed) ? this.props.speed[0] : this.props.speed;
         this.count += 0.005 * this.props.speed[0];
-        if (this.count >= this.steps) {
+        if (this.count >= this.steps - 1) {
             this.count = 0;
         }
-        this.setState({ currentStep: Math.round(this.count) });
+        let step = Math.round(this.count);
+        let prevStep = step - 1;
+        if (prevStep < 0) {
+            prevStep = this.steps - 1;
+        }
+        this.setState({ currentStep: step, prevStep });
     };
 
     getMaxSteps = () => {
