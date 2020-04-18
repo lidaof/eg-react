@@ -1,5 +1,10 @@
 # Version History
 
+## 51.0.2
+
+-   fixed a crash bug when dragging a dynamic bedgraph track
+-   added dynamic labels dynamic tracks
+
 ## 51.0.1
 
 -   add tooltip for dynamic hic track

@@ -3,12 +3,18 @@ import Chromosome from "../Chromosome";
 import Genome from "../Genome";
 import TrackModel from "../../TrackModel";
 
-const genome = new Genome("nCoV2019", [new Chromosome("NC_045512.2", 29903)]);
+const genome = new Genome("SARS-CoV-2", [new Chromosome("NC_045512.2", 29903)]);
 
 const navContext = genome.makeNavContext();
 const defaultRegion = navContext.parse("NC_045512.2:0-29903");
 
 const defaultTracks = [
+    new TrackModel({
+        type: "geneAnnotation",
+        name: "ncbiGene",
+        label: "NCBI genes",
+        genome: "nCoV2019",
+    }),
     new TrackModel({
         type: "ruler",
         name: "Ruler",

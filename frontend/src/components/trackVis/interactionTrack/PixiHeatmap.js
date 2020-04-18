@@ -151,12 +151,16 @@ export class PixiHeatmap extends React.PureComponent {
     };
 
     drawHeatmap = () => {
-        const { opacityScale, color, color2, viewWindow, height, placedInteractionsArray } = this.props;
+        const { opacityScale, color, color2, viewWindow, height, placedInteractionsArray, trackModel } = this.props;
         if (this.subs.length) {
             this.resetSubs();
         } else {
             this.initializeSubs();
         }
+        const style = new PIXI.TextStyle({
+            fontFamily: "Arial",
+            fontSize: 16,
+        });
         const g = new PIXI.Graphics();
         g.lineStyle(0);
         g.beginFill(0xffffff, 1);
@@ -206,6 +210,12 @@ export class PixiHeatmap extends React.PureComponent {
                     });
                 }
             });
+            const label = trackModel.tracks[index].label ? trackModel.tracks[index].label : "";
+            if (label) {
+                const t = new PIXI.Text(trackModel.tracks[index].label, style);
+                t.position.set(viewWindow.start + 5, height - 21);
+                this.subs[index].addChild(t);
+            }
         });
     };
 
