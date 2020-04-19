@@ -126,6 +126,9 @@ export class PixiScene extends React.PureComponent {
 
     componentDidUpdate(prevProps, prevState) {
         const { currentStep, prevStep } = this.state;
+        if (prevProps.width !== this.props.width) {
+            this.handleWidthChange();
+        }
         if (prevProps.xToValue !== this.props.xToValue || prevState.currentStep !== currentStep) {
             this.steps = this.getMaxSteps();
             this.draw();
@@ -158,20 +161,20 @@ export class PixiScene extends React.PureComponent {
                 this.labels.forEach((t) => t.position.set(this.props.viewWindow.start + 5, 5));
             }
         }
-        if (prevProps.width !== this.props.width) {
-            this.particles.removeChildren();
-            this.sprites = [];
-            const color = colorString2number(this.props.color);
-            const tintColor = colorString2number(color);
-            for (let i = 0; i < this.props.width; i++) {
-                const s = new PIXI.Sprite(this.t);
-                s.tint = tintColor;
-                this.sprites.push(s);
-                this.particles.addChild(s);
-                // this.app.stage.addChild(s);
-            }
-        }
     }
+
+    handleWidthChange = () => {
+        this.particles.removeChildren();
+        this.sprites = [];
+        const color = colorString2number(this.props.color);
+        const tintColor = colorString2number(color);
+        for (let i = 0; i < this.props.width; i++) {
+            const s = new PIXI.Sprite(this.t);
+            s.tint = tintColor;
+            this.sprites.push(s);
+            this.particles.addChild(s);
+        }
+    };
     onWindowResize = () => {
         const { height, width } = this.props;
         this.app.renderer.resize(width, height);

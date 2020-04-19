@@ -1,10 +1,11 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import ReactModal from 'react-modal';
-import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
-import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
-import { SliderRail, Handle, Track } from './SliderSubComponents';
-import { ActionCreators } from '../../AppState';
+import React from "react";
+import { connect } from "react-redux";
+import ReactModal from "react-modal";
+import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import { Slider, Rail, Handles, Tracks } from "react-compound-slider";
+import { SliderRail, Handle, Track } from "./SliderSubComponents";
+import { ActionCreators } from "../../AppState";
+import arrayMove from "array-move";
 
 /**
  * a component to drag and drop tracks
@@ -13,30 +14,36 @@ import { ActionCreators } from '../../AppState';
 
 function mapStateToProps(state) {
     return {
-        tracks: state.browser.present.tracks
+        tracks: state.browser.present.tracks,
     };
 }
 
 const callbacks = {
-    onTracksChanged: ActionCreators.setTracks
+    onTracksChanged: ActionCreators.setTracks,
 };
 
 const gridItemStyles = {
-    height: '24px',
-    backgroundColor: '#e5e5e5',
-    cursor: 'move'
+    height: "24px",
+    backgroundColor: "#e5e5e5",
+    cursor: "move",
 };
 
 const GridItem = SortableElement(({ value }) => {
-    const style = value.options ? {color: value.options.color} : null;
-    return <div style={gridItemStyles}><span style={style}>{value.label} ({value.type})</span></div>;
+    const style = value.options ? { color: value.options.color } : null;
+    return (
+        <div style={gridItemStyles}>
+            <span style={style}>
+                {value.label} ({value.type})
+            </span>
+        </div>
+    );
 });
 
 const Grid = SortableContainer(({ items, colNum }) => {
     const gridStyles = {
-        display: 'grid',
+        display: "grid",
         gridTemplateColumns: `repeat(${colNum}, 1fr)`,
-        gridGap: '5px'
+        gridGap: "5px",
     };
     return (
         <div style={gridStyles}>
@@ -55,7 +62,7 @@ class ReorderMany extends React.Component {
         this.state = {
             items: [],
             values: defaultValues.slice(),
-            update: defaultValues.slice()
+            update: defaultValues.slice(),
         };
     }
 
@@ -64,22 +71,22 @@ class ReorderMany extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if(prevProps.tracks !==this.props.tracks){
-          this.setState({items: [].concat(this.props.tracks) });
+        if (prevProps.tracks !== this.props.tracks) {
+            this.setState({ items: [].concat(this.props.tracks) });
         }
-      }
+    }
 
     onSortEnd = ({ oldIndex, newIndex }) => {
         this.setState(({ items }) => ({
-            items: arrayMove(items, oldIndex, newIndex)
+            items: arrayMove(items, oldIndex, newIndex),
         }));
     };
 
-    onUpdate = update => {
+    onUpdate = (update) => {
         this.setState({ update });
     };
 
-    onChange = values => {
+    onChange = (values) => {
         this.setState({ values });
     };
 
@@ -88,16 +95,16 @@ class ReorderMany extends React.Component {
      */
     renderSlider = () => {
         const sliderStyle = {
-            position: 'relative',
-            width: '100%',
-            marginTop: '40px'
+            position: "relative",
+            width: "100%",
+            marginTop: "40px",
         };
 
         const domain = [1, 20];
         const { values } = this.state;
 
         return (
-            <div style={{ height: 40, width: '100%' }}>
+            <div style={{ height: 40, width: "100%" }}>
                 <Slider
                     mode={1}
                     step={1}
@@ -111,7 +118,7 @@ class ReorderMany extends React.Component {
                     <Handles>
                         {({ handles, getHandleProps }) => (
                             <div className="slider-handles">
-                                {handles.map(handle => (
+                                {handles.map((handle) => (
                                     <Handle
                                         key={handle.id}
                                         handle={handle}
@@ -145,7 +152,9 @@ class ReorderMany extends React.Component {
 (Alt+G)"
                     className="btn btn-light"
                 >
-                    <span role="img" aria-label="reorder">🔃</span>
+                    <span role="img" aria-label="reorder">
+                        🔃
+                    </span>
                 </button>
                 <ReactModal
                     isOpen={this.props.showReorderManyModal}
@@ -155,7 +164,9 @@ class ReorderMany extends React.Component {
                     shouldCloseOnOverlayClick={true}
                 >
                     <div className="ReorderMany">
-                        <h5>Please drag and drop to re-order your tracks. Press the apply button after you are done.</h5>
+                        <h5>
+                            Please drag and drop to re-order your tracks. Press the apply button after you are done.
+                        </h5>
                         <button
                             onClick={() => this.props.onTracksChanged(this.state.items)}
                             className="btn btn-sm btn-info"
@@ -163,9 +174,18 @@ class ReorderMany extends React.Component {
                             Apply
                         </button>
                         <span
-                            className="text-right" 
-                            style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px", zIndex: 2}}
-                            onClick={this.props.onCloseReorderManyModal}>
+                            className="text-right"
+                            style={{
+                                cursor: "pointer",
+                                color: "red",
+                                fontSize: "2em",
+                                position: "absolute",
+                                top: "-5px",
+                                right: "15px",
+                                zIndex: 2,
+                            }}
+                            onClick={this.props.onCloseReorderManyModal}
+                        >
                             ×
                         </span>
                         <p>You can adjust column numbers using the slider below:</p>
@@ -183,7 +203,4 @@ class ReorderMany extends React.Component {
     }
 }
 
-export default connect(
-    mapStateToProps,
-    callbacks
-)(ReorderMany);
+export default connect(mapStateToProps, callbacks)(ReorderMany);

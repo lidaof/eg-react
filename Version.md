@@ -2,8 +2,8 @@
 
 ## 51.0.2
 
--   fixed a crash bug when dragging a dynamic bedgraph track
--   added dynamic labels dynamic tracks
+-   fixed a crash bug when reize window with a dynamic bedgraph track
+-   added dynamic labels to dynamic tracks
 
 ## 51.0.1
 
