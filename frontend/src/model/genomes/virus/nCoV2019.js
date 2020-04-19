@@ -13,7 +13,7 @@ const defaultTracks = [
         type: "geneAnnotation",
         name: "ncbiGene",
         label: "NCBI genes",
-        genome: "nCoV2019",
+        genome: "SARS-CoV-2",
     }),
     new TrackModel({
         type: "ruler",
@@ -88,6 +88,7 @@ const annotationTracks = {
             name: "ncbiGene",
             label: "NCBI genes",
             filetype: "geneAnnotation",
+            genome: "SARS-CoV-2",
         },
     ],
     Assembly: [

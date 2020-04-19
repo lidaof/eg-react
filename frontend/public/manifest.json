@@ -13,7 +13,7 @@
             "type": "image/png"
         }
     ],
-    "start_url": "/browser/",
+    "start_url": "/browser/index.html",
     "display": "standalone",
     "orientation": "landscape",
     "theme_color": "#000000",

@@ -4,6 +4,7 @@
 
 -   fixed a crash bug when reize window with a dynamic bedgraph track
 -   added dynamic labels to dynamic tracks
+-   fixed a bug when zooming in a dynamic bedgraph data not show
 
 ## 51.0.1
 

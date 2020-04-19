@@ -62,13 +62,17 @@ export class PixiScene extends React.PureComponent {
             autoResize: true,
             resolution: window.devicePixelRatio,
         });
-        this.particles = new PIXI.ParticleContainer(width, {
-            scale: true,
-            position: true,
-            rotation: true,
-            uvs: true,
-            alpha: true,
-        });
+        // this.particles = new PIXI.ParticleContainer(width, {
+        //     scale: true,
+        //     position: true,
+        //     rotation: true,
+        //     uvs: true,
+        //     alpha: true,
+        //     autoResize: true,
+        // });
+        //somehow paticles get that bug when more sprites added, auto rezie not working, need force refresh
+        // changed to container
+        this.particles = new PIXI.Container();
         this.container.appendChild(this.app.view);
         this.app.ticker.add(this.tick);
         // this.g = new PIXI.Graphics();
@@ -126,8 +130,11 @@ export class PixiScene extends React.PureComponent {
 
     componentDidUpdate(prevProps, prevState) {
         const { currentStep, prevStep } = this.state;
-        if (prevProps.width !== this.props.width) {
-            this.handleWidthChange();
+        if (prevProps.height !== this.props.height || prevProps.width !== this.props.width) {
+            this.onWindowResize();
+            if (prevProps.width !== this.props.width) {
+                this.handleWidthChange();
+            }
         }
         if (prevProps.xToValue !== this.props.xToValue || prevState.currentStep !== currentStep) {
             this.steps = this.getMaxSteps();
@@ -146,9 +153,7 @@ export class PixiScene extends React.PureComponent {
         if (prevProps.backgroundColor !== this.props.backgroundColor) {
             this.app.renderer.backgroundColor = colorString2number(this.props.backgroundColor);
         }
-        if (prevProps.height !== this.props.height || prevProps.width !== this.props.width) {
-            this.app.renderer.resize(this.props.width, this.props.height);
-        }
+
         if (prevProps.playing !== this.props.playing) {
             if (this.props.playing) {
                 this.app.ticker.start();
@@ -175,6 +180,7 @@ export class PixiScene extends React.PureComponent {
             this.particles.addChild(s);
         }
     };
+
     onWindowResize = () => {
         const { height, width } = this.props;
         this.app.renderer.resize(width, height);
@@ -215,6 +221,7 @@ export class PixiScene extends React.PureComponent {
     };
 
     draw = () => {
+        // console.log(this.sprites.length, this.particles.width);
         const { scales, height } = this.props;
         const { currentStep } = this.state;
         // this.graphics.forEach(g => g.clear());
