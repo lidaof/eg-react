@@ -1,10 +1,10 @@
 import { TrackModel } from './../../model/TrackModel';
 import { TrackConfig } from './TrackConfig';
-import CallingCardTrack, {DEFAULT_OPTIONS} from '../trackVis/CallingCardTrack';
+import QBedTrack, {DEFAULT_OPTIONS} from '../trackVis/QBedTrack';
 import WorkerSource from '../../dataSources/worker/WorkerSource';
 import { BedWorker } from '../../dataSources/WorkerTSHook';
 import LocalBedSource from '../../dataSources/LocalBedSource';
-import CallingCard from '../../model/CallingCard';
+import QBed from '../../model/QBed';
 import BedRecord from '../../dataSources/bed/BedRecord';
 import BedTextSource from "../../dataSources/BedTextSource";
 import HeightConfig from '../trackContextMenu/HeightConfig';
@@ -16,7 +16,7 @@ import MarkerSizeConfig from '../trackContextMenu/MarkerSizeConfig';
 import { BackgroundColorConfig, PrimaryColorConfig } from '../trackContextMenu/ColorConfig';
 
 
-export class CallingCardTrackConfig extends TrackConfig {
+export class QBedTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
         super(trackModel);
         this.setDefaultOptions(DEFAULT_OPTIONS);
@@ -39,17 +39,17 @@ export class CallingCardTrackConfig extends TrackConfig {
     }
 
     /**
-     * Converts BedRecords to CallingCards.
+     * Converts BedRecords to QBeds.
      * 
      * @param {BedRecord[]} data - bed records to convert
-     * @return {CallingCard[]} CallingCard records
+     * @return {QBed[]} QBed records
      */
     formatData(data: BedRecord[]) {
-        return data.map(record => new CallingCard(record));
+        return data.map(record => new QBed(record));
     }
 
     getComponent() {
-        return CallingCardTrack;
+        return QBedTrack;
     }
 
     getMenuComponents() {

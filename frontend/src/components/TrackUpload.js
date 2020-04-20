@@ -181,7 +181,7 @@ export class TrackUpload extends React.Component {
                             <option value="bed">bed</option>
                             <option value="refBed">refBed</option>
                             <option value="longrange">longrange</option>
-                            <option value="callingcard">callingcard</option>
+                            <option value="qbed">qBED</option>
                             <option value="bam">BAM</option>
                         </optgroup>
                     </select>
