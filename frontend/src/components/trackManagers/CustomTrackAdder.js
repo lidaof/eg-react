@@ -22,6 +22,7 @@ export const TRACK_TYPES = {
     Alignment: ["bam", "pairwise"],
     Callingcard: ["callingcard"],
     "3D Structure": ["g3d"],
+    Dynamic: ["dbedgraph"],
 };
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
@@ -43,6 +44,7 @@ const TYPES_DESC = {
     pairwise: "pairwise alignment data",
     callingcard: "calling card data",
     g3d: "3D structure in .g3d format",
+    dbedgraph: "Dynamic bedgraph data",
 };
 
 /**
