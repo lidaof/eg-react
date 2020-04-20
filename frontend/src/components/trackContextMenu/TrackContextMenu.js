@@ -270,7 +270,9 @@ export function ObjectAsTable(props) {
     }
     const rows = Object.entries(content).map((values, idx) => {
         let tdContent;
-        if (variableIsObject(values[1])) {
+        if (React.isValidElement(values[1])) {
+            tdContent = values[1];
+        } else if (variableIsObject(values[1])) {
             tdContent = <ObjectAsTable content={values[1]} />;
         } else {
             tdContent = Array.isArray(values[1]) ? values[1].join(" > ") : values[1];

@@ -32,13 +32,16 @@ export class PixiScene extends React.PureComponent {
         this.container = null;
         this.particles = null;
         this.app = null;
+        this.t = null;
         this.state = {
             currentStep: 0,
             isPlaying: true,
+            prevStep: 0,
         };
         this.count = 0;
         // this.graphics = [];
         this.sprites = [];
+        this.labels = [];
         // this.colors = props.colors.length ? [...props.colors] : [];
         // if (props.steps) {
         //     if (this.colors.length < props.steps) {
@@ -59,13 +62,17 @@ export class PixiScene extends React.PureComponent {
             autoResize: true,
             resolution: window.devicePixelRatio,
         });
-        this.particles = new PIXI.ParticleContainer(width, {
-            scale: true,
-            position: true,
-            rotation: true,
-            uvs: true,
-            alpha: true,
-        });
+        // this.particles = new PIXI.ParticleContainer(width, {
+        //     scale: true,
+        //     position: true,
+        //     rotation: true,
+        //     uvs: true,
+        //     alpha: true,
+        //     autoResize: true,
+        // });
+        //somehow paticles get that bug when more sprites added, auto rezie not working, need force refresh
+        // changed to container
+        this.particles = new PIXI.Container();
         this.container.appendChild(this.app.view);
         this.app.ticker.add(this.tick);
         // this.g = new PIXI.Graphics();
@@ -78,19 +85,19 @@ export class PixiScene extends React.PureComponent {
         // } else {
         //     color = colorString2number(this.props.color);
         // }
-        const color = colorString2number(this.props.color);
         const g = new PIXI.Graphics();
         g.lineStyle(0);
         g.beginFill(0xffffff, 1);
         g.drawRect(0, 0, 1, 1);
         g.endFill();
+        const color = colorString2number(this.props.color);
         const tintColor = colorString2number(color);
         // const t = PIXI.RenderTexture.create(g.width, g.height);
-        const t = this.app.renderer.generateTexture(g);
-        this.app.renderer.render(g, t);
+        this.t = this.app.renderer.generateTexture(g);
+        this.app.renderer.render(g, this.t);
         for (let i = 0; i < width; i++) {
             // this.graphics.push(new PIXI.Graphics());
-            const s = new PIXI.Sprite(t);
+            const s = new PIXI.Sprite(this.t);
             s.tint = tintColor;
             this.sprites.push(s);
             this.particles.addChild(s);
@@ -99,6 +106,21 @@ export class PixiScene extends React.PureComponent {
         this.app.stage.addChild(this.particles);
         window.addEventListener("resize", this.onWindowResize);
         this.app.renderer.plugins.interaction.on("pointerdown", this.onPointerDown);
+        const style = new PIXI.TextStyle({
+            fontFamily: "Arial",
+            fontSize: 16,
+        });
+        if (this.props.dynamicLabels && this.props.dynamicLabels.length) {
+            this.props.dynamicLabels.forEach((label) => {
+                const t = new PIXI.Text(label, style);
+                t.position.set(this.props.viewWindow.start + 5, 5);
+                t.visible = false;
+                this.labels.push(t);
+            });
+        }
+        if (this.labels.length) {
+            this.labels.forEach((t) => this.app.stage.addChild(t));
+        }
     }
 
     componentWillUnmount() {
@@ -107,9 +129,22 @@ export class PixiScene extends React.PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.xToValue !== this.props.xToValue || prevState.currentStep !== this.state.currentStep) {
+        const { currentStep, prevStep } = this.state;
+        if (prevProps.height !== this.props.height || prevProps.width !== this.props.width) {
+            this.onWindowResize();
+            if (prevProps.width !== this.props.width) {
+                this.handleWidthChange();
+            }
+        }
+        if (prevProps.xToValue !== this.props.xToValue || prevState.currentStep !== currentStep) {
             this.steps = this.getMaxSteps();
             this.draw();
+            if (this.labels.length) {
+                if (currentStep < this.labels.length && prevStep < this.labels.length) {
+                    this.labels[currentStep].visible = true;
+                    this.labels[prevStep].visible = false;
+                }
+            }
         }
         if (prevProps.color !== this.props.color) {
             const color = colorString2number(this.props.color);
@@ -118,9 +153,7 @@ export class PixiScene extends React.PureComponent {
         if (prevProps.backgroundColor !== this.props.backgroundColor) {
             this.app.renderer.backgroundColor = colorString2number(this.props.backgroundColor);
         }
-        if (prevProps.height !== this.props.height || prevProps.width !== this.props.width) {
-            this.app.renderer.resize(this.props.width, this.props.height);
-        }
+
         if (prevProps.playing !== this.props.playing) {
             if (this.props.playing) {
                 this.app.ticker.start();
@@ -128,7 +161,26 @@ export class PixiScene extends React.PureComponent {
                 this.app.ticker.stop();
             }
         }
+        if (prevProps.viewWindow !== this.props.viewWindow) {
+            if (this.labels.length) {
+                this.labels.forEach((t) => t.position.set(this.props.viewWindow.start + 5, 5));
+            }
+        }
     }
+
+    handleWidthChange = () => {
+        this.particles.removeChildren();
+        this.sprites = [];
+        const color = colorString2number(this.props.color);
+        const tintColor = colorString2number(color);
+        for (let i = 0; i < this.props.width; i++) {
+            const s = new PIXI.Sprite(this.t);
+            s.tint = tintColor;
+            this.sprites.push(s);
+            this.particles.addChild(s);
+        }
+    };
+
     onWindowResize = () => {
         const { height, width } = this.props;
         this.app.renderer.resize(width, height);
@@ -152,10 +204,15 @@ export class PixiScene extends React.PureComponent {
     tick = () => {
         // const useSpeed = Array.isArray(this.props.speed) ? this.props.speed[0] : this.props.speed;
         this.count += 0.005 * this.props.speed[0];
-        if (this.count >= this.steps) {
+        if (this.count >= this.steps - 1) {
             this.count = 0;
         }
-        this.setState({ currentStep: Math.round(this.count) });
+        let step = Math.round(this.count);
+        let prevStep = step - 1;
+        if (prevStep < 0) {
+            prevStep = this.steps - 1;
+        }
+        this.setState({ currentStep: step, prevStep });
     };
 
     getMaxSteps = () => {
@@ -164,6 +221,7 @@ export class PixiScene extends React.PureComponent {
     };
 
     draw = () => {
+        // console.log(this.sprites.length, this.particles.width);
         const { scales, height } = this.props;
         const { currentStep } = this.state;
         // this.graphics.forEach(g => g.clear());
@@ -180,8 +238,10 @@ export class PixiScene extends React.PureComponent {
             // g.drawRect(x, TOP_PADDING, 1, scaleHeight);
             // g.endFill();
             const s = this.sprites[x];
-            s.position.set(x, height);
-            s.scale.set(1, scaleHeight);
+            if (s) {
+                s.position.set(x, height);
+                s.scale.set(1, scaleHeight);
+            }
         });
     };
 

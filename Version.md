@@ -1,5 +1,18 @@
 # Version History
 
+## 51.0.2
+
+-   fixed a crash bug when reize window with a dynamic bedgraph track
+-   added dynamic labels to dynamic tracks
+-   fixed a bug when zooming in a dynamic bedgraph data not show
+
+## 51.0.1
+
+-   add tooltip for dynamic hic track
+-   fixed one bug when `bigwig` files have just one zoomLevel causing `data fetch error`
+-   a new option `alwaysDrawLabel` added to `bed` and `categorical` track for telling the browser always render the label
+-   update nCoV2019 public hubs
+
 ## 51.0.0
 
 -   added dynamic numerical track

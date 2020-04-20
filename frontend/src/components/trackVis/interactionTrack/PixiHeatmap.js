@@ -1,13 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-// import _ from "lodash";
 import * as PIXI from "pixi.js";
-// import { ScaleLinear } from "d3-scale";
-// import pointInPolygon from "point-in-polygon";
-// import { GenomeInteraction } from "../../../model/GenomeInteraction";
-// import { PlacedInteraction } from "../../../model/FeaturePlacer";
-// import OpenInterval from "../../../model/interval/OpenInterval";
-// import HoverTooltipContext from "../commonComponents/tooltip/HoverTooltipContext";
+import pointInPolygon from "point-in-polygon";
+import HoverTooltipContext from "../commonComponents/tooltip/HoverTooltipContext";
 import { colorString2number } from "../../../util";
 
 const ANGLE = Math.PI / 4;
@@ -127,12 +122,14 @@ export class PixiHeatmap extends React.PureComponent {
         this.steps = this.getMaxSteps();
         for (let i = 0; i < this.steps; i++) {
             this.subs.push(new PIXI.Container());
+            this.hmData.push([]);
         }
         this.subs.forEach((c) => this.subcontainer.addChild(c));
     };
 
     resetSubs = () => {
         this.subs.forEach((c) => c.removeChildren());
+        this.hmData = this.hmData.map(() => []);
     };
 
     onWindowResize = () => {
@@ -154,13 +151,16 @@ export class PixiHeatmap extends React.PureComponent {
     };
 
     drawHeatmap = () => {
-        const { opacityScale, color, color2, viewWindow, height, placedInteractionsArray } = this.props;
+        const { opacityScale, color, color2, viewWindow, height, placedInteractionsArray, trackModel } = this.props;
         if (this.subs.length) {
             this.resetSubs();
         } else {
             this.initializeSubs();
         }
-        this.hmData = [];
+        const style = new PIXI.TextStyle({
+            fontFamily: "Arial",
+            fontSize: 16,
+        });
         const g = new PIXI.Graphics();
         g.lineStyle(0);
         g.beginFill(0xffffff, 1);
@@ -204,18 +204,73 @@ export class PixiHeatmap extends React.PureComponent {
                 this.subs[index].addChild(s);
                 // only push the points in screen
                 if (topX + halfSpan2 > viewWindow.start && topX - halfSpan1 < viewWindow.end && topY < height) {
-                    this.hmData.push({
+                    this.hmData[index].push({
                         points,
                         interaction: placedInteraction.interaction,
                     });
                 }
             });
+            const label = trackModel.tracks[index].label ? trackModel.tracks[index].label : "";
+            if (label) {
+                const t = new PIXI.Text(trackModel.tracks[index].label, style);
+                t.position.set(viewWindow.start + 5, height - 21);
+                this.subs[index].addChild(t);
+            }
         });
+    };
+
+    /**
+     * Renders the default tooltip that is displayed on hover.
+     *
+     * @param {number} relativeX - x coordinate of hover relative to the visualizer
+     * @param {number} relativeY - y coordinate of hover relative to the visualizer
+     * @return {JSX.Element} tooltip to render
+     */
+    renderTooltip = (relativeX, relativeY) => {
+        const { trackModel } = this.props;
+        const polygons = this.findPolygon(relativeX, relativeY);
+        if (polygons.length) {
+            return (
+                <div>
+                    {polygons.map((polygon, i) => {
+                        return (
+                            <div key={i}>
+                                <div>
+                                    <strong>{trackModel.tracks[i].label}</strong>
+                                </div>
+                                <div>Locus1: {polygon.interaction.locus1.toString()}</div>
+                                <div>Locus2: {polygon.interaction.locus2.toString()}</div>
+                                <div>Score: {polygon.interaction.score}</div>
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+        } else {
+            return null;
+        }
+    };
+
+    findPolygon = (x, y) => {
+        const polygons = [];
+        for (const hmData of this.hmData) {
+            for (const item of hmData) {
+                if (pointInPolygon([x, y], item.points)) {
+                    polygons.push(item);
+                    break;
+                }
+            }
+        }
+        return polygons;
     };
 
     render() {
         const { height, width } = this.props;
         const style = { width: `${width}px`, height: `${height}px` };
-        return <div style={style} ref={this.myRef}></div>;
+        return (
+            <HoverTooltipContext getTooltipContents={this.renderTooltip} useRelativeY={true}>
+                <div style={style} ref={this.myRef}></div>;
+            </HoverTooltipContext>
+        );
     }
 }

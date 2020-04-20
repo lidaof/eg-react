@@ -21,6 +21,7 @@ export const TRACK_TYPES = {
     Repeats: ["repeatmasker"],
     Alignment: ["bam", "pairwise"],
     "3D Structure": ["g3d"],
+    Dynamic: ["dbedgraph"],
 };
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
@@ -42,6 +43,7 @@ const TYPES_DESC = {
     pairwise: "pairwise alignment data",
     qBED: "quantized numerical data, processed by tabix in .gz format",
     g3d: "3D structure in .g3d format",
+    dbedgraph: "Dynamic bedgraph data",
 };
 
 /**

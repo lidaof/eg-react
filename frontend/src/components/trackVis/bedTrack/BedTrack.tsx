@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react";
 
-import BedAnnotation from './BedAnnotation';
-import { PropsFromTrackContainer } from '../commonComponents/Track';
-import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
-import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
-import Tooltip from '../commonComponents/tooltip/Tooltip';
-import { withTooltip, TooltipCallbacks } from '../commonComponents/tooltip/withTooltip';
-import { Feature } from '../../../model/Feature';
-import { PlacedFeatureGroup } from '../../../model/FeatureArranger';
+import BedAnnotation from "./BedAnnotation";
+import { PropsFromTrackContainer } from "../commonComponents/Track";
+import AnnotationTrack from "../commonComponents/annotation/AnnotationTrack";
+import FeatureDetail from "../commonComponents/annotation/FeatureDetail";
+import Tooltip from "../commonComponents/tooltip/Tooltip";
+import { withTooltip, TooltipCallbacks } from "../commonComponents/tooltip/withTooltip";
+import { Feature } from "../../../model/Feature";
+import { PlacedFeatureGroup } from "../../../model/FeatureArranger";
 
 const ROW_VERTICAL_PADDING = 2;
 const ROW_HEIGHT = BedAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
@@ -17,16 +17,17 @@ interface BedTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
     options: {
         color?: string;
         color2?: string;
-    }
+        alwaysDrawLabel?: boolean;
+    };
 }
 
 /**
  * Track component for BED annotations.
- * 
+ *
  * @author Silas Hsu
  */
 class BedTrackNoTooltip extends React.Component<BedTrackProps> {
-    static displayName = 'BedTrack';
+    static displayName = "BedTrack";
 
     constructor(props: BedTrackProps) {
         super(props);
@@ -36,13 +37,13 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
 
     /**
      * Renders the tooltip for a feature.
-     * 
+     *
      * @param {React.MouseEvent} event - mouse event that triggered the tooltip request
      * @param {Feature} feature - Feature for which to display details
      */
     renderTooltip(event: React.MouseEvent, feature: Feature) {
         const tooltip = (
-            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} >
+            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip}>
                 <FeatureDetail feature={feature} />
             </Tooltip>
         );
@@ -51,7 +52,7 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
 
     /**
      * Renders one annotation.
-     * 
+     *
      * @param {PlacedFeature} - feature and drawing info
      * @param {number} y - y coordinate to render the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
@@ -59,7 +60,7 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
      * @return {JSX.Element} element visualizing the feature
      */
     renderAnnotation(placedGroup: PlacedFeatureGroup, y: number, isLastRow: boolean, index: number) {
-        return placedGroup.placedFeatures.map((placement, i) =>
+        return placedGroup.placedFeatures.map((placement, i) => (
             <BedAnnotation
                 key={i}
                 feature={placement.feature}
@@ -70,16 +71,13 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
                 reverseStrandColor={this.props.options.color2}
                 isInvertArrowDirection={placement.isReverse}
                 onClick={this.renderTooltip}
+                alwaysDrawLabel={this.props.options.alwaysDrawLabel}
             />
-        );
+        ));
     }
 
     render() {
-        return <AnnotationTrack
-            {...this.props}
-            rowHeight={ROW_HEIGHT}
-            getAnnotationElement={this.renderAnnotation}
-        />;
+        return <AnnotationTrack {...this.props} rowHeight={ROW_HEIGHT} getAnnotationElement={this.renderAnnotation} />;
     }
 }
 

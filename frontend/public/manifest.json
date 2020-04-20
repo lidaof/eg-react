@@ -1,20 +1,21 @@
 {
-  "short_name": "EpiBrowser",
-  "name": "WashU Epigenome Browser",
-  "icons": [
-    {
-      "src": "/favicon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
-  "start_url": "/index.html",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+    "short_name": "EpiBrowser",
+    "name": "WashU Epigenome Browser",
+    "icons": [
+        {
+            "src": "/browser/favicon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/browser/icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "/browser/index.html",
+    "display": "standalone",
+    "orientation": "landscape",
+    "theme_color": "#000000",
+    "background_color": "#ffffff"
 }
