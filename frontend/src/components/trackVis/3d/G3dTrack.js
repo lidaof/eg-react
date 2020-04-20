@@ -19,7 +19,7 @@ export const DEFAULT_OPTIONS = {
  */
 class G3dTrack extends React.PureComponent {
     static propTypes = Object.assign({}, Track.propsFromTrackContainer, {
-        data: PropTypes.array.isRequired, // PropTypes.arrayOf(CallingCard)
+        data: PropTypes.array.isRequired, // PropTypes.arrayOf(QBed)
         options: PropTypes.shape({
             height: PropTypes.number.isRequired // Height of the track
         }).isRequired,

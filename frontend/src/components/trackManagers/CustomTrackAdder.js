@@ -13,14 +13,13 @@ import { TrackOptionsUI } from "./TrackOptionsUI";
 // const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'cool', 'bam'];
 
 export const TRACK_TYPES = {
-    Numerical: ["bigWig", "bedGraph"],
+    Numerical: ["bigWig", "bedGraph", "qBED"],
     Annotation: ["bed", "bigBed", "refBed"],
     Categorical: ["categorical"],
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange"],
     Repeats: ["repeatmasker"],
     Alignment: ["bam", "pairwise"],
-    Callingcard: ["callingcard"],
     "3D Structure": ["g3d"],
 };
 
@@ -41,7 +40,7 @@ const TYPES_DESC = {
     cool: "long range interaction data in cool format, use data uuid instead of URL",
     bam: "reads alignment data",
     pairwise: "pairwise alignment data",
-    callingcard: "calling card data",
+    qBED: "quantized numerical data, processed by tabix in .gz format",
     g3d: "3D structure in .g3d format",
 };
 
