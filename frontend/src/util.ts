@@ -9,6 +9,7 @@ import _ from "lodash";
 import iwanthue from "iwanthue";
 import * as THREE from "three";
 import rgba from "color-rgba";
+import ChromosomeInterval from "model/interval/ChromosomeInterval";
 
 interface Coordinate {
     x: number;
@@ -21,7 +22,7 @@ interface Coordinate {
 export enum MouseButton {
     LEFT = 0,
     MIDDLE = 1,
-    RIGHT = 2
+    RIGHT = 2,
 }
 
 /**
@@ -42,7 +43,7 @@ export function getRelativeCoordinates(event: React.MouseEvent, relativeTo?: Ele
     const targetBoundingRect = relativeTo.getBoundingClientRect();
     return {
         x: event.clientX - targetBoundingRect.left,
-        y: event.clientY - targetBoundingRect.top
+        y: event.clientY - targetBoundingRect.top,
     };
 }
 
@@ -58,7 +59,7 @@ export function getPageCoordinates(relativeTo: Element, relativeX: number, relat
     const targetBoundingRect = relativeTo.getBoundingClientRect();
     return {
         x: window.scrollX + targetBoundingRect.left + relativeX,
-        y: window.scrollY + targetBoundingRect.top + relativeY
+        y: window.scrollY + targetBoundingRect.top + relativeY,
     };
 }
 
@@ -161,7 +162,7 @@ export const HELP_LINKS = {
     tracks: "https://eg.readthedocs.io/en/latest/tracks.html",
     localhub: "https://eg.readthedocs.io/en/latest/local.html",
     trackOptions: "https://eg.readthedocs.io/en/latest/datahub.html#track-properties",
-    textTrack: "https://eg.readthedocs.io/en/latest/text.html"
+    textTrack: "https://eg.readthedocs.io/en/latest/text.html",
 };
 
 // /**
@@ -217,7 +218,7 @@ export const pcorr = (x: number[], y: number[]) => {
  */
 export function getSecondaryGenomes(current: string, tracks: any[]) {
     const genomes: string[] = [];
-    tracks.forEach(tk => {
+    tracks.forEach((tk) => {
         if (tk.type === "genomealign") {
             if (tk.querygenome) {
                 genomes.push(tk.querygenome);
@@ -235,9 +236,9 @@ export function variableIsObject(obj: any) {
 }
 
 function reformatData(data: any) {
-    const grouped = _.groupBy(data, x => x[6]);
+    const grouped = _.groupBy(data, (x) => x[6]);
     const sorted = {};
-    Object.keys(grouped).forEach(key => {
+    Object.keys(grouped).forEach((key) => {
         const sort = grouped[key].sort((a, b) => a[0].localeCompare(b[0]) || a[1] - b[1]);
         sorted[key] = sort;
     });
@@ -286,4 +287,8 @@ export function repeatArray(arr: any[], count: number): any[] {
         b.push(arr[i % ln]);
     }
     return b;
+}
+
+export function sameLoci(locus1: ChromosomeInterval, locus2: ChromosomeInterval) {
+    return locus1.chr === locus2.chr && locus1.start === locus2.start && locus1.end === locus2.end;
 }

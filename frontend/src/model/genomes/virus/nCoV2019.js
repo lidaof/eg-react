@@ -36,6 +36,21 @@ const defaultTracks = [
         },
     }),
     new TrackModel({
+        type: "categorical",
+        name: "Transcription regulatory sequences (TRSs)",
+        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_trs_sorted.bed.gz",
+        options: {
+            height: 15,
+            alwaysDrawLabel: true,
+            maxRows: 20,
+            hiddenPixels: 0,
+            category: {
+                "TRS-L": { name: "TRS-L", color: "#000000" },
+                "TRS-B": { name: "TRS-B", color: "#FF0000" },
+            },
+        },
+    }),
+    new TrackModel({
         type: "longrange",
         name: "TRS-L-dependent recombination",
         url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/TRS-L-dependent_recombinationEvents_sorted.bed.gz",
@@ -45,22 +60,8 @@ const defaultTracks = [
             yMin: 0,
             displayMode: "arc",
             lineWidth: 5,
-            height: 300,
-        },
-    }),
-    new TrackModel({
-        type: "categorical",
-        name: "Transcription regulatory sequences (TRSs)",
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_trs_sorted.bed.gz",
-        options: {
-            height: 20,
-            alwaysDrawLabel: true,
-            maxRows: 20,
-            hiddenPixels: 0,
-            category: {
-                "TRS-L": { name: "TRS-L", color: "#000000" },
-                "TRS-B": { name: "TRS-B", color: "#FF0000" },
-            },
+            height: 155,
+            greedyTooltip: true,
         },
     }),
     new TrackModel({

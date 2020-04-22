@@ -35,6 +35,7 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
         scoreMin?: number;
         height: number;
         lineWidth?: number;
+        greedyTooltip?: boolean;
     };
     forceSvg?: boolean;
 }
@@ -49,6 +50,7 @@ export const DEFAULT_OPTIONS = {
     scoreMin: 0,
     height: 500,
     lineWidth: 2,
+    greedyTooltip: false,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -142,6 +144,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             onInteractionHovered: this.showTooltip,
             onMouseOut: this.hideTooltip,
             forceSvg,
+            greedyTooltip: options.greedyTooltip,
         };
         let visualizer; // , height;
         // if (options.displayMode === InteractionDisplayMode.HEATMAP) {

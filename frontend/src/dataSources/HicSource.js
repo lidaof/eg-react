@@ -1,6 +1,6 @@
 import _ from "lodash";
 // import Straw from 'hic-straw/src/straw';
-import HicStraw from "hic-straw/dist/hic-straw_es6";
+import HicStraw from "hic-straw/dist/hic-straw";
 import DataSource from "./DataSource";
 import ChromosomeInterval from "../model/interval/ChromosomeInterval";
 import { NormalizationMode } from "../model/HicDataModes";

@@ -1,5 +1,11 @@
 # Version History
 
+## 51.0.3
+
+-   add a new option `greedyTooltip` for arc display of chromatin interaction data, this option will show more than one interaction from same 2 loci if exists
+-   track type `callingcard` renamed to 'qBed'
+-   update `hic-straw` package
+
 ## 51.0.2
 
 -   fixed a crash bug when reize window with a dynamic bedgraph track
