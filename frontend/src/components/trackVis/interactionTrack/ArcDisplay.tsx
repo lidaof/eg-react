@@ -67,7 +67,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 // d={moveTo(xSpan1Center, 0) + quadraticCurveTo(spanCenter, curveYScale(spanLength), xSpan2Center, 0)}
                 d={moveTo(xSpan1Center, 0) + arcTo(radius, xSpan2Center)}
                 fill="none"
-                opacity={opacityScale(score)}
+                opacity={opacityScale(Math.abs(score))}
                 className="ArcDisplay-emphasize-on-hover"
                 stroke={score >= 0 ? color : color2}
                 strokeWidth={lineWidth}

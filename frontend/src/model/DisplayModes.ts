@@ -16,6 +16,11 @@ export enum InteractionDisplayMode {
     SQUARE = "square",
 }
 
+export enum DynamicInteractionDisplayMode {
+    HEATMAP = "heatmap",
+    ARC = "arc",
+}
+
 export const GenomeAlignDisplayModes = {
     ROUGH: "rough",
     FINE: "fine",

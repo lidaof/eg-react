@@ -1,14 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import * as PIXI from "pixi.js";
-import pointInPolygon from "point-in-polygon";
-import HoverTooltipContext from "../commonComponents/tooltip/HoverTooltipContext";
+// import HoverTooltipContext from "../commonComponents/tooltip/HoverTooltipContext";
 import { colorString2number } from "../../../util";
 
-const ANGLE = Math.PI / 4;
-const SIDE_SCALE = Math.sin(ANGLE);
+const ITEM_LIMIT = 1000;
 
-export class PixiHeatmap extends React.PureComponent {
+export class PixiArc extends React.PureComponent {
     static propTypes = {
         placedInteractionsArray: PropTypes.array.isRequired,
         viewWindow: PropTypes.object.isRequired,
@@ -21,6 +19,7 @@ export class PixiHeatmap extends React.PureComponent {
         speed: PropTypes.array, //playing speed, 1-10, 1 is slowest, 10 is fastest
         steps: PropTypes.number, //total steps of animation
         currentStep: PropTypes.number, //current playing step, default is first step 0
+        lineWidth: PropTypes.number,
     };
 
     static defaultProps = {
@@ -29,6 +28,7 @@ export class PixiHeatmap extends React.PureComponent {
         // colors: [],
         color: "blue",
         backgroundColor: "white",
+        lineWidth: 1,
     };
 
     constructor(props) {
@@ -37,13 +37,14 @@ export class PixiHeatmap extends React.PureComponent {
         this.container = null;
         this.subcontainer = null;
         this.app = null;
+        // this.g = null;
         this.state = {
             currentStep: 0,
             isPlaying: true,
         };
         this.count = 0;
         this.subs = []; //holder for sub containers for each sprite sets from each track
-        this.hmData = [];
+        this.arcData = [];
     }
 
     componentDidMount() {
@@ -63,6 +64,7 @@ export class PixiHeatmap extends React.PureComponent {
         this.app.stage.addChild(this.subcontainer);
         window.addEventListener("resize", this.onWindowResize);
         this.app.renderer.plugins.interaction.on("pointerdown", this.onPointerDown);
+        // this.g = new PIXI.Graphics();
     }
 
     componentWillUnmount() {
@@ -72,7 +74,7 @@ export class PixiHeatmap extends React.PureComponent {
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.placedInteractionsArray !== this.props.placedInteractionsArray) {
-            this.drawHeatmap();
+            this.drawArc();
         }
         if (prevProps.color !== this.props.color) {
             const color = colorString2number(this.props.color);
@@ -121,15 +123,18 @@ export class PixiHeatmap extends React.PureComponent {
         this.subs = [];
         this.steps = this.getMaxSteps();
         for (let i = 0; i < this.steps; i++) {
-            this.subs.push(new PIXI.Container());
-            this.hmData.push([]);
+            this.subs.push(new PIXI.Graphics());
+            this.arcData.push([]);
         }
         this.subs.forEach((c) => this.subcontainer.addChild(c));
     };
 
     resetSubs = () => {
-        this.subs.forEach((c) => c.removeChildren());
-        this.hmData = this.hmData.map(() => []);
+        this.subs.forEach((c) => {
+            c.clear();
+            c.removeChildren();
+        });
+        this.arcData = this.arcData.map(() => []);
     };
 
     onWindowResize = () => {
@@ -150,8 +155,17 @@ export class PixiHeatmap extends React.PureComponent {
         return max;
     };
 
-    drawHeatmap = () => {
-        const { opacityScale, color, color2, viewWindow, height, placedInteractionsArray, trackModel } = this.props;
+    drawArc = () => {
+        const {
+            opacityScale,
+            color,
+            color2,
+            viewWindow,
+            height,
+            placedInteractionsArray,
+            trackModel,
+            lineWidth,
+        } = this.props;
         if (this.subs.length) {
             this.resetSubs();
         } else {
@@ -161,54 +175,54 @@ export class PixiHeatmap extends React.PureComponent {
             fontFamily: "Arial",
             fontSize: 16,
         });
-        const g = new PIXI.Graphics();
-        g.lineStyle(0);
-        g.beginFill(0xffffff, 1);
-        g.drawRect(0, 0, 1, 1);
-        g.endFill();
-        const t = PIXI.RenderTexture.create(g.width, g.height);
-        this.app.renderer.render(g, t);
+        // const g = new PIXI.Graphics();
+        // const radius = Math.SQRT2 * 0.5 * width - lineWidth * 0.5;
+        // g.moveTo(width, 0);
+        // g.lineStyle(lineWidth, 0xffffff, 1);
+        // g.arc(0.5 * width, -0.5 * width, radius, Math.SQRT1_2, Math.PI - Math.SQRT1_2);
+        // const t = this.app.renderer.generateTexture(g);
         placedInteractionsArray.forEach((placedInteractions, index) => {
-            placedInteractions.forEach((placedInteraction) => {
+            const sortedInteractions = placedInteractions
+                .slice()
+                .sort((a, b) => b.interaction.score - a.interaction.score);
+            const slicedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
+            slicedInteractions.forEach((placedInteraction) => {
                 const score = placedInteraction.interaction.score;
                 if (!score) {
-                    return null;
+                    return;
                 }
                 const { xSpan1, xSpan2 } = placedInteraction;
-                if (xSpan1.end < viewWindow.start && xSpan2.start > viewWindow.end) {
-                    return null;
+                let xSpan1Center, xSpan2Center;
+                if (xSpan1.start === xSpan2.start && xSpan1.end === xSpan2.end) {
+                    // inter-region arc
+                    xSpan1Center = xSpan1.start;
+                    xSpan2Center = xSpan1.end;
+                } else {
+                    xSpan1Center = 0.5 * (xSpan1.start + xSpan1.end);
+                    xSpan2Center = 0.5 * (xSpan2.start + xSpan2.end);
                 }
-                const gapCenter = (xSpan1.end + xSpan2.start) / 2;
-                const gapLength = xSpan2.start - xSpan1.end;
-                const topX = gapCenter;
-                const topY = 0.5 * gapLength;
-                const halfSpan1 = Math.max(0.5 * xSpan1.getLength(), 1);
-                const halfSpan2 = Math.max(0.5 * xSpan2.getLength(), 1);
+                const spanCenter = 0.5 * (xSpan1Center + xSpan2Center);
+                const spanLength = xSpan2Center - xSpan1Center;
+                const halfLength = 0.5 * spanLength;
+                if (spanLength < 1) {
+                    return;
+                }
+                const radius = Math.max(0, Math.SQRT2 * halfLength - lineWidth * 0.5);
                 const colorToUse = score >= 0 ? color : color2;
                 const tintColor = colorString2number(colorToUse);
-                const bottomY = topY + halfSpan1 + halfSpan2;
-                const points = [
-                    // Going counterclockwise
-                    [topX, topY], // Top
-                    [topX - halfSpan1, topY + halfSpan1], // Left
-                    [topX - halfSpan1 + halfSpan2, bottomY], // Bottom = left + halfSpan2
-                    [topX + halfSpan2, topY + halfSpan2], // Right
-                ];
-                const s = new PIXI.Sprite(t);
-                s.tint = tintColor;
-                s.position.set(topX, topY);
-                s.scale.set(SIDE_SCALE * xSpan2.getLength(), SIDE_SCALE * xSpan1.getLength());
-                s.pivot.set(0);
-                s.rotation = ANGLE;
-                s.alpha = opacityScale(score);
-                this.subs[index].addChild(s);
-                // only push the points in screen
-                if (topX + halfSpan2 > viewWindow.start && topX - halfSpan1 < viewWindow.end && topY < height) {
-                    this.hmData[index].push({
-                        points,
-                        interaction: placedInteraction.interaction,
-                    });
-                }
+                const g = this.subs[index];
+                g.moveTo(xSpan2Center, 0);
+                g.lineStyle(lineWidth, tintColor, opacityScale(score));
+                g.arc(spanCenter, -halfLength, radius, Math.SQRT1_2, Math.PI - Math.SQRT1_2);
+                // const t = this.app.renderer.generateTexture(g);
+                // const s = new PIXI.Sprite(t);
+                // s.tint = tintColor;
+                // s.position.set(xSpan1Center, 0);
+                // s.scale.set(spanLength / width);
+                // s.alpha = opacityScale(score);
+                // this.subs[index].addChild(s);
+                // g.clear();
+                this.arcData[index].push([spanCenter, -halfLength, radius, lineWidth, placedInteraction.interaction]);
             });
             const label = trackModel.tracks[index].label ? trackModel.tracks[index].label : "";
             if (label) {
@@ -217,60 +231,16 @@ export class PixiHeatmap extends React.PureComponent {
                 this.subs[index].addChild(t);
             }
         });
-    };
-
-    /**
-     * Renders the default tooltip that is displayed on hover.
-     *
-     * @param {number} relativeX - x coordinate of hover relative to the visualizer
-     * @param {number} relativeY - y coordinate of hover relative to the visualizer
-     * @return {JSX.Element} tooltip to render
-     */
-    renderTooltip = (relativeX, relativeY) => {
-        const { trackModel } = this.props;
-        const polygons = this.findPolygon(relativeX, relativeY);
-        if (polygons.length) {
-            return (
-                <div>
-                    {polygons.map((polygon, i) => {
-                        return (
-                            <div key={i}>
-                                <div>
-                                    <strong>{trackModel.tracks[i].label}</strong>
-                                </div>
-                                <div>Locus1: {polygon.interaction.locus1.toString()}</div>
-                                <div>Locus2: {polygon.interaction.locus2.toString()}</div>
-                                <div>Score: {polygon.interaction.score}</div>
-                            </div>
-                        );
-                    })}
-                </div>
-            );
-        } else {
-            return null;
-        }
-    };
-
-    findPolygon = (x, y) => {
-        const polygons = [];
-        for (const hmData of this.hmData) {
-            for (const item of hmData) {
-                if (pointInPolygon([x, y], item.points)) {
-                    polygons.push(item);
-                    break;
-                }
-            }
-        }
-        return polygons;
+        // g.destroy();
     };
 
     render() {
         const { height, width } = this.props;
         const style = { width: `${width}px`, height: `${height}px` };
         return (
-            <HoverTooltipContext getTooltipContents={this.renderTooltip} useRelativeY={true}>
-                <div style={style} ref={this.myRef}></div>
-            </HoverTooltipContext>
+            // <HoverTooltipContext getTooltipContents={this.renderTooltip} useRelativeY={true}>
+            <div style={style} ref={this.myRef}></div>
+            // </HoverTooltipContext>
         );
     }
 }

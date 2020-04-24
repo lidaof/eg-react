@@ -4,6 +4,7 @@ import {
     AnnotationDisplayModes,
     NumericalDisplayModes,
     InteractionDisplayMode,
+    DynamicInteractionDisplayMode,
     BigWigZoomLevels,
 } from "../../model/DisplayModes";
 
@@ -51,6 +52,18 @@ export function InteractionDisplayModeConfig(props) {
             label="Display mode:"
             defaultValue={InteractionDisplayMode.HEATMAP}
             choices={InteractionDisplayMode}
+        />
+    );
+}
+
+export function DynamicInteractionDisplayModeConfig(props) {
+    return (
+        <SelectConfig
+            {...props}
+            optionName="displayMode"
+            label="Display mode:"
+            defaultValue={DynamicInteractionDisplayMode.HEATMAP}
+            choices={DynamicInteractionDisplayMode}
         />
     );
 }

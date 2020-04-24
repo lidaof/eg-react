@@ -14,6 +14,9 @@ import HeightConfig from "../trackContextMenu/HeightConfig";
 import MatplotSource from "../../dataSources/MatplotSource";
 import PlayingConfig from "components/trackContextMenu/PlayingConfig";
 import SpeedConfig from "components/trackContextMenu/SpeedConfig";
+import { DynamicInteractionDisplayModeConfig } from "components/trackContextMenu/DisplayModeConfig";
+import LineWidthConfig from "components/trackContextMenu/LineWidthConfig";
+import { DynamicInteractionDisplayMode } from "model/DisplayModes";
 
 export class DynamicHicTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -44,6 +47,7 @@ export class DynamicHicTrackConfig extends TrackConfig {
     getMenuComponents() {
         const items = [
             LabelConfig,
+            DynamicInteractionDisplayModeConfig,
             PlayingConfig,
             SpeedConfig,
             HicNormalizationConfig,
@@ -54,6 +58,10 @@ export class DynamicHicTrackConfig extends TrackConfig {
             SecondaryColorConfig,
             BackgroundColorConfig,
         ];
+        if (this.getOptions().displayMode !== DynamicInteractionDisplayMode.HEATMAP) {
+            items.splice(2, 0, LineWidthConfig);
+        }
+
         return items;
     }
 }

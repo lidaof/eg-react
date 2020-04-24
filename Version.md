@@ -1,5 +1,10 @@
 # Version History
 
+## 51.0.4
+
+-   add dynamic arc view for dynamic hic tracks
+-   fixed a bug arc with negative score not show up in screenshot
+
 ## 51.0.3
 
 -   add a new option `greedyTooltip` for arc display of chromatin interaction data, this option will show more than one interaction from same 2 loci if exists

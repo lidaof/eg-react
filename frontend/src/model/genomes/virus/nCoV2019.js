@@ -28,6 +28,12 @@ const defaultTracks = [
         },
     }),
     new TrackModel({
+        type: "pairwise",
+        name: "Mutation Alert",
+        url:
+            "https://wangftp.wustl.edu/~cfan/public_viralBrowser/ncov/daily_updates/latest/diversity/ncov_alert.bed.sort.gz",
+    }),
+    new TrackModel({
         name: "Viral RNA expression (nanopore)",
         type: "bigwig",
         url: "https://wangftp.wustl.edu/~xzhuo/bat_genomes/VeroInf24h.bw",
@@ -97,6 +103,22 @@ const annotationTracks = {
             type: "bedgraph",
             name: "GC Percentage",
             url: "https://vizhub.wustl.edu/public/virus/ncov_CGpct.bedgraph.sort.gz",
+        },
+    ],
+    Diversity: [
+        {
+            type: "bedgraph",
+            name: "Sequence diversity (Shannon Entropy)",
+            url: "https://wangftp.wustl.edu/~cfan/updates/latest/diversity/ncov_entropy.bedgraph.sort.gz",
+            options: {
+                aggregateMethod: "MAX",
+            },
+        },
+        {
+            type: "pairwise",
+            name: "Mutation Alert",
+            url:
+                "https://wangftp.wustl.edu/~cfan/public_viralBrowser/ncov/daily_updates/latest/diversity/ncov_alert.bed.sort.gz",
         },
     ],
     "Genome Comparison": [

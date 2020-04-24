@@ -5,6 +5,7 @@ import { scaleLinear } from "d3-scale";
 import { notify } from "react-notify-toast";
 
 import { PixiHeatmap } from "./PixiHeatmap";
+import { PixiArc } from "./PixiArc";
 
 import Track, { PropsFromTrackContainer } from "../commonComponents/Track";
 import TrackLegend from "../commonComponents/TrackLegend";
@@ -15,6 +16,7 @@ import Tooltip from "../commonComponents/tooltip/Tooltip";
 import { FeaturePlacer } from "../../../model/FeaturePlacer";
 import { GenomeInteraction } from "../../../model/GenomeInteraction";
 import { ScaleChoices } from "../../../model/ScaleChoices";
+import { DynamicInteractionDisplayMode } from "../../../model/DisplayModes";
 
 interface DynamicInteractionTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
     data: GenomeInteraction[][];
@@ -29,6 +31,8 @@ interface DynamicInteractionTrackProps extends PropsFromTrackContainer, TooltipC
         height: number;
         playing?: boolean;
         speed?: number[];
+        lineWidth?: number;
+        displayMode: DynamicInteractionDisplayMode;
     };
 }
 
@@ -42,6 +46,8 @@ export const DEFAULT_OPTIONS = {
     height: 500,
     playing: true,
     speed: [5],
+    lineWidth: 1,
+    displayMode: DynamicInteractionDisplayMode.HEATMAP,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -62,7 +68,10 @@ class DynamicInteractionTrack extends React.PureComponent<DynamicInteractionTrac
 
     computeScale = () => {
         const { scoreScale, scoreMin, scoreMax } = this.props.options;
-        const maxValues = this.props.data.map((d) => _.maxBy(d, "score").score);
+        const maxValues = this.props.data.map((d) => {
+            const maxObj = _.maxBy(d, "score");
+            return maxObj ? maxObj.score : 1;
+        });
         const maxScore = _.max(maxValues);
         if (scoreScale === ScaleChoices.AUTO) {
             return {
@@ -125,8 +134,14 @@ class DynamicInteractionTrack extends React.PureComponent<DynamicInteractionTrac
             playing: options.playing,
             speed: options.speed,
             trackModel,
+            lineWidth: options.lineWidth,
         };
-        const visualizer = <PixiHeatmap {...visualizerProps} />;
+        let visualizer;
+        if (options.displayMode === DynamicInteractionDisplayMode.ARC) {
+            visualizer = <PixiArc {...visualizerProps} />;
+        } else {
+            visualizer = <PixiHeatmap {...visualizerProps} />;
+        }
 
         return (
             <Track
