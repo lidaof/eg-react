@@ -1,6 +1,7 @@
 import { TrackConfig } from "./TrackConfig";
 import { BamTrackConfig } from "./BamTrackConfig";
 import { BedTrackConfig } from "./BedTrackConfig";
+import { DynamicBedTrackConfig } from "./DynamicBedTrackConfig";
 import { QBedTrackConfig } from "./QBedTrackConfig";
 import { CategoricalTrackConfig } from "./CategoricalTrackConfig";
 import { BigBedTrackConfig } from "./BigBedTrackConfig";
@@ -26,12 +27,14 @@ import { G3dTrackConfig } from "./G3dTrackConfig";
 import { ProteinTrackConfig } from "./ProteinTrackConfig";
 import { DynamicBedGraphTrackConfig } from "./DynamicBedGraphTrackConfig";
 import { DynamicHicTrackConfig } from "./DynamicHicTrackConfig";
+import { DynamicLongrangeTrackConfig } from "./DynamicLongrangeTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 
 const TYPE_NAME_TO_CONFIG = {
     bam: BamTrackConfig,
     bed: BedTrackConfig,
+    dynamicbed: DynamicBedTrackConfig,
     qbed: QBedTrackConfig,
     categorical: CategoricalTrackConfig,
     bedgraph: BedGraphTrackConfig,
@@ -55,7 +58,8 @@ const TYPE_NAME_TO_CONFIG = {
     pairwise: PairwiseSegmentTrackConfig,
     protein: ProteinTrackConfig,
     dbedgraph: DynamicBedGraphTrackConfig,
-    dynamichic: DynamicHicTrackConfig
+    dynamichic: DynamicHicTrackConfig,
+    dynamiclongrange: DynamicLongrangeTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

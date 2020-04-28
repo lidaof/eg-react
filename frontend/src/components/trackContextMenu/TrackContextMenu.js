@@ -132,6 +132,11 @@ class TrackContextMenu extends React.PureComponent {
                 <MatplotMenu tracks={selectedTracks} onApplyMatplot={this.props.onApplyMatplot} />
                 <DynamicplotMenu tracks={selectedTracks} onApplyDynamicplot={this.props.onApplyDynamicplot} />
                 <DynamicHicMenu tracks={selectedTracks} onApplyDynamicHic={this.props.onApplyDynamicHic} />
+                <DynamicLongrangeMenu
+                    tracks={selectedTracks}
+                    onApplyDynamicLongrange={this.props.onApplyDynamicLongrange}
+                />
+                <DynamicBedMenu tracks={selectedTracks} onApplyDynamicBed={this.props.onApplyDynamicBed} />
             </div>
         );
     }
@@ -204,7 +209,7 @@ function DynamicplotMenu(props) {
 }
 
 /**
- * a menu that applys dynamic plot for more than 1 numerical tracks
+ * a menu that applys dynamic hic for more than 1 hic tracks
  * @param {TrackModel[]} props
  */
 function DynamicHicMenu(props) {
@@ -220,6 +225,53 @@ function DynamicHicMenu(props) {
         <div className="TrackContextMenu-item">
             <button className="btn btn-info btn-sm btn-tight" onClick={() => props.onApplyDynamicHic(props.tracks)}>
                 Dynamic HiC
+            </button>
+        </div>
+    );
+}
+
+/**
+ * a menu that applys dynamic long range for more than 1 longrange tracks
+ * @param {TrackModel[]} props
+ */
+function DynamicLongrangeMenu(props) {
+    const numTracks = props.tracks.length;
+    if (numTracks === 1) {
+        return null;
+    }
+    const trackTypes = props.tracks.map((tk) => tk.type);
+    if (trackTypes.some((type) => type !== "longrange")) {
+        return null;
+    }
+    return (
+        <div className="TrackContextMenu-item">
+            <button
+                className="btn btn-info btn-sm btn-tight"
+                onClick={() => props.onApplyDynamicLongrange(props.tracks)}
+            >
+                Dynamic Longrange
+            </button>
+        </div>
+    );
+}
+
+/**
+ * a menu that applys dynamic bed for more than 1 bed tracks
+ * @param {TrackModel[]} props
+ */
+function DynamicBedMenu(props) {
+    const numTracks = props.tracks.length;
+    if (numTracks === 1) {
+        return null;
+    }
+    const trackTypes = props.tracks.map((tk) => tk.type);
+    if (trackTypes.some((type) => type !== "bed")) {
+        return null;
+    }
+    return (
+        <div className="TrackContextMenu-item">
+            <button className="btn btn-info btn-sm btn-tight" onClick={() => props.onApplyDynamicBed(props.tracks)}>
+                Dynamic Bed
             </button>
         </div>
     );

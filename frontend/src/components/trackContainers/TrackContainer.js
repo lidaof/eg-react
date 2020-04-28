@@ -361,6 +361,42 @@ class TrackContainer extends React.Component {
         this.props.onTracksChanged(newTracks);
     };
 
+    /**
+     * happens when user selects dynamic hic plot
+     */
+    applyDynamicLongrange = (tracks) => {
+        const newTrack = new TrackModel({
+            type: "dynamiclongrange",
+            name: "dynamic longrange",
+            tracks,
+            // options: {
+            //     ...DYNAMIC_HIC_OPTIONS,
+            //     binSize: BinSize.AUTO,
+            //     normalization: NormalizationMode.NONE,
+            // },
+        });
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    };
+
+    /**
+     * happens when user selects dynamic bed
+     */
+    applyDynamicBed = (tracks) => {
+        const newTrack = new TrackModel({
+            type: "dynamicbed",
+            name: "dynamic bed",
+            tracks,
+            // options: {
+            //     ...DYNAMIC_HIC_OPTIONS,
+            //     binSize: BinSize.AUTO,
+            //     normalization: NormalizationMode.NONE,
+            // },
+        });
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    };
+
     // End callback methods
     ////////////////////
     // Render methods //
@@ -557,6 +593,8 @@ class TrackContainer extends React.Component {
                 onApplyMatplot={this.applyMatPlot}
                 onApplyDynamicplot={this.applyDynamicPlot}
                 onApplyDynamicHic={this.applyDynamicHic}
+                onApplyDynamicLongrange={this.applyDynamicLongrange}
+                onApplyDynamicBed={this.applyDynamicBed}
             />
         );
         const trackDivStyle = {
