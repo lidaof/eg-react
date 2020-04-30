@@ -10,6 +10,7 @@ import LocalBedSource from "../../dataSources/LocalBedSource";
 import BedTextSource from "../../dataSources/BedTextSource";
 import LabelConfig from "components/trackContextMenu/LabelConfig";
 import PlayingConfig from "components/trackContextMenu/PlayingConfig";
+import UseDynamicColorsConfig from "components/trackContextMenu/UseDynamicColorsConfig";
 import HeightConfig from "components/trackContextMenu/HeightConfig";
 import { BackgroundColorConfig, PrimaryColorConfig } from "components/trackContextMenu/ColorConfig";
 import TrackModel from "model/TrackModel";
@@ -28,7 +29,7 @@ export class DynamicBedGraphTrackConfig extends TrackConfig {
             return new BedTextSource({
                 url: this.trackModel.url,
                 blob: this.trackModel.fileObj,
-                textConfig: this.trackModel.textConfig
+                textConfig: this.trackModel.textConfig,
             });
         } else {
             if (this.trackModel.files.length > 0) {
@@ -47,7 +48,7 @@ export class DynamicBedGraphTrackConfig extends TrackConfig {
      * @return {NumericalArrayFeature[]} numerical features to draw
      */
     formatData(data: BedRecord[]) {
-        return data.map(record => {
+        return data.map((record) => {
             const locus = new ChromosomeInterval(record.chr, record.start, record.end);
             let parsedValue;
             try {
@@ -72,7 +73,8 @@ export class DynamicBedGraphTrackConfig extends TrackConfig {
             HeightConfig,
             ArrayAggregateConfig,
             PrimaryColorConfig,
-            BackgroundColorConfig
+            UseDynamicColorsConfig,
+            BackgroundColorConfig,
         ];
 
         return items;

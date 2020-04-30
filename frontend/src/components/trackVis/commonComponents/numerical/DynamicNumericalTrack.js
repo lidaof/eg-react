@@ -23,6 +23,8 @@ export const DEFAULT_OPTIONS = {
     backgroundColor: "white",
     playing: true,
     speed: [10],
+    dynamicColors: [],
+    useDynamicColors: false,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 const TOP_PADDING = 2;
@@ -67,8 +69,11 @@ class DynamicNumericalTrack extends React.PureComponent {
 
     computeScales(xToValue, height) {
         const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
-        const max = _.max(visibleValues.map((x) => _.max(x))) || 0; // in case undefined returned here, cause maxboth be undefined too
-        const min = 0;
+        const max = _.max(visibleValues.map((x) => _.max(x))) || 1; // in case undefined returned here, cause maxboth be undefined too
+        let min = _.min(visibleValues.map((x) => _.min(x))) || 0;
+        if (min > 0) {
+            min = 0;
+        }
         return {
             valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
             min,
@@ -99,7 +104,17 @@ class DynamicNumericalTrack extends React.PureComponent {
 
     render() {
         const { data, viewRegion, width, trackModel, unit, options, viewWindow } = this.props;
-        const { height, arrayAggregateMethod, color, backgroundColor, playing, speed, dynamicLabels } = options;
+        const {
+            height,
+            arrayAggregateMethod,
+            color,
+            backgroundColor,
+            playing,
+            speed,
+            dynamicLabels,
+            dynamicColors,
+            useDynamicColors,
+        } = options;
         this.xToValue = this.aggregateFeatures(data, viewRegion, width, arrayAggregateMethod);
         this.scales = this.computeScales(this.xToValue, height);
         const legend = (
@@ -118,6 +133,8 @@ class DynamicNumericalTrack extends React.PureComponent {
                     speed={speed}
                     dynamicLabels={dynamicLabels}
                     viewWindow={viewWindow}
+                    dynamicColors={dynamicColors}
+                    useDynamicColors={useDynamicColors}
                 />
             </HoverTooltipContext>
         );

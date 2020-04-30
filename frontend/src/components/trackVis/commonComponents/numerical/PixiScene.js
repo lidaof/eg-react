@@ -21,9 +21,10 @@ export class PixiScene extends React.PureComponent {
     static defaultProps = {
         currentStep: 0,
         speed: [5], //react-compound-slider require an array, to be FIXED
-        // colors: [],
         color: "blue",
         backgroundColor: "white",
+        dynamicColors: [],
+        useDynamicColors: false,
     };
 
     constructor(props) {
@@ -33,6 +34,7 @@ export class PixiScene extends React.PureComponent {
         this.particles = null;
         this.app = null;
         this.t = null;
+        this.centerLine = null;
         this.state = {
             currentStep: 0,
             isPlaying: true,
@@ -121,6 +123,9 @@ export class PixiScene extends React.PureComponent {
         if (this.labels.length) {
             this.labels.forEach((t) => this.app.stage.addChild(t));
         }
+        this.centerLine = new PIXI.Sprite(this.t);
+        this.centerLine.visible = false;
+        this.particles.addChild(this.centerLine);
     }
 
     componentWillUnmount() {
@@ -147,8 +152,16 @@ export class PixiScene extends React.PureComponent {
             }
         }
         if (prevProps.color !== this.props.color) {
-            const color = colorString2number(this.props.color);
-            this.sprites.forEach((s) => (s.tint = color));
+            if (!(this.props.useDynamicColors && this.props.dynamicColors.length)) {
+                const color = colorString2number(this.props.color);
+                this.sprites.forEach((s) => (s.tint = color));
+            }
+        }
+        if (prevProps.useDynamicColors !== this.props.useDynamicColors) {
+            if (!this.props.useDynamicColors) {
+                const color = colorString2number(this.props.color);
+                this.sprites.forEach((s) => (s.tint = color));
+            }
         }
         if (prevProps.backgroundColor !== this.props.backgroundColor) {
             this.app.renderer.backgroundColor = colorString2number(this.props.backgroundColor);
@@ -171,11 +184,11 @@ export class PixiScene extends React.PureComponent {
     handleWidthChange = () => {
         this.particles.removeChildren();
         this.sprites = [];
-        const color = colorString2number(this.props.color);
-        const tintColor = colorString2number(color);
+        // const color = colorString2number(this.props.color);
+        // const tintColor = colorString2number(color);
         for (let i = 0; i < this.props.width; i++) {
             const s = new PIXI.Sprite(this.t);
-            s.tint = tintColor;
+            // s.tint = tintColor;
             this.sprites.push(s);
             this.particles.addChild(s);
         }
@@ -222,25 +235,42 @@ export class PixiScene extends React.PureComponent {
 
     draw = () => {
         // console.log(this.sprites.length, this.particles.width);
-        const { scales, height } = this.props;
+        const { scales, useDynamicColors, dynamicColors, width } = this.props;
         const { currentStep } = this.state;
         // this.graphics.forEach(g => g.clear());
         this.sprites.forEach((s) => s.scale.set(0));
+        const y = scales.valueToY(0); // for nagative values, move start position to center
+        if (scales.min < 0) {
+            // has negative values
+            this.centerLine.position.set(0, y);
+            this.centerLine.tint = 0x000;
+            this.centerLine.scale.set(width, 0.5);
+            this.centerLine.visible = true;
+        } else {
+            this.centerLine.visible = false;
+        }
         this.props.xToValue.forEach((value, x) => {
             const valueIndex = currentStep < value.length ? currentStep : currentStep % value.length;
             if (Number.isNaN(value[valueIndex])) {
                 return;
             }
-            const scaleHeight = scales.valueToY(value[valueIndex]) - height;
+            const scaleHeight = scales.valueToY(value[valueIndex]) - y;
             // const g = this.graphics[x];
             // g.lineStyle(0);
             // g.beginFill(color, 1);
             // g.drawRect(x, TOP_PADDING, 1, scaleHeight);
             // g.endFill();
+            // console.log(y, height);
             const s = this.sprites[x];
             if (s) {
-                s.position.set(x, height);
+                s.position.set(x, y);
                 s.scale.set(1, scaleHeight);
+                if (useDynamicColors && dynamicColors.length) {
+                    const colorIndex =
+                        currentStep < dynamicColors.length ? currentStep : currentStep % dynamicColors.length;
+                    const color = colorString2number(dynamicColors[colorIndex]);
+                    s.tint = color;
+                }
             }
         });
     };
