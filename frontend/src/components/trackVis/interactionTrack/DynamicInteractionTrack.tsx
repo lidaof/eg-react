@@ -33,6 +33,8 @@ interface DynamicInteractionTrackProps extends PropsFromTrackContainer, TooltipC
         speed?: number[];
         lineWidth?: number;
         displayMode: DynamicInteractionDisplayMode;
+        dynamicColors?: any[];
+        useDynamicColors?: boolean;
     };
 }
 
@@ -47,6 +49,8 @@ export const DEFAULT_OPTIONS = {
     playing: true,
     speed: [5],
     lineWidth: 1,
+    useDynamicColors: false,
+    dynamicColors: [] as any[],
     displayMode: DynamicInteractionDisplayMode.HEATMAP,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
@@ -135,6 +139,8 @@ class DynamicInteractionTrack extends React.PureComponent<DynamicInteractionTrac
             speed: options.speed,
             trackModel,
             lineWidth: options.lineWidth,
+            dynamicColors: options.dynamicColors,
+            useDynamicColors: options.useDynamicColors,
         };
         let visualizer;
         if (options.displayMode === DynamicInteractionDisplayMode.ARC) {

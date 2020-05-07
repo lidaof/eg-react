@@ -18,6 +18,8 @@ export const DEFAULT_OPTIONS = {
     hiddenPixels: 0.5,
     speed: [5],
     playing: true,
+    dynamicColors: [],
+    useDynamicColors: false,
 };
 
 /**
@@ -65,6 +67,8 @@ class DynamicBedTrackNoTooltip extends React.Component {
                 speed={options.speed}
                 playing={options.playing}
                 trackModel={trackModel}
+                dynamicColors={options.dynamicColors}
+                useDynamicColors={options.useDynamicColors}
             />
         );
         const message = <React.Fragment>{this.props.message}</React.Fragment>;

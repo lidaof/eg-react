@@ -26,6 +26,8 @@ export class PixiAnnotation extends React.PureComponent {
         // colors: [],
         color: "blue",
         backgroundColor: "white",
+        dynamicColors: [],
+        useDynamicColors: false,
     };
 
     constructor(props) {
@@ -71,8 +73,16 @@ export class PixiAnnotation extends React.PureComponent {
             this.drawAnnotations();
         }
         if (prevProps.color !== this.props.color) {
-            const color = colorString2number(this.props.color);
-            this.subs.forEach((c) => c.children.forEach((s) => (s.tint = color)));
+            if (!(this.props.useDynamicColors && this.props.dynamicColors.length)) {
+                const color = colorString2number(this.props.color);
+                this.subs.forEach((c) => c.children.forEach((s) => (s.tint = color)));
+            }
+        }
+        if (prevProps.useDynamicColors !== this.props.useDynamicColors) {
+            if (!this.props.useDynamicColors) {
+                const color = colorString2number(this.props.color);
+                this.subs.forEach((c) => c.children.forEach((s) => (s.tint = color)));
+            }
         }
         if (prevProps.backgroundColor !== this.props.backgroundColor) {
             this.app.renderer.backgroundColor = colorString2number(this.props.backgroundColor);
@@ -145,7 +155,17 @@ export class PixiAnnotation extends React.PureComponent {
     };
 
     drawAnnotations = () => {
-        const { color, color2, viewWindow, height, arrangeResults, trackModel, rowHeight } = this.props;
+        const {
+            color,
+            color2,
+            viewWindow,
+            height,
+            arrangeResults,
+            trackModel,
+            rowHeight,
+            useDynamicColors,
+            dynamicColors,
+        } = this.props;
         if (this.subs.length) {
             this.resetSubs();
         } else {
@@ -158,19 +178,26 @@ export class PixiAnnotation extends React.PureComponent {
         const bedStyle = new PIXI.TextStyle({
             fontFamily: "Arial",
             fontSize: rowHeight,
-            fill: color,
         });
         const g = new PIXI.Graphics();
         g.lineStyle(0);
         g.beginFill(0xffffff, 1);
         g.drawRect(0, 0, 1, 1);
         g.endFill();
+        let colorEach;
         const t = PIXI.RenderTexture.create(g.width, g.height);
         this.app.renderer.render(g, t);
         arrangeResults.forEach((placementGroup, index) => {
+            if (useDynamicColors && dynamicColors.length) {
+                const colorIndex = index < dynamicColors.length ? index : index % dynamicColors.length;
+                colorEach = dynamicColors[colorIndex];
+            } else {
+                colorEach = color;
+            }
             placementGroup.placements.forEach((placement) => {
                 const { xSpan, row, feature } = placement;
-                const colorToUse = feature.getIsReverseStrand() ? color2 : color;
+                const colorToUse =
+                    !(useDynamicColors && dynamicColors.length) && feature.getIsReverseStrand() ? color2 : colorEach;
                 const tintColor = colorString2number(colorToUse);
                 const itemWidth = Math.max(2, xSpan.end - xSpan.start);
                 const s = new PIXI.Sprite(t);
@@ -179,7 +206,7 @@ export class PixiAnnotation extends React.PureComponent {
                 s.position.set(xSpan.start, itemY);
                 s.scale.set(itemWidth, rowHeight);
                 this.subs[index].addChild(s);
-                const textStyle = feature.getIsReverseStrand() ? { ...bedStyle, fill: color2 } : bedStyle;
+                const textStyle = { ...bedStyle, fill: colorEach };
                 const st = new PIXI.Text(feature.getName(), textStyle);
                 st.position.set(xSpan.end + 2, itemY - TOP_PADDING);
                 this.subs[index].addChild(st);

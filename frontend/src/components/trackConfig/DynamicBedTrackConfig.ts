@@ -13,6 +13,7 @@ import SpeedConfig from "components/trackContextMenu/SpeedConfig";
 import MaxRowsConfig from "components/trackContextMenu/MaxRowsConfig";
 import HiddenPixelsConfig from "components/trackContextMenu/HiddenPixelsConfig";
 import RowHeightConfig from "components/trackContextMenu/RowHeightConfig";
+import UseDynamicColorsConfig from "components/trackContextMenu/UseDynamicColorsConfig";
 
 export class DynamicBedTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -36,6 +37,7 @@ export class DynamicBedTrackConfig extends TrackConfig {
             PrimaryColorConfig,
             SecondaryColorConfig,
             BackgroundColorConfig,
+            UseDynamicColorsConfig,
             RowHeightConfig,
             MaxRowsConfig,
             HiddenPixelsConfig,

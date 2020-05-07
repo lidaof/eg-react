@@ -29,6 +29,8 @@ export class PixiArc extends React.PureComponent {
         color: "blue",
         backgroundColor: "white",
         lineWidth: 1,
+        dynamicColors: [],
+        useDynamicColors: false,
     };
 
     constructor(props) {
@@ -43,6 +45,7 @@ export class PixiArc extends React.PureComponent {
             isPlaying: true,
         };
         this.count = 0;
+        this.steps = 0;
         this.subs = []; //holder for sub containers for each sprite sets from each track
         this.arcData = [];
     }
@@ -65,6 +68,8 @@ export class PixiArc extends React.PureComponent {
         window.addEventListener("resize", this.onWindowResize);
         this.app.renderer.plugins.interaction.on("pointerdown", this.onPointerDown);
         // this.g = new PIXI.Graphics();
+        this.steps = this.getMaxSteps();
+        this.drawArc();
     }
 
     componentWillUnmount() {
@@ -77,8 +82,16 @@ export class PixiArc extends React.PureComponent {
             this.drawArc();
         }
         if (prevProps.color !== this.props.color) {
-            const color = colorString2number(this.props.color);
-            this.subs.forEach((c) => c.children.forEach((s) => (s.tint = color)));
+            if (!(this.props.useDynamicColors && this.props.dynamicColors.length)) {
+                const color = colorString2number(this.props.color);
+                this.subs.forEach((c) => c.children.forEach((s) => (s.tint = color)));
+            }
+        }
+        if (prevProps.useDynamicColors !== this.props.useDynamicColors) {
+            if (!this.props.useDynamicColors) {
+                const color = colorString2number(this.props.color);
+                this.subs.forEach((c) => c.children.forEach((s) => (s.tint = color)));
+            }
         }
         if (prevProps.backgroundColor !== this.props.backgroundColor) {
             this.app.renderer.backgroundColor = colorString2number(this.props.backgroundColor);
@@ -165,6 +178,8 @@ export class PixiArc extends React.PureComponent {
             placedInteractionsArray,
             trackModel,
             lineWidth,
+            useDynamicColors,
+            dynamicColors,
         } = this.props;
         if (this.subs.length) {
             this.resetSubs();
@@ -181,11 +196,18 @@ export class PixiArc extends React.PureComponent {
         // g.lineStyle(lineWidth, 0xffffff, 1);
         // g.arc(0.5 * width, -0.5 * width, radius, Math.SQRT1_2, Math.PI - Math.SQRT1_2);
         // const t = this.app.renderer.generateTexture(g);
+        let colorEach;
         placedInteractionsArray.forEach((placedInteractions, index) => {
             const sortedInteractions = placedInteractions
                 .slice()
                 .sort((a, b) => b.interaction.score - a.interaction.score);
             const slicedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
+            if (useDynamicColors && dynamicColors.length) {
+                const colorIndex = index < dynamicColors.length ? index : index % dynamicColors.length;
+                colorEach = dynamicColors[colorIndex];
+            } else {
+                colorEach = color;
+            }
             slicedInteractions.forEach((placedInteraction) => {
                 const score = placedInteraction.interaction.score;
                 if (!score) {
@@ -208,7 +230,7 @@ export class PixiArc extends React.PureComponent {
                     return;
                 }
                 const radius = Math.max(0, Math.SQRT2 * halfLength - lineWidth * 0.5);
-                const colorToUse = score >= 0 ? color : color2;
+                const colorToUse = !(useDynamicColors && dynamicColors.length) && score < 0 ? color2 : colorEach;
                 const tintColor = colorString2number(colorToUse);
                 const g = this.subs[index];
                 g.moveTo(xSpan2Center, 0);

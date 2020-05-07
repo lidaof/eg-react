@@ -9,11 +9,17 @@ import { BackgroundColorConfig, PrimaryColorConfig } from "../trackContextMenu/C
 import TrackModel from "../../model/TrackModel";
 import SpeedConfig from "components/trackContextMenu/SpeedConfig";
 import PlayingConfig from "components/trackContextMenu/PlayingConfig";
+import UseDynamicColorsConfig from "components/trackContextMenu/UseDynamicColorsConfig";
 
 export class DynamicplotTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
         super(trackModel);
-        this.setDefaultOptions(DEFAULT_OPTIONS);
+        let options = { ...DEFAULT_OPTIONS };
+        if (!this.trackModel.options.dynamicLabels) {
+            const labels = this.trackModel.tracks.map((t) => t.label);
+            options = { ...options, dynamicLabels: labels };
+        }
+        this.setDefaultOptions(options);
     }
 
     initDataSource() {
@@ -34,6 +40,7 @@ export class DynamicplotTrackConfig extends TrackConfig {
             AggregateConfig,
             SmoothConfig,
             PrimaryColorConfig,
+            UseDynamicColorsConfig,
             BackgroundColorConfig,
         ];
     }

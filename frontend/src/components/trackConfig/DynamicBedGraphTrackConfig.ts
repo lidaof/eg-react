@@ -1,6 +1,5 @@
 import { TrackConfig } from "./TrackConfig";
 import DynamicNumericalTrack, { DEFAULT_OPTIONS } from "../trackVis/commonComponents/numerical/DynamicNumericalTrack";
-
 import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { BedWorker } from "../../dataSources/WorkerTSHook";
 import ChromosomeInterval from "../../model/interval/ChromosomeInterval";

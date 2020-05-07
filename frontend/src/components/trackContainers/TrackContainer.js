@@ -329,6 +329,17 @@ class TrackContainer extends React.Component {
         //         colors.push(tk.options.color);
         //     }
         // });
+        const labels = tracks.map((t) => t.label);
+        const colors = [];
+        let useDynamicColors = false;
+        tracks.forEach((t) => {
+            if (t.options.color) {
+                colors.push(t.options.color);
+            }
+        });
+        if (colors.length === tracks.length) {
+            useDynamicColors = true;
+        }
         const newTrack = new TrackModel({
             type: "dynamic",
             name: "dynamic plot",
@@ -337,6 +348,9 @@ class TrackContainer extends React.Component {
                 steps: tracks.length,
                 //...DYNAMIC_OPTIONS,
                 // colors
+                dynamicLabels: labels,
+                dynamicColors: colors,
+                useDynamicColors,
             },
         });
         const newTracks = [...this.props.tracks, newTrack];
@@ -347,15 +361,24 @@ class TrackContainer extends React.Component {
      * happens when user selects dynamic hic plot
      */
     applyDynamicHic = (tracks) => {
+        const colors = [];
+        let useDynamicColors = false;
+        tracks.forEach((t) => {
+            if (t.options.color) {
+                colors.push(t.options.color);
+            }
+        });
+        if (colors.length === tracks.length) {
+            useDynamicColors = true;
+        }
         const newTrack = new TrackModel({
             type: "dynamichic",
             name: "dynamic hic",
             tracks,
-            // options: {
-            //     ...DYNAMIC_HIC_OPTIONS,
-            //     binSize: BinSize.AUTO,
-            //     normalization: NormalizationMode.NONE,
-            // },
+            options: {
+                dynamicColors: colors,
+                useDynamicColors,
+            },
         });
         const newTracks = [...this.props.tracks, newTrack];
         this.props.onTracksChanged(newTracks);
@@ -365,15 +388,24 @@ class TrackContainer extends React.Component {
      * happens when user selects dynamic hic plot
      */
     applyDynamicLongrange = (tracks) => {
+        const colors = [];
+        let useDynamicColors = false;
+        tracks.forEach((t) => {
+            if (t.options.color) {
+                colors.push(t.options.color);
+            }
+        });
+        if (colors.length === tracks.length) {
+            useDynamicColors = true;
+        }
         const newTrack = new TrackModel({
             type: "dynamiclongrange",
             name: "dynamic longrange",
             tracks,
-            // options: {
-            //     ...DYNAMIC_HIC_OPTIONS,
-            //     binSize: BinSize.AUTO,
-            //     normalization: NormalizationMode.NONE,
-            // },
+            options: {
+                dynamicColors: colors,
+                useDynamicColors,
+            },
         });
         const newTracks = [...this.props.tracks, newTrack];
         this.props.onTracksChanged(newTracks);
@@ -383,15 +415,24 @@ class TrackContainer extends React.Component {
      * happens when user selects dynamic bed
      */
     applyDynamicBed = (tracks) => {
+        const colors = [];
+        let useDynamicColors = false;
+        tracks.forEach((t) => {
+            if (t.options.color) {
+                colors.push(t.options.color);
+            }
+        });
+        if (colors.length === tracks.length) {
+            useDynamicColors = true;
+        }
         const newTrack = new TrackModel({
             type: "dynamicbed",
             name: "dynamic bed",
             tracks,
-            // options: {
-            //     ...DYNAMIC_HIC_OPTIONS,
-            //     binSize: BinSize.AUTO,
-            //     normalization: NormalizationMode.NONE,
-            // },
+            options: {
+                dynamicColors: colors,
+                useDynamicColors,
+            },
         });
         const newTracks = [...this.props.tracks, newTrack];
         this.props.onTracksChanged(newTracks);

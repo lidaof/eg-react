@@ -17,6 +17,7 @@ import SpeedConfig from "components/trackContextMenu/SpeedConfig";
 import { DynamicInteractionDisplayModeConfig } from "components/trackContextMenu/DisplayModeConfig";
 import LineWidthConfig from "components/trackContextMenu/LineWidthConfig";
 import { DynamicInteractionDisplayMode } from "model/DisplayModes";
+import UseDynamicColorsConfig from "components/trackContextMenu/UseDynamicColorsConfig";
 
 export class DynamicHicTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -56,6 +57,7 @@ export class DynamicHicTrackConfig extends TrackConfig {
             BinSizeConfig,
             PrimaryColorConfig,
             SecondaryColorConfig,
+            UseDynamicColorsConfig,
             BackgroundColorConfig,
         ];
         if (this.getOptions().displayMode !== DynamicInteractionDisplayMode.HEATMAP) {

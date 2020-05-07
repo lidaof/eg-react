@@ -25,7 +25,10 @@ export const DEFAULT_OPTIONS = {
     color: "blue",
     backgroundColor: "white",
     playing: true,
-    speed: [10]
+    speed: [10],
+    dynamicColors: [],
+    useDynamicColors: false,
+    dynamicLabels: [],
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -48,7 +51,7 @@ class DynamicplotTrack extends React.PureComponent {
         unit: PropTypes.string, // Unit to display after the number in tooltips
         options: PropTypes.object.isRequired,
         isLoading: PropTypes.bool, // If true, applies loading styling
-        error: PropTypes.any // If present, applies error styling
+        error: PropTypes.any, // If present, applies error styling
     });
 
     constructor(props) {
@@ -79,7 +82,7 @@ class DynamicplotTrack extends React.PureComponent {
             It comes directly from the `ViewExpansion` object from `RegionExpander.ts`
         */
         const visibleValues = _.flatten(
-            xToValue.map(d => d.slice(this.props.viewWindow.start, this.props.viewWindow.end))
+            xToValue.map((d) => d.slice(this.props.viewWindow.start, this.props.viewWindow.end))
         );
         let max = _.max(visibleValues) || 0; // in case undefined returned here, cause maxboth be undefined too
         let min = _.min(visibleValues) || 0;
@@ -91,12 +94,9 @@ class DynamicplotTrack extends React.PureComponent {
             min = max;
         }
         return {
-            valueToY: scaleLinear()
-                .domain([max, min])
-                .range([TOP_PADDING, height])
-                .clamp(true),
+            valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
             min,
-            max
+            max,
         };
     }
 
@@ -109,8 +109,8 @@ class DynamicplotTrack extends React.PureComponent {
      */
     renderTooltip(relativeX) {
         const { trackModel, viewRegion, width, unit } = this.props;
-        const values = this.xToValue.map(value => value[Math.round(relativeX)]);
-        const stringValues = values.map(value => {
+        const values = this.xToValue.map((value) => value[Math.round(relativeX)]);
+        const stringValues = values.map((value) => {
             return typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : "(no data)";
         });
         const divs = stringValues.map((value, i) => {
@@ -136,10 +136,22 @@ class DynamicplotTrack extends React.PureComponent {
     }
 
     render() {
-        const { data, viewRegion, width, trackModel, unit, options } = this.props;
-        const { height, aggregateMethod, smooth, color, backgroundColor, playing, speed, steps } = options;
-        const aggreagatedData = data.map(d => this.aggregateFeatures(d, viewRegion, width, aggregateMethod));
-        this.xToValue = smooth === 0 ? aggreagatedData : aggreagatedData.map(d => Smooth(d, smooth));
+        const { data, viewRegion, width, trackModel, unit, options, viewWindow } = this.props;
+        const {
+            height,
+            aggregateMethod,
+            smooth,
+            color,
+            backgroundColor,
+            playing,
+            speed,
+            steps,
+            dynamicLabels,
+            dynamicColors,
+            useDynamicColors,
+        } = options;
+        const aggreagatedData = data.map((d) => this.aggregateFeatures(d, viewRegion, width, aggregateMethod));
+        this.xToValue = smooth === 0 ? aggreagatedData : aggreagatedData.map((d) => Smooth(d, smooth));
         this.scales = this.computeScales(this.xToValue, height);
         this.xToValueZipped = _.zip(...this.xToValue);
         const legend = (
@@ -157,6 +169,10 @@ class DynamicplotTrack extends React.PureComponent {
                     backgroundColor={backgroundColor}
                     playing={playing}
                     speed={speed}
+                    dynamicLabels={dynamicLabels}
+                    viewWindow={viewWindow}
+                    dynamicColors={dynamicColors}
+                    useDynamicColors={useDynamicColors}
                 />
             </HoverTooltipContext>
         );

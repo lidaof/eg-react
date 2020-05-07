@@ -29,6 +29,8 @@ export class PixiHeatmap extends React.PureComponent {
         // colors: [],
         color: "blue",
         backgroundColor: "white",
+        dynamicColors: [],
+        useDynamicColors: false,
     };
 
     constructor(props) {
@@ -42,6 +44,7 @@ export class PixiHeatmap extends React.PureComponent {
             isPlaying: true,
         };
         this.count = 0;
+        this.steps = 0;
         this.subs = []; //holder for sub containers for each sprite sets from each track
         this.hmData = [];
     }
@@ -63,6 +66,8 @@ export class PixiHeatmap extends React.PureComponent {
         this.app.stage.addChild(this.subcontainer);
         window.addEventListener("resize", this.onWindowResize);
         this.app.renderer.plugins.interaction.on("pointerdown", this.onPointerDown);
+        this.steps = this.getMaxSteps();
+        this.drawHeatmap();
     }
 
     componentWillUnmount() {
@@ -75,8 +80,16 @@ export class PixiHeatmap extends React.PureComponent {
             this.drawHeatmap();
         }
         if (prevProps.color !== this.props.color) {
-            const color = colorString2number(this.props.color);
-            this.subs.forEach((c) => c.children.forEach((s) => (s.tint = color)));
+            if (!(this.props.useDynamicColors && this.props.dynamicColors.length)) {
+                const color = colorString2number(this.props.color);
+                this.subs.forEach((c) => c.children.forEach((s) => (s.tint = color)));
+            }
+        }
+        if (prevProps.useDynamicColors !== this.props.useDynamicColors) {
+            if (!this.props.useDynamicColors) {
+                const color = colorString2number(this.props.color);
+                this.subs.forEach((c) => c.children.forEach((s) => (s.tint = color)));
+            }
         }
         if (prevProps.backgroundColor !== this.props.backgroundColor) {
             this.app.renderer.backgroundColor = colorString2number(this.props.backgroundColor);
@@ -151,7 +164,17 @@ export class PixiHeatmap extends React.PureComponent {
     };
 
     drawHeatmap = () => {
-        const { opacityScale, color, color2, viewWindow, height, placedInteractionsArray, trackModel } = this.props;
+        const {
+            opacityScale,
+            color,
+            color2,
+            viewWindow,
+            height,
+            placedInteractionsArray,
+            trackModel,
+            useDynamicColors,
+            dynamicColors,
+        } = this.props;
         if (this.subs.length) {
             this.resetSubs();
         } else {
@@ -166,9 +189,16 @@ export class PixiHeatmap extends React.PureComponent {
         g.beginFill(0xffffff, 1);
         g.drawRect(0, 0, 1, 1);
         g.endFill();
+        let colorEach;
         const t = PIXI.RenderTexture.create(g.width, g.height);
         this.app.renderer.render(g, t);
         placedInteractionsArray.forEach((placedInteractions, index) => {
+            if (useDynamicColors && dynamicColors.length) {
+                const colorIndex = index < dynamicColors.length ? index : index % dynamicColors.length;
+                colorEach = dynamicColors[colorIndex];
+            } else {
+                colorEach = color;
+            }
             placedInteractions.forEach((placedInteraction) => {
                 const score = placedInteraction.interaction.score;
                 if (!score) {
@@ -184,7 +214,7 @@ export class PixiHeatmap extends React.PureComponent {
                 const topY = 0.5 * gapLength;
                 const halfSpan1 = Math.max(0.5 * xSpan1.getLength(), 1);
                 const halfSpan2 = Math.max(0.5 * xSpan2.getLength(), 1);
-                const colorToUse = score >= 0 ? color : color2;
+                const colorToUse = !(useDynamicColors && dynamicColors.length) && score < 0 ? color2 : colorEach;
                 const tintColor = colorString2number(colorToUse);
                 const bottomY = topY + halfSpan1 + halfSpan2;
                 const points = [

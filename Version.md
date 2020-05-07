@@ -4,6 +4,7 @@
 
 -   add dynamic arc view for dynamic hic tracks
 -   fixed a bug arc with negative score not show up in screenshot
+-   dynamic colors `dynamicColors` are supported for all dynamic tracks
 
 ## 51.0.3
 
