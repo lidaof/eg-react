@@ -1,5 +1,11 @@
 # Version History
 
+## 51.0.5
+
+-   updated SARS-CoV-2 publib hubs and default tracks
+-   enabled tracks can be loaded from both hub url and previous session storage with new URL parameter `hubSessionStorage`
+-   fixed a `qBed` when mouseover outside of the track caused TypeError bug
+
 ## 51.0.4
 
 -   add dynamic arc view for dynamic hic tracks

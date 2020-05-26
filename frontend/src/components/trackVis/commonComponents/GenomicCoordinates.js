@@ -11,31 +11,34 @@ import NavigationContext from "../../../model/NavigationContext";
  * @author Silas Hsu
  */
 class GenomicCoordinates extends React.Component {
-  static propTypes = {
-    viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-    width: PropTypes.number.isRequired,
-    x: PropTypes.number.isRequired
-  };
+    static propTypes = {
+        viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        width: PropTypes.number.isRequired,
+        x: PropTypes.number.isRequired,
+    };
 
-  /**
-   * @inheritdoc
-   */
-  render() {
-    const { viewRegion, width, x } = this.props;
-    const drawModel = new LinearDrawingModel(viewRegion, width);
-    let segment;
-    try {
-      segment = drawModel.xToSegmentCoordinate(x);
-    } catch (error) {
-      return null;
+    /**
+     * @inheritdoc
+     */
+    render() {
+        const { viewRegion, width, x } = this.props;
+        const drawModel = new LinearDrawingModel(viewRegion, width);
+        let segment;
+        try {
+            segment = drawModel.xToSegmentCoordinate(x);
+        } catch (error) {
+            return null;
+        }
+        if (NavigationContext.isGapFeature(segment.feature)) {
+            return segment.getName();
+        } else {
+            const locus = segment.getLocus();
+            const start = Math.floor(locus.start);
+            const end = Math.ceil(start + drawModel.xWidthToBases(1));
+            return `${locus.chr}:${start}-${end}`;
+            // return `${locus.chr}:${Math.floor(locus.start)}`;
+        }
     }
-    if (NavigationContext.isGapFeature(segment.feature)) {
-      return segment.getName();
-    } else {
-      const locus = segment.getLocus();
-      return `${locus.chr}:${Math.floor(locus.start)}`;
-    }
-  }
 }
 
 export default GenomicCoordinates;

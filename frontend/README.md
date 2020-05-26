@@ -1,6 +1,6 @@
 # WashU Epigenome Browser
 
-![WashU Epigenome Browser Logo](https://eg.readthedocs.io/en/latest/_images/eg.png 'WashU Epigenome Browser')
+![WashU Epigenome Browser Logo](https://eg.readthedocs.io/en/latest/_images/eg.png "WashU Epigenome Browser")
 
 ## Start the browser standalone
 
@@ -41,7 +41,7 @@ Yes please! Feature requests / pull requests are welcome.
 <link rel="stylesheet" href="https://unpkg.com/epgg@latest/umd/epgg.css" />
 
 <!-- JS -->
-<script src="https://unpkg.com/epgg@latest/umd/epgg.js"></script>
+<script src="https://target.wustl.edu/dli/eg/epgg.js"></script>
 
 <script>
     renderBrowserInElement(contents, container);
@@ -94,45 +94,45 @@ Create a HTML page with following contents: (the example shows how to embed a mo
         <div id="embed" style="width:1000px"></div>
         <h2>some other headings</h2>
         <script>
-            const container = document.getElementById('embed');
+            const container = document.getElementById("embed");
             const contents = {
-                genomeName: 'mm10',
-                displayRegion: 'chr5:51997494-52853744',
+                genomeName: "mm10",
+                displayRegion: "chr5:51997494-52853744",
                 trackLegendWidth: 120,
                 isShowingNavigator: true,
                 tracks: [
                     {
-                        type: 'geneannotation',
-                        name: 'refGene',
-                        genome: 'mm10'
+                        type: "geneannotation",
+                        name: "refGene",
+                        genome: "mm10",
                     },
                     {
-                        type: 'geneannotation',
-                        name: 'gencodeM19Basic',
-                        genome: 'mm10'
+                        type: "geneannotation",
+                        name: "gencodeM19Basic",
+                        genome: "mm10",
                     },
                     {
-                        type: 'ruler',
-                        name: 'Ruler'
+                        type: "ruler",
+                        name: "Ruler",
                     },
                     {
-                        type: 'bigWig',
-                        name: 'ChipSeq of Heart',
-                        url: 'https://www.encodeproject.org/files/ENCFF641FBI/@@download/ENCFF641FBI.bigWig',
-                        options: { color: 'red' },
-                        metadata: { Sample: 'Heart' }
+                        type: "bigWig",
+                        name: "ChipSeq of Heart",
+                        url: "https://www.encodeproject.org/files/ENCFF641FBI/@@download/ENCFF641FBI.bigWig",
+                        options: { color: "red" },
+                        metadata: { Sample: "Heart" },
                     },
                     {
-                        type: 'bigWig',
-                        name: 'ChipSeq of Liver',
-                        url: 'https://www.encodeproject.org/files/ENCFF555LBI/@@download/ENCFF555LBI.bigWig',
-                        options: { color: 'blue' },
-                        metadata: { Sample: 'Liver' }
-                    }
+                        type: "bigWig",
+                        name: "ChipSeq of Liver",
+                        url: "https://www.encodeproject.org/files/ENCFF555LBI/@@download/ENCFF555LBI.bigWig",
+                        options: { color: "blue" },
+                        metadata: { Sample: "Liver" },
+                    },
                 ],
-                metadataTerms: ['Sample'],
+                metadataTerms: ["Sample"],
                 regionSets: [],
-                regionSetViewIndex: -1
+                regionSetViewIndex: -1,
             };
             renderBrowserInElement(contents, container);
         </script>

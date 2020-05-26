@@ -9,6 +9,7 @@ import { withTooltip, TooltipCallbacks } from "../commonComponents/tooltip/withT
 import { Feature } from "../../../model/Feature";
 import { PlacedFeatureGroup } from "../../../model/FeatureArranger";
 import configOptionMerging from "../commonComponents/configOptionMerging";
+import OpenInterval from "model/interval/OpenInterval";
 
 export const DEFAULT_OPTIONS = {
     height: 20,
@@ -56,6 +57,16 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
         this.props.onShowTooltip(tooltip);
     }
 
+    paddingFunc = (feature: Feature, xSpan: OpenInterval) => {
+        const width = xSpan.end - xSpan.start;
+        const estimatedLabelWidth = feature.getName().length * 9;
+        if (estimatedLabelWidth < 0.5 * width) {
+            return 5;
+        } else {
+            return 9 + estimatedLabelWidth;
+        }
+    };
+
     /**
      * Renders one annotation.
      *
@@ -93,6 +104,7 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
                 {...this.props}
                 rowHeight={this.props.options.height}
                 getAnnotationElement={this.renderAnnotation}
+                featurePadding={this.paddingFunc}
             />
         );
     }

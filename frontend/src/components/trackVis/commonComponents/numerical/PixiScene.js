@@ -184,11 +184,11 @@ export class PixiScene extends React.PureComponent {
     handleWidthChange = () => {
         this.particles.removeChildren();
         this.sprites = [];
-        // const color = colorString2number(this.props.color);
-        // const tintColor = colorString2number(color);
+        const color = colorString2number(this.props.color); // need set a color even with dynamic colors otherwise track become empty
+        const tintColor = colorString2number(color);
         for (let i = 0; i < this.props.width; i++) {
             const s = new PIXI.Sprite(this.t);
-            // s.tint = tintColor;
+            s.tint = tintColor;
             this.sprites.push(s);
             this.particles.addChild(s);
         }

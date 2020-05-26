@@ -22,16 +22,19 @@ const defaultTracks = [
     new TrackModel({
         type: "bedgraph",
         name: "Sequence diversity (Shannon Entropy)",
-        url: "https://wangftp.wustl.edu/~cfan/updates/latest/diversity/ncov_entropy.bedgraph.sort.gz",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_entropy.bedgraph.sort.gz",
         options: {
             aggregateMethod: "MAX",
         },
     }),
     new TrackModel({
-        type: "pairwise",
+        type: "qbed",
         name: "Mutation Alert",
-        url:
-            "https://wangftp.wustl.edu/~cfan/public_viralBrowser/ncov/daily_updates/latest/diversity/ncov_alert.bed.sort.gz",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_alert.bed.sort.gz",
+        options: {
+            height: 60,
+            color: "darkgreen",
+        },
     }),
     new TrackModel({
         name: "Viral RNA expression (nanopore)",
@@ -39,6 +42,16 @@ const defaultTracks = [
         url: "https://wangftp.wustl.edu/~xzhuo/bat_genomes/VeroInf24h.bw",
         options: {
             zoomLevel: "0",
+        },
+    }),
+    new TrackModel({
+        type: "bed",
+        name: "Putative SARS Immune Epitopes",
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/IEDB_NC_045512.2_SARS-tblastn-nCoV_3H3V6ZBF01R.bed.gz",
+        options: {
+            color: "#9013fe",
+            displayMode: "density",
+            height: 60,
         },
     }),
     new TrackModel({
@@ -66,7 +79,7 @@ const defaultTracks = [
             yMin: 0,
             displayMode: "arc",
             lineWidth: 5,
-            height: 155,
+            height: 205,
             greedyTooltip: true,
         },
     }),
@@ -109,47 +122,46 @@ const annotationTracks = {
         {
             type: "bedgraph",
             name: "Sequence diversity (Shannon Entropy)",
-            url: "https://wangftp.wustl.edu/~cfan/updates/latest/diversity/ncov_entropy.bedgraph.sort.gz",
+            url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_entropy.bedgraph.sort.gz",
             options: {
                 aggregateMethod: "MAX",
             },
         },
         {
-            type: "pairwise",
+            type: "qbed",
             name: "Mutation Alert",
-            url:
-                "https://wangftp.wustl.edu/~cfan/public_viralBrowser/ncov/daily_updates/latest/diversity/ncov_alert.bed.sort.gz",
+            url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_alert.bed.sort.gz",
         },
     ],
     "Genome Comparison": [
         {
             name: "merstonCoV2019",
-            label: "MERS to nCoV2019 alignment",
+            label: "MERS to SARS-CoV-2 alignment",
             querygenome: "MERS",
             filetype: "genomealign",
             url: "https://vizhub.wustl.edu/public/virus/ncov_mers.genomealign.gz",
         },
         {
             name: "sarstonCoV2019",
-            label: "SARS to nCoV2019 alignment",
+            label: "SARS to SARS-CoV-2 alignment",
             querygenome: "SARS",
             filetype: "genomealign",
             url: "https://vizhub.wustl.edu/public/virus/ncov_sars.genomealign.gz",
         },
-        // {
-        //     name: "pangolinCoVtonCoV2019",
-        //     label: "pangolin CoV to nCoV2019 alignment",
-        //     querygenome: "pangolin",
-        //     filetype: "genomealign",
-        //     url: "https://wangftp.wustl.edu/~dli/virusGateway/nCoV-pangolin.fa.genomealign1.gz"
-        // },
-        // {
-        //     name: "batCoVtonCoV2019",
-        //     label: "bat CoV to nCoV2019 alignment",
-        //     querygenome: "bat",
-        //     filetype: "genomealign",
-        //     url: "https://wangftp.wustl.edu/~dli/virusGateway/nCoV-RaTG13.fa.genomealign1.gz"
-        // }
+        {
+            name: "pangolinCoVtonCoV2019",
+            label: "pangolin CoV to SARS-CoV-2 alignment",
+            querygenome: "pangolin",
+            filetype: "genomealign",
+            url: "https://wangftp.wustl.edu/~dli/virusGateway/nCoV-pangolin.fa.genomealign1.gz",
+        },
+        {
+            name: "batCoVtonCoV2019",
+            label: "bat CoV to SARS-CoV-2 alignment",
+            querygenome: "bat",
+            filetype: "genomealign",
+            url: "https://wangftp.wustl.edu/~dli/virusGateway/nCoV-RaTG13.fa.genomealign1.gz",
+        },
     ],
 };
 
@@ -160,11 +172,14 @@ const publicHubData = {
         "SNV tracks of all SARS-CoV-2 strains from Nextstrain, displaying their sequence variation from the reference",
     "GISAID database":
         "SNV tracks of SARS-CoV-2 strains from GISAID, displaying their sequence variation from the reference",
-    Primers: "CDC/non-CDC primers for detecting SARS-CoV-2",
+    Diagnostics: "Primers, gRNAs, etc. for diagnostic tests",
     "Epitope predictions": "SARS-CoV-2 Epitope Predictions Across HLA-1 Alleles",
     "Recombination events": "Recombination events detected by junction-spanning RNA-seq",
     "Viral RNA modifications": "RNA modifications detected using Nanopore direct RNA sequencing",
     "Viral RNA expression": "Viral RNA expression measured by Nanopore",
+    "Sequence variation": "Demo tracks for using the browser to study sequence variation and diversity across strains",
+    "Putative SARS-CoV-2 Immune Epitopes":
+        "Datahubs with tracks providing predicted epitope sequences across the SARS-CoV-2 reference genome",
 };
 
 const publicHubList = [
@@ -215,7 +230,7 @@ const publicHubList = [
         },
     },
     {
-        collection: "Primers",
+        collection: "Diagnostics",
         name: "Primers",
         numTracks: "Updating",
         oldHubFormat: false,
@@ -228,16 +243,55 @@ const publicHubList = [
         },
     },
     {
-        collection: "Epitope Predictions",
-        name: "Epitope Predictions (Campbell, et al. 2020)",
-        numTracks: 1,
+        collection: "Diagnostics",
+        name: "CRISPR-based diagnostic tests",
+        numTracks: 2,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/crispr_diagnostic_tests.json",
+        description: {
+            "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
+            "hub info": "CRISPR-based assays for detecting SARS-CoV-2.",
+            "SHERLOCK diagnostic test track":
+                "Primer and guide RNA sequences used in the CRISPR-Cas13a-based SHERLOCK assay for detecting SARS-CoV-2 (source: https://www.broadinstitute.org/files/publications/special/COVID-19%20detection%20(updated).pdf; accessed on 05-08-20).",
+            "DETECTR diagnostic test track":
+                "Primer and guide RNA sequences used in the CRISPR-Cas12-based DETECTR assay for detecting SARS-CoV-2 (source: Broughton et al., 2020; doi: https://doi.org/10.1038/s41587-020-0513-4).",
+        },
+    },
+    {
+        collection: "Putative SARS-CoV-2 Immune Epitopes",
+        name: "SARS-CoV-2 Epitopes Predicted to Bind HLA Class 1 Proteins Database",
+        numTracks: "1",
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/Campbell_et_al/campbell_et_al.json",
         description: {
             "hub built by": "Jennifer Flynn (jaflynn@wustl.edu)",
-            "hub info": "Predicted SARS-CoV-2 epitopes that bind to class 1 HLA proteins.",
+            "hub info": "Predicted SARS-CoV-2 epitopes that bind to class 1 HLA proteins",
             values:
                 "Values represent number of strains with the predicted epitope. Only epitope predictions with 100% sequence identity in SARS-CoV-2 are displayed.",
+            "data source": "Campbell, et al. (2020) pre-print (DOI: 10.1101/2020.03.30.016931)",
+        },
+    },
+    {
+        collection: "Putative SARS-CoV-2 Immune Epitopes",
+        name: "Congeneric (or Closely-related) Putative SARS Immune Epitopes Locations (this publication)",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/IEDB_NC_045512.2_SARS-tblastn-nCoV_3H3V6ZBF01R.hub",
+        description: {
+            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
+            "hub info":
+                "Congeneric (or closely-related) putative SARS linear immune epitopes catalogued in IEDB mapped to exact-match locations in SARS-CoV-2",
+        },
+    },
+    {
+        collection: "Putative SARS-CoV-2 Immune Epitopes",
+        name: "Putative SARS-CoV-2 Epitopes",
+        numTracks: 14,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/SARS-CoV-2_immune_epitopes.hub",
+        description: {
+            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
+            "hub info": "SARS-CoV-2 Immune Epitopes from various pre-prints and publications",
         },
     },
     {
@@ -279,6 +333,18 @@ const publicHubList = [
             "hub built by": "Xiaoyu Zhuo (xzhuo@wustl.edu)",
             "hub info":
                 "a bigwig track displaying nanopore expression from SARS-CoV-2 infected Vero cells (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011).",
+        },
+    },
+    {
+        collection: "Sequence variation",
+        name: "D614G prevalence across time",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/D614G_byweek.hub",
+        description: {
+            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
+            "hub info":
+                "Percentage of strains with D614G mutation collected in each week between 12/23/2019 and 05/04/2020",
         },
     },
 ];

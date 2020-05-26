@@ -35,16 +35,6 @@ class AnnotationTrack extends React.PureComponent {
         }).isRequired,
     });
 
-    paddingFunc = (feature, xSpan) => {
-        const width = xSpan.endX - xSpan.startX;
-        const estimatedLabelWidth = feature.getName().length * 9;
-        if (estimatedLabelWidth < 0.5 * width) {
-            return 5;
-        } else {
-            return 9 + estimatedLabelWidth;
-        }
-    };
-
     render() {
         if (this.props.options.displayMode === AnnotationDisplayModes.DENSITY) {
             const numericalOptions = {
@@ -55,7 +45,7 @@ class AnnotationTrack extends React.PureComponent {
             return <NumericalTrack {...this.props} unit="feature density" options={numericalOptions} />;
         } else {
             // Assume FULL display mode
-            return <FullDisplayMode {...this.props} featurePadding={this.paddingFunc} />;
+            return <FullDisplayMode {...this.props} />;
         }
     }
 }

@@ -99,6 +99,7 @@ enum ActionType {
     SET_TRACKS_CUSTOM_TRACKS_POOL = "SET_TRACKS_CUSTOM_TRACKS_POOL",
     SET_CUSTOM_VIRUS_GENOME = "SET_CUSTOM_VIRUS_GENOME",
     SET_VIRUS_BROWSER_MODE = "SET_VIRUS_BROWSER_MODE",
+    SET_HUB_SESSION_STORAGE = "SET_HUB_SESSION_STORAGE",
 }
 
 interface AppAction {
@@ -182,6 +183,14 @@ export const ActionCreators = {
         return {
             type: ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL,
             tracks,
+            customTracksPool,
+        };
+    },
+
+    setHubSessionStorage: (state: AppState, customTracksPool: TrackModel[]) => {
+        return {
+            type: ActionType.SET_HUB_SESSION_STORAGE,
+            state,
             customTracksPool,
         };
     },
@@ -357,6 +366,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             };
         case ActionType.SET_CUSTOM_TRACKS_POOL:
             return { ...prevState, customTracksPool: action.customTracksPool };
+        case ActionType.SET_HUB_SESSION_STORAGE:
+            return {
+                ...action.state,
+                customTracksPool: action.customTracksPool,
+            };
         case ActionType.SET_VIRUS_BROWSER_MODE:
             return {
                 ...prevState,
@@ -449,6 +463,52 @@ async function asyncInitState() {
             const json = await new Json5Fetcher().get(query.sessionFile as string);
             if (json) {
                 AppState.dispatch(ActionCreators.restoreSession(json));
+            }
+        }
+        if (query.hubSessionStorage) {
+            const customTracksPool = await getTracksFromHubURL(query.hubSessionStorage as string);
+            if (customTracksPool) {
+                const tracksInHub = customTracksPool.filter((track: any) => track.showOnHubLoad);
+                const blob = STORAGE.getItem(SESSION_KEY);
+                if (blob) {
+                    try {
+                        const state = new AppStateLoader().fromJSON(blob);
+                        if (state.genomeName === query.genome) {
+                            const trackSets = new Set();
+                            state.tracks.forEach((t: any) => trackSets.add(t.url || t.label));
+                            const filteredTracks = tracksInHub.filter((t: any) => {
+                                if (t.url) {
+                                    return !trackSets.has(t.url);
+                                } else if (t.label) {
+                                    return !trackSets.has(t.label);
+                                } else {
+                                    return true;
+                                }
+                            });
+                            const tracks = [...state.tracks, ...filteredTracks];
+                            const finalState = { ...state, tracks };
+                            AppState.dispatch(ActionCreators.setHubSessionStorage(finalState, customTracksPool));
+                        } else {
+                            //if url changed genome
+                            if (tracksInHub.length > 0) {
+                                AppState.dispatch(
+                                    ActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool)
+                                );
+                            } else {
+                                AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Error restoring hub session storage");
+                        console.error(error);
+                    }
+                } else {
+                    if (tracksInHub.length > 0) {
+                        AppState.dispatch(ActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool));
+                    } else {
+                        AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
+                    }
+                }
             }
         }
     }

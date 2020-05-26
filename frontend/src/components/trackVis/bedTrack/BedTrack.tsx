@@ -8,6 +8,7 @@ import Tooltip from "../commonComponents/tooltip/Tooltip";
 import { withTooltip, TooltipCallbacks } from "../commonComponents/tooltip/withTooltip";
 import { Feature } from "../../../model/Feature";
 import { PlacedFeatureGroup } from "../../../model/FeatureArranger";
+import OpenInterval from "model/interval/OpenInterval";
 
 const ROW_VERTICAL_PADDING = 2;
 const ROW_HEIGHT = BedAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
@@ -50,6 +51,16 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
         this.props.onShowTooltip(tooltip);
     }
 
+    paddingFunc = (feature: Feature, xSpan: OpenInterval) => {
+        const width = xSpan.end - xSpan.start;
+        const estimatedLabelWidth = feature.getName().length * 9;
+        if (estimatedLabelWidth < 0.5 * width) {
+            return 5;
+        } else {
+            return 9 + estimatedLabelWidth;
+        }
+    };
+
     /**
      * Renders one annotation.
      *
@@ -77,7 +88,14 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
     }
 
     render() {
-        return <AnnotationTrack {...this.props} rowHeight={ROW_HEIGHT} getAnnotationElement={this.renderAnnotation} />;
+        return (
+            <AnnotationTrack
+                {...this.props}
+                rowHeight={ROW_HEIGHT}
+                getAnnotationElement={this.renderAnnotation}
+                featurePadding={this.paddingFunc}
+            />
+        );
     }
 }
 
