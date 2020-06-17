@@ -19,6 +19,7 @@ import { InteractionDisplayMode } from "../../../model/DisplayModes";
 import { FeaturePlacer } from "../../../model/FeaturePlacer";
 import { GenomeInteraction } from "../../../model/GenomeInteraction";
 import { ScaleChoices } from "../../../model/ScaleChoices";
+import { TrackFileMeta } from "../commonComponents/TrackFileMeta";
 
 const TOP_PADDING = 2;
 
@@ -184,7 +185,12 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
                     />
                 }
                 // legend={<TrackLegend trackModel={trackModel} height={50} />}
-                visualizer={visualizer}
+                visualizer={
+                    <div>
+                        {visualizer}
+                        <TrackFileMeta meta={this.props.meta} viewWindow={this.props.viewWindow} />
+                    </div>
+                }
             />
         );
     }

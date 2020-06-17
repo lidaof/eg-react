@@ -16,6 +16,10 @@ class DataSource {
         return Promise.resolve();
     }
 
+    getCurrentMeta(region, basesPerPixel, options = {}) {
+        return {};
+    }
+
     /**
      * Functions as this object's destructor; deallocates anything that needs manual deallocation.
      */

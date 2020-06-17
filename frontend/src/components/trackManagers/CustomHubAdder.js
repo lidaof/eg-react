@@ -33,7 +33,8 @@ class RemoteHubAdder extends React.Component {
         this.loadHub = this.loadHub.bind(this);
     }
 
-    async loadHub() {
+    async loadHub(e) {
+        e.preventDefault();
         if (!this.props.onTracksAdded) {
             return;
         }

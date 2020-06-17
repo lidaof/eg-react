@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Track from "../commonComponents/Track";
 import TrackLegend from "../commonComponents/TrackLegend";
 import { ThreeScene } from "./ThreeScene";
+import { TrackFileMeta } from "../commonComponents/TrackFileMeta";
 
 export const DEFAULT_OPTIONS = {
     height: 500,
@@ -28,7 +29,7 @@ class G3dTrack extends React.PureComponent {
     });
 
     render() {
-        const { data, trackModel, width, options } = this.props;
+        const { data, trackModel, width, options, meta, viewWindow } = this.props;
         // const newProps = {
         //         ...this.props,
         //         onContextMenu: () => null,
@@ -38,8 +39,12 @@ class G3dTrack extends React.PureComponent {
             <Track
                 {...this.props}
                 legend={<TrackLegend trackModel={trackModel} height={options.height} />}
-                // legend={<TrackLegend trackModel={trackModel} height={50} />}
-                visualizer={<ThreeScene data={data} width={width} height={options.height} options={options} />}
+                visualizer={
+                    <div>
+                        <ThreeScene data={data} width={width} height={options.height} options={options} />
+                        <TrackFileMeta meta={meta} viewWindow={viewWindow} />
+                    </div>
+                }
             />
         );
     }

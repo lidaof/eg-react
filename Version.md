@@ -1,10 +1,16 @@
 # Version History
 
+## 51.0.6
+
+-   track file information can be displayed with track data (like resolution and normalization for `hic`, `g3d` track etc)
+-   new 'snv' track for display sequence variations from reference
+
 ## 51.0.5
 
 -   updated SARS-CoV-2 publib hubs and default tracks
 -   enabled tracks can be loaded from both hub url and previous session storage with new URL parameter `hubSessionStorage`
 -   fixed a `qBed` when mouseover outside of the track caused TypeError bug
+-   fixed a bug that remote hub load button not working in Firefox
 
 ## 51.0.4
 

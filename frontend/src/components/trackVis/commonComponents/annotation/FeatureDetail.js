@@ -1,12 +1,12 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import Feature from '../../../../model/Feature';
-import '../../commonComponents/tooltip/Tooltip.css';
-import { CopyToClip } from '../../../../components/CopyToClipboard';
+import PropTypes from "prop-types";
+import React from "react";
+import Feature from "../../../../model/Feature";
+import "../../commonComponents/tooltip/Tooltip.css";
+import { CopyToClip } from "../../../../components/CopyToClipboard";
 
 /**
  * Box that contains feature details when a annotation is cdivcked.
- * 
+ *
  * @author Silas Hsu
  */
 class FeatureDetail extends React.PureComponent {
@@ -16,23 +16,51 @@ class FeatureDetail extends React.PureComponent {
     };
 
     render() {
-        const {feature, category} = this.props;
-        const featureName = category ? category[feature.getName()].name: feature.getName();
-        let ncbiLink, ncbiURL, ensemblLink, ensemblURL;
+        const { feature, category } = this.props;
+        const featureName = category ? category[feature.getName()].name : feature.getName();
+        let linkOut;
         if (feature.id) {
-            ncbiURL = `https://www.ncbi.nlm.nih.gov/gene/?term=${feature.id.split('.')[0]}`;
-            ensemblURL = `http://www.ensembl.org/Multi/Search/Results?q=${feature.id}`;
-            ncbiLink =  <a href={ncbiURL} target="_blank" rel="noopener noreferrer">NCBI<span role="img" aria-label="NCBI">🔗</span></a>;
-            ensemblLink =  <a href={ensemblURL} target="_blank" rel="noopener noreferrer">Ensembl<span role="img" aria-label="Ensembl">🔗</span></a>;
+            if (feature.id.startsWith("ENS")) {
+                // given the ensembl naming pattern: https://uswest.ensembl.org/info/genome/stable_ids/index.html
+                const ensemblURL = `http://www.ensembl.org/Multi/Search/Results?q=${feature.id}`;
+                linkOut = (
+                    <a href={ensemblURL} target="_blank" rel="noopener noreferrer">
+                        Ensembl
+                        <span role="img" aria-label="Ensembl">
+                            🔗
+                        </span>
+                    </a>
+                );
+            } else {
+                const ncbiURL = `https://www.ncbi.nlm.nih.gov/gene/?term=${feature.id.split(".")[0]}`;
+                linkOut = (
+                    <a href={ncbiURL} target="_blank" rel="noopener noreferrer">
+                        NCBI
+                        <span role="img" aria-label="NCBI">
+                            🔗
+                        </span>
+                    </a>
+                );
+            }
         }
-        
+
         return (
-        <div>
-            {featureName ? <div className="Tooltip-major-text" >{featureName} <CopyToClip value={featureName}/> </div> : null}
-            {feature.id ? <div>{feature.id} {ncbiLink} {ensemblLink}</div> : null}
-            <div>{feature.getLocus().toString()} ({feature.getLocus().getLength()}bp)</div>
-            {feature.getHasStrand() ? <div>Strand: {feature.getStrand()}</div> : null}
-        </div>
+            <div>
+                {featureName ? (
+                    <div className="Tooltip-major-text">
+                        {featureName} <CopyToClip value={featureName} />{" "}
+                    </div>
+                ) : null}
+                {feature.id ? (
+                    <div>
+                        {feature.id} {linkOut}
+                    </div>
+                ) : null}
+                <div>
+                    {feature.getLocus().toString()} ({feature.getLocus().getLength()}bp)
+                </div>
+                {feature.getHasStrand() ? <div>Strand: {feature.getStrand()}</div> : null}
+            </div>
         );
     }
 }

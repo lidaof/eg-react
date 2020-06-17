@@ -19,7 +19,7 @@ export const TRACK_TYPES = {
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange"],
     Repeats: ["repeatmasker"],
-    Alignment: ["bam", "pairwise"],
+    Alignment: ["bam", "pairwise", "snv"],
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
 };
@@ -41,6 +41,7 @@ const TYPES_DESC = {
     cool: "long range interaction data in cool format, use data uuid instead of URL",
     bam: "reads alignment data",
     pairwise: "pairwise alignment data",
+    snv: "sequence variations from pairwise alignment",
     qBED: "quantized numerical data, processed by tabix in .gz format",
     g3d: "3D structure in .g3d format",
     dbedgraph: "Dynamic bedgraph data",

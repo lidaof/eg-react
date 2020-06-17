@@ -23,6 +23,7 @@ import { MatplotTrackConfig } from "./MatplotTrackConfig";
 import { DynamicplotTrackConfig } from "./DynamicplotTrackConfig";
 import { HammockTrackConfig } from "./HammockTrackConfig";
 import { PairwiseSegmentTrackConfig } from "./PairwiseSegmentTrackConfig";
+import { SnvSegmentTrackConfig } from "./SnvSegmentTrackConfig";
 import { G3dTrackConfig } from "./G3dTrackConfig";
 import { ProteinTrackConfig } from "./ProteinTrackConfig";
 import { DynamicBedGraphTrackConfig } from "./DynamicBedGraphTrackConfig";
@@ -56,6 +57,7 @@ const TYPE_NAME_TO_CONFIG = {
     hammock: HammockTrackConfig,
     g3d: G3dTrackConfig,
     pairwise: PairwiseSegmentTrackConfig,
+    snv: SnvSegmentTrackConfig,
     protein: ProteinTrackConfig,
     dbedgraph: DynamicBedGraphTrackConfig,
     dynamichic: DynamicHicTrackConfig,

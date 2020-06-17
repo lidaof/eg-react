@@ -188,7 +188,7 @@ const publicHubList = [
         name: "All NCBI SARS-CoV-2 isolates",
         numTracks: "Updating",
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/updates/latest/browser_strains.json",
+        url: "https://wangftp.wustl.edu/~cfan/ncbi/latest/browser_strains.json",
         description: {
             "hub built by": "Changxu Fan (fanc@wustl.edu)",
             "hub info":
@@ -215,13 +215,29 @@ const publicHubList = [
     },
     {
         collection: "GISAID database",
-        name: "All GISAID SARS-CoV-2 isolates",
-        numTracks: "Updating",
+        name: "GISAID database -5/22/2020",
+        numTracks: 30612,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/browser_strains.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/5-22/browser_strains.json",
         description: {
             "track type":
-                "SNV tracks of all SARS-CoV-2 strains from GISAID, displaying their sequence variation from the reference",
+                "SNV tracks of all SARS-CoV-2 strains available on GISAID as of 5/22/2020, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database 5/22/2020- ",
+        numTracks: "updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/browser_strains_new.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID since 5/22/2020, displaying their sequence variation from the reference",
             "data source": (
                 <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
                     <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
