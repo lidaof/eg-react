@@ -130,7 +130,7 @@
         "text-encoding": "^0.7.0",
         "three": "^0.110.0",
         "three-orbitcontrols": "^2.110.3",
-        "typescript": "^3.9.5",
+        "typescript": "^3.4.5",
         "underscore": "^1.10.2",
         "uuid": "^3.4.0",
         "webpack": "^4.42.0",
