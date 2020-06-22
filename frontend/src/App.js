@@ -19,8 +19,50 @@ import { Footer } from "./components/Footer";
 import { SessionUI } from "./components/SessionUI";
 import { Offline } from "react-detect-offline";
 import { HELP_LINKS } from "./util";
+import FlexLayout from "flexlayout-react";
 
+import "../node_modules/flexlayout-react/style/light.css";
 import "./App.css";
+
+const json = {
+    global: {},
+    borders: [],
+    layout: {
+        type: "row",
+        id: "#1",
+        children: [
+            {
+                type: "row",
+                children: [
+                    {
+                        type: "tabset",
+                        id: "#11",
+                        children: [
+                            {
+                                type: "tab",
+                                id: "#111",
+                                name: "Browser",
+                                component: "app",
+                            },
+                        ],
+                    },
+                    {
+                        type: "tabset",
+                        id: "#12",
+                        children: [
+                            {
+                                type: "tab",
+                                id: "#121",
+                                name: "VR",
+                                component: "vr",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+};
 
 const REGION_EXPANDER = new RegionExpander(1);
 
@@ -33,7 +75,7 @@ function mapStateToProps(state) {
         trackLegendWidth: state.browser.present.trackLegendWidth,
         isShowingNavigator: state.browser.present.isShowingNavigator,
         customTracksPool: state.browser.present.customTracksPool,
-        virusBrowserMode: state.browser.present.virusBrowserMode
+        virusBrowserMode: state.browser.present.virusBrowserMode,
     };
 }
 
@@ -41,7 +83,7 @@ const callbacks = {
     onNewViewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
     onLegendWidthChange: ActionCreators.setTrackLegendWidth,
-    onToggleNavigator: ActionCreators.toggleNavigator
+    onToggleNavigator: ActionCreators.toggleNavigator,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -54,7 +96,7 @@ class App extends React.Component {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
         onNewViewRegion: PropTypes.func,
         onTracksChanged: PropTypes.func,
-        embeddingMode: PropTypes.bool
+        embeddingMode: PropTypes.bool,
     };
 
     constructor(props) {
@@ -71,7 +113,8 @@ class App extends React.Component {
             // publicTrackSets: new Set(),
             // customTrackSets: new Set(),
             availableTrackSets: new Set(),
-            suggestedMetaSets: new Set(["Track type"])
+            suggestedMetaSets: new Set(["Track type"]),
+            model: FlexLayout.Model.fromJson(json),
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
@@ -85,7 +128,7 @@ class App extends React.Component {
     componentDidMount() {
         if (this.props.genomeConfig && this.props.genomeConfig.publicHubList) {
             this.setState({
-                publicHubs: this.props.genomeConfig.publicHubList.slice()
+                publicHubs: this.props.genomeConfig.publicHubList.slice(),
             });
         }
         this.initializeMetaSets(this.props.tracks);
@@ -95,12 +138,12 @@ class App extends React.Component {
         if (nextProps.genomeConfig && nextProps.genomeConfig !== this.props.genomeConfig) {
             if (nextProps.genomeConfig.publicHubList) {
                 this.setState({
-                    publicHubs: nextProps.genomeConfig.publicHubList.slice()
+                    publicHubs: nextProps.genomeConfig.publicHubList.slice(),
                 });
             } else {
                 // when switch genome, need reset hub as well
                 this.setState({
-                    publicHubs: []
+                    publicHubs: [],
                 });
             }
             this.setState({ publicTracksPool: [], customTracksPool: [] });
@@ -122,8 +165,8 @@ class App extends React.Component {
         this.initializeMetaSets(nextProps.tracks);
     }
 
-    initializeMetaSets = tracks => {
-        const allKeys = tracks.map(track => Object.keys(track.metadata));
+    initializeMetaSets = (tracks) => {
+        const allKeys = tracks.map((track) => Object.keys(track.metadata));
         const metaKeys = _.union(...allKeys);
         this.addTermToMetaSets(metaKeys);
     };
@@ -131,13 +174,13 @@ class App extends React.Component {
     addTermToMetaSets(term) {
         const toBeAdded = Array.isArray(term) ? term : [term];
         this.setState({
-            suggestedMetaSets: new Set([...this.state.suggestedMetaSets, ...toBeAdded])
+            suggestedMetaSets: new Set([...this.state.suggestedMetaSets, ...toBeAdded]),
         });
     }
 
     addTracktoAvailable(trackModel) {
         this.setState({
-            availableTrackSets: new Set([...this.state.availableTrackSets, trackModel])
+            availableTrackSets: new Set([...this.state.availableTrackSets, trackModel]),
         });
     }
 
@@ -145,7 +188,7 @@ class App extends React.Component {
         const newTrackSets = new Set(Array.from(this.state.availableTrackSets));
         newTrackSets.delete(trackModel);
         this.setState({
-            availableTrackSets: newTrackSets
+            availableTrackSets: newTrackSets,
         });
     }
 
@@ -159,13 +202,13 @@ class App extends React.Component {
         if (toPublic) {
             // const urlSets = new Set([...this.state.publicTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
-                publicTracksPool: this.state.publicTracksPool.concat(newTracks)
+                publicTracksPool: this.state.publicTracksPool.concat(newTracks),
                 // publicTrackSets: urlSets,
             });
         } else {
             // const urlSets = new Set([...this.state.customTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
-                customTracksPool: this.state.customTracksPool.concat(newTracks)
+                customTracksPool: this.state.customTracksPool.concat(newTracks),
                 // customTrackSets: urlSets,
             });
         }
@@ -190,32 +233,32 @@ class App extends React.Component {
     // };
 
     toggle3DScene = () => {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             return { isShowing3D: !prevState.isShowing3D };
         });
     };
 
     toggleHighlight = () => {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             return { highlightEnteredRegion: !prevState.highlightEnteredRegion };
         });
     };
 
-    setEnteredRegion = chrInterval => {
+    setEnteredRegion = (chrInterval) => {
         this.setState({ enteredRegion: chrInterval });
     };
 
-    setHighlightColor = color => {
+    setHighlightColor = (color) => {
         const rgb = color.rgb;
         this.setState({
-            highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`
+            highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`,
         });
     };
 
     groupTrackByGenome = () => {
         const { genomeConfig, tracks } = this.props;
         const grouped = {}; // key: genome name like `hg19`, value: a set of track name or url
-        tracks.forEach(track => {
+        tracks.forEach((track) => {
             const gname = track.getMetadata("genome");
             const targeName = gname ? gname : genomeConfig.genome.getName();
             if (grouped[targeName]) {
@@ -227,7 +270,7 @@ class App extends React.Component {
         return grouped;
     };
 
-    render() {
+    renderApp = (node) => {
         const {
             genomeConfig,
             viewRegion,
@@ -240,8 +283,9 @@ class App extends React.Component {
             isShowingNavigator,
             onToggleNavigator,
             embeddingMode,
-            virusBrowserMode
+            virusBrowserMode,
         } = this.props;
+        console.log(node);
         if (sessionFromUrl) {
             return (
                 <div className="container-fluid">
@@ -261,8 +305,8 @@ class App extends React.Component {
             );
         }
         const tracksUrlSets = new Set([
-            ...tracks.filter(track => track.url).map(track => track.url),
-            ...tracks.filter(track => !track.url).map(track => track.name)
+            ...tracks.filter((track) => track.url).map((track) => track.url),
+            ...tracks.filter((track) => !track.url).map((track) => track.name),
         ]);
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
@@ -301,16 +345,7 @@ class App extends React.Component {
                 {isShowingNavigator && (
                     <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
                 )}
-                {this.state.isShowing3D && (
-                    <ErrorBoundary>
-                        <BrowserScene
-                            viewRegion={viewRegion}
-                            tracks={tracks}
-                            expansionAmount={REGION_EXPANDER}
-                            genomeConfig={genomeConfig}
-                        />
-                    </ErrorBoundary>
-                )}
+
                 <Offline>
                     <div className="alert alert-warning text-center lead" role="alert">
                         You are currently offline, so tracks on web won't load. But you can still use the{" "}
@@ -335,6 +370,37 @@ class App extends React.Component {
                 {!embeddingMode && <Footer />}
             </div>
         );
+    };
+
+    render3Dscene = (node) => {
+        const { viewRegion, tracks, genomeConfig } = this.props;
+        return (
+            <ErrorBoundary>
+                <BrowserScene
+                    viewRegion={viewRegion}
+                    tracks={tracks}
+                    expansionAmount={REGION_EXPANDER}
+                    genomeConfig={genomeConfig}
+                />
+            </ErrorBoundary>
+        );
+    };
+
+    factory = (node) => {
+        const layoutComponent = node.getComponent();
+        const layoutFuncs = {
+            app: (node) => this.renderApp(node),
+            vr: (node) => this.render3Dscene(node),
+        };
+        return layoutFuncs[layoutComponent](node);
+    };
+
+    render() {
+        if (this.state.isShowing3D) {
+            return <FlexLayout.Layout model={this.state.model} factory={this.factory} />;
+        } else {
+            return this.renderApp();
+        }
     }
 }
 
