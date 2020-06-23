@@ -151,7 +151,7 @@ class RegionSetConfig extends React.Component {
         return props.set;
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.set !== nextProps.set) {
             this.setState({set: this.getRegionSetFromProps(nextProps)});
         }

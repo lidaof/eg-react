@@ -1,6 +1,6 @@
 const { InjectManifest } = require("workbox-webpack-plugin");
 const path = require("path");
-
+process.traceDeprecation = true;
 module.exports = (config, env) => {
     // This should help with typescript source-maps
     config.devtool = "source-map";
@@ -17,29 +17,29 @@ module.exports = (config, env) => {
         exclude: /node_modules/,
         query: {
             presets: ["@babel/preset-typescript", "@babel/preset-env", "@babel/preset-react"],
-            plugins: ["@babel/proposal-class-properties", "@babel/proposal-object-rest-spread"]
+            plugins: ["@babel/proposal-class-properties", "@babel/proposal-object-rest-spread"],
         },
-        test: /\.(js|jsx)$/
+        test: /\.(js|jsx)$/,
     });
 
     config.module.rules.push({
         test: /\.worker\.js/,
         use: {
-            loader: "worker-loader"
+            loader: "worker-loader",
             // options: { inline: true }
-        }
+        },
     });
 
     config.output = {
         ...config.output,
-        globalObject: "this"
+        globalObject: "this",
     };
 
-    config.plugins = config.plugins.map(plugin => {
+    config.plugins = config.plugins.map((plugin) => {
         if (plugin.constructor.name === "GenerateSW") {
             return new InjectManifest({
                 swSrc: path.join(__dirname, "src", "sw.js"),
-                swDest: "service-worker.js"
+                swDest: "service-worker.js",
             });
         }
 

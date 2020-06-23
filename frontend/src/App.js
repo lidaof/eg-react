@@ -134,7 +134,7 @@ class App extends React.Component {
         this.initializeMetaSets(this.props.tracks);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.genomeConfig && nextProps.genomeConfig !== this.props.genomeConfig) {
             if (nextProps.genomeConfig.publicHubList) {
                 this.setState({

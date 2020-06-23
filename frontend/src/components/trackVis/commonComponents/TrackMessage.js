@@ -35,7 +35,7 @@ export class TrackMessage extends React.PureComponent {
     /**
      * Re-shows the message every time it changes.
      */
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.message !== nextProps.message) {
             this.setState({isShowing: true});
         }

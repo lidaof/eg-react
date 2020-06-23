@@ -58,7 +58,7 @@ function withOptionMerging(toMerge, WrappedComponent) {
             };
         }
 
-        componentWillReceiveProps(nextProps) {
+        UNSAFE_componentWillReceiveProps(nextProps) {
             if (!_.isEqual(this.props.options, nextProps.options)) { // Deep comparison
                 this.setState({options: this.getMergedOptionsObject(nextProps)});
             }
@@ -71,7 +71,7 @@ function withOptionMerging(toMerge, WrappedComponent) {
         render() {
             return <WrappedComponent {...this.props} options={this.state.options} />;
         }
-    }
+    };
 }
 
 export default configOptionMerging;
