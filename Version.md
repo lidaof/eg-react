@@ -1,9 +1,20 @@
 # Version History
 
+## 52.0.0
+
+-   upgrade dependent packages: react, react-dom -> 16.13.1
+-   supports nodejs v12+
+-   SARS-CoV-2 hubs updated by Fan
+-   fixed a `smooth` option caused display issue (related to #163)
+-   improved window/container resize listener using ResizeObserver API
+-   improved responsive layout of navigation menu and tools bar
+-   modified vendor `bigwig.js` to support chromosome names like `chr1` or `1`
+
 ## 51.0.6
 
 -   track file information can be displayed with track data (like resolution and normalization for `hic`, `g3d` track etc)
 -   new 'snv' track for display sequence variations from reference
+-   update hubs of virus genomes
 
 ## 51.0.5
 

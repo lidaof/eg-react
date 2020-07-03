@@ -185,6 +185,66 @@ const publicHubData = {
 const publicHubList = [
     {
         collection: "NCBI database",
+        name: "All NCBI SARS-CoV-2 isolates, in SNV2 format",
+        numTracks: "keep updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/ncbi/latest/browser_strains_snv2.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "hub info":
+                "All SARS-CoV-2 strains available on NCBI. Aligned to reference genome (NC_045512.2) using EMBL 'stretcher'.",
+            format: "SNV (v2): suggests putative amino acid level mutations",
+            "data source": "https://www.ncbi.nlm.nih.gov/nuccore",
+        },
+    },
+    {
+        collection: "Nextstrain database",
+        name: "All Nextstrain SARS-CoV-2 isolates, in SNV2 format",
+        numTracks: "keep updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/nextstrain/latest/browser_strains_snv2.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "track type":
+                "SNV tracks of all SARS-CoV-2 strains from Nextstrain, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": "http://data.Nextstrain.org/ncov.json",
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (-5/22/2020)",
+        numTracks: 30612,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/5-22/browser_strains_snv2.json",
+        description: {
+            "track type":
+                "SNV2 tracks of all SARS-CoV-2 strains available on GISAID as of 5/22/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (5/22/2020-) ",
+        numTracks: "updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/browser_strains_new_snv2.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID since 5/22/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+
+    {
+        collection: "NCBI database",
         name: "All NCBI SARS-CoV-2 isolates",
         numTracks: "Updating",
         oldHubFormat: false,

@@ -37,6 +37,8 @@ import TrackRegionController from "../genomeNavigator/TrackRegionController";
 import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
 
+import "./TrackContainer.css";
+
 // import { DEFAULT_OPTIONS as DYNAMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack";
 
 const DEFAULT_CURSOR = "crosshair";
@@ -480,45 +482,51 @@ class TrackContainer extends React.Component {
             </button>
         );
         return (
-            <div style={{ display: "flex", alignItems: "center" }}>
-                <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} />
-                {this.props.embeddingMode && (
-                    <TrackRegionController
-                        selectedRegion={viewRegion}
-                        onRegionSelected={onNewRegion}
-                        onToggleHighlight={onToggleHighlight}
-                        onSetEnteredRegion={onSetEnteredRegion}
+            <div className="tool-container">
+                <div className="tool-panel">
+                    <ToolButtons
+                        allTools={Tools}
+                        selectedTool={this.state.selectedTool}
+                        onToolClicked={this.toggleTool}
                     />
-                )}
-                <div>
-                    <ReorderMany
-                        onOpenReorderManyModal={this.openReorderManyModal}
-                        onCloseReorderManyModal={this.closeReorderManyModal}
-                        showReorderManyModal={this.state.showReorderManyModal}
+                    {this.props.embeddingMode && (
+                        <TrackRegionController
+                            selectedRegion={viewRegion}
+                            onRegionSelected={onNewRegion}
+                            onToggleHighlight={onToggleHighlight}
+                            onSetEnteredRegion={onSetEnteredRegion}
+                        />
+                    )}
+                    <div className="tool-element">
+                        <ReorderMany
+                            onOpenReorderManyModal={this.openReorderManyModal}
+                            onCloseReorderManyModal={this.closeReorderManyModal}
+                            showReorderManyModal={this.state.showReorderManyModal}
+                        />
+                    </div>
+                    <ButtonGroup buttons={panLeftButton} />
+                    {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
+                    <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
+                    <ButtonGroup buttons={panRightButton} />
+                    <div className="tool-element">
+                        <UndoRedo />
+                    </div>
+                    <div className="tool-element">
+                        <History />
+                    </div>
+                    <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
+                        <PixelInfo
+                            basesPerPixel={this.props.basesPerPixel}
+                            viewRegion={viewRegion}
+                            primaryView={primaryView}
+                        />
+                    </div>
+                    <MetadataHeader
+                        terms={metadataTerms}
+                        onNewTerms={onMetadataTermsChanged}
+                        suggestedMetaSets={suggestedMetaSets}
                     />
                 </div>
-                <ButtonGroup buttons={panLeftButton} />
-                {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
-                <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
-                <ButtonGroup buttons={panRightButton} />
-                <div>
-                    <UndoRedo />
-                </div>
-                <div>
-                    <History />
-                </div>
-                <div>
-                    <PixelInfo
-                        basesPerPixel={this.props.basesPerPixel}
-                        viewRegion={viewRegion}
-                        primaryView={primaryView}
-                    />
-                </div>
-                <MetadataHeader
-                    terms={metadataTerms}
-                    onNewTerms={onMetadataTermsChanged}
-                    suggestedMetaSets={suggestedMetaSets}
-                />
             </div>
         );
     }

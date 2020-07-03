@@ -25,7 +25,7 @@ import "../node_modules/flexlayout-react/style/light.css";
 import "./App.css";
 
 const json = {
-    global: {},
+    global: { tabSetHeaderHeight: 25, tabSetTabStripHeight: 25 },
     borders: [],
     layout: {
         type: "row",
@@ -41,6 +41,7 @@ const json = {
                             {
                                 type: "tab",
                                 id: "#111",
+                                enableClose: false,
                                 name: "Browser",
                                 component: "app",
                             },
@@ -285,7 +286,6 @@ class App extends React.Component {
             embeddingMode,
             virusBrowserMode,
         } = this.props;
-        console.log(node);
         if (sessionFromUrl) {
             return (
                 <div className="container-fluid">

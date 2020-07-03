@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Tabs, Tab } from "react-bootstrap-tabs";
+import { Tabs, Tab } from "react-bootstrap-tabs-rename-unsafe-lifecycles";
 import JSON5 from "json5";
 // import { notify } from 'react-notify-toast';
 import TrackModel from "../../model/TrackModel";
@@ -19,7 +19,7 @@ export const TRACK_TYPES = {
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange"],
     Repeats: ["repeatmasker"],
-    Alignment: ["bam", "pairwise", "snv"],
+    Alignment: ["bam", "pairwise", "snv", "snv2"],
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
 };
@@ -40,8 +40,9 @@ const TYPES_DESC = {
     bigInteract: "long range interaction data in bigInteract format",
     cool: "long range interaction data in cool format, use data uuid instead of URL",
     bam: "reads alignment data",
-    pairwise: "pairwise alignment data",
-    snv: "sequence variations from pairwise alignment",
+    pairwise: "pairwise nucleotide alignment data (same as snv)",
+    snv: "pairwise nucleotide alignment data",
+    snv2: "pairwise nucleotide alignment data with amino acid level mutations",
     qBED: "quantized numerical data, processed by tabix in .gz format",
     g3d: "3D structure in .g3d format",
     dbedgraph: "Dynamic bedgraph data",
@@ -77,13 +78,15 @@ class CustomTrackAdder extends React.Component {
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
     }
 
-    handleSubmitClick() {
+    handleSubmitClick(e) {
+        e.preventDefault();
         if (!this.props.onTracksAdded) {
             return;
         }
 
         if (!this.state.url) {
             this.setState({ urlError: "Enter a URL" });
+            return;
         } else {
             const newTrack = new TrackModel({ ...this.state, datahub: "Custom track" });
             this.props.onTracksAdded([newTrack]);
