@@ -21,6 +21,7 @@ export class TrackFileMeta extends React.Component {
                         bottom: "10px",
                         left: `${viewWindow.start + 10}px`,
                         backgroundColor: "rgba(255, 255, 255, 0.5)",
+                        padding: "0 2px",
                     }}
                 >
                     {Object.entries(meta).map((value) => (

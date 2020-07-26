@@ -35,7 +35,18 @@ import "./Nav.css";
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
 
-const callbacks = { onGenomeSelected: ActionCreators.setGenome };
+function mapStateToProps(state) {
+    return {
+        isShowingNavigator: state.browser.present.isShowingNavigator,
+        isShowingVR: state.browser.present.isShowingVR,
+    };
+}
+
+const callbacks = {
+    onGenomeSelected: ActionCreators.setGenome,
+    onToggleNavigator: ActionCreators.toggleNavigator,
+    onToggleVR: ActionCreators.toggleVR,
+};
 
 /**
  * the top navigation bar for browser
@@ -147,9 +158,11 @@ class Nav extends React.Component {
             selectedRegion,
             onRegionSelected,
             isShowingNavigator,
+            isShowingVR,
             onToggleNavigator,
-            isShowing3D,
-            onToggle3DScene,
+            onToggleVR,
+            // isShowing3D,
+            // onToggle3DScene,
             bundleId,
             onToggleHighlight,
             onSetEnteredRegion,
@@ -416,13 +429,8 @@ class Nav extends React.Component {
                                 </ModalMenuItem>
                             </label>
                             {!virusBrowserMode && (
-                                <label className="dropdown-item" htmlFor="switch3D">
-                                    <input
-                                        id="switch3D"
-                                        type="checkbox"
-                                        checked={isShowing3D}
-                                        onChange={onToggle3DScene}
-                                    />
+                                <label className="dropdown-item" htmlFor="switchVR">
+                                    <input id="switchVR" type="checkbox" checked={isShowingVR} onChange={onToggleVR} />
                                     <span style={{ marginLeft: "1ch" }}>VR mode</span>
                                 </label>
                             )}
@@ -531,7 +539,7 @@ class Nav extends React.Component {
     }
 }
 
-export default connect(null, callbacks)(Nav);
+export default connect(mapStateToProps, callbacks)(Nav);
 
 function HighlightColorChange(props) {
     const { color, onChange } = props;

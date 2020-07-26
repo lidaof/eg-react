@@ -8,8 +8,6 @@ import Nav from "./components/Nav";
 import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
 import TrackContainer from "./components/trackContainers/TrackContainer";
 import withCurrentGenome from "./components/withCurrentGenome";
-import { BrowserScene } from "./components/vr/BrowserScene";
-import ErrorBoundary from "./components/ErrorBoundary";
 import DisplayedRegionModel from "./model/DisplayedRegionModel";
 import TrackModel from "./model/TrackModel";
 import Notifications from "react-notify-toast";
@@ -19,51 +17,8 @@ import { Footer } from "./components/Footer";
 import { SessionUI } from "./components/SessionUI";
 import { Offline } from "react-detect-offline";
 import { HELP_LINKS } from "./util";
-import FlexLayout from "flexlayout-react";
 
-import "../node_modules/flexlayout-react/style/light.css";
 import "./App.css";
-
-const json = {
-    global: { tabSetHeaderHeight: 25, tabSetTabStripHeight: 25 },
-    borders: [],
-    layout: {
-        type: "row",
-        id: "#1",
-        children: [
-            {
-                type: "row",
-                children: [
-                    {
-                        type: "tabset",
-                        id: "#11",
-                        children: [
-                            {
-                                type: "tab",
-                                id: "#111",
-                                enableClose: false,
-                                name: "Browser",
-                                component: "app",
-                            },
-                        ],
-                    },
-                    {
-                        type: "tabset",
-                        id: "#12",
-                        children: [
-                            {
-                                type: "tab",
-                                id: "#121",
-                                name: "VR",
-                                component: "vr",
-                            },
-                        ],
-                    },
-                ],
-            },
-        ],
-    },
-};
 
 const REGION_EXPANDER = new RegionExpander(1);
 
@@ -84,7 +39,6 @@ const callbacks = {
     onNewViewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
     onLegendWidthChange: ActionCreators.setTrackLegendWidth,
-    onToggleNavigator: ActionCreators.toggleNavigator,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -103,7 +57,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isShowing3D: false,
+            // isShowing3D: false,
             // isShowingNavigator: true,
             highlightEnteredRegion: true,
             enteredRegion: null,
@@ -115,7 +69,6 @@ class App extends React.Component {
             // customTrackSets: new Set(),
             availableTrackSets: new Set(),
             suggestedMetaSets: new Set(["Track type"]),
-            model: FlexLayout.Model.fromJson(json),
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
@@ -233,11 +186,11 @@ class App extends React.Component {
     //     this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
     // };
 
-    toggle3DScene = () => {
-        this.setState((prevState) => {
-            return { isShowing3D: !prevState.isShowing3D };
-        });
-    };
+    // toggle3DScene = () => {
+    //     this.setState((prevState) => {
+    //         return { isShowing3D: !prevState.isShowing3D };
+    //     });
+    // };
 
     toggleHighlight = () => {
         this.setState((prevState) => {
@@ -271,7 +224,7 @@ class App extends React.Component {
         return grouped;
     };
 
-    renderApp = (node) => {
+    render() {
         const {
             genomeConfig,
             viewRegion,
@@ -282,9 +235,9 @@ class App extends React.Component {
             trackLegendWidth,
             onLegendWidthChange,
             isShowingNavigator,
-            onToggleNavigator,
             embeddingMode,
             virusBrowserMode,
+            layoutModel,
         } = this.props;
         if (sessionFromUrl) {
             return (
@@ -315,9 +268,9 @@ class App extends React.Component {
             <div className="App container-fluid">
                 <Nav
                     {...this.state}
-                    isShowingNavigator={isShowingNavigator}
-                    onToggleNavigator={onToggleNavigator}
-                    onToggle3DScene={this.toggle3DScene}
+                    // isShowingNavigator={isShowingNavigator}
+                    // onToggleNavigator={onToggleNavigator}
+                    // onToggle3DScene={this.toggle3DScene}
                     onToggleHighlight={this.toggleHighlight}
                     onSetEnteredRegion={this.setEnteredRegion}
                     onSetHighlightColor={this.setHighlightColor}
@@ -345,7 +298,6 @@ class App extends React.Component {
                 {isShowingNavigator && (
                     <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
                 )}
-
                 <Offline>
                     <div className="alert alert-warning text-center lead" role="alert">
                         You are currently offline, so tracks on web won't load. But you can still use the{" "}
@@ -366,41 +318,12 @@ class App extends React.Component {
                     expansionAmount={REGION_EXPANDER}
                     suggestedMetaSets={this.state.suggestedMetaSets}
                     genomeConfig={genomeConfig}
+                    tracks={tracks.filter((tk) => tk.type !== "g3d")}
+                    layoutModel={layoutModel}
                 />
                 {!embeddingMode && <Footer />}
             </div>
         );
-    };
-
-    render3Dscene = (node) => {
-        const { viewRegion, tracks, genomeConfig } = this.props;
-        return (
-            <ErrorBoundary>
-                <BrowserScene
-                    viewRegion={viewRegion}
-                    tracks={tracks}
-                    expansionAmount={REGION_EXPANDER}
-                    genomeConfig={genomeConfig}
-                />
-            </ErrorBoundary>
-        );
-    };
-
-    factory = (node) => {
-        const layoutComponent = node.getComponent();
-        const layoutFuncs = {
-            app: (node) => this.renderApp(node),
-            vr: (node) => this.render3Dscene(node),
-        };
-        return layoutFuncs[layoutComponent](node);
-    };
-
-    render() {
-        if (this.state.isShowing3D) {
-            return <FlexLayout.Layout model={this.state.model} factory={this.factory} />;
-        } else {
-            return this.renderApp();
-        }
     }
 }
 

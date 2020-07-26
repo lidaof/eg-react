@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { TrackModel } from "../model/TrackModel";
 import { notify } from "react-notify-toast";
-import { Tabs, Tab } from "react-bootstrap-tabs-rename-unsafe-lifecycles";
+import { Tabs, Tab } from "react-bootstrap-tabs";
 import JSON5 from "json5";
 import { readFileAsText, HELP_LINKS } from "../util";
 import { TrackOptionsUI } from "./trackManagers/TrackOptionsUI";

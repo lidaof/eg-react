@@ -29,6 +29,8 @@ import { ProteinTrackConfig } from "./ProteinTrackConfig";
 import { DynamicBedGraphTrackConfig } from "./DynamicBedGraphTrackConfig";
 import { DynamicHicTrackConfig } from "./DynamicHicTrackConfig";
 import { DynamicLongrangeTrackConfig } from "./DynamicLongrangeTrackConfig";
+import { OmeroidrTrackConfig } from "./OmeroidrTrackConfig";
+import { Omero4dnTrackConfig } from "./Omero4dnTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 
@@ -63,6 +65,8 @@ const TYPE_NAME_TO_CONFIG = {
     dbedgraph: DynamicBedGraphTrackConfig,
     dynamichic: DynamicHicTrackConfig,
     dynamiclongrange: DynamicLongrangeTrackConfig,
+    omeroidr: OmeroidrTrackConfig,
+    omero4dn: Omero4dnTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

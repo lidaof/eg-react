@@ -2,6 +2,8 @@
  * The global Redux store for the Browser.  All state that needs to be saved and restored in sessions belongs here.
  *
  * @author Silas Hsu
+ * @author Daofeng Li
+ *
  */
 import { createStore, combineReducers, compose } from "redux";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
@@ -62,9 +64,12 @@ export interface AppState {
     bundleId: string;
     sessionFromUrl?: boolean;
     isShowingNavigator: boolean;
+    isShowingVR?: boolean;
     customTracksPool?: TrackModel[];
     genomeConfig?: object;
     virusBrowserMode?: boolean;
+    layout?: object;
+    // threedTracks?: TrackModel[];
 }
 
 const bundleId = uuid.v1();
@@ -80,7 +85,10 @@ const initialState: AppState = {
     bundleId,
     sessionFromUrl: false,
     isShowingNavigator: true,
+    isShowingVR: false,
     customTracksPool: [],
+    layout: {},
+    // threedTracks: [],
 };
 
 enum ActionType {
@@ -95,11 +103,14 @@ enum ActionType {
     RETRIEVE_BUNDLE = "RETRIEVE_BUNDLE",
     SET_GENOME_RESTORE_SESSION = "SET_GENOME_RESTORE_SESSION",
     TOGGLE_NAVIGATOR = "TOGGLE_NAVIGATOR",
+    TOGGLE_SHOWING_VR = "TOGGLE_SHOWING_VR",
     SET_CUSTOM_TRACKS_POOL = "SET_CUSTOM_TRACKS_POOL",
     SET_TRACKS_CUSTOM_TRACKS_POOL = "SET_TRACKS_CUSTOM_TRACKS_POOL",
     SET_CUSTOM_VIRUS_GENOME = "SET_CUSTOM_VIRUS_GENOME",
     SET_VIRUS_BROWSER_MODE = "SET_VIRUS_BROWSER_MODE",
     SET_HUB_SESSION_STORAGE = "SET_HUB_SESSION_STORAGE",
+    SET_LAYOUT = "SET_LAYOUT",
+    // SET_THREED_TRACKS = "SET_THREED_TRACKS",
 }
 
 interface AppAction {
@@ -175,6 +186,10 @@ export const ActionCreators = {
         return { type: ActionType.TOGGLE_NAVIGATOR };
     },
 
+    toggleVR: () => {
+        return { type: ActionType.TOGGLE_SHOWING_VR };
+    },
+
     setCustomTracksPool: (customTracksPool: TrackModel[]) => {
         return { type: ActionType.SET_CUSTOM_TRACKS_POOL, customTracksPool };
     },
@@ -202,6 +217,17 @@ export const ActionCreators = {
     setVirusBrowserMode: () => {
         return { type: ActionType.SET_VIRUS_BROWSER_MODE };
     },
+
+    setLayout: (layout: object) => {
+        return {
+            type: ActionType.SET_LAYOUT,
+            layout,
+        };
+    },
+
+    // setThreedTracks: (newTracks: TrackModel[]) => {
+    //     return { type: ActionType.SET_THREED_TRACKS, threedTracks: newTracks };
+    // },
 };
 
 function getInitialState(): AppState {
@@ -357,6 +383,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 ...prevState,
                 isShowingNavigator: !prevState.isShowingNavigator,
             };
+        case ActionType.TOGGLE_SHOWING_VR:
+            return {
+                ...prevState,
+                isShowingVR: !prevState.isShowingVR,
+            };
         case ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL:
             const tracks = [...prevState.tracks, ...action.tracks];
             return {
@@ -376,6 +407,10 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 ...prevState,
                 virusBrowserMode: true,
             };
+        case ActionType.SET_LAYOUT:
+            return { ...prevState, layout: action.layout };
+        // case ActionType.SET_THREED_TRACKS:
+        //     return { ...prevState, threedTracks: action.tracks };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);

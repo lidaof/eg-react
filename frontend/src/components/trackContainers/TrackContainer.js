@@ -51,7 +51,7 @@ function mapStateToProps(state) {
     return {
         genome: state.browser.present.genomeName,
         viewRegion: state.browser.present.viewRegion,
-        tracks: state.browser.present.tracks,
+        // tracks: state.browser.present.tracks,
         metadataTerms: state.browser.present.metadataTerms,
     };
 }
@@ -535,7 +535,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const { tracks, trackData, primaryView, metadataTerms, viewRegion } = this.props;
+        const { tracks, trackData, primaryView, metadataTerms, viewRegion, layoutModel } = this.props;
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
@@ -556,6 +556,7 @@ class TrackContainer extends React.Component {
                     onClick={this.handleTrackClicked}
                     onMetadataClick={this.handleMetadataClicked}
                     selectedRegion={viewRegion}
+                    layoutModel={layoutModel}
                 />
             );
         });

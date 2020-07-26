@@ -9,6 +9,8 @@
 -   improved window/container resize listener using ResizeObserver API
 -   improved responsive layout of navigation menu and tools bar
 -   modified vendor `bigwig.js` to support chromosome names like `chr1` or `1`
+-   introduced image track:
+    ![image track example](https://eg.readthedocs.io/en/latest/_images/image_track_example.png "image track example")
 
 ## 51.0.6
 
@@ -141,7 +143,7 @@
 
 -   added chicken genome `galGal6` and `galGal5`
 -   a `flatarc` mode added for chromatin interacion track:
-    ![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png "Flat arc mode]")
+    ![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png "Flat arc mode")
 -   fixed a metadata bug when define customized color
 
 ## 48.5.2

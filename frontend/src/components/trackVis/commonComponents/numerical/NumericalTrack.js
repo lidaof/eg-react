@@ -77,7 +77,10 @@ class NumericalTrack extends React.PureComponent {
     aggregateFeatures(data, viewRegion, width, aggregatorId) {
         const aggregator = new FeatureAggregator();
         const xToFeatures = aggregator.makeXMap(data, viewRegion, width);
-        return xToFeatures.map(DefaultAggregators.fromId(aggregatorId));
+        console.log(data, xToFeatures);
+        const aggregatedData = xToFeatures.map(DefaultAggregators.fromId(aggregatorId));
+        console.log(aggregatedData);
+        return aggregatedData;
     }
 
     computeScales(xToValue, xToValue2, height) {

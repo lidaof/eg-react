@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, Tab } from "react-bootstrap-tabs-rename-unsafe-lifecycles";
+import { Tabs, Tab } from "react-bootstrap-tabs";
 import FacetTable from "./trackManagers/FacetTable";
 
 class FacetTableUI extends React.Component {

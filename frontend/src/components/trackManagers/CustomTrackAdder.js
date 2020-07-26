@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Tabs, Tab } from "react-bootstrap-tabs-rename-unsafe-lifecycles";
+import { Tabs, Tab } from "react-bootstrap-tabs";
 import JSON5 from "json5";
 // import { notify } from 'react-notify-toast';
 import TrackModel from "../../model/TrackModel";
@@ -22,6 +22,7 @@ export const TRACK_TYPES = {
     Alignment: ["bam", "pairwise", "snv", "snv2"],
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
+    Image: ["omero4dn", "omeroidr"],
 };
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
@@ -46,6 +47,8 @@ const TYPES_DESC = {
     qBED: "quantized numerical data, processed by tabix in .gz format",
     g3d: "3D structure in .g3d format",
     dbedgraph: "Dynamic bedgraph data",
+    omero4dn: "image data from 4DN (4D Nucleome Data Portal)",
+    omeroidr: "image data from IDR (Image Data Resource)",
 };
 
 /**
