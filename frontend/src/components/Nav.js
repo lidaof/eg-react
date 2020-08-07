@@ -1,36 +1,36 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import ReactModal from 'react-modal';
-import _ from 'lodash';
-import { connect } from 'react-redux';
-import { RadioGroup, Radio } from 'react-radio-group';
-import { ActionCreators } from '../AppState';
-import DisplayedRegionModel from '../model/DisplayedRegionModel';
-import { getSpeciesInfo, allGenomes } from '../model/genomes/allGenomes';
-import TrackRegionController from './genomeNavigator/TrackRegionController';
-import RegionSetSelector from './RegionSetSelector';
-import Geneplot from './Geneplot/Geneplot';
-import TrackList from './trackManagers/TrackList';
-import { TrackModel } from '../model/TrackModel';
-import { AnnotationTrackUI } from './trackManagers/AnnotationTrackUI';
-import HubPane from './trackManagers/HubPane';
-import CustomTrackAdder from './trackManagers/CustomTrackAdder';
-import { SessionUI } from './SessionUI';
-import LiveUI from './LiveUI';
-import { RegionExpander } from '../model/RegionExpander';
-import { ScreenshotUI } from './ScreenshotUI';
-import FacetTableUI from './FacetTableUI';
-import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from '../AppState';
-import { HotKeyInfo } from './HotKeyInfo';
-import { INTERACTION_TYPES } from './trackConfig/getTrackConfig';
-import { TrackUpload } from './TrackUpload';
-import { FetchSequence } from './FetchSequence';
-import packageJson from '../../package.json';
-import ScatterPlot from './Geneplot/ScatterPlot';
-import ColorPicker from './ColorPicker';
-import { TextTrack } from './TextTrack';
+import React from "react";
+import PropTypes from "prop-types";
+import ReactModal from "react-modal";
+import _ from "lodash";
+import { connect } from "react-redux";
+import { RadioGroup, Radio } from "react-radio-group";
+import { ActionCreators } from "../AppState";
+import DisplayedRegionModel from "../model/DisplayedRegionModel";
+import { getSpeciesInfo, allGenomes } from "../model/genomes/allGenomes";
+import TrackRegionController from "./genomeNavigator/TrackRegionController";
+import RegionSetSelector from "./RegionSetSelector";
+import Geneplot from "./Geneplot/Geneplot";
+import TrackList from "./trackManagers/TrackList";
+import { TrackModel } from "../model/TrackModel";
+import { AnnotationTrackUI } from "./trackManagers/AnnotationTrackUI";
+import HubPane from "./trackManagers/HubPane";
+import CustomTrackAdder from "./trackManagers/CustomTrackAdder";
+import { SessionUI } from "./SessionUI";
+import LiveUI from "./LiveUI";
+import { RegionExpander } from "../model/RegionExpander";
+import { ScreenshotUI } from "./ScreenshotUI";
+import FacetTableUI from "./FacetTableUI";
+import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "../AppState";
+import { HotKeyInfo } from "./HotKeyInfo";
+import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
+import { TrackUpload } from "./TrackUpload";
+import { FetchSequence } from "./FetchSequence";
+import packageJson from "../../package.json";
+import ScatterPlot from "./Geneplot/ScatterPlot";
+import ColorPicker from "./ColorPicker";
+import { TextTrack } from "./TextTrack";
 
-import './Nav.css';
+import "./Nav.css";
 
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
@@ -51,7 +51,7 @@ class Nav extends React.Component {
         onTrackRemoved: PropTypes.func,
         trackLegendWidth: PropTypes.number,
         onLegendWidthChange: PropTypes.func,
-        onSetHighlightColor: PropTypes.func
+        onSetHighlightColor: PropTypes.func,
     };
 
     constructor(props) {
@@ -59,7 +59,7 @@ class Nav extends React.Component {
         this.state = {
             isCacheEnabled: true,
             genomeModal: false,
-            otherGenome: null
+            otherGenome: null,
         };
         this.debounced = _.debounce(this.props.onLegendWidthChange, 250);
         this.renderOtherGenomes = this.renderOtherGenomes.bind(this);
@@ -78,7 +78,7 @@ class Nav extends React.Component {
         this.setState({ genomeModal: false });
     };
 
-    changeLegendWidth = e => {
+    changeLegendWidth = (e) => {
         const width = Number.parseFloat(e.currentTarget.value);
         //const debounced = _.debounce(this.props.onLegendWidthChange, 250);
         if (width >= 60 && width <= 200) {
@@ -112,8 +112,8 @@ class Nav extends React.Component {
 
     renderOtherGenomes() {
         const genomeName = this.props.genomeConfig.genome.getName();
-        const otherGenomes = allGenomes.map(g => g.genome.getName()).filter(g => g !== genomeName);
-        const radios = otherGenomes.map(g => {
+        const otherGenomes = allGenomes.map((g) => g.genome.getName()).filter((g) => g !== genomeName);
+        const radios = otherGenomes.map((g) => {
             const { name } = getSpeciesInfo(g);
             return (
                 <label key={g}>
@@ -126,7 +126,7 @@ class Nav extends React.Component {
                 name="otherGenome"
                 selectedValue={this.state.otherGenome}
                 onChange={this.handleOtherGenomeChange}
-                style={{ display: 'grid' }}
+                style={{ display: "grid" }}
             >
                 {radios}
             </RadioGroup>
@@ -169,68 +169,78 @@ class Nav extends React.Component {
             addTermToMetaSets,
             onSetHighlightColor,
             highlightColor,
-            groupedTrackSets
+            groupedTrackSets,
+            virusBrowserMode,
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const { name, logo, color } = getSpeciesInfo(genomeName);
-        const hasInteractionTrack = tracks.some(model => INTERACTION_TYPES.includes(model.type)) ? true : false;
+        const hasInteractionTrack = tracks.some((model) => INTERACTION_TYPES.includes(model.type)) ? true : false;
         const REGION_EXPANDER = hasInteractionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
         const { genomeModal, otherGenome } = this.state;
         return (
             <div className="Nav-container">
-                <div id="logoDiv">
-                    <img
-                        src="https://epigenomegateway.wustl.edu/images/eglogo.jpg"
-                        width="180px"
-                        height="30px"
-                        alt="browser logo"
-                    />
-                    {/* <span id="theNew" >The New</span> */}
-                    <span id="theVersion">v{packageJson.version}</span>
-                </div>
-                <div
-                    className="Nav-genome Nav-center"
-                    style={{ backgroundImage: `url(${logo})`, color: color, backgroundSize: 'cover' }}
-                >
-                    <div onClick={this.handleGenomeOpenModal}>
-                        <span className="capitalize">{name}</span> <span className="italic">{genomeName}</span>
+                {!virusBrowserMode && (
+                    <div id="logoDiv">
+                        <img
+                            src="https://epigenomegateway.wustl.edu/images/eglogo.jpg"
+                            width="180px"
+                            height="30px"
+                            alt="browser logo"
+                        />
+                        {/* <span id="theNew" >The New</span> */}
+                        <span id="theVersion">v{packageJson.version}</span>
                     </div>
-                    <ReactModal
-                        isOpen={genomeModal}
-                        ariaHideApp={false}
-                        contentLabel="genomeModal"
-                        onRequestClose={this.handleGenomeCloseModal}
-                        shouldCloseOnOverlayClick={true}
+                )}
+                {!virusBrowserMode && (
+                    <div
+                        className="Nav-genome Nav-center"
                         style={{
-                            content: {
-                                right: 'unset',
-                                bottom: 'unset',
-                                top: 0,
-                                left: 0,
-                                height: '100%'
-                            },
-                            overlay: {
-                                backgroundColor: 'rgba(111,107,101, 0.7)'
-                            }
+                            backgroundImage: `url(${logo})`,
+                            color: color,
+                            backgroundSize: "cover",
                         }}
                     >
-                        {this.renderOtherGenomes()}
-                        <button className="btn btn-sm btn-danger" onClick={this.handleGenomeCloseModal}>
-                            Close
-                        </button>{' '}
-                        {otherGenome && (
-                            <button className="btn btn-sm btn-primary" onClick={this.changeGenome}>
-                                Go
-                            </button>
-                        )}
-                    </ReactModal>
-                </div>
+                        <div onClick={this.handleGenomeOpenModal}>
+                            <span className="capitalize">{name}</span> <span className="italic">{genomeName}</span>
+                        </div>
+                        <ReactModal
+                            isOpen={genomeModal}
+                            ariaHideApp={false}
+                            contentLabel="genomeModal"
+                            onRequestClose={this.handleGenomeCloseModal}
+                            shouldCloseOnOverlayClick={true}
+                            style={{
+                                content: {
+                                    right: "unset",
+                                    bottom: "unset",
+                                    top: 0,
+                                    left: 0,
+                                    height: "100%",
+                                },
+                                overlay: {
+                                    backgroundColor: "rgba(111,107,101, 0.7)",
+                                },
+                            }}
+                        >
+                            {this.renderOtherGenomes()}
+                            <button className="btn btn-sm btn-danger" onClick={this.handleGenomeCloseModal}>
+                                Close
+                            </button>{" "}
+                            {otherGenome && (
+                                <button className="btn btn-sm btn-primary" onClick={this.changeGenome}>
+                                    Go
+                                </button>
+                            )}
+                        </ReactModal>
+                    </div>
+                )}
                 <div className="Nav-center">
                     <TrackRegionController
                         selectedRegion={selectedRegion}
                         onRegionSelected={onRegionSelected}
                         onToggleHighlight={onToggleHighlight}
                         onSetEnteredRegion={onSetEnteredRegion}
+                        virusBrowserMode={virusBrowserMode}
                     />
                 </div>
                 {/* <div className="Nav-center">
@@ -274,7 +284,7 @@ class Nav extends React.Component {
                                 addTermToMetaSets={addTermToMetaSets}
                             />
                         </ModalMenuItem>
-                        <ModalMenuItem itemLabel="Custom Tracks">
+                        <ModalMenuItem itemLabel="Remote Tracks">
                             <CustomTrackAdder
                                 addedTracks={tracks}
                                 onTracksAdded={onTracksAdded}
@@ -286,6 +296,12 @@ class Nav extends React.Component {
                                 addTermToMetaSets={addTermToMetaSets}
                             />
                         </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Local Tracks">
+                            <TrackUpload onTracksAdded={onTracksAdded} />
+                        </ModalMenuItem>
+                        <ModalMenuItem itemLabel="Local Text Tracks">
+                            <TextTrack onTracksAdded={onTracksAdded} />
+                        </ModalMenuItem>
                         <ModalMenuItem itemLabel="Track List">
                             <TrackList
                                 addedTracks={tracks}
@@ -296,12 +312,6 @@ class Nav extends React.Component {
                                 addTracktoAvailable={addTracktoAvailable}
                                 removeTrackFromAvailable={removeTrackFromAvailable}
                             />
-                        </ModalMenuItem>
-                        <ModalMenuItem itemLabel="View Local Tracks">
-                            <TrackUpload onTracksAdded={onTracksAdded} />
-                        </ModalMenuItem>
-                        <ModalMenuItem itemLabel="Text Tracks">
-                            <TextTrack onTracksAdded={onTracksAdded} />
                         </ModalMenuItem>
                     </div>
                 </div>
@@ -321,11 +331,11 @@ class Nav extends React.Component {
                             itemLabel="Session"
                             style={{
                                 content: {
-                                    right: 'unset',
-                                    bottom: 'unset',
-                                    overflow: 'visible',
-                                    padding: '5px'
-                                }
+                                    right: "unset",
+                                    bottom: "unset",
+                                    overflow: "visible",
+                                    padding: "5px",
+                                },
                             }}
                         >
                             <SessionUI bundleId={bundleId} />
@@ -334,17 +344,21 @@ class Nav extends React.Component {
                             itemLabel="Go Live"
                             style={{
                                 content: {
-                                    right: 'unset',
-                                    bottom: 'unset',
-                                    overflow: 'visible',
-                                    padding: '5px'
-                                }
+                                    right: "unset",
+                                    bottom: "unset",
+                                    overflow: "visible",
+                                    padding: "5px",
+                                },
                             }}
                         >
                             <LiveUI />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Screenshot">
-                            <ScreenshotUI expansionAmount={REGION_EXPANDER} needClip={hasInteractionTrack} />
+                            <ScreenshotUI
+                                expansionAmount={REGION_EXPANDER}
+                                needClip={hasInteractionTrack}
+                                genomeConfig={genomeConfig}
+                            />
                         </ModalMenuItem>
                         <ModalMenuItem itemLabel="Fetch Sequence">
                             <FetchSequence genomeConfig={genomeConfig} selectedRegion={selectedRegion} />
@@ -361,11 +375,11 @@ class Nav extends React.Component {
                                 checked={isShowingNavigator}
                                 onChange={onToggleNavigator}
                             />
-                            <span style={{ marginLeft: '1ch' }}>Show genome-wide navigator</span>
+                            <span style={{ marginLeft: "1ch" }}>Show genome-wide navigator</span>
                             <span className="GenomeNavigator-tooltip" role="img" aria-label="genomenavigator">
                                 ❓
                                 <div className="GenomeNavigator-tooltiptext">
-                                    <ul style={{ lineHeight: '1.2em', marginBottom: 0 }}>
+                                    <ul style={{ lineHeight: "1.2em", marginBottom: 0 }}>
                                         <li>Left mouse drag: select</li>
                                         <li>Right mouse drag: pan</li>
                                         <li>Mousewheel: zoom</li>
@@ -380,30 +394,32 @@ class Nav extends React.Component {
                                 checked={highlightEnteredRegion}
                                 onChange={onToggleHighlight}
                             />
-                            <span style={{ marginLeft: '1ch' }}>Highlight entered region</span>
+                            <span style={{ marginLeft: "1ch" }}>Highlight entered region</span>
                         </label>
                         <label className="dropdown-item">
                             <ModalMenuItem
                                 itemLabel="Change highlight color"
                                 style={{
                                     content: {
-                                        left: 'unset',
-                                        bottom: 'unset',
-                                        overflow: 'visible',
-                                        padding: '5px'
+                                        left: "unset",
+                                        bottom: "unset",
+                                        overflow: "visible",
+                                        padding: "5px",
                                     },
                                     overlay: {
-                                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                                    }
+                                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                    },
                                 }}
                             >
                                 <HighlightColorChange color={highlightColor} onChange={onSetHighlightColor} />
                             </ModalMenuItem>
                         </label>
-                        <label className="dropdown-item" htmlFor="switch3D">
-                            <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={onToggle3DScene} />
-                            <span style={{ marginLeft: '1ch' }}>VR mode</span>
-                        </label>
+                        {!virusBrowserMode && (
+                            <label className="dropdown-item" htmlFor="switch3D">
+                                <input id="switch3D" type="checkbox" checked={isShowing3D} onChange={onToggle3DScene} />
+                                <span style={{ marginLeft: "1ch" }}>VR mode</span>
+                            </label>
+                        )}
                         <label className="dropdown-item" htmlFor="cacheToggle">
                             <input
                                 id="cacheToggle"
@@ -411,7 +427,7 @@ class Nav extends React.Component {
                                 checked={this.state.isCacheEnabled}
                                 onChange={this.toggleCache}
                             />
-                            <span style={{ marginLeft: '1ch' }}>Restore current view after Refresh</span>
+                            <span style={{ marginLeft: "1ch" }}>Restore current view after Refresh</span>
                         </label>
                         <label className="dropdown-item" htmlFor="setLegendWidth">
                             <input
@@ -423,76 +439,82 @@ class Nav extends React.Component {
                                 defaultValue={trackLegendWidth}
                                 onChange={this.changeLegendWidth}
                             />
-                            <span style={{ marginLeft: '1ch' }}>Change track legend width</span>
+                            <span style={{ marginLeft: "1ch" }}>Change track legend width</span>
                         </label>
                     </div>
                 </div>
-                <div className="Nav-center">
-                    <DropdownOpener extraClassName="btn-warning" label="📖Help" />
-                    <div className="dropdown-menu">
-                        <label className="dropdown-item">
-                            <ModalMenuItem
-                                itemLabel="Hotkeys"
-                                style={{
-                                    content: {
-                                        left: 'unset',
-                                        bottom: 'unset',
-                                        overflow: 'visible',
-                                        padding: '5px'
-                                    }
-                                }}
-                            >
-                                <HotKeyInfo />
-                            </ModalMenuItem>
-                        </label>
-                        <label className="dropdown-item">
-                            <a
-                                href="https://epigenomegateway.readthedocs.io/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Documentation
-                            </a>
-                        </label>
-                        <label className="dropdown-item">
-                            <a
-                                href="http://epigenomegateway.wustl.edu/legacy"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                The 'old' browser
-                            </a>
-                        </label>
-                        <label className="dropdown-item">
-                            <a href="https://groups.google.com/d/forum/epgg" target="_blank" rel="noopener noreferrer">
-                                Google groups
-                            </a>
-                        </label>
-                        <label className="dropdown-item">
-                            <a
-                                href="https://join.slack.com/t/epgg/shared_invite/enQtNTA5NDY5MDIwNjc4LTlhYjJlZWM4MmRlMTcyODEzMDI0ZTlmNmM2ZjIyYmY2NTU5ZTY2MWRmOWExMDg1N2U5ZWE3NzhkMjVkZDVhNTc"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Join our Slack
-                            </a>
-                        </label>
-                        <label className="dropdown-item">
-                            <a href="https://github.com/lidaof/eg-react" target="_blank" rel="noopener noreferrer">
-                                Source code @ Github
-                            </a>
-                        </label>
-                        <label className="dropdown-item">
-                            <a
-                                href="https://www.youtube.com/channel/UCnGVWbxJv-DPDCAFDQ1oFQA"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                YouTube channel
-                            </a>
-                        </label>
+                {!virusBrowserMode && (
+                    <div className="Nav-center">
+                        <DropdownOpener extraClassName="btn-warning" label="📖Help" />
+                        <div className="dropdown-menu">
+                            <label className="dropdown-item">
+                                <ModalMenuItem
+                                    itemLabel="Hotkeys"
+                                    style={{
+                                        content: {
+                                            left: "unset",
+                                            bottom: "unset",
+                                            overflow: "visible",
+                                            padding: "5px",
+                                        },
+                                    }}
+                                >
+                                    <HotKeyInfo />
+                                </ModalMenuItem>
+                            </label>
+                            <label className="dropdown-item">
+                                <a
+                                    href="https://epigenomegateway.readthedocs.io/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Documentation
+                                </a>
+                            </label>
+                            <label className="dropdown-item">
+                                <a
+                                    href="http://epigenomegateway.wustl.edu/legacy"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    The 'old' browser
+                                </a>
+                            </label>
+                            <label className="dropdown-item">
+                                <a
+                                    href="https://groups.google.com/d/forum/epgg"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Google groups
+                                </a>
+                            </label>
+                            <label className="dropdown-item">
+                                <a
+                                    href="https://join.slack.com/t/epgg/shared_invite/enQtNTA5NDY5MDIwNjc4LTlhYjJlZWM4MmRlMTcyODEzMDI0ZTlmNmM2ZjIyYmY2NTU5ZTY2MWRmOWExMDg1N2U5ZWE3NzhkMjVkZDVhNTc"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Join our Slack
+                                </a>
+                            </label>
+                            <label className="dropdown-item">
+                                <a href="https://github.com/lidaof/eg-react" target="_blank" rel="noopener noreferrer">
+                                    Source code @ Github
+                                </a>
+                            </label>
+                            <label className="dropdown-item">
+                                <a
+                                    href="https://www.youtube.com/channel/UCnGVWbxJv-DPDCAFDQ1oFQA"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    YouTube channel
+                                </a>
+                            </label>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         );
     }
@@ -504,7 +526,7 @@ function HighlightColorChange(props) {
     const { color, onChange } = props;
     return (
         <React.Fragment>
-            <p style={{ marginRight: '40px' }}>
+            <p style={{ marginRight: "40px" }}>
                 Click the button below to change
                 <br />
                 the highlight color:
@@ -531,19 +553,19 @@ function DropdownOpener(props) {
 
 class ModalMenuItem extends React.Component {
     static propTypes = {
-        itemLabel: PropTypes.string
+        itemLabel: PropTypes.string,
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            isOpen: false
+            isOpen: false,
         };
         this.toggleOpen = this.toggleOpen.bind(this);
     }
 
     toggleOpen() {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             return { isOpen: !prevState.isOpen };
         });
     }
@@ -552,10 +574,10 @@ class ModalMenuItem extends React.Component {
         const style = {
             ...{
                 overlay: {
-                    backgroundColor: 'rgba(111,107,101, 0.7)'
-                }
+                    backgroundColor: "rgba(111,107,101, 0.7)",
+                },
             },
-            ...this.props.style
+            ...this.props.style,
         };
         return (
             <React.Fragment>
@@ -582,13 +604,13 @@ function ModalCloseButton(props) {
         <span
             className="text-right"
             style={{
-                cursor: 'pointer',
-                color: 'red',
-                fontSize: '2em',
-                position: 'absolute',
-                top: '-5px',
-                right: '15px',
-                zIndex: 2
+                cursor: "pointer",
+                color: "red",
+                fontSize: "2em",
+                position: "absolute",
+                top: "-5px",
+                right: "15px",
+                zIndex: 2,
             }}
             onClick={props.onClick}
         >

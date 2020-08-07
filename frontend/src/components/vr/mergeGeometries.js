@@ -1,25 +1,23 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 /**
  * Merges an array of BufferGeometry into one BufferGeometry.
- * 
+ *
  * @param {THREE.BufferGeometry[]} geometries - the geometries to merge
  * @return {THREE.BufferGeometry} the merged geometry
  */
 export function mergeGeometries(geometries) {
-    const nonIndexedInput = geometries.map(geometry =>
-        geometry.index === null ? geometry : geometry.toNonIndexed()
-    );
+    const nonIndexedInput = geometries.map(geometry => (geometry.index === null ? geometry : geometry.toNonIndexed()));
     // getAttribute('index') somehow not working
-    const totalVertices = _.sumBy(nonIndexedInput, geometry => geometry.getAttribute('position').count);
+    const totalVertices = _.sumBy(nonIndexedInput, geometry => geometry.getAttribute("position").count);
 
     let mergedGeometry = new window.THREE.BufferGeometry();
     // We are assuming Vector3s
-    mergedGeometry.addAttribute('position', new window.THREE.BufferAttribute(new Float32Array(totalVertices * 3), 3));
+    mergedGeometry.setAttribute("position", new window.THREE.BufferAttribute(new Float32Array(totalVertices * 3), 3));
     let vertexNum = 0;
     for (let geometry of nonIndexedInput) {
         mergedGeometry.merge(geometry, vertexNum);
-        vertexNum += geometry.getAttribute('position').count;
+        vertexNum += geometry.getAttribute("position").count;
     }
     return mergedGeometry;
 }
