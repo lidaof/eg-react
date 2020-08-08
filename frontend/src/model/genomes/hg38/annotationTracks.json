@@ -177,6 +177,17 @@
             }
         },
         {
+            "name": "panTro6tohg38",
+            "label": "Chimpanzee panTro6 to hg38 blastz",
+            "querygenome": "panTro6",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/panTro6/hg38TopanTro6.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsPanTro6/"
+            }
+        },
+        {
             "name": "rheMac3tohg38",
             "label": "Rhesus Macaque rheMac3 to hg38 blastz",
             "querygenome": "rheMac3",
