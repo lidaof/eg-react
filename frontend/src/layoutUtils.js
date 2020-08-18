@@ -51,6 +51,9 @@ export function addTabSetToLayout(newTabset, exisingLayout) {
 }
 
 export function deleteTabByIdFromLayout(layout, tabId) {
+    if (_.isEmpty(layout)) {
+        return;
+    }
     const model = FlexLayout.Model.fromJson(layout);
     model.doAction(FlexLayout.Actions.deleteTab(tabId));
     const json = model.toJson();

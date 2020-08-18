@@ -546,6 +546,9 @@ async function asyncInitState() {
                 }
             }
         }
+        if (query.virusBrowserMode) {
+            AppState.dispatch(ActionCreators.setVirusBrowserMode());
+        }
     }
 }
 

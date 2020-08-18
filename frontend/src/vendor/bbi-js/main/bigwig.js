@@ -58,6 +58,35 @@ BigWig.prototype.readChromTree = function (callback) {
     var thisB = this;
     this.chromsToIDs = {};
     this.idsToChroms = {};
+    this.chrAlias = {
+        "1": "chr1",
+        "2": "chr2",
+        "3": "chr3",
+        "4": "chr4",
+        "5": "chr5",
+        "6": "chr6",
+        "7": "chr7",
+        "8": "chr8",
+        "9": "chr9",
+        "10": "chr10",
+        "11": "chr11",
+        "12": "chr12",
+        "13": "chr13",
+        "14": "chr14",
+        "15": "chr15",
+        "16": "chr16",
+        "17": "chr17",
+        "18": "chr18",
+        "19": "chr19",
+        "20": "chr20",
+        "21": "chr21",
+        "22": "chr22",
+        X: "chrX",
+        Y: "chrY",
+        M: "chrM",
+        MT: "chrM",
+    };
+
     this.maxID = 0;
 
     var udo = this.unzoomedDataOffset;
@@ -101,13 +130,18 @@ BigWig.prototype.readChromTree = function (callback) {
                     offset += 8;
 
                     thisB.chromsToIDs[key] = chromId;
-                    if (key.indexOf("chr") == 0) {
-                        thisB.chromsToIDs[key.substr(3)] = chromId;
-                        thisB.idsToChroms[chromId] = key;
-                    } else {
-                        var chrkey = "chr" + key;
-                        thisB.chromsToIDs[chrkey] = chromId;
-                        thisB.idsToChroms[chromId] = chrkey;
+                    thisB.idsToChroms[chromId] = key;
+                    // if (key.indexOf("chr") == 0) {
+                    //     thisB.chromsToIDs[key.substr(3)] = chromId;
+                    //     thisB.idsToChroms[chromId] = key;
+                    // } else {
+                    //     var chrkey = "chr" + key;
+                    //     thisB.chromsToIDs[chrkey] = chromId;
+                    //     thisB.idsToChroms[chromId] = chrkey;
+                    // }
+                    if (thisB.chrAlias.hasOwnProperty(key)) {
+                        thisB.chromsToIDs[thisB.chrAlias[key]] = chromId;
+                        thisB.idsToChroms[chromId] = thisB.chrAlias[key];
                     }
                     thisB.maxID = Math.max(thisB.maxID, chromId);
                 }
@@ -753,6 +787,7 @@ BigWig.prototype.getUnzoomedView = function () {
 
 BigWig.prototype.getZoomedView = function (z) {
     var zh = this.zoomLevels[z];
+    // console.log(this.zoomLevels, z, zh);
     if (!zh.view) {
         zh.view = new BigWigView(
             this,

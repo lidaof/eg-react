@@ -137,11 +137,12 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
             const trackConfig = getTrackConfig(track);
             const options = trackConfig.getOptions();
             try {
-                let visRegion;
-                let alignment = null;
+                let visRegion,
+                    primaryView,
+                    alignment = null;
                 if (!genome || genome === this._primaryGenome) {
-                    const primaryView = await this.props.primaryViewPromise;
-                    visRegion = options.fetchViewWindowOnly ? primaryView.viewWindowRegion : primaryView.visRegion;
+                    primaryView = await this.props.primaryViewPromise;
+                    visRegion = primaryView.visRegion;
                 } else {
                     const alignments = await this.props.alignments;
                     alignment = alignments[genome];
@@ -151,10 +152,10 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
                 if (!this.isViewStillFresh(view)) {
                     return;
                 }
-
+                const dataRegion = options.fetchViewWindowOnly ? primaryView.viewWindowRegion : visRegion;
                 const dataSource = this._dataSourceManager.getDataSource(track);
-                const rawData = await dataSource.getData(visRegion, this.props.basesPerPixel, options);
-                const meta = dataSource.getCurrentMeta(visRegion, this.props.basesPerPixel, options);
+                const rawData = await dataSource.getData(dataRegion, this.props.basesPerPixel, options);
+                const meta = dataSource.getCurrentMeta(dataRegion, this.props.basesPerPixel, options);
 
                 if (this.isViewStillFresh(view)) {
                     this.dispatchTrackUpdate(track, {

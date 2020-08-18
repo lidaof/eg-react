@@ -24,10 +24,11 @@ const defaultTracks = [
     }),
     new TrackModel({
         type: "bedgraph",
-        name: "Sequence diversity (Shannon Entropy)",
+        name: "Sequence Diversity (Shannon Entropy)",
         url: "https://wangftp.wustl.edu/~cfan/viralBrowser/sme/sars/diversity/sars_entropy.bedgraph.sort.gz",
         options: {
             aggregateMethod: "MEAN",
+            height: 50,
         },
     }),
     new TrackModel({
@@ -66,7 +67,7 @@ const annotationTracks = {
     Diversity: [
         {
             type: "bedgraph",
-            name: "Sequence diversity (Shannon Entropy)",
+            name: "Sequence Diversity (Shannon Entropy)",
             url: "https://wangftp.wustl.edu/~cfan/viralBrowser/sme/sars/diversity/sars_entropy.bedgraph.sort.gz",
             options: {
                 aggregateMethod: "MEAN",

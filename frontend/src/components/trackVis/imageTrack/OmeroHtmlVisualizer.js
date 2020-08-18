@@ -65,6 +65,17 @@ class OmeroHtmlVisualizer extends React.PureComponent {
 
     renderTooltip = (event, imgHash, imgId, imageUrl, imageUrlSuffix, detailUrl) => {
         const dataTable = imgHash[imgId];
+        const detailButton = dataTable.id ? (
+            <a
+                href={dataTable.id}
+                role="button"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-success btn-sm"
+            >
+                See details in 4DN data portal
+            </a>
+        ) : null;
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} hideArrow={true}>
                 <div>
@@ -73,8 +84,9 @@ class OmeroHtmlVisualizer extends React.PureComponent {
                         className="btn btn-info btn-sm"
                         onClick={() => this.newPanelWithImage(imgId, imageUrl, imageUrlSuffix, detailUrl)}
                     >
-                        View in a new panel
-                    </button>
+                        View larger image
+                    </button>{" "}
+                    {detailButton}
                 </div>
                 <ObjectAsTable content={dataTable} />
             </Tooltip>

@@ -81,7 +81,7 @@ export class TrackModel {
         this.options = this.options || {}; // `options` stores dynamically-configurable options.
         this.options.label = this.label; // ...which is why we copy this.name.
         this.url = this.url || "";
-        this.metadata = this.metadata || {};
+        this.metadata = variableIsObject(this.metadata) || Array.isArray(this.metadata) ? this.metadata : {}; // avoid number or string as metadata
         this.metadata["Track type"] = this.type;
         this.fileObj = this.fileObj || "";
         this.files = this.files || [];

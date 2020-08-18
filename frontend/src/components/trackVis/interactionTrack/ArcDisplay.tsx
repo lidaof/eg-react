@@ -111,7 +111,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 });
                 return (
                     <div>
-                        <div>{arcs.length} interactions found. Showing top 3 at most:</div>
+                        <div>{arcs.length} interactions found. Showing top 3:</div>
                         <div>{divs}</div>
                     </div>
                 );

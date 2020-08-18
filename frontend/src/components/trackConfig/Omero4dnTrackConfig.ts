@@ -5,7 +5,8 @@ import _ from "lodash";
 const IMAGE_URL = "https://omero.hms.harvard.edu/webgateway/render_thumbnail";
 const IMAGE_URL_SUFFIX = "360/";
 const DETAIL_URL = "https://omero.hms.harvard.edu/pathviewer/vanilla-viewer";
-const THUMBNAIL_DATA = "https://omero.hms.harvard.edu/webgateway/get_thumbnails";
+// const THUMBNAIL_DATA = "https://omero.hms.harvard.edu/webgateway/get_thumbnails"; // 4dn doesn't allow CORS access
+const THUMBNAIL_DATA = "";
 const THUMBNAIL_URL = "https://omero.hms.harvard.edu/webgateway/render_thumbnail";
 const THUMBNAIL_URL_SUFFIX = "100/";
 

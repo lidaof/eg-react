@@ -367,7 +367,16 @@ class Nav extends React.Component {
                             >
                                 <LiveUI />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Screenshot">
+                            <ModalMenuItem
+                                itemLabel="Screenshot"
+                                style={{
+                                    content: {
+                                        left: 0,
+                                        right: 0,
+                                        padding: "14px",
+                                    },
+                                }}
+                            >
                                 <ScreenshotUI
                                     expansionAmount={REGION_EXPANDER}
                                     needClip={hasInteractionTrack}
