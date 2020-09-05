@@ -88,7 +88,7 @@
         "jquery.kinetic": "^2.2.4",
         "json5": "^1.0.1",
         "jsonschema": "^1.2.6",
-        "lodash": "^4.17.13",
+        "lodash": "^4.17.19",
         "memoize-one": "^3.1.1",
         "molstar": "^1.1.9",
         "nightmare": "^2.10.0",

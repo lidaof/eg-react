@@ -12,7 +12,7 @@ import { PluginSpec } from "molstar/lib/mol-plugin/spec";
 import { ObjectKeys } from "molstar/lib/mol-util/type-helpers";
 import { PluginLayoutControlsDisplay } from "molstar/lib/mol-plugin/layout";
 import { G3DFormat, G3dProvider, G3DHeaderFromUrl, G3DTrajectory } from "molstar/lib/extensions/g3d/format";
-import { g3dHaplotypeQuery, getG3dInfoData } from "molstar/lib/extensions/g3d/model";
+import { g3dHaplotypeQuery, G3dInfoDataProperty } from "molstar/lib/extensions/g3d/model";
 import { StateTransforms } from "molstar/lib/mol-plugin-state/transforms";
 import { createStructureRepresentationParams } from "molstar/lib/mol-plugin-state/helpers/structure-representation-params";
 import { DataFormatProvider } from "molstar/lib/mol-plugin-state/formats/provider";
@@ -89,7 +89,7 @@ class Molstar3D {
             if (!model) return;
             const structure = await builder.createStructure(model);
 
-            const info = getG3dInfoData(model.data!);
+            const info = G3dInfoDataProperty.get(model.data!);
             if (!info) return;
 
             const components = this.plugin.build().to(structure);

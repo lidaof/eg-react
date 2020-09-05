@@ -1,30 +1,34 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "eg-react backend",
-  "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "node setup/setupMongo.js",
-    "start": "node main.js dev",
-    "start-prod": "node main.js prod",
-    "start-api": "node main.js api"
-  },
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "assert": "^1.4.1",
-    "boom": "^7.2.0",
-    "good": "^8.0.0",
-    "good-console": "^7.1.0",
-    "good-squeeze": "^5.0.2",
-    "hapi": "^17.2.0",
-    "hapi-swagger": "^9.1.1",
-    "inert": "^5.1.0",
-    "joi": "^13.1.2",
-    "lodash": "^4.17.14",
-    "mongodb": "^3.0.1",
-    "vision": "^5.3.1",
-    "yesno": "0.0.1"
-  }
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "eg-react backend",
+    "main": "main.js",
+    "author": "Ting Wang Lab @WUSTL",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/lidaof/eg-react.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "setup": "node setup/setupMongo.js",
+        "start": "node main.js dev",
+        "start-prod": "node main.js prod",
+        "start-api": "node main.js api"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "assert": "^1.4.1",
+        "boom": "^7.2.0",
+        "good": "^8.0.0",
+        "good-console": "^7.1.0",
+        "good-squeeze": "^5.0.2",
+        "@hapi/hapi": "^20.0.0",
+        "hapi-swagger": "^9.1.1",
+        "inert": "^5.1.0",
+        "joi": "^13.1.2",
+        "lodash": "^4.17.19",
+        "mongodb": "^3.0.1",
+        "vision": "^5.3.1",
+        "yesno": "0.0.1"
+    }
 }
