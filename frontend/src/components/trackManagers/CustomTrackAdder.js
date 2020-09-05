@@ -19,9 +19,10 @@ export const TRACK_TYPES = {
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange"],
     Repeats: ["repeatmasker"],
-    Alignment: ["bam", "pairwise"],
+    Alignment: ["bam", "pairwise", "snv", "snv2"],
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
+    Image: ["omero4dn", "omeroidr"],
 };
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
@@ -40,10 +41,14 @@ const TYPES_DESC = {
     bigInteract: "long range interaction data in bigInteract format",
     cool: "long range interaction data in cool format, use data uuid instead of URL",
     bam: "reads alignment data",
-    pairwise: "pairwise alignment data",
+    pairwise: "pairwise nucleotide alignment data (same as snv)",
+    snv: "pairwise nucleotide alignment data",
+    snv2: "pairwise nucleotide alignment data with amino acid level mutations",
     qBED: "quantized numerical data, processed by tabix in .gz format",
     g3d: "3D structure in .g3d format",
     dbedgraph: "Dynamic bedgraph data",
+    omero4dn: "image data from 4DN (4D Nucleome Data Portal)",
+    omeroidr: "image data from IDR (Image Data Resource)",
 };
 
 /**
@@ -76,13 +81,15 @@ class CustomTrackAdder extends React.Component {
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
     }
 
-    handleSubmitClick() {
+    handleSubmitClick(e) {
+        e.preventDefault();
         if (!this.props.onTracksAdded) {
             return;
         }
 
         if (!this.state.url) {
             this.setState({ urlError: "Enter a URL" });
+            return;
         } else {
             const newTrack = new TrackModel({ ...this.state, datahub: "Custom track" });
             this.props.onTracksAdded([newTrack]);

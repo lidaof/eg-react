@@ -87,7 +87,7 @@ export class PannableTrackContainer extends React.Component {
     /**
      * Resets the draw offset for the tracks when getting a new region.
      */
-    componentWillReceiveProps(newProps) {
+    UNSAFE_componentWillReceiveProps(newProps) {
         if (this.props.visData !== newProps.visData) {
             this.props.onXOffsetChanged(0);
         }

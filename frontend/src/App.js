@@ -8,8 +8,6 @@ import Nav from "./components/Nav";
 import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
 import TrackContainer from "./components/trackContainers/TrackContainer";
 import withCurrentGenome from "./components/withCurrentGenome";
-import { BrowserScene } from "./components/vr/BrowserScene";
-import ErrorBoundary from "./components/ErrorBoundary";
 import DisplayedRegionModel from "./model/DisplayedRegionModel";
 import TrackModel from "./model/TrackModel";
 import Notifications from "react-notify-toast";
@@ -33,7 +31,7 @@ function mapStateToProps(state) {
         trackLegendWidth: state.browser.present.trackLegendWidth,
         isShowingNavigator: state.browser.present.isShowingNavigator,
         customTracksPool: state.browser.present.customTracksPool,
-        virusBrowserMode: state.browser.present.virusBrowserMode
+        virusBrowserMode: state.browser.present.virusBrowserMode,
     };
 }
 
@@ -41,7 +39,6 @@ const callbacks = {
     onNewViewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
     onLegendWidthChange: ActionCreators.setTrackLegendWidth,
-    onToggleNavigator: ActionCreators.toggleNavigator
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -54,13 +51,13 @@ class App extends React.Component {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
         onNewViewRegion: PropTypes.func,
         onTracksChanged: PropTypes.func,
-        embeddingMode: PropTypes.bool
+        embeddingMode: PropTypes.bool,
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            isShowing3D: false,
+            // isShowing3D: false,
             // isShowingNavigator: true,
             highlightEnteredRegion: true,
             enteredRegion: null,
@@ -71,7 +68,7 @@ class App extends React.Component {
             // publicTrackSets: new Set(),
             // customTrackSets: new Set(),
             availableTrackSets: new Set(),
-            suggestedMetaSets: new Set(["Track type"])
+            suggestedMetaSets: new Set(["Track type"]),
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
@@ -85,22 +82,22 @@ class App extends React.Component {
     componentDidMount() {
         if (this.props.genomeConfig && this.props.genomeConfig.publicHubList) {
             this.setState({
-                publicHubs: this.props.genomeConfig.publicHubList.slice()
+                publicHubs: this.props.genomeConfig.publicHubList.slice(),
             });
         }
         this.initializeMetaSets(this.props.tracks);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.genomeConfig && nextProps.genomeConfig !== this.props.genomeConfig) {
             if (nextProps.genomeConfig.publicHubList) {
                 this.setState({
-                    publicHubs: nextProps.genomeConfig.publicHubList.slice()
+                    publicHubs: nextProps.genomeConfig.publicHubList.slice(),
                 });
             } else {
                 // when switch genome, need reset hub as well
                 this.setState({
-                    publicHubs: []
+                    publicHubs: [],
                 });
             }
             this.setState({ publicTracksPool: [], customTracksPool: [] });
@@ -122,8 +119,8 @@ class App extends React.Component {
         this.initializeMetaSets(nextProps.tracks);
     }
 
-    initializeMetaSets = tracks => {
-        const allKeys = tracks.map(track => Object.keys(track.metadata));
+    initializeMetaSets = (tracks) => {
+        const allKeys = tracks.map((track) => Object.keys(track.metadata));
         const metaKeys = _.union(...allKeys);
         this.addTermToMetaSets(metaKeys);
     };
@@ -131,13 +128,13 @@ class App extends React.Component {
     addTermToMetaSets(term) {
         const toBeAdded = Array.isArray(term) ? term : [term];
         this.setState({
-            suggestedMetaSets: new Set([...this.state.suggestedMetaSets, ...toBeAdded])
+            suggestedMetaSets: new Set([...this.state.suggestedMetaSets, ...toBeAdded]),
         });
     }
 
     addTracktoAvailable(trackModel) {
         this.setState({
-            availableTrackSets: new Set([...this.state.availableTrackSets, trackModel])
+            availableTrackSets: new Set([...this.state.availableTrackSets, trackModel]),
         });
     }
 
@@ -145,7 +142,7 @@ class App extends React.Component {
         const newTrackSets = new Set(Array.from(this.state.availableTrackSets));
         newTrackSets.delete(trackModel);
         this.setState({
-            availableTrackSets: newTrackSets
+            availableTrackSets: newTrackSets,
         });
     }
 
@@ -159,13 +156,13 @@ class App extends React.Component {
         if (toPublic) {
             // const urlSets = new Set([...this.state.publicTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
-                publicTracksPool: this.state.publicTracksPool.concat(newTracks)
+                publicTracksPool: this.state.publicTracksPool.concat(newTracks),
                 // publicTrackSets: urlSets,
             });
         } else {
             // const urlSets = new Set([...this.state.customTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
-                customTracksPool: this.state.customTracksPool.concat(newTracks)
+                customTracksPool: this.state.customTracksPool.concat(newTracks),
                 // customTrackSets: urlSets,
             });
         }
@@ -189,33 +186,33 @@ class App extends React.Component {
     //     this.setState(prevState => {return {isShowingNavigator: !prevState.isShowingNavigator}});
     // };
 
-    toggle3DScene = () => {
-        this.setState(prevState => {
-            return { isShowing3D: !prevState.isShowing3D };
-        });
-    };
+    // toggle3DScene = () => {
+    //     this.setState((prevState) => {
+    //         return { isShowing3D: !prevState.isShowing3D };
+    //     });
+    // };
 
     toggleHighlight = () => {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             return { highlightEnteredRegion: !prevState.highlightEnteredRegion };
         });
     };
 
-    setEnteredRegion = chrInterval => {
+    setEnteredRegion = (chrInterval) => {
         this.setState({ enteredRegion: chrInterval });
     };
 
-    setHighlightColor = color => {
+    setHighlightColor = (color) => {
         const rgb = color.rgb;
         this.setState({
-            highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`
+            highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`,
         });
     };
 
     groupTrackByGenome = () => {
         const { genomeConfig, tracks } = this.props;
         const grouped = {}; // key: genome name like `hg19`, value: a set of track name or url
-        tracks.forEach(track => {
+        tracks.forEach((track) => {
             const gname = track.getMetadata("genome");
             const targeName = gname ? gname : genomeConfig.genome.getName();
             if (grouped[targeName]) {
@@ -238,9 +235,9 @@ class App extends React.Component {
             trackLegendWidth,
             onLegendWidthChange,
             isShowingNavigator,
-            onToggleNavigator,
             embeddingMode,
-            virusBrowserMode
+            virusBrowserMode,
+            layoutModel,
         } = this.props;
         if (sessionFromUrl) {
             return (
@@ -261,8 +258,8 @@ class App extends React.Component {
             );
         }
         const tracksUrlSets = new Set([
-            ...tracks.filter(track => track.url).map(track => track.url),
-            ...tracks.filter(track => !track.url).map(track => track.name)
+            ...tracks.filter((track) => track.url).map((track) => track.url),
+            ...tracks.filter((track) => !track.url).map((track) => track.name),
         ]);
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
@@ -271,9 +268,9 @@ class App extends React.Component {
             <div className="App container-fluid">
                 <Nav
                     {...this.state}
-                    isShowingNavigator={isShowingNavigator}
-                    onToggleNavigator={onToggleNavigator}
-                    onToggle3DScene={this.toggle3DScene}
+                    // isShowingNavigator={isShowingNavigator}
+                    // onToggleNavigator={onToggleNavigator}
+                    // onToggle3DScene={this.toggle3DScene}
                     onToggleHighlight={this.toggleHighlight}
                     onSetEnteredRegion={this.setEnteredRegion}
                     onSetHighlightColor={this.setHighlightColor}
@@ -301,16 +298,6 @@ class App extends React.Component {
                 {isShowingNavigator && (
                     <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
                 )}
-                {this.state.isShowing3D && (
-                    <ErrorBoundary>
-                        <BrowserScene
-                            viewRegion={viewRegion}
-                            tracks={tracks}
-                            expansionAmount={REGION_EXPANDER}
-                            genomeConfig={genomeConfig}
-                        />
-                    </ErrorBoundary>
-                )}
                 <Offline>
                     <div className="alert alert-warning text-center lead" role="alert">
                         You are currently offline, so tracks on web won't load. But you can still use the{" "}
@@ -331,6 +318,8 @@ class App extends React.Component {
                     expansionAmount={REGION_EXPANDER}
                     suggestedMetaSets={this.state.suggestedMetaSets}
                     genomeConfig={genomeConfig}
+                    tracks={tracks.filter((tk) => tk.type !== "g3d")}
+                    layoutModel={layoutModel}
                 />
                 {!embeddingMode && <Footer />}
             </div>

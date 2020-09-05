@@ -63,7 +63,7 @@ class IsoformSelection extends React.PureComponent {
         this.setState({isLoading: false, genes: genes});
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const nextGeneName = nextProps.geneName.trim();
         if (this.props.geneName.trim() !== nextGeneName) {
             this.setState({isLoading: true});

@@ -132,7 +132,7 @@ class GeneSearchBox extends React.PureComponent {
         } );
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         this.setState( {
             inputValue: nextProps.transcript.replace(/\s/g, ""),
         } );

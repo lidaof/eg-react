@@ -54,7 +54,7 @@ export function withDataFetch(initialData = [], WrappedComponent) {
          * @param {object} prevProps - previous props
          * @override
          */
-        componentWillReceiveProps(nextProps) {
+        UNSAFE_componentWillReceiveProps(nextProps) {
             if (this.props.viewRegion !== nextProps.viewRegion) {
                 this.setState({ isLoading: true });
                 this.fetchData(nextProps);

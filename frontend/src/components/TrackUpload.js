@@ -1,13 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { TrackModel } from '../model/TrackModel';
-import { notify } from 'react-notify-toast';
-import { Tabs, Tab } from 'react-bootstrap-tabs';
-import JSON5 from 'json5';
-import { readFileAsText, HELP_LINKS } from '../util';
-import { TrackOptionsUI } from './trackManagers/TrackOptionsUI';
+import React from "react";
+import PropTypes from "prop-types";
+import { TrackModel } from "../model/TrackModel";
+import { notify } from "react-notify-toast";
+import { Tabs, Tab } from "react-bootstrap-tabs";
+import JSON5 from "json5";
+import { readFileAsText, HELP_LINKS } from "../util";
+import { TrackOptionsUI } from "./trackManagers/TrackOptionsUI";
 
-const ONE_TRACK_FILE_LIST = ['bigwig', 'bigbed', 'hic', 'biginteract', 'g3d']; // all lower case
+const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract", "g3d"]; // all lower case
 
 /**
  * handles local track file upload using FileReader API
@@ -16,35 +16,35 @@ const ONE_TRACK_FILE_LIST = ['bigwig', 'bigbed', 'hic', 'biginteract', 'g3d']; /
 
 export class TrackUpload extends React.Component {
     static propTypes = {
-        onTracksAdded: PropTypes.func
+        onTracksAdded: PropTypes.func,
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            fileType: 'bigWig',
+            fileType: "bigWig",
             selectedTabIndex: 0,
-            indexSuffix: '.tbi',
-            msg: '',
-            options: null
+            indexSuffix: ".tbi",
+            msg: "",
+            options: null,
         };
     }
 
-    handleTypeChange = event => {
+    handleTypeChange = (event) => {
         const fileType = event.target.value;
-        const indexSuffix = fileType === 'bam' ? '.bai' : '.tbi';
+        const indexSuffix = fileType === "bam" ? ".bai" : ".tbi";
         this.setState({ fileType, indexSuffix });
     };
 
-    handleFileUpload = async event => {
-        this.setState({ msg: 'Uploading track...' });
+    handleFileUpload = async (event) => {
+        this.setState({ msg: "Uploading track..." });
         let tracks;
         const { options } = this.state;
         const fileList = Array.from(event.target.files);
         const { indexSuffix } = this.state;
         if (ONE_TRACK_FILE_LIST.includes(this.state.fileType.toLocaleLowerCase())) {
             tracks = fileList.map(
-                file =>
+                (file) =>
                     new TrackModel({
                         type: this.state.fileType,
                         url: null,
@@ -52,16 +52,16 @@ export class TrackUpload extends React.Component {
                         name: file.name,
                         label: file.name,
                         files: null,
-                        options
+                        options,
                     })
             );
         } else {
             if (fileList.length !== 2) {
-                notify.show('Aborting, please only select 2 files, the track file and the index file', 'error', 5000);
+                notify.show("Aborting, please only select 2 files, the track file and the index file", "error", 5000);
                 return null;
             }
-            if (fileList[0].name.replace(indexSuffix, '') !== fileList[1].name.replace(indexSuffix, '')) {
-                notify.show('Aborting, track file not match index file', 'error', 5000);
+            if (fileList[0].name.replace(indexSuffix, "") !== fileList[1].name.replace(indexSuffix, "")) {
+                notify.show("Aborting, track file not match index file", "error", 5000);
                 return null;
             }
             tracks = [
@@ -72,39 +72,39 @@ export class TrackUpload extends React.Component {
                     name: fileList[0].name,
                     label: fileList[0].name,
                     files: fileList,
-                    options
-                })
+                    options,
+                }),
             ];
         }
         this.props.onTracksAdded(tracks);
-        this.setState({ msg: 'Track added.' });
+        this.setState({ msg: "Track added." });
     };
 
-    handleHubUpload = async event => {
-        this.setState({ msg: 'Uploading hub...' });
+    handleHubUpload = async (event) => {
+        this.setState({ msg: "Uploading hub..." });
         const tracks = [];
         const fileList = Array.from(event.target.files);
-        const hubFile = fileList.filter(f => f.name === 'hub.config.json');
+        const hubFile = fileList.filter((f) => f.name === "hub.config.json");
         if (hubFile.length !== 1) {
-            notify.show('Aborting, can not find `hub.config.json` file', 'error', 5000);
+            notify.show("Aborting, can not find `hub.config.json` file", "error", 5000);
             return null;
         }
-        const idxFiles = fileList.filter(f => f.name.endsWith('.tbi') || f.name.endsWith('.bai'));
+        const idxFiles = fileList.filter((f) => f.name.endsWith(".tbi") || f.name.endsWith(".bai"));
         const idxHash = {};
         const fileHash = {};
-        idxFiles.forEach(item => {
+        idxFiles.forEach((item) => {
             idxHash[item.name] = item;
         });
         for (const file of fileList) {
             const fileName = file.name;
             // find a type in hub.config.json file
-            if (fileName.startsWith('.')) {
+            if (fileName.startsWith(".")) {
                 continue; // skip hidden files like .DS_Store
             }
-            if (fileName.endsWith('.tbi') || fileName.endsWith('.bai')) {
+            if (fileName.endsWith(".tbi") || fileName.endsWith(".bai")) {
                 continue; // skip index files
             }
-            if (fileName === 'hub.config.json') {
+            if (fileName === "hub.config.json") {
                 continue;
             }
             fileHash[fileName] = file;
@@ -114,7 +114,7 @@ export class TrackUpload extends React.Component {
         for (const item of json) {
             if (fileHash.hasOwnProperty(item.filename)) {
                 const trackType = item.type.toLocaleLowerCase();
-                const indexSuffix = trackType === 'bam' ? '.bai' : '.tbi';
+                const indexSuffix = trackType === "bam" ? ".bai" : ".tbi";
                 let track;
                 if (ONE_TRACK_FILE_LIST.includes(trackType)) {
                     track = new TrackModel({
@@ -124,7 +124,7 @@ export class TrackUpload extends React.Component {
                         name: item.name || item.filename,
                         label: item.label || item.name || item.filename,
                         files: null,
-                        options: item.options || {}
+                        options: item.options || {},
                     });
                 } else {
                     track = new TrackModel({
@@ -134,24 +134,24 @@ export class TrackUpload extends React.Component {
                         name: item.name || item.filename,
                         label: item.label || item.name || item.filename,
                         files: [fileHash[item.filename], idxHash[item.filename + indexSuffix]],
-                        options: item.options || {}
+                        options: item.options || {},
                     });
                 }
                 tracks.push(track);
             } else {
-                notify.show('Skipping ' + item.filename + ' not found in `hub.config.json`', 'warning', 3000);
+                notify.show("Skipping " + item.filename + " not found in `hub.config.json`", "warning", 3000);
             }
         }
         if (tracks.length > 0) {
             this.props.onTracksAdded(tracks);
         } else {
-            notify.show('No local tracks could be found, please check your files and configuration', 'error', 5000);
+            notify.show("No local tracks could be found, please check your files and configuration", "error", 5000);
             return null;
         }
-        this.setState({ msg: 'Hub uploaded.' });
+        this.setState({ msg: "Hub uploaded." });
     };
 
-    getOptions = value => {
+    getOptions = (value) => {
         let options = null;
         try {
             options = JSON5.parse(value);
@@ -187,7 +187,7 @@ export class TrackUpload extends React.Component {
                     </select>
                 </label>
                 <br />
-                <TrackOptionsUI onGetOptions={value => this.getOptions(value)} />
+                <TrackOptionsUI onGetOptions={(value) => this.getOptions(value)} />
                 <label htmlFor="trackFile">
                     <h3>2. Choose track file:</h3>
                     <input type="file" id="trackFile" multiple onChange={this.handleFileUpload} />
@@ -236,8 +236,8 @@ export class TrackUpload extends React.Component {
                 <Tabs
                     onSelect={(index, label) => this.setState({ selectedTabIndex: index })}
                     selected={this.state.selectedTabIndex}
-                    headerStyle={{ fontWeight: 'bold' }}
-                    activeHeaderStyle={{ color: 'blue' }}
+                    headerStyle={{ fontWeight: "bold" }}
+                    activeHeaderStyle={{ color: "blue" }}
                 >
                     <Tab label="Add Local Track">{this.renderTrackUpload()}</Tab>
                     <Tab label="Add Local Hub">{this.renderHubUpload()}</Tab>

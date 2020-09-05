@@ -167,6 +167,22 @@ export class HicSource extends DataSource {
     }
 
     /**
+     * Gets current HiC file meta information being used.
+     *
+     * @param {DisplayedRegionModel} region - region for which to fetch data
+     * @param {number} basesPerPixel - bases per pixel.  Higher = more zoomed out
+     * @param {Object} options - rendering options
+     * @return {} a meta object
+     */
+    getCurrentMeta(region, basesPerPixel, options) {
+        const binSize = this.getBinSize(options, region);
+        return {
+            resolution: binSize,
+            normalization: options.normalization,
+        };
+    }
+
+    /**
      * Gets the genome-wide interaction map from the HiC file.
      *
      * @param {NavigationContext} genome - genome metadata

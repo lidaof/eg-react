@@ -112,7 +112,7 @@ class Chromosomes extends React.PureComponent {
    *
    * @param {Object} nextProps - props as specified by React
    */
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.viewRegion !== nextProps.viewRegion) {
       const drawModel = new LinearDrawingModel(
         nextProps.viewRegion,

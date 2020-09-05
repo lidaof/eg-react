@@ -14,11 +14,11 @@ const MODAL_STYLE = {
         bottom: "unset",
         overflow: "visible",
         padding: "5px",
-        color: "black"
+        color: "black",
     },
     overlay: {
-        backgroundColor: "rgba(111,107,101, 0.7)"
-    }
+        backgroundColor: "rgba(111,107,101, 0.7)",
+    },
 };
 
 const X_BUTTON_STYLE = {
@@ -27,7 +27,7 @@ const X_BUTTON_STYLE = {
     fontSize: "2em",
     position: "absolute",
     top: "-5px",
-    right: "15px"
+    right: "15px",
 };
 
 /**
@@ -46,7 +46,7 @@ class TrackRegionController extends React.Component {
          *         `newStart`: the nav context coordinate of the start of the interval
          *         `newEnd`: the nav context coordinate of the end of the interval
          */
-        onRegionSelected: PropTypes.func.isRequired
+        onRegionSelected: PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -54,7 +54,7 @@ class TrackRegionController extends React.Component {
         this.input = null;
         this.state = {
             badInputMessage: "",
-            showModal: false
+            showModal: false,
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -112,7 +112,7 @@ class TrackRegionController extends React.Component {
     render() {
         const coordinates = this.props.selectedRegion.currentRegionAsString();
         return (
-            <div>
+            <div className="tool-element">
                 <button className="btn btn-secondary" onClick={this.handleOpenModal}>
                     {coordinates}
                 </button>
@@ -151,7 +151,7 @@ class TrackRegionController extends React.Component {
                         Region search (current region is {coordinates} <CopyToClip value={coordinates} />)
                     </h6>
                     <input
-                        ref={input => (this.input = input)}
+                        ref={(input) => (this.input = input)}
                         type="text"
                         size="30"
                         placeholder="Coordinate"

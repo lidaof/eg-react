@@ -1,10 +1,10 @@
-import React from 'react';
-import * as THREE from 'three';
-import OrbitControls from 'three-orbitcontrols';
-import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { getSplines, getTubeMesh } from '../../../util';
+import React from "react";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { CSS2DRenderer, CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { getSplines, getTubeMesh } from "../../../util";
 
-import './ThreeScene.css';
+import "./ThreeScene.css";
 
 export class ThreeScene extends React.PureComponent {
     constructor(props) {
@@ -33,7 +33,7 @@ export class ThreeScene extends React.PureComponent {
             this.renderScene();
         });
         this.toggleChromLabelDisplay();
-        window.addEventListener('resize', this.onWindowResize);
+        window.addEventListener("resize", this.onWindowResize);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -94,7 +94,7 @@ export class ThreeScene extends React.PureComponent {
         // label renderer
         this.labelRenderer = new CSS2DRenderer();
         this.labelRenderer.setSize(this.container.clientWidth, this.container.clientHeight);
-        this.labelRenderer.domElement.style.position = 'absolute';
+        this.labelRenderer.domElement.style.position = "absolute";
         this.labelRenderer.domElement.style.top = 0;
         // this.labelRenderer.domElement.id = 'labelDiv' // for by pass mouse events
         this.container.appendChild(this.labelRenderer.domElement);
@@ -113,7 +113,7 @@ export class ThreeScene extends React.PureComponent {
 
     toggleChromLabelDisplay() {
         const labelDiv = this.labelRenderer.domElement;
-        labelDiv.style.display = this.props.options.showChromLabels ? 'block' : 'none';
+        labelDiv.style.display = this.props.options.showChromLabels ? "block" : "none";
     }
 
     disposeMesh(mesh) {
@@ -128,7 +128,7 @@ export class ThreeScene extends React.PureComponent {
     }
     clearScene() {
         if (Object.keys(this.meshes).length) {
-            Object.keys(this.meshes).forEach(chrom => {
+            Object.keys(this.meshes).forEach((chrom) => {
                 const mesh = this.meshes[chrom];
                 this.scene.remove(mesh);
                 this.disposeMesh(mesh);
@@ -140,15 +140,15 @@ export class ThreeScene extends React.PureComponent {
         this.clearScene();
         this.clearLabelDiv();
         const splines = getSplines(this.props.data);
-        Object.keys(splines).forEach(chrom => {
+        Object.keys(splines).forEach((chrom) => {
             const { spline, color } = splines[chrom];
             const mesh = getTubeMesh(spline, color);
             this.scene.add(mesh);
             // add label
-            const labelDiv = document.createElement('div');
-            labelDiv.className = 'label';
+            const labelDiv = document.createElement("div");
+            labelDiv.className = "label";
             labelDiv.textContent = chrom;
-            labelDiv.style.marginTop = '-1em';
+            labelDiv.style.marginTop = "-1em";
             labelDiv.style.color = color;
             const label = new CSS2DObject(labelDiv);
             label.position.copy(spline.getPoint(0));

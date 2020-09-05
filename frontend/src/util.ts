@@ -163,6 +163,7 @@ export const HELP_LINKS = {
     localhub: "https://eg.readthedocs.io/en/latest/local.html",
     trackOptions: "https://eg.readthedocs.io/en/latest/datahub.html#track-properties",
     textTrack: "https://eg.readthedocs.io/en/latest/text.html",
+    publish: "https://eg.readthedocs.io/en/latest/faq.html#publish-with-the-browser",
 };
 
 // /**

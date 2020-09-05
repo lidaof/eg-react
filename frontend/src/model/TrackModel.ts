@@ -69,6 +69,7 @@ export class TrackModel {
     querygenome?: string;
     isText?: boolean;
     textConfig?: any;
+    apiConfig?: any;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
@@ -80,13 +81,14 @@ export class TrackModel {
         this.options = this.options || {}; // `options` stores dynamically-configurable options.
         this.options.label = this.label; // ...which is why we copy this.name.
         this.url = this.url || "";
-        this.metadata = this.metadata || {};
+        this.metadata = variableIsObject(this.metadata) || Array.isArray(this.metadata) ? this.metadata : {}; // avoid number or string as metadata
         this.metadata["Track type"] = this.type;
         this.fileObj = this.fileObj || "";
         this.files = this.files || [];
         this.tracks = this.tracks ? this.tracks.map((tk) => new TrackModel(tk)) : [];
         this.isText = this.isText || false;
         this.textConfig = this.textConfig || {};
+        this.apiConfig = this.apiConfig || {};
 
         // in case user define height in string, like "25" instead of 25
         if (this.options.height && typeof this.options.height === "string") {

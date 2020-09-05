@@ -33,7 +33,8 @@ class RemoteHubAdder extends React.Component {
         this.loadHub = this.loadHub.bind(this);
     }
 
-    async loadHub() {
+    async loadHub(e) {
+        e.preventDefault();
         if (!this.props.onTracksAdded) {
             return;
         }
@@ -42,6 +43,10 @@ class RemoteHubAdder extends React.Component {
         let json;
         try {
             json = await new Json5Fetcher().get(this.state.inputUrl);
+            if (!Array.isArray(json)) {
+                this.setState({ isLoading: false, error: "Error: data hub should be an array of JSON object." });
+                return;
+            }
         } catch (error) {
             // console.error(error);
             this.setState({ isLoading: false, error: "Cannot load the hub. Error: HTTP " + error.status });
