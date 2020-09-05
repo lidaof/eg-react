@@ -17,17 +17,17 @@
     },
     "license": "MIT",
     "dependencies": {
+        "@hapi/boom": "^7.4.11",
+        "@hapi/good": "^8.2.4",
+        "@hapi/hapi": "^20.0.0",
+        "@hapi/inert": "^5.2.2",
         "assert": "^1.4.1",
-        "boom": "^7.2.0",
-        "good": "^8.0.0",
         "good-console": "^7.1.0",
         "good-squeeze": "^5.0.2",
-        "@hapi/hapi": "^20.0.0",
         "hapi-swagger": "^9.1.1",
-        "inert": "^5.1.0",
-        "joi": "^13.1.2",
+        "joi": "^17.1.1",
         "lodash": "^4.17.19",
-        "mongodb": "^3.0.1",
+        "mongodb": "^3.1.13",
         "vision": "^5.3.1",
         "yesno": "0.0.1"
     }
