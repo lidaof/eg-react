@@ -1,4 +1,5 @@
 const { InjectManifest } = require("workbox-webpack-plugin");
+// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const path = require("path");
 process.traceDeprecation = true;
 module.exports = (config, env) => {
@@ -11,6 +12,15 @@ module.exports = (config, env) => {
     if (!config.module.rules) {
         config.module.rules = [];
     }
+
+    // config.module.rules.push({
+    //     test: /\.(s*)css$/,
+    //     use: [
+    //         MiniCssExtractPlugin.loader,
+    //         { loader: "css-loader", options: { sourceMap: false } },
+    //         { loader: "sass-loader", options: { sourceMap: false } },
+    //     ],
+    // });
 
     config.module.rules.push({
         loader: require.resolve("babel-loader"),

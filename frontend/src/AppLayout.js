@@ -7,6 +7,7 @@ import { ActionCreators } from "./AppState";
 import withCurrentGenome from "./components/withCurrentGenome";
 import App from "./App";
 import G3dContainer from "components/trackVis/3d/G3dContainer";
+import MolstarContainer from "components/trackVis/3d/MolstarContainer";
 import { BrowserScene } from "./components/vr/BrowserScene";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { RegionExpander } from "model/RegionExpander";
@@ -138,6 +139,27 @@ class AppLayout extends React.Component {
         );
     };
 
+    renderMolStarContainer = (node) => {
+        const { viewRegion, genomeConfig } = this.props;
+        const config = node.getConfig();
+        const g3dtrack = TrackModel.deserialize(config.trackModel);
+        g3dtrack.id = config.trackId;
+        node.setEventListener("close", () => {
+            const layout = deleteTabByIdFromLayout(this.props.layout, config.tabId);
+            this.props.onSetLayout(layout);
+        });
+        return (
+            <ErrorBoundary>
+                <MolstarContainer
+                    viewRegion={viewRegion}
+                    tracks={[g3dtrack]}
+                    expansionAmount={REGION_EXPANDER0}
+                    genomeConfig={genomeConfig}
+                />
+            </ErrorBoundary>
+        );
+    };
+
     renderOmeroContainer = (node) => {
         const config = node.getConfig();
         const { imageId, tabId, imageUrl, imageUrlSuffix, detailUrl } = config;
@@ -162,7 +184,7 @@ class AppLayout extends React.Component {
         const layoutFuncs = {
             app: (node) => this.renderApp(node),
             vr: (node) => this.renderVRscene(node),
-            g3d: (node) => this.render3Dscene(node),
+            g3d: (node) => this.renderMolStarContainer(node),
             omero: (node) => this.renderOmeroContainer(node),
         };
         return layoutFuncs[layoutComponent](node);
