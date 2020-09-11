@@ -1,3 +1,4 @@
+import { TrackOptions } from "model/TrackModel";
 import { InteractionDisplayMode } from "./../../model/DisplayModes";
 import { TrackConfig } from "./TrackConfig";
 import WorkerSource from "../../dataSources/worker/WorkerSource";
@@ -15,6 +16,9 @@ import HeightConfig from "../trackContextMenu/HeightConfig";
 import LineWidthConfig from "../trackContextMenu/LineWidthConfig";
 import LongrangeAndreaTextSource from "../../dataSources/LongrangeAndreaTextSource";
 import BedTextSource from "../../dataSources/BedTextSource";
+import FetchViewWindowConfig from "components/trackContextMenu/FetchViewWindowConfig";
+import MaxValueFilterConfig from "components/trackContextMenu/MaxValueFilterConfig";
+import MinValueFilterConfig from "components/trackContextMenu/MinValueFilterConfig";
 
 export class LongRangeTrackConfig extends TrackConfig {
     constructor(props: any) {
@@ -73,6 +77,13 @@ export class LongRangeTrackConfig extends TrackConfig {
         return interactions;
     }
 
+    /**
+     * @override
+     */
+    shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
+        return oldOptions.fetchViewWindowOnly !== newOptions.fetchViewWindowOnly;
+    }
+
     getComponent() {
         return InteractionTrack;
     }
@@ -85,6 +96,9 @@ export class LongRangeTrackConfig extends TrackConfig {
             PrimaryColorConfig,
             SecondaryColorConfig,
             BackgroundColorConfig,
+            MaxValueFilterConfig,
+            MinValueFilterConfig,
+            FetchViewWindowConfig,
         ];
         if (this.getOptions().displayMode === InteractionDisplayMode.ARC) {
             items.splice(1, 0, LineWidthConfig);

@@ -1,12 +1,13 @@
 import React from 'react';
 import { AnnotationTrackConfig } from './AnnotationTrackConfig';
-
 import BamSource from '../../dataSources/BamSource';
 import { BamAlignment } from '../../model/BamAlignment';
 import { TrackModel } from '../../model/TrackModel';
-
 import BamTrack from '../trackVis/bamTrack/BamTrack';
-import { ColorConfig, BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
+import { ColorConfig, BackgroundColorConfig, SecondaryColorConfig } from '../trackContextMenu/ColorConfig';
+import { AnnotationDisplayModes } from 'model/DisplayModes';
+import YscaleConfig from 'components/trackContextMenu/YscaleConfig';
+import SmoothConfig from 'components/trackContextMenu/SmoothConfig';
 
 export class BamTrackConfig extends AnnotationTrackConfig {
     constructor(trackModel: TrackModel) {
@@ -15,6 +16,9 @@ export class BamTrackConfig extends AnnotationTrackConfig {
             mismatchColor: 'yellow',
             deletionColor: 'black',
             insertionColor: 'green',
+            color: 'red',
+            color2: 'blue',
+            smooth: 0, // for density mode
         });
     }
 
@@ -36,7 +40,11 @@ export class BamTrackConfig extends AnnotationTrackConfig {
 
     getMenuComponents() {
         const menu = super.getMenuComponents();
-        menu.splice(menu.findIndex(component => component === BackgroundColorConfig), 0, MismatchColorConfig);
+        if (this.getOptions().displayMode === AnnotationDisplayModes.FULL) {
+            menu.splice(menu.findIndex(component => component === BackgroundColorConfig), 0, MismatchColorConfig);
+        } else {
+            menu.splice(menu.findIndex(component => component === SecondaryColorConfig), 1, YscaleConfig, SmoothConfig)
+        }
         return menu;
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "epgg",
-    "version": "52.0.0",
+    "version": "52.1.0",
     "author": "Ting Wang Lab @WUSTL",
     "repository": {
         "type": "git",
@@ -167,5 +167,6 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
-    }
+    },
+    "proxy": "http://localhost:3001/"
 }

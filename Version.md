@@ -1,5 +1,10 @@
 # Version History
 
+## 52.1.0
+
+-   added new genome `Plasmodium falciparum (Pfal3D7)`
+-   fixed one bug that bam track at density mode not showing y scale config
+
 ## 52.0.0
 
 -   upgrade dependent packages: react, react-dom -> 16.13.1

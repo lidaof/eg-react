@@ -21,14 +21,17 @@
         "@hapi/good": "^8.2.4",
         "@hapi/hapi": "^20.0.0",
         "@hapi/inert": "^5.2.2",
+        "@hapi/joi": "^17.1.1",
+        "@hapi/vision": "^6.0.1",
         "assert": "^1.4.1",
         "good-console": "^7.1.0",
         "good-squeeze": "^5.0.2",
-        "hapi-swagger": "^9.1.1",
-        "joi": "^17.1.1",
+        "hapi-swagger": "^9.4.2",
+        "inert": "^5.1.3",
+        "joi": "^17.2.1",
         "lodash": "^4.17.19",
         "mongodb": "^3.1.13",
-        "vision": "^5.3.1",
+        "vision": "^5.4.4",
         "yesno": "0.0.1"
     }
 }
