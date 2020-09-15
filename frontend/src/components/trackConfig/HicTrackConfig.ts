@@ -17,6 +17,7 @@ import { InteractionDisplayMode } from "../../model/DisplayModes";
 import FetchViewWindowConfig from "components/trackContextMenu/FetchViewWindowConfig";
 import MaxValueFilterConfig from "components/trackContextMenu/MaxValueFilterConfig";
 import MinValueFilterConfig from "components/trackContextMenu/MinValueFilterConfig";
+import BothAnchorsInViewConfig from "components/trackContextMenu/BothAnchorsInViewConfig";
 
 export class HicTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -65,6 +66,7 @@ export class HicTrackConfig extends TrackConfig {
             MaxValueFilterConfig,
             MinValueFilterConfig,
             FetchViewWindowConfig,
+            BothAnchorsInViewConfig,
         ];
         if (this.getOptions().displayMode !== InteractionDisplayMode.HEATMAP) {
             items.splice(2, 0, LineWidthConfig);

@@ -21,6 +21,7 @@ interface SquareDisplayProps {
   ): void;
   onMouseOut(event: React.MouseEvent): void;
   forceSvg?: boolean;
+  bothAnchorsInView?: boolean;
 }
 
 export class SquareDisplay extends React.PureComponent<SquareDisplayProps, {}> {
@@ -31,7 +32,7 @@ export class SquareDisplay extends React.PureComponent<SquareDisplayProps, {}> {
   hmData: any[];
 
   renderRect = (placedInteraction: PlacedInteraction, index: number) => {
-    const { opacityScale, color, color2, viewWindow, height } = this.props;
+    const { opacityScale, color, color2, viewWindow, height, bothAnchorsInView } = this.props;
     const drawWidth = viewWindow.getLength();
     const angle = height / drawWidth;
     const score = placedInteraction.interaction.score;
@@ -41,6 +42,11 @@ export class SquareDisplay extends React.PureComponent<SquareDisplayProps, {}> {
     const { xSpan1, xSpan2 } = placedInteraction;
     if (!(xSpan1.start >= viewWindow.start && xSpan2.end <= viewWindow.end)) {
       return null;
+    }
+    if (bothAnchorsInView) {
+      if (xSpan1.start < viewWindow.start || xSpan2.end > viewWindow.end) {
+        return null;
+      }
     }
     const pointLeft = [
       // Going counterclockwise

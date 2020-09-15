@@ -19,6 +19,7 @@ import BedTextSource from "../../dataSources/BedTextSource";
 import FetchViewWindowConfig from "components/trackContextMenu/FetchViewWindowConfig";
 import MaxValueFilterConfig from "components/trackContextMenu/MaxValueFilterConfig";
 import MinValueFilterConfig from "components/trackContextMenu/MinValueFilterConfig";
+import BothAnchorsInViewConfig from "components/trackContextMenu/BothAnchorsInViewConfig";
 
 export class LongRangeTrackConfig extends TrackConfig {
     constructor(props: any) {
@@ -99,6 +100,7 @@ export class LongRangeTrackConfig extends TrackConfig {
             MaxValueFilterConfig,
             MinValueFilterConfig,
             FetchViewWindowConfig,
+            BothAnchorsInViewConfig,
         ];
         if (this.getOptions().displayMode === InteractionDisplayMode.ARC) {
             items.splice(1, 0, LineWidthConfig);

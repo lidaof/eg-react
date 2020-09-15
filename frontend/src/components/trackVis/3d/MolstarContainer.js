@@ -23,7 +23,7 @@ class MolstarContainer extends React.PureComponent {
         const { tracks } = this.props;
         const trackModel = tracks[0];
         const mol = new Molstar3D(this.myRef.current);
-        mol.init({ url: trackModel.url, resolution: 200000 });
+        mol.init({ url: trackModel.url });
     };
 
     render() {

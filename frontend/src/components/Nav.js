@@ -341,32 +341,36 @@ class Nav extends React.Component {
                             <ModalMenuItem itemLabel="Scatter Plot">
                                 <ScatterPlot genome={genomeConfig.genome} />
                             </ModalMenuItem>
-                            <ModalMenuItem
-                                itemLabel="Session"
-                                style={{
-                                    content: {
-                                        right: "unset",
-                                        bottom: "unset",
-                                        overflow: "visible",
-                                        padding: "5px",
-                                    },
-                                }}
-                            >
-                                <SessionUI bundleId={bundleId} />
-                            </ModalMenuItem>
-                            <ModalMenuItem
-                                itemLabel="Go Live"
-                                style={{
-                                    content: {
-                                        right: "unset",
-                                        bottom: "unset",
-                                        overflow: "visible",
-                                        padding: "5px",
-                                    },
-                                }}
-                            >
-                                <LiveUI />
-                            </ModalMenuItem>
+                            {!process.env.REACT_APP_NO_FIREBASE && (
+                                <>
+                                    <ModalMenuItem
+                                        itemLabel="Session"
+                                        style={{
+                                            content: {
+                                                right: "unset",
+                                                bottom: "unset",
+                                                overflow: "visible",
+                                                padding: "5px",
+                                            },
+                                        }}
+                                    >
+                                        <SessionUI bundleId={bundleId} />
+                                    </ModalMenuItem>{" "}
+                                    <ModalMenuItem
+                                        itemLabel="Go Live"
+                                        style={{
+                                            content: {
+                                                right: "unset",
+                                                bottom: "unset",
+                                                overflow: "visible",
+                                                padding: "5px",
+                                            },
+                                        }}
+                                    >
+                                        <LiveUI />
+                                    </ModalMenuItem>
+                                </>
+                            )}
                             <ModalMenuItem
                                 itemLabel="Screenshot"
                                 style={{

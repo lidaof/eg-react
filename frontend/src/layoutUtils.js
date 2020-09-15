@@ -3,12 +3,15 @@ import FlexLayout from "flexlayout-react";
 import shortid from "shortid";
 
 /**
- * utilies to deal with layouts
+ * utilities to deal with layouts
  * @author Daofeng Li
  */
 
+export const global0 = { tabSetHeaderHeight: 0, tabSetTabStripHeight: 0 };
+export const global25 = { tabSetHeaderHeight: 25, tabSetTabStripHeight: 25 };
+
 export const initialLayout = {
-    global: { tabSetHeaderHeight: 25, tabSetTabStripHeight: 25 },
+    global: global0,
     layout: {
         type: "row",
         children: [
@@ -47,7 +50,7 @@ export function addTabSetToLayout(newTabset, exisingLayout) {
         children = [...initial.layout.children, newTabset];
     }
     const layout = { ...initial.layout, children };
-    return { ...initial, layout };
+    return { ...initial, layout, global: global25 };
 }
 
 export function deleteTabByIdFromLayout(layout, tabId) {
@@ -57,7 +60,11 @@ export function deleteTabByIdFromLayout(layout, tabId) {
     const model = FlexLayout.Model.fromJson(layout);
     model.doAction(FlexLayout.Actions.deleteTab(tabId));
     const json = model.toJson();
-    return json.layout.children.length > 1 ? json : {};
+    if (json.layout.children.length > 1) {
+        return json; // always keep the layout
+    } else {
+        return { ...json, global: global0 };
+    }
 }
 
 export function tabIdExistInLayout(layout, tabId) {

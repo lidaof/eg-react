@@ -11,7 +11,7 @@ import MolstarContainer from "components/trackVis/3d/MolstarContainer";
 import { BrowserScene } from "./components/vr/BrowserScene";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { RegionExpander } from "model/RegionExpander";
-import { addTabSetToLayout, deleteTabByIdFromLayout, tabIdExistInLayout } from "./layoutUtils";
+import { addTabSetToLayout, deleteTabByIdFromLayout, initialLayout, tabIdExistInLayout } from "./layoutUtils";
 import TrackModel from "model/TrackModel";
 import OmeroContainer from "components/trackVis/imageTrack/OmeroContainer";
 
@@ -41,7 +41,7 @@ const callbacks = {
     onSetLayout: ActionCreators.setLayout,
 };
 
-class AppLayout extends React.Component {
+class AppLayout extends React.PureComponent {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isShowingVR !== this.props.isShowingVR) {
             if (this.props.isShowingVR) {
@@ -67,7 +67,7 @@ class AppLayout extends React.Component {
         }
         if (prevProps.tracks !== this.props.tracks) {
             const g3dtracks = this.props.tracks.filter((t) => t.type === "g3d");
-            let layout;
+            let layout = { ...this.props.layout };
             if (g3dtracks.length) {
                 g3dtracks.forEach((tk) => {
                     const tabId = shortid.generate();
@@ -76,7 +76,7 @@ class AppLayout extends React.Component {
                         children: [
                             {
                                 type: "tab",
-                                name: "3D",
+                                name: tk.getDisplayLabel(),
                                 component: "g3d",
                                 id: tabId,
                                 config: {
@@ -87,7 +87,7 @@ class AppLayout extends React.Component {
                             },
                         ],
                     };
-                    layout = addTabSetToLayout(addLayout, this.props.layout);
+                    layout = addTabSetToLayout(addLayout, layout);
                 });
                 this.props.onSetLayout(layout);
             }
@@ -95,7 +95,8 @@ class AppLayout extends React.Component {
     }
 
     renderApp = (node) => {
-        const model = node ? node.getModel() : {};
+        const model = node ? node.getModel() : initialLayout;
+        // const model = node ? node.getModel() : {};
         // console.log(model);
         return <App layoutModel={model} />;
     };
@@ -147,6 +148,7 @@ class AppLayout extends React.Component {
         node.setEventListener("close", () => {
             const layout = deleteTabByIdFromLayout(this.props.layout, config.tabId);
             this.props.onSetLayout(layout);
+            this.removeTrackById(g3dtrack.id);
         });
         return (
             <ErrorBoundary>
@@ -190,15 +192,24 @@ class AppLayout extends React.Component {
         return layoutFuncs[layoutComponent](node);
     };
 
+    removeTrackById(trackId) {
+        let newTracks = this.props.tracks.filter((track) => track.id !== trackId);
+        this.props.onTracksChanged(newTracks);
+    }
+
     render() {
-        if (_.isEmpty(this.props.layout)) {
-            return this.renderApp();
-        } else {
-            // console.log(this.props.layout);
-            const model = FlexLayout.Model.fromJson(this.props.layout);
-            // console.log(model);
-            return <FlexLayout.Layout model={model} factory={this.factory} />;
-        }
+        const layout = _.isEmpty(this.props.layout) ? initialLayout : this.props.layout;
+        const model = FlexLayout.Model.fromJson(layout);
+        return <FlexLayout.Layout model={model} factory={this.factory} />;
+        // if there is no new tabs, no need to use layout?
+        // if (_.isEmpty(this.props.layout)) {
+        //     return this.renderApp();
+        // } else {
+        // console.log(this.props.layout);
+        // const model = FlexLayout.Model.fromJson(this.props.layout);
+        // console.log(model);
+        // return <FlexLayout.Layout model={model} factory={this.factory} />;
+        // }
     }
 }
 

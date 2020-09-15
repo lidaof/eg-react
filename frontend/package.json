@@ -120,7 +120,7 @@
         "react-radio-buttons": "^1.2.2",
         "react-radio-group": "^3.0.3",
         "react-redux": "^5.1.2",
-        "react-redux-firebase": "^2.5.0",
+        "react-redux-firebase": "^2.5.1",
         "react-router": "^5.2.0",
         "react-router-dom": "^5.2.0",
         "react-scripts": "^3.4.1",

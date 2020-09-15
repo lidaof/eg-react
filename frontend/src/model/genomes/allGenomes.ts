@@ -20,7 +20,7 @@ import SARS from "./virus/sars";
 import MERS from "./virus/mers";
 import nCoV2019 from "./virus/nCoV2019";
 import LEPOCU1 from "./lepOcu1/lepOcu1";
-import pfal3d7 from "./pfal3d7/pfal3d7";
+import Pfal3D7 from "./Pfal3D7/Pfal3D7";
 import { GenomeConfig } from "./GenomeConfig";
 
 /**
@@ -49,7 +49,7 @@ export const allGenomes = [
     MERS,
     nCoV2019,
     LEPOCU1,
-    pfal3d7,
+    Pfal3D7,
 ];
 
 const genomeNameToConfig = {};
@@ -141,7 +141,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     "P. falciparum": {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Pfalciparum.png",
-        assemblies: [pfal3d7.genome.getName()],
+        assemblies: [Pfal3D7.genome.getName()],
         color: "black",
     },
     virus: {

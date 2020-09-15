@@ -451,19 +451,25 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
     }
 }
 
-const rootReducer = combineReducers({
-    browser: undoable(getNextState, { limit: 20 }),
-    firebase: firebaseReducer,
-});
+const rootReducer = !process.env.REACT_APP_NO_FIREBASE
+    ? combineReducers({
+          browser: undoable(getNextState, { limit: 20 }),
+          firebase: firebaseReducer,
+      })
+    : combineReducers({
+          browser: undoable(getNextState, { limit: 20 }),
+      });
 
-// Firebase config
-const firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_DOMAIN,
-    databaseURL: process.env.REACT_APP_FIREBASE_DATABASE,
-    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-};
-firebase.initializeApp(firebaseConfig);
+if (!process.env.REACT_APP_NO_FIREBASE) {
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: process.env.REACT_APP_FIREBASE_KEY,
+        authDomain: process.env.REACT_APP_FIREBASE_DOMAIN,
+        databaseURL: process.env.REACT_APP_FIREBASE_DATABASE,
+        storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    };
+    firebase.initializeApp(firebaseConfig);
+}
 
 // react-redux-firebase options
 const config = {
@@ -472,7 +478,9 @@ const config = {
 };
 
 // Add redux Firebase to compose
-const createStoreWithFirebase = compose(reactReduxFirebase(firebase, config))(createStore);
+const createStoreWithFirebase = !process.env.REACT_APP_NO_FIREBASE
+    ? compose(reactReduxFirebase(firebase, config))(createStore)
+    : createStore;
 
 // OK, so it's really an AppStore, but then that would mean something completely different 😛
 export const AppState = createStoreWithFirebase(

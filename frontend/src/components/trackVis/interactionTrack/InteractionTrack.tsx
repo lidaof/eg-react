@@ -40,6 +40,7 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
         fetchViewWindowOnly?: boolean,
         maxValueFilter?: number,
         minValueFilter?: number,
+        bothAnchorsInView?: boolean,
 
     };
     forceSvg?: boolean;
@@ -57,6 +58,7 @@ export const DEFAULT_OPTIONS = {
     lineWidth: 2,
     greedyTooltip: false,
     fetchViewWindowOnly: false,
+    bothAnchorsInView: false,
 
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
@@ -133,16 +135,16 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
     hideTooltip() {
         this.props.onHideTooltip();
     }
-    
+
     filterData = (data: GenomeInteraction[]): GenomeInteraction[] => {
-        const {minValueFilter, maxValueFilter} = this.props.options;
+        const { minValueFilter, maxValueFilter } = this.props.options;
         let filteredData: GenomeInteraction[] = [];
-        if(maxValueFilter && !isNaN(maxValueFilter)) {
+        if (maxValueFilter && !isNaN(maxValueFilter)) {
             filteredData = data.filter(d => d.score <= maxValueFilter)
         } else {
             filteredData = data;
         }
-        if(minValueFilter && !isNaN(minValueFilter)) {
+        if (minValueFilter && !isNaN(minValueFilter)) {
             filteredData = filteredData.filter(d => d.score >= minValueFilter)
         }
         return filteredData;
@@ -167,6 +169,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             onMouseOut: this.hideTooltip,
             forceSvg,
             greedyTooltip: options.greedyTooltip,
+            bothAnchorsInView: options.bothAnchorsInView,
         };
         let visualizer; // , height;
         // if (options.displayMode === InteractionDisplayMode.HEATMAP) {

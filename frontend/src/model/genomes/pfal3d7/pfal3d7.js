@@ -4,7 +4,7 @@ import TrackModel from "../../TrackModel";
 import cytobands from "./cytoBandIdeo.json";
 import annotationTracks from "./annotationTracks.json";
 
-const genome = new Genome("pfal3d7", [
+const genome = new Genome("Pfal3D7", [
     new Chromosome("chr1", 640851),
     new Chromosome("chr2", 947102),
     new Chromosome("chr3", 1067971),
@@ -26,9 +26,8 @@ const defaultRegion = navContext.parse("chr1:256704-310866");
 const defaultTracks = [
     new TrackModel({
         type: "geneAnnotation",
-        // name: "PlasmoDBGene",
-        name: "refGene",
-        genome: "pfal3d7",
+        name: "PlasmoDBGene",
+        genome: "Pfal3D7",
         label: "PlasmoDB 9.0 genes",
     }),
     new TrackModel({
@@ -37,14 +36,32 @@ const defaultTracks = [
     }),
 ];
 
-const pfal3d7 = {
+const publicHubData = {
+    "Noble lab": "Published data from Noble lab (https://noble.gs.washington.edu/)",
+};
+
+const publicHubList = [
+    {
+        collection: "Noble lab",
+        name: "Long-range chromatin interaction experiments",
+        numTracks: 11,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/Pfalciparum3D7/long",
+        description:
+            "A collection of long-range chromatin interaction data sets from https://noble.gs.washington.edu/proj/plasmo3d/",
+    },
+];
+
+const Pfal3D7 = {
     genome: genome,
     navContext: navContext,
     cytobands: cytobands,
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
+    publicHubList,
+    publicHubData,
     twoBitURL: "https://vizhub.wustl.edu/public/Pfal3D7/Pfal3D7.2bit",
     annotationTracks,
 };
 
-export default pfal3d7;
+export default Pfal3D7;

@@ -44,7 +44,7 @@ const callbacks = {
 const withAppState = connect(mapStateToProps, callbacks);
 const withEnhancements = _.flowRight(withAppState, withCurrentGenome);
 
-class App extends React.Component {
+class App extends React.PureComponent {
     static propTypes = {
         genomeConfig: PropTypes.object,
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel),
@@ -250,7 +250,7 @@ class App extends React.Component {
             return (
                 <div className="container-fluid">
                     <GenomePicker />
-                    <SessionUI bundleId={bundleId} withGenomePicker={true} />
+                    {!process.env.REACT_APP_NO_FIREBASE && <SessionUI bundleId={bundleId} withGenomePicker={true} />}
                     <hr />
                     <Footer />
                     <Notifications />

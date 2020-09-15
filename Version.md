@@ -4,6 +4,9 @@
 
 -   added new genome `Plasmodium falciparum (Pfal3D7)`
 -   fixed one bug that bam track at density mode not showing y scale config
+-   fixed a bug when load `g3d` track from datahub caused browser track facet table lost
+-   fixed issue #111 and #176 for long range track data filtering
+-   add option to avoid use firebase database by remove session/live function (see doc for details)
 
 ## 52.0.0
 

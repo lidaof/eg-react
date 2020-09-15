@@ -8,7 +8,7 @@
     ],
     "Genes": [
         {
-            "name": "refGene",
+            "name": "PlasmoDBGene",
             "label": "PlasmoDB 9.0 genes",
             "filetype": "geneAnnotation"
         }
