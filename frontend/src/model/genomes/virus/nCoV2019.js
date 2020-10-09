@@ -10,21 +10,56 @@ const defaultRegion = navContext.parse("NC_045512.2:0-29903");
 
 const defaultTracks = [
     new TrackModel({
+        type: "ruler",
+        name: "Ruler",
+    }),
+    new TrackModel({
         type: "geneAnnotation",
         name: "ncbiGene",
         label: "NCBI genes",
         genome: "SARS-CoV-2",
     }),
     new TrackModel({
-        type: "ruler",
-        name: "Ruler",
+        type: "categorical",
+        name: "S protein annotations",
+        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_Sprot_annot_sorted.bed.gz",
+        options: {
+            height: 20,
+            alwaysDrawLabel: true,
+            maxRows: 100,
+            hiddenPixels: 0,
+            category: {
+                "receptor-binding domain (RBD)": {
+                    name: "Binds to the ACE2 receptor (PMID: 32225176)",
+                    color: "#FF0000",
+                },
+                "receptor-binding motif (RBM)": {
+                    name: "Interacts directly with the ACE2 receptor (PMID: 32225176)",
+                    color: "#FFC300",
+                },
+                "S1/S2 cleavage site": {
+                    name:
+                        "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
+                    color: "#18872F",
+                },
+                "heptad repeat 1 (HR1)": {
+                    name: "Mediates membrane fusion and viral entry into host cell (PMID: 32376627)",
+                    color: "#0000FF",
+                },
+                "heptad repeat 2 (HR2)": {
+                    name: "Mediates membrane fusion and viral entry into host cell (PMID: 32376627)",
+                    color: "#0000FF",
+                },
+            },
+        },
     }),
     new TrackModel({
         type: "bedgraph",
-        name: "Sequence diversity (Shannon Entropy)",
+        name: "Sequence Diversity (Shannon Entropy)",
         url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_entropy.bedgraph.sort.gz",
         options: {
             aggregateMethod: "MAX",
+            height: 50,
         },
     }),
     new TrackModel({
@@ -78,7 +113,7 @@ const defaultTracks = [
             yMax: 7000000,
             yMin: 0,
             displayMode: "arc",
-            lineWidth: 5,
+            lineWidth: 3,
             height: 205,
             greedyTooltip: true,
         },
@@ -111,6 +146,42 @@ const annotationTracks = {
             genome: "SARS-CoV-2",
         },
     ],
+    Proteins: [
+        {
+            type: "categorical",
+            name: "S protein annotations",
+            url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_Sprot_annot_sorted.bed.gz",
+            options: {
+                height: 20,
+                alwaysDrawLabel: true,
+                maxRows: 100,
+                hiddenPixels: 0,
+                category: {
+                    "receptor-binding domain (RBD)": {
+                        name: "Binds to the ACE2 receptor (PMID: 32225176)",
+                        color: "#FF0000",
+                    },
+                    "receptor-binding motif (RBM)": {
+                        name: "Interacts directly with the ACE2 receptor (PMID: 32225176)",
+                        color: "#FFC300",
+                    },
+                    "S1/S2 cleavage site": {
+                        name:
+                            "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
+                        color: "#18872F",
+                    },
+                    "heptad repeat 1 (HR1)": {
+                        name: "Mediates membrane fusion and viral entry into host cell (PMID: 32376627)",
+                        color: "#0000FF",
+                    },
+                    "heptad repeat 2 (HR2)": {
+                        name: "Mediates membrane fusion and viral entry into host cell (PMID: 32376627)",
+                        color: "#0000FF",
+                    },
+                },
+            },
+        },
+    ],
     Assembly: [
         {
             type: "bedgraph",
@@ -121,7 +192,7 @@ const annotationTracks = {
     Diversity: [
         {
             type: "bedgraph",
-            name: "Sequence diversity (Shannon Entropy)",
+            name: "Sequence Diversity (Shannon Entropy)",
             url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_entropy.bedgraph.sort.gz",
             options: {
                 aggregateMethod: "MAX",
@@ -180,15 +251,30 @@ const publicHubData = {
     "Sequence variation": "Demo tracks for using the browser to study sequence variation and diversity across strains",
     "Putative SARS-CoV-2 Immune Epitopes":
         "Datahubs with tracks providing predicted epitope sequences across the SARS-CoV-2 reference genome",
+    "Image data from IDR": "Images from IDR (https://idr.openmicroscopy.org/)",
 };
 
 const publicHubList = [
     {
         collection: "NCBI database",
+        name: "All NCBI SARS-CoV-2 isolates, in SNV2 format",
+        numTracks: "Updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/ncbi/latest/browser_strains_snv2.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "hub info":
+                "All SARS-CoV-2 strains available on NCBI. Aligned to reference genome (NC_045512.2) using EMBL 'stretcher'.",
+            format: "SNV (v2): suggests putative amino acid level mutations",
+            "data source": "https://www.ncbi.nlm.nih.gov/nuccore",
+        },
+    },
+    {
+        collection: "NCBI database",
         name: "All NCBI SARS-CoV-2 isolates",
         numTracks: "Updating",
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/updates/latest/browser_strains.json",
+        url: "https://wangftp.wustl.edu/~cfan/ncbi/latest/browser_strains.json",
         description: {
             "hub built by": "Changxu Fan (fanc@wustl.edu)",
             "hub info":
@@ -198,6 +284,19 @@ const publicHubList = [
             "colored bars":
                 "Variation from the reference. Details are color coded. Zoom in to click on the bar to see detail",
             "long stretches of rosy brown": "Unsequenced regions",
+        },
+    },
+    {
+        collection: "Nextstrain database",
+        name: "All Nextstrain SARS-CoV-2 isolates, in SNV2 format",
+        numTracks: "Updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/nextstrain/latest/browser_strains_snv2.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "track type":
+                "SNV tracks of all SARS-CoV-2 strains from Nextstrain, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": "http://data.Nextstrain.org/ncov.json",
         },
     },
     {
@@ -215,13 +314,93 @@ const publicHubList = [
     },
     {
         collection: "GISAID database",
-        name: "All GISAID SARS-CoV-2 isolates",
-        numTracks: "Updating",
+        name: "GISAID database (-5/22/2020)",
+        numTracks: 30612,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/browser_strains.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/5-22/browser_strains.json",
         description: {
             "track type":
-                "SNV tracks of all SARS-CoV-2 strains from GISAID, displaying their sequence variation from the reference",
+                "SNV tracks of all SARS-CoV-2 strains available on GISAID as of 5/22/2020, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (-5/22/2020)",
+        numTracks: 30612,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/5-22/browser_strains_snv2.json",
+        description: {
+            "track type":
+                "SNV2 tracks of all SARS-CoV-2 strains available on GISAID as of 5/22/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (5/22/2020-7/28/2020)",
+        numTracks: 42199,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/7-28/browser_strains_new.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 strains that became available on GISAID between 5/22/2020 and 7/28/2020 , displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (5/22/2020-7/28/2020)",
+        numTracks: 42199,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/7-28/browser_strains_new_snv2.json",
+        description: {
+            "track type":
+                "SNV2 tracks of all SARS-CoV-2 strains that became available on GISAID between 5/22/2020 and 7/28/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (7/28/2020 - now) ",
+        numTracks: "Updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/browser_strains_new.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID since 7/28/2020, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (7/28/2020 - now) ",
+        numTracks: "Updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/browser_strains_new_snv2.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID since 7/28/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
             "data source": (
                 <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
                     <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
@@ -345,6 +524,18 @@ const publicHubList = [
             "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
             "hub info":
                 "Percentage of strains with D614G mutation collected in each week between 12/23/2019 and 05/04/2020",
+        },
+    },
+    {
+        collection: "Image data from IDR",
+        name: "Images from IDR (https://idr.openmicroscopy.org/)",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/virus/imagehub.json",
+        description: {
+            "hub built by": "Daofeng Li (dli23@wustl.edu)",
+            "hub info": "Images are displayed through API provided by IDR.",
+            "data source": "https://idr.openmicroscopy.org/",
         },
     },
 ];

@@ -1,9 +1,10 @@
-import axios from 'axios';
-import _ from 'lodash';
-import DataSource from './DataSource';
-
+import axios from "axios";
+import _ from "lodash";
+import DataSource from "./DataSource";
 
 export const AWS_API = "https://lambda.epigenomegateway.org/v2";
+// export const AWS_API = ""; // local test
+
 /**
  * A DataSource that calls our backend API for gene annotations.
  *
@@ -18,7 +19,7 @@ class GeneSource extends DataSource {
     constructor(trackModel) {
         super();
         if (!trackModel) {
-            console.warn('No track model specified.  This data source will fetch no data!');
+            console.warn("No track model specified.  This data source will fetch no data!");
         }
         this.trackModel = trackModel;
     }
@@ -31,24 +32,24 @@ class GeneSource extends DataSource {
             return [];
         }
 
-        let promises = region.getGenomeIntervals().map(locus => {
+        let promises = region.getGenomeIntervals().map((locus) => {
             const params = {
                 chr: locus.chr,
                 start: locus.start,
-                end: locus.end
+                end: locus.end,
             };
-            const genome = this.trackModel.getMetadata('genome') || this.trackModel.genome;
+            const genome = this.trackModel.getMetadata("genome") || this.trackModel.genome;
 
             /**
              * Gets an object that looks like {data: []}
              */
             return axios.get(`${AWS_API}/${genome}/genes/${this.trackModel.name}/queryRegion`, {
-                params: params
+                params: params,
             });
         });
 
         const dataForEachSegment = await Promise.all(promises);
-        return _.flatMap(dataForEachSegment, 'data');
+        return _.flatMap(dataForEachSegment, "data");
     }
 }
 

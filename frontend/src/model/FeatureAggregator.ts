@@ -13,7 +13,8 @@ export const AggregatorTypes = {
     SUM: "SUM", // Sums values of records
     COUNT: "COUNT", // Counts records
     MIN: "MIN", // Computes value of min record
-    MAX: "MAX" // Computes value of max record
+    MAX: "MAX", // Computes value of max record
+    IMAGECOUNT: "IMAGECOUNT", // for image track count
 };
 
 const aggregateFunctions = {};
@@ -27,13 +28,15 @@ aggregateFunctions[AggregatorTypes.MIN] = (records: any[]) =>
 aggregateFunctions[AggregatorTypes.MAX] = (records: any[]) =>
     _.maxBy(records, VALUE_PROP_NAME)[VALUE_PROP_NAME] || null;
 
+aggregateFunctions[AggregatorTypes.IMAGECOUNT] = (records: any[]) => _.sum(records.map((x) => x.images.length));
+
 /**
  * aggregator utils for array data
  */
 const VALUES_PROP_NAME = "values";
 
 export const ArrayAggregatorTypes = {
-    MEAN: "MEAN" //computers average of each element in the array from multiple arrays
+    MEAN: "MEAN", //computers average of each element in the array from multiple arrays
 };
 
 const arrayAggregateFunctions = {};
@@ -53,8 +56,8 @@ arrayAggregateFunctions[ArrayAggregatorTypes.MEAN] = (records: any[]) =>
  * @param dataKeyName default to `values`
  */
 export function calMeanOfArrays(records: any[], dataKeyName: string) {
-    const valuesArray = records.map(record => record[dataKeyName]);
-    const maxLen = _.max(valuesArray.map(v => v.length));
+    const valuesArray = records.map((record) => record[dataKeyName]);
+    const maxLen = _.max(valuesArray.map((v) => v.length));
     let i, j, tmp;
     const results = Array(maxLen).fill(null);
     for (i = 0; i < maxLen; i++) {
@@ -68,7 +71,7 @@ export function calMeanOfArrays(records: any[], dataKeyName: string) {
         }
         results[i] = tmp.slice();
     }
-    return results.map(v => _.mean(v));
+    return results.map((v) => _.mean(v));
 }
 
 export const DefaultAggregators = {
@@ -79,7 +82,7 @@ export const DefaultAggregators = {
             throw new Error(`Unknown aggregator id "${id}"`);
         }
         return aggregator;
-    }
+    },
 };
 
 export const DefaultArrayAggregators = {
@@ -90,7 +93,7 @@ export const DefaultArrayAggregators = {
             throw new Error(`Unknown aggregator id "${id}"`);
         }
         return aggregator;
-    }
+    },
 };
 
 /**

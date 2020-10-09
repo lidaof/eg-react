@@ -1,10 +1,37 @@
 # Version History
 
+## 52.1.0
+
+-   added new genome `Plasmodium falciparum (Pfal3D7)`
+-   fixed one bug that bam track at density mode not showing y scale config
+-   fixed a bug when load `g3d` track from datahub caused browser track facet table lost
+-   fixed issue #111 and #176 for long range track data filtering
+-   add option to avoid use firebase database by remove session/live function (see doc for details)
+
+## 52.0.0
+
+-   upgrade dependent packages: react, react-dom -> 16.13.1
+-   supports nodejs v12+
+-   SARS-CoV-2 hubs updated by Fan
+-   fixed a `smooth` option caused display issue (related to #163)
+-   improved window/container resize listener using ResizeObserver API
+-   improved responsive layout of navigation menu and tools bar
+-   modified vendor `bigwig.js` to support chromosome names like `chr1` or `1`
+-   introduced image track:
+    ![image track example](https://eg.readthedocs.io/en/latest/_images/image_track_example.png "image track example")
+
+## 51.0.6
+
+-   track file information can be displayed with track data (like resolution and normalization for `hic`, `g3d` track etc)
+-   new 'snv' track for display sequence variations from reference
+-   update hubs of virus genomes
+
 ## 51.0.5
 
 -   updated SARS-CoV-2 publib hubs and default tracks
 -   enabled tracks can be loaded from both hub url and previous session storage with new URL parameter `hubSessionStorage`
 -   fixed a `qBed` when mouseover outside of the track caused TypeError bug
+-   fixed a bug that remote hub load button not working in Firefox
 
 ## 51.0.4
 
@@ -124,7 +151,7 @@
 
 -   added chicken genome `galGal6` and `galGal5`
 -   a `flatarc` mode added for chromatin interacion track:
-    ![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png "Flat arc mode]")
+    ![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png "Flat arc mode")
 -   fixed a metadata bug when define customized color
 
 ## 48.5.2

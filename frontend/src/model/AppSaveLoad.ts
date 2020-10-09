@@ -1,14 +1,14 @@
-import TrackModel from './TrackModel';
-import RegionSet from './RegionSet';
-import DisplayedRegionModel from './DisplayedRegionModel';
-import { getGenomeConfig } from './genomes/allGenomes';
-import { AppState, DEFAULT_TRACK_LEGEND_WIDTH } from '../AppState';
-import OpenInterval from './interval/OpenInterval';
+import TrackModel from "./TrackModel";
+import RegionSet from "./RegionSet";
+import DisplayedRegionModel from "./DisplayedRegionModel";
+import { getGenomeConfig } from "./genomes/allGenomes";
+import { AppState, DEFAULT_TRACK_LEGEND_WIDTH } from "../AppState";
+import OpenInterval from "./interval/OpenInterval";
 // import { withFirebase } from 'react-redux-firebase'
 
 /**
  * Converter of app state to plain objects and JSON.  In other words, app state serializer.
- * 
+ *
  * @author Silas Hsu
  * @see {AppState}
  */
@@ -26,17 +26,20 @@ export class AppStateSaver {
      * @return {Object} plain object representing app state
      */
     toObject(appState: AppState): object {
-        const regionSetViewIndex = appState.regionSets.findIndex(set => set === appState.regionSetView);
+        const regionSetViewIndex = appState.regionSets.findIndex((set) => set === appState.regionSetView);
         const object = {
             genomeName: appState.genomeName,
             viewInterval: appState.viewRegion ? appState.viewRegion.getContextCoordinates().serialize() : null,
-            tracks: appState.tracks.filter(track => !track.fileObj).map(track => track.serialize()),
+            tracks: appState.tracks.filter((track) => !track.fileObj).map((track) => track.serialize()),
             metadataTerms: appState.metadataTerms,
-            regionSets: appState.regionSets.map(set => set.serialize()),
+            regionSets: appState.regionSets.map((set) => set.serialize()),
             regionSetViewIndex,
             trackLegendWidth: appState.trackLegendWidth,
             bundleId: appState.bundleId,
             isShowingNavigator: appState.isShowingNavigator,
+            isShowingVR: appState.isShowingVR,
+            layout: appState.layout,
+            // threedTracks: appState.threedTracks.filter((track) => !track.fileObj).map((track) => track.serialize()),
         };
         return object;
     }
@@ -44,7 +47,7 @@ export class AppStateSaver {
 
 /**
  * Converter of JSON and plain objects to app state.  In other words, app state deserializer.
- * 
+ *
  * @author Silas Hsu
  * @see {AppState}
  */
@@ -75,6 +78,9 @@ export class AppStateLoader {
             trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
             bundleId: object.bundleId,
             isShowingNavigator: object.isShowingNavigator,
+            isShowingVR: object.isShowingVR,
+            layout: object.layout || {},
+            // threedTracks: object.threedTracks.map((data: any) => TrackModel.deserialize(data)),
         };
     }
 
@@ -82,7 +88,7 @@ export class AppStateLoader {
      * Infers the DisplayedRegionModel from the plain object representing app state.  Takes a already-deserialized
      * RegionSet as an optional parameter, because if the app was in region set view when it was saved, we will want to
      * restore that, not the genome view.
-     * 
+     *
      * @param {Object} object - plain object representing app state
      * @param {RegionSet} [regionSetView] - (optional) already-deserialized RegionSet from the object
      * @return {DisplayedRegionModel} - inferred view region
@@ -94,7 +100,7 @@ export class AppStateLoader {
         }
 
         let viewInterval;
-        if( object.hasOwnProperty('viewInterval') ){
+        if (object.hasOwnProperty("viewInterval")) {
             viewInterval = OpenInterval.deserialize(object.viewInterval);
         } else {
             viewInterval = genomeConfig.navContext.parse(object.displayRegion);

@@ -69,7 +69,7 @@ class GenomeNavigator extends React.Component {
      * @param {any} nextProps - new props that this component will receive
      * @override
      */
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const thisNavContext = this.state.viewRegion.getNavigationContext();
         const nextNavContext = nextProps.selectedRegion.getNavigationContext();
         if (thisNavContext !== nextNavContext) {

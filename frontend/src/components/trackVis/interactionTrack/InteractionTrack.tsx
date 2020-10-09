@@ -19,6 +19,7 @@ import { InteractionDisplayMode } from "../../../model/DisplayModes";
 import { FeaturePlacer } from "../../../model/FeaturePlacer";
 import { GenomeInteraction } from "../../../model/GenomeInteraction";
 import { ScaleChoices } from "../../../model/ScaleChoices";
+import { TrackFileMeta } from "../commonComponents/TrackFileMeta";
 
 const TOP_PADDING = 2;
 
@@ -36,6 +37,11 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
         height: number;
         lineWidth?: number;
         greedyTooltip?: boolean;
+        fetchViewWindowOnly?: boolean,
+        maxValueFilter?: number,
+        minValueFilter?: number,
+        bothAnchorsInView?: boolean,
+
     };
     forceSvg?: boolean;
 }
@@ -51,6 +57,9 @@ export const DEFAULT_OPTIONS = {
     height: 500,
     lineWidth: 2,
     greedyTooltip: false,
+    fetchViewWindowOnly: false,
+    bothAnchorsInView: false,
+
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -127,11 +136,26 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
         this.props.onHideTooltip();
     }
 
+    filterData = (data: GenomeInteraction[]): GenomeInteraction[] => {
+        const { minValueFilter, maxValueFilter } = this.props.options;
+        let filteredData: GenomeInteraction[] = [];
+        if (maxValueFilter && !isNaN(maxValueFilter)) {
+            filteredData = data.filter(d => d.score <= maxValueFilter)
+        } else {
+            filteredData = data;
+        }
+        if (minValueFilter && !isNaN(minValueFilter)) {
+            filteredData = filteredData.filter(d => d.score >= minValueFilter)
+        }
+        return filteredData;
+    }
+
     render(): JSX.Element {
         const { data, trackModel, visRegion, width, viewWindow, options, forceSvg } = this.props;
+        const filteredData = this.filterData(data);
         this.scales = this.computeScale();
         const visualizerProps = {
-            placedInteractions: this.featurePlacer.placeInteractions(data, visRegion, width),
+            placedInteractions: this.featurePlacer.placeInteractions(filteredData, visRegion, width),
             viewWindow,
             width,
             height: options.height,
@@ -145,6 +169,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             onMouseOut: this.hideTooltip,
             forceSvg,
             greedyTooltip: options.greedyTooltip,
+            bothAnchorsInView: options.bothAnchorsInView,
         };
         let visualizer; // , height;
         // if (options.displayMode === InteractionDisplayMode.HEATMAP) {
@@ -184,7 +209,12 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
                     />
                 }
                 // legend={<TrackLegend trackModel={trackModel} height={50} />}
-                visualizer={visualizer}
+                visualizer={
+                    <div>
+                        {visualizer}
+                        <TrackFileMeta meta={this.props.meta} viewWindow={this.props.viewWindow} />
+                    </div>
+                }
             />
         );
     }

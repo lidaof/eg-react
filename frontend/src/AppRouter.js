@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { Redirect } from "react-router";
-import App from "./App";
+import AppLayout from "./AppLayout";
 import NotFoundPage from "./NotFound";
 import Live from "./components/Live";
 import EmbeddedContainerUI from "./components/EmbeddedContainerUI";
@@ -11,7 +11,7 @@ const AppRouter = () => (
     <BrowserRouter basename="/browser">
         <React.Fragment>
             <Switch>
-                <Route path="/" component={App} exact={true} />
+                <Route path="/" component={AppLayout} exact={true} />
                 <Route exact path="/index.html">
                     {<Redirect to="/" />}
                 </Route>

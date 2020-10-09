@@ -1,10 +1,10 @@
 'use strict';
 
-const Hapi = require('hapi');
-const Inert = require('inert');
+const Hapi = require('@hapi/hapi');
+const Inert = require('@hapi/inert');
 const Vision = require('vision');
+const Good = require('@hapi/good');
 const HapiSwagger = require('hapi-swagger');
-const Good = require('good');
 
 /**
  * All routes to add to the server.  Each element of this array should be an object with a `registerRoutes` method,

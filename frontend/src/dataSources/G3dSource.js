@@ -1,8 +1,8 @@
-import DataSource from './DataSource';
-import G3dFile from 'g3djs';
-import _ from 'lodash';
-import { findClosestNumber } from '../util';
-import { RegionMode } from 'model/G3dDataModes';
+import DataSource from "./DataSource";
+import G3dFile from "g3djs";
+import _ from "lodash";
+import { findClosestNumber } from "../util";
+import { RegionMode } from "model/G3dDataModes";
 
 /**
  * Data source that fetches data from .g3d files.
@@ -21,7 +21,7 @@ export class G3dSource extends DataSource {
     constructor(url) {
         super();
         let config;
-        if (typeof url === 'string') {
+        if (typeof url === "string") {
             config = { url };
         } else {
             config = { blob: url };
@@ -92,5 +92,20 @@ export class G3dSource extends DataSource {
         }
         const dataForEachSegment = await Promise.all(promises);
         return _.flatten(dataForEachSegment);
+    }
+
+    /**
+     * Gets current HiC file meta information being used.
+     *
+     * @param {DisplayedRegionModel} region - region for which to fetch data
+     * @param {number} basesPerPixel - bases per pixel.  Higher = more zoomed out
+     * @param {Object} options - rendering options
+     * @return {} a meta object
+     */
+    getCurrentMeta(region, basesPerPixel, options) {
+        return {
+            resolution: options.resolution,
+            "display region": options.region,
+        };
     }
 }

@@ -37,6 +37,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
         private _primaryGenome: string;
         private _primaryGenomeConfig: GenomeConfig;
         private _multiAlignmentCalculator: MultiAlignmentViewCalculator;
+        _isMounted = false;
 
         constructor(props: DataManagerProps) {
             super(props);
@@ -44,22 +45,27 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             this._primaryGenomeConfig = props.genomeConfig;
             // const queryGenomes = this.getSecondaryGenomes(props.tracks);
             // this._multiAlignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
-
+            // this.wasUnmounted = true;
             this.state = {
-                primaryView: this.props.expansionAmount.calculateExpansion(
-                    props.viewRegion,
-                    this.getVisualizationWidth()
-                )
+                primaryView: props.expansionAmount.calculateExpansion(props.viewRegion, this.getVisualizationWidth()),
             };
             this.fetchPrimaryView = memoizeOne(this.fetchPrimaryView);
         }
 
+        componentDidMount() {
+            this._isMounted = true;
+        }
+
         getVisualizationWidth() {
-            return Math.max(1, this.props.containerWidth - this.props.legendWidth);
+            if (this.props.tracks.length === 1 && this.props.tracks[0].type === "g3d") {
+                return Math.max(100, this.props.containerWidth);
+            } else {
+                return Math.max(100, this.props.containerWidth - this.props.legendWidth);
+            }
         }
 
         getSecondaryGenomes(tracks: TrackModel[]) {
-            const genomeSet = new Set(tracks.map(track => track.querygenome || track.getMetadata("genome")));
+            const genomeSet = new Set(tracks.map((track) => track.querygenome || track.getMetadata("genome")));
             genomeSet.delete(this._primaryGenome);
             genomeSet.delete(undefined);
             return Array.from(genomeSet);
@@ -82,12 +88,16 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
                 const primaryVisData = Object.values(alignment).length
                     ? Object.values(alignment)[0].primaryVisData
                     : visData;
-                this.setState({ primaryView: primaryVisData });
+                if (this._isMounted) {
+                    this.setState({ primaryView: primaryVisData });
+                }
                 return primaryVisData;
             } catch (error) {
                 console.error(error);
                 console.error("Falling back to nonaligned primary view");
-                this.setState({ primaryView: visData });
+                if (this._isMounted) {
+                    this.setState({ primaryView: visData });
+                }
                 return visData;
             }
         }
@@ -112,12 +122,20 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
                     this.props.tracks,
                     this.getVisualizationWidth()
                 );
-                this.setState({ primaryView });
+                if (this._isMounted) {
+                    // console.log("from update");
+                    this.setState({ primaryView });
+                }
             }
             if (prevProps.genomeConfig !== this.props.genomeConfig) {
                 this._primaryGenome = this.props.genome;
                 this._primaryGenomeConfig = this.props.genomeConfig;
             }
+        }
+
+        componentWillUnmount() {
+            this._isMounted = false;
+            // console.log("from unmount");
         }
 
         render() {

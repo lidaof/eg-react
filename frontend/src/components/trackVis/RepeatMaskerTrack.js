@@ -53,7 +53,7 @@ class RepeatTrack extends React.PureComponent {
         this.renderTooltip = this.renderTooltip.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.options !== nextProps.options) {
             this.setState(this.makeScale(nextProps))
         }

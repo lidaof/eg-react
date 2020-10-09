@@ -59,7 +59,7 @@ class FacetTable extends Component {
         this.initializeTracks(this.props.tracks);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.tracks !== this.props.tracks) {
             this.initializeTracks(nextProps.tracks);
         }

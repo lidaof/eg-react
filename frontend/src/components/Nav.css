@@ -1,45 +1,30 @@
+/*
+https://stackoverflow.com/questions/12251750/can-media-queries-resize-based-on-a-div-element-instead-of-the-screen
+followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
+*/
+
+:root {
+    --breakpoint: 600px;
+    --multiplier: calc(var(--breakpoint) - 100%);
+}
+
 .Nav-container {
-    display: grid;
-    /* grid-auto-flow: column;
-    grid-auto-columns: auto; */
-    grid-template-columns: repeat(8, auto) 1fr;
-    justify-items: start;
-    /* grid-template-columns: min-content; */
+    display: flex;
 }
 
-@media screen and (max-width: 1050px) {
-    .Nav-container {
-        display: grid;
-        grid-template-columns: repeat(4, auto);
-        justify-items: center;
+.panel {
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    .element {
+        min-width: 33%;
+        max-width: 100%;
+        flex-grow: 1;
+        flex-basis: calc(var(--multiplier) * 999);
     }
 }
 
-@media screen and (max-width: 630px) {
-    .Nav-container {
-        display: grid;
-        grid-template-columns: repeat(3, auto);
-        justify-items: center;
-    }
-}
-
-@media screen and (max-width: 436px) {
-    .Nav-container {
-        display: grid;
-        grid-template-columns: auto auto;
-        justify-items: center;
-    }
-}
-
-@media screen and (max-width: 234px) {
-    .Nav-container {
-        display: grid;
-        grid-template-columns: auto;
-        justify-items: center;
-    }
-}
-
-.Nav-container > div {
+.element {
     padding: 0 1px;
 }
 
@@ -47,7 +32,7 @@
     opacity: 0.3;
     text-align: center;
     cursor: pointer;
-    width: 150px;
+    width: 180px;
 }
 
 .Nav-genome:hover {
@@ -82,15 +67,19 @@
 
 /* The animation code */
 @keyframes example {
-    from {font-size: 1.4em;}
-    to {font-size: 0.7em;}
+    from {
+        font-size: 1.4em;
+    }
+    to {
+        font-size: 0.7em;
+    }
 }
 
 #theVersion {
     color: red;
     font-size: 0.7em;
     position: absolute;
-    top: 3px;
+    top: 2px;
     left: 130px;
 }
 
@@ -114,7 +103,6 @@
     color: #fff;
     padding: 5px 0;
     border-radius: 6px;
- 
     /* Position the tooltip text - see examples below! */
     position: absolute;
     z-index: 1;
@@ -128,14 +116,14 @@
 .GenomeNavigator-tooltip .GenomeNavigator-tooltiptext {
     widows: 240px;
     top: 100%;
-    left: 50%; 
+    left: 50%;
     margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
 }
 
 .GenomeNavigator-tooltip .GenomeNavigator-tooltiptext::after {
     content: " ";
     position: absolute;
-    bottom: 100%;  /* At the top of the tooltip */
+    bottom: 100%; /* At the top of the tooltip */
     left: 24%;
     margin-left: -5px;
     border-width: 5px;
@@ -156,5 +144,5 @@
 }
 
 .italic {
-    font-style: italic
+    font-style: italic;
 }

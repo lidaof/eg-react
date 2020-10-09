@@ -23,6 +23,7 @@ interface ArcDisplayProps {
     onMouseOut(event: React.MouseEvent): void;
     forceSvg?: boolean;
     greedyTooltip?: boolean;
+    bothAnchorsInView?: boolean;
 }
 
 // const ITEM_LIMIT = 1000;
@@ -36,13 +37,14 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     arcData: any[];
 
     renderArc = (placedInteraction: PlacedInteraction, index: number) => {
-        const { opacityScale, color, color2, lineWidth } = this.props;
+        const { opacityScale, color, color2, lineWidth, bothAnchorsInView, viewWindow } = this.props;
         // const arcs = [], arcHeights = [];
         // const curveYScale = scaleLinear().domain([0, viewWindow.getLength()]).range([0, HEIGHT]).clamp(true);
         const score = placedInteraction.interaction.score;
         if (!score) {
             return null;
         }
+
         const { xSpan1, xSpan2 } = placedInteraction;
         let xSpan1Center, xSpan2Center;
         if (xSpan1.start === xSpan2.start && xSpan1.end === xSpan2.end) {
@@ -52,6 +54,11 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         } else {
             xSpan1Center = 0.5 * (xSpan1.start + xSpan1.end);
             xSpan2Center = 0.5 * (xSpan2.start + xSpan2.end);
+        }
+        if (bothAnchorsInView) {
+            if (xSpan1.start < viewWindow.start || xSpan2.end > viewWindow.end) {
+                return null;
+            }
         }
         const spanCenter = 0.5 * (xSpan1Center + xSpan2Center);
         const spanLength = xSpan2Center - xSpan1Center;
@@ -71,7 +78,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 className="ArcDisplay-emphasize-on-hover"
                 stroke={score >= 0 ? color : color2}
                 strokeWidth={lineWidth}
-                // onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
+            // onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
             />
         );
     };
@@ -111,7 +118,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 });
                 return (
                     <div>
-                        <div>{arcs.length} interactions found. Showing top 3 at most:</div>
+                        <div>{arcs.length} interactions found. Showing top 3:</div>
                         <div>{divs}</div>
                     </div>
                 );

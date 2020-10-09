@@ -15,7 +15,7 @@ export class TrackHandle extends React.Component {
         this.state = this.getTrackSpecialization(props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.trackModel !== nextProps.trackModel) {
             this.setState(this.getTrackSpecialization(nextProps));
         }

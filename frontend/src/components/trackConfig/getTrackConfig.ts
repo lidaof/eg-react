@@ -23,11 +23,14 @@ import { MatplotTrackConfig } from "./MatplotTrackConfig";
 import { DynamicplotTrackConfig } from "./DynamicplotTrackConfig";
 import { HammockTrackConfig } from "./HammockTrackConfig";
 import { PairwiseSegmentTrackConfig } from "./PairwiseSegmentTrackConfig";
+import { SnvSegmentTrackConfig } from "./SnvSegmentTrackConfig";
 import { G3dTrackConfig } from "./G3dTrackConfig";
 import { ProteinTrackConfig } from "./ProteinTrackConfig";
 import { DynamicBedGraphTrackConfig } from "./DynamicBedGraphTrackConfig";
 import { DynamicHicTrackConfig } from "./DynamicHicTrackConfig";
 import { DynamicLongrangeTrackConfig } from "./DynamicLongrangeTrackConfig";
+import { OmeroidrTrackConfig } from "./OmeroidrTrackConfig";
+import { Omero4dnTrackConfig } from "./Omero4dnTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 
@@ -56,10 +59,14 @@ const TYPE_NAME_TO_CONFIG = {
     hammock: HammockTrackConfig,
     g3d: G3dTrackConfig,
     pairwise: PairwiseSegmentTrackConfig,
+    snv: PairwiseSegmentTrackConfig,
+    snv2: SnvSegmentTrackConfig,
     protein: ProteinTrackConfig,
     dbedgraph: DynamicBedGraphTrackConfig,
     dynamichic: DynamicHicTrackConfig,
     dynamiclongrange: DynamicLongrangeTrackConfig,
+    omeroidr: OmeroidrTrackConfig,
+    omero4dn: Omero4dnTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

@@ -1,8 +1,8 @@
 'use strict';
 
 const _ = require('lodash');
-const Joi = require('joi');
-const Boom = require('boom');
+const Joi = require('@hapi/joi');
+const Boom = require('@hapi/boom');
 const mongoUtils = require('../mongoUtils');
 
 const RECORDS_LIMIT = 50;
@@ -23,13 +23,13 @@ function registerRoutes(server) {
             notes: 'Returns list of gene names or refGene records matching query',
             tags: ['api'],
             validate: {
-                params: {
+                params: Joi.object({
                     genome: Joi.string()
                         .required()
                         .description('Genome name')
                         .default('hg19')
-                },
-                query: {
+                }),
+                query: Joi.object({
                     q: Joi.string()
                         .required()
                         .description('String that gene name must start with'),
@@ -39,7 +39,8 @@ function registerRoutes(server) {
                     getOnlyNames: Joi.bool()
                         .description('Whether to get only a list of matching names, or full records')
                         .default(false)
-                }
+                })
+               
             }
         }
     });
