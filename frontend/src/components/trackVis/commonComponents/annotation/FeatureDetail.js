@@ -31,12 +31,22 @@ class FeatureDetail extends React.PureComponent {
                         </span>
                     </a>
                 );
-            }else if(feature.id.startsWith("PF3D7")){
+            } else if (feature.id.startsWith("PF3D7")) {
                 const plasmodbURL = `https://plasmodb.org/plasmo/app/record/gene/${feature.id}`;
                 linkOut = (
                     <a href={plasmodbURL} target="_blank" rel="noopener noreferrer">
                         PlasmoDB
                         <span role="img" aria-label="PlasmoDB">
+                            🔗
+                        </span>
+                    </a>
+                );
+            } else if (feature.id.startsWith("Cre")) {
+                const plasmodbURL = `https://phytozome.jgi.doe.gov/phytomine/portal.do?class=Protein&externalids=${feature.id}`;
+                linkOut = (
+                    <a href={plasmodbURL} target="_blank" rel="noopener noreferrer">
+                        Phytozome
+                        <span role="img" aria-label="Phytozome">
                             🔗
                         </span>
                     </a>

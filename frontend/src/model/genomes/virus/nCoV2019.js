@@ -527,6 +527,19 @@ const publicHubList = [
         },
     },
     {
+        collection: "SARS-CoV-2 database",
+        name: "Non-canonical ORFs",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_finkel2020_novelORFs.json",
+        description: {
+            "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
+            "hub info":
+                "Non-canonical open reading frames (ORFs) in SARS-CoV-2. Abbreviations: iORF = internal ORF; uORF = upstream ORF; ext = extended ORF.",
+            "data source": "Finkel et al., 2020 (PMID: 32906143)",
+        },
+    },
+    {
         collection: "Image data from IDR",
         name: "Images from IDR (https://idr.openmicroscopy.org/)",
         numTracks: 1,
