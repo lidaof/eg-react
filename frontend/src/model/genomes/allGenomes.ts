@@ -21,7 +21,7 @@ import SARS from "./virus/sars";
 import MERS from "./virus/mers";
 import nCoV2019 from "./virus/nCoV2019";
 import LEPOCU1 from "./lepOcu1/lepOcu1";
-import Pfal3D7 from "./Pfal3D7/Pfal3D7";
+import Pfal3D7 from "./pfal3d7/pfal3d7";
 import { GenomeConfig } from "./GenomeConfig";
 
 /**
