@@ -76,6 +76,14 @@ const panTro5 = [
     },
 ];
 
+const panTro6 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const mm10 = [
     {
         name: "refGene",
@@ -222,6 +230,7 @@ const genomeConfig = {
     danRer11,
     hg38,
     panTro5,
+    panTro6,
     rn6,
     mm9,
     bosTau8,

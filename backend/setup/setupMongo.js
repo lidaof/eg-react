@@ -1,19 +1,19 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
+const fs = require("fs");
 // const child_process = require('child_process');
-const yesno = require('yesno');
+const yesno = require("yesno");
 //const ALL_IMPORTERS = require('./mongoImporters');
-const MongoImporter = require('./mongoImporters');
-const mongoUtils = require('../mongoUtils');
-const genomeConfig = require('./genomeConfig');
+const MongoImporter = require("./mongoImporters");
+const mongoUtils = require("../mongoUtils");
+const genomeConfig = require("./genomeConfig");
 
-const MONGO_URL = 'mongodb://localhost:27017';
-const DATA_DIR = 'genomeData';
+const MONGO_URL = "mongodb://localhost:27017";
+const DATA_DIR = "genomeData";
 const ExitCodes = {
     DATA_DIR_MISSING_ERROR: 1,
     MONGO_CONNECT_ERROR: 2,
-    IMPORT_ERROR: 3
+    IMPORT_ERROR: 3,
 };
 
 /**
@@ -25,7 +25,7 @@ const ExitCodes = {
  */
 function askUser(question, defaultValue) {
     return new Promise((resolve, reject) => {
-        yesno.ask(question, defaultValue, answer => {
+        yesno.ask(question, defaultValue, (answer) => {
             process.stdin.end(); // yesno fails to close stdin, so we do it here.
             resolve(answer);
         });
@@ -42,14 +42,16 @@ function askUser(question, defaultValue) {
  */
 async function main() {
     // Get directories to import
-    let genomes;
-    try {
-        genomes = fs.readdirSync(DATA_DIR).filter(dir => !dir.startsWith('.'));
-    } catch (error) {
-        console.error(error.toString());
-        console.error('Could not open data directory; aborting...');
-        return ExitCodes.DATA_DIR_MISSING_ERROR;
-    }
+    // let genomes;
+    // try {
+    //     genomes = fs.readdirSync(DATA_DIR).filter(dir => !dir.startsWith('.'));
+    // } catch (error) {
+    //     console.error(error.toString());
+    //     console.error('Could not open data directory; aborting...');
+    //     return ExitCodes.DATA_DIR_MISSING_ERROR;
+    // }
+
+    const genomes = ["panTro6"]; // if just want to load one genome
 
     // Get mongo connection
     let mongoClient;
@@ -63,13 +65,13 @@ async function main() {
 
     // Get permission
     const permission = await askUser(
-        'This will modify the following databases in MongoDB:\n' +
-            `    ${genomes.join('\n    ')}\n` +
-            'Continue (y/n)?',
+        "This will modify the following databases in MongoDB:\n" +
+            `    ${genomes.join("\n    ")}\n` +
+            "Continue (y/n)?",
         false
     );
     if (!permission) {
-        console.log('Aborting.');
+        console.log("Aborting.");
         return 0;
     }
 
@@ -99,7 +101,7 @@ async function main() {
         console.log();
     }
 
-    console.log('All done');
+    console.log("All done");
     return 0;
 }
 
