@@ -4,6 +4,7 @@ import MM10 from "./mm10/mm10";
 import DAN_RER10 from "./danRer10/danRer10";
 import DAN_RER11 from "./danRer11/danRer11";
 import PANTRO5 from "./panTro5/panTro5";
+import PANTRO6 from "./panTro6/panTro6";
 import RN6 from "./rn6/rn6";
 import MM9 from "./mm9/mm9";
 import BosTau8 from "./bosTau8/bosTau8";
@@ -31,6 +32,7 @@ export const allGenomes = [
   MM10,
   MM9,
   PANTRO5,
+  PANTRO6,
   BosTau8,
   DAN_RER10,
   DAN_RER11,
@@ -76,7 +78,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   chimp: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
-    assemblies: [PANTRO5.genome.getName()],
+    assemblies: [PANTRO5.genome.getName(), PANTRO6.genome.getName()],
     color: "white"
   },
   rhesus: {
