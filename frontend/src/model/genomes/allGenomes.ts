@@ -21,7 +21,8 @@ import SARS from "./virus/sars";
 import MERS from "./virus/mers";
 import nCoV2019 from "./virus/nCoV2019";
 import LEPOCU1 from "./lepOcu1/lepOcu1";
-import Pfal3D7 from "./pfal3d7/pfal3d7";
+import Pfal3D7 from "./Pfal3D7/Pfal3D7";
+import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
 import { GenomeConfig } from "./GenomeConfig";
 
 /**
@@ -52,6 +53,7 @@ export const allGenomes = [
     nCoV2019,
     LEPOCU1,
     Pfal3D7,
+    Creinhardtii506,
 ];
 
 const genomeNameToConfig = {};
@@ -78,7 +80,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     chimp: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
-        assemblies: [PANTRO5.genome.getName(), PANTRO6.genome.getName()],
+        assemblies: [PANTRO6.genome.getName(), PANTRO5.genome.getName()],
         color: "white",
     },
     rhesus: {
@@ -145,6 +147,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Pfalciparum.png",
         assemblies: [Pfal3D7.genome.getName()],
         color: "black",
+    },
+    "Green algae": {
+        logoUrl: "https://vizhub.wustl.edu/public/Creinhardtii506/Creinhardtii506.png",
+        assemblies: [Creinhardtii506.genome.getName()],
+        color: "yellow",
     },
     virus: {
         logoUrl: "https://vizhub.wustl.edu/public/virus/virus.png",

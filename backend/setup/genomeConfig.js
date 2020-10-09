@@ -199,10 +199,18 @@ const sacCer3 = [
     },
 ];
 
-const pfal3d7 = [
+const Pfal3D7 = [
     {
         name: "PlasmoDBGene",
         file: "PlasmoDB9Gene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const Creinhardtii506 = [
+    {
+        name: "PhytozomeGene",
+        file: "Creinhardtii506_load",
         fieldsConfig: geneFieldsAndIndex,
     },
 ];
@@ -223,8 +231,9 @@ const genomeConfig = {
     galGal6,
     ce11,
     sacCer3,
-    pfal3d7,
+    Pfal3D7,
     dm6,
+    Creinhardtii506,
 };
 
 module.exports = genomeConfig;
