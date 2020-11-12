@@ -19,8 +19,9 @@ class BigSourceWorker extends WorkerRunnableSource {
     constructor(url) {
         super();
         this.url = url;
+        const opts = {credentials: this.url.includes('4dnucleome') ? process.env.REACT_APP_4DN_KEY : undefined}
         this.bigWigPromise = new Promise((resolve, reject) => {
-            bigwig.makeBwg(new bin.URLFetchable(url), (bigWigObj, error) => {
+            bigwig.makeBwg(new bin.URLFetchable(url, opts), (bigWigObj, error) => {
                 if (error) {
                     reject(error);
                 }

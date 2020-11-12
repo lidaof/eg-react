@@ -236,7 +236,8 @@ URLFetchable.prototype.fetch = function(callback, opts) {
       }
     };
     if (this.opts.credentials) {
-      req.withCredentials = true;
+      // req.withCredentials = true;
+      req.setRequestHeader("Authorization", this.opts.credentials);
     }
     req.send('');
   } catch (e) {

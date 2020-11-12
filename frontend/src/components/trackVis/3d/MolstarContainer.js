@@ -19,11 +19,16 @@ class MolstarContainer extends React.PureComponent {
         this.visualG3d();
     }
 
-    visualG3d = () => {
+    visualG3d = async () => {
         const { tracks } = this.props;
         const trackModel = tracks[0];
         const mol = new Molstar3D(this.myRef.current);
-        mol.init({ url: trackModel.url });
+        await mol.init({ url: trackModel.url });
+        mol.showChrom3dStruct('chr7');
+        mol.showRegion3dStruct('chr7', 2000000, 7000000);
+        // mol.decorChrom3d();
+        mol.decorRegion3d();
+        await mol.final();
     };
 
     render() {

@@ -49,9 +49,13 @@ export class HicSource extends DataSource {
         let config;
         if (typeof url === "string") {
             config = { url };
+            if(url.includes('4dnucleome')) {
+                config = {url, headers: {Authorization : process.env.REACT_APP_4DN_KEY}}
+            }
         } else {
             config = { blob: url };
         }
+        // console.log(config)
         this.straw = new HicStraw(config);
         // this.datasetPromise = this.straw.reader.loadDataset({});
         // this.metadataPromise = null;

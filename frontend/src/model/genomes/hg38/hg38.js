@@ -93,7 +93,7 @@ const publicHubList = [
     },
     {
         collection: "4D Nucleome Network",
-        name: "4DN HiC datasets",
+        name: "4DN datasets",
         numTracks: 344,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~dli/eg-hubs/4dn/2019/4dn-human.json",

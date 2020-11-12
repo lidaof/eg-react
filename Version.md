@@ -1,5 +1,9 @@
 # Version History
 
+## 52.2.0
+
+-   add the API key and secret for accessing 4DN tracks
+
 ## 52.1.0
 
 -   added new genome `Plasmodium falciparum (Pfal3D7)`
