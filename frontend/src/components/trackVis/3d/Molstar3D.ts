@@ -7,7 +7,7 @@
 
 import { createPlugin, DefaultPluginSpec } from "molstar/lib/mol-plugin";
 import { PluginContext } from "molstar/lib/mol-plugin/context";
-import { AnimateUnitsExplode } from "molstar/lib/mol-plugin-state/animation/built-in";
+import { AnimateUnitsExplode } from "molstar/lib/mol-plugin-state/animation/built-in/explode-units";
 import { PluginSpec } from "molstar/lib/mol-plugin/spec";
 import { ObjectKeys } from "molstar/lib/mol-util/type-helpers";
 import { PluginLayoutControlsDisplay } from "molstar/lib/mol-plugin/layout";
@@ -19,6 +19,7 @@ import { DataFormatProvider } from "molstar/lib/mol-plugin-state/formats/provide
 import { stringToWords } from "molstar/lib/mol-util/string";
 import { PluginConfig } from "molstar/lib/mol-plugin/config";
 import { DecorateResiduesWithAnnotations } from './MolstarColoring';
+import { PluginCommands } from 'molstar/lib/mol-plugin/commands';
 require("molstar/lib/mol-plugin-ui/skin/light.scss");
 
 const CustomFormats = [["g3d", G3dProvider] as const];
@@ -43,11 +44,22 @@ type InitParams = {
     resolution?: number;
 };
 
+type GenomicRegion = {
+    chrom: string,
+    start: number,
+    end: number,
+}
+
 class Molstar3D {
     plugin: PluginContext;
-    components: any;
-    chromVisualSelector: any;
-    regionVisualSelector: any;
+    chrom3dComponents: any;
+    region3dComponents: any;
+    chromSelectionSelectors: any;
+    regionSelectionSelectors: any;
+    structure: any;
+    builder: any;
+    model: any;
+    trajectory: any;
 
     constructor(target: HTMLElement, options: Partial<ViewerOptions> = {}) {
         const o = { ...DefaultViewerOptions, ...options };
@@ -75,7 +87,8 @@ class Molstar3D {
                 remoteState: "none",
             },
         });
-        this.components= null;
+        this.chromSelectionSelectors = [];
+        this.regionSelectionSelectors = [];
     }
 
     async init(params: InitParams) {
@@ -84,23 +97,23 @@ class Molstar3D {
             this.plugin.representation.structure.themes.colorThemeRegistry.add(DecorateResiduesWithAnnotations.colorThemeProvider!);
             this.plugin.managers.lociLabels.addProvider(DecorateResiduesWithAnnotations.labelProvider!);
             this.plugin.customModelProperties.register(DecorateResiduesWithAnnotations.propertyProvider, true);
-            const trajectory = await this.plugin
+            this.trajectory = await this.plugin
                 .build()
                 .toRoot()
                 .apply(G3DHeaderFromUrl, { url: params.url })
                 .apply(G3DTrajectory, { resolution: params.resolution })
                 .commit();
 
-            const builder = this.plugin.builders.structure;
-            const model = await builder.createModel(trajectory);
+            this.builder = this.plugin.builders.structure;
+            this.model = await this.builder.createModel(this.trajectory);
 
-            if (!model) return;
-            const structure = await builder.createStructure(model);
+            if (!this.model) return;
+            this.structure = await this.builder.createStructure(this.model);
 
-            const info = G3dInfoDataProperty.get(model.data!);
+            const info = G3dInfoDataProperty.get(this.model.data!);
             if (!info) return;
 
-            this.components = this.plugin.build().to(structure);
+            const components = this.plugin.build().to(this.structure);
 
             const repr = createStructureRepresentationParams(this.plugin, void 0, {
                 type: 'cartoon',
@@ -111,14 +124,20 @@ class Molstar3D {
             });
         
             for (const h of info.haplotypes) {
-                this.components
+                components
                     .apply(StateTransforms.Model.StructureSelectionFromExpression, { expression: g3dHaplotypeQuery(h), label: stringToWords(h) })
                     .apply(StateTransforms.Representation.StructureRepresentation3D, repr);
             }
+            await components.commit();
         });
     }
 
-    showChrom3dStruct = (chrom: string) => {
+    /**
+     * 
+     * @param chroms chromosome name string
+     * input a list of chrom names in case region spans more than 1 chrom
+     */
+    showChroms3dStruct = async (chroms: string[]) => {
         // show struct of chromosome
         const reprChrom = createStructureRepresentationParams(this.plugin, void 0, {
             type: 'cartoon',
@@ -127,11 +146,26 @@ class Molstar3D {
             sizeParams: { value: 0.25 },
             typeParams: { alpha: 0.2 }
         });
-        this.chromVisualSelector = this.components.apply(StateTransforms.Model.StructureSelectionFromExpression, { expression: g3dChromosomeQuery(chrom), label: chrom })
-            .apply(StateTransforms.Representation.StructureRepresentation3D, reprChrom).selector;
+        if(this.chromSelectionSelectors.length) {
+            // remove first
+            this.chromSelectionSelectors.forEach((selector: any) => PluginCommands.State.RemoveObject(this.plugin, {state: this.plugin.state.data, ref: selector}))
+            this.chromSelectionSelectors = []
+        }
+        chroms.forEach(async chrom => {
+            const components = this.plugin.build().to(this.structure);
+            const chromSelection = components.apply(StateTransforms.Model.StructureSelectionFromExpression, { expression: g3dChromosomeQuery(chrom), label: chrom });
+            this.chromSelectionSelectors.push(chromSelection.selector);
+            chromSelection.apply(StateTransforms.Representation.StructureRepresentation3D, reprChrom);
+            await components.commit();
+        });
     }
 
-    showRegion3dStruct = (chrom: string, start: number, end: number) => {
+    /**
+     * 
+     * @param regions GenomicRegion[]
+     * when region spans more than 1 chrom, split to a list of regions
+     */
+    showRegions3dStruct = async (regions: GenomicRegion[]) => {
         // show struct of a particular region
         const reprRegion = createStructureRepresentationParams(this.plugin, void 0, {
             type: 'cartoon',
@@ -140,26 +174,32 @@ class Molstar3D {
             sizeParams: { value: 0.25 },
             typeParams: { alpha: 1 }
         });
-        this.regionVisualSelector = this.components.apply(StateTransforms.Model.StructureSelectionFromExpression, { expression: g3dRegionQuery(chrom, start, end), label: `${chrom}:${start}-${end}` })
-            .apply(StateTransforms.Representation.StructureRepresentation3D, reprRegion).selector;
+        if(this.regionSelectionSelectors.length) {
+            // remove first
+            this.regionSelectionSelectors.forEach((selector: any) => PluginCommands.State.RemoveObject(this.plugin, {state: this.plugin.state.data, ref: selector}))
+            this.regionSelectionSelectors = []
+        }
+        regions.forEach(async region => {
+            const components = this.plugin.build().to(this.structure);
+            const regionSelection = components.apply(StateTransforms.Model.StructureSelectionFromExpression, { expression: g3dRegionQuery(region.chrom, region.start, region.end), label: `${region.chrom}:${region.start}-${region.end}` });
+            this.regionSelectionSelectors.push(regionSelection.selector);
+            regionSelection.apply(StateTransforms.Representation.StructureRepresentation3D, reprRegion);
+            await components.commit();
+        });
     }
 
-    decorChrom3d = () => {
-        const colorTheme = { name: DecorateResiduesWithAnnotations.propertyProvider.descriptor.name, params: this.plugin.representation.structure.themes.colorThemeRegistry.get(DecorateResiduesWithAnnotations.propertyProvider.descriptor.name).defaultValues };
-        this.components.to(this.chromVisualSelector).update(StateTransforms.Representation.StructureRepresentation3D, (old:any) => ({ ...old, colorTheme }));
+    // decorChrom3d = () => {
+    //     const colorTheme = { name: DecorateResiduesWithAnnotations.propertyProvider.descriptor.name, params: this.plugin.representation.structure.themes.colorThemeRegistry.get(DecorateResiduesWithAnnotations.propertyProvider.descriptor.name).defaultValues };
+    //     this.components.to(this.chromVisualSelector).update(StateTransforms.Representation.StructureRepresentation3D, (old:any) => ({ ...old, colorTheme }));
             
-    }
+    // }
 
-    decorRegion3d = () => {
-        console.log(DecorateResiduesWithAnnotations)
-        const colorTheme = { name: DecorateResiduesWithAnnotations.propertyProvider.descriptor.name, params: this.plugin.representation.structure.themes.colorThemeRegistry.get(DecorateResiduesWithAnnotations.propertyProvider.descriptor.name).defaultValues };
-        this.components.to(this.regionVisualSelector).update(StateTransforms.Representation.StructureRepresentation3D, (old:any) => ({ ...old, colorTheme }));
+    // decorRegion3d = () => {
+    //     console.log(DecorateResiduesWithAnnotations)
+    //     const colorTheme = { name: DecorateResiduesWithAnnotations.propertyProvider.descriptor.name, params: this.plugin.representation.structure.themes.colorThemeRegistry.get(DecorateResiduesWithAnnotations.propertyProvider.descriptor.name).defaultValues };
+    //     this.components.to(this.regionVisualSelector).update(StateTransforms.Representation.StructureRepresentation3D, (old:any) => ({ ...old, colorTheme }));
             
-    }
-
-    final = async () => {
-        await this.components.commit();
-    }
+    // }
 }
 
 export default Molstar3D;

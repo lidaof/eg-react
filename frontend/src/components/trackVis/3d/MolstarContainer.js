@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import TrackModel from "model/TrackModel";
 import DisplayedRegionModel from "model/DisplayedRegionModel";
 import Molstar3D from "./Molstar3D";
+import { arraysEqual } from "../../../util";
 
 class MolstarContainer extends React.PureComponent {
     static propTypes = {
@@ -13,22 +14,48 @@ class MolstarContainer extends React.PureComponent {
     constructor(props) {
         super(props);
         this.myRef = React.createRef();
+        this.mol = null;
     }
 
     componentDidMount() {
         this.visualG3d();
     }
 
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        if(this.mol) {
+            if(prevProps.viewRegion !== this.props.viewRegion) {
+                const chroms = this.viewRegionToChroms()
+                const regions = this.viewRegionToRegions();
+                const prevChroms = prevProps.viewRegion.getFeatureSegments().map(region => region.getName());
+                if(!arraysEqual(prevChroms, chroms)){
+                    this.mol.showChroms3dStruct(chroms);
+                }
+                this.mol.showRegions3dStruct(regions);
+            }
+        }
+    }
+
+    viewRegionToChroms = () => {
+        const regions = this.props.viewRegion.getFeatureSegments();
+        return regions.map(region => region.getName());
+    }
+
+    viewRegionToRegions = () => {
+        const regions = this.props.viewRegion.getFeatureSegments();
+        return regions.map(region => ({chrom: region.getName(), start: region.relativeStart, end: region.relativeEnd}))
+    }
+
     visualG3d = async () => {
         const { tracks } = this.props;
         const trackModel = tracks[0];
-        const mol = new Molstar3D(this.myRef.current);
-        await mol.init({ url: trackModel.url });
-        mol.showChrom3dStruct('chr7');
-        mol.showRegion3dStruct('chr7', 2000000, 7000000);
+        this.mol = new Molstar3D(this.myRef.current);
+        await this.mol.init({ url: trackModel.url });
+        const chroms = this.viewRegionToChroms()
+        const regions = this.viewRegionToRegions();
+        this.mol.showChroms3dStruct(chroms);
+        this.mol.showRegions3dStruct(regions);
         // mol.decorChrom3d();
-        mol.decorRegion3d();
-        await mol.final();
+        // this.mol.decorRegion3d();
     };
 
     render() {
