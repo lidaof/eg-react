@@ -189,14 +189,14 @@ class NumericalTrack extends React.PureComponent {
         } else {
             xToValue2BeforeSmooth = [];
         }
-        if (options.yScale === ScaleChoices.FIXED && options.yMin !== undefined) {
-            xToValue2BeforeSmooth = xToValue2BeforeSmooth.map((x) => {
-                if (x >= options.yMin) {
-                    return x;
-                }
-                return undefined;
-            });
-        }
+        // if (options.yScale === ScaleChoices.FIXED && options.yMin !== undefined) {
+        //     xToValue2BeforeSmooth = xToValue2BeforeSmooth.map((x) => {
+        //         if (x >= options.yMin) {
+        //             return x;
+        //         }
+        //         return undefined;
+        //     });
+        // }
         const smoothNumber = Number.parseInt(smooth) || 0;
         this.xToValue2 = smoothNumber === 0 ? xToValue2BeforeSmooth : Smooth(xToValue2BeforeSmooth, smoothNumber);
         const xValues2 = this.xToValue2.filter((x) => x);
@@ -221,7 +221,7 @@ class NumericalTrack extends React.PureComponent {
         );
         const visualizer = this.hasReverse ? (
             <React.Fragment>
-                <HoverTooltipContext tooltipRelativeY={halfHeight} getTooltipContents={this.renderTooltip}>
+                <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip}>
                     <ValuePlot
                         xToValue={this.xToValue}
                         scales={this.scales}
@@ -296,7 +296,6 @@ class ValuePlot extends React.PureComponent {
         const y = value > 0 ? scales.valueToY(value) : scales.valueToYReverse(value);
         let drawY = value > 0 ? y : 0;
         let drawHeight = value > 0 ? height - y : y;
-
         if (isDrawingBars) {
             // const y = scales.valueToY(value);
             // const drawHeight = height - y;

@@ -15,7 +15,8 @@ export const SORTED_BIN_SIZES = [2500000, 1000000, 500000, 250000, 100000, 50000
 
 export enum NormalizationMode {
     NONE = "NONE",
-    KR = "KR",
-    VC_SQRT = "VC_SQRT",
-    VC = "VC",
+    Coverage = "VC",
+    "Coverage - Sqrt" = "VC_SQRT",
+    Balanced = "KR",
+    SCALE = "SCALE",
 }

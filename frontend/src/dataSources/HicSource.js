@@ -1,6 +1,7 @@
 import _ from "lodash";
 // import Straw from 'hic-straw/src/straw';
-import HicStraw from "hic-straw/dist/hic-straw";
+// import HicStraw from "hic-straw/dist/hic-straw";
+import HicStraw from "hic-straw/dist/hic-straw.esm.js";
 import DataSource from "./DataSource";
 import ChromosomeInterval from "../model/interval/ChromosomeInterval";
 import { NormalizationMode } from "../model/HicDataModes";
@@ -71,12 +72,12 @@ export class HicSource extends DataSource {
      *
      * @return {Promise<void>} a promise that resolves when normalization data is finished loading
      */
-    fetchNormalizationData() {
-        if (!this.normVectorsPromise) {
-            this.normVectorsPromise = this.straw.hicFile.readNormExpectedValuesAndNormVectorIndex();
-        }
-        return this.normVectorsPromise;
-    }
+    // fetchNormalizationData() {
+    //     if (!this.normVectorsPromise) {
+    //         this.normVectorsPromise = this.straw.hicFile.readNormExpectedValuesAndNormVectorIndex();
+    //     }
+    //     return this.normVectorsPromise;
+    // }
 
     /**
      * Returns the largest bin size such at least MIN_BINS_PER_REGION fit in a region of the provided length.  If no such
@@ -124,10 +125,13 @@ export class HicSource extends DataSource {
         // if (normalization !== NormalizationMode.NONE) {
         //     await this.fetchNormalizationData();
         // }
+        // console.log(this.normOptions)
         if (!this.normOptions.includes(normalization)) {
             return [];
         }
+        // console.log(normalization, queryLocus1, queryLocus2, "BP", binSize)
         const records = await this.straw.getContactRecords(normalization, queryLocus1, queryLocus2, "BP", binSize);
+        // console.log(records)
         const interactions = [];
         for (const record of records) {
             const recordLocus1 = new ChromosomeInterval(
