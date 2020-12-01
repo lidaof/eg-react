@@ -21,6 +21,12 @@ import SARS from "./virus/sars";
 import MERS from "./virus/mers";
 import nCoV2019 from "./virus/nCoV2019";
 import LEPOCU1 from "./lepOcu1/lepOcu1";
+import panTro4 from "./panTro4/panTro4";
+import gorGor3 from "./gorGor3/gorGor3";
+import nomLeu3 from "./nomLeu3/nomLeu3";
+import papAnu2 from "./papAnu2/papAnu2";
+import rheMac3 from "./rheMac3/rheMac3";
+import calJac3 from "./calJac3/calJac3";
 import Pfal3D7 from "./Pfal3D7/Pfal3D7";
 import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
 import { GenomeConfig } from "./GenomeConfig";
@@ -29,31 +35,37 @@ import { GenomeConfig } from "./GenomeConfig";
  * All available genomes.
  */
 export const allGenomes = [
-    HG19,
-    HG38,
-    MM10,
-    MM9,
-    PANTRO5,
-    PANTRO6,
-    BosTau8,
-    DAN_RER10,
-    DAN_RER11,
-    RN6,
-    AraTha1,
-    RheMac8,
-    GalGal6,
-    GalGal5,
-    DM6,
-    CE11,
-    APLCAL3,
-    SACCER3,
-    Ebola,
-    SARS,
-    MERS,
-    nCoV2019,
-    LEPOCU1,
-    Pfal3D7,
-    Creinhardtii506,
+  HG19,
+  HG38,
+  MM10,
+  MM9,
+  PANTRO5,
+  BosTau8,
+  DAN_RER10,
+  DAN_RER11,
+  RN6,
+  AraTha1,
+  RheMac8,
+  GalGal6,
+  GalGal5,
+  DM6,
+  CE11,
+  APLCAL3,
+  SACCER3,
+  Ebola,
+  SARS,
+  MERS,
+  nCoV2019,
+  LEPOCU1,
+  panTro4,
+  gorGor3,
+  nomLeu3,
+  papAnu2,
+  rheMac3,
+  calJac3,
+  PANTRO6,
+  Pfal3D7,
+  Creinhardtii506,
 ];
 
 const genomeNameToConfig = {};
@@ -73,91 +85,112 @@ interface SpeciesConfig {
 }
 
 export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
-    human: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
-        assemblies: [HG19.genome.getName(), HG38.genome.getName()],
-        color: "white",
-    },
-    chimp: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
-        assemblies: [PANTRO6.genome.getName(), PANTRO5.genome.getName()],
-        color: "white",
-    },
-    rhesus: {
-        logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
-        assemblies: [RheMac8.genome.getName()],
-        color: "yellow",
-    },
-    cow: {
-        logoUrl: "https://vizhub.wustl.edu/public/bosTau8/Cow.png",
-        assemblies: [BosTau8.genome.getName()],
-        color: "yellow",
-    },
-    mouse: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Mouse.png",
-        assemblies: [MM10.genome.getName(), MM9.genome.getName()],
-        color: "yellow",
-    },
-    rat: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Rat.png",
-        assemblies: [RN6.genome.getName()],
-        color: "white",
-    },
-    chicken: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chicken.png",
-        assemblies: [GalGal6.genome.getName(), GalGal5.genome.getName()],
-        color: "yellow",
-    },
-    zebrafish: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
-        assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName()],
-        color: "yellow",
-    },
-    "spotted Gar": {
-        logoUrl: "https://vizhub.wustl.edu/public/lepOcu1/SpottedGar.png",
-        assemblies: [LEPOCU1.genome.getName()],
-        color: "white",
-    },
-    "fruit fly": {
-        logoUrl: "https://epigenomegateway.wustl.edu/legacy/images/Fruit%20fly.png",
-        assemblies: [DM6.genome.getName()],
-        color: "white",
-    },
-    "c.elegans": {
-        logoUrl: "https://epigenomegateway.wustl.edu/legacy/images/C.elegans.png",
-        assemblies: [CE11.genome.getName()],
-        color: "black",
-    },
-    arabidopsis: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png",
-        assemblies: [AraTha1.genome.getName()],
-        color: "yellow",
-    },
-    seahare: {
-        logoUrl: "https://vizhub.wustl.edu/public/aplCal3/seaHare.png",
-        assemblies: [APLCAL3.genome.getName()],
-        color: "white",
-    },
-    yeast: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Yeast.png",
-        assemblies: [SACCER3.genome.getName()],
-        color: "black",
-    },
-    "P. falciparum": {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Pfalciparum.png",
-        assemblies: [Pfal3D7.genome.getName()],
-        color: "black",
-    },
-    "Green algae": {
-        logoUrl: "https://vizhub.wustl.edu/public/Creinhardtii506/Creinhardtii506.png",
-        assemblies: [Creinhardtii506.genome.getName()],
-        color: "yellow",
-    },
-    virus: {
-        logoUrl: "https://vizhub.wustl.edu/public/virus/virus.png",
-        assemblies: [nCoV2019.genome.getName(), MERS.genome.getName(), SARS.genome.getName(), Ebola.genome.getName()],
-        color: "yellow",
-    },
+  human: {
+    logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
+    assemblies: [HG19.genome.getName(), HG38.genome.getName()],
+    color: "white"
+  },
+  chimp: {
+    logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
+    assemblies: [PANTRO6.genome.getName(), PANTRO5.genome.getName(), panTro4.genome.getName()],
+    color: "white"
+  },
+  gorilla: {
+    logoUrl: "",
+    assemblies: [gorGor3.genome.getName()],
+    color: "red"
+  },
+  gibbon: {
+    logoUrl: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/nomLeu3/nomleu.jpg",
+    assemblies: [nomLeu3.genome.getName()],
+    color: "red"
+  },
+  baboon: {
+    logoUrl: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/papanu.jpg",
+    assemblies: [papAnu2.genome.getName()],
+    color: "red"
+  },
+  rhesus: {
+    logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
+    assemblies: [RheMac8.genome.getName(), rheMac3.genome.getName()],
+    color: "yellow"
+  },
+  marmoset: {
+    logoUrl: "",
+    assemblies: [calJac3.genome.getName()],
+    color: "red"
+  },
+  cow: {
+    logoUrl: "https://vizhub.wustl.edu/public/bosTau8/Cow.png",
+    assemblies: [BosTau8.genome.getName()],
+    color: "yellow"
+  },
+  mouse: {
+    logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Mouse.png",
+    assemblies: [MM10.genome.getName(), MM9.genome.getName()],
+    color: "yellow"
+  },
+  rat: {
+    logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Rat.png",
+    assemblies: [RN6.genome.getName()],
+    color: "white"
+  },
+  chicken: {
+    logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chicken.png",
+    assemblies: [GalGal6.genome.getName(), GalGal5.genome.getName()],
+    color: "yellow"
+  },
+  zebrafish: {
+    logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
+    assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName()],
+    color: "yellow"
+  },
+  "spotted Gar": {
+    logoUrl: "https://vizhub.wustl.edu/public/lepOcu1/SpottedGar.png",
+    assemblies: [LEPOCU1.genome.getName()],
+    color: "white"
+  },
+  "fruit fly": {
+    logoUrl: "https://epigenomegateway.wustl.edu/legacy/images/Fruit%20fly.png",
+    assemblies: [DM6.genome.getName()],
+    color: "white"
+  },
+  "c.elegans": {
+    logoUrl: "https://epigenomegateway.wustl.edu/legacy/images/C.elegans.png",
+    assemblies: [CE11.genome.getName()],
+    color: "black"
+  },
+  arabidopsis: {
+    logoUrl:
+      "https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png",
+    assemblies: [AraTha1.genome.getName()],
+    color: "yellow"
+  },
+  seahare: {
+    logoUrl: "https://vizhub.wustl.edu/public/aplCal3/seaHare.png",
+    assemblies: [APLCAL3.genome.getName()],
+    color: "white"
+  },
+  yeast: {
+    logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Yeast.png",
+    assemblies: [SACCER3.genome.getName()],
+    color: "black"
+  },
+  "P. falciparum": {
+      logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Pfalciparum.png",
+      assemblies: [Pfal3D7.genome.getName()],
+      color: "black",
+  },
+  "Green algae": {
+      logoUrl: "https://vizhub.wustl.edu/public/Creinhardtii506/Creinhardtii506.png",
+      assemblies: [Creinhardtii506.genome.getName()],
+      color: "yellow",
+  },
+  virus: {
+      logoUrl: "https://vizhub.wustl.edu/public/virus/virus.png",
+      assemblies: [nCoV2019.genome.getName(), MERS.genome.getName(), SARS.genome.getName(), Ebola.genome.getName()],
+      color: "yellow",
+  },
 };
 
 /**

@@ -1,0 +1,41 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "refGene",
+            "label": "RefSeq genes",
+            "filetype": "geneAnnotation"
+        },
+        {
+            "name": "ensembl",
+            "label": "Ensembl genes",
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/papAnu2_rmsk.bb",
+                "height": 30
+            }
+        ]
+    },
+    "Genome Comparison": [
+        {
+            "name": "hg19topapAnu2",
+            "label": "Human hg19 to papAnu2 blastz",
+            "querygenome": "hg19",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/papAnu2_hg19.gz"
+        }
+    ]
+}
