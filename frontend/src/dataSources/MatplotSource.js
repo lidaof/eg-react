@@ -6,7 +6,7 @@ class MatplotSource extends DataSource {
         super();
         this.sources = [];
         this.configs = [];
-        trackModel.tracks.forEach(model => {
+        trackModel.tracks.forEach((model) => {
             const config = getTrackConfig(model);
             const source = config.initDataSource();
             this.configs.push(config);
@@ -15,8 +15,10 @@ class MatplotSource extends DataSource {
     }
 
     async getData(region, basesPerPixel, options) {
-        const dataForEachSource = await Promise.all(this.sources.map(source => source.getData(region)));
-        const formatedData = dataForEachSource.map((d,i) => this.configs[i].formatData(d));
+        const dataForEachSource = await Promise.all(
+            this.sources.map((source) => source.getData(region, basesPerPixel, options))
+        );
+        const formatedData = dataForEachSource.map((d, i) => this.configs[i].formatData(d));
         return formatedData;
     }
 }

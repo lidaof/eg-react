@@ -4,6 +4,7 @@ import MM10 from "./mm10/mm10";
 import DAN_RER10 from "./danRer10/danRer10";
 import DAN_RER11 from "./danRer11/danRer11";
 import PANTRO5 from "./panTro5/panTro5";
+import PANTRO6 from "./panTro6/panTro6";
 import RN6 from "./rn6/rn6";
 import MM9 from "./mm9/mm9";
 import BosTau8 from "./bosTau8/bosTau8";
@@ -26,6 +27,8 @@ import nomLeu3 from "./nomLeu3/nomLeu3";
 import papAnu2 from "./papAnu2/papAnu2";
 import rheMac3 from "./rheMac3/rheMac3";
 import calJac3 from "./calJac3/calJac3";
+import Pfal3D7 from "./Pfal3D7/Pfal3D7";
+import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
 import { GenomeConfig } from "./GenomeConfig";
 
 /**
@@ -59,28 +62,30 @@ export const allGenomes = [
   nomLeu3,
   papAnu2,
   rheMac3,
-  calJac3
+  calJac3,
+  PANTRO6,
+  Pfal3D7,
+  Creinhardtii506,
 ];
 
 const genomeNameToConfig = {};
 for (const config of allGenomes) {
-  const genomeName = config.genome.getName();
-  if (genomeNameToConfig[genomeName]) {
-    // We need this, because when saving session, we save the genome name.
-    throw new Error(
-      `Two genomes have the same name ${genomeName}.  Refusing to continue!`
-    );
-  }
-  genomeNameToConfig[genomeName] = config;
+    const genomeName = config.genome.getName();
+    if (genomeNameToConfig[genomeName]) {
+        // We need this, because when saving session, we save the genome name.
+        throw new Error(`Two genomes have the same name ${genomeName}.  Refusing to continue!`);
+    }
+    genomeNameToConfig[genomeName] = config;
 }
 
 interface SpeciesConfig {
-  logoUrl: string;
-  assemblies: string[];
-  color: string;
+    logoUrl: string;
+    assemblies: string[];
+    color: string;
 }
 
 export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
+<<<<<<< HEAD
   human: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
     assemblies: [HG19.genome.getName(), HG38.genome.getName()],
@@ -88,7 +93,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   chimp: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
-    assemblies: [PANTRO5.genome.getName(), panTro4.genome.getName()],
+    assemblies: [PANTRO6.genome.getName(), PANTRO5.genome.getName(), panTro4.genome.getName()],
     color: "white"
   },
   gorilla: {
@@ -172,16 +177,21 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     assemblies: [SACCER3.genome.getName()],
     color: "black"
   },
+  "P. falciparum": {
+      logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Pfalciparum.png",
+      assemblies: [Pfal3D7.genome.getName()],
+      color: "black",
+  },
+  "Green algae": {
+      logoUrl: "https://vizhub.wustl.edu/public/Creinhardtii506/Creinhardtii506.png",
+      assemblies: [Creinhardtii506.genome.getName()],
+      color: "yellow",
+  },
   virus: {
-    logoUrl: "https://vizhub.wustl.edu/public/virus/virus.png",
-    assemblies: [
-      nCoV2019.genome.getName(),
-      MERS.genome.getName(),
-      SARS.genome.getName(),
-      Ebola.genome.getName()
-    ],
-    color: "yellow"
-  }
+      logoUrl: "https://vizhub.wustl.edu/public/virus/virus.png",
+      assemblies: [nCoV2019.genome.getName(), MERS.genome.getName(), SARS.genome.getName(), Ebola.genome.getName()],
+      color: "yellow",
+  },
 };
 
 /**
@@ -189,14 +199,14 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
  * @return {GenomeConfig} the genome's configuration object, or null if no such genome exists.
  */
 export function getGenomeConfig(genomeName: string): GenomeConfig {
-  return genomeNameToConfig[genomeName] || null;
+    return genomeNameToConfig[genomeName] || null;
 }
 
 export function getSpeciesInfo(genomeName: string) {
-  for (const [species, details] of Object.entries(treeOfLife)) {
-    if (details.assemblies.includes(genomeName)) {
-      return { name: species, logo: details.logoUrl, color: details.color };
+    for (const [species, details] of Object.entries(treeOfLife)) {
+        if (details.assemblies.includes(genomeName)) {
+            return { name: species, logo: details.logoUrl, color: details.color };
+        }
     }
-  }
-  return { name: "", logo: "", color: "" };
+    return { name: "", logo: "", color: "" };
 }

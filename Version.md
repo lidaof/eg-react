@@ -1,5 +1,82 @@
 # Version History
 
+## 52.1.0
+
+-   added new genome `Plasmodium falciparum (Pfal3D7)`
+-   fixed one bug that bam track at density mode not showing y scale config
+-   fixed a bug when load `g3d` track from datahub caused browser track facet table lost
+-   fixed issue #111 and #176 for long range track data filtering
+-   add option to avoid use firebase database by remove session/live function (see doc for details)
+
+## 52.0.0
+
+-   upgrade dependent packages: react, react-dom -> 16.13.1
+-   supports nodejs v12+
+-   SARS-CoV-2 hubs updated by Fan
+-   fixed a `smooth` option caused display issue (related to #163)
+-   improved window/container resize listener using ResizeObserver API
+-   improved responsive layout of navigation menu and tools bar
+-   modified vendor `bigwig.js` to support chromosome names like `chr1` or `1`
+-   introduced image track:
+    ![image track example](https://eg.readthedocs.io/en/latest/_images/image_track_example.png "image track example")
+
+## 51.0.6
+
+-   track file information can be displayed with track data (like resolution and normalization for `hic`, `g3d` track etc)
+-   new 'snv' track for display sequence variations from reference
+-   update hubs of virus genomes
+
+## 51.0.5
+
+-   updated SARS-CoV-2 publib hubs and default tracks
+-   enabled tracks can be loaded from both hub url and previous session storage with new URL parameter `hubSessionStorage`
+-   fixed a `qBed` when mouseover outside of the track caused TypeError bug
+-   fixed a bug that remote hub load button not working in Firefox
+
+## 51.0.4
+
+-   add dynamic arc view for dynamic hic tracks
+-   fixed a bug arc with negative score not show up in screenshot
+-   dynamic colors `dynamicColors` are supported for all dynamic tracks
+
+## 51.0.3
+
+-   add a new option `greedyTooltip` for arc display of chromatin interaction data, this option will show more than one interaction from same 2 loci if exists
+-   track type `callingcard` renamed to 'qBed'
+-   update `hic-straw` package
+
+## 51.0.2
+
+-   fixed a crash bug when reize window with a dynamic bedgraph track
+-   added dynamic labels to dynamic tracks
+-   fixed a bug when zooming in a dynamic bedgraph data not show
+
+## 51.0.1
+
+-   add tooltip for dynamic hic track
+-   fixed one bug when `bigwig` files have just one zoomLevel causing `data fetch error`
+-   a new option `alwaysDrawLabel` added to `bed` and `categorical` track for telling the browser always render the label
+-   update nCoV2019 public hubs
+
+## 51.0.0
+
+-   added dynamic numerical track
+-   added dynamic plot menu for >=2 numerical tracks
+-   fixed a `virusBrowserMode` bug (redirected to main page) introduced in last few commits
+-   fixed a bug long-range track data cannot have dot in chromosome names
+-   added an option `zoomLevel` for `bigwig` track
+-   changed custom track menu to remote track for better distinguish from local track
+-   added dynamic hic plot track/menu
+-   updated public hubs for nCoV2019
+
+## 50.4.0
+
+-   added 4 virus genomes for aiding virus research
+-   global URL parameter `virusBrowserMode` added
+-   VR freeze issue fixed
+-   VR mode supports `longrange` track type now, thanks Silas for the help
+-   certain public hubs added to 2019-nCoV by Changxu Fan
+
 ## 50.3.6
 
 -   added sea hare genome (aplCal3) by Xiaoyu
@@ -74,7 +151,7 @@
 
 -   added chicken genome `galGal6` and `galGal5`
 -   a `flatarc` mode added for chromatin interacion track:
-    ![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png "Flat arc mode]")
+    ![flat arc mode](https://eg.readthedocs.io/en/latest/_images/flatarc.png "Flat arc mode")
 -   fixed a metadata bug when define customized color
 
 ## 48.5.2

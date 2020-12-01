@@ -1,0 +1,27 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "refGene",
+            "label": "RefSeq genes",
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://vizhub.wustl.edu/public/panTro6/panTro6.bb",
+                "height": 30
+            }
+        ]
+    }
+}

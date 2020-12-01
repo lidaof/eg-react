@@ -56,7 +56,7 @@ class SingleInputConfig extends React.PureComponent {
      * 
      * @param {Object} nextProps - next props as specified by React
      */
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.optionsObjects !== nextProps.optionsObjects) {
             const {optionsObjects, optionName, defaultValue, multiValue} = nextProps;
             this.setState({ inputValue: aggregateOptions(optionsObjects, optionName, defaultValue, multiValue) });

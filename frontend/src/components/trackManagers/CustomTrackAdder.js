@@ -13,15 +13,16 @@ import { TrackOptionsUI } from "./TrackOptionsUI";
 // const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'cool', 'bam'];
 
 export const TRACK_TYPES = {
-    Numerical: ["bigWig", "bedGraph"],
+    Numerical: ["bigWig", "bedGraph", "qBED"],
     Annotation: ["bed", "bigBed", "refBed"],
     Categorical: ["categorical"],
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange"],
     Repeats: ["repeatmasker"],
-    Alignment: ["bam", "pairwise"],
-    Callingcard: ["callingcard"],
-    "3D Structure": ["g3d"]
+    Alignment: ["bam", "pairwise", "snv", "snv2"],
+    "3D Structure": ["g3d"],
+    Dynamic: ["dbedgraph"],
+    Image: ["omero4dn", "omeroidr"],
 };
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
@@ -40,9 +41,14 @@ const TYPES_DESC = {
     bigInteract: "long range interaction data in bigInteract format",
     cool: "long range interaction data in cool format, use data uuid instead of URL",
     bam: "reads alignment data",
-    pairwise: "pairwise alignment data",
-    callingcard: "calling card data",
-    g3d: "3D structure in .g3d format"
+    pairwise: "pairwise nucleotide alignment data (same as snv)",
+    snv: "pairwise nucleotide alignment data",
+    snv2: "pairwise nucleotide alignment data with amino acid level mutations",
+    qBED: "quantized numerical data, processed by tabix in .gz format",
+    g3d: "3D structure in .g3d format",
+    dbedgraph: "Dynamic bedgraph data",
+    omero4dn: "image data from 4DN (4D Nucleome Data Portal)",
+    omeroidr: "image data from IDR (Image Data Resource)",
 };
 
 /**
@@ -57,7 +63,7 @@ class CustomTrackAdder extends React.Component {
         onTracksAdded: PropTypes.func,
         onAddTracksToPool: PropTypes.func,
         addTermToMetaSets: PropTypes.func,
-        addedTrackSets: PropTypes.instanceOf(Set)
+        addedTrackSets: PropTypes.instanceOf(Set),
     };
 
     constructor(props) {
@@ -70,18 +76,20 @@ class CustomTrackAdder extends React.Component {
             urlError: "",
             trackAdded: false,
             selectedTabIndex: 0,
-            options: null // custom track options
+            options: null, // custom track options
         };
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
     }
 
-    handleSubmitClick() {
+    handleSubmitClick(e) {
+        e.preventDefault();
         if (!this.props.onTracksAdded) {
             return;
         }
 
         if (!this.state.url) {
             this.setState({ urlError: "Enter a URL" });
+            return;
         } else {
             const newTrack = new TrackModel({ ...this.state, datahub: "Custom track" });
             this.props.onTracksAdded([newTrack]);
@@ -91,9 +99,9 @@ class CustomTrackAdder extends React.Component {
     }
 
     renderTypeOptions() {
-        return Object.entries(TRACK_TYPES).map(types => (
+        return Object.entries(TRACK_TYPES).map((types) => (
             <optgroup label={types[0]} key={types[0]}>
-                {types[1].map(type => (
+                {types[1].map((type) => (
                     <option key={type} value={type}>
                         {type} - {TYPES_DESC[type]}
                     </option>
@@ -123,7 +131,7 @@ class CustomTrackAdder extends React.Component {
         }
     }
 
-    getOptions = value => {
+    getOptions = (value) => {
         let options = null;
         try {
             options = JSON5.parse(value);
@@ -137,7 +145,7 @@ class CustomTrackAdder extends React.Component {
         const { type, url, name, urlError } = this.state;
         return (
             <form>
-                <h1>Add custom track</h1>
+                <h1>Add remote track</h1>
                 <div className="form-group">
                     <label>Track type</label>
                     <span style={{ marginLeft: "10px", fontStyle: "italic" }}>
@@ -148,7 +156,7 @@ class CustomTrackAdder extends React.Component {
                     <select
                         className="form-control"
                         value={type}
-                        onChange={event => this.setState({ type: event.target.value })}
+                        onChange={(event) => this.setState({ type: event.target.value })}
                     >
                         {this.renderTypeOptions()}
                     </select>
@@ -159,7 +167,7 @@ class CustomTrackAdder extends React.Component {
                         type="text"
                         className="form-control"
                         value={url}
-                        onChange={event => this.setState({ url: event.target.value })}
+                        onChange={(event) => this.setState({ url: event.target.value })}
                     />
                     <span style={{ color: "red" }}>{urlError}</span>
                 </div>
@@ -169,10 +177,10 @@ class CustomTrackAdder extends React.Component {
                         type="text"
                         className="form-control"
                         value={name}
-                        onChange={event => this.setState({ name: event.target.value })}
+                        onChange={(event) => this.setState({ name: event.target.value })}
                     />
                 </div>
-                <TrackOptionsUI onGetOptions={value => this.getOptions(value)} />
+                <TrackOptionsUI onGetOptions={(value) => this.getOptions(value)} />
                 {this.renderButtons()}
             </form>
         );
@@ -181,8 +189,8 @@ class CustomTrackAdder extends React.Component {
     renderCustomHubAdder() {
         return (
             <CustomHubAdder
-                onTracksAdded={tracks => this.props.onTracksAdded(tracks)}
-                onAddTracksToPool={tracks => this.props.onAddTracksToPool(tracks, false)}
+                onTracksAdded={(tracks) => this.props.onTracksAdded(tracks)}
+                onAddTracksToPool={(tracks) => this.props.onAddTracksToPool(tracks, false)}
             />
         );
     }
@@ -197,8 +205,8 @@ class CustomTrackAdder extends React.Component {
                         headerStyle={{ fontWeight: "bold" }}
                         activeHeaderStyle={{ color: "blue" }}
                     >
-                        <Tab label="Add Custom Track">{this.renderCustomTrackAdder()}</Tab>
-                        <Tab label="Add Custom Data Hub">{this.renderCustomHubAdder()}</Tab>
+                        <Tab label="Add Remote Track">{this.renderCustomTrackAdder()}</Tab>
+                        <Tab label="Add Remote Data Hub">{this.renderCustomHubAdder()}</Tab>
                     </Tabs>
                 </div>
                 {this.props.customTracksPool.length > 0 && (

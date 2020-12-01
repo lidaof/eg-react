@@ -1,43 +1,47 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import connect from 'react-redux/lib/connect/connect';
-import ReactModal from 'react-modal';
-import Hotkeys from 'react-hot-keys';
+import React from "react";
+import PropTypes from "prop-types";
+import _ from "lodash";
+import connect from "react-redux/lib/connect/connect";
+import ReactModal from "react-modal";
+import Hotkeys from "react-hot-keys";
 
-import { ActionCreators } from '../../AppState';
+import { ActionCreators } from "../../AppState";
 
-import { withTrackData } from './TrackDataManager';
-import { withTrackView } from './TrackViewManager';
-import TrackHandle from './TrackHandle';
-import { PannableTrackContainer } from './PannableTrackContainer';
-import ReorderableTrackContainer from './ReorderableTrackContainer';
-import { ZoomableTrackContainer } from './ZoomableTrackContainer';
-import MetadataHeader from './MetadataHeader';
-import { Tools, ToolButtons } from './Tools';
-import ZoomButtons from './ZoomButtons';
-import OutsideClickDetector from '../OutsideClickDetector';
-import ContextMenuManager from '../ContextMenuManager';
-import DivWithBullseye from '../DivWithBullseye';
-import withAutoDimensions from '../withAutoDimensions';
-import TrackContextMenu from '../trackContextMenu/TrackContextMenu';
+import { withTrackData } from "./TrackDataManager";
+import { withTrackView } from "./TrackViewManager";
+import TrackHandle from "./TrackHandle";
+import { PannableTrackContainer } from "./PannableTrackContainer";
+import ReorderableTrackContainer from "./ReorderableTrackContainer";
+import { ZoomableTrackContainer } from "./ZoomableTrackContainer";
+import MetadataHeader from "./MetadataHeader";
+import { Tools, ToolButtons } from "./Tools";
+import ZoomButtons from "./ZoomButtons";
+import OutsideClickDetector from "../OutsideClickDetector";
+import ContextMenuManager from "../ContextMenuManager";
+import DivWithBullseye from "../DivWithBullseye";
+import withAutoDimensions from "../withAutoDimensions";
+import TrackContextMenu from "../trackContextMenu/TrackContextMenu";
 
-import TrackModel from '../../model/TrackModel';
-import TrackSelectionBehavior from '../../model/TrackSelectionBehavior';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import UndoRedo from './UndoRedo';
-import History from './History';
+import TrackModel from "../../model/TrackModel";
+import TrackSelectionBehavior from "../../model/TrackSelectionBehavior";
+import DisplayedRegionModel from "../../model/DisplayedRegionModel";
+import UndoRedo from "./UndoRedo";
+import History from "./History";
 
-import HighlightRegion from '../HighlightRegion';
-import { VerticalDivider } from './VerticalDivider';
-import { CircletView } from './CircletView';
-import ButtonGroup from './ButtonGroup';
-import TrackRegionController from '../genomeNavigator/TrackRegionController';
+import HighlightRegion from "../HighlightRegion";
+import { VerticalDivider } from "./VerticalDivider";
+import { CircletView } from "./CircletView";
+import ButtonGroup from "./ButtonGroup";
+import TrackRegionController from "../genomeNavigator/TrackRegionController";
 
-import ReorderMany from './ReorderMany';
-import { niceBpCount } from '../../util';
+import ReorderMany from "./ReorderMany";
+import { niceBpCount } from "../../util";
 
-const DEFAULT_CURSOR = 'crosshair';
+import "./TrackContainer.css";
+
+// import { DEFAULT_OPTIONS as DYNAMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack";
+
+const DEFAULT_CURSOR = "crosshair";
 const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 
 ///////////
@@ -47,15 +51,15 @@ function mapStateToProps(state) {
     return {
         genome: state.browser.present.genomeName,
         viewRegion: state.browser.present.viewRegion,
-        tracks: state.browser.present.tracks,
-        metadataTerms: state.browser.present.metadataTerms
+        // tracks: state.browser.present.tracks,
+        metadataTerms: state.browser.present.metadataTerms,
     };
 }
 
 const callbacks = {
     onNewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
-    onMetadataTermsChanged: ActionCreators.setMetadataTerms
+    onMetadataTermsChanged: ActionCreators.setMetadataTerms,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -88,13 +92,13 @@ class TrackContainer extends React.Component {
          * Callback requesting a change in the metadata terms.  Signature: (newTerms: string[]): void
          */
         onMetadataTermsChanged: PropTypes.func,
-        suggestedMetaSets: PropTypes.instanceOf(Set)
+        suggestedMetaSets: PropTypes.instanceOf(Set),
     };
 
     static defaultProps = {
         tracks: [],
         onNewRegion: () => undefined,
-        onTracksChanged: () => undefined
+        onTracksChanged: () => undefined,
     };
 
     constructor(props) {
@@ -105,9 +109,9 @@ class TrackContainer extends React.Component {
             showModal: false,
             showReorderManyModal: false,
             trackForCircletView: null, // the trackmodel for circlet view
-            circletColor: '#ff5722',
-            panningAnimation: 'none',
-            zoomAnimation: 0
+            circletColor: "#ff5722",
+            panningAnimation: "none",
+            zoomAnimation: 0,
         };
 
         this.toggleTool = this.toggleTool.bind(this);
@@ -129,15 +133,15 @@ class TrackContainer extends React.Component {
         const { primaryView, onNewRegion } = this.props;
         let newRegion, panning;
         if (left) {
-            panning = 'left';
+            panning = "left";
             newRegion = primaryView.viewWindowRegion.clone().panLeft();
         } else {
-            panning = 'right';
+            panning = "right";
             newRegion = primaryView.viewWindowRegion.clone().panRight();
         }
         this.setState({ panningAnimation: panning }, () => {
             window.setTimeout(() => {
-                this.setState({ panningAnimation: 'none' });
+                this.setState({ panningAnimation: "none" });
                 // this.pan(-width); // Changes DRM
                 onNewRegion(...newRegion.getContextCoordinates());
             }, 1000);
@@ -159,30 +163,30 @@ class TrackContainer extends React.Component {
 
     onKeyDown(keyName, e, handle) {
         switch (keyName) {
-            case 'alt+h':
-            case 'alt+d':
+            case "alt+h":
+            case "alt+d":
                 this.toggleTool(Tools.DRAG);
                 break;
-            case 'alt+s':
-            case 'alt+r':
+            case "alt+s":
+            case "alt+r":
                 this.toggleTool(Tools.REORDER);
                 break;
-            case 'alt+m':
+            case "alt+m":
                 this.toggleTool(Tools.ZOOM_IN);
                 break;
-            case 'alt+z':
+            case "alt+z":
                 this.panLeftOrRight(true);
                 break;
-            case 'alt+x':
+            case "alt+x":
                 this.panLeftOrRight(false);
                 break;
-            case 'alt+i':
+            case "alt+i":
                 this.zoomOut(0.5);
                 break;
-            case 'alt+o':
+            case "alt+o":
                 this.zoomOut(2);
                 break;
-            case 'alt+g':
+            case "alt+g":
                 this.toggleReorderManyModal();
                 break;
             default:
@@ -227,7 +231,7 @@ class TrackContainer extends React.Component {
     };
 
     toggleReorderManyModal = () => {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             return { showReorderManyModal: !prevState.showReorderManyModal };
         });
     };
@@ -242,7 +246,7 @@ class TrackContainer extends React.Component {
         }
         const tracks = this.props.tracks;
         if (tracks.length !== newSelections.length) {
-            console.error('Cannot apply track selection array with different length than existing tracks.');
+            console.error("Cannot apply track selection array with different length than existing tracks.");
             console.error(newSelections);
         }
 
@@ -304,15 +308,134 @@ class TrackContainer extends React.Component {
     /**
      * happens when user selects matplot
      */
-    applyMatPlot = tracks => {
+    applyMatPlot = (tracks) => {
         // console.log(tracks);
         // const tracksLeft = this.props.tracks.filter(tk => !tk.isSelected);
         const newTrack = new TrackModel({
-            type: 'matplot',
-            name: 'matplot wrap',
-            tracks
+            type: "matplot",
+            name: "matplot wrap",
+            tracks,
         });
         // const newTracks = [...tracksLeft, newTrack];
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    };
+
+    /**
+     * happens when user selects dynamic plot
+     */
+    applyDynamicPlot = (tracks) => {
+        // const colors = [];
+        // tracks.forEach(tk => {
+        //     if (tk.options && tk.options.color) {
+        //         colors.push(tk.options.color);
+        //     }
+        // });
+        const labels = tracks.map((t) => t.label);
+        const colors = [];
+        let useDynamicColors = false;
+        tracks.forEach((t) => {
+            if (t.options.color) {
+                colors.push(t.options.color);
+            }
+        });
+        if (colors.length === tracks.length) {
+            useDynamicColors = true;
+        }
+        const newTrack = new TrackModel({
+            type: "dynamic",
+            name: "dynamic plot",
+            tracks,
+            options: {
+                steps: tracks.length,
+                //...DYNAMIC_OPTIONS,
+                // colors
+                dynamicLabels: labels,
+                dynamicColors: colors,
+                useDynamicColors,
+            },
+        });
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    };
+
+    /**
+     * happens when user selects dynamic hic plot
+     */
+    applyDynamicHic = (tracks) => {
+        const colors = [];
+        let useDynamicColors = false;
+        tracks.forEach((t) => {
+            if (t.options.color) {
+                colors.push(t.options.color);
+            }
+        });
+        if (colors.length === tracks.length) {
+            useDynamicColors = true;
+        }
+        const newTrack = new TrackModel({
+            type: "dynamichic",
+            name: "dynamic hic",
+            tracks,
+            options: {
+                dynamicColors: colors,
+                useDynamicColors,
+            },
+        });
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    };
+
+    /**
+     * happens when user selects dynamic hic plot
+     */
+    applyDynamicLongrange = (tracks) => {
+        const colors = [];
+        let useDynamicColors = false;
+        tracks.forEach((t) => {
+            if (t.options.color) {
+                colors.push(t.options.color);
+            }
+        });
+        if (colors.length === tracks.length) {
+            useDynamicColors = true;
+        }
+        const newTrack = new TrackModel({
+            type: "dynamiclongrange",
+            name: "dynamic longrange",
+            tracks,
+            options: {
+                dynamicColors: colors,
+                useDynamicColors,
+            },
+        });
+        const newTracks = [...this.props.tracks, newTrack];
+        this.props.onTracksChanged(newTracks);
+    };
+
+    /**
+     * happens when user selects dynamic bed
+     */
+    applyDynamicBed = (tracks) => {
+        const colors = [];
+        let useDynamicColors = false;
+        tracks.forEach((t) => {
+            if (t.options.color) {
+                colors.push(t.options.color);
+            }
+        });
+        if (colors.length === tracks.length) {
+            useDynamicColors = true;
+        }
+        const newTrack = new TrackModel({
+            type: "dynamicbed",
+            name: "dynamic bed",
+            tracks,
+            options: {
+                dynamicColors: colors,
+                useDynamicColors,
+            },
+        });
         const newTracks = [...this.props.tracks, newTrack];
         this.props.onTracksChanged(newTracks);
     };
@@ -333,7 +456,7 @@ class TrackContainer extends React.Component {
             onNewRegion,
             onToggleHighlight,
             onSetEnteredRegion,
-            primaryView
+            primaryView,
         } = this.props;
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
         const panLeftButton = (
@@ -341,7 +464,7 @@ class TrackContainer extends React.Component {
                 className="btn btn-outline-dark"
                 title="Pan left
 (Alt+Z)"
-                style={{ fontFamily: 'monospace' }}
+                style={{ fontFamily: "monospace" }}
                 onClick={() => this.panLeftOrRight(true)}
             >
                 ◀
@@ -352,52 +475,58 @@ class TrackContainer extends React.Component {
                 className="btn btn-outline-dark"
                 title="Pan right
 (Alt+X)"
-                style={{ fontFamily: 'monospace' }}
+                style={{ fontFamily: "monospace" }}
                 onClick={() => this.panLeftOrRight(false)}
             >
                 ▶
             </button>
         );
         return (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <ToolButtons allTools={Tools} selectedTool={this.state.selectedTool} onToolClicked={this.toggleTool} />
-                {this.props.embeddingMode && (
-                    <TrackRegionController
-                        selectedRegion={viewRegion}
-                        onRegionSelected={onNewRegion}
-                        onToggleHighlight={onToggleHighlight}
-                        onSetEnteredRegion={onSetEnteredRegion}
+            <div className="tool-container">
+                <div className="tool-panel">
+                    <ToolButtons
+                        allTools={Tools}
+                        selectedTool={this.state.selectedTool}
+                        onToolClicked={this.toggleTool}
                     />
-                )}
-                <div>
-                    <ReorderMany
-                        onOpenReorderManyModal={this.openReorderManyModal}
-                        onCloseReorderManyModal={this.closeReorderManyModal}
-                        showReorderManyModal={this.state.showReorderManyModal}
+                    {this.props.embeddingMode && (
+                        <TrackRegionController
+                            selectedRegion={viewRegion}
+                            onRegionSelected={onNewRegion}
+                            onToggleHighlight={onToggleHighlight}
+                            onSetEnteredRegion={onSetEnteredRegion}
+                        />
+                    )}
+                    <div className="tool-element">
+                        <ReorderMany
+                            onOpenReorderManyModal={this.openReorderManyModal}
+                            onCloseReorderManyModal={this.closeReorderManyModal}
+                            showReorderManyModal={this.state.showReorderManyModal}
+                        />
+                    </div>
+                    <ButtonGroup buttons={panLeftButton} />
+                    {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
+                    <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
+                    <ButtonGroup buttons={panRightButton} />
+                    <div className="tool-element">
+                        <UndoRedo />
+                    </div>
+                    <div className="tool-element">
+                        <History />
+                    </div>
+                    <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
+                        <PixelInfo
+                            basesPerPixel={this.props.basesPerPixel}
+                            viewRegion={viewRegion}
+                            primaryView={primaryView}
+                        />
+                    </div>
+                    <MetadataHeader
+                        terms={metadataTerms}
+                        onNewTerms={onMetadataTermsChanged}
+                        suggestedMetaSets={suggestedMetaSets}
                     />
                 </div>
-                <ButtonGroup buttons={panLeftButton} />
-                {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
-                <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
-                <ButtonGroup buttons={panRightButton} />
-                <div>
-                    <UndoRedo />
-                </div>
-                <div>
-                    <History />
-                </div>
-                <div>
-                    <PixelInfo
-                        basesPerPixel={this.props.basesPerPixel}
-                        viewRegion={viewRegion}
-                        primaryView={primaryView}
-                    />
-                </div>
-                <MetadataHeader
-                    terms={metadataTerms}
-                    onNewTerms={onMetadataTermsChanged}
-                    suggestedMetaSets={suggestedMetaSets}
-                />
             </div>
         );
     }
@@ -406,7 +535,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const { tracks, trackData, primaryView, metadataTerms, viewRegion } = this.props;
+        const { tracks, trackData, primaryView, metadataTerms, viewRegion, layoutModel } = this.props;
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
@@ -427,6 +556,7 @@ class TrackContainer extends React.Component {
                     onClick={this.handleTrackClicked}
                     onMetadataClick={this.handleMetadataClicked}
                     selectedRegion={viewRegion}
+                    layoutModel={layoutModel}
                 />
             );
         });
@@ -501,7 +631,7 @@ class TrackContainer extends React.Component {
             highlightEnteredRegion,
             primaryView,
             viewRegion,
-            highlightColor
+            highlightColor,
         } = this.props;
         const { selectedTool } = this.state;
         const contextMenu = (
@@ -511,12 +641,16 @@ class TrackContainer extends React.Component {
                 deselectAllTracks={this.deselectAllTracks}
                 onCircletRequested={this.handleOpenModal}
                 onApplyMatplot={this.applyMatPlot}
+                onApplyDynamicplot={this.applyDynamicPlot}
+                onApplyDynamicHic={this.applyDynamicHic}
+                onApplyDynamicLongrange={this.applyDynamicLongrange}
+                onApplyDynamicBed={this.applyDynamicBed}
             />
         );
         const trackDivStyle = {
-            border: '1px solid black',
-            paddingBottom: '3px',
-            cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR
+            border: "1px solid black",
+            paddingBottom: "3px",
+            cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR,
         };
         return (
             <React.Fragment>
@@ -524,7 +658,7 @@ class TrackContainer extends React.Component {
                     {this.renderControls()}
                     <ContextMenuManager
                         menuElement={contextMenu}
-                        shouldMenuClose={event => !SELECTION_BEHAVIOR.isToggleEvent(event)}
+                        shouldMenuClose={(event) => !SELECTION_BEHAVIOR.isToggleEvent(event)}
                     >
                         <DivWithBullseye style={trackDivStyle} id="trackContainer">
                             <VerticalDivider

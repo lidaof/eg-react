@@ -14,7 +14,7 @@ import "../commonComponents/tooltip/Tooltip.css";
 class GeneDetail extends React.PureComponent {
     static propTypes = {
         gene: PropTypes.instanceOf(Gene).isRequired, // The Gene object for which to display info
-        collectionName: PropTypes.string.isRequired
+        collectionName: PropTypes.string.isRequired,
     };
 
     render() {
@@ -23,7 +23,7 @@ class GeneDetail extends React.PureComponent {
         return (
             <div style={{ maxWidth: 400 }}>
                 <FeatureDetail feature={gene} />
-                <i style={{ wordBreak: "break-all" }}>{gene.description}</i>
+                <i style={{ wordBreak: "break-word" }}>{gene.description}</i>
                 <div>
                     {gene.transcriptionClass && (
                         <span>

@@ -1,0 +1,16 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "PlasmoDBGene",
+            "label": "PlasmoDB 9.0 genes",
+            "filetype": "geneAnnotation"
+        }
+    ]
+}

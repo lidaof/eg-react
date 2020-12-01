@@ -1,14 +1,15 @@
-import React from 'react';
+import React from "react";
 
-import CategoricalAnnotation from './CategoricalAnnotation';
-import { PropsFromTrackContainer } from '../commonComponents/Track';
-import AnnotationTrack from '../commonComponents/annotation/AnnotationTrack';
-import FeatureDetail from '../commonComponents/annotation/FeatureDetail';
-import Tooltip from '../commonComponents/tooltip/Tooltip';
-import { withTooltip, TooltipCallbacks } from '../commonComponents/tooltip/withTooltip';
-import { Feature } from '../../../model/Feature';
-import { PlacedFeatureGroup } from '../../../model/FeatureArranger';
-import configOptionMerging from '../commonComponents/configOptionMerging';
+import CategoricalAnnotation from "./CategoricalAnnotation";
+import { PropsFromTrackContainer } from "../commonComponents/Track";
+import AnnotationTrack from "../commonComponents/annotation/AnnotationTrack";
+import FeatureDetail from "../commonComponents/annotation/FeatureDetail";
+import Tooltip from "../commonComponents/tooltip/Tooltip";
+import { withTooltip, TooltipCallbacks } from "../commonComponents/tooltip/withTooltip";
+import { Feature } from "../../../model/Feature";
+import { PlacedFeatureGroup } from "../../../model/FeatureArranger";
+import configOptionMerging from "../commonComponents/configOptionMerging";
+import OpenInterval from "model/interval/OpenInterval";
 
 export const DEFAULT_OPTIONS = {
     height: 20,
@@ -23,16 +24,17 @@ interface CategoricalTrackProps extends PropsFromTrackContainer, TooltipCallback
     options: {
         category: object;
         height?: number;
-    }
+        alwaysDrawLabel?: boolean;
+    };
 }
 
 /**
  * Track component for BED annotations.
- * 
+ *
  * @author Silas Hsu
  */
 class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
-    static displayName = 'CategoricalTrack';
+    static displayName = "CategoricalTrack";
 
     constructor(props: CategoricalTrackProps) {
         super(props);
@@ -42,22 +44,32 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
 
     /**
      * Renders the tooltip for a feature.
-     * 
+     *
      * @param {React.MouseEvent} event - mouse event that triggered the tooltip request
      * @param {Feature} feature - Feature for which to display details
      */
     renderTooltip(event: React.MouseEvent, feature: Feature) {
         const tooltip = (
-            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} >
+            <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip}>
                 <FeatureDetail feature={feature} category={this.props.options.category} />
             </Tooltip>
         );
         this.props.onShowTooltip(tooltip);
     }
 
+    paddingFunc = (feature: Feature, xSpan: OpenInterval) => {
+        const width = xSpan.end - xSpan.start;
+        const estimatedLabelWidth = feature.getName().length * 9;
+        if (estimatedLabelWidth < 0.5 * width) {
+            return 5;
+        } else {
+            return 9 + estimatedLabelWidth;
+        }
+    };
+
     /**
      * Renders one annotation.
-     * 
+     *
      * @param {PlacedFeature} - feature and drawing info
      * @param {number} y - y coordinate to render the annotation
      * @param {boolean} isLastRow - whether the annotation is assigned to the last configured row
@@ -65,32 +77,36 @@ class CategoricalTrackNoTooltip extends React.Component<CategoricalTrackProps> {
      * @return {JSX.Element} element visualizing the feature
      */
     renderAnnotation(placedGroup: PlacedFeatureGroup, y: number, isLastRow: boolean, index: number) {
-        const {category, height} = this.props.options;
+        const { category, height, alwaysDrawLabel } = this.props.options;
         return placedGroup.placedFeatures.map((placement, i) => {
             const featureName = placement.feature.getName();
-            const color = category && category[featureName] ? category[featureName].color: 'blue';
-            return <CategoricalAnnotation
-                key={i}
-                feature={placement.feature}
-                xSpan={placement.xSpan}
-                y={y}
-                isMinimal={false}
-                color={color}
-                onClick={this.renderTooltip}
-                category={category}
-                height={height}
-                />;
-        }
-            
-        );
+            const color = category && category[featureName] ? category[featureName].color : "blue";
+            return (
+                <CategoricalAnnotation
+                    key={i}
+                    feature={placement.feature}
+                    xSpan={placement.xSpan}
+                    y={y}
+                    isMinimal={false}
+                    color={color}
+                    onClick={this.renderTooltip}
+                    category={category}
+                    height={height}
+                    alwaysDrawLabel={alwaysDrawLabel}
+                />
+            );
+        });
     }
 
     render() {
-        return <AnnotationTrack
-            {...this.props}
-            rowHeight={this.props.options.height}
-            getAnnotationElement={this.renderAnnotation}
-        />;
+        return (
+            <AnnotationTrack
+                {...this.props}
+                rowHeight={this.props.options.height}
+                getAnnotationElement={this.renderAnnotation}
+                featurePadding={this.paddingFunc}
+            />
+        );
     }
 }
 

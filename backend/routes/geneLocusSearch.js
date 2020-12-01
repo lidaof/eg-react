@@ -1,8 +1,8 @@
 'use strict';
 
 const _ = require('lodash');
-const Joi = require('joi');
-const Boom = require('boom');
+const Joi = require('@hapi/joi');
+const Boom = require('@hapi/boom');
 const mongoUtils = require('../mongoUtils');
 
 const GENOME_2_COLLECTION_NAME = {
@@ -26,7 +26,7 @@ function registerRoutes(server) {
             notes: 'Returns list of Gene records in a genetic region',
             tags: ['api'],
             validate: {
-                params: {
+                params: Joi.object({
                     genome: Joi.string()
                         .required()
                         .description('Genome name')
@@ -35,8 +35,8 @@ function registerRoutes(server) {
                         .required()
                         .description('Gene collection name')
                         .default('refGene')
-                },
-                query: {
+                }),
+                query: Joi.object({
                     chr: Joi.string()
                         .required()
                         .description('Chromosome')
@@ -49,7 +49,8 @@ function registerRoutes(server) {
                         .required()
                         .description('End base')
                         .default(27219880)
-                }
+                })
+           
             }
         }
     });

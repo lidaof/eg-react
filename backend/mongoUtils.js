@@ -10,7 +10,7 @@ const MongoClient = require('mongodb').MongoClient;
  */
 async function getMongoClient(url) {
     return new Promise((resolve, reject) => {
-        MongoClient.connect(url, (error, client) => {
+        MongoClient.connect(url, { useNewUrlParser: true }, (error, client) => {
             if (error) {
                 reject(error);
             } else {
