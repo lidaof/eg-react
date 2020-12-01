@@ -85,7 +85,6 @@ interface SpeciesConfig {
 }
 
 export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
-<<<<<<< HEAD
   human: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
     assemblies: [HG19.genome.getName(), HG38.genome.getName()],
