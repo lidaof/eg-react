@@ -8,12 +8,7 @@
     ],
     "Genes": [
         {
-            "name": "refGene",
-            "label": "RefSeq genes",
-            "filetype": "geneAnnotation"
-        },
-        {
-            "name": "ensembl",
+            "name": "ensGene",
             "label": "Ensembl genes",
             "filetype": "geneAnnotation"
         }
@@ -24,7 +19,7 @@
                 "name": "rmsk_all",
                 "label": "RepeatMasker",
                 "filetype": "repeatmasker",
-                "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/papAnu2_rmsk.bb",
+                "url": "https://vizhub.wustl.edu/public/papAnu2/papAnu2_rmsk.bb",
                 "height": 30
             }
         ]
@@ -35,7 +30,7 @@
             "label": "Human hg19 to papAnu2 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/papAnu2_hg19.gz"
+            "url": "https://vizhub.wustl.edu/public/papAnu2/papAnu2_hg19.gz"
         }
     ]
 }

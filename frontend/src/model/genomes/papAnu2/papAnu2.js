@@ -16,20 +16,14 @@ const defaultTracks = [
     }),
     new TrackModel({
         type: "geneAnnotation",
-        name: "refGene",
-        label: "refGene genes",
-        url: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/",
-    }),
-    new TrackModel({
-        type: "geneAnnotation",
-        name: "ensembl",
+        name: "ensGene",
         label: "ensembl genes",
-        url: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/",
+        genome: 'papAnu2'
     }),
     new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
-        url: 'https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/papAnu2_rmsk.bb',
+        url: 'https://vizhub.wustl.edu/public/papAnu2/papAnu2_rmsk.bb',
     })
 ];
 
@@ -39,7 +33,7 @@ const PAPANU2 = {
     cytobands: {},
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
-    twoBitURL: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/papAnu2.2bit",
+    twoBitURL: "https://vizhub.wustl.edu/public/papAnu2/papAnu2.2bit",
     annotationTracks,
 };
 

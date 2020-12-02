@@ -8,7 +8,7 @@ import chromSize from "./chromSize.json";
 const allSize = chromSize.map(genom => new Chromosome(genom.chr, genom.size));
 const genome = new Genome("gorGor3", allSize);
 const navContext = genome.makeNavContext();
-const defaultRegion = navContext.parse("chr6:52425276-52425961");
+const defaultRegion = navContext.parse("chr6:52341786-52427411");
 const defaultTracks = [
     new TrackModel({
         type: "ruler",
@@ -16,14 +16,14 @@ const defaultTracks = [
     }),
     new TrackModel({
         type: "geneAnnotation",
-        name: "ensembl",
+        name: "ensGene",
         label: "ensembl genes",
-        url: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/gorGor3/",
+        genome: 'gorGor3'
     }),
     new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
-        url: 'https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/gorGor3/gorGor3_rmsk.bb',
+        url: 'https://vizhub.wustl.edu/public/gorGor3/gorGor3_rmsk.bb',
     })
 ];
 
@@ -33,7 +33,7 @@ const GORGOR3 = {
     cytobands: {},
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
-    twoBitURL: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/gorGor3/gorGor3.2bit",
+    twoBitURL: "https://vizhub.wustl.edu/public/gorGor3/gorGor3.2bit",
     annotationTracks,
 };
 

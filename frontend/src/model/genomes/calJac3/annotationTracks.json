@@ -8,12 +8,12 @@
     ],
     "Genes": [
         {
-            "name": "refGene",
-            "label": "RefSeq genes",
+            "name": "ncbiGene",
+            "label": "NCBI genes",
             "filetype": "geneAnnotation"
         },
         {
-            "name": "ensembl",
+            "name": "ensGene",
             "label": "Ensembl genes",
             "filetype": "geneAnnotation"
         }
@@ -24,7 +24,7 @@
                 "name": "rmsk_all",
                 "label": "RepeatMasker",
                 "filetype": "repeatmasker",
-                "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/calJac3/calJac3_rmsk.bb",
+                "url": "https://vizhub.wustl.edu/public/calJac3/calJac3_rmsk.bb",
                 "height": 30
             }
         ]
@@ -35,7 +35,7 @@
             "label": "Human hg19 to calJac3 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/calJac3/calJac3_hg19.gz"
+            "url": "https://vizhub.wustl.edu/public/calJac3/calJac3_hg19.gz"
         }
     ]
 }

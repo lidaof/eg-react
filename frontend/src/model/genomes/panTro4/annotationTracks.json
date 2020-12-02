@@ -13,7 +13,7 @@
             "filetype": "geneAnnotation"
         },
         {
-            "name": "ensembl",
+            "name": "ensGene",
             "label": "Ensembl genes",
             "filetype": "geneAnnotation"
         }
@@ -24,7 +24,7 @@
                 "name": "rmsk_all",
                 "label": "RepeatMasker",
                 "filetype": "repeatmasker",
-                "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/panTro4/panTro4_rmsk.bb",
+                "url": "https://vizhub.wustl.edu/public/panTro4/panTro4_rmsk.bb",
                 "height": 30
             }
         ]
@@ -35,7 +35,7 @@
             "label": "Human hg19 to panTro4 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/panTro4/panTro4_hg19.gz"
+            "url": "https://vizhub.wustl.edu/public/panTro4/panTro4_hg19.gz"
         }
     ]
 }

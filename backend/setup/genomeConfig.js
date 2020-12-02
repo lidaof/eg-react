@@ -223,6 +223,64 @@ const Creinhardtii506 = [
     },
 ];
 
+const panTro4 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ensGene",
+        file: "ensGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const calJac3 = [
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ensGene",
+        file: "ensGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const nomLeu3 = [
+    {
+        name: "ensGene",
+        file: "ensGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+]
+
+const gorGor3 = [
+    {
+        name: "ensGene",
+        file: "ensGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+]
+
+const papAnu2 = [
+    {
+        name: "ensGene",
+        file: "ensGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+]
+
+const rheMac3 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const genomeConfig = {
     hg19,
     mm10,
@@ -243,6 +301,12 @@ const genomeConfig = {
     Pfal3D7,
     dm6,
     Creinhardtii506,
+    panTro4,
+    calJac3,
+    nomLeu3,
+    gorGor3,
+    papAnu2,
+    rheMac3,
 };
 
 module.exports = genomeConfig;

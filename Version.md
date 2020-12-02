@@ -1,5 +1,11 @@
 # Version History
 
+## 52.3.0
+
+-   fixed a bug that hic track fetches whole hic file when switch to other norm options with updated hic-straw package
+-   fixed a bug that numerical track shows wrong threshold for negative data values
+-   6 new genomes added
+
 ## 52.2.0
 
 -   add the API key and secret for accessing 4DN tracks

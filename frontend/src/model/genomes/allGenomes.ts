@@ -96,19 +96,19 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     color: "white"
   },
   gorilla: {
-    logoUrl: "",
+    logoUrl: "https://vizhub.wustl.edu/public/gorGor3/Gorilla.png",
     assemblies: [gorGor3.genome.getName()],
-    color: "red"
+    color: "yellow"
   },
   gibbon: {
-    logoUrl: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/nomLeu3/nomleu.jpg",
+    logoUrl: "https://vizhub.wustl.edu/public/nomLeu3/Gibbon.png",
     assemblies: [nomLeu3.genome.getName()],
-    color: "red"
+    color: "yellow"
   },
   baboon: {
-    logoUrl: "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/papAnu2/papanu.jpg",
+    logoUrl: "https://vizhub.wustl.edu/public/papAnu2/Baboon.png",
     assemblies: [papAnu2.genome.getName()],
-    color: "red"
+    color: "yellow"
   },
   rhesus: {
     logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
@@ -116,9 +116,9 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     color: "yellow"
   },
   marmoset: {
-    logoUrl: "",
+    logoUrl: "https://vizhub.wustl.edu/public/calJac3/Marmoset.png",
     assemblies: [calJac3.genome.getName()],
-    color: "red"
+    color: "yellow"
   },
   cow: {
     logoUrl: "https://vizhub.wustl.edu/public/bosTau8/Cow.png",

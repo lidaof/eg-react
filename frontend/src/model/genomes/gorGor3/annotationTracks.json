@@ -8,7 +8,7 @@
     ],
     "Genes": [
         {
-            "name": "ensembl",
+            "name": "ensGene",
             "label": "Ensembl genes",
             "filetype": "geneAnnotation"
         }
@@ -19,7 +19,7 @@
                 "name": "rmsk_all",
                 "label": "RepeatMasker",
                 "filetype": "repeatmasker",
-                "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/gorGor3/gorGor3_rmsk.bb",
+                "url": "https://vizhub.wustl.edu/public/gorGor3/gorGor3_rmsk.bb",
                 "height": 30
             }
         ]
@@ -30,7 +30,7 @@
             "label": "Human hg19 to gorGor3 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~adu/browser/compareTo_hg19/gorGor3/gorGor3_hg19.gz"
+            "url": "https://vizhub.wustl.edu/public/gorGor3/gorGor3_hg19.gz"
         }
     ]
 }
