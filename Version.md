@@ -5,6 +5,9 @@
 -   fixed a bug that hic track fetches whole hic file when switch to other norm options with updated hic-straw package
 -   fixed a bug that numerical track shows wrong threshold for negative data values
 -   6 new genomes added
+-   new `noDefaultTracks` url parameter remove the default tracks while loading a remote hub
+-   removed limitation that querygenome of `genomealign` track need be preconfigured
+-   added default width and height for `withAutoDimensions` module
 
 ## 52.2.0
 

@@ -7,7 +7,7 @@ import {
   PlacedMergedAlignment,
   PlacedAlignment,
   PlacedSequenceSegment,
-  GapText
+  GapText,
 } from "../../model/alignment/AlignmentViewCalculator";
 import AnnotationArrows from "./commonComponents/annotation/AnnotationArrows";
 import OpenInterval from "../../model/interval/OpenInterval";
@@ -19,7 +19,7 @@ import configOptionMerging from "./commonComponents/configOptionMerging";
 export const DEFAULT_OPTIONS = {
   height: 80,
   primaryColor: "darkblue",
-  queryColor: "#B8008A"
+  queryColor: "#B8008A",
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -53,9 +53,7 @@ function swap(array: any[], i: number, j: number) {
  * @author Silas Hsu
  */
 
-class GenomeAlignTrackWithoutOptions extends React.Component<
-  PropsFromTrackContainer
-> {
+class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackContainer> {
   constructor(props: PropsFromTrackContainer) {
     super(props);
     this.renderTooltip = this.renderTooltip.bind(this);
@@ -67,24 +65,14 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
     const { height, primaryColor, queryColor } = this.props.options;
     const placementTargetGap = gap.targetGapText;
     const placementQueryGap = gap.queryGapText;
-    const placementGapX =
-      (gap.targetTextXSpan.start + gap.targetTextXSpan.end) / 2;
-    const queryPlacementGapX =
-      (gap.queryTextXSpan.start + gap.queryTextXSpan.end) / 2;
+    const placementGapX = (gap.targetTextXSpan.start + gap.targetTextXSpan.end) / 2;
+    const queryPlacementGapX = (gap.queryTextXSpan.start + gap.queryTextXSpan.end) / 2;
     const shiftTargetText = gap.shiftTarget;
     const shiftQueryText = gap.shiftQuery;
-    const targetY = shiftTargetText
-      ? ALIGN_TRACK_MARGIN - 10
-      : ALIGN_TRACK_MARGIN + 5;
-    const targetTickY = shiftTargetText
-      ? ALIGN_TRACK_MARGIN - 5
-      : ALIGN_TRACK_MARGIN + 5;
-    const queryY = shiftQueryText
-      ? height - ALIGN_TRACK_MARGIN + 10
-      : height - ALIGN_TRACK_MARGIN - 5;
-    const queryTickY = shiftQueryText
-      ? height - ALIGN_TRACK_MARGIN + 5
-      : height - ALIGN_TRACK_MARGIN - 5;
+    const targetY = shiftTargetText ? ALIGN_TRACK_MARGIN - 10 : ALIGN_TRACK_MARGIN + 5;
+    const targetTickY = shiftTargetText ? ALIGN_TRACK_MARGIN - 5 : ALIGN_TRACK_MARGIN + 5;
+    const queryY = shiftQueryText ? height - ALIGN_TRACK_MARGIN + 10 : height - ALIGN_TRACK_MARGIN - 5;
+    const queryTickY = shiftQueryText ? height - ALIGN_TRACK_MARGIN + 5 : height - ALIGN_TRACK_MARGIN - 5;
 
     return (
       <React.Fragment key={"gap " + i}>
@@ -124,24 +112,13 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
 
     function renderText(text: string, x: number, y: number, color: string) {
       return (
-        <text
-          x={x}
-          y={y}
-          dominantBaseline="middle"
-          style={{ textAnchor: "middle", fill: color, fontSize: 10 }}
-        >
+        <text x={x} y={y} dominantBaseline="middle" style={{ textAnchor: "middle", fill: color, fontSize: 10 }}>
           {text}
         </text>
       );
     }
 
-    function renderLine(
-      x1: number,
-      y1: number,
-      x2: number,
-      y2: number,
-      color: string
-    ) {
+    function renderLine(x1: number, y1: number, x2: number, y2: number, color: string) {
       return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} />;
     }
   }
@@ -156,13 +133,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
 
     return (
       <React.Fragment key={i}>
-        {renderSequenceSegments(
-          targetSequence,
-          targetSegments,
-          ALIGN_TRACK_MARGIN,
-          primaryColor,
-          false
-        )}
+        {renderSequenceSegments(targetSequence, targetSegments, ALIGN_TRACK_MARGIN, primaryColor, false)}
         {renderAlignTicks()}
         {renderSequenceSegments(
           querySequence,
@@ -178,10 +149,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
       const ticks = [];
       let x = targetXSpan.start;
       for (i = 0; i < targetSequence.length; i++) {
-        if (
-          targetSequence.charAt(i).toUpperCase() ===
-          querySequence.charAt(i).toUpperCase()
-        ) {
+        if (targetSequence.charAt(i).toUpperCase() === querySequence.charAt(i).toUpperCase()) {
           ticks.push(
             <line
               key={i}
@@ -206,7 +174,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
       color: string,
       isQuery: boolean
     ) {
-      const nonGaps = segments.filter(segment => !segment.isGap);
+      const nonGaps = segments.filter((segment) => !segment.isGap);
       const rects = nonGaps.map((segment, i) => (
         <rect
           key={i}
@@ -260,12 +228,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
   }
 
   // Add arrow to query region, arrow direction is determined by plotReverse.
-  renderRoughStrand(
-    strand: string,
-    topY: number,
-    viewWindow: OpenInterval,
-    isPrimary: boolean
-  ) {
+  renderRoughStrand(strand: string, topY: number, viewWindow: OpenInterval, isPrimary: boolean) {
     const plotReverse = strand === "-" ? true : false;
     return (
       <AnnotationArrows
@@ -281,11 +244,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
     );
   }
 
-  renderRoughAlignment(
-    placement: PlacedMergedAlignment,
-    plotReverse: boolean,
-    roughHeight: number
-  ) {
+  renderRoughAlignment(placement: PlacedMergedAlignment, plotReverse: boolean, roughHeight: number) {
     const { queryFeature, queryXSpan, segments, targetXSpan } = placement;
     const queryRectTopY = roughHeight - RECT_HEIGHT;
     const targetGenomeRect = (
@@ -295,10 +254,10 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
         width={targetXSpan.getLength()}
         height={RECT_HEIGHT}
         fill={this.props.options.primaryColor}
-        // tslint:disable-next-line:jsx-no-lambda
-        // onClick={() =>
-        //   console.log("You clicked on " + queryFeature.getLocus().toString())
-        // }
+      // tslint:disable-next-line:jsx-no-lambda
+      // onClick={() =>
+      //   console.log("You clicked on " + queryFeature.getLocus().toString())
+      // }
       />
     );
     const queryGenomeRect = (
@@ -309,9 +268,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
         height={RECT_HEIGHT}
         fill={this.props.options.queryColor}
         // tslint:disable-next-line:jsx-no-lambda
-        onClick={() =>
-          console.log("You clicked on " + queryFeature.getLocus().toString())
-        }
+        onClick={() => console.log("You clicked on " + queryFeature.getLocus().toString())}
       />
     );
 
@@ -337,7 +294,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
         [Math.floor(segment.targetXSpan.start), RECT_HEIGHT],
         [Math.floor(segment.queryXSpan.start), queryRectTopY],
         [Math.ceil(segment.queryXSpan.end), queryRectTopY],
-        [Math.ceil(segment.targetXSpan.end), RECT_HEIGHT]
+        [Math.ceil(segment.targetXSpan.end), RECT_HEIGHT],
       ];
       if (
         (!plotReverse && segment.record.queryStrand === "-") ||
@@ -353,9 +310,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
           fill={this.props.options.queryColor}
           fillOpacity={0.5}
           // tslint:disable-next-line:jsx-no-lambda
-          onClick={() =>
-            console.log("You clicked on " + segment.record.getLocus())
-          }
+          onClick={() => console.log("You clicked on " + segment.record.getLocus())}
         />
       );
     });
@@ -377,10 +332,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
 
     // Which segment in drawData cusor lands on:
     const indexOfCusorSegment = drawData.reduce(
-      (iCusor, x, i) =>
-        x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX
-          ? i
-          : iCusor,
+      (iCusor, x, i) => (x.targetXSpan.start < relativeX && x.targetXSpan.end >= relativeX ? i : iCusor),
       NaN
     );
     const cusorSegment = drawData[indexOfCusorSegment];
@@ -404,31 +356,24 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
   render() {
     const { width, trackModel, alignment, options, viewWindow } = this.props;
     const { height, queryColor, primaryColor } = options;
-    let drawheight,
-      svgElements = [];
+    let svgElements = [];
     const hoverHeight = height - ALIGN_TRACK_MARGIN;
     let visualizer;
     if (!alignment) {
-      drawheight = height;
       svgElements = null;
     } else if (alignment.isFineMode) {
-      drawheight = height;
       const drawData = alignment.drawData as PlacedAlignment[];
       svgElements = drawData.map(this.renderFineAlignment);
       const drawGapText = alignment.drawGapText as GapText[];
       svgElements.push(...drawGapText.map(this.renderGapText));
       visualizer = (
-        <HoverTooltipContext
-          tooltipRelativeY={hoverHeight}
-          getTooltipContents={this.renderTooltip}
-        >
-          <svg width={width} height={drawheight} style={{ display: "block" }}>
+        <HoverTooltipContext tooltipRelativeY={hoverHeight} getTooltipContents={this.renderTooltip}>
+          <svg width={width} height={height} style={{ display: "block" }}>
             {svgElements}
           </svg>
         </HoverTooltipContext>
       );
     } else {
-      drawheight = height;
       const drawData = alignment.drawData as PlacedMergedAlignment[];
       // const targetLocusArrayArray = drawData.map(
       //     placement => placement.segments.map(segment => segment.visiblePart.getLocus()));
@@ -436,30 +381,20 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
       // const queryLocusArrayArray = drawData.map(
       //     placement => placement.segments.map(segment => segment.visiblePart.getQueryLocus()));
       // const queryLocusArray = [].concat.apply([], queryLocusArrayArray);
-      const targetXSpanArrayArray = drawData.map(placement =>
-        placement.segments.map(segment => segment.targetXSpan)
+      const targetXSpanArrayArray = drawData.map((placement) =>
+        placement.segments.map((segment) => segment.targetXSpan)
       );
-      const targetXSpanArray = [].concat.apply(
-        [],
-        targetXSpanArrayArray as any
-      );
-      const queryXSpanArrayArray = drawData.map(placement =>
-        placement.segments.map(segment => segment.queryXSpan)
+      const targetXSpanArray = [].concat.apply([], targetXSpanArrayArray as any);
+      const queryXSpanArrayArray = drawData.map((placement) =>
+        placement.segments.map((segment) => segment.queryXSpan)
       );
       const queryXSpanArray = [].concat.apply([], queryXSpanArrayArray as any);
       const strand = alignment.plotStrand;
-      svgElements = drawData.map(placement =>
-        this.renderRoughAlignment(placement, strand === "-", height)
-      );
+      svgElements = drawData.map((placement) => this.renderRoughAlignment(placement, strand === "-", height));
       const arrows = this.renderRoughStrand("+", 0, viewWindow, false);
       svgElements.push(arrows);
       const primaryViewWindow = alignment.primaryVisData.viewWindow;
-      const primaryArrows = this.renderRoughStrand(
-        strand,
-        height - RECT_HEIGHT,
-        primaryViewWindow,
-        true
-      );
+      const primaryArrows = this.renderRoughStrand(strand, height - RECT_HEIGHT, primaryViewWindow, true);
       svgElements.push(primaryArrows);
       visualizer = (
         <HorizontalFragment
@@ -470,7 +405,7 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
           targetXSpanList={targetXSpanArray}
           queryXSpanList={queryXSpanArray}
         >
-          <svg width={width} height={drawheight} style={{ display: "block" }}>
+          <svg width={width} height={height} style={{ display: "block" }}>
             {svgElements}
           </svg>
         </HorizontalFragment>
@@ -481,12 +416,10 @@ class GenomeAlignTrackWithoutOptions extends React.Component<
       <Track
         {...this.props}
         visualizer={visualizer}
-        legend={<TrackLegend trackModel={trackModel} height={drawheight} />}
+        legend={<TrackLegend trackModel={trackModel} height={height} />}
       />
     );
   }
 }
 
-export const GenomeAlignTrack = withDefaultOptions(
-  GenomeAlignTrackWithoutOptions
-);
+export const GenomeAlignTrack = withDefaultOptions(GenomeAlignTrackWithoutOptions);

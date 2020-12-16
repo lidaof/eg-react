@@ -1,3 +1,4 @@
+import { TrackModel } from 'model/TrackModel';
 import { GenomeConfig } from "./../genomes/GenomeConfig";
 import { AlignmentRecord } from "./AlignmentRecord";
 import DisplayedRegionModel from "../DisplayedRegionModel";
@@ -11,11 +12,14 @@ import { GenomeAlignWorker } from "../../dataSources/WorkerTSHook";
 export class AlignmentFetcher {
     public primaryGenome: string;
     private _dataSource: DataSource;
+    public queryTrack: TrackModel;
+    public queryGenome: string;
 
-    constructor(public primaryGenomeConfig: GenomeConfig, public queryGenome: string) {
+    constructor(public primaryGenomeConfig: GenomeConfig, public track: TrackModel) {
         this.primaryGenome = primaryGenomeConfig.genome.getName();
         this.primaryGenomeConfig = primaryGenomeConfig;
-        this.queryGenome = queryGenome;
+        this.queryTrack = track;
+        this.queryGenome = track.querygenome || track.getMetadata("genome");
         this._dataSource = this.initDataSource();
     }
 
@@ -30,10 +34,10 @@ export class AlignmentFetcher {
         if (!this.primaryGenomeConfig) {
             return this.makeErrorSource();
         }
-        const annotationTracks = this.primaryGenomeConfig.annotationTracks || {};
-        const comparisonTracks = annotationTracks["Genome Comparison"] || [];
-        const theTrack = comparisonTracks.find((track: any) => track.querygenome === this.queryGenome) || {};
-        const url = theTrack.url;
+        // const annotationTracks = this.primaryGenomeConfig.annotationTracks || {};
+        // const comparisonTracks = annotationTracks["Genome Comparison"] || [];
+        // const theTrack = comparisonTracks.find((track: any) => track.querygenome === this.queryGenome) || {};
+        const url = this.queryTrack.url;
         if (!url) {
             return this.makeErrorSource();
         }

@@ -194,11 +194,12 @@ export const ActionCreators = {
         return { type: ActionType.SET_CUSTOM_TRACKS_POOL, customTracksPool };
     },
 
-    setTracksCustomTracksPool: (tracks: TrackModel[], customTracksPool: TrackModel[]) => {
+    setTracksCustomTracksPool: (tracks: TrackModel[], customTracksPool: TrackModel[], withDefaultTracks: boolean = true) => {
         return {
             type: ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL,
             tracks,
             customTracksPool,
+            withDefaultTracks,
         };
     },
 
@@ -389,7 +390,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 isShowingVR: !prevState.isShowingVR,
             };
         case ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL:
-            const tracks = [...prevState.tracks, ...action.tracks];
+            const tracks = action.withDefaultTracks ? [...prevState.tracks, ...action.tracks]: [...action.tracks];
             return {
                 ...prevState,
                 tracks,
@@ -492,11 +493,12 @@ async function asyncInitState() {
     const { query } = querySting.parseUrl(window.location.href);
     if (!_.isEmpty(query)) {
         if (query.hub) {
+            const withDefaultTracks = !query.noDefaultTracks || (query.noDefaultTracks ? false: true);
             const customTracksPool = await getTracksFromHubURL(query.hub as string);
             if (customTracksPool) {
                 const tracks = customTracksPool.filter((track: any) => track.showOnHubLoad);
                 if (tracks.length > 0) {
-                    AppState.dispatch(ActionCreators.setTracksCustomTracksPool(tracks, customTracksPool));
+                    AppState.dispatch(ActionCreators.setTracksCustomTracksPool(tracks, customTracksPool, withDefaultTracks));
                 } else {
                     AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
                 }

@@ -1,10 +1,13 @@
-import { TrackConfig } from './TrackConfig';
+import { TrackConfig } from "./TrackConfig";
 
-import { GenomeAlignTrack, DEFAULT_OPTIONS } from '../trackVis/GenomeAlignTrack';
-import { BackgroundColorConfig, primaryGenomeColorConfig, 
-            queryGenomeColorConfig } from '../trackContextMenu/ColorConfig';
-import HeightConfig from '../trackContextMenu/HeightConfig';
-import { TrackModel } from '../../model/TrackModel';
+import { GenomeAlignTrack, DEFAULT_OPTIONS } from "../trackVis/GenomeAlignTrack";
+import {
+    BackgroundColorConfig,
+    primaryGenomeColorConfig,
+    queryGenomeColorConfig,
+} from "../trackContextMenu/ColorConfig";
+import HeightConfig from "../trackContextMenu/HeightConfig";
+import { TrackModel } from "../../model/TrackModel";
 
 export class GenomeAlignTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -17,7 +20,12 @@ export class GenomeAlignTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), HeightConfig, primaryGenomeColorConfig, 
-                queryGenomeColorConfig, BackgroundColorConfig];
+        return [
+            ...super.getMenuComponents(),
+            HeightConfig,
+            primaryGenomeColorConfig,
+            queryGenomeColorConfig,
+            BackgroundColorConfig,
+        ];
     }
 }

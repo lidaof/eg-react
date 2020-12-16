@@ -1,3 +1,4 @@
+import { TrackModel } from 'model/TrackModel';
 import { GenomeConfig } from "./../genomes/GenomeConfig";
 import _ from "lodash";
 import memoizeOne from "memoize-one";
@@ -79,8 +80,8 @@ export class AlignmentViewCalculator {
     private _alignmentFetcher: AlignmentFetcher;
     private _viewBeingFetched: ViewExpansion;
 
-    constructor(primaryGenomeConfig: GenomeConfig, queryGenome: string) {
-        this._alignmentFetcher = new AlignmentFetcher(primaryGenomeConfig, queryGenome);
+    constructor(primaryGenomeConfig: GenomeConfig, track: TrackModel) {
+        this._alignmentFetcher = new AlignmentFetcher(primaryGenomeConfig, track);
         this._viewBeingFetched = null;
         this.align = memoizeOne(this.align);
     }

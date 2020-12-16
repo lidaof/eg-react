@@ -64,7 +64,10 @@ function withAutoDimensions<P extends object>(
         }
 
         setMounted = () => {
-            this.setState({ isMounted: true });
+            const width = Math.max(100, this._node.clientWidth);
+            const height = Math.max(100, this._node.clientHeight);
+            // console.log(width, height)
+            this.setState({ isMounted: true, width, height });
         };
 
         setDimensions = (width: number, height: number) => {
