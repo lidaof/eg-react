@@ -37,7 +37,7 @@ const defaultTracks = [
                     name: "Interacts directly with the ACE2 receptor (PMID: 32225176)",
                     color: "#FFC300",
                 },
-                "S1/S2 cleavage site": {
+                "S1,S2 cleavage site": {
                     name:
                         "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
                     color: "#18872F",
@@ -165,7 +165,7 @@ const annotationTracks = {
                         name: "Interacts directly with the ACE2 receptor (PMID: 32225176)",
                         color: "#FFC300",
                     },
-                    "S1/S2 cleavage site": {
+                    "S1,S2 cleavage site": {
                         name:
                             "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
                         color: "#18872F",

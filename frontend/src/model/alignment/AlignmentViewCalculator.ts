@@ -80,8 +80,8 @@ export class AlignmentViewCalculator {
     private _alignmentFetcher: AlignmentFetcher;
     private _viewBeingFetched: ViewExpansion;
 
-    constructor(primaryGenomeConfig: GenomeConfig, track: TrackModel) {
-        this._alignmentFetcher = new AlignmentFetcher(primaryGenomeConfig, track);
+    constructor(primaryGenomeConfig: GenomeConfig, queryTrack: TrackModel) {
+        this._alignmentFetcher = new AlignmentFetcher(primaryGenomeConfig, queryTrack);
         this._viewBeingFetched = null;
         this.align = memoizeOne(this.align);
     }

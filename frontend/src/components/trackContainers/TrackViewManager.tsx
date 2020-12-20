@@ -45,7 +45,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             this._primaryGenomeConfig = props.genomeConfig;
             // const queryGenomes = this.getSecondaryGenomes(props.tracks);
             // this._multiAlignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenome, queryGenomes);
-            this._multiAlignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenomeConfig, props.tracks.filter(track => (track.type === 'genomealign' || track.filetype === 'genomealign')));
+            // this.wasUnmounted = true;
             this.state = {
                 primaryView: props.expansionAmount.calculateExpansion(props.viewRegion, this.getVisualizationWidth()),
             };
@@ -71,23 +71,34 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             return Array.from(genomeSet);
         }
 
+        getSecondaryTracks = (tracks: TrackModel[]) => {
+            const secondaryTracks: TrackModel[] = [];
+            tracks.forEach(track => {
+                const genome = track.querygenome || track.getMetadata("genome");
+                if (genome && genome !== this._primaryGenome) {
+                    secondaryTracks.push(track);
+                }
+            })
+            return secondaryTracks;
+        }
+
         async fetchPrimaryView(
             viewRegion: DisplayedRegionModel,
             tracks: TrackModel[],
             visWidth: number
         ): Promise<ViewExpansion> {
-            console.log(visWidth)
             const visData = this.props.expansionAmount.calculateExpansion(viewRegion, visWidth);
             const secondaryGenomes = this.getSecondaryGenomes(tracks);
             if (!secondaryGenomes) {
                 return visData;
             }
+
             try {
                 const alignment = await this._multiAlignmentCalculator.multiAlign(visData);
-
                 // All the primaryVisData in alignment should be the same:
-                const [alignmentData] = Object.entries(alignment) // alignmentData is an array [queygenome string, alignment data]
-                const primaryVisData = alignmentData.length ? alignmentData[1].primaryVisData : visData;
+                const primaryVisData = Object.values(alignment).length
+                    ? Object.values(alignment)[0].primaryVisData
+                    : visData;
                 if (this._isMounted) {
                     this.setState({ primaryView: primaryVisData });
                 }
@@ -102,10 +113,13 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             }
         }
 
-        fetchAlignments(viewRegion: DisplayedRegionModel, visWidth: number): Promise<MultiAlignment> {
-            const visData = this.props.expansionAmount.calculateExpansion(viewRegion, visWidth);
+        fetchAlignments(viewRegion: DisplayedRegionModel, tracks: TrackModel[]): Promise<MultiAlignment> {
+            const visData = this.props.expansionAmount.calculateExpansion(viewRegion, this.getVisualizationWidth());
             // const queryGenomes = this.getSecondaryGenomes(this.props.tracks);
-            const fetchedAlignment = this._multiAlignmentCalculator.multiAlign(visData);
+            const queryTracks = this.getSecondaryTracks(tracks)
+            this._multiAlignmentCalculator = new MultiAlignmentViewCalculator(this._primaryGenomeConfig, queryTracks.filter(tk => tk.type === 'genomealign' || tk.filetype === 'genomealign'));
+            const alignmentCalculator = this._multiAlignmentCalculator;
+            const fetchedAlignment = alignmentCalculator.multiAlign(visData);
             return fetchedAlignment;
         }
 
@@ -144,7 +158,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             */
             return (
                 <WrappedComponent
-                    alignments={this.fetchAlignments(this.props.viewRegion, this.getVisualizationWidth())}
+                    alignments={this.fetchAlignments(this.props.viewRegion, this.props.tracks)}
                     basesPerPixel={this.props.viewRegion.getWidth() / this.getVisualizationWidth()}
                     primaryViewPromise={this.fetchPrimaryView(
                         this.props.viewRegion,

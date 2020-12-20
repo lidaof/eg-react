@@ -12,14 +12,13 @@ import { GenomeAlignWorker } from "../../dataSources/WorkerTSHook";
 export class AlignmentFetcher {
     public primaryGenome: string;
     private _dataSource: DataSource;
-    public queryTrack: TrackModel;
     public queryGenome: string;
 
-    constructor(public primaryGenomeConfig: GenomeConfig, public track: TrackModel) {
+    constructor(public primaryGenomeConfig: GenomeConfig, public queryTrack: TrackModel) {
         this.primaryGenome = primaryGenomeConfig.genome.getName();
         this.primaryGenomeConfig = primaryGenomeConfig;
-        this.queryTrack = track;
-        this.queryGenome = track.querygenome || track.getMetadata("genome");
+        this.queryTrack = queryTrack;
+        this.queryGenome = queryTrack.querygenome || queryTrack.getMetadata('genome');
         this._dataSource = this.initDataSource();
     }
 
@@ -34,10 +33,13 @@ export class AlignmentFetcher {
         if (!this.primaryGenomeConfig) {
             return this.makeErrorSource();
         }
-        // const annotationTracks = this.primaryGenomeConfig.annotationTracks || {};
-        // const comparisonTracks = annotationTracks["Genome Comparison"] || [];
-        // const theTrack = comparisonTracks.find((track: any) => track.querygenome === this.queryGenome) || {};
-        const url = this.queryTrack.url;
+        let url = this.queryTrack.url;
+        if(!url) {
+            const annotationTracks = this.primaryGenomeConfig.annotationTracks || {};
+            const comparisonTracks = annotationTracks["Genome Comparison"] || [];
+            const theTrack = comparisonTracks.find((track: any) => track.querygenome === this.queryGenome) || {};
+            url = theTrack.url;
+        }
         if (!url) {
             return this.makeErrorSource();
         }

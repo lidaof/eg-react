@@ -1,4 +1,4 @@
-import { TrackModel } from "model/TrackModel";
+import { TrackModel } from 'model/TrackModel';
 import { GenomeConfig } from "./../genomes/GenomeConfig";
 import _ from "lodash";
 import memoizeOne from "memoize-one";
@@ -98,14 +98,16 @@ export class MultiAlignmentViewCalculator {
     private primaryGenome: string;
     private _alignmentFetchers: AlignmentFetcher[];
 
-    constructor(primaryGenomeConfig: GenomeConfig, tracks: TrackModel[]) {
-        this._alignmentFetchers = tracks.map((track) => new AlignmentFetcher(primaryGenomeConfig, track));
+    constructor(primaryGenomeConfig: GenomeConfig, queryTracks: TrackModel[]) {
+        this._alignmentFetchers = queryTracks.map(
+            (track) => new AlignmentFetcher(primaryGenomeConfig, track)
+        );
         this.primaryGenome = primaryGenomeConfig.genome.getName();
         this.multiAlign = memoizeOne(this.multiAlign);
     }
 
     cleanUp() {
-        this._alignmentFetchers.map((fetcher) => fetcher.cleanUp());
+        this._alignmentFetchers.forEach((fetcher) => fetcher.cleanUp());
     }
     async multiAlign(visData: ViewExpansion): Promise<MultiAlignment> {
         const { visRegion, visWidth, viewWindowRegion } = visData;
