@@ -2,7 +2,6 @@ import UnknownTrack from '../trackVis/UnknownTrack';
 import LabelConfig from '../trackContextMenu/LabelConfig';
 import { TrackModel, TrackOptions } from '../../model/TrackModel';
 import DataSource from '../../dataSources/DataSource';
-import DisplayedRegionModel from 'model/DisplayedRegionModel';
 
 export class TrackConfig {
     public defaultOptions: TrackOptions;
@@ -46,18 +45,26 @@ export class TrackConfig {
         return false;
     }
 
+    isGenomeAlignTrack(): boolean {
+        return this.trackModel.type === "genomealign" || this.trackModel.filetype === "genomealign";
+    }
+
     /**
      *
      * @param oldRegion
      * @param newRegion
-     * @return {boolean} whether do data fetch due to region change
+     * @return {boolean} whether to fetch new data due to region change
      */
-    shouldFetchBecauseRegionChange(
-        currentOptions: TrackOptions,
-        oldRegion: DisplayedRegionModel,
-        newRegion: DisplayedRegionModel
-    ): boolean {
-        return oldRegion !== newRegion;
+    shouldFetchBecauseRegionChange(currentOptions: TrackOptions): boolean {
+        return true;
+    }
+
+    /**
+     * @return {boolean} whether to fetch new data because the view window changed (for instance, when the window is
+     * resized)
+     */
+    shouldFetchBecauseViewWindowChange(): boolean {
+        return false;
     }
 
     getComponent(): React.ComponentType {

@@ -107,6 +107,7 @@ export class MultiAlignmentViewCalculator {
     cleanUp() {
         this._alignmentFetchers.map((fetcher) => fetcher.cleanUp());
     }
+
     async multiAlign(visData: ViewExpansion): Promise<MultiAlignment> {
         const { visRegion, visWidth, viewWindowRegion } = visData;
 

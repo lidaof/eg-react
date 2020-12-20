@@ -6,7 +6,6 @@ import HeightConfig from '../trackContextMenu/HeightConfig';
 import { BackgroundColorConfig } from 'components/trackContextMenu/ColorConfig';
 import TrackModel, { TrackOptions } from '../../model/TrackModel';
 import { G3dResolutionConfig, G3dRegionConfig } from 'components/trackContextMenu/G3dDataConfig';
-import DisplayedRegionModel from 'model/DisplayedRegionModel';
 import { RegionMode } from 'model/G3dDataModes';
 import G3dShowChromLabelsConfig from 'components/trackContextMenu/G3dShowChromLabelsConfig';
 import LabelConfig from 'components/trackContextMenu/LabelConfig';
@@ -34,15 +33,8 @@ export class G3dTrackConfig extends TrackConfig {
         return oldOptions.region !== newOptions.region || oldOptions.resolution !== newOptions.resolution;
     }
 
-    shouldFetchBecauseRegionChange(
-        currentOptions: TrackOptions,
-        oldRegion: DisplayedRegionModel,
-        newRegion: DisplayedRegionModel
-    ): boolean {
-        if (currentOptions.region === RegionMode.GENOME || currentOptions.region === RegionMode.CHROMOSOME) {
-            return false;
-        }
-        return oldRegion !== newRegion;
+    shouldFetchBecauseRegionChange(currentOptions: TrackOptions): boolean {
+        return currentOptions.region !== RegionMode.GENOME && currentOptions.region !== RegionMode.CHROMOSOME;
     }
 
     getComponent() {
@@ -50,7 +42,7 @@ export class G3dTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        const items = [
+        return [
             LabelConfig,
             G3dResolutionConfig,
             G3dRegionConfig,
@@ -58,7 +50,5 @@ export class G3dTrackConfig extends TrackConfig {
             HeightConfig,
             BackgroundColorConfig
         ];
-
-        return items;
     }
 }

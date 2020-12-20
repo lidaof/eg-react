@@ -74,7 +74,7 @@ class TrackContainer extends React.Component {
     static propTypes = {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired, // Tracks to render
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-        primaryView: PropTypes.object.isRequired,
+        primaryView: PropTypes.object,
         trackData: PropTypes.object.isRequired,
         metadataTerms: PropTypes.arrayOf(PropTypes.string).isRequired, // Metadata terms
         /**
@@ -633,6 +633,9 @@ class TrackContainer extends React.Component {
             viewRegion,
             highlightColor,
         } = this.props;
+        if (!primaryView) {
+            return null;
+        }
         const { selectedTool } = this.state;
         const contextMenu = (
             <TrackContextMenu
