@@ -59,14 +59,6 @@ export class TrackConfig {
         return true;
     }
 
-    /**
-     * @return {boolean} whether to fetch new data because the view window changed (for instance, when the window is
-     * resized)
-     */
-    shouldFetchBecauseViewWindowChange(): boolean {
-        return false;
-    }
-
     getComponent(): React.ComponentType {
         return UnknownTrack;
     }
