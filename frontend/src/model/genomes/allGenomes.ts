@@ -3,6 +3,7 @@ import HG38 from "./hg38/hg38";
 import MM10 from "./mm10/mm10";
 import DAN_RER10 from "./danRer10/danRer10";
 import DAN_RER11 from "./danRer11/danRer11";
+import DAN_RER7 from "./danRer7/danRer7";
 import PANTRO5 from "./panTro5/panTro5";
 import PANTRO6 from "./panTro6/panTro6";
 import RN6 from "./rn6/rn6";
@@ -43,6 +44,7 @@ export const allGenomes = [
   BosTau8,
   DAN_RER10,
   DAN_RER11,
+  DAN_RER7,
   RN6,
   AraTha1,
   RheMac8,
@@ -142,7 +144,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   zebrafish: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
-    assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName()],
+    assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName(), DAN_RER7.genome.getName()],
     color: "yellow"
   },
   "spotted Gar": {
