@@ -28,7 +28,7 @@ import nomLeu3 from "./nomLeu3/nomLeu3";
 import papAnu2 from "./papAnu2/papAnu2";
 import rheMac3 from "./rheMac3/rheMac3";
 import calJac3 from "./calJac3/calJac3";
-import Pfal3D7 from "./Pfal3D7/Pfal3D7";
+import Pfal3D7 from "./pfal3d7/pfal3d7";
 import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
 import { GenomeConfig } from "./GenomeConfig";
 

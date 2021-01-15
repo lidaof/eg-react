@@ -51,7 +51,7 @@ function withAutoDimensions<P extends object>(
                 height: 600,
             };
             this._node = null;
-            this.setDimensions = _.debounce(this.setDimensions, 100);
+            this.setDimensions = _.debounce(this.setDimensions, 200);
 
             this.myObserver = new ResizeObserver((entries: any) => {
                 entries.forEach((entry: any) => {
