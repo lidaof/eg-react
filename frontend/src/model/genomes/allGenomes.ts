@@ -23,6 +23,7 @@ import MERS from "./virus/mers";
 import nCoV2019 from "./virus/nCoV2019";
 import LEPOCU1 from "./lepOcu1/lepOcu1";
 import panTro4 from "./panTro4/panTro4";
+import gorGor4 from "./gorGor4/gorGor4";
 import gorGor3 from "./gorGor3/gorGor3";
 import nomLeu3 from "./nomLeu3/nomLeu3";
 import papAnu2 from "./papAnu2/papAnu2";
@@ -60,6 +61,7 @@ export const allGenomes = [
   nCoV2019,
   LEPOCU1,
   panTro4,
+  gorGor4,
   gorGor3,
   nomLeu3,
   papAnu2,
@@ -99,7 +101,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   gorilla: {
     logoUrl: "https://vizhub.wustl.edu/public/gorGor3/Gorilla.png",
-    assemblies: [gorGor3.genome.getName()],
+    assemblies: [gorGor4.genome.getName(), gorGor3.genome.getName()],
     color: "yellow"
   },
   gibbon: {
