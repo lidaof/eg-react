@@ -1,23 +1,24 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import { Custom3DObject } from './Custom3DObject';
-import RulerDesigner from '../../art/RulerDesigner';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import { mergeGeometries } from './mergeGeometries';
+import { Custom3DObject } from "./Custom3DObject";
+import RulerDesigner from "../../art/RulerDesigner";
+import DisplayedRegionModel from "../../model/DisplayedRegionModel";
+import { mergeGeometries } from "./mergeGeometries";
 
 const FONT_SIZE = 0.2;
-const FONT_URL = "https://raw.githubusercontent.com/rollup/three-jsnext/master/examples/fonts/helvetiker_regular.typeface.json";
+const FONT_URL =
+    "https://raw.githubusercontent.com/rollup/three-jsnext/master/examples/fonts/helvetiker_regular.typeface.json";
 const FONT_PROMISE = new Promise((resolve, reject) => {
     const fontLoader = new window.THREE.FontLoader();
     fontLoader.load(FONT_URL, resolve, undefined, reject);
 });
-const LINE_MATERIAL = new window.THREE.LineBasicMaterial({color: "black"});
-const MATERIAL = new window.THREE.MeshBasicMaterial({color: "black"});
+const LINE_MATERIAL = new window.THREE.LineBasicMaterial({ color: "black" });
+const MATERIAL = new window.THREE.MeshBasicMaterial({ color: "black" });
 
 /**
  * A ruler on the x-z plane.
- * 
+ *
  * @author Silas Hsu
  */
 class VrRuler extends React.Component {
@@ -30,7 +31,7 @@ class VrRuler extends React.Component {
 
     static defaultProps = {
         tickHeight: 1,
-        z: 0,
+        z: 0
     };
 
     constructor(props) {
@@ -38,7 +39,7 @@ class VrRuler extends React.Component {
         this.state = {
             font: null
         };
-        FONT_PROMISE.then((font) => this.setState({font: font}));
+        FONT_PROMISE.then(font => this.setState({ font: font }));
     }
 
     _makeLines() {
@@ -52,7 +53,7 @@ class VrRuler extends React.Component {
         }
         lineVertices = new Float32Array(lineVertices);
         const lineGeometry = new window.THREE.BufferGeometry();
-        lineGeometry.addAttribute('position', new window.THREE.BufferAttribute(lineVertices, 3));
+        lineGeometry.setAttribute("position", new window.THREE.BufferAttribute(lineVertices, 3));
         return new window.THREE.LineSegments(lineGeometry, LINE_MATERIAL);
     }
 
@@ -70,12 +71,14 @@ class VrRuler extends React.Component {
 
         const lines = this._makeLines();
         const text = this._makeText();
-        const commonProps = {rotation: "-90 0 0", position: `0 0 ${this.props.z}`}
+        const commonProps = { rotation: "-90 0 0", position: `0 0 ${this.props.z}` };
 
-        return <React.Fragment>
-            <Custom3DObject object={lines} {...commonProps} />,
-            <Custom3DObject object={text} {...commonProps} />,
-        </React.Fragment>;
+        return (
+            <React.Fragment>
+                <Custom3DObject object={lines} {...commonProps} />,
+                <Custom3DObject object={text} {...commonProps} />,
+            </React.Fragment>
+        );
     }
 }
 
@@ -111,7 +114,6 @@ class VrRulerLineFactory {
 
 const PADDING = 0.03;
 class VrRulerTextFactory {
-    
     constructor(majorTextSize, font) {
         this.majorTextSize = majorTextSize;
         this.font = font;

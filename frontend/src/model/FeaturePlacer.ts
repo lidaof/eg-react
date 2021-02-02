@@ -70,7 +70,7 @@ export class FeaturePlacer {
      * @param {number} width - width of visualization
      * @return {PlacedFeature[]} draw info for the features
      */
-    placeFeatures(features: Feature[], viewRegion: DisplayedRegionModel, width: number): PlacedFeature[] {
+    placeFeatures(features: Feature[], viewRegion: DisplayedRegionModel, width: number, useCenter: boolean=false): PlacedFeature[] {
         const drawModel = new LinearDrawingModel(viewRegion, width);
         const viewRegionBounds = viewRegion.getContextCoordinates();
         const navContext = viewRegion.getNavigationContext();
@@ -80,7 +80,7 @@ export class FeaturePlacer {
             for (let contextLocation of feature.computeNavContextCoordinates(navContext)) {
                 contextLocation = contextLocation.getOverlap(viewRegionBounds); // Clamp the location to view region
                 if (contextLocation) {
-                    const xSpan = drawModel.baseSpanToXSpan(contextLocation);
+                    const xSpan = useCenter ? drawModel.baseSpanToXCenter(contextLocation) : drawModel.baseSpanToXSpan(contextLocation);
                     const {visiblePart, isReverse} = this._locatePlacement(feature, navContext, contextLocation);
                     placements.push({ feature, visiblePart, contextLocation, xSpan, isReverse });
                 }

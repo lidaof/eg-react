@@ -1,21 +1,23 @@
-import _ from 'lodash';
-import memoizeOne from 'memoize-one';
+import { TrackModel } from 'model/TrackModel';
+import { GenomeConfig } from "./../genomes/GenomeConfig";
+import _ from "lodash";
+import memoizeOne from "memoize-one";
 
-import { segmentSequence, makeBaseNumberLookup, countBases, SequenceSegment } from './AlignmentStringUtils';
-import { AlignmentRecord } from './AlignmentRecord';
-import { AlignmentSegment } from './AlignmentSegment';
-import { AlignmentFetcher } from './AlignmentFetcher';
-import { NavContextBuilder, Gap } from './NavContextBuilder';
+import { segmentSequence, makeBaseNumberLookup, countBases, SequenceSegment } from "./AlignmentStringUtils";
+import { AlignmentRecord } from "./AlignmentRecord";
+import { AlignmentSegment } from "./AlignmentSegment";
+import { AlignmentFetcher } from "./AlignmentFetcher";
+import { NavContextBuilder, Gap } from "./NavContextBuilder";
 
-import ChromosomeInterval from '../interval/ChromosomeInterval';
-import OpenInterval from '../interval/OpenInterval';
-import NavigationContext from '../NavigationContext';
-import LinearDrawingModel from '../LinearDrawingModel';
-import { Feature } from '../Feature';
-import { ViewExpansion } from '../RegionExpander';
-import { FeaturePlacer } from '../FeaturePlacer';
-import DisplayedRegionModel from '../DisplayedRegionModel';
-import { niceBpCount } from '../../util';
+import ChromosomeInterval from "../interval/ChromosomeInterval";
+import OpenInterval from "../interval/OpenInterval";
+import NavigationContext from "../NavigationContext";
+import LinearDrawingModel from "../LinearDrawingModel";
+import { Feature } from "../Feature";
+import { ViewExpansion } from "../RegionExpander";
+import { FeaturePlacer } from "../FeaturePlacer";
+import DisplayedRegionModel from "../DisplayedRegionModel";
+import { niceBpCount } from "../../util";
 
 export interface PlacedAlignment {
     record: AlignmentRecord;
@@ -60,7 +62,7 @@ export interface Alignment {
      * PlacedAlignment[] in fine mode; PlacedMergedAlignment in rough mode.
      */
     drawData: PlacedAlignment[] | PlacedMergedAlignment[];
-    drawGapText?: GapText[];  // An array holding gap size information between placedAlignments, fineMode only
+    drawGapText?: GapText[]; // An array holding gap size information between placedAlignments, fineMode only
     plotStrand?: string; // rough mode plot positive or negative
     primaryGenome: string;
     queryGenome: string;
@@ -78,8 +80,8 @@ export class AlignmentViewCalculator {
     private _alignmentFetcher: AlignmentFetcher;
     private _viewBeingFetched: ViewExpansion;
 
-    constructor(primaryGenome: string, queryGenome: string) {
-        this._alignmentFetcher = new AlignmentFetcher(primaryGenome, queryGenome);
+    constructor(primaryGenomeConfig: GenomeConfig, queryTrack: TrackModel) {
+        this._alignmentFetcher = new AlignmentFetcher(primaryGenomeConfig, queryTrack);
         this._viewBeingFetched = null;
         this.align = memoizeOne(this.align);
     }
@@ -89,7 +91,7 @@ export class AlignmentViewCalculator {
     }
 
     async align(visData: ViewExpansion): Promise<Alignment> {
-        const {visRegion, visWidth, viewWindowRegion} = visData;
+        const { visRegion, visWidth, viewWindowRegion } = visData;
         this._viewBeingFetched = visData;
 
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
@@ -102,23 +104,15 @@ export class AlignmentViewCalculator {
         }
 
         if (this._viewBeingFetched !== visData) {
-            return Promise.reject(new Error('Alignment canceled due to another call to align()'));
+            return Promise.reject(new Error("Alignment canceled due to another call to align()"));
         }
-        
-        // Count how many bases are in positive strand and how many of them are in negative strand.
-        // More in negative strand (<0) => plotStrand = "-". 
-        const aggregateStrandsNumber = records.reduce((aggregateStrand, record) => 
-        aggregateStrand + (record.getIsReverseStrandQuery()?
-        (-1 * record.getLength()):record.getLength()), 0
-        );
-        const plotStrand = aggregateStrandsNumber < 0?"-":"+";
 
-        return isFineMode ? this.alignFine(records, visData) : this.alignRough(records, visData, plotStrand);
+        return isFineMode ? this.alignFine(records, visData) : this.alignRough(records, visData);
     }
 
     alignFine(records: AlignmentRecord[], visData: ViewExpansion): Alignment {
         // There's a lot of steps, so bear with me...
-        const {visRegion, viewWindow, viewWindowRegion} = visData;
+        const { visRegion, viewWindow, viewWindowRegion } = visData;
         const oldNavContext = visRegion.getNavigationContext();
         // const drawModel = new LinearDrawingModel(visRegion, visWidth);
         // const minGapLength = drawModel.xWidthToBases(MIN_GAP_DRAW_WIDTH);
@@ -163,7 +157,7 @@ export class AlignmentViewCalculator {
         const drawGapTexts = [];
         const targetIntervalPlacer = new IntervalPlacer(MARGIN);
         const queryIntervalPlacer = new IntervalPlacer(MARGIN);
-        for(let i=1; i<placements.length; i++) {
+        for (let i = 1; i < placements.length; i++) {
             const lastPlacement = placements[i - 1];
             const placement = placements[i];
             const lastXEnd = lastPlacement.targetXSpan.end;
@@ -172,57 +166,54 @@ export class AlignmentViewCalculator {
             const lastTargetEnd = lastPlacement.record.locus.end;
             const lastQueryChr = lastPlacement.record.queryLocus.chr;
             const lastStrand = lastPlacement.record.queryStrand;
-            const lastQueryEnd = 
+            const lastQueryEnd =
                 lastStrand === "+" ? lastPlacement.record.queryLocus.end : lastPlacement.record.queryLocus.start;
             const targetChr = placement.record.locus.chr;
             const targetStart = placement.record.locus.start;
             const queryChr = placement.record.queryLocus.chr;
             const queryStrand = placement.record.queryStrand;
-            const queryStart = 
+            const queryStart =
                 queryStrand === "+" ? placement.record.queryLocus.start : placement.record.queryLocus.end;
             let placementQueryGap: string;
-            if (lastQueryChr === queryChr){
+            if (lastQueryChr === queryChr) {
                 if (lastStrand === "+" && queryStrand === "+") {
                     placementQueryGap = queryStart >= lastQueryEnd ? "" : "overlap ";
                     placementQueryGap += niceBpCount(Math.abs(queryStart - lastQueryEnd));
-
-                }
-                else if (lastStrand === "-" && queryStrand === "-") {
+                } else if (lastStrand === "-" && queryStrand === "-") {
                     placementQueryGap = lastQueryEnd >= queryStart ? "" : "overlap ";
                     placementQueryGap += niceBpCount(Math.abs(lastQueryEnd - queryStart));
-                }
-                else {
+                } else {
                     placementQueryGap = "reverse direction";
                 }
             } else {
                 placementQueryGap = "not connected";
             }
             const placementGapX = (lastXEnd + xStart) / 2;
-            const queryPlacementGapX = (lastPlacement.queryXSpan.end + placement.queryXSpan.start) / 2
-            const placementTargetGap = lastTargetChr === targetChr ? 
-                    niceBpCount(targetStart - lastTargetEnd) : "not connected";
+            const queryPlacementGapX = (lastPlacement.queryXSpan.end + placement.queryXSpan.start) / 2;
+            const placementTargetGap =
+                lastTargetChr === targetChr ? niceBpCount(targetStart - lastTargetEnd) : "not connected";
 
-            const targetTextWidth = placementTargetGap.length * 5;  // use font size 10...
+            const targetTextWidth = placementTargetGap.length * 5; // use font size 10...
             const halfTargetTextWidth = 0.5 * targetTextWidth;
             const preferredTargetStart = placementGapX - halfTargetTextWidth;
             const preferredTargetEnd = placementGapX + halfTargetTextWidth;
             // shift text position only if the width of text is bigger than the gap size:
-            const shiftTargetTxt = (preferredTargetStart <= lastXEnd || preferredTargetEnd >= xStart);
-            const targetGapTextXSpan = shiftTargetTxt?
-                targetIntervalPlacer.place(new OpenInterval(preferredTargetStart, preferredTargetEnd)):
-                new OpenInterval(preferredTargetStart, preferredTargetEnd);
+            const shiftTargetTxt = preferredTargetStart <= lastXEnd || preferredTargetEnd >= xStart;
+            const targetGapTextXSpan = shiftTargetTxt
+                ? targetIntervalPlacer.place(new OpenInterval(preferredTargetStart, preferredTargetEnd))
+                : new OpenInterval(preferredTargetStart, preferredTargetEnd);
             const targetGapXSpan = new OpenInterval(lastXEnd, xStart);
-            
-            const queryTextWidth = placementQueryGap.length * 5;   // use font size 10...
+
+            const queryTextWidth = placementQueryGap.length * 5; // use font size 10...
             const halfQueryTextWidth = 0.5 * queryTextWidth;
             const preferredQueryStart = queryPlacementGapX - halfQueryTextWidth;
             const preferredQueryEnd = queryPlacementGapX + halfQueryTextWidth;
             // shift text position only if the width of text is bigger than the gap size:
-            const shiftQueryTxt = (preferredQueryStart <= lastPlacement.queryXSpan.end || 
-                preferredQueryEnd >= placement.queryXSpan.start);
-            const queryGapTextXSpan = shiftQueryTxt?
-                queryIntervalPlacer.place(new OpenInterval(preferredQueryStart, preferredQueryEnd)):
-                new OpenInterval(preferredQueryStart, preferredQueryEnd);
+            const shiftQueryTxt =
+                preferredQueryStart <= lastPlacement.queryXSpan.end || preferredQueryEnd >= placement.queryXSpan.start;
+            const queryGapTextXSpan = shiftQueryTxt
+                ? queryIntervalPlacer.place(new OpenInterval(preferredQueryStart, preferredQueryEnd))
+                : new OpenInterval(preferredQueryStart, preferredQueryEnd);
             const queryGapXSpan = new OpenInterval(lastPlacement.queryXSpan.end, placement.queryXSpan.start);
             drawGapTexts.push({
                 targetGapText: placementTargetGap,
@@ -245,7 +236,7 @@ export class AlignmentViewCalculator {
                 visRegion: newVisRegion,
                 visWidth: newVisWidth,
                 viewWindowRegion: newViewWindowRegion,
-                viewWindow: newViewWindow,
+                viewWindow: newViewWindow
             },
             queryRegion,
             drawData: placements,
@@ -268,22 +259,33 @@ export class AlignmentViewCalculator {
     /**
      * Groups and merges alignment records based on their proximity in the query (secondary) genome.  Then, calculates
      * draw positions for all records.
-     * 
+     *
      * @param {AlignmentRecord[]} alignmentRecords - records to process
      * @param {DisplayedRegionModel} viewRegion - view region of the primary genome
      * @param {number} width - view width of the primary genome
      * @return {PlacedMergedAlignment[]} placed merged alignments
      */
-    alignRough(alignmentRecords: AlignmentRecord[], visData: ViewExpansion, plotStrand: string): Alignment {
-        const {visRegion, visWidth} = visData;
+    alignRough(alignmentRecords: AlignmentRecord[], visData: ViewExpansion): Alignment {
+        const { visRegion, visWidth } = visData;
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
         const mergeDistance = drawModel.xWidthToBases(MERGE_PIXEL_DISTANCE);
+
+        // Count how many bases are in positive strand and how many of them are in negative strand.
+        // More in negative strand (<0) => plotStrand = "-".
+        const aggregateStrandsNumber = alignmentRecords.reduce(
+            (aggregateStrand, record) =>
+                aggregateStrand + (record.getIsReverseStrandQuery() ? -1 * record.getLength() : record.getLength()),
+            0
+        );
+        const plotStrand = aggregateStrandsNumber < 0 ? "-" : "+";
 
         const placedRecords = this._computeContextLocations(alignmentRecords, visData);
         // First, merge the alignments by query genome coordinates
         let queryLocusMerges = ChromosomeInterval.mergeAdvanced(
             // Note that the third parameter gets query loci
-            placedRecords, mergeDistance, placement => placement.visiblePart.getQueryLocus()
+            placedRecords,
+            mergeDistance,
+            placement => placement.visiblePart.getQueryLocus()
         );
 
         // Sort so we place the largest query loci first in the next step
@@ -301,9 +303,9 @@ export class AlignmentViewCalculator {
             }
 
             // Find the center of the primary segments, and try to center the merged query locus there too.
-            const drawCenter = computeCentroid(placementsInMerge.map(segment => segment.targetXSpan));
-            const targetXStart = Math.min(...placementsInMerge.map(segment => segment.targetXSpan.start));
-            const targetEnd = Math.max(...placementsInMerge.map(segment => segment.targetXSpan.end));
+            const drawCenter = computeCentroid(placementsInMerge.map((segment:any) => segment.targetXSpan));
+            const targetXStart = Math.min(...placementsInMerge.map((segment:any) => segment.targetXSpan.start));
+            const targetEnd = Math.max(...placementsInMerge.map((segment:any) => segment.targetXSpan.end));
             const mergeTargetXSpan = new OpenInterval(targetXStart, targetEnd);
             const preferredStart = drawCenter - halfDrawWidth;
             const preferredEnd = drawCenter + halfDrawWidth;
@@ -312,7 +314,7 @@ export class AlignmentViewCalculator {
 
             // Put the actual secondary/query genome segments in the placed merged query locus from above
             const queryLoci = placementsInMerge.map(placement => placement.record.queryLocus);
-            const isReverse = plotStrand==="-"?true:false;
+            const isReverse = plotStrand === "-" ? true : false;
             const lociXSpans = this._placeInternalLoci(mergeLocus, queryLoci, mergeXSpan, isReverse, drawModel);
             for (let i = 0; i < queryLoci.length; i++) {
                 placementsInMerge[i].queryXSpan = lociXSpans[i];
@@ -341,32 +343,32 @@ export class AlignmentViewCalculator {
     /**
      * Calculates context coordinates in the *primary* genome for alignment records.  Returns PlacedAlignments with NO x
      * coordinates set.  Make sure you set them before returning them in any public API!
-     * 
-     * @param records 
-     * @param visData 
+     *
+     * @param records
+     * @param visData
      */
     _computeContextLocations(records: AlignmentRecord[], visData: ViewExpansion): PlacedAlignment[] {
-        const {visRegion, visWidth} = visData;
+        const { visRegion, visWidth } = visData;
         return FEATURE_PLACER.placeFeatures(records, visRegion, visWidth).map(placement => {
             return {
                 record: placement.feature as AlignmentRecord,
                 visiblePart: AlignmentSegment.fromFeatureSegment(placement.visiblePart),
                 contextSpan: placement.contextLocation,
                 targetXSpan: placement.xSpan,
-                queryXSpan: null,
+                queryXSpan: null
             };
         });
     }
 
     /**
-     * 
-     * @param placedAlignment 
-     * @param minGapLength 
+     *
+     * @param placedAlignment
+     * @param minGapLength
      */
     _getPrimaryGenomeGaps(placements: PlacedAlignment[], minGapLength: number): Gap[] {
         const gaps = [];
         for (const placement of placements) {
-            const {visiblePart, contextSpan} = placement;
+            const { visiblePart, contextSpan } = placement;
             const segments = segmentSequence(visiblePart.getTargetSequence(), minGapLength, true);
             const baseLookup = makeBaseNumberLookup(visiblePart.getTargetSequence(), contextSpan.start);
             for (const segment of segments) {
@@ -389,19 +391,19 @@ export class AlignmentViewCalculator {
             (segment as PlacedSequenceSegment).xSpan = new OpenInterval(x, x + xSpanLength);
             x += xSpanLength;
         }
-        return (segments as PlacedSequenceSegment[]);
+        return segments as PlacedSequenceSegment[];
     }
 
     /**
-     * 
-     * @param placements 
-     * @param minGapLength 
-     * @param pixelsPerBase 
+     *
+     * @param placements
+     * @param minGapLength
+     * @param pixelsPerBase
      */
     _getQueryPieces(placements: PlacedAlignment[]): QueryGenomePiece[] {
         const queryPieces: QueryGenomePiece[] = [];
         for (const placement of placements) {
-            const {record, visiblePart} = placement;
+            const { record, visiblePart } = placement;
             const isReverse = record.getIsReverseStrandQuery();
             const querySeq = visiblePart.getQuerySequence();
             let baseLookup;
@@ -413,7 +415,7 @@ export class AlignmentViewCalculator {
             const queryChr = record.queryLocus.chr;
 
             for (const segment of placement.querySegments) {
-                const {isGap, index, length, xSpan} = segment;
+                const { isGap, index, length, xSpan } = segment;
                 if (isGap) {
                     continue;
                 }
@@ -436,24 +438,27 @@ export class AlignmentViewCalculator {
         return queryPieces;
     }
 
-    _makeQueryGenomeRegion(genomePieces: QueryGenomePiece[], visWidth: number,
-        drawModel: LinearDrawingModel): DisplayedRegionModel
-    {
+    _makeQueryGenomeRegion(
+        genomePieces: QueryGenomePiece[],
+        visWidth: number,
+        drawModel: LinearDrawingModel
+    ): DisplayedRegionModel {
         // Sort by start
         const sortedPieces = genomePieces.slice().sort((a, b) => a.queryXSpan.start - b.queryXSpan.start);
         const features = [];
 
         let x = 0;
-        let prevLocus = new ChromosomeInterval('', -1, -1); // Placeholder
+        let prevLocus = new ChromosomeInterval("", -1, -1); // Placeholder
         for (const piece of sortedPieces) {
-            const {queryXSpan, queryFeature} = piece;
+            const { queryXSpan, queryFeature } = piece;
             const queryLocus = queryFeature.getLocus();
 
             const gapPixels = queryXSpan.start - x; // Compute potential gap
             const gapBases = Math.round(drawModel.xWidthToBases(gapPixels));
             if (gapBases >= 1) {
-                const specialName = doLociTouchInGenome(queryLocus, prevLocus) ?
-                    `${niceBpCount(gapBases)} gap` : undefined;
+                const specialName = doLociTouchInGenome(queryLocus, prevLocus)
+                    ? `${niceBpCount(gapBases)} gap`
+                    : undefined;
                 features.push(NavigationContext.makeGap(gapBases, specialName));
             }
 
@@ -466,32 +471,36 @@ export class AlignmentViewCalculator {
         if (finalGapBases > 0) {
             features.push(NavigationContext.makeGap(finalGapBases));
         }
-        return new DisplayedRegionModel( new NavigationContext('', features) );
+        return new DisplayedRegionModel(new NavigationContext("", features));
     }
 
-    _placeInternalLoci(parentLocus: ChromosomeInterval, internalLoci: ChromosomeInterval[], parentXSpan: OpenInterval,
-         drawReverse: boolean, drawModel: LinearDrawingModel)
-    {
+    _placeInternalLoci(
+        parentLocus: ChromosomeInterval,
+        internalLoci: ChromosomeInterval[],
+        parentXSpan: OpenInterval,
+        drawReverse: boolean,
+        drawModel: LinearDrawingModel
+    ) {
         const xSpans = [];
-        if (drawReverse) {  // place segments from right to left if drawReverse
+        if (drawReverse) {
+            // place segments from right to left if drawReverse
             for (const locus of internalLoci) {
                 const distanceFromParent = locus.start - parentLocus.start;
                 const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
                 const locusXEnd = parentXSpan.end - xDistanceFromParent;
                 const xWidth = drawModel.basesToXWidth(locus.getLength());
-                const xEnd = locusXEnd<parentXSpan.end?locusXEnd:parentXSpan.end;
-                const xStart = (locusXEnd - xWidth)> parentXSpan.start?(locusXEnd - xWidth):parentXSpan.start;
+                const xEnd = locusXEnd < parentXSpan.end ? locusXEnd : parentXSpan.end;
+                const xStart = locusXEnd - xWidth > parentXSpan.start ? locusXEnd - xWidth : parentXSpan.start;
                 xSpans.push(new OpenInterval(xStart, xEnd));
             }
-        }
-        else {
+        } else {
             for (const locus of internalLoci) {
                 const distanceFromParent = locus.start - parentLocus.start;
                 const xDistanceFromParent = drawModel.basesToXWidth(distanceFromParent);
                 const locusXStart = parentXSpan.start + xDistanceFromParent;
                 const xWidth = drawModel.basesToXWidth(locus.getLength());
-                const xStart = locusXStart>parentXSpan.start?locusXStart:parentXSpan.start;
-                const xEnd = (locusXStart + xWidth)<parentXSpan.end?(locusXStart + xWidth):parentXSpan.end;
+                const xStart = locusXStart > parentXSpan.start ? locusXStart : parentXSpan.start;
+                const xEnd = locusXStart + xWidth < parentXSpan.end ? locusXStart + xWidth : parentXSpan.end;
                 xSpans.push(new OpenInterval(xStart, xEnd));
             }
         }
@@ -505,7 +514,7 @@ class IntervalPlacer {
     public margin: number;
     private _placements: OpenInterval[];
 
-    constructor(margin=0) {
+    constructor(margin = 0) {
         this.leftExtent = Infinity;
         this.rightExtent = -Infinity;
         this.margin = margin;
@@ -515,11 +524,11 @@ class IntervalPlacer {
     place(preferredLocation: OpenInterval) {
         let finalLocation = preferredLocation;
         if (this._placements.some(placement => placement.getOverlap(preferredLocation) != null)) {
-            const center = 0.5 * (preferredLocation.start + preferredLocation.end)
+            const center = 0.5 * (preferredLocation.start + preferredLocation.end);
             const isInsertLeft = Math.abs(center - this.leftExtent) < Math.abs(center - this.rightExtent);
-            finalLocation = isInsertLeft ?
-                new OpenInterval(this.leftExtent - preferredLocation.getLength(), this.leftExtent) :
-                new OpenInterval(this.rightExtent, this.rightExtent + preferredLocation.getLength());
+            finalLocation = isInsertLeft
+                ? new OpenInterval(this.leftExtent - preferredLocation.getLength(), this.leftExtent)
+                : new OpenInterval(this.rightExtent, this.rightExtent + preferredLocation.getLength());
         }
 
         this._placements.push(finalLocation);

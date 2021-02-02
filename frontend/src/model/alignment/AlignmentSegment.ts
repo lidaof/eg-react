@@ -1,12 +1,12 @@
-import { FeatureSegment } from '../interval/FeatureSegment';
-import { AlignmentRecord } from './AlignmentRecord';
-import OpenInterval from '../interval/OpenInterval';
-import ChromosomeInterval from '../interval/ChromosomeInterval';
-import { countBases, AlignmentIterator } from './AlignmentStringUtils';
+import { FeatureSegment } from "../interval/FeatureSegment";
+import { AlignmentRecord } from "./AlignmentRecord";
+import OpenInterval from "../interval/OpenInterval";
+import ChromosomeInterval from "../interval/ChromosomeInterval";
+import { countBases, AlignmentIterator } from "./AlignmentStringUtils";
 
 /**
  * A segment of an alignment record.  Has methods that get parts of the attached record's sequences and loci.
- * 
+ *
  * @author Silas Hsu
  */
 export class AlignmentSegment extends FeatureSegment {
@@ -19,7 +19,7 @@ export class AlignmentSegment extends FeatureSegment {
     /**
      * Creates an AlignmentSegment from a FeatureSegment whose attached feature is an AlignmentRecord.  Works almost
      * like a cast from FeatureSegment to AlignmentSegment.
-     * 
+     *
      * @param {FeatureSegment} segment - a FeatureSegment whose attached feature must be an AlignmentRecord
      * @return {AlignmentSegment} a new AlignmentSegment from the data in the input
      */
@@ -29,11 +29,12 @@ export class AlignmentSegment extends FeatureSegment {
 
     /**
      * Constructs a new instance.
-     * 
+     *
      * @see {FeatureSegment}
      */
     constructor(record: AlignmentRecord, start?: number, end?: number) {
         super(record, start, end);
+        this.feature = record; // this line should be non-necessary since super() already set it...
         const alignIter = new AlignmentIterator(record.targetSeq);
         // +1 because AlignmentIterator starts on string index -1.
         const substringStart = alignIter.advanceN(this.relativeStart + 1);
@@ -51,26 +52,35 @@ export class AlignmentSegment extends FeatureSegment {
 
     /**
      * Gets the approximate location in the query/secondary genome that this segment covers.
-     * 
+     *
      * @return {ChromosomeInterval} the approximate locus in the query/secondary genome represented by this segment.
      */
     getQueryLocus() {
-        const {queryStrand, queryLocus} = this.feature;
+        const { queryStrand, queryLocus } = this.feature;
+        // return new ChromosomeInterval(
+        //     queryLocus.chr,
+        //     queryStrand === "+" ? queryLocus.start + this.relativeStart : queryLocus.end - this.relativeEnd,
+        //     queryStrand === "+" ? queryLocus.start + this.relativeEnd : queryLocus.end - this.relativeStart
+        // );
         return new ChromosomeInterval(
             queryLocus.chr,
-            queryStrand === "+" ? queryLocus.start + this.relativeStart : queryLocus.end - this.relativeEnd,
-            queryStrand === "+" ? queryLocus.start + this.relativeEnd : queryLocus.end - this.relativeStart
+            queryStrand === "+"
+                ? queryLocus.start + this.relativeStart
+                : Math.max(0, queryLocus.end - this.relativeEnd),
+            queryStrand === "+"
+                ? Math.min(queryLocus.start + this.relativeEnd, queryLocus.end)
+                : queryLocus.end - this.relativeStart
         );
     }
 
     /**
      * Gets the location in the query/secondary genome that this segment covers.  Unlike `getQueryLocus`, this method
      * uses sequence data, so it will be more accurate, but also somewhat slower.
-     * 
+     *
      * @return {ChromosomeInterval} the locus in the query/secondary genome represented by this segment.
      */
     getQueryLocusFine() {
-        const {querySeq, queryLocus} = this.feature;
+        const { querySeq, queryLocus } = this.feature;
         // The sequence in the record "before" this sequence
         const baseOffset = countBases(querySeq.substring(0, this.sequenceInterval.start));
         const baseLength = countBases(this.getQuerySequence());

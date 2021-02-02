@@ -1,21 +1,32 @@
 .GenomePicker-main {
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: auto auto;
     align-items: center;
     /* height: 60vh; */
-    grid-gap: 20px;
-    width: 50%;
+    grid-gap: 10px;
+    width: 80%;
     margin: auto;
 }
 
 .GenomePicker-species {
     display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 10px;
+}
+
+.GenomePicker-nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+.GenomePicker-select {
+    display: grid;
     grid-template-columns: auto;
     grid-gap: 10px;
 }
 
-.capitalize {
-    text-transform: capitalize;
+.capitalize:first-letter {
+    text-transform: uppercase;
 }
 
 .GenomePicker-one-species label {
@@ -27,7 +38,8 @@
     cursor: pointer;
 }
 
-.GenomePicker-one-species:hover, .GenomePicker-assembly > label:hover {
+.GenomePicker-one-species:hover,
+.GenomePicker-assembly > label:hover {
     transform: translateX(2%);
     transition: transform 0.5s;
 }
@@ -45,3 +57,8 @@
     display: grid;
     grid-template-columns: auto auto;
 }
+
+/* .GenomePicker-img {
+    height: auto;
+    width: 200px;
+} */

@@ -86,6 +86,22 @@ class LinearDrawingModel {
         return new OpenInterval(startX, endX);
     }
 
+     /**
+     * Converts an interval of bases to an interval of X coordinates, but just the center.
+     * 
+     * @param {OpenInterval} baseInterval - interval of bases to convert
+     * @return {OpenInterval} x draw interval
+     */
+    baseSpanToXCenter(baseInterval: OpenInterval): OpenInterval {
+        const span = this.baseSpanToXSpan(baseInterval);
+        const centerX = Math.round((span.start + span.end) / 2);
+        // const startX = this.baseToX(baseInterval.start);
+        // const endX = this.baseToX(baseInterval.end);
+        // const centerX = (startX + endX) / 2;
+        // Round centerx and return (centerX, centerX) to plot a single marker
+        return new OpenInterval(centerX, centerX);
+    }
+
     /**
      * Gets the segment coordinates that a pixel coordinate represents.
      * 

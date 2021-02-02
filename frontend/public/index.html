@@ -1,53 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="theme-color" content="#000000">
-    <!--
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="theme-color" content="#000000" />
+        <!--
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <!-- For old IEs -->
-<link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+        <!-- For old IEs -->
+        <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
 
-<!-- For new browsers - multisize ico  -->
-<link rel="icon" type="image/x-icon" sizes="16x16 32x32" href="%PUBLIC_URL%/favicon.ico">
+        <!-- For new browsers - multisize ico  -->
+        <link rel="icon" type="image/x-icon" sizes="16x16 32x32" href="%PUBLIC_URL%/favicon.ico" />
 
-<!-- For iPad with high-resolution Retina display running iOS ≥ 7: -->
-<link rel="apple-touch-icon" sizes="152x152" href="%PUBLIC_URL%/favicon-152-precomposed.png">
+        <!-- For iPad with high-resolution Retina display running iOS ≥ 7: -->
+        <link rel="apple-touch-icon" sizes="152x152" href="%PUBLIC_URL%/favicon-152-precomposed.png" />
 
-<!-- For iPad with high-resolution Retina display running iOS ≤ 6: -->
-<link rel="apple-touch-icon" sizes="144x144" href="%PUBLIC_URL%/favicon-144-precomposed.png">
+        <!-- For iPad with high-resolution Retina display running iOS ≤ 6: -->
+        <link rel="apple-touch-icon" sizes="144x144" href="%PUBLIC_URL%/favicon-144-precomposed.png" />
 
-<!-- For iPhone with high-resolution Retina display running iOS ≥ 7: -->
-<link rel="apple-touch-icon" sizes="120x120" href="%PUBLIC_URL%/favicon-120-precomposed.png">
+        <!-- For iPhone with high-resolution Retina display running iOS ≥ 7: -->
+        <link rel="apple-touch-icon" sizes="120x120" href="%PUBLIC_URL%/favicon-120-precomposed.png" />
 
-<!-- For iPhone with high-resolution Retina display running iOS ≤ 6: -->
-<link rel="apple-touch-icon" sizes="114x114" href="%PUBLIC_URL%/favicon-114-precomposed.png">
+        <!-- For iPhone with high-resolution Retina display running iOS ≤ 6: -->
+        <link rel="apple-touch-icon" sizes="114x114" href="%PUBLIC_URL%/favicon-114-precomposed.png" />
 
-<!-- For iPhone 6+ -->
-<link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/favicon-180-precomposed.png">
+        <!-- For iPhone 6+ -->
+        <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/favicon-180-precomposed.png" />
 
-<!-- For first- and second-generation iPad: -->
-<link rel="apple-touch-icon" sizes="72x72" href="%PUBLIC_URL%/favicon-72-precomposed.png">
+        <!-- For first- and second-generation iPad: -->
+        <link rel="apple-touch-icon" sizes="72x72" href="%PUBLIC_URL%/favicon-72-precomposed.png" />
 
-<!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
-<link rel="apple-touch-icon" href="%PUBLIC_URL%/favicon-57.png">
+        <!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
+        <link rel="apple-touch-icon" href="%PUBLIC_URL%/favicon-57.png" />
 
-<!-- For Old Chrome -->
-<link rel="icon" href="%PUBLIC_URL%/favicon-32.png" sizes="32x32">
+        <!-- For Old Chrome -->
+        <link rel="icon" href="%PUBLIC_URL%/favicon-32.png" sizes="32x32" />
 
-<!-- For IE10 Metro -->
-<meta name="msapplication-TileColor" content="#FFFFFF">
-<meta name="msapplication-TileImage" content="%PUBLIC_URL%/favicon-144.png">
-<meta name="theme-color" content="#ffffff">
+        <!-- For IE10 Metro -->
+        <meta name="msapplication-TileColor" content="#FFFFFF" />
+        <meta name="msapplication-TileImage" content="%PUBLIC_URL%/favicon-144.png" />
+        <meta name="theme-color" content="#ffffff" />
 
-<!-- Chrome for Android -->
-<link rel="icon" sizes="192x192" href="%PUBLIC_URL%/favicon-192.png">
-    <!--
+        <!-- Chrome for Android -->
+        <link rel="icon" sizes="192x192" href="%PUBLIC_URL%/favicon-192.png" />
+        <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -56,36 +56,51 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>WashU Epigenome Browser</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
-    <!-- <script src="https://epigenomegateway.wustl.edu/js/igv.min.js"></script> -->
-    <!-- <script src="https://epigenomegateway.wustl.edu/js/juicebox.min.js"></script> -->
-    <script src="https://epigenomegateway.wustl.edu/js/zlib_and_gzip.min.js"></script>
-    <script src="https://epigenomegateway.wustl.edu/js/jspdf.min.js"></script>
-    <script src="https://epigenomegateway.wustl.edu/js/svg2pdf.min.js"></script>
-    <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <!-- <script crossorigin src="https://cdn.plot.ly/plotly-cartesian-latest.min.js"></script> -->
-    <!-- <script crossorigin src="https://unpkg.com/react-plotly.js@1.0.2/dist/create-plotly-component.js"></script> -->
-    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-    <script crossorigin src="https://cdn.plot.ly/plotly-cartesian-latest.min.js"></script>
-    <!-- <script crossorigin src="https://unpkg.com/react-plotly.js@1.0.2/dist/create-plotly-component.js"></script> -->
-    <script crossorigin src="https://unpkg.com/react-plotly.js@2.3.0/dist/create-plotly-component.min.js"></script>
-    <!-- Required for non-UTF encodings -->
-    <!-- <script src="js/encoding-indexes.js"></script>
-    <script src="js/encoding.js"></script> -->
+        <title>WashU Epigenome Browser</title>
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" /> -->
+        <!-- <link rel="stylesheet" href="https://epigenomegateway.wustl.edu/vendor/bootstrap/4.0/bootstrap.min.css" /> -->
+        <link rel="stylesheet" href="%PUBLIC_URL%/css/bootstrap.min.css" />
+        <!-- <script src="https://epigenomegateway.wustl.edu/js/zlib_and_gzip.min.js"></script>
+        <script src="https://epigenomegateway.wustl.edu/js/jspdf.min.js"></script>
+        <script src="https://epigenomegateway.wustl.edu/js/svg2pdf.min.js"></script>
+        <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+        <script
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"
+        ></script>
+        <script src="https://epigenomegateway.wustl.edu/vendor/bootstrap/4.0/bootstrap.min.js"></script>
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script crossorigin src="https://cdn.plot.ly/plotly-cartesian-latest.min.js"></script>
+        <script crossorigin src="https://unpkg.com/react-plotly.js@2.3.0/dist/create-plotly-component.min.js"></script> -->
 
-  </head>
-  <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
-    <div id="root"></div>
-    <!--
+        <script src="%PUBLIC_URL%/js/zlib_and_gzip.min.js"></script>
+        <script src="%PUBLIC_URL%/js/jspdf.min.js"></script>
+        <script src="%PUBLIC_URL%/js/svg2pdf.min.js"></script>
+        <script src="https://aframe.io/releases/1.0.3/aframe.min.js"></script>
+        <!-- <script src="%PUBLIC_URL%/js/aframe.min.js"></script> -->
+        <script src="%PUBLIC_URL%/js/jquery-3.2.1.slim.min.js"></script>
+        <script src="%PUBLIC_URL%/js/popper.min.js"></script>
+        <script src="%PUBLIC_URL%/js/bootstrap.min.js"></script>
+        <script src="%PUBLIC_URL%/js/react.development.js"></script>
+        <script src="%PUBLIC_URL%/js/react-dom.development.js"></script>
+        <script src="%PUBLIC_URL%/js/plotly-cartesian-latest.min.js"></script>
+        <script src="%PUBLIC_URL%/js/create-plotly-component.min.js"></script>
+    </head>
+    <body>
+        <noscript>
+            You need to enable JavaScript to run this app.
+        </noscript>
+        <div id="newVersionNotification"></div>
+        <div id="root"></div>
+        <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -95,13 +110,15 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129313073-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date()); 
-          gtag('config', 'UA-129313073-1');
-    </script>
-  </body>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129313073-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
+            gtag("config", "UA-129313073-1");
+        </script>
+    </body>
 </html>

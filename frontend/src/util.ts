@@ -1,10 +1,15 @@
 /**
  * Utility functions that don't really fit in any particular folder.
- * 
+ *
  * @author Silas Hsu
- */ 
-import parseColor from 'parse-color';
-import _ from 'lodash';
+ */
+
+import parseColor from "parse-color";
+import _ from "lodash";
+import iwanthue from "iwanthue";
+import * as THREE from "three";
+import rgba from "color-rgba";
+import ChromosomeInterval from "model/interval/ChromosomeInterval";
 
 interface Coordinate {
     x: number;
@@ -17,16 +22,16 @@ interface Coordinate {
 export enum MouseButton {
     LEFT = 0,
     MIDDLE = 1,
-    RIGHT = 2
-};
+    RIGHT = 2,
+}
 
 /**
  * Gets the x and y coordinates of a mouse event *relative to the top left corner of an element*.  By default, the
  * element is the event's `currentTarget`, the element to which the event listener has been attached.
- * 
+ *
  * For example, if the top left corner of the element is at screen coordinates (10, 10) and the event's screen
  * coordinates are (11, 12), then this function will return `{x: 1, y: 2}`.
- * 
+ *
  * @param {React.MouseEvent} event - the event for which to get relative coordinates
  * @param {Element} [relativeTo] - calculate coordinates relative to this element.  Default is event.currentTarget.
  * @return {Coordinate} object with props x and y that contain the relative coordinates
@@ -38,13 +43,13 @@ export function getRelativeCoordinates(event: React.MouseEvent, relativeTo?: Ele
     const targetBoundingRect = relativeTo.getBoundingClientRect();
     return {
         x: event.clientX - targetBoundingRect.left,
-        y: event.clientY - targetBoundingRect.top
+        y: event.clientY - targetBoundingRect.top,
     };
 }
 
 /**
  * Given coordinates relative to the top left corner of an element, gets the page coordinates.
- * 
+ *
  * @param {Element} relativeTo - element to use as reference point
  * @param {number} relativeX - x coordinates inside an element
  * @param {number} relativeY - y coordinates inside an element
@@ -54,16 +59,16 @@ export function getPageCoordinates(relativeTo: Element, relativeX: number, relat
     const targetBoundingRect = relativeTo.getBoundingClientRect();
     return {
         x: window.scrollX + targetBoundingRect.left + relativeX,
-        y: window.scrollY + targetBoundingRect.top + relativeY
+        y: window.scrollY + targetBoundingRect.top + relativeY,
     };
 }
 
 /**
  * Gets a color that contrasts well with the input color.  Useful for determining font color for a given background
  * color.  If parsing fails for the input color, returns black.
- * 
+ *
  * Credit goes to https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
- * 
+ *
  * @param {string} color - color for which to find a contrasting color
  * @return {string} a color that contrasts well with the input color
  */
@@ -84,7 +89,7 @@ export function getContrastingColor(color: string): string {
 /**
  * Returns a copy of the input list, ensuring its length is below `limit`.  If the list is too long, selects
  * equally-spaced elements from the original list.  Note that if the input is sorted, the output will be sorted as well.
- * 
+ *
  * @param {T[]} list - list for which to ensure a max length
  * @param {number} limit - maximum length of the result list
  * @return {T[]} copy of list with max length ensured
@@ -107,19 +112,19 @@ export function ensureMaxListLength<T>(list: T[], limit: number): T[] {
  * @param {number} bases - number of bases
  * @return {string} human-readable string representing that number of bases
  */
-export function niceBpCount(bases: number, useMinus=false) {
+export function niceBpCount(bases: number, useMinus = false) {
     const rounded = bases >= 1000 ? Math.floor(bases) : Math.round(bases);
     if (rounded >= 750000) {
-        return `${(rounded/1000000).toFixed(1)} Mb`;
+        return `${(rounded / 1000000).toFixed(1)} Mb`;
     } else if (rounded >= 10000) {
-        return `${(rounded/1000).toFixed(1)} kb`;
+        return `${(rounded / 1000).toFixed(1)} kb`;
     } else if (rounded > 0) {
         return `${rounded} bp`;
     } else {
         if (useMinus) {
-            return '<1 bp';
+            return "<1 bp";
         } else {
-            return '0 bp';
+            return "0 bp";
         }
     }
 }
@@ -139,7 +144,7 @@ export function readFileAsText(file: Blob) {
     return promise;
 }
 
-/** 
+/**
  * find closest number in a number array (sorted or un-sorted)
  */
 export function findClosestNumber(arr: number[], num: number) {
@@ -147,17 +152,19 @@ export function findClosestNumber(arr: number[], num: number) {
         return num;
     }
     return arr.reduce((prev, curr) => {
-        return (Math.abs(curr - num) < Math.abs(prev - num) ? curr : prev);
-      });
+        return Math.abs(curr - num) < Math.abs(prev - num) ? curr : prev;
+    });
 }
 
 export const HELP_LINKS = {
-    datahub: 'https://eg.readthedocs.io/en/latest/datahub.html',
-    numerical: 'https://eg.readthedocs.io/en/latest/tracks.html#numerical-tracks',
-    tracks: 'https://eg.readthedocs.io/en/latest/tracks.html',
-    localhub: 'https://eg.readthedocs.io/en/latest/local.html',
-    trackOptions: 'https://eg.readthedocs.io/en/latest/datahub.html#track-properties',
-}
+    datahub: "https://eg.readthedocs.io/en/latest/datahub.html",
+    numerical: "https://eg.readthedocs.io/en/latest/tracks.html#numerical-tracks",
+    tracks: "https://eg.readthedocs.io/en/latest/tracks.html",
+    localhub: "https://eg.readthedocs.io/en/latest/local.html",
+    trackOptions: "https://eg.readthedocs.io/en/latest/datahub.html#track-properties",
+    textTrack: "https://eg.readthedocs.io/en/latest/text.html",
+    publish: "https://eg.readthedocs.io/en/latest/faq.html#publish-with-the-browser",
+};
 
 // /**
 //  * react table column header filter, case insensitive
@@ -183,35 +190,37 @@ export const HELP_LINKS = {
  * from https://stackoverflow.com/questions/15886527/javascript-library-for-pearson-and-or-spearman-correlations#
  */
 
-export const pcorr = (x: number[], y:number[]) => {
+export const pcorr = (x: number[], y: number[]) => {
     let sumX = 0,
-      sumY = 0,
-      sumXY = 0,
-      sumX2 = 0,
-      sumY2 = 0;
-    const minLength = x.length = y.length = Math.min(x.length, y.length),
-      reduce = (xi: number, idx: number) => {
-        const yi = y[idx];
-        sumX += xi;
-        sumY += yi;
-        sumXY += xi * yi;
-        sumX2 += xi * xi;
-        sumY2 += yi * yi;
-      }
+        sumY = 0,
+        sumXY = 0,
+        sumX2 = 0,
+        sumY2 = 0;
+    const minLength = (x.length = y.length = Math.min(x.length, y.length)),
+        reduce = (xi: number, idx: number) => {
+            const yi = y[idx];
+            sumX += xi;
+            sumY += yi;
+            sumXY += xi * yi;
+            sumX2 += xi * xi;
+            sumY2 += yi * yi;
+        };
     x.forEach(reduce);
-    return (minLength * sumXY - sumX * sumY) / 
-        Math.sqrt((minLength * sumX2 - sumX * sumX) * (minLength * sumY2 - sumY * sumY));
-}
+    return (
+        (minLength * sumXY - sumX * sumY) /
+        Math.sqrt((minLength * sumX2 - sumX * sumX) * (minLength * sumY2 - sumY * sumY))
+    );
+};
 
 /**
- * 
+ *
  * @param current {string} current genome
  * @param tracks {trackModel[]} list of tracks
  */
 export function getSecondaryGenomes(current: string, tracks: any[]) {
     const genomes: string[] = [];
-    tracks.forEach(tk => {
-        if (tk.type === 'genomealign') {
+    tracks.forEach((tk) => {
+        if (tk.type === "genomealign") {
             if (tk.querygenome) {
                 genomes.push(tk.querygenome);
             }
@@ -223,6 +232,80 @@ export function getSecondaryGenomes(current: string, tracks: any[]) {
     return _.uniq(genomes);
 }
 
-export function variableIsObject(obj: any){
-    return obj !== null && obj !== undefined && (obj.constructor.name === "Object");
+export function variableIsObject(obj: any) {
+    return obj !== null && obj !== undefined && obj.constructor.name === "Object";
 }
+
+function reformatData(data: any) {
+    const grouped = _.groupBy(data, (x) => x[6]);
+    const sorted = {};
+    Object.keys(grouped).forEach((key) => {
+        const sort = grouped[key].sort((a, b) => a[0].localeCompare(b[0]) || a[1] - b[1]);
+        sorted[key] = sort;
+    });
+    return sorted;
+}
+
+export function getSplines(data: any) {
+    if (!data.length) {
+        console.error("error: data for splines is empty");
+        return null;
+    }
+    const splines = {};
+    const palette = iwanthue(data.length * 2);
+    data.forEach((dat: any, datIndex: number) => {
+        if (!dat) return;
+        const formatted = reformatData(dat.data);
+        Object.keys(formatted).forEach((key, keyIndex) => {
+            const tubeData = formatted[key];
+
+            const points = tubeData.map((item: any) => new THREE.Vector3(item[3], item[4], item[5]));
+            // console.log(points.length);
+            const spline = new THREE.CatmullRomCurve3(points);
+            const color = palette[datIndex + keyIndex];
+            splines[`${dat.region}_${key}`] = { spline, color };
+        });
+    });
+    return splines;
+}
+
+export function getTubeMesh(spline: any, color: any) {
+    const geometry = new THREE.TubeBufferGeometry(spline, 2000, 0.5, 8, false);
+    const material = new THREE.MeshBasicMaterial({ color });
+    const mesh = new THREE.Mesh(geometry, material);
+    return mesh;
+}
+
+export function colorString2number(color: string): number {
+    const [r, g, b] = rgba(color); //alpha not spreaded
+    return (r << 16) + (g << 8) + b;
+}
+
+export function repeatArray(arr: any[], count: number): any[] {
+    const ln = arr.length;
+    const b = [];
+    for (let i = 0; i < count; i++) {
+        b.push(arr[i % ln]);
+    }
+    return b;
+}
+
+export function sameLoci(locus1: ChromosomeInterval, locus2: ChromosomeInterval) {
+    return locus1.chr === locus2.chr && locus1.start === locus2.start && locus1.end === locus2.end;
+}
+
+export function arraysEqual(a: any[], b: any[]) {
+    if (a === b) return true;
+    if (a === null || b === null) return false;
+    if (a.length !== b.length) return false;
+  
+    // If you don't care about the order of the elements inside
+    // the array, you should sort both arrays here.
+    // Please note that calling sort on an array will modify that array.
+    // you might want to clone your array first.
+  
+    for (let i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }

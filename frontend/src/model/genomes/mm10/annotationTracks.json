@@ -255,6 +255,13 @@
             "querygenome": "rn5",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rn5_axt.gz"
+        },
+        {
+            "name": "rn6tomm10",
+            "label": "Rat rn6 to mm10 blastz",
+            "querygenome": "rn6",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/mm10.rn6.gz"
         }
     ],
     "Mappability": [

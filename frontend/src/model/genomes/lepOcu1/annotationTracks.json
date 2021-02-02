@@ -1,0 +1,27 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "type": "refbed",
+            "name": "ensembl_gene",
+            "url": "https://wangftp.wustl.edu/~xzhuo/lepOcu1/lepOcu1_Gene.bed.gz"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://wangftp.wustl.edu/~xzhuo/lepOcu1/lepOcu1.bb",
+                "height": 30
+            }
+        ]
+    }
+}

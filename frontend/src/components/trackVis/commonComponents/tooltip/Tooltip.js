@@ -1,36 +1,37 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
-import { Manager, Target, Popper, Arrow } from 'react-popper';
-import OutsideClickDetector from '../../../OutsideClickDetector';
+import React from "react";
+import ReactDOM from "react-dom";
+import PropTypes from "prop-types";
+import { Manager, Target, Popper, Arrow } from "react-popper";
+import OutsideClickDetector from "../../../OutsideClickDetector";
 
-import './Tooltip.css';
+import "./Tooltip.css";
 
 const BACKGROUND_COLOR = "rgba(173, 216, 230, 0.9)"; // lightblue with opacity adjustment
 const ARROW_SIZE = 15;
-const ARROW_STYLE = { // This is for a upwards-pointing arrow; other directions will require more code.
+const ARROW_STYLE = {
+    // This is for a upwards-pointing arrow; other directions will require more code.
     width: 0,
     height: 0,
     position: "absolute",
     top: -ARROW_SIZE,
-    borderLeft: `${ARROW_SIZE/2}px solid transparent`,
-    borderRight: `${ARROW_SIZE/2}px solid transparent`,
+    borderLeft: `${ARROW_SIZE / 2}px solid transparent`,
+    borderRight: `${ARROW_SIZE / 2}px solid transparent`,
     borderBottom: `${ARROW_SIZE}px solid ${BACKGROUND_COLOR}`,
-}
+};
 
 /**
  * Stops the propagation of an event.
- * 
+ *
  * @param {Event} event - event for which to stop propagation
  */
 function stopEvent(event) {
-    event.stopPropagation()
+    event.stopPropagation();
 }
 
 /**
  * A tooltip with a upwards-pointing arrow, and content below.  Its position refers to the tip of the arrow.  Content is
  * managed via children.  Does not close itself; however, there is a `onClose` prop that requests closings.
- * 
+ *
  * @author Silas Hsu
  */
 class Tooltip extends React.PureComponent {
@@ -44,6 +45,7 @@ class Tooltip extends React.PureComponent {
          */
         style: PropTypes.object,
         onClose: PropTypes.func, // Called when the tooltip wants to close.  Signature: (event: MouseEvent): void
+        hideArrow: PropTypes.bool,
     };
 
     /**
@@ -51,7 +53,7 @@ class Tooltip extends React.PureComponent {
      */
     willRenderChildren() {
         let hasContent = false;
-        React.Children.forEach(this.props.children, child => {
+        React.Children.forEach(this.props.children, (child) => {
             if (child !== null) {
                 hasContent = true;
             }
@@ -66,11 +68,14 @@ class Tooltip extends React.PureComponent {
         if (!this.willRenderChildren()) {
             return null;
         }
-        const {pageX, pageY, onClose, ignoreMouse, style, children} = this.props;
-        const contentStyle = Object.assign({
-            marginTop: ARROW_SIZE,
-            pointerEvents: ignoreMouse ? "none" : "auto"
-        }, style);
+        const { pageX, pageY, onClose, ignoreMouse, style, children } = this.props;
+        const contentStyle = Object.assign(
+            {
+                marginTop: ARROW_SIZE,
+                pointerEvents: ignoreMouse ? "none" : "auto",
+            },
+            style
+        );
 
         /**
          * On the stopEvent for onMouseDown: despite being in document.body, parents of the Tooltip in React's virtual
@@ -79,18 +84,16 @@ class Tooltip extends React.PureComponent {
          */
         return ReactDOM.createPortal(
             <Manager>
-                <Target style={{position: "absolute", left: pageX, top: pageY}} />
+                <Target style={{ position: "absolute", left: pageX, top: pageY }} />
                 <Popper
                     placement="bottom-start"
-                    modifiers={{flip: {enabled: false}}}
+                    modifiers={{ flip: { enabled: false } }}
                     className="Tooltip"
                     style={contentStyle}
                     onMouseDown={stopEvent}
                 >
-                    <OutsideClickDetector onOutsideClick={onClose} >
-                        {children}
-                    </OutsideClickDetector>
-                    <Arrow style={ARROW_STYLE} />
+                    <OutsideClickDetector onOutsideClick={onClose}>{children}</OutsideClickDetector>
+                    {!this.props.hideArrow && <Arrow style={ARROW_STYLE} />}
                 </Popper>
             </Manager>,
             document.body

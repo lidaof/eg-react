@@ -1,16 +1,16 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import ReactModal from 'react-modal';
-import HubTrackTable from './HubTrackTable';
-import TrackModel from '../../model/TrackModel';
-import { variableIsObject } from '../../util';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import _ from "lodash";
+import ReactModal from "react-modal";
+import HubTrackTable from "./HubTrackTable";
+import TrackModel from "../../model/TrackModel";
+import { variableIsObject } from "../../util";
 
-import './FacetTable.css';
+import "./FacetTable.css";
 
-const DEFAULT_ROW = 'Sample';
-const DEFAULT_COLUMN = 'Assay';
-export const UNUSED_META_KEY = 'notused';
+const DEFAULT_ROW = "Sample";
+const DEFAULT_COLUMN = "Assay";
+export const UNUSED_META_KEY = "notused";
 
 /**
  * component for display facet table for a data hub
@@ -18,20 +18,19 @@ export const UNUSED_META_KEY = 'notused';
  */
 
 class FacetTable extends Component {
-
     static propTypes = {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
         addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
-        onTrackAdded: PropTypes.func,
+        onTracksAdded: PropTypes.func,
         addTermToMetaSets: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
-        publicTrackSets: PropTypes.instanceOf(Set),
-    }
+        publicTrackSets: PropTypes.instanceOf(Set)
+    };
 
     static defaultProps = {
         tracks: [],
-        addedTracks: [],
-    }
+        addedTracks: []
+    };
 
     constructor(props) {
         super(props);
@@ -41,10 +40,10 @@ class FacetTable extends Component {
             columnList: [],
             parent2children: {},
             child2ancestor: {}, // child to top most parent hash
-            rowHeader: '',
-            columnHeader: '',
+            rowHeader: "",
+            columnHeader: "",
             showModalId: null,
-            metaKeys: [],
+            metaKeys: []
         };
 
         this.toggleHeader = this.toggleHeader.bind(this);
@@ -56,11 +55,11 @@ class FacetTable extends Component {
         this.initializeTracks = this.initializeTracks.bind(this);
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.initializeTracks(this.props.tracks);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.tracks !== this.props.tracks) {
             this.initializeTracks(nextProps.tracks);
         }
@@ -110,7 +109,7 @@ class FacetTable extends Component {
                 }
                 metadata[metaKey] = metaValue;
             }
-            let newTrack = {...track, metadata: metadata};
+            let newTrack = { ...track, metadata: metadata };
             rawtracks.push(newTrack);
         }
         //console.log(rawtracks);
@@ -125,12 +124,12 @@ class FacetTable extends Component {
                 let lastValue, newValue;
                 if (Array.isArray(metaValue)) {
                     // array metadata
-                    lastValue = metaValue[metaValue.length - 1]
+                    lastValue = metaValue[metaValue.length - 1];
                 } else {
                     // string metadata
                     lastValue = metaValue;
                 }
-                if ( _.has(parent2children, lastValue) ){
+                if (_.has(parent2children, lastValue)) {
                     if (Array.isArray(metaValue)) {
                         newValue = [...metaValue, `(${lastValue})`];
                     } else {
@@ -145,21 +144,30 @@ class FacetTable extends Component {
                     metadata[metaKey] = metaValue;
                 }
             }
-            let newTrack = {...track, metadata: metadata};
-            tracks.push( new TrackModel(newTrack) );
+            let newTrack = { ...track, metadata: metadata };
+            tracks.push(new TrackModel(newTrack));
         }
         const rowHeader = metaKeys.includes(DEFAULT_ROW) ? DEFAULT_ROW : metaKeys[0];
-        let columnHeader = metaKeys.includes(DEFAULT_COLUMN) ? DEFAULT_COLUMN : metaKeys[1];
-        const rowList = [{
-            name: rowHeader, expanded: false, children: parent2children[rowHeader]
-        }];
+        let columnHeader =
+            metaKeys.includes(DEFAULT_COLUMN) && DEFAULT_COLUMN !== rowHeader ? DEFAULT_COLUMN : metaKeys[1];
+        const rowList = [
+            {
+                name: rowHeader,
+                expanded: false,
+                children: parent2children[rowHeader]
+            }
+        ];
         let columnList;
         if (columnHeader) {
-            columnList = [{
-                name: columnHeader, expanded: false, children: parent2children[columnHeader]
-            }]
+            columnList = [
+                {
+                    name: columnHeader,
+                    expanded: false,
+                    children: parent2children[columnHeader]
+                }
+            ];
         } else {
-            columnList = [{name: '--'}]
+            columnList = [{ name: "--" }];
         }
         this.setState({
             rowList,
@@ -169,20 +177,20 @@ class FacetTable extends Component {
             child2ancestor,
             metaKeys,
             rowHeader,
-            columnHeader: columnHeader? columnHeader : UNUSED_META_KEY,
+            columnHeader: columnHeader ? columnHeader : UNUSED_META_KEY
         });
     }
 
-    handleOpenModal (id) {
+    handleOpenModal(id) {
         this.setState({ showModalId: id });
     }
-      
-    handleCloseModal () {
+
+    handleCloseModal() {
         this.setState({ showModalId: null });
     }
 
     toggleHeader(event) {
-        const {name} = event.currentTarget;
+        const { name } = event.currentTarget;
 
         let attrList;
         if (this.state.child2ancestor[name] === this.state.rowHeader) {
@@ -191,19 +199,23 @@ class FacetTable extends Component {
             attrList = this.state.columnList;
         }
 
-        const index = _.findIndex(attrList, ['name', name]);
+        const index = _.findIndex(attrList, ["name", name]);
 
         const isExpanded = !attrList[index].expanded;
-        const newAttr = {...attrList[index], expanded: isExpanded}
+        const newAttr = { ...attrList[index], expanded: isExpanded };
         let newList = [...attrList];
         newList[index] = newAttr;
-        if (isExpanded){
-            for (let item of this.state.parent2children[name]){
-                newList.splice(index+1, 0, { name: item, expanded: false, children: this.state.parent2children[item] })
+        if (isExpanded) {
+            for (let item of this.state.parent2children[name]) {
+                newList.splice(index + 1, 0, {
+                    name: item,
+                    expanded: false,
+                    children: this.state.parent2children[item]
+                });
             }
         } else {
             newList = [
-                ...newList.slice(0, index+1),
+                ...newList.slice(0, index + 1),
                 ...newList.slice(index + 1 + this.state.parent2children[name].size)
             ];
             // remove all child items, recursive
@@ -211,14 +223,14 @@ class FacetTable extends Component {
         }
 
         if (this.state.child2ancestor[name] === this.state.rowHeader) {
-            this.setState({rowList: newList});
+            this.setState({ rowList: newList });
         } else {
-            this.setState({columnList: newList});
+            this.setState({ columnList: newList });
         }
         this.setColNumber();
     }
 
-    removeChild(list, parentName){
+    removeChild(list, parentName) {
         if (this.state.parent2children[parentName]) {
             for (let item of this.state.parent2children[parentName]) {
                 _.remove(list, n => n.name === item);
@@ -232,23 +244,24 @@ class FacetTable extends Component {
         let attrList, rowClass, colClass, expandClass;
         if (attr === this.state.rowHeader) {
             attrList = this.state.rowList;
-            rowClass = 'facet-row-header';
+            rowClass = "facet-row-header";
         } else {
             attrList = this.state.columnList;
-            colClass = 'facet-column-header';
+            colClass = "facet-column-header";
         }
 
         let divList = [];
         for (let [idx, element] of attrList.entries()) {
-            let prefix = '';
+            let prefix = "";
             if (element.children && element.children.size) {
-                prefix = element.expanded ? '⊟' : '⊞';
-                expandClass = element.expanded ? 'expanded' : '';
+                prefix = element.expanded ? "⊟" : "⊞";
+                expandClass = element.expanded ? "expanded" : "";
                 divList.push(
                     <div key={`${element.name}-${idx}`} className={`${rowClass} ${colClass}`}>
                         <button name={element.name} type="button" onClick={this.toggleHeader} className={expandClass}>
                             <span>
-                                {prefix}{element.name}
+                                {prefix}
+                                {element.name}
                             </span>
                         </button>
                     </div>
@@ -258,10 +271,11 @@ class FacetTable extends Component {
                     <div key={`${element.name}-${idx}`} className={`${rowClass} ${colClass}`}>
                         <button name={element.name} className="not-button">
                             <span>
-                                {prefix}{element.name}
+                                {prefix}
+                                {element.name}
                             </span>
-                        </button>    
-                    </div> 
+                        </button>
+                    </div>
                 );
             }
         }
@@ -273,13 +287,13 @@ class FacetTable extends Component {
      * swap the column and row
      */
     swapHeader() {
-        let {rowHeader, columnHeader, rowList, columnList} = this.state;
+        let { rowHeader, columnHeader, rowList, columnList } = this.state;
         if (columnHeader === UNUSED_META_KEY) {
             return;
         }
         [rowHeader, columnHeader] = [columnHeader, rowHeader];
         [rowList, columnList] = [columnList, rowList];
-        this.setState({rowHeader, columnHeader, rowList, columnList});
+        this.setState({ rowHeader, columnHeader, rowList, columnList });
         this.buildMatrix();
         this.setColNumber();
     }
@@ -288,104 +302,126 @@ class FacetTable extends Component {
      * build the matrix, actually list of divs, use grid to control layout
      */
     buildMatrix() {
-        const {columnHeader, rowList, columnList} = this.state;
+        const { columnHeader, rowList, columnList } = this.state;
         let divs = [];
         if (columnHeader !== UNUSED_META_KEY) {
             for (let row of rowList) {
                 for (let col of columnList) {
                     if (row.expanded || col.expanded) {
-                        divs.push( <div key={`${row.name}-${col.name}`}></div> );
+                        divs.push(<div key={`${row.name}-${col.name}`}></div>);
                     } else {
-                        divs.push(<div key={`${row.name}-${col.name}`}>{this.countTracks(row, col)}</div> );
+                        divs.push(<div key={`${row.name}-${col.name}`}>{this.countTracks(row, col)}</div>);
                     }
                 }
             }
         } else {
             for (let row of rowList) {
                 if (row.expanded) {
-                    divs.push( <div key={`${row.name}-col}`}></div> );
+                    divs.push(<div key={`${row.name}-col}`}></div>);
                 } else {
-                    divs.push(<div key={`${row.name}-col`}>{this.countTracks(row, UNUSED_META_KEY)}</div> );
+                    divs.push(<div key={`${row.name}-col`}>{this.countTracks(row, UNUSED_META_KEY)}</div>);
                 }
             }
         }
         return divs;
     }
 
+    trackMetadataBelongsTo = (tkMeta, metaType) => {
+        if (Array.isArray(tkMeta)) {
+            return tkMeta.includes(metaType);
+        } else {
+            return tkMeta === metaType;
+        }
+    };
+
     /**
-     * 
-     * @param {onject} row 
-     * @param {object} col 
+     *
+     * @param {onject} row
+     * @param {object} col
      * @return {ReactModal} how many tracks belong to the row and col combination, and popup the track list
      */
     countTracks(row, col) {
-        const {tracks, rowHeader, columnHeader, showModalId} = this.state;
+        const { tracks, rowHeader, columnHeader, showModalId } = this.state;
         let found = [];
-        for (let track of tracks){
+        for (let track of tracks) {
             // console.log(rowHeader);
             // console.log(track.metadata);
             if (!track.metadata[rowHeader]) {
                 continue;
             }
-            const tkRowInfo = variableIsObject(track.metadata[rowHeader]) ? track.metadata[rowHeader].name: track.metadata[rowHeader];
-            const tkColumnInfo = variableIsObject(track.metadata[columnHeader]) ? track.metadata[columnHeader].name: track.metadata[columnHeader];
-            if (row.name === rowHeader || tkRowInfo.includes(row.name)) {
+            const tkRowInfo = variableIsObject(track.metadata[rowHeader])
+                ? track.metadata[rowHeader].name
+                : track.metadata[rowHeader];
+            const tkColumnInfo = variableIsObject(track.metadata[columnHeader])
+                ? track.metadata[columnHeader].name
+                : track.metadata[columnHeader];
+            if (row.name === rowHeader || this.trackMetadataBelongsTo(tkRowInfo, row.name)) {
                 // confusing code here, need to check if column was used
                 if (col === UNUSED_META_KEY) {
                     found.push(track);
                 } else {
                     if (!tkColumnInfo) {
-                        if ( col.name === columnHeader ) {
+                        if (col.name === columnHeader) {
                             found.push(track);
                         }
                         continue;
                     }
-                    if ( col.name === columnHeader || tkColumnInfo.includes(col.name) ) {
+                    if (col.name === columnHeader || this.trackMetadataBelongsTo(tkColumnInfo, col.name)) {
                         found.push(track);
                     }
-                } 
+                }
             }
         }
         if (!found.length) {
             return;
         }
         const id = `modal-${row.name}-${col.name}`;
-        const addUrls = found.filter(tk => this.props.addedTrackSets.has(tk.url) || this.props.addedTrackSets.has(tk.name))
+        const addUrls = found.filter(
+            tk => this.props.addedTrackSets.has(tk.url) || this.props.addedTrackSets.has(tk.name)
+        );
         return (
-        <div>
-            <button onClick={()=>this.handleOpenModal(id)} className="facet-item">
-                <span className="green">{addUrls.length}</span>
-                /
-                {found.length}
-            </button>
-            <ReactModal
-               isOpen={showModalId === id}
-               contentLabel="track list"
-               ariaHideApp={false}
-               id={id}
-               style={{overlay: {zIndex: 3, backgroundColor: 'rgba(111,107,101, 0.7)'}}}
-            >
-                <span
-                    className="text-right" 
-                    style={{cursor: "pointer", color: "red", fontSize: "2em", position:"absolute", top: "-5px", right: "15px"}}
-                    onClick={this.handleCloseModal}>
-                    ×
-                </span>
-                <HubTrackTable
-                    tracks={found}
-                    addedTrackSets={this.props.addedTrackSets}
-                    onTrackAdded={track => this.props.onTracksAdded([track])}
-                    rowHeader={rowHeader}
-                    columnHeader={columnHeader}
-                />
-            </ReactModal>
-        </div>
+            <div>
+                <button onClick={() => this.handleOpenModal(id)} className="facet-item">
+                    <span className="green">{addUrls.length}</span>/{found.length}
+                </button>
+                <ReactModal
+                    isOpen={showModalId === id}
+                    contentLabel="track list"
+                    ariaHideApp={false}
+                    id={id}
+                    style={{
+                        overlay: { zIndex: 3, backgroundColor: "rgba(111,107,101, 0.7)" }
+                    }}
+                >
+                    <span
+                        className="text-right"
+                        style={{
+                            cursor: "pointer",
+                            color: "red",
+                            fontSize: "2em",
+                            position: "absolute",
+                            top: "-5px",
+                            right: "15px"
+                        }}
+                        onClick={this.handleCloseModal}
+                    >
+                        ×
+                    </span>
+                    <HubTrackTable
+                        tracks={found}
+                        addedTrackSets={this.props.addedTrackSets}
+                        onTracksAdded={this.props.onTracksAdded}
+                        rowHeader={rowHeader}
+                        columnHeader={columnHeader}
+                    />
+                </ReactModal>
+            </div>
         );
     }
 
     setColNumber() {
         let colNum = Math.max(1, this.state.columnList.length);
-        document.documentElement.style.setProperty('--colNum', colNum + 1);
+        document.documentElement.style.setProperty("--colNum", colNum + 1);
     }
 
     renderHeaderSelection(isColumn) {
@@ -401,21 +437,28 @@ class FacetTable extends Component {
         }
 
         return (
-        <label>
-            {isColumn ?  'Column: ' : 'Row: '}
-            <select value={stateToRead} onChange={changeCallback} >
-                {this.state.metaKeys
-                    .filter(metaKey => metaKey !== otherState)
-                    .map(metaKey => <option key={metaKey} value={metaKey}>{metaKey}</option>)
-                }
-                {isColumn &&
-                    <React.Fragment>
-                        <option key="disabled" disabled>────</option>
-                        <option key={UNUSED_META_KEY} value={UNUSED_META_KEY}>Not used</option>
-                    </React.Fragment>
-                }
-            </select>
-        </label>
+            <label>
+                {isColumn ? "Column: " : "Row: "}
+                <select value={stateToRead} onChange={changeCallback}>
+                    {this.state.metaKeys
+                        .filter(metaKey => metaKey !== otherState)
+                        .map(metaKey => (
+                            <option key={metaKey} value={metaKey}>
+                                {metaKey}
+                            </option>
+                        ))}
+                    {isColumn && (
+                        <React.Fragment>
+                            <option key="disabled" disabled>
+                                ────
+                            </option>
+                            <option key={UNUSED_META_KEY} value={UNUSED_META_KEY}>
+                                Not used
+                            </option>
+                        </React.Fragment>
+                    )}
+                </select>
+            </label>
         );
     }
 
@@ -423,11 +466,13 @@ class FacetTable extends Component {
         const selectedMetaKey = event.currentTarget.value;
         this.setState({
             rowHeader: selectedMetaKey,
-            rowList: [{
-                name: selectedMetaKey,
-                expanded: false,
-                children: this.state.parent2children[selectedMetaKey]
-            }]
+            rowList: [
+                {
+                    name: selectedMetaKey,
+                    expanded: false,
+                    children: this.state.parent2children[selectedMetaKey]
+                }
+            ]
         });
     }
 
@@ -436,16 +481,18 @@ class FacetTable extends Component {
         if (selectedMetaKey === UNUSED_META_KEY) {
             this.setState({
                 columnHeader: UNUSED_META_KEY,
-                columnList: [{name: '--'}]
+                columnList: [{ name: "--" }]
             });
         } else {
             this.setState({
                 columnHeader: selectedMetaKey,
-                columnList: [{
-                    name: selectedMetaKey,
-                    expanded: false,
-                    children: this.state.parent2children[selectedMetaKey]
-                }]
+                columnList: [
+                    {
+                        name: selectedMetaKey,
+                        expanded: false,
+                        children: this.state.parent2children[selectedMetaKey]
+                    }
+                ]
             });
         }
     }
@@ -460,8 +507,10 @@ class FacetTable extends Component {
                 <div className="facet-container">
                     <div className="facet-config">
                         <div>{this.renderHeaderSelection(false)}</div>
-                        <div className="facet-swap" title="swap row/column" onClick={this.swapHeader}>&#8646;</div>
-                        <div>{this.renderHeaderSelection(true)}</div>   
+                        <div className="facet-swap" title="swap row/column" onClick={this.swapHeader}>
+                            &#8646;
+                        </div>
+                        <div>{this.renderHeaderSelection(true)}</div>
                     </div>
                     <div className="facet-outer">
                         <div className="facet-content">

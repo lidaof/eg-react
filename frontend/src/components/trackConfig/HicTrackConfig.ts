@@ -1,18 +1,23 @@
-import { TrackConfig } from './TrackConfig';
+import LabelConfig from "../trackContextMenu/LabelConfig";
+import { TrackConfig } from "./TrackConfig";
 
-import InteractionTrack, { DEFAULT_OPTIONS } from '../trackVis/interactionTrack/InteractionTrack';
+import InteractionTrack, { DEFAULT_OPTIONS } from "../trackVis/interactionTrack/InteractionTrack";
 
-import { HicSource } from '../../dataSources/HicSource';
-import { TrackModel, TrackOptions } from '../../model/TrackModel';
-import { BinSize, NormalizationMode } from '../..//model/HicDataModes';
+import { HicSource } from "../../dataSources/HicSource";
+import { TrackModel, TrackOptions } from "../../model/TrackModel";
+import { BinSize, NormalizationMode } from "../..//model/HicDataModes";
 
-import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
-import { InteractionDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';
-import ScoreConfig from '../trackContextMenu/ScoreConfig';
-import { BinSizeConfig, HicNormalizationConfig } from '../trackContextMenu/HicDataConfig';
-import HeightConfig from '../trackContextMenu/HeightConfig';
-import LineWidthConfig from '../trackContextMenu/LineWidthConfig';
-import { InteractionDisplayMode } from '../../model/DisplayModes';
+import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from "../trackContextMenu/ColorConfig";
+import { InteractionDisplayModeConfig } from "../trackContextMenu/DisplayModeConfig";
+import ScoreConfig from "../trackContextMenu/ScoreConfig";
+import { BinSizeConfig, HicNormalizationConfig } from "../trackContextMenu/HicDataConfig";
+import HeightConfig from "../trackContextMenu/HeightConfig";
+import LineWidthConfig from "../trackContextMenu/LineWidthConfig";
+import { InteractionDisplayMode } from "../../model/DisplayModes";
+import FetchViewWindowConfig from "components/trackContextMenu/FetchViewWindowConfig";
+import MaxValueFilterConfig from "components/trackContextMenu/MaxValueFilterConfig";
+import MinValueFilterConfig from "components/trackContextMenu/MinValueFilterConfig";
+import BothAnchorsInViewConfig from "components/trackContextMenu/BothAnchorsInViewConfig";
 
 export class HicTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -20,12 +25,12 @@ export class HicTrackConfig extends TrackConfig {
         this.setDefaultOptions({
             ...DEFAULT_OPTIONS,
             binSize: BinSize.AUTO,
-            normalization: NormalizationMode.NONE
+            normalization: NormalizationMode.NONE,
         });
     }
 
     initDataSource() {
-        if(this.trackModel.fileObj) {
+        if (this.trackModel.fileObj) {
             return new HicSource(this.trackModel.fileObj);
         } else {
             return new HicSource(this.trackModel.url);
@@ -36,7 +41,11 @@ export class HicTrackConfig extends TrackConfig {
      * @override
      */
     shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
-        return oldOptions.normalization !== newOptions.normalization || oldOptions.binSize !== newOptions.binSize;
+        return (
+            oldOptions.normalization !== newOptions.normalization ||
+            oldOptions.binSize !== newOptions.binSize ||
+            oldOptions.fetchViewWindowOnly !== newOptions.fetchViewWindowOnly
+        );
     }
 
     getComponent() {
@@ -44,8 +53,21 @@ export class HicTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        const items =  [HicNormalizationConfig, InteractionDisplayModeConfig, HeightConfig, ScoreConfig, BinSizeConfig,
-            PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig];
+        const items = [
+            LabelConfig,
+            HicNormalizationConfig,
+            InteractionDisplayModeConfig,
+            HeightConfig,
+            ScoreConfig,
+            BinSizeConfig,
+            PrimaryColorConfig,
+            SecondaryColorConfig,
+            BackgroundColorConfig,
+            MaxValueFilterConfig,
+            MinValueFilterConfig,
+            FetchViewWindowConfig,
+            BothAnchorsInViewConfig,
+        ];
         if (this.getOptions().displayMode !== InteractionDisplayMode.HEATMAP) {
             items.splice(2, 0, LineWidthConfig);
         }

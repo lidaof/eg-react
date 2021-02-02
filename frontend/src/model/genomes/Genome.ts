@@ -1,32 +1,32 @@
-import Feature from '../Feature';
-import NavigationContext from '../NavigationContext';
-import ChromosomeInterval from '../interval/ChromosomeInterval';
-import OpenInterval from '../interval/OpenInterval';
-import TrackModel from '../TrackModel';
-import Chromosome from './Chromosome';
+import Feature from "../Feature";
+import NavigationContext from "../NavigationContext";
+import ChromosomeInterval from "../interval/ChromosomeInterval";
+// import OpenInterval from '../interval/OpenInterval';
+// import TrackModel from '../TrackModel';
+import Chromosome from "./Chromosome";
 
-export interface GenomeConfig {
-    genome: Genome;
-    navContext: NavigationContext;
-    cytobands: any;
-    defaultRegion: OpenInterval;
-    defaultTracks: TrackModel[];
-    twoBitUrl: string;
-}
+// export interface GenomeConfig {
+//     genome: Genome;
+//     navContext: NavigationContext;
+//     cytobands: any;
+//     defaultRegion: OpenInterval;
+//     defaultTracks: TrackModel[];
+//     twoBitUrl: string;
+// }
 
 /**
  * A named set of chromosomes.
- * 
+ *
  * @author Silas Hsu
  */
 export class Genome {
     private _name: string;
     private _chromosomes: Chromosome[];
-    private _nameToChromosome: {[chrName: string]: Chromosome};
+    private _nameToChromosome: { [chrName: string]: Chromosome };
 
     /**
      * Makes a new instance, with name and list of chromosomes.  For best results, chromosomes should have unique names.
-     * 
+     *
      * @param {string} name - name of the genome
      * @param {Chromosome[]} chromosomes - list of chromosomes in the genome
      */
@@ -52,7 +52,7 @@ export class Genome {
 
     /**
      * Gets a chromosome with the specified name.  Returns null if there is no such chromosome.
-     * 
+     *
      * @param {string} name - chromosome name to look up
      * @return {Chromosome} chromosome with the query name, or null if not found
      */
@@ -64,7 +64,7 @@ export class Genome {
      * Intersects a genomic location with this genome.  If there is no overlap, then returns null.  Possible reasons for
      * null include unknown chromosome name or an interval past the end of a chromosome.  Can be used to check/ensure a
      * location actually lies within the genome.
-     * 
+     *
      * @param {ChromosomeInterval} chrInterval - genomic location to intersect with the genome
      * @return {ChromosomeInterval} intersection result, or null if there is no overlap at all
      */
@@ -80,13 +80,13 @@ export class Genome {
     /**
      * Makes a NavigationContext representing this genome.  It will have the same name as the genome, and the
      * features/segments will consist of whole chromosomes.
-     * 
+     *
      * @return {NavigationContext} NavigationContext representing this genome
      */
     makeNavContext(): NavigationContext {
         const features = this._chromosomes.map(chr => {
             const name = chr.getName();
-            return new Feature(name, new ChromosomeInterval(name, 0, chr.getLength()))
+            return new Feature(name, new ChromosomeInterval(name, 0, chr.getLength()));
         });
         return new NavigationContext(this.getName(), features);
     }

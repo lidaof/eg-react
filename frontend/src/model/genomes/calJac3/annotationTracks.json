@@ -1,0 +1,41 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "ncbiGene",
+            "label": "NCBI genes",
+            "filetype": "geneAnnotation"
+        },
+        {
+            "name": "ensGene",
+            "label": "Ensembl genes",
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://vizhub.wustl.edu/public/calJac3/calJac3_rmsk.bb",
+                "height": 30
+            }
+        ]
+    },
+    "Genome Comparison": [
+        {
+            "name": "hg19tocalJac3",
+            "label": "Human hg19 to calJac3 blastz",
+            "querygenome": "hg19",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/calJac3/calJac3_hg19.gz"
+        }
+    ]
+}

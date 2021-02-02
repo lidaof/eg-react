@@ -1,18 +1,24 @@
-import { AlignmentRecord } from './AlignmentRecord';
-import DisplayedRegionModel from '../DisplayedRegionModel';
-import { ViewExpansion } from '../RegionExpander';
-import { getGenomeConfig } from '../genomes/allGenomes';
+import { TrackModel } from 'model/TrackModel';
+import { GenomeConfig } from "./../genomes/GenomeConfig";
+import { AlignmentRecord } from "./AlignmentRecord";
+import DisplayedRegionModel from "../DisplayedRegionModel";
+import { ViewExpansion } from "../RegionExpander";
+// import { getGenomeConfig } from "../genomes/allGenomes";
 
-import DataSource from '../../dataSources/DataSource';
-import WorkerSource from '../../dataSources/worker/WorkerSource';
-import { GenomeAlignWorker } from '../../dataSources/WorkerTSHook';
+import DataSource from "../../dataSources/DataSource";
+import WorkerSource from "../../dataSources/worker/WorkerSource";
+import { GenomeAlignWorker } from "../../dataSources/WorkerTSHook";
 
 export class AlignmentFetcher {
+    public primaryGenome: string;
     private _dataSource: DataSource;
+    public queryGenome: string;
 
-    constructor(public primaryGenome: string, public queryGenome: string) {
-        this.primaryGenome = primaryGenome;
-        this.queryGenome = queryGenome;
+    constructor(public primaryGenomeConfig: GenomeConfig, public queryTrack: TrackModel) {
+        this.primaryGenome = primaryGenomeConfig.genome.getName();
+        this.primaryGenomeConfig = primaryGenomeConfig;
+        this.queryTrack = queryTrack;
+        this.queryGenome = queryTrack.querygenome || queryTrack.getMetadata('genome');
         this._dataSource = this.initDataSource();
     }
 
@@ -23,14 +29,17 @@ export class AlignmentFetcher {
     }
 
     initDataSource(): DataSource {
-        const genomeConfig = getGenomeConfig(this.primaryGenome);
-        if (!genomeConfig) {
+        // const genomeConfig = getGenomeConfig(this.primaryGenome);
+        if (!this.primaryGenomeConfig) {
             return this.makeErrorSource();
         }
-        const annotationTracks = genomeConfig.annotationTracks || {};
-        const comparisonTracks = annotationTracks["Genome Comparison"] || [];
-        const theTrack = comparisonTracks.find((track: any) => track.querygenome === this.queryGenome) || {};
-        const url = theTrack.url;
+        let url = this.queryTrack.url;
+        if(!url) {
+            const annotationTracks = this.primaryGenomeConfig.annotationTracks || {};
+            const comparisonTracks = annotationTracks["Genome Comparison"] || [];
+            const theTrack = comparisonTracks.find((track: any) => track.querygenome === this.queryGenome) || {};
+            url = theTrack.url;
+        }
         if (!url) {
             return this.makeErrorSource();
         }
@@ -38,22 +47,25 @@ export class AlignmentFetcher {
     }
 
     makeErrorSource(): DataSource {
-        const errorMessage = `No configuration found for comparison of "${this.primaryGenome}" (primary) and ` +
-            `"${this.queryGenome}" (query)`; 
+        const errorMessage =
+            `No configuration found for comparison of "${this.primaryGenome}" (primary) and ` +
+            `"${this.queryGenome}" (query)`;
         return new ErrorSource(new Error(errorMessage));
     }
 
     /**
-     * 
+     *
      * @param {DisplayedRegionModel} viewRegion - view region in the primary genome
-     * @param {number} width 
+     * @param {number} width
      */
-    async fetchAlignment(fetchRegion: DisplayedRegionModel, visData: ViewExpansion,
-        isRoughMode=true): Promise<AlignmentRecord[]>
-    {
-        const {visRegion, visWidth} = visData;
+    async fetchAlignment(
+        fetchRegion: DisplayedRegionModel,
+        visData: ViewExpansion,
+        isRoughMode = true
+    ): Promise<AlignmentRecord[]> {
+        const { visRegion, visWidth } = visData;
         const basesPerPixel = visRegion.getWidth() / visWidth;
-        const rawRecords: any[] = await this._dataSource.getData(fetchRegion, basesPerPixel, {isRoughMode});
+        const rawRecords: any[] = await this._dataSource.getData(fetchRegion, basesPerPixel, { isRoughMode });
         return rawRecords.map(record => new AlignmentRecord(record));
     }
 }

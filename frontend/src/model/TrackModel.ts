@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import { variableIsObject } from '../util';
+import _ from "lodash";
+import { variableIsObject } from "../util";
 
 export interface TrackOptions {
     label?: string;
@@ -7,14 +7,14 @@ export interface TrackOptions {
 }
 
 interface ITrackModelMetadata {
-    'Track Type'?: string;
+    "Track Type"?: string;
     genome?: string;
     [k: string]: any;
 }
 
 /**
  * Serialized track model, or the plain object argument to TrackModel's constructor.
- * 
+ *
  * @example
  * {
  *     type: 'bigWig',
@@ -42,7 +42,7 @@ let nextId = 0;
 
 /**
  * An object storing track metadata and state.
- * 
+ *
  * @implements {Serializable}
  * @author Silas Hsu
  */
@@ -50,7 +50,7 @@ export class TrackModel {
     /**
      * Makes a new TrackModel based off the input plain object.  Bascially does a shallow copy of the object and sets
      * sets reasonable defaults for certain properties.
-     * 
+     *
      * @param {ITrackModel} plainObject - data that will form the basis of the new instance
      */
     name: string;
@@ -65,24 +65,35 @@ export class TrackModel {
     showOnHubLoad?: boolean;
     fileObj?: any;
     files?: any;
-    tracks?: TrackModel[];  // for matplot
+    tracks?: TrackModel[]; // for matplot
     querygenome?: string;
+    isText?: boolean;
+    textConfig?: any;
+    apiConfig?: any;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
         this.name = this.name || "";
-        this.label = this.label || this.name || "";
+        this.label = this.options && this.options.label ? this.options.label : this.label || this.name || "";
         this.isSelected = this.isSelected || false;
         this.type = this.type || this.filetype || "";
         this.type = this.type.toLowerCase();
         this.options = this.options || {}; // `options` stores dynamically-configurable options.
         this.options.label = this.label; // ...which is why we copy this.name.
         this.url = this.url || "";
-        this.metadata = this.metadata || {};
+        this.metadata = variableIsObject(this.metadata) || Array.isArray(this.metadata) ? this.metadata : {}; // avoid number or string as metadata
         this.metadata["Track type"] = this.type;
         this.fileObj = this.fileObj || "";
         this.files = this.files || [];
-        this.tracks = this.tracks ? this.tracks.map(tk => new TrackModel(tk)) : [];
+        this.tracks = this.tracks ? this.tracks.map((tk) => new TrackModel(tk)) : [];
+        this.isText = this.isText || false;
+        this.textConfig = this.textConfig || {};
+        this.apiConfig = this.apiConfig || {};
+
+        // in case user define height in string, like "25" instead of 25
+        if (this.options.height && typeof this.options.height === "string") {
+            this.options.height = Number.parseFloat(this.options.height) || 20;
+        }
 
         // Other misc props
         this.id = nextId;
@@ -102,7 +113,7 @@ export class TrackModel {
     /**
      * Gets this object's id.  Ids are used to keep track of track identity even through different instances of
      * TrackModel; two models with the same id are considered the same track, perhaps with different options configured.
-     * 
+     *
      * @return {number} this object's id
      */
     getId(): number {
@@ -111,7 +122,7 @@ export class TrackModel {
 
     /**
      * Gets the label to display for this track; this method returns a reasonable default even in the absence of data.
-     * 
+     *
      * @return {string} the display label of the track
      */
     getDisplayLabel(): string {
@@ -136,8 +147,8 @@ export class TrackModel {
     }
 
     /**
-     * 
-     * @param term 
+     *
+     * @param term
      * always return an array
      */
     getMetadataAsArray(term: string): string[] | undefined {
@@ -147,15 +158,15 @@ export class TrackModel {
         } else {
             if (variableIsObject(value)) {
                 return [value.name];
-            }else {
+            } else {
                 return [value];
             }
         }
     }
 
     /**
-     * 
-     * @param term 
+     *
+     * @param term
      * @return return the meta value defined by user, maybe a string, an array or an object
      * purpose of this is to allow users to customize metadata display, like defining colors
      * in this way, for example
@@ -167,7 +178,7 @@ export class TrackModel {
 
     /**
      * **Shallowly** clones this.
-     * 
+     *
      * @return {TrackModel} a shallow copy of this
      */
     clone(): TrackModel {
@@ -177,7 +188,7 @@ export class TrackModel {
     /**
      * Shallowly clones `this` and `this.options`, and then modifies the clone's options.  Returns the clone.  This
      * method will not mutate this instance.
-     * 
+     *
      * @param {string} name - the name of the option to set
      * @param {any} optionValue - the value of the option
      * @return {TrackModel} shallow clone of this, with the option set
@@ -190,7 +201,7 @@ export class TrackModel {
 
     /**
      * Shallowly clones this and also selects a particular property to be cloned one level deeper.
-     * 
+     *
      * @param {string} prop - property name to also clone
      * @return {TrackModel} shallow clone of this
      */
