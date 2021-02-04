@@ -113,6 +113,8 @@ class TrackContainer extends React.Component {
             panningAnimation: "none",
             zoomAnimation: 0,
         };
+        this.leftBeam = React.createRef();
+        this.rightBeam = React.createRef();
 
         this.toggleTool = this.toggleTool.bind(this);
         this.handleTrackClicked = this.handleTrackClicked.bind(this);
@@ -127,6 +129,10 @@ class TrackContainer extends React.Component {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.panLeftOrRight = this.panLeftOrRight.bind(this);
         this.zoomOut = this.zoomOut.bind(this);
+    }
+
+    getBeamRefs = () => {
+        return [this.leftBeam.current, this.rightBeam.current];
     }
 
     panLeftOrRight(left = true) {
@@ -557,6 +563,7 @@ class TrackContainer extends React.Component {
                     onMetadataClick={this.handleMetadataClicked}
                     selectedRegion={viewRegion}
                     layoutModel={layoutModel}
+                    getBeamRefs={this.getBeamRefs}
                 />
             );
         });
@@ -664,6 +671,8 @@ class TrackContainer extends React.Component {
                         shouldMenuClose={(event) => !SELECTION_BEHAVIOR.isToggleEvent(event)}
                     >
                         <DivWithBullseye style={trackDivStyle} id="trackContainer">
+                            <div id="beamLeft" ref={this.leftBeam}> <div id="beamLeftInner"></div> </div>
+                            <div id="beamRight" ref={this.rightBeam}> <div id="beamRightInner"></div> </div>
                             <VerticalDivider
                                 visData={primaryView}
                                 genomeRegion={viewRegion}

@@ -17,3 +17,41 @@
         flex-basis: calc(var(--multiplier) * 999);
     }
 }
+
+#beamLeft {
+    position: absolute;
+    border: 1px solid rgb(128, 166, 255);
+    z-index: 10;
+    display: none;
+    top: 0;
+    height: 100%;
+    will-change: left;
+    pointer-events: none;
+}
+
+#beamLeftInner {
+    background-color: blue;
+    opacity: 0.1;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+}
+
+#beamRight {
+    position: absolute;
+    border: 1px solid rgb(255, 133, 92);
+    z-index: 10;
+    display: none;
+    top: 0;
+    height: 100%;
+    will-change: left;
+    pointer-events: none;
+}
+
+#beamRightInner {
+    background-color: rgb(245, 61, 0);
+    opacity: 0.1;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+}
