@@ -1,6 +1,7 @@
 import HG19 from "./hg19/hg19";
 import HG38 from "./hg38/hg38";
 import MM10 from "./mm10/mm10";
+import MM39 from "./mm39/mm39";
 import DAN_RER10 from "./danRer10/danRer10";
 import DAN_RER11 from "./danRer11/danRer11";
 import PANTRO5 from "./panTro5/panTro5";
@@ -34,9 +35,10 @@ import { GenomeConfig } from "./GenomeConfig";
 /**
  * All available genomes.
  */
-export const allGenomes = [
-  HG19,
+export const allGenomes = [  // order matters, shows same order in genome list after click genome logo
   HG38,
+  HG19,
+  MM39,
   MM10,
   MM9,
   PANTRO5,
@@ -127,7 +129,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   mouse: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Mouse.png",
-    assemblies: [MM10.genome.getName(), MM9.genome.getName()],
+    assemblies: [MM39.genome.getName(), MM10.genome.getName(), MM9.genome.getName()],
     color: "yellow"
   },
   rat: {

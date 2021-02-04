@@ -6,6 +6,7 @@ import { withTrackData } from './trackContainers/TrackDataManager';
 import { withTrackView } from './trackContainers/TrackViewManager';
 import { TrackHandle } from './trackContainers/TrackHandle';
 import { withTrackLegendWidth } from './withTrackLegendWidth';
+import { getTrackConfig } from './trackConfig/getTrackConfig';
 
 function mapStateToProps(state) {
     return {
@@ -189,10 +190,10 @@ class ScreenshotUINotConnected extends React.Component {
 
     makeSvgTrackElements() {
         const {tracks, trackData, primaryView, metadataTerms, viewRegion} = this.props;
-        const trackSvgElements = tracks.map((trackModel, index) => {
+        const trackSvgElements = tracks.filter(track => !getTrackConfig(track).isDynamicTrack()).map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
-            return <TrackHandle
+            return primaryView ? <TrackHandle
                 key={trackModel.getId()}
                 trackModel={trackModel}
                 {...data}
@@ -205,7 +206,7 @@ class ScreenshotUINotConnected extends React.Component {
                 forceSvg={true}
                 selectedRegion={viewRegion}
                 zoomAnimation={0}
-            />
+            />: null;
         });
         return trackSvgElements;
     }
