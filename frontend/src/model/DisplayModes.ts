@@ -14,6 +14,7 @@ export enum InteractionDisplayMode {
     ARC = "arc",
     FLATARC = "flatarc",
     SQUARE = "square",
+    SASHIMI = "sashimi",
 }
 
 export enum DynamicInteractionDisplayMode {
