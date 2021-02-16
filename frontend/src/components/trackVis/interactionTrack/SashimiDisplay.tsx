@@ -51,9 +51,7 @@ export class SashimiDisplay extends React.PureComponent<SashimiDisplayProps, {}>
             return null;
         }
         const arcCenter = xSpan1Center + 0.5 * spanLength;
-        const controlY = 20;
-        console.log(score.toString());
-        console.log(arcCenter);
+        const controlY = 35;
         return (
             <g key={placedInteraction.generateKey() + index}>
                 <path
@@ -66,7 +64,7 @@ export class SashimiDisplay extends React.PureComponent<SashimiDisplayProps, {}>
                     // onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
                 />
                 <text key={placedInteraction.generateKey() + index + "text"}
-                    x={arcCenter} y={40} dominantBaseline="middle" style={{ textAnchor: "middle", fill: "black", fontSize: 10 }}>
+                    x={arcCenter} y={controlY} dominantBaseline="middle" style={{ textAnchor: "middle", fill: color, fontSize: 10 }}>
                     {score.toString()}
                 </text>
             </g>
@@ -82,7 +80,7 @@ export class SashimiDisplay extends React.PureComponent<SashimiDisplayProps, {}>
         //        => b.interaction.score - a.interaction.score);
         // const slicedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
         return <HoverTooltipContext useRelativeY={true}>
-            <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS}
+            <DesignRenderer type={RenderTypes.SVG}
                 width={width} height={height}>
                 {placedInteractions.map(this.renderCurve)}
             </DesignRenderer>
