@@ -1,7 +1,8 @@
 import _ from "lodash";
 // import Straw from 'hic-straw/src/straw';
 // import HicStraw from "hic-straw/dist/hic-straw";
-import HicStraw from "hic-straw/dist/hic-straw.esm.js";
+// import HicStraw from "hic-straw/dist/hic-straw.esm.js";
+import HicStraw from "hic-straw/dist/hic-straw.min.js";
 import DataSource from "./DataSource";
 import ChromosomeInterval from "../model/interval/ChromosomeInterval";
 import { NormalizationMode } from "../model/HicDataModes";

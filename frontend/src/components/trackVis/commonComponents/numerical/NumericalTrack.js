@@ -82,7 +82,7 @@ class NumericalTrack extends React.PureComponent {
 
     computeScales(xToValue, xToValue2, height) {
         const { yScale, yMin, yMax } = this.props.options;
-        if (yMin > yMax) {
+        if (yMin >= yMax) {
             notify.show("Y-axis min must less than max", "error", 2000);
         }
         /*
@@ -101,12 +101,16 @@ class NumericalTrack extends React.PureComponent {
         min = xValues2.length ? -maxBoth : 0;
         if (yScale === ScaleChoices.FIXED) {
             max = yMax ? yMax : max;
-            min = yMin ? yMin : min;
+            min = yMin !== undefined ? yMin : min;
+            if(xValues2.length && yMin > 0) {
+                notify.show("Please set Y-axis min <=0 when there are negative values", "warning", 5000);
+                min = 0;
+            }
         }
         if (min > max) {
             min = max;
         }
-        if (xValues2.length) {
+        if (xValues2.length && !(yScale === ScaleChoices.FIXED && yMin === 0 )) {
             return {
                 valueToY: scaleLinear()
                     .domain([max, 0])
@@ -179,31 +183,23 @@ class NumericalTrack extends React.PureComponent {
 
     render() {
         const { data, viewRegion, width, trackModel, unit, options, forceSvg } = this.props;
-        const { height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin, smooth } = options;
+        const { height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin, smooth, yScale, yMin } = options;
         const halfHeight = height * 0.5;
-        const dataForward = data.filter((feature) => feature.value === undefined || feature.value >= 0); // bed track to density mode
-        const dataReverse = data.filter((feature) => feature.value < 0);
+        const data2 = (yScale === ScaleChoices.FIXED && yMin) ? data.filter(f => f.value >= yMin) : data;
+        const dataForward = data2.filter((feature) => feature.value === undefined || feature.value >= 0); // bed track to density mode
+        const dataReverse = data2.filter((feature) => feature.value < 0);
         let xToValue2BeforeSmooth;
         if (dataReverse.length) {
             xToValue2BeforeSmooth = this.aggregateFeatures(dataReverse, viewRegion, width, aggregateMethod);
         } else {
             xToValue2BeforeSmooth = [];
         }
-        // if (options.yScale === ScaleChoices.FIXED && options.yMin !== undefined) {
-        //     xToValue2BeforeSmooth = xToValue2BeforeSmooth.map((x) => {
-        //         if (x >= options.yMin) {
-        //             return x;
-        //         }
-        //         return undefined;
-        //     });
-        // }
         const smoothNumber = Number.parseInt(smooth) || 0;
         this.xToValue2 = smoothNumber === 0 ? xToValue2BeforeSmooth : Smooth(xToValue2BeforeSmooth, smoothNumber);
         const xValues2 = this.xToValue2.filter((x) => x);
-        if (xValues2.length) {
+        this.hasReverse = false;
+        if (xValues2.length && !(yScale === ScaleChoices.FIXED && yMin === 0 )) {
             this.hasReverse = true;
-        } else {
-            this.hasReverse = false;
         }
         const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
         const xToValueBeforeSmooth =

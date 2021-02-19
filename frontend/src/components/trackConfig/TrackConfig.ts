@@ -2,6 +2,7 @@ import UnknownTrack from '../trackVis/UnknownTrack';
 import LabelConfig from '../trackContextMenu/LabelConfig';
 import { TrackModel, TrackOptions } from '../../model/TrackModel';
 import DataSource from '../../dataSources/DataSource';
+import { DYNAMIC_TYPES } from './getTrackConfig';
 
 export class TrackConfig {
     public defaultOptions: TrackOptions;
@@ -49,6 +50,11 @@ export class TrackConfig {
         return this.trackModel.type === "genomealign" || this.trackModel.filetype === "genomealign";
     }
 
+    isDynamicTrack(): boolean {
+        const trackType = this.trackModel.type || this.trackModel.filetype;
+        return DYNAMIC_TYPES.includes(trackType);
+    }
+
     /**
      *
      * @param oldRegion
@@ -57,14 +63,6 @@ export class TrackConfig {
      */
     shouldFetchBecauseRegionChange(currentOptions: TrackOptions): boolean {
         return true;
-    }
-
-    /**
-     * @return {boolean} whether to fetch new data because the view window changed (for instance, when the window is
-     * resized)
-     */
-    shouldFetchBecauseViewWindowChange(): boolean {
-        return false;
     }
 
     getComponent(): React.ComponentType {

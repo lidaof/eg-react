@@ -19,6 +19,7 @@ import { SessionUI } from "./SessionUI";
 import LiveUI from "./LiveUI";
 import { RegionExpander } from "../model/RegionExpander";
 import { ScreenshotUI } from "./ScreenshotUI";
+import { DynamicRecordUI } from "./DynamicRecordUI";
 import FacetTableUI from "./FacetTableUI";
 import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "../AppState";
 import { HotKeyInfo } from "./HotKeyInfo";
@@ -384,6 +385,21 @@ class Nav extends React.Component {
                                 <ScreenshotUI
                                     expansionAmount={REGION_EXPANDER}
                                     needClip={hasInteractionTrack}
+                                    genomeConfig={genomeConfig}
+                                />
+                            </ModalMenuItem>
+                            <ModalMenuItem
+                                itemLabel="Dynamic record"
+                                style={{
+                                    content: {
+                                        left: 0,
+                                        right: 0,
+                                        padding: "14px",
+                                    },
+                                }}
+                            >
+                                <DynamicRecordUI
+                                    expansionAmount={REGION_EXPANDER}
                                     genomeConfig={genomeConfig}
                                 />
                             </ModalMenuItem>

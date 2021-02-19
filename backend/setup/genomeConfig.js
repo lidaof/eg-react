@@ -281,6 +281,14 @@ const rheMac3 = [
     },
 ];
 
+const mm39 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const genomeConfig = {
     hg19,
     mm10,
@@ -307,6 +315,7 @@ const genomeConfig = {
     gorGor3,
     papAnu2,
     rheMac3,
+    mm39,
 };
 
 module.exports = genomeConfig;

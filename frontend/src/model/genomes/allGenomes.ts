@@ -1,8 +1,10 @@
 import HG19 from "./hg19/hg19";
 import HG38 from "./hg38/hg38";
 import MM10 from "./mm10/mm10";
+import MM39 from "./mm39/mm39";
 import DAN_RER10 from "./danRer10/danRer10";
 import DAN_RER11 from "./danRer11/danRer11";
+import DAN_RER7 from "./danRer7/danRer7";
 import PANTRO5 from "./panTro5/panTro5";
 import PANTRO6 from "./panTro6/panTro6";
 import RN6 from "./rn6/rn6";
@@ -22,6 +24,7 @@ import MERS from "./virus/mers";
 import nCoV2019 from "./virus/nCoV2019";
 import LEPOCU1 from "./lepOcu1/lepOcu1";
 import panTro4 from "./panTro4/panTro4";
+import gorGor4 from "./gorGor4/gorGor4";
 import gorGor3 from "./gorGor3/gorGor3";
 import nomLeu3 from "./nomLeu3/nomLeu3";
 import papAnu2 from "./papAnu2/papAnu2";
@@ -34,15 +37,17 @@ import { GenomeConfig } from "./GenomeConfig";
 /**
  * All available genomes.
  */
-export const allGenomes = [
-  HG19,
+export const allGenomes = [  // order matters, shows same order in genome list after click genome logo
   HG38,
+  HG19,
+  MM39,
   MM10,
   MM9,
   PANTRO5,
   BosTau8,
   DAN_RER10,
   DAN_RER11,
+  DAN_RER7,
   RN6,
   AraTha1,
   RheMac8,
@@ -58,6 +63,7 @@ export const allGenomes = [
   nCoV2019,
   LEPOCU1,
   panTro4,
+  gorGor4,
   gorGor3,
   nomLeu3,
   papAnu2,
@@ -97,7 +103,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   gorilla: {
     logoUrl: "https://vizhub.wustl.edu/public/gorGor3/Gorilla.png",
-    assemblies: [gorGor3.genome.getName()],
+    assemblies: [gorGor4.genome.getName(), gorGor3.genome.getName()],
     color: "yellow"
   },
   gibbon: {
@@ -127,7 +133,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   mouse: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Mouse.png",
-    assemblies: [MM10.genome.getName(), MM9.genome.getName()],
+    assemblies: [MM39.genome.getName(), MM10.genome.getName(), MM9.genome.getName()],
     color: "yellow"
   },
   rat: {
@@ -142,7 +148,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   zebrafish: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
-    assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName()],
+    assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName(), DAN_RER7.genome.getName()],
     color: "yellow"
   },
   "spotted Gar": {

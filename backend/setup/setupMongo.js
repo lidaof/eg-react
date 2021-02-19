@@ -51,7 +51,7 @@ async function main() {
         return ExitCodes.DATA_DIR_MISSING_ERROR;
     }
 
-    // const genomes = ["panTro6"]; // if just want to load one genome
+    // const genomes = ["mm39"]; // if just want to load one genome
 
     // Get mongo connection
     let mongoClient;

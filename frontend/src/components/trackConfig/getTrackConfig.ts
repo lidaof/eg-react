@@ -35,6 +35,7 @@ import { ImportanceTrackConfig } from "./ImportanceTrackConfig";
 
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
+export const DYNAMIC_TYPES = ["dynamic", "dbedgraph", "dynamichic", "dynamiclongrange"];
 
 const TYPE_NAME_TO_CONFIG = {
     bam: BamTrackConfig,

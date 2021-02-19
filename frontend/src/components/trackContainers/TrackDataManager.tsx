@@ -13,7 +13,6 @@ import { GuaranteeMap } from "../../model/GuaranteeMap";
 import { Alignment } from "../../model/alignment/MultiAlignmentViewCalculator";
 import { GenomeConfig } from "../../model/genomes/GenomeConfig";
 
-
 interface TrackDataMap {
     [id: number]: TrackData;
 }

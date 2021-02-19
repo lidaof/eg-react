@@ -1,6 +1,6 @@
 {
     "name": "epgg",
-    "version": "52.3.0",
+    "version": "52.4.0",
     "author": "Ting Wang Lab @WUSTL",
     "repository": {
         "type": "git",
@@ -82,7 +82,7 @@
         "fuse.js": "^3.6.1",
         "g3djs": "^1.5.0",
         "generic-filehandle": "^2.0.3",
-        "hic-straw": "^2.0.0",
+        "hic-straw": "^2.0.2",
         "iwanthue": "^1.4.0",
         "jest-image-snapshot": "^1.0.1",
         "jquery": "^3.5.1",
@@ -96,6 +96,7 @@
         "node-sass": "^4.14.1",
         "papaparse": "^5.2.0",
         "parse-color": "^1.0.0",
+        "percentile": "^1.4.0",
         "pixi.js": "^5.3.0",
         "point-in-polygon": "^1.0.1",
         "polygon-lookup": "^2.6.0",
