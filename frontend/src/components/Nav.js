@@ -231,6 +231,7 @@ class Nav extends React.Component {
                                         top: 0,
                                         left: 0,
                                         height: "100%",
+                                        zIndex: 5,
                                     },
                                     overlay: {
                                         backgroundColor: "rgba(111,107,101, 0.7)",
@@ -352,6 +353,7 @@ class Nav extends React.Component {
                                                 bottom: "unset",
                                                 overflow: "visible",
                                                 padding: "5px",
+                                                zIndex: 5,
                                             },
                                         }}
                                     >
@@ -365,6 +367,7 @@ class Nav extends React.Component {
                                                 bottom: "unset",
                                                 overflow: "visible",
                                                 padding: "5px",
+                                                zIndex: 5,
                                             },
                                         }}
                                     >
@@ -379,6 +382,7 @@ class Nav extends React.Component {
                                         left: 0,
                                         right: 0,
                                         padding: "14px",
+                                        zIndex: 5,
                                     },
                                 }}
                             >
@@ -395,13 +399,11 @@ class Nav extends React.Component {
                                         left: 0,
                                         right: 0,
                                         padding: "14px",
+                                        zIndex: 5,
                                     },
                                 }}
                             >
-                                <DynamicRecordUI
-                                    expansionAmount={REGION_EXPANDER}
-                                    genomeConfig={genomeConfig}
-                                />
+                                <DynamicRecordUI expansionAmount={REGION_EXPANDER} genomeConfig={genomeConfig} />
                             </ModalMenuItem>
                             <ModalMenuItem itemLabel="Fetch Sequence">
                                 <FetchSequence genomeConfig={genomeConfig} selectedRegion={selectedRegion} />
@@ -448,6 +450,7 @@ class Nav extends React.Component {
                                             bottom: "unset",
                                             overflow: "visible",
                                             padding: "5px",
+                                            zIndex: 5,
                                         },
                                         overlay: {
                                             backgroundColor: "rgba(255, 255, 255, 0.1)",
@@ -499,6 +502,7 @@ class Nav extends React.Component {
                                                 bottom: "unset",
                                                 overflow: "visible",
                                                 padding: "5px",
+                                                zIndex: 5,
                                             },
                                         }}
                                     >
@@ -623,6 +627,7 @@ class ModalMenuItem extends React.Component {
             ...{
                 overlay: {
                     backgroundColor: "rgba(111,107,101, 0.7)",
+                    zIndex: 4,
                 },
             },
             ...this.props.style,
@@ -658,7 +663,7 @@ function ModalCloseButton(props) {
                 position: "absolute",
                 top: "-5px",
                 right: "15px",
-                zIndex: 2,
+                zIndex: 5,
             }}
             onClick={props.onClick}
         >

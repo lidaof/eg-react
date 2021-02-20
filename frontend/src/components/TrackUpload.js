@@ -125,6 +125,7 @@ export class TrackUpload extends React.Component {
                         label: item.label || item.name || item.filename,
                         files: null,
                         options: item.options || {},
+                        metadata: item.metadata || {},
                     });
                 } else {
                     track = new TrackModel({
@@ -135,6 +136,7 @@ export class TrackUpload extends React.Component {
                         label: item.label || item.name || item.filename,
                         files: [fileHash[item.filename], idxHash[item.filename + indexSuffix]],
                         options: item.options || {},
+                        metadata: item.metadata || {},
                     });
                 }
                 tracks.push(track);

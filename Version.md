@@ -1,5 +1,10 @@
 # Version History
 
+## 52.4.1
+
+-   bug fix: numerical track y-scale threshold not working for negative values
+-   bug fix: local data hub missed track's `metadata` attibute
+
 ## 52.4.0
 
 -   added percentile scale for interaction tracks (`hic`, `longrange` etc.)
