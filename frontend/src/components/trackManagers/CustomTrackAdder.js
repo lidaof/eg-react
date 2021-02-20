@@ -23,6 +23,7 @@ export const TRACK_TYPES = {
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
     Image: ["omero4dn", "omeroidr"],
+    Importance: ["importance"],
 };
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
@@ -49,6 +50,7 @@ const TYPES_DESC = {
     dbedgraph: "Dynamic bedgraph data",
     omero4dn: "image data from 4DN (4D Nucleome Data Portal)",
     omeroidr: "image data from IDR (Image Data Resource)",
+    importance: "importance tracks by snair",
 };
 
 /**
