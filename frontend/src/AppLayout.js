@@ -6,8 +6,9 @@ import _ from "lodash";
 import { ActionCreators } from "./AppState";
 import withCurrentGenome from "./components/withCurrentGenome";
 import App from "./App";
-import G3dContainer from "components/trackVis/3d/G3dContainer";
-import MolstarContainer from "components/trackVis/3d/MolstarContainer";
+// import G3dContainer from "components/trackVis/3d/G3dContainer";
+// import MolstarContainer from "components/trackVis/3d/MolstarContainer";
+import ThreedmolContainer from "components/trackVis/3dmol/ThreedmolContainer";
 import { BrowserScene } from "./components/vr/BrowserScene";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { RegionExpander } from "model/RegionExpander";
@@ -94,10 +95,18 @@ class AppLayout extends React.PureComponent {
         }
     }
 
+    handleNodeResize = (node) => {
+        const model = FlexLayout.Model.fromJson(this.props.layout);
+        const parent = node.getParent();
+        model.doAction(FlexLayout.Actions.updateNodeAttributes(parent.getId(), { weight: parent.getWeight() }));
+        this.props.onSetLayout(model.toJson());
+    };
+
     renderApp = (node) => {
         const model = node ? node.getModel() : initialLayout;
-        // const model = node ? node.getModel() : {};
-        // console.log(model);
+        // if (node) {
+        //     node.setEventListener("resize", () => this.handleNodeResize(node));
+        // }
         return <App layoutModel={model} />;
     };
 
@@ -106,6 +115,7 @@ class AppLayout extends React.PureComponent {
         node.setEventListener("close", () => {
             this.props.onToggleVR();
         });
+        // node.setEventListener("resize", () => this.handleNodeResize(node));
         return (
             <ErrorBoundary>
                 <BrowserScene
@@ -118,31 +128,54 @@ class AppLayout extends React.PureComponent {
         );
     };
 
-    render3Dscene = (node) => {
-        const { viewRegion, genomeConfig } = this.props;
-        const config = node.getConfig();
-        // console.log(config);
-        const g3dtrack = TrackModel.deserialize(config.trackModel);
-        g3dtrack.id = config.trackId;
-        node.setEventListener("close", () => {
-            const layout = deleteTabByIdFromLayout(this.props.layout, config.tabId);
-            this.props.onSetLayout(layout);
-        });
-        return (
-            <ErrorBoundary>
-                <G3dContainer
-                    viewRegion={viewRegion}
-                    tracks={[g3dtrack]}
-                    expansionAmount={REGION_EXPANDER0}
-                    genomeConfig={genomeConfig}
-                />
-            </ErrorBoundary>
-        );
-    };
+    // render3Dscene = (node) => {
+    //     const { viewRegion, genomeConfig } = this.props;
+    //     const config = node.getConfig();
+    //     // console.log(config);
+    //     const g3dtrack = TrackModel.deserialize(config.trackModel);
+    //     g3dtrack.id = config.trackId;
+    //     node.setEventListener("close", () => {
+    //         const layout = deleteTabByIdFromLayout(this.props.layout, config.tabId);
+    //         this.props.onSetLayout(layout);
+    //     });
+    //     return (
+    //         <ErrorBoundary>
+    //             <G3dContainer
+    //                 viewRegion={viewRegion}
+    //                 tracks={[g3dtrack]}
+    //                 expansionAmount={REGION_EXPANDER0}
+    //                 genomeConfig={genomeConfig}
+    //             />
+    //         </ErrorBoundary>
+    //     );
+    // };
 
-    renderMolStarContainer = (node) => {
-        const { viewRegion, genomeConfig } = this.props;
+    // renderMolStarContainer = (node) => {
+    //     const { viewRegion, genomeConfig } = this.props;
+    //     const config = node.getConfig();
+    //     const g3dtrack = TrackModel.deserialize(config.trackModel);
+    //     g3dtrack.id = config.trackId;
+    //     node.setEventListener("close", () => {
+    //         const layout = deleteTabByIdFromLayout(this.props.layout, config.tabId);
+    //         this.props.onSetLayout(layout);
+    //         this.removeTrackById(g3dtrack.id);
+    //     });
+    //     return (
+    //         <ErrorBoundary>
+    //             <MolstarContainer
+    //                 viewRegion={viewRegion}
+    //                 tracks={[g3dtrack]}
+    //                 expansionAmount={REGION_EXPANDER0}
+    //                 genomeConfig={genomeConfig}
+    //             />
+    //         </ErrorBoundary>
+    //     );
+    // };
+
+    render3dmolContainer = (node) => {
+        const { viewRegion, genomeConfig, tracks } = this.props;
         const config = node.getConfig();
+        const { width, height } = node.getRect();
         const g3dtrack = TrackModel.deserialize(config.trackModel);
         g3dtrack.id = config.trackId;
         node.setEventListener("close", () => {
@@ -150,15 +183,17 @@ class AppLayout extends React.PureComponent {
             this.props.onSetLayout(layout);
             this.removeTrackById(g3dtrack.id);
         });
+        // node.setEventListener("resize", () => this.handleNodeResize(node));
         return (
-            <ErrorBoundary>
-                <MolstarContainer
-                    viewRegion={viewRegion}
-                    tracks={[g3dtrack]}
-                    expansionAmount={REGION_EXPANDER0}
-                    genomeConfig={genomeConfig}
-                />
-            </ErrorBoundary>
+            <ThreedmolContainer
+                viewRegion={viewRegion}
+                tracks={tracks}
+                g3dtrack={g3dtrack}
+                expansionAmount={REGION_EXPANDER0}
+                genomeConfig={genomeConfig}
+                width={width}
+                height={height}
+            />
         );
     };
 
@@ -169,6 +204,7 @@ class AppLayout extends React.PureComponent {
             const layout = deleteTabByIdFromLayout(this.props.layout, tabId);
             this.props.onSetLayout(layout);
         });
+        // node.setEventListener("resize", () => this.handleNodeResize(node));
         return (
             <ErrorBoundary>
                 <OmeroContainer
@@ -183,10 +219,11 @@ class AppLayout extends React.PureComponent {
 
     factory = (node) => {
         const layoutComponent = node.getComponent();
+        node.setEventListener("resize", () => this.handleNodeResize(node));
         const layoutFuncs = {
             app: (node) => this.renderApp(node),
             vr: (node) => this.renderVRscene(node),
-            g3d: (node) => this.renderMolStarContainer(node),
+            g3d: (node) => this.render3dmolContainer(node),
             omero: (node) => this.renderOmeroContainer(node),
         };
         return layoutFuncs[layoutComponent](node);

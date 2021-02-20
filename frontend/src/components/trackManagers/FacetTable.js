@@ -24,12 +24,12 @@ class FacetTable extends Component {
         onTracksAdded: PropTypes.func,
         addTermToMetaSets: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
-        publicTrackSets: PropTypes.instanceOf(Set)
+        publicTrackSets: PropTypes.instanceOf(Set),
     };
 
     static defaultProps = {
         tracks: [],
-        addedTracks: []
+        addedTracks: [],
     };
 
     constructor(props) {
@@ -43,7 +43,7 @@ class FacetTable extends Component {
             rowHeader: "",
             columnHeader: "",
             showModalId: null,
-            metaKeys: []
+            metaKeys: [],
         };
 
         this.toggleHeader = this.toggleHeader.bind(this);
@@ -66,7 +66,7 @@ class FacetTable extends Component {
     }
 
     initializeTracks(allTracks) {
-        const allKeys = allTracks.map(track => Object.keys(track.metadata));
+        const allKeys = allTracks.map((track) => Object.keys(track.metadata));
         const metaKeys = _.union(...allKeys);
         this.props.addTermToMetaSets(metaKeys);
         let tracks = []; // fix dup metadata
@@ -154,8 +154,8 @@ class FacetTable extends Component {
             {
                 name: rowHeader,
                 expanded: false,
-                children: parent2children[rowHeader]
-            }
+                children: parent2children[rowHeader],
+            },
         ];
         let columnList;
         if (columnHeader) {
@@ -163,8 +163,8 @@ class FacetTable extends Component {
                 {
                     name: columnHeader,
                     expanded: false,
-                    children: parent2children[columnHeader]
-                }
+                    children: parent2children[columnHeader],
+                },
             ];
         } else {
             columnList = [{ name: "--" }];
@@ -177,7 +177,7 @@ class FacetTable extends Component {
             child2ancestor,
             metaKeys,
             rowHeader,
-            columnHeader: columnHeader ? columnHeader : UNUSED_META_KEY
+            columnHeader: columnHeader ? columnHeader : UNUSED_META_KEY,
         });
     }
 
@@ -210,13 +210,13 @@ class FacetTable extends Component {
                 newList.splice(index + 1, 0, {
                     name: item,
                     expanded: false,
-                    children: this.state.parent2children[item]
+                    children: this.state.parent2children[item],
                 });
             }
         } else {
             newList = [
                 ...newList.slice(0, index + 1),
-                ...newList.slice(index + 1 + this.state.parent2children[name].size)
+                ...newList.slice(index + 1 + this.state.parent2children[name].size),
             ];
             // remove all child items, recursive
             this.removeChild(newList, name);
@@ -233,7 +233,7 @@ class FacetTable extends Component {
     removeChild(list, parentName) {
         if (this.state.parent2children[parentName]) {
             for (let item of this.state.parent2children[parentName]) {
-                _.remove(list, n => n.name === item);
+                _.remove(list, (n) => n.name === item);
                 this.removeChild(list, item);
             }
         }
@@ -377,7 +377,7 @@ class FacetTable extends Component {
         }
         const id = `modal-${row.name}-${col.name}`;
         const addUrls = found.filter(
-            tk => this.props.addedTrackSets.has(tk.url) || this.props.addedTrackSets.has(tk.name)
+            (tk) => this.props.addedTrackSets.has(tk.url) || this.props.addedTrackSets.has(tk.name)
         );
         return (
             <div>
@@ -390,7 +390,7 @@ class FacetTable extends Component {
                     ariaHideApp={false}
                     id={id}
                     style={{
-                        overlay: { zIndex: 3, backgroundColor: "rgba(111,107,101, 0.7)" }
+                        overlay: { zIndex: 4, backgroundColor: "rgba(111,107,101, 0.7)" },
                     }}
                 >
                     <span
@@ -401,7 +401,7 @@ class FacetTable extends Component {
                             fontSize: "2em",
                             position: "absolute",
                             top: "-5px",
-                            right: "15px"
+                            right: "15px",
                         }}
                         onClick={this.handleCloseModal}
                     >
@@ -441,8 +441,8 @@ class FacetTable extends Component {
                 {isColumn ? "Column: " : "Row: "}
                 <select value={stateToRead} onChange={changeCallback}>
                     {this.state.metaKeys
-                        .filter(metaKey => metaKey !== otherState)
-                        .map(metaKey => (
+                        .filter((metaKey) => metaKey !== otherState)
+                        .map((metaKey) => (
                             <option key={metaKey} value={metaKey}>
                                 {metaKey}
                             </option>
@@ -470,9 +470,9 @@ class FacetTable extends Component {
                 {
                     name: selectedMetaKey,
                     expanded: false,
-                    children: this.state.parent2children[selectedMetaKey]
-                }
-            ]
+                    children: this.state.parent2children[selectedMetaKey],
+                },
+            ],
         });
     }
 
@@ -481,7 +481,7 @@ class FacetTable extends Component {
         if (selectedMetaKey === UNUSED_META_KEY) {
             this.setState({
                 columnHeader: UNUSED_META_KEY,
-                columnList: [{ name: "--" }]
+                columnList: [{ name: "--" }],
             });
         } else {
             this.setState({
@@ -490,9 +490,9 @@ class FacetTable extends Component {
                     {
                         name: selectedMetaKey,
                         expanded: false,
-                        children: this.state.parent2children[selectedMetaKey]
-                    }
-                ]
+                        children: this.state.parent2children[selectedMetaKey],
+                    },
+                ],
             });
         }
     }
