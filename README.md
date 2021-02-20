@@ -1,9 +1,3 @@
-# Importance Tracks
-
-This fork will implements tracks for importance scores for the browser. Works well with Chrome/Edge, not with Safari. Get in touch with Surag for the Firebase .env config file if interested in using sessions and place it in frontend/. Otherwise just store `REACT_APP_NO_FIREBASE=1` in `frontend/.env`. Then run `npm install` from within frontend/ and then `npm start`. 
-
-Check out the `importance_tracks.mov` video to see how it looks!
-
 # WashU Epigenome Browser
 
 ![WashU Epigenome Browser Logo](https://eg.readthedocs.io/en/latest/_images/eg.png "WashU Epigenome Browser")
