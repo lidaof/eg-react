@@ -96,7 +96,8 @@ class AppLayout extends React.PureComponent {
     }
 
     handleNodeResize = (node) => {
-        const model = FlexLayout.Model.fromJson(this.props.layout);
+        const layout = _.isEmpty(this.props.layout) ? initialLayout : this.props.layout;
+        const model = FlexLayout.Model.fromJson(layout);
         const parent = node.getParent();
         model.doAction(FlexLayout.Actions.updateNodeAttributes(parent.getId(), { weight: parent.getWeight() }));
         this.props.onSetLayout(model.toJson());

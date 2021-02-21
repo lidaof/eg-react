@@ -1,5 +1,9 @@
 # Version History
 
+## 52.5.0
+
+-   Dynamic sequence track type `dynseq` added, the track type is proposed and initially developped by Surag Nai from Anshul Kundaje's lab at Stanford University
+
 ## 52.4.1
 
 -   bug fix: numerical track y-scale threshold not working for negative values

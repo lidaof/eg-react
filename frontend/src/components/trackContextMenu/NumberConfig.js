@@ -1,12 +1,12 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import SingleInputConfig from './SingleInputConfig';
+import React from "react";
+import PropTypes from "prop-types";
+import SingleInputConfig from "./SingleInputConfig";
 
-import './TrackContextMenu.css';
+import "./TrackContextMenu.css";
 
 /**
  * A menu option that configures some integer-based property.
- * 
+ *
  * @author Silas Hsu
  */
 class NumberConfig extends React.PureComponent {
@@ -23,7 +23,7 @@ class NumberConfig extends React.PureComponent {
 
     static defaultProps = {
         label: "Number:",
-        width: "7ch" // Should be enough for values up to 9999
+        width: "10ch", // Should be enough for values up to 9999
     };
 
     constructor(props) {
@@ -34,26 +34,28 @@ class NumberConfig extends React.PureComponent {
 
     /**
      * Renders the <input> element.
-     * 
+     *
      * @param {string} inputValue - value of the input
      * @param {function} setNewValue - function to call when input value changes
      * @return {JSX.Element} <input> to render
      */
     renderInputElement(inputValue, setNewValue) {
-        const {minValue, step, width} = this.props;
-        return <input
-            type="number"
-            min={minValue}
-            step={step}
-            value={inputValue}
-            style={{width: width}}
-            onChange={event => setNewValue(event.target.value)}
-        />;
+        const { minValue, step, width } = this.props;
+        return (
+            <input
+                type="number"
+                min={minValue}
+                step={step}
+                value={inputValue}
+                style={{ width: width }}
+                onChange={(event) => setNewValue(event.target.value)}
+            />
+        );
     }
 
     /**
      * Parses the string containing number from the <input> element.
-     * 
+     *
      * @param {string} optionName - track option prop name to modify
      * @param {string} value - string containing number from <input> element
      */
@@ -70,17 +72,19 @@ class NumberConfig extends React.PureComponent {
     }
 
     render() {
-        const {optionName, optionsObjects, label, defaultValue, hasSetButton} = this.props;
+        const { optionName, optionsObjects, label, defaultValue, hasSetButton } = this.props;
         const setButton = hasSetButton === undefined ? true : hasSetButton;
-        return <SingleInputConfig
-            optionName={optionName}
-            optionsObjects={optionsObjects}
-            label={label}
-            defaultValue={defaultValue}
-            hasSetButton={setButton}
-            getInputElement={this.renderInputElement}
-            onOptionSet={this.handleOptionSet}
-        />;
+        return (
+            <SingleInputConfig
+                optionName={optionName}
+                optionsObjects={optionsObjects}
+                label={label}
+                defaultValue={defaultValue}
+                hasSetButton={setButton}
+                getInputElement={this.renderInputElement}
+                onOptionSet={this.handleOptionSet}
+            />
+        );
     }
 }
 
