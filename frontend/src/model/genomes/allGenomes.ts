@@ -27,6 +27,7 @@ import gorGor4 from "./gorGor4/gorGor4";
 import gorGor3 from "./gorGor3/gorGor3";
 import nomLeu3 from "./nomLeu3/nomLeu3";
 import papAnu2 from "./papAnu2/papAnu2";
+import oryCun2 from "./oryCun2/oryCun2";
 import rheMac3 from "./rheMac3/rheMac3";
 import calJac3 from "./calJac3/calJac3";
 import Pfal3D7 from "./pfal3d7/pfal3d7";
@@ -65,6 +66,7 @@ export const allGenomes = [
   gorGor3,
   nomLeu3,
   papAnu2,
+  oryCun2,
   rheMac3,
   calJac3,
   PANTRO6,
@@ -127,6 +129,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   cow: {
     logoUrl: "https://vizhub.wustl.edu/public/bosTau8/Cow.png",
     assemblies: [BosTau8.genome.getName()],
+    color: "yellow"
+  },
+  rabbit: {
+    logoUrl: "https://wangftp.wustl.edu/~xzhuo/browser/oryCun2/rabbit.png",
+    assemblies: [oryCun2.genome.getName()],
     color: "yellow"
   },
   mouse: {
