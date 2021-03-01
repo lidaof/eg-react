@@ -188,6 +188,16 @@
             }
         },
         {
+            "name": "gorGor4tohg38",
+            "label": "Gorilla gorGor4 to hg38 blastz",
+            "querygenome": "gorGor4",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/HiC/hg38.gorGor4.gz",
+            "details": {
+                "source": "UCSC Genome Browser"
+            }
+        },
+        {
             "name": "rheMac3tohg38",
             "label": "Rhesus Macaque rheMac3 to hg38 blastz",
             "querygenome": "rheMac3",
