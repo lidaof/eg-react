@@ -8,6 +8,8 @@ import OpenInterval from '../../../model/interval/OpenInterval';
 import DesignRenderer, { RenderTypes } from '../../../art/DesignRenderer';
 import HoverTooltipContext from '../commonComponents/tooltip/HoverTooltipContext';
 import { withTrackLegendWidth } from 'components/withTrackLegendWidth';
+import Tooltip from '../commonComponents/tooltip/Tooltip';
+import { getRelativeCoordinates } from '../../../util';
 
 interface HeatmapProps {
     placedInteractions: PlacedInteraction[];
@@ -23,6 +25,9 @@ interface HeatmapProps {
     bothAnchorsInView?: boolean;
     legendWidth: number;
     getBeamRefs: any;
+    onSetAnchors3d?: any;
+    onShowTooltip?: any;
+    onHideTooltip?: any;
 }
 
 class HeatmapNoLegendWidth extends React.PureComponent<HeatmapProps, {}> {
@@ -42,9 +47,11 @@ class HeatmapNoLegendWidth extends React.PureComponent<HeatmapProps, {}> {
     componentDidMount() {
         // this.beamLeft = document.getElementById('beamLeft');
         // this.beamRight = document.getElementById('beamRight');
-        const beamRefs = this.props.getBeamRefs();
-        this.beamLeft = beamRefs[0];
-        this.beamRight = beamRefs[1];
+        if (this.props.getBeamRefs) {
+            const beamRefs = this.props.getBeamRefs();
+            this.beamLeft = beamRefs[0];
+            this.beamRight = beamRefs[1];
+        }
     }
 
     renderRect = (placedInteraction: PlacedInteraction, index: number) => {
@@ -114,19 +121,23 @@ class HeatmapNoLegendWidth extends React.PureComponent<HeatmapProps, {}> {
             const left = xSpan1.start - viewWindow.start + legendWidth;
             const right = xSpan2.start - viewWindow.start + legendWidth;
             const leftWidth = Math.max(xSpan1.getLength(), 1);
-            const rightWidth = Math.max(xSpan2.getLength(), 1)
-            this.beamLeft.style.display = 'block';
-            this.beamLeft.style.left = left + 'px';
-            this.beamLeft.style.width = leftWidth + 'px';
-            if (left < legendWidth) {
-                this.beamLeft.style.display = 'none';
+            const rightWidth = Math.max(xSpan2.getLength(), 1);
+            if (this.beamLeft) {
+                this.beamLeft.style.display = 'block';
+                this.beamLeft.style.left = left + 'px';
+                this.beamLeft.style.width = leftWidth + 'px';
+                if (left < legendWidth) {
+                    this.beamLeft.style.display = 'none';
+                }
             }
-            if ((right + rightWidth) <= (viewWindow.end - viewWindow.start + legendWidth)) {
-                this.beamRight.style.display = 'block';
-                this.beamRight.style.left = right + 'px';
-                this.beamRight.style.width = rightWidth + 'px';
-            } else {
-                this.beamRight.style.display = 'none';
+            if (this.beamRight) {
+                if ((right + rightWidth) <= (viewWindow.end - viewWindow.start + legendWidth)) {
+                    this.beamRight.style.display = 'block';
+                    this.beamRight.style.left = right + 'px';
+                    this.beamRight.style.width = rightWidth + 'px';
+                } else {
+                    this.beamRight.style.display = 'none';
+                }
             }
             return <div>
                 <div>Locus1: {interaction.locus1.toString()}</div>
@@ -139,8 +150,12 @@ class HeatmapNoLegendWidth extends React.PureComponent<HeatmapProps, {}> {
     }
 
     closeBeam = () => {
-        this.beamLeft.style.display = 'none';
-        this.beamRight.style.display = 'none';
+        if (this.beamLeft) {
+            this.beamLeft.style.display = 'none';
+        }
+        if (this.beamRight) {
+            this.beamRight.style.display = 'none';
+        }
     }
 
     findPolygon = (x: number, y: number): any => {
@@ -152,12 +167,44 @@ class HeatmapNoLegendWidth extends React.PureComponent<HeatmapProps, {}> {
         return null;
     }
 
+    set3dAnchors = (anchors: any) => {
+        if (this.props.onSetAnchors3d) {
+            this.props.onSetAnchors3d(anchors)
+        }
+    }
+
+    clear3dAnchors = () => {
+        if (this.props.onSetAnchors3d) {
+            this.props.onSetAnchors3d([]);
+        }
+        this.props.onHideTooltip()
+    }
+
+    clickTooltip = (event: React.MouseEvent) => {
+        const { x, y } = getRelativeCoordinates(event);
+        const polygon = this.findPolygon(x, y);
+        if (polygon) {
+            const { interaction } = polygon;
+            const tooltip = (
+                <Tooltip pageX={event.pageX} pageY={event.pageY}>
+                    <div>
+                        <button className="btn btn-sm btn-primary" onClick={() => this.set3dAnchors([interaction.locus1, interaction.locus2])}>Show in 3D</button>
+                    </div>
+                    <div>
+                        <button className="btn btn-sm btn-secondary" onClick={this.clear3dAnchors} >Clear in 3D</button>
+                    </div>
+                </Tooltip>
+            );
+            this.props.onShowTooltip(tooltip);
+        }
+    }
+
     render() {
         this.hmData = []
         const { placedInteractions, width, forceSvg, height } = this.props;
         return <HoverTooltipContext getTooltipContents={this.renderTooltip} useRelativeY={true}>
             <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS}
-                width={width} height={height} onMouseOut={this.closeBeam} >
+                width={width} height={height} onMouseOut={this.closeBeam} onClick={this.clickTooltip} >
                 {placedInteractions.map(this.renderRect)}
             </DesignRenderer>
         </HoverTooltipContext>

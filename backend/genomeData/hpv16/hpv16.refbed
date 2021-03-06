@@ -1,0 +1,8 @@
+NC_001526.4	0	1950	0	1950	+	E1	HpV16gp3		0	1950	ID=gene-HpV16gp3;Dbxref=GeneID:1489075;Name=E1;gbkey=Gene;gene=E1;gene_biotype=protein_coding;locus_tag=HpV16gp3
+NC_001526.4	0	2756	0	2756	+	E1^E4	HpV16gp5		0,2493	16,2756	ID=gene-HpV16gp5;Dbxref=GeneID:1489076;Name=E1^E4;gbkey=Gene;gene=E1^E4;gene_biotype=protein_coding;locus_tag=HpV16gp5
+NC_001526.4	1891	2989	1891	2989	+	E2	HpV16gp4		1891	2989	ID=gene-HpV16gp4;Dbxref=GeneID:1489080;Name=E2;gbkey=Gene;gene=E2;gene_biotype=protein_coding;locus_tag=HpV16gp4
+NC_001526.4	2985	3237	2985	3237	+	E5	HpV16gp6		2985	3237	ID=gene-HpV16gp6;Dbxref=GeneID:1489077;Name=E5;gbkey=Gene;gene=E5;gene_biotype=protein_coding;locus_tag=HpV16gp6
+NC_001526.4	3372	4794	3372	4794	+	L2	HpV16gp7		3372	4794	ID=gene-HpV16gp7;Dbxref=GeneID:1489081;Name=L2;gbkey=Gene;gene=L2;gene_biotype=protein_coding;locus_tag=HpV16gp7
+NC_001526.4	4774	6292	4774	6292	+	L1	HpV16gp8		4774	6292	ID=gene-HpV16gp8;Dbxref=GeneID:1489082;Name=L1;gbkey=Gene;gene=L1;gene_biotype=protein_coding;locus_tag=HpV16gp8
+NC_001526.4	7124	7601	7124	7601	+	E6	HpV16gp1		7124,7124,7450	7268,7459,7601	ID=gene-HpV16gp1;Dbxref=GeneID:1489078;Name=E6;gbkey=Gene;gene=E6;gene_biotype=protein_coding;locus_tag=HpV16gp1
+NC_001526.4	7603	7900	7603	7900	+	E7	HpV16gp2		7603	7900	ID=gene-HpV16gp2;Dbxref=GeneID:1489079;Name=E7;gbkey=Gene;gene=E7;gene_biotype=protein_coding;locus_tag=HpV16gp2

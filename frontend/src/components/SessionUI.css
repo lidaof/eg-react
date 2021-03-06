@@ -7,9 +7,18 @@ button.SessionUI {
     position: relative;
 }
 
-.SessionUI-upload-btn-wrapper input[type=file] {
+.SessionUI-upload-btn-wrapper input[type="file"] {
     position: absolute;
     left: 0;
     top: 0;
     opacity: 0;
+}
+
+.SessionUI-sessionlist label {
+    margin-right: 1ch;
+    margin-left: 1ch;
+}
+
+.SessionUI-sessionlist input {
+    margin-right: 2px;
 }

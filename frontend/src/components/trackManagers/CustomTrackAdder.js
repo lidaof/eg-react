@@ -14,7 +14,9 @@ import { TrackOptionsUI } from "./TrackOptionsUI";
 
 export const TRACK_TYPES = {
     Numerical: ["bigWig", "bedGraph", "qBED"],
+    "Dynamic sequence": ["dynseq"],
     Annotation: ["bed", "bigBed", "refBed"],
+    Peak: ["rgbpeak"],
     Categorical: ["categorical"],
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange"],
@@ -23,7 +25,6 @@ export const TRACK_TYPES = {
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
     Image: ["omero4dn", "omeroidr"],
-    "Dynamic sequence": ["dynseq"],
 };
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
@@ -51,6 +52,7 @@ export const TYPES_DESC = {
     omero4dn: "image data from 4DN (4D Nucleome Data Portal)",
     omeroidr: "image data from IDR (Image Data Resource)",
     dynseq: "dynamic sequence",
+    rgbpeak: "peak in bigbed format with RGB value",
 };
 
 /**

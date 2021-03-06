@@ -255,7 +255,7 @@ const nomLeu3 = [
         file: "ensGene_load",
         fieldsConfig: geneFieldsAndIndex,
     },
-]
+];
 
 const gorGor3 = [
     {
@@ -263,7 +263,7 @@ const gorGor3 = [
         file: "ensGene_load",
         fieldsConfig: geneFieldsAndIndex,
     },
-]
+];
 
 const papAnu2 = [
     {
@@ -271,7 +271,7 @@ const papAnu2 = [
         file: "ensGene_load",
         fieldsConfig: geneFieldsAndIndex,
     },
-]
+];
 
 const rheMac3 = [
     {
@@ -285,6 +285,14 @@ const mm39 = [
     {
         name: "refGene",
         file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const hpv16 = [
+    {
+        name: "ncbiGene",
+        file: "hpv16.refbed",
         fieldsConfig: geneFieldsAndIndex,
     },
 ];
@@ -316,6 +324,7 @@ const genomeConfig = {
     papAnu2,
     rheMac3,
     mm39,
+    hpv16,
 };
 
 module.exports = genomeConfig;

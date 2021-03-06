@@ -1,8 +1,17 @@
 # Version History
 
+## 52.5.1
+
+-   fixed a bug that `dynseq` track doesn't work correctly in Safari
+-   fixed a bug that screenshot error on `hic` heatmap mode
+-   fixed a bug that `longrange` track cannot change name/label
+-   added a feature that sessions are sorted by date by dafault, can change to sorting by label
+-   add a new track type `rgbpeak` to show the peaks in `bigbed` format supporting `itemRgb` attribute
+-   added a new virus genome `hpv16`, ref sequence from https://www.ncbi.nlm.nih.gov/nuccore/NC_001526.4, gene annotation from https://www.ncbi.nlm.nih.gov/assembly/GCF_000863945.3/
+
 ## 52.5.0
 
--   Dynamic sequence track type `dynseq` added, the track type is proposed and initially developped by Surag Nai from Anshul Kundaje's lab at Stanford University
+-   Dynamic sequence track type `dynseq` added, the track type is proposed and initially developped by Surag Nair from Anshul Kundaje's lab at Stanford University
 
 ## 52.4.1
 
@@ -11,7 +20,7 @@
 
 ## 52.4.0
 
--   added percentile scale for interaction tracks (`hic`, `longrange` etc.)
+-   added percentile scale for interaction tracks (`hic`, `longrange`) etc.
 -   improved fixed scale config for numerical tracks
 -   video output for dynamic track
 -   added the highlight beams for interaction track at `heatmap` mode

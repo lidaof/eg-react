@@ -133,7 +133,7 @@ class TrackContainer extends React.Component {
 
     getBeamRefs = () => {
         return [this.leftBeam.current, this.rightBeam.current];
-    }
+    };
 
     panLeftOrRight(left = true) {
         const { primaryView, onNewRegion } = this.props;
@@ -541,7 +541,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const { tracks, trackData, primaryView, metadataTerms, viewRegion, layoutModel } = this.props;
+        const { tracks, trackData, primaryView, metadataTerms, viewRegion, layoutModel, onSetAnchors3d } = this.props;
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
@@ -564,6 +564,7 @@ class TrackContainer extends React.Component {
                     selectedRegion={viewRegion}
                     layoutModel={layoutModel}
                     getBeamRefs={this.getBeamRefs}
+                    onSetAnchors3d={onSetAnchors3d}
                 />
             );
         });
@@ -671,8 +672,14 @@ class TrackContainer extends React.Component {
                         shouldMenuClose={(event) => !SELECTION_BEHAVIOR.isToggleEvent(event)}
                     >
                         <DivWithBullseye style={trackDivStyle} id="trackContainer">
-                            <div id="beamLeft" ref={this.leftBeam}> <div id="beamLeftInner"></div> </div>
-                            <div id="beamRight" ref={this.rightBeam}> <div id="beamRightInner"></div> </div>
+                            <div id="beamLeft" ref={this.leftBeam}>
+                                {" "}
+                                <div id="beamLeftInner"></div>{" "}
+                            </div>
+                            <div id="beamRight" ref={this.rightBeam}>
+                                {" "}
+                                <div id="beamRightInner"></div>{" "}
+                            </div>
                             <VerticalDivider
                                 visData={primaryView}
                                 genomeRegion={viewRegion}

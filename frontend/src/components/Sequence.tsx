@@ -86,39 +86,36 @@ export class Sequence extends React.PureComponent<SequenceProps> {
         }
 
         const letters = [];
-        if (drawHeights && drawHeights.length) {
-            if (baseWidth >= letterSize) {
-                let x = xSpan.start;
-                for (const base of sequenceToDraw) {
-                    const x_mid = x + baseWidth / 2;
+        const seqmode = !!drawHeights && drawHeights.length > 0;
+        if (baseWidth >= letterSize) {
+            let x = xSpan.start;
+            for (const base of sequenceToDraw) {
+                const x_mid = x + baseWidth * 0.5;
+                if (seqmode) {
                     // this scale factor somehow miraculously works
                     // don't exactly know the height size fontsize = 1.4*baseWidth
                     const scale_fac = drawHeights[Math.floor(x_mid)] / baseWidth;
-
                     letters.push(
                         <text
                             key={x}
-                            dominantBaseline="baseline"
+                            x={x_mid}
+                            y={zeroLine}
+                            dominantBaseline="auto"
+                            transform={`translate(${x_mid} ${zeroLine}) scale(1 ${scale_fac}) translate(-${x_mid} -${zeroLine})`}
                             style={{
                                 textAnchor: "middle", fill: BASE_COLORS[base.toUpperCase()],
-                                transform: `translate(${x_mid}px, ${y + zeroLine}px) scaleY(${scale_fac})`,
-                                fontSize: 1.4 * baseWidth
+                                fontSize: 1.4 * baseWidth,
                             }}
                         >
-                            {base}
+                            {base.toUpperCase()}
                         </text>
                     );
-                    x += baseWidth;
                 }
-            }
-        } else {
-            if (baseWidth >= letterSize) {
-                let x = xSpan.start;
-                for (const base of sequenceToDraw) {
+                else {
                     letters.push(
                         <text
                             key={x}
-                            x={x + baseWidth / 2}
+                            x={x_mid}
                             y={y + height / 2 + 1}
                             dominantBaseline="middle"
                             style={{ textAnchor: "middle", fill: 'white', fontSize: letterSize }}
@@ -126,10 +123,11 @@ export class Sequence extends React.PureComponent<SequenceProps> {
                             {base}
                         </text>
                     );
-                    x += baseWidth;
                 }
+                x += baseWidth;
             }
         }
+
 
 
         return <React.Fragment>{rects}{letters}</React.Fragment>;

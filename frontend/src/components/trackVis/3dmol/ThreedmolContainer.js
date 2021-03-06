@@ -11,15 +11,15 @@ import Drawer from "rc-drawer";
 import TrackModel from "model/TrackModel";
 import DisplayedRegionModel from "model/DisplayedRegionModel";
 import { BigwigSource } from "./BigwigSource";
-import { chromColors, colorAsNumber, g3dParser, getClosestValueIndex } from "./helpers-3dmol";
+import { chromColors, colorAsNumber, g3dParser } from "./helpers-3dmol";
 import { Legend } from "./Legend";
 import { HoverInfo } from "./HoverInfo";
 import { CategoryLegend } from "./CategoryLegend";
 import { ResolutionList } from "./ResolutionList";
 import { ModelListMenu } from "./ModelListMenu";
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
-import { reg2bin, reg2bins, getBigwigValueForAtom, atomInFilterRegions } from "./binning";
-import { arraysEqual } from "../../../util";
+import { reg2bin, reg2bins, getBigwigValueForAtom, atomInFilterRegions, findAtomsWithRegion } from "./binning";
+import { arraysEqual, readFileAsText, readFileAsBuffer } from "../../../util";
 
 import "rc-drawer/assets/index.css";
 import "./ThreedmolContainer.css";
@@ -48,10 +48,12 @@ class ThreedmolContainer extends React.Component {
         this.viewer2 = null;
         this.model = {}; // hap as key, model as value
         this.model2 = {};
+        this.arrows = [];
         this.g3dFile = null;
         this.bwData = {};
-        this.annData = [];
-        this.atomData = {}; //resolution as key, atom list as data
+        this.compData = [];
+        this.atomData = {}; //resolution as key, value: [{hap: [atoms...]}, ]
+        this.atomKeeper = {}; // resolution as key, value: {hap: keeper}
         // this.mol.chrom = {};
         // this.mol.chrom.atom = chromColors;
         this.chromHash = {}; // key: chrom, value: length
@@ -75,8 +77,9 @@ class ThreedmolContainer extends React.Component {
             end: 0,
             thumbStyle: "cartoon",
             hoveringAtom: null,
-            paintMethod: "score", // other way is category
+            paintMethod: "score", // other way is compartmemt
             paintRegion: "none", // region, chrom, genome, or new when switch bw url
+            paintCompartmentRegion: "none",
             compAcolor: "green",
             compBcolor: "red",
             resolutions: [],
@@ -122,7 +125,7 @@ class ThreedmolContainer extends React.Component {
     }
 
     async componentDidUpdate(prevProps, prevState) {
-        const { paintRegion, bigWigUrl, bigWigInputUrl, useExistingBigwig } = this.state;
+        const { paintRegion, bigWigUrl, bigWigInputUrl, useExistingBigwig, paintCompartmentRegion } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
         if (
@@ -132,7 +135,7 @@ class ThreedmolContainer extends React.Component {
             await this.paintBigwig(paintRegion);
         }
         if (this.state.compAcolor !== prevState.compAcolor || this.state.compBcolor !== prevState.compBcolor) {
-            await this.paintWithAnnotation();
+            await this.paintCompartment(paintCompartmentRegion);
         }
         if (this.state.thumbStyle !== prevState.thumbStyle) {
             switch (this.state.thumbStyle) {
@@ -170,6 +173,13 @@ class ThreedmolContainer extends React.Component {
                 this.removeHighlightRegions();
             }
         }
+        if (this.props.anchors3d !== prevProps.anchors3d) {
+            if (this.props.anchors3d.length) {
+                this.drawAnchors3d();
+            } else {
+                this.removeAnchors3d();
+            }
+        }
         if (prevProps.viewRegion !== this.props.viewRegion) {
             if (this.state.highlightingOn) {
                 this.highlightRegions();
@@ -181,6 +191,15 @@ class ThreedmolContainer extends React.Component {
                 const prevChroms = prevProps.viewRegion.getFeatureSegments().map((region) => region.getName());
                 if (!arraysEqual(prevChroms, chroms)) {
                     await this.paintBigwig("chrom");
+                }
+            }
+            if (paintCompartmentRegion === "region") {
+                await this.paintCompartment("region");
+            } else if (paintRegion === "chrom") {
+                const chroms = this.viewRegionToChroms();
+                const prevChroms = prevProps.viewRegion.getFeatureSegments().map((region) => region.getName());
+                if (!arraysEqual(prevChroms, chroms)) {
+                    await this.paintCompartment("chrom");
                 }
             }
         }
@@ -213,9 +232,91 @@ class ThreedmolContainer extends React.Component {
     componentWillUnmount() {
         this.clearScene();
         this.bwData = {}; //clean
-        this.annData = [];
+        this.compData = [];
         this.atomData = {};
     }
+
+    drawAnchors3d = () => {
+        const { resolution } = this.state;
+        const resString = resolution.toString();
+        //clean existing arrows
+        if (this.arrows.length) {
+            this.removeAnchors3d(false);
+        }
+        if (_.isEmpty(this.atomKeeper) || !this.atomKeeper.hasOwnProperty(resString)) {
+            this.buildAtomKeeper();
+        }
+        const already = {}; // to avoid duplication
+        this.props.anchors3d.forEach((anchor, idx) => {
+            const color = idx % 2 ? "red" : "blue";
+            const str = anchor.toString();
+            if (!already.hasOwnProperty(str)) {
+                const atoms = findAtomsWithRegion(
+                    this.atomKeeper[resString],
+                    anchor.chr,
+                    anchor.start,
+                    anchor.end,
+                    resolution
+                );
+                atoms.forEach((atom) => {
+                    this.arrows.push(
+                        this.viewer.addArrow({
+                            start: { x: 0, y: 0.0, z: 0.0 },
+                            end: { x: atom.x, y: atom.y, z: atom.z },
+                            radius: 0.2,
+                            radiusRadio: 0.2,
+                            mid: 1.0,
+                            color,
+                        })
+                    );
+                });
+            }
+            already[str] = 1;
+        });
+        if (!this.arrows.length) {
+            this.setState({ message: "cannot find matched atoms to point, skip" });
+            return;
+        }
+        this.viewer.render();
+    };
+
+    removeAnchors3d = (updateRender = true) => {
+        this.arrows.forEach((arrow) => this.viewer.removeShape(arrow));
+        this.arrows = [];
+        if (updateRender) {
+            this.viewer.render();
+            this.setState({ message: "" });
+        }
+    };
+
+    /**
+     * build an atom keeper object for quick search atoms given region
+     */
+    buildAtomKeeper = () => {
+        const { resolution } = this.state;
+        const resString = resolution.toString();
+        if (!this.atomData.hasOwnProperty(resString)) {
+            this.setState({ message: "error, model data empty, abort" });
+            return;
+        }
+        this.atomKeeper[resString] = {};
+        const [atoms2] = this.atomData[resString];
+        Object.keys(atoms2).forEach((hap) => {
+            if (!this.atomKeeper[resString].hasOwnProperty(hap)) {
+                this.atomKeeper[resString][hap] = {};
+            }
+            atoms2[hap].forEach((atom) => {
+                if (!this.atomKeeper[resString][hap].hasOwnProperty(atom.chain)) {
+                    this.atomKeeper[resString][hap][atom.chain] = {};
+                }
+                const binkey = reg2bin(atom.properties.start, atom.properties.start + resolution).toString();
+                if (!this.atomKeeper[resString][hap][atom.chain].hasOwnProperty(binkey)) {
+                    this.atomKeeper[resString][hap][atom.chain][binkey] = [];
+                }
+                this.atomKeeper[resString][hap][atom.chain][binkey].push(atom);
+            });
+        });
+    };
 
     viewRegionToChroms = () => {
         const regions = this.props.viewRegion.getFeatureSegments();
@@ -350,12 +451,26 @@ class ThreedmolContainer extends React.Component {
         });
     };
 
+    toggleUseCompartment = () => {
+        this.setState((prevState) => {
+            return { uploadCompartmentFile: !prevState.uploadCompartmentFile };
+        });
+    };
+
     handleBigWigUrlChange = (e) => {
         this.setState({ bigWigUrl: e.target.value.trim() });
     };
 
     handleBigWigInputUrlChange = (e) => {
         this.setState({ bigWigInputUrl: e.target.value.trim() });
+    };
+
+    handleCompartmentFileUrlChange = (e) => {
+        this.setState({ compartmentFileUrl: e.target.value.trim() });
+    };
+
+    handleCompartmentFileUpload = (e) => {
+        this.setState({ compartmentFileObject: e.target.files[0] });
     };
 
     toggleModelDisplay = (hap) => {
@@ -480,8 +595,15 @@ class ThreedmolContainer extends React.Component {
 
         const fetchedData = await Promise.all(promises);
         for (let i = 0; i < fetchedChroms.length; i++) {
-            keepers[fetchedChroms[i]] = fetchedData[i];
-            this.bwData[key][fetchedChroms[i]] = fetchedData[i];
+            if (fetchedData[i]) {
+                // only assign value is there is something
+                keepers[fetchedChroms[i]] = fetchedData[i];
+                this.bwData[key][fetchedChroms[i]] = fetchedData[i];
+            }
+        }
+        if (_.isEmpty(keepers)) {
+            this.setState({ message: "bigwig file empty or error parse bigwig file, please check your file" });
+            return;
         }
         const [minScore, maxScore] = this.minMaxOfKeepers(keepers, regions, chooseRegion === "region");
         const filterRegions = {}; // key, chrom, value, list of [start, end] , for GSV later
@@ -597,66 +719,192 @@ class ThreedmolContainer extends React.Component {
         }
     };
 
-    paintWithAnnotation = async () => {
-        this.setState({ paintMethod: "category" });
-        const { compAcolor, compBcolor } = this.state;
-        const ann = this.annData.length ? this.annData : await this.getAnnotationData();
-        const annStarts = ann.map((b) => b.start); //sorted by default
-        const colorByCategory = function (atom) {
-            const a = getClosestValueIndex(annStarts, atom.properties.start);
-            // if(atom.properties.start >= start && atom.properties.start <= end){
-            // console.log(atom)
-            const category = ann[a].category;
-            // console.log(a, value)
-            return category === "A" ? compAcolor : compBcolor;
-            // }else {
-            //   return 'grey';
-            // }
-        };
-        this.viewer.setStyle(
-            { chain: "chr7" },
-            { cartoon: { colorfunc: colorByCategory, style: "trace", thickness: 1 } }
-        );
-        this.viewer.render();
+    parseRemoteAnnotationData = async (url) => {
+        // console.log(url);
+        const headers = url.includes("4dnucleome")
+            ? {
+                  Authorization: process.env.REACT_APP_4DN_KEY,
+              }
+            : {};
+        // console.log(headers);
+        try {
+            const response = await axios.get(url, { headers, responseType: "arraybuffer" });
+            // const response = await axios.get("https://wangftp.wustl.edu/~dli/tmp/4DNFIL65C8ZI.txt.gz", {
+            // responseType: "arraybuffer",
+            // });
+            //    const response = await axios.get(
+            //     'https://wangftp.wustl.edu/~dli/tmp/4DNFIL65C8ZI_copy.txt',
+            //     {responseType: 'arraybuffer'}
+            //  );
+            // console.log(response)
+            const buffer = Buffer.from(response.data);
+            //  console.log(buffer)
+            let dataString;
+            if (response.headers["content-type"] === "text/plain") {
+                // text file
+                dataString = buffer.toString();
+            } else {
+                const unzipped = await unzip(buffer);
+                dataString = unzipped.toString();
+            }
+            return dataString.split("\n");
+        } catch (error) {
+            this.setState({ message: "error parse annotation file url" });
+            return;
+        }
+    };
+
+    parseAnnotationFile = async (fileobj) => {
+        // console.log(fileobj);
+        try {
+            const textFile = /text.*/;
+            let dataString;
+            if (fileobj.type.match(textFile)) {
+                dataString = await readFileAsText(fileobj);
+            } else {
+                const zipped = await readFileAsBuffer(fileobj);
+                const unzipped = await unzip(zipped);
+                dataString = unzipped.toString();
+            }
+            return dataString.split("\n");
+        } catch (error) {
+            this.setState({ message: "error parse uploaded annotation file" });
+            return;
+        }
     };
 
     getAnnotationData = async () => {
-        const response = await axios.get("https://wangftp.wustl.edu/~dli/tmp/4DNFIL65C8ZI.txt.gz", {
-            responseType: "arraybuffer",
-        });
-        //    const response = await axios.get(
-        //     'https://wangftp.wustl.edu/~dli/tmp/4DNFIL65C8ZI_copy.txt',
-        //     {responseType: 'arraybuffer'}
-        //  );
-        // console.log(response)
-        const buffer = Buffer.from(response.data);
-        //  console.log(buffer)
-        let dataString;
-        if (response.headers["content-type"] === "text/plain") {
-            // text file
-            dataString = buffer.toString();
-        } else {
-            const unzipped = await unzip(buffer);
-            dataString = unzipped.toString();
+        const { compartmentFileUrl, compartmentFileObject, uploadCompartmentFile } = this.state;
+        if (!compartmentFileUrl.length && !compartmentFileObject) {
+            this.setState({ message: "compartment url or file empty, abort..." });
+            return;
         }
-        const data = dataString.split("\n");
+        const key = uploadCompartmentFile ? compartmentFileObject.name : compartmentFileUrl;
+        if (this.compData.hasOwnProperty(key)) {
+            return this.compData[key];
+        }
+        const data = uploadCompartmentFile
+            ? await this.parseAnnotationFile(compartmentFileObject)
+            : await this.parseRemoteAnnotationData(compartmentFileUrl);
         // console.log(data);
-        const ann = [];
+        if (!data) {
+            this.setState({ message: "file empty or error parse annotation file, please check your file" });
+            return;
+        }
+        const comp = {};
         data.slice(1).forEach((line) => {
             const t = line.trim().split("\t");
             if (t.length === 8) {
-                if (t[0] === "chr7") {
-                    ann.push({
-                        start: Number.parseInt(t[1], 10),
-                        end: Number.parseInt(t[1], 10),
-                        category: Number.parseFloat(t[7]) > 0 ? "A" : "B",
-                    });
+                const chrom = t[0];
+                const start = Number.parseInt(t[1], 10);
+                const end = Number.parseInt(t[2], 10);
+                const score = Number.parseFloat(t[7]);
+                const binkey = reg2bin(start, end).toString();
+                if (!comp.hasOwnProperty(chrom)) {
+                    comp[chrom] = {};
                 }
+                if (!comp[chrom].hasOwnProperty(binkey)) {
+                    comp[chrom][binkey] = [];
+                }
+                comp[chrom][binkey].push({
+                    chrom,
+                    start,
+                    end,
+                    score,
+                });
             }
         });
-        console.log(ann);
-        this.annData = ann;
-        return ann;
+        this.compData[key] = comp;
+        return comp;
+    };
+
+    paintCompartment = async (chooseRegion) => {
+        this.setState({
+            paintCompartmentRegion: chooseRegion,
+            paintMethod: "compartment",
+            message: "compartment painting...",
+        });
+        const comp = await this.getAnnotationData();
+        if (_.isEmpty(comp)) {
+            this.setState({ message: "file empty or error parse annotation file, please check your file" });
+            return;
+        }
+        const regions = this.viewRegionToRegions();
+        const chroms = this.viewRegionToChroms();
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } });
+        switch (chooseRegion) {
+            case "region":
+                this.paintWithComparment(comp, regions, chooseRegion);
+                break;
+            case "chrom":
+                this.paintWithComparment(comp, chroms, chooseRegion);
+                break;
+            case "genome":
+                this.paintWithComparment(comp, Object.keys(this.chromHash), chooseRegion);
+                break;
+            default:
+                break;
+        }
+        this.setState({ message: "" });
+    };
+
+    paintWithComparment = (comp, regions, chooseRegion) => {
+        const { compAcolor, compBcolor, resolution } = this.state; // resolution for atom end pos
+        const queryChroms = chooseRegion === "region" ? regions.map((r) => r.chrom) : regions;
+        const filterRegions = {}; // key, chrom, value, list of [start, end] , for GSV later
+        if (chooseRegion === "region") {
+            regions.forEach((r) => {
+                if (!filterRegions.hasOwnProperty(r.chrom)) {
+                    filterRegions[r.chrom] = [];
+                }
+                filterRegions[r.chrom].push([r.start, r.end]);
+            });
+        } else {
+            regions.forEach((chrom) => {
+                if (!filterRegions.hasOwnProperty(chrom)) {
+                    filterRegions[chrom] = [];
+                }
+                filterRegions[chrom].push([0, this.chromHash[chrom]]);
+            });
+        }
+        // console.log(filterRegions);
+        const colorByCompartment = function (atom) {
+            if (atomInFilterRegions(atom, filterRegions)) {
+                const value = getBigwigValueForAtom(comp, atom, resolution);
+                if (value !== undefined) {
+                    return value >= 0 ? compAcolor : compBcolor;
+                } else {
+                    return "grey";
+                }
+            } else {
+                return "grey";
+            }
+        };
+        queryChroms.forEach((chrom) => {
+            this.viewer.setStyle(
+                { chain: chrom },
+                { cartoon: { colorfunc: colorByCompartment, style: "trace", thickness: 1 } }
+            );
+        });
+        this.viewer.render();
+        this.setState({ categories: { A: compAcolor, B: compBcolor } });
+    };
+
+    removeCompartmentPaint = () => {
+        this.setState({ paintCompartmentRegion: "none" });
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } });
+        this.viewer.render();
+        this.setState({
+            highlightingOn: false,
+            categories: null,
+        });
+    };
+
+    set4DNExampleURL = () => {
+        this.setState({
+            compartmentFileUrl:
+                "https://data.4dnucleome.org/files-processed/4DNFIL65C8ZI/@@download/4DNFIL65C8ZI.txt.gz",
+        });
     };
 
     onLayoutChange = (e) => {
@@ -671,6 +919,10 @@ class ThreedmolContainer extends React.Component {
         });
     };
 
+    clearMessage = () => {
+        this.setState({ message: "" });
+    };
+
     render() {
         const {
             legendMax,
@@ -679,8 +931,6 @@ class ThreedmolContainer extends React.Component {
             layout,
             thumbStyle,
             hoveringAtom,
-            compAcolor,
-            compBcolor,
             paintMethod,
             resolutions,
             resolution,
@@ -697,9 +947,12 @@ class ThreedmolContainer extends React.Component {
             bigWigUrl,
             bigWigInputUrl,
             paintRegion,
+            uploadCompartmentFile,
+            compartmentFileUrl,
+            paintCompartmentRegion,
+            categories,
         } = this.state;
         const { tracks } = this.props;
-        const categories = { A: compAcolor, B: compBcolor };
         const bwTracks = tracks.filter((track) => getTrackConfig(track).isBigwigTrack());
         return (
             <div id="threed-mol-container">
@@ -985,26 +1238,70 @@ class ThreedmolContainer extends React.Component {
                                             aria-expanded="true"
                                             aria-controls="collapse5"
                                         >
-                                            Annotation Painting
+                                            Compartment Painting
                                         </button>
                                     </h5>
                                 </div>
                                 <div id="collapse5" className="collapse show" aria-labelledby="heading5">
                                     <div className="card-body">
+                                        <div>
+                                            <p>
+                                                <strong>4DN compartment data:</strong>
+                                            </p>
+                                            <label>
+                                                <input
+                                                    type="checkbox"
+                                                    name="useAnnot"
+                                                    checked={uploadCompartmentFile === false}
+                                                    onChange={this.toggleUseCompartment}
+                                                />
+                                                <span>Use File URL</span>
+                                            </label>
+                                        </div>
+                                        <input
+                                            style={{ display: uploadCompartmentFile ? "block" : "none" }}
+                                            type="file"
+                                            name="annotFile"
+                                            onChange={this.handleCompartmentFileUpload}
+                                        />
+                                        <div style={{ display: uploadCompartmentFile ? "none" : "block" }}>
+                                            <input
+                                                type="text"
+                                                placeholder="compartment file url"
+                                                value={compartmentFileUrl}
+                                                onChange={this.handleCompartmentFileUrlChange}
+                                            />
+                                            {/* <button className="btn btn-warning btn-sm" onClick={this.set4DNExampleURL}>Example</button> */}
+                                        </div>
                                         <p>
                                             <button
                                                 className="btn btn-primary btn-sm"
-                                                onClick={this.paintWithAnnotation}
+                                                disabled={paintCompartmentRegion === "region"}
+                                                onClick={() => this.paintCompartment("region")}
                                             >
-                                                paint chr7 with compartments data
-                                            </button>{" "}
-                                            <a
-                                                href="https://data.4dnucleome.org/files-processed/4DNFIL65C8ZI/"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                                Paint region
+                                            </button>
+                                            <button
+                                                className="btn btn-success btn-sm"
+                                                disabled={paintCompartmentRegion === "chrom"}
+                                                onClick={() => this.paintCompartment("chrom")}
                                             >
-                                                4DNFIL65C8ZI
-                                            </a>
+                                                Paint chromosome
+                                            </button>
+                                            <button
+                                                className="btn btn-info btn-sm"
+                                                disabled={paintCompartmentRegion === "genome"}
+                                                onClick={() => this.paintCompartment("genome")}
+                                            >
+                                                Paint genome
+                                            </button>
+                                            <button
+                                                className="btn btn-secondary btn-sm"
+                                                disabled={paintCompartmentRegion === "none"}
+                                                onClick={this.removeCompartmentPaint}
+                                            >
+                                                Remove paint
+                                            </button>
                                         </p>
                                     </div>
                                 </div>
@@ -1030,7 +1327,14 @@ class ThreedmolContainer extends React.Component {
                                 </select>
                             </label>
                             <span className="text-danger font-italic">
-                                {message.length ? <div>{message}</div> : null}
+                                {message.length ? (
+                                    <div>
+                                        {message}{" "}
+                                        <button className="btn btn-danger btn-sm" onClick={this.clearMessage}>
+                                            X
+                                        </button>
+                                    </div>
+                                ) : null}
                             </span>
                         </div>
 

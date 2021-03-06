@@ -111,12 +111,15 @@ class NumericalTrack extends React.PureComponent {
             notify.show("Y-axis min should less than Y-axis max", "warning", 5000);
             min = 0;
         }
-        // determines the distance of y=0 from the top
-        const zeroLine = min < 0 ? TOP_PADDING + ((height - TOP_PADDING) * max) / (max + Math.abs(min)) : height;
+        // determines the distance of y=0 from the top, also the height of positive part
+        const zeroLine = min < 0 ? TOP_PADDING + ((height - 2 * TOP_PADDING) * max) / (max - min) : height;
 
         if (xValues2.length && (yScale === ScaleChoices.AUTO || (yScale === ScaleChoices.FIXED && yMin < 0))) {
             return {
-                axisScale: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
+                axisScale: scaleLinear()
+                    .domain([max, min])
+                    .range([TOP_PADDING, height - TOP_PADDING])
+                    .clamp(true),
                 valueToY: scaleLinear().domain([max, 0]).range([TOP_PADDING, zeroLine]).clamp(true),
                 valueToYReverse: scaleLinear()
                     .domain([0, min])

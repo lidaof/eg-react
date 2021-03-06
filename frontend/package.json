@@ -1,6 +1,6 @@
 {
     "name": "epgg",
-    "version": "52.5.0",
+    "version": "52.5.1",
     "author": "Ting Wang Lab @WUSTL",
     "repository": {
         "type": "git",
@@ -95,6 +95,7 @@
         "lodash": "^4.17.19",
         "memoize-one": "^3.1.1",
         "nightmare": "^2.10.0",
+        "node-fetch": "^2.6.1",
         "node-sass": "^4.14.1",
         "papaparse": "^5.2.0",
         "parse-color": "^1.0.0",

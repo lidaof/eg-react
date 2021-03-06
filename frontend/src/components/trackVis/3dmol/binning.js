@@ -98,20 +98,61 @@ function overlapHalf(s1, e1, start, end) {
     return (Math.min(e1, end) - Math.max(s1, start)) / (e1 - s1) >= 0.5;
 }
 
+/**
+ * find atoms based on give region, since there are different haplotyps, so return an array instead, just return the first one in each hap
+ *
+ * @param {*} keeper
+ * @param {*} chr
+ * @param {*} start
+ * @param {*} end
+ */
+export function findAtomsWithRegion(keeper, chr, start, end, resolution) {
+    const atoms = [];
+    Object.keys(keeper).forEach((hap) => {
+        if (keeper[hap].hasOwnProperty(chr)) {
+            const binkeys = reg2bins(start, end).map((k) => k.toString());
+            let found = false,
+                i,
+                j;
+            for (i = 0; i < binkeys.length; i++) {
+                if (keeper[hap][chr].hasOwnProperty(binkeys[i])) {
+                    for (j = 0; j < keeper[hap][chr][binkeys[i]].length; j++) {
+                        const center = 0.5 * (start + end);
+                        if (
+                            center >= keeper[hap][chr][binkeys[i]][j].properties.start &&
+                            center <= keeper[hap][chr][binkeys[i]][j].properties.start + resolution
+                        ) {
+                            atoms.push(keeper[hap][chr][binkeys[i]][j]);
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (found) {
+                    break;
+                }
+            }
+        }
+    });
+    return atoms;
+}
+
 export function getBigwigValueForAtom(keepers, atom, resolution) {
     // console.log(keepers, atom);
     const values = [];
     const binkeys = reg2bins(atom.properties.start, atom.properties.start + resolution).map((k) => k.toString());
     // console.log(binkeys);
     binkeys.forEach((binkey) => {
-        if (keepers[atom.chain].hasOwnProperty(binkey)) {
-            keepers[atom.chain][binkey].forEach((item) => {
-                //center not looking good, many data missing
-                // if (item.start >= atom.properties.start && item.end <= atom.properties.start + resolution) {
-                if (overlapHalf(item.start, item.end, atom.properties.start, atom.properties.start + resolution)) {
-                    values.push(item.score);
-                }
-            });
+        if (keepers.hasOwnProperty(atom.chain)) {
+            if (keepers[atom.chain].hasOwnProperty(binkey)) {
+                keepers[atom.chain][binkey].forEach((item) => {
+                    //center not looking good, many data missing
+                    // if (item.start >= atom.properties.start && item.end <= atom.properties.start + resolution) {
+                    if (overlapHalf(item.start, item.end, atom.properties.start, atom.properties.start + resolution)) {
+                        values.push(item.score);
+                    }
+                });
+            }
         }
     });
     // console.log(values);

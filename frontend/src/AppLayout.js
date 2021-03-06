@@ -43,6 +43,13 @@ const callbacks = {
 };
 
 class AppLayout extends React.PureComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            anchors3d: [],
+        };
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isShowingVR !== this.props.isShowingVR) {
             if (this.props.isShowingVR) {
@@ -95,6 +102,10 @@ class AppLayout extends React.PureComponent {
         }
     }
 
+    setAnchors3d = (anchors) => {
+        this.setState({ anchors3d: anchors });
+    };
+
     handleNodeResize = (node) => {
         const layout = _.isEmpty(this.props.layout) ? initialLayout : this.props.layout;
         const model = FlexLayout.Model.fromJson(layout);
@@ -108,7 +119,7 @@ class AppLayout extends React.PureComponent {
         // if (node) {
         //     node.setEventListener("resize", () => this.handleNodeResize(node));
         // }
-        return <App layoutModel={model} />;
+        return <App layoutModel={model} onSetAnchors3d={this.setAnchors3d} />;
     };
 
     renderVRscene = (node) => {
@@ -194,6 +205,7 @@ class AppLayout extends React.PureComponent {
                 genomeConfig={genomeConfig}
                 width={width}
                 height={height}
+                anchors3d={this.state.anchors3d}
             />
         );
     };

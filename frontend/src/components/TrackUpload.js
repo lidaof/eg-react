@@ -8,7 +8,7 @@ import { readFileAsText, HELP_LINKS } from "../util";
 import { TrackOptionsUI } from "./trackManagers/TrackOptionsUI";
 import { TYPES_DESC } from "./trackManagers/CustomTrackAdder";
 
-const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract", "g3d", "dynseq"]; // all lower case
+const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract", "g3d", "dynseq", "rgbpeak"]; // all lower case
 
 /**
  * handles local track file upload using FileReader API
@@ -173,6 +173,7 @@ export class TrackUpload extends React.Component {
                         <optgroup label="select only the track file (can select many of same type)">
                             <option value="bigWig">bigWig - {TYPES_DESC.bigWig}</option>
                             <option value="bigBed">bigBed - {TYPES_DESC.bigBed}</option>
+                            <option value="rgbpeak">RgbPeak - {TYPES_DESC.rgbpeak}</option>
                             <option value="hic">HiC - {TYPES_DESC.hic}</option>
                             <option value="bigInteract">bigInteract - {TYPES_DESC.bigInteract}</option>
                             <option value="dynseq">dynseq - {TYPES_DESC.dynseq}</option>

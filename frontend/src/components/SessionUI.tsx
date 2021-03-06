@@ -47,6 +47,7 @@ interface SessionUIState {
     newSessionLabel: string;
     retrieveId: string;
     lastBundleId: string;
+    sortSession: string;
 }
 
 class SessionUINotConnected extends React.Component<SessionUIProps, SessionUIState> {
@@ -58,6 +59,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
             newSessionLabel: getFunName(),
             retrieveId: "",
             lastBundleId: "",
+            sortSession: 'date', // or label
         };
     }
 
@@ -170,10 +172,34 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
         notify.show("Session deleted.", "success", 2000);
     };
 
+    onSortChaneg = (e: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({
+            sortSession: e.target.value,
+        });
+    };
+
     renderSavedSessions = () => {
         const bundle: SessionBundle = this.getBundle();
-        const { lastBundleId } = this.state;
-        const buttons = Object.entries(bundle.sessionsInBundle || {}).map(([id, session]) => {
+        const { lastBundleId, sortSession } = this.state;
+        const sessions = Object.entries(bundle.sessionsInBundle || {});
+        if (!sessions.length) {
+            return null;
+        }
+        if (sortSession === 'date') {
+            sessions.sort((a, b) => b[1].date - a[1].date)
+        }
+        if (sortSession === 'label') {
+            sessions.sort((a, b) => {
+                if (a[1].label > b[1].label) {
+                    return 1;
+                }
+                if (b[1].label > a[1].label) {
+                    return -1;
+                }
+                return 0;
+            })
+        }
+        const buttons = sessions.map(([id, session]) => {
             let button;
             if (lastBundleId === bundle.bundleId && id === bundle.currentId) {
                 button = (
@@ -206,7 +232,31 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
             );
         });
 
-        return <ol>{buttons}</ol>;
+        return (<div className="SessionUI-sessionlist">
+            Sort session by: <label>
+                <input
+                    type="radio"
+                    value="date"
+                    name="sort"
+                    checked={sortSession === "date"}
+                    onChange={this.onSortChaneg}
+                />
+                <span>Date</span>
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="sort"
+                    value="label"
+                    checked={sortSession === "label"}
+                    onChange={this.onSortChaneg}
+                />
+                <span>Label</span>
+            </label>
+
+            <ol>{buttons}</ol>
+        </div>);
     };
 
     setRetrieveId = (event: React.ChangeEvent<HTMLInputElement>) => {
