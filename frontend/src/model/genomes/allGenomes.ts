@@ -28,6 +28,8 @@ import gorGor3 from "./gorGor3/gorGor3";
 import nomLeu3 from "./nomLeu3/nomLeu3";
 import papAnu2 from "./papAnu2/papAnu2";
 import oryCun2 from "./oryCun2/oryCun2";
+import canFam3 from "./canFam3/canFam3";
+import rheMac2 from "./rheMac2/rheMac2";
 import rheMac3 from "./rheMac3/rheMac3";
 import calJac3 from "./calJac3/calJac3";
 import Pfal3D7 from "./pfal3d7/pfal3d7";
@@ -67,6 +69,8 @@ export const allGenomes = [
   nomLeu3,
   papAnu2,
   oryCun2,
+  canFam3,
+  rheMac2,
   rheMac3,
   calJac3,
   PANTRO6,
@@ -118,7 +122,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   },
   rhesus: {
     logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
-    assemblies: [RheMac8.genome.getName(), rheMac3.genome.getName()],
+    assemblies: [RheMac8.genome.getName(), rheMac3.genome.getName(), rheMac2.genome.getName()],
     color: "yellow"
   },
   marmoset: {
@@ -134,6 +138,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   rabbit: {
     logoUrl: "https://wangftp.wustl.edu/~xzhuo/browser/oryCun2/rabbit.png",
     assemblies: [oryCun2.genome.getName()],
+    color: "yellow"
+  },
+  dog: {
+    logoUrl: "https://wangftp.wustl.edu/~xzhuo/browser/canFam3/dog.png",
+    assemblies: [canFam3.genome.getName()],
     color: "yellow"
   },
   mouse: {
