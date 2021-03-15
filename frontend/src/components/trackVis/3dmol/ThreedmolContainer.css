@@ -69,15 +69,6 @@
     display: block;
 }
 
-#hoverbox {
-    position: absolute;
-    left: 5px;
-    bottom: 5px;
-    z-index: 3;
-    background: lightcyan;
-    text-align: left;
-}
-
 .toggle-model-container {
     display: flex;
     justify-content: space-between;
@@ -131,4 +122,16 @@
 
 .card-header {
     padding: 0;
+}
+
+.FrameListMenu label {
+    margin-bottom: 0;
+}
+
+.FrameListMenu ol {
+    list-style-type: circle;
+}
+
+.hoverButtons button {
+    line-height: 1;
 }

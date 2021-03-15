@@ -48,6 +48,7 @@ class AppLayout extends React.PureComponent {
         this.state = {
             anchors3d: [],
         };
+        this.handleNodeResize = _.debounce(this.handleNodeResize, 250);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -185,9 +186,9 @@ class AppLayout extends React.PureComponent {
     // };
 
     render3dmolContainer = (node) => {
-        const { viewRegion, genomeConfig, tracks } = this.props;
+        const { viewRegion, genomeConfig, tracks, onNewViewRegion } = this.props;
         const config = node.getConfig();
-        const { width, height } = node.getRect();
+        const { x, y, width, height } = node.getRect();
         const g3dtrack = TrackModel.deserialize(config.trackModel);
         g3dtrack.id = config.trackId;
         node.setEventListener("close", () => {
@@ -205,7 +206,10 @@ class AppLayout extends React.PureComponent {
                 genomeConfig={genomeConfig}
                 width={width}
                 height={height}
+                x={x}
+                y={y}
                 anchors3d={this.state.anchors3d}
+                onNewViewRegion={onNewViewRegion}
             />
         );
     };

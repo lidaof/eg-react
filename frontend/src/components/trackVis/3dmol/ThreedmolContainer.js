@@ -17,6 +17,7 @@ import { HoverInfo } from "./HoverInfo";
 import { CategoryLegend } from "./CategoryLegend";
 import { ResolutionList } from "./ResolutionList";
 import { ModelListMenu } from "./ModelListMenu";
+import { FrameListMenu } from "./FrameListMenu";
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 import { reg2bin, reg2bins, getBigwigValueForAtom, atomInFilterRegions, findAtomsWithRegion } from "./binning";
 import { arraysEqual, readFileAsText, readFileAsBuffer } from "../../../util";
@@ -53,6 +54,7 @@ class ThreedmolContainer extends React.Component {
         this.bwData = {};
         this.compData = [];
         this.atomData = {}; //resolution as key, value: [{hap: [atoms...]}, ]
+        this.newAtoms = {}; // holder for addtional models for animation, key: file name, value {hap: [list of atoms]}
         this.atomKeeper = {}; // resolution as key, value: {hap: keeper}
         // this.mol.chrom = {};
         // this.mol.chrom.atom = chromColors;
@@ -77,6 +79,8 @@ class ThreedmolContainer extends React.Component {
             end: 0,
             thumbStyle: "cartoon",
             hoveringAtom: null,
+            hoveringX: 0,
+            hoveringY: 0,
             paintMethod: "score", // other way is compartmemt
             paintRegion: "none", // region, chrom, genome, or new when switch bw url
             paintCompartmentRegion: "none",
@@ -99,6 +103,11 @@ class ThreedmolContainer extends React.Component {
             uploadCompartmentFile: false,
             compartmentFileUrl: "",
             compartmentFileObject: null,
+            newG3dUrl: "",
+            animateMode: false,
+            frameAtoms: [],
+            frameLabels: [],
+            currentFrame: 0,
         };
         this.paintWithBigwig = _.debounce(this.paintWithBigwig, 150);
     }
@@ -125,7 +134,15 @@ class ThreedmolContainer extends React.Component {
     }
 
     async componentDidUpdate(prevProps, prevState) {
-        const { paintRegion, bigWigUrl, bigWigInputUrl, useExistingBigwig, paintCompartmentRegion } = this.state;
+        const {
+            paintRegion,
+            bigWigUrl,
+            bigWigInputUrl,
+            useExistingBigwig,
+            paintCompartmentRegion,
+            frameLabels,
+            animateMode,
+        } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
         if (
@@ -172,6 +189,9 @@ class ThreedmolContainer extends React.Component {
             } else {
                 this.removeHighlightRegions();
             }
+        }
+        if (animateMode && frameLabels !== prevState.frameLabels) {
+            this.updateModelFrames();
         }
         if (this.props.anchors3d !== prevProps.anchors3d) {
             if (this.props.anchors3d.length) {
@@ -234,7 +254,12 @@ class ThreedmolContainer extends React.Component {
         this.bwData = {}; //clean
         this.compData = [];
         this.atomData = {};
+        this.newAtoms = {};
     }
+
+    removeHover = () => {
+        this.setState({ hoveringAtom: null, hoveringX: 0, hoveringY: 0 });
+    };
 
     drawAnchors3d = () => {
         const { resolution } = this.state;
@@ -352,6 +377,7 @@ class ThreedmolContainer extends React.Component {
 
     /**
      * atoms with hover event added
+     * add click event instead, hover seems slow
      * @param {*} atoms2
      */
     assginAtomsCallbacks = (atoms2) => {
@@ -360,32 +386,34 @@ class ThreedmolContainer extends React.Component {
             const addevents = atoms2[hap].map((atom2) => {
                 // mouse over and click handler
                 const atom = Object.assign({}, atom2);
-                atom.hoverable = true;
-                let oldStyle;
-                atom.hover_callback = (at) => {
-                    // console.log('hover', at.resi)
-                    this.setState({ hoveringAtom: at });
-                    oldStyle = { ...at.style };
-                    // console.log(oldStyle)
-                    // this.viewer.setStyle({resi: at.resi}, {sphere: {color: 'pink', opacity: 1, radius: 2}});
-                    // this.viewer.setStyle({resi: at.resi}, {cross: {color: 'pink', opacity: 1, radius: 2}});
-                    this.viewer.setStyle(
-                        { resi: [`${at.resi}-${at.resi + 1}`] },
-                        { cartoon: { color: "#ff3399", style: "trace", thickness: 1 } }
-                    );
-                    this.viewer.render();
-                };
-                atom.unhover_callback = (at) => {
-                    // console.log('unhover', at);
-                    this.setState({ hoveringAtom: null });
-                    this.viewer.setStyle({ resi: [`${at.resi}-${at.resi + 1}`] }, oldStyle);
-                    this.viewer.render();
-                };
+                // atom.hoverable = true;
+                // let oldStyle;
+                // atom.hover_callback = (at) => {
+                //     // console.log('hover', at.resi)
+                //     this.setState({ hoveringAtom: at });
+                //     oldStyle = { ...at.style };
+                //     // console.log(oldStyle)
+                //     // this.viewer.setStyle({resi: at.resi}, {sphere: {color: 'pink', opacity: 1, radius: 2}});
+                //     // this.viewer.setStyle({resi: at.resi}, {cross: {color: 'pink', opacity: 1, radius: 2}});
+                //     this.viewer.setStyle(
+                //         { resi: [`${at.resi}-${at.resi + 1}`] },
+                //         { cartoon: { color: "#ff3399", style: "trace", thickness: 1 } }
+                //     );
+                //     this.viewer.render();
+                // };
+                // atom.unhover_callback = (at) => {
+                //     // console.log('unhover', at);
+                //     this.setState({ hoveringAtom: null });
+                //     this.viewer.setStyle({ resi: [`${at.resi}-${at.resi + 1}`] }, oldStyle);
+                //     this.viewer.render();
+                // };
                 atom.clickable = true;
                 atom.callback = (at) => {
                     // at.color = 0x0000ff;
                     // at.style= {cartoon: {color: '#ff3399', style: 'trace', thickness: 1}}
-                    console.log("clicked", at);
+                    // console.log("clicked", at, this.viewer.modelToScreen(at));
+                    const screenXY = this.viewer.modelToScreen(at);
+                    this.setState({ hoveringAtom: at, hoveringX: screenXY.x, hoveringY: screenXY.y });
                 };
                 return atom;
             });
@@ -402,10 +430,12 @@ class ThreedmolContainer extends React.Component {
     };
 
     prepareAtomData = async () => {
-        this.setState({ message: "updating..." });
+        this.setState({ message: "updating...", frameAtoms: [], frameLabels: [] });
         this.clearScene();
         const { resolution } = this.state;
         const resString = resolution.toString();
+        const stateAtoms = [],
+            stateLabels = [];
         let atoms2, atoms; // atoms2 original object, atoms with added events callback
         if (this.atomData.hasOwnProperty(resString)) {
             [atoms2, atoms] = this.atomData[resString];
@@ -425,6 +455,13 @@ class ThreedmolContainer extends React.Component {
             this.model[hap].addAtoms(atoms[hap]);
         });
 
+        //set atoms for animation
+
+        Object.keys(atoms2).forEach((hap) => {
+            stateAtoms.push(atoms2[hap]);
+            stateLabels.push(hap);
+        });
+
         this.viewer2.setStyle({}, { cartoon: { colorscheme: "chrom", style: "trace", thickness: 1 } });
         this.viewer2.render();
 
@@ -442,7 +479,7 @@ class ThreedmolContainer extends React.Component {
 
         this.highlightRegions();
 
-        this.setState({ message: "" });
+        this.setState({ message: "", frameAtoms: stateAtoms, frameLabels: stateLabels });
     };
 
     toggleUseBigWig = () => {
@@ -455,6 +492,10 @@ class ThreedmolContainer extends React.Component {
         this.setState((prevState) => {
             return { uploadCompartmentFile: !prevState.uploadCompartmentFile };
         });
+    };
+
+    handleNewG3dUrlChange = (e) => {
+        this.setState({ newG3dUrl: e.target.value.trim() });
     };
 
     handleBigWigUrlChange = (e) => {
@@ -923,6 +964,91 @@ class ThreedmolContainer extends React.Component {
         this.setState({ message: "" });
     };
 
+    addNewG3D = async (url, key, resolution) => {
+        const newg3d = new G3dFile({ url });
+        const data = await newg3d.readData(resolution);
+        // console.log(data);
+        if (!data) {
+            this.setState({ message: "g3d model file empty or resolution not exist, abort" });
+            return;
+        }
+        const newatoms = g3dParser(data);
+        // console.log(newatoms);
+        this.newAtoms[key] = newatoms;
+        return newatoms;
+    };
+
+    prepareModelFrames = async () => {
+        const { newG3dUrl, resolution, frameAtoms, frameLabels } = this.state;
+        if (!newG3dUrl.length) {
+            this.setState({ message: "g3d url empty, abort" });
+            return;
+        }
+
+        const splits = _.split(newG3dUrl, "/");
+        const key = splits[splits.length - 1];
+        if (this.newAtoms.hasOwnProperty(key)) {
+            this.setState({ message: "g3d url already added, abort" });
+            return;
+        }
+        const newatoms = await this.addNewG3D(newG3dUrl, key, resolution);
+        const atoms = [],
+            labels = [];
+
+        Object.keys(newatoms).forEach((hap) => {
+            atoms.push(newatoms[hap]);
+            labels.push(key + " " + hap);
+        });
+        // console.log(atoms);
+        this.setState({
+            animateMode: true,
+            frameAtoms: frameAtoms.concat(atoms),
+            frameLabels: frameLabels.concat(labels),
+        });
+    };
+
+    updateModelFrames = () => {
+        this.setState({ thumbStyle: "hide" });
+        this.clearScene();
+        const { frameAtoms, frameLabels } = this.state;
+        const model = this.viewer.addModelsAsFrames();
+        const labelY = this.props.height - 36; //default label font size 18
+        frameAtoms.forEach((al, idx) => {
+            model.addFrame(al);
+            this.viewer.addLabel(frameLabels[idx], {
+                position: { x: 6, y: labelY, z: 0 },
+                useScreen: true,
+                backgroundColor: 0x800080,
+                backgroundOpacity: 0.8,
+                frame: idx,
+                inFront: true,
+                showBackground: true,
+            });
+        });
+        model.setFrame(0);
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 1 } });
+        // this.viewer.zoomTo();
+        this.viewer.render();
+    };
+
+    animate = async () => {
+        if (!this.state.animateMode) {
+            this.updateModelFrames();
+        }
+        this.viewer.animate({ loop: "forward", reps: 0, interval: 500 });
+    };
+
+    stopAnimate = () => {
+        this.viewer.stopAnimate();
+    };
+
+    resetAnimate = () => {
+        this.setState({ animateMode: false, thumbStyle: "cartoon", message: "working..." });
+        this.clearScene();
+        this.prepareAtomData();
+        this.setState({ message: "" });
+    };
+
     render() {
         const {
             legendMax,
@@ -931,6 +1057,8 @@ class ThreedmolContainer extends React.Component {
             layout,
             thumbStyle,
             hoveringAtom,
+            hoveringX,
+            hoveringY,
             paintMethod,
             resolutions,
             resolution,
@@ -951,8 +1079,10 @@ class ThreedmolContainer extends React.Component {
             compartmentFileUrl,
             paintCompartmentRegion,
             categories,
+            newG3dUrl,
+            frameLabels,
         } = this.state;
-        const { tracks } = this.props;
+        const { tracks, x, y, onNewViewRegion, viewRegion } = this.props;
         const bwTracks = tracks.filter((track) => getTrackConfig(track).isBigwigTrack());
         return (
             <div id="threed-mol-container">
@@ -1306,6 +1436,51 @@ class ThreedmolContainer extends React.Component {
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="card">
+                                <div className="card-header" id="heading6">
+                                    <h5 className="mb-0">
+                                        <button
+                                            className="btn btn-link btn-block text-left"
+                                            data-toggle="collapse"
+                                            data-target="#collapse6"
+                                            aria-expanded="true"
+                                            aria-controls="collapse6"
+                                        >
+                                            Animation
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapse6" className="collapse show" aria-labelledby="heading6">
+                                    <div className="card-body">
+                                        <FrameListMenu frameList={frameLabels} />
+                                        <input
+                                            type="text"
+                                            placeholder="new g3d url"
+                                            value={newG3dUrl}
+                                            onChange={this.handleNewG3dUrlChange}
+                                        />
+                                        <button className="btn btn-primary btn-sm" onClick={this.prepareModelFrames}>
+                                            Add
+                                        </button>
+                                        {frameLabels.length > 1 ? (
+                                            <div>
+                                                <button className="btn btn-success btn-sm" onClick={this.animate}>
+                                                    Play
+                                                </button>
+                                                <button className="btn btn-secondary btn-sm" onClick={this.stopAnimate}>
+                                                    Stop
+                                                </button>
+                                                <button className="btn btn-info btn-sm" onClick={this.resetAnimate}>
+                                                    Reset
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div>add 2 and more models for animation</div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </Drawer>
                 )}
@@ -1353,9 +1528,15 @@ class ThreedmolContainer extends React.Component {
                     </div>
 
                     <div className={layout}>
-                        <div id="hoverbox">
-                            <HoverInfo atom={hoveringAtom} resolution={resolution} />
-                        </div>
+                        <HoverInfo
+                            atom={hoveringAtom}
+                            resolution={resolution}
+                            x={hoveringX - x}
+                            y={hoveringY - y}
+                            viewRegion={viewRegion}
+                            onNewViewRegion={onNewViewRegion}
+                            removeHover={this.removeHover}
+                        />
                         <div
                             className="box1"
                             style={{ width: mainBoxWidth, height: mainBoxHeight }}
