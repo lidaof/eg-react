@@ -215,6 +215,13 @@
     ],
     "Genome Comparison": [
         {
+            "name": "canFam3tomm10",
+            "label": "Dog canFam3 to mm10 blastz",
+            "querygenome": "canFam3",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/mm10.canFam3.gz"
+        },
+        {
             "name": "cavPor3tomm10",
             "label": "Guinea Pig cavPor3 to mm10 blastz",
             "querygenome": "cavPor3",
