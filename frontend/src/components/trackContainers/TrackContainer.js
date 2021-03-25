@@ -541,7 +541,16 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const { tracks, trackData, primaryView, metadataTerms, viewRegion, layoutModel, onSetAnchors3d } = this.props;
+        const {
+            tracks,
+            trackData,
+            primaryView,
+            metadataTerms,
+            viewRegion,
+            layoutModel,
+            onSetAnchors3d,
+            viewer3dNumFrames,
+        } = this.props;
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
@@ -565,6 +574,7 @@ class TrackContainer extends React.Component {
                     layoutModel={layoutModel}
                     getBeamRefs={this.getBeamRefs}
                     onSetAnchors3d={onSetAnchors3d}
+                    viewer3dNumFrames={viewer3dNumFrames}
                 />
             );
         });

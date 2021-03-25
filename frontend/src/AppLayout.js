@@ -47,6 +47,8 @@ class AppLayout extends React.PureComponent {
         super(props);
         this.state = {
             anchors3d: [],
+            sync3d: false,
+            viewer3dNumFrames: null,
         };
         this.handleNodeResize = _.debounce(this.handleNodeResize, 250);
     }
@@ -107,6 +109,14 @@ class AppLayout extends React.PureComponent {
         this.setState({ anchors3d: anchors });
     };
 
+    getViewer3dAndNumFrames = (viewer3dNumFrames) => {
+        this.setState({ viewer3dNumFrames });
+    };
+
+    toggleSync3d = (isSync3d) => {
+        this.setState({ sync3d: isSync3d });
+    };
+
     handleNodeResize = (node) => {
         const layout = _.isEmpty(this.props.layout) ? initialLayout : this.props.layout;
         const model = FlexLayout.Model.fromJson(layout);
@@ -120,7 +130,13 @@ class AppLayout extends React.PureComponent {
         // if (node) {
         //     node.setEventListener("resize", () => this.handleNodeResize(node));
         // }
-        return <App layoutModel={model} onSetAnchors3d={this.setAnchors3d} />;
+        return (
+            <App
+                layoutModel={model}
+                onSetAnchors3d={this.setAnchors3d}
+                viewer3dNumFrames={this.state.viewer3dNumFrames}
+            />
+        );
     };
 
     renderVRscene = (node) => {
@@ -210,6 +226,9 @@ class AppLayout extends React.PureComponent {
                 y={y}
                 anchors3d={this.state.anchors3d}
                 onNewViewRegion={onNewViewRegion}
+                sync3d={this.state.sync3d}
+                onToggleSync3d={this.toggleSync3d}
+                onGetViewer3dAndNumFrames={this.getViewer3dAndNumFrames}
             />
         );
     };

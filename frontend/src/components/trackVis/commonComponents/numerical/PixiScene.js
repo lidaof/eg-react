@@ -201,7 +201,7 @@ export class PixiScene extends React.PureComponent {
 
     onPointerDown = (event) => {
         // console.log(event, event.data.originalEvent.which);
-        if (event.data.originalEvent.which === 1) {
+        if (event.data.originalEvent.which === 2) {
             // only left click
             this.setState((prevState) => {
                 return { isPlaying: !prevState.isPlaying };

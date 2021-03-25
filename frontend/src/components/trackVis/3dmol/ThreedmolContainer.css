@@ -116,6 +116,10 @@
     top: 17%;
 }
 
+.drawer.drawer-open .drawer-mask {
+    opacity: 0.1;
+}
+
 .card-header button {
     margin-bottom: 0 !important;
 }

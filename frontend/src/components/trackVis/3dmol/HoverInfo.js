@@ -26,6 +26,7 @@ export const HoverInfo = ({ atom, resolution, x, y, onNewViewRegion, viewRegion,
                 zIndex: 3,
                 background: "rgb(191 228 173)",
                 textAlign: "left",
+                border: "solid 1px orange",
             }}
         >
             <div>

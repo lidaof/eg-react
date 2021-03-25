@@ -239,6 +239,7 @@ class App extends React.PureComponent {
             virusBrowserMode,
             layoutModel,
             onSetAnchors3d,
+            viewer3dNumFrames,
         } = this.props;
         if (sessionFromUrl) {
             return (
@@ -322,6 +323,7 @@ class App extends React.PureComponent {
                     tracks={tracks.filter((tk) => tk.type !== "g3d")}
                     layoutModel={layoutModel}
                     onSetAnchors3d={onSetAnchors3d}
+                    viewer3dNumFrames={viewer3dNumFrames}
                 />
                 {!embeddingMode && <Footer />}
             </div>

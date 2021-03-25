@@ -516,7 +516,7 @@ class ThreedmolContainer extends React.Component {
 
     toggleModelDisplay = (hap) => {
         const newDisplayConfig = { ...this.state.modelDisplayConfig, [hap]: !this.state.modelDisplayConfig[hap] };
-        console.log(newDisplayConfig, hap);
+        // console.log(newDisplayConfig, hap);
         if (newDisplayConfig[hap]) {
             this.model2[hap].show();
             this.model[hap].show();
@@ -1026,7 +1026,8 @@ class ThreedmolContainer extends React.Component {
             });
         });
         model.setFrame(0);
-        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 1 } });
+        // this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 1 } });
+        this.viewer.setStyle({}, { cartoon: { colorscheme: "chrom", style: "trace", thickness: 1 } });
         // this.viewer.zoomTo();
         this.viewer.render();
     };
@@ -1046,6 +1047,29 @@ class ThreedmolContainer extends React.Component {
         this.setState({ animateMode: false, thumbStyle: "cartoon", message: "working..." });
         this.clearScene();
         this.prepareAtomData();
+        this.setState({ message: "" });
+    };
+
+    syncHic = () => {
+        const dHicTracks = this.props.tracks.filter((tk) => tk.type === "dynamichic");
+        if (!dHicTracks.length) {
+            this.setState({ message: "Abort, no dynamic hic track loaded..." });
+            return;
+        }
+        if (this.viewer.isAnimated()) {
+            this.stopAnimate();
+        }
+        if (!this.state.animateMode) {
+            this.updateModelFrames();
+        }
+        this.props.onToggleSync3d(true);
+        this.props.onGetViewer3dAndNumFrames({ viewer3d: this.viewer, numFrames: this.viewer.getNumFrames() });
+        this.setState({ message: "sync mode" });
+    };
+
+    stopSync = () => {
+        this.props.onToggleSync3d(false);
+        this.props.onGetViewer3dAndNumFrames({ viewer3d: null, numFrames: 0 });
         this.setState({ message: "" });
     };
 
@@ -1082,7 +1106,7 @@ class ThreedmolContainer extends React.Component {
             newG3dUrl,
             frameLabels,
         } = this.state;
-        const { tracks, x, y, onNewViewRegion, viewRegion } = this.props;
+        const { tracks, x, y, onNewViewRegion, viewRegion, sync3d } = this.props;
         const bwTracks = tracks.filter((track) => getTrackConfig(track).isBigwigTrack());
         return (
             <div id="threed-mol-container">
@@ -1454,30 +1478,63 @@ class ThreedmolContainer extends React.Component {
                                 <div id="collapse6" className="collapse show" aria-labelledby="heading6">
                                     <div className="card-body">
                                         <FrameListMenu frameList={frameLabels} />
-                                        <input
-                                            type="text"
-                                            placeholder="new g3d url"
-                                            value={newG3dUrl}
-                                            onChange={this.handleNewG3dUrlChange}
-                                        />
-                                        <button className="btn btn-primary btn-sm" onClick={this.prepareModelFrames}>
-                                            Add
-                                        </button>
+                                        <div style={{ display: "flex" }}>
+                                            <input
+                                                type="text"
+                                                placeholder="new g3d url"
+                                                value={newG3dUrl}
+                                                onChange={this.handleNewG3dUrlChange}
+                                            />
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                onClick={this.prepareModelFrames}
+                                            >
+                                                Add
+                                            </button>
+                                        </div>
                                         {frameLabels.length > 1 ? (
                                             <div>
-                                                <button className="btn btn-success btn-sm" onClick={this.animate}>
+                                                <button
+                                                    className="btn btn-success btn-sm"
+                                                    onClick={this.animate}
+                                                    disabled={sync3d}
+                                                >
                                                     Play
                                                 </button>
-                                                <button className="btn btn-secondary btn-sm" onClick={this.stopAnimate}>
+                                                <button
+                                                    className="btn btn-secondary btn-sm"
+                                                    onClick={this.stopAnimate}
+                                                    disabled={sync3d}
+                                                >
                                                     Stop
                                                 </button>
-                                                <button className="btn btn-info btn-sm" onClick={this.resetAnimate}>
+                                                <button
+                                                    className="btn btn-info btn-sm"
+                                                    onClick={this.resetAnimate}
+                                                    disabled={sync3d}
+                                                >
                                                     Reset
                                                 </button>
                                             </div>
                                         ) : (
                                             <div>add 2 and more models for animation</div>
                                         )}
+                                        <div>
+                                            <button
+                                                className="btn btn-warning btn-sm"
+                                                onClick={this.syncHic}
+                                                disabled={sync3d}
+                                            >
+                                                Sync dynamic HiC
+                                            </button>
+                                            <button
+                                                className="btn btn-danger btn-sm"
+                                                onClick={this.stopSync}
+                                                disabled={!sync3d}
+                                            >
+                                                Stop sync
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

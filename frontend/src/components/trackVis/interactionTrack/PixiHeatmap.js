@@ -112,13 +112,20 @@ export class PixiHeatmap extends React.PureComponent {
                     c.visible = false;
                 }
             });
+            if (this.props.viewer3dNumFrames) {
+                if (this.props.viewer3dNumFrames.viewer3d && this.props.viewer3dNumFrames.numFrames !== 0) {
+                    this.props.viewer3dNumFrames.viewer3d
+                        .setFrame(this.state.currentStep % this.props.viewer3dNumFrames.numFrames)
+                        .then(() => this.props.viewer3dNumFrames.viewer3d.render());
+                }
+            }
         }
     }
 
     onPointerDown = (event) => {
         // console.log(event, event.data.originalEvent.which);
-        if (event.data.originalEvent.which === 1) {
-            // only left click
+        if (event.data.originalEvent.which === 2) {
+            // only middle click
             this.setState((prevState) => {
                 return { isPlaying: !prevState.isPlaying };
             });

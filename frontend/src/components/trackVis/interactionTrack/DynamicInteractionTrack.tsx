@@ -36,6 +36,7 @@ interface DynamicInteractionTrackProps extends PropsFromTrackContainer, TooltipC
         dynamicColors?: any[];
         useDynamicColors?: boolean;
     };
+    viewer3dNumFrames?: any;
 }
 
 export const DEFAULT_OPTIONS = {
@@ -121,7 +122,7 @@ class DynamicInteractionTrack extends React.PureComponent<DynamicInteractionTrac
     }
 
     render(): JSX.Element {
-        const { data, trackModel, visRegion, width, viewWindow, options } = this.props;
+        const { data, trackModel, visRegion, width, viewWindow, options, viewer3dNumFrames } = this.props;
         this.scales = this.computeScale();
         const visualizerProps = {
             placedInteractionsArray: data.map((d) => this.featurePlacer.placeInteractions(d, visRegion, width)),
@@ -141,6 +142,7 @@ class DynamicInteractionTrack extends React.PureComponent<DynamicInteractionTrac
             lineWidth: options.lineWidth,
             dynamicColors: options.dynamicColors,
             useDynamicColors: options.useDynamicColors,
+            viewer3dNumFrames,
         };
         let visualizer;
         if (options.displayMode === DynamicInteractionDisplayMode.ARC) {
