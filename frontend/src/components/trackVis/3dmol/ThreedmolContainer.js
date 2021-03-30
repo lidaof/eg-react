@@ -1073,6 +1073,16 @@ class ThreedmolContainer extends React.Component {
         this.setState({ message: "" });
     };
 
+    saveImage = (viewer) => {
+        const ImgData = viewer.pngURI();
+        const dl = document.createElement("a");
+        document.body.appendChild(dl); // This line makes it work in Firefox.
+        dl.setAttribute("href", ImgData);
+        dl.setAttribute("download", new Date().toISOString() + "_eg3d.png");
+        dl.click();
+        document.body.removeChild(dl);
+    };
+
     render() {
         const {
             legendMax,
@@ -1534,6 +1544,43 @@ class ThreedmolContainer extends React.Component {
                                             >
                                                 Stop sync
                                             </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="card">
+                                <div className="card-header" id="heading7">
+                                    <h5 className="mb-0">
+                                        <button
+                                            className="btn btn-link btn-block text-left"
+                                            data-toggle="collapse"
+                                            data-target="#collapse7"
+                                            aria-expanded="true"
+                                            aria-controls="collapse7"
+                                        >
+                                            Export
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapse7" className="collapse show" aria-labelledby="heading7">
+                                    <div className="card-body">
+                                        <div>
+                                            Save main and thumbnail viewer as image.
+                                            <div>
+                                                <button
+                                                    className="btn btn-primary btn-sm"
+                                                    onClick={() => this.saveImage(this.viewer)}
+                                                >
+                                                    Save main
+                                                </button>
+                                                <button
+                                                    className="btn btn-success btn-sm"
+                                                    onClick={() => this.saveImage(this.viewer2)}
+                                                >
+                                                    Save thumbnail
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
