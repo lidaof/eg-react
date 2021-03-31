@@ -297,6 +297,22 @@ const hpv16 = [
     },
 ];
 
+const TbruceiTREU927 = [
+    {
+        name: "gene",
+        file: "TriTrypDB-51_TbruceiTREU927.gff.refbed",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const TbruceiLister427 = [
+    {
+        name: "gene",
+        file: "TriTrypDB-51_TbruceiLister427_2018.gff.refbed",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const genomeConfig = {
     hg19,
     mm10,
@@ -325,6 +341,8 @@ const genomeConfig = {
     rheMac3,
     mm39,
     hpv16,
+    TbruceiTREU927,
+    TbruceiLister427,
 };
 
 module.exports = genomeConfig;

@@ -10,7 +10,11 @@
         {
             "name": "PhytozomeGene",
             "label": "Phytozome genes",
-            "filetype": "geneAnnotation"
+            "filetype": "geneAnnotation",
+            "queryEndpoint": {
+                "name": "Phytozome",
+                "endpoint": "https://phytozome.jgi.doe.gov/phytomine/portal.do?class=Protein&externalids="
+            }
         }
     ]
 }

@@ -10,7 +10,8 @@
         {
             "name": "PlasmoDBGene",
             "label": "PlasmoDB 9.0 genes",
-            "filetype": "geneAnnotation"
+            "filetype": "geneAnnotation",
+            "queryEndpoint": { "name": "PlasmoDB", "endpoint": "https://plasmodb.org/plasmo/app/record/gene/" }
         }
     ]
 }

@@ -51,7 +51,8 @@ async function main() {
     //     return ExitCodes.DATA_DIR_MISSING_ERROR;
     // }
 
-    const genomes = ["hpv16"]; // if just want to load one genome
+    // const genomes = ["hpv16"]; // if just want to load one genome
+    const genomes = ["TbruceiTREU927", "TbruceiLister427"]; // if just want to load one genome
 
     // Get mongo connection
     let mongoClient;

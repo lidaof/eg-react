@@ -32,6 +32,8 @@ import papAnu2 from "./papAnu2/papAnu2";
 import rheMac3 from "./rheMac3/rheMac3";
 import calJac3 from "./calJac3/calJac3";
 import Pfal3D7 from "./pfal3d7/pfal3d7";
+import TbruceiTREU927 from "./trypanosome/TbruceiTREU927";
+import TbruceiLister427 from "./trypanosome/TbruceiLister427";
 import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
 import { GenomeConfig } from "./GenomeConfig";
 
@@ -75,6 +77,8 @@ export const allGenomes = [
     PANTRO6,
     Pfal3D7,
     Creinhardtii506,
+    TbruceiTREU927,
+    TbruceiLister427,
 ];
 
 const genomeNameToConfig = {};
@@ -204,6 +208,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
             hpv16.genome.getName(),
         ],
         color: "yellow",
+    },
+    trypanosome: {
+        logoUrl: "https://vizhub.wustl.edu/public/trypanosome/trypanosome.png",
+        assemblies: [TbruceiTREU927.genome.getName(), TbruceiLister427.genome.getName()],
+        color: "blue",
     },
 };
 

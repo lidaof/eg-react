@@ -12,6 +12,11 @@ interface ITrackModelMetadata {
     [k: string]: any;
 }
 
+interface QueryEndpoint {
+    name?: string;
+    endpoint?: string;
+}
+
 /**
  * Serialized track model, or the plain object argument to TrackModel's constructor.
  *
@@ -36,6 +41,7 @@ interface ITrackModel {
     url: string;
     metadata: ITrackModelMetadata;
     fileObj?: Blob;
+    queryEndpoint?: QueryEndpoint;
 }
 
 let nextId = 0;
@@ -70,6 +76,7 @@ export class TrackModel {
     isText?: boolean;
     textConfig?: any;
     apiConfig?: any;
+    queryEndpoint?: QueryEndpoint;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
@@ -89,6 +96,7 @@ export class TrackModel {
         this.isText = this.isText || false;
         this.textConfig = this.textConfig || {};
         this.apiConfig = this.apiConfig || {};
+        this.queryEndpoint = this.queryEndpoint || {};
 
         // in case user define height in string, like "25" instead of 25
         if (this.options.height && typeof this.options.height === "string") {

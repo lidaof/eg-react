@@ -29,6 +29,7 @@ const defaultTracks = [
         name: "PlasmoDBGene",
         genome: "Pfal3D7",
         label: "PlasmoDB 9.0 genes",
+        queryEndpoint: { name: "PlasmoDB", endpoint: "https://plasmodb.org/plasmo/app/record/gene/" },
     }),
     new TrackModel({
         type: "ruler",

@@ -31,6 +31,10 @@ const defaultTracks = [
         type: "geneAnnotation",
         name: "PhytozomeGene",
         genome: "Creinhardtii506",
+        queryEndpoint: {
+            name: "Phytozome",
+            endpoint: "https://phytozome.jgi.doe.gov/phytomine/portal.do?class=Protein&externalids=",
+        },
     }),
     new TrackModel({
         type: "ruler",

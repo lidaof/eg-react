@@ -1,5 +1,10 @@
 # Version History
 
+## 52.5.2
+
+-   add an option `queryEndpoint` to `TrackModel` allow customization of gene/feature annotaion query
+-   added 2 new Trypanosome genomes `TbruceiTREU927` and `TbruceiLister427` per user's request
+
 ## 52.5.1
 
 -   fixed a bug that `dynseq` track doesn't work correctly in Safari
