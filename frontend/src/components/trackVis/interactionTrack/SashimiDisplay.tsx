@@ -51,7 +51,11 @@ export class SashimiDisplay extends React.PureComponent<SashimiDisplayProps, {}>
             return null;
         }
         const arcCenter = xSpan1Center + 0.5 * spanLength;
-        const controlY = 35;
+        var controlY = heightScale(score);
+        if (controlY<10) {
+            controlY=10;
+        }
+        const scoreWidth = 10 * score.toString().length;  // with fondSize = 10
         return (
             <g key={placedInteraction.generateKey() + index}>
                 <path
@@ -64,7 +68,7 @@ export class SashimiDisplay extends React.PureComponent<SashimiDisplayProps, {}>
                     // onMouseMove={event => onInteractionHovered(event, placedInteraction.interaction)} // tslint:disable-line
                 />
                 <text key={placedInteraction.generateKey() + index + "text"}
-                    x={arcCenter} y={controlY} dominantBaseline="middle" style={{ textAnchor: "middle", fill: color, fontSize: 10 }}>
+                    x={arcCenter} y={controlY} dominantBaseline="middle" style={{ textAnchor: "middle", fill: "black", fontSize: 10 }}>
                     {score.toString()}
                 </text>
             </g>
