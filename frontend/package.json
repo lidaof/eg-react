@@ -17,7 +17,6 @@
         "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
         "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules"
     },
-    "dependencies": {},
     "peerDependencies": {
         "prop-types": "^15.6.0",
         "react": "^16.3.0",
