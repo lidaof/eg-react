@@ -87,9 +87,9 @@ export class AnnotationTrackSelector extends React.Component {
                 return <div>{trackModel.label} (Added)</div>;
             }
         }
-        // if (this.props.addGenomeLabel && trackModel.querygenome) {
-        //     return <div>{trackModel.label} (Can only be added to primary genome)</div>;
-        // }
+        if (this.props.addGenomeLabel && trackModel.querygenome) {
+            return <div>{trackModel.label} (Can only be added to primary genome)</div>;
+        }
         return <div>{trackModel.label} <button onClick={() => this.addLeafTrack(trackModel) } 
                     className="btn btn-sm btn-success dense-button">Add</button>
                 </div>;
