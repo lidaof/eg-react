@@ -4,6 +4,7 @@ import { Tabs, Tab } from "react-bootstrap-tabs";
 import JSON5 from "json5";
 // import { notify } from 'react-notify-toast';
 import TrackModel from "../../model/TrackModel";
+import { getSpeciesInfo, allGenomes } from "../../model/genomes/allGenomes";
 import CustomHubAdder from "./CustomHubAdder";
 import FacetTable from "./FacetTable";
 import { HELP_LINKS } from "../../util";
@@ -63,6 +64,7 @@ class CustomTrackAdder extends React.Component {
         onTracksAdded: PropTypes.func,
         onAddTracksToPool: PropTypes.func,
         addTermToMetaSets: PropTypes.func,
+        genomeConfig: PropTypes.object,
         addedTrackSets: PropTypes.instanceOf(Set),
     };
 
@@ -74,6 +76,7 @@ class CustomTrackAdder extends React.Component {
             url: "",
             name: "",
             urlError: "",
+            metadata: {"genome":""},
             trackAdded: false,
             selectedTabIndex: 0,
             options: null, // custom track options
@@ -142,7 +145,7 @@ class CustomTrackAdder extends React.Component {
     };
 
     renderCustomTrackAdder() {
-        const { type, url, name, urlError } = this.state;
+        const { type, url, name, metadata, urlError } = this.state;
         return (
             <form>
                 <h1>Add remote track</h1>
@@ -178,6 +181,15 @@ class CustomTrackAdder extends React.Component {
                         className="form-control"
                         value={name}
                         onChange={(event) => this.setState({ name: event.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label>genome</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={metadata.genome}
+                        onChange={(event) => this.setState({ metadata: {genome:event.target.value} })}
                     />
                 </div>
                 <TrackOptionsUI onGetOptions={(value) => this.getOptions(value)} />
