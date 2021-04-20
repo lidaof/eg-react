@@ -308,6 +308,7 @@ class Nav extends React.Component {
                                     customTrackSets={customTrackSets}
                                     addedTrackSets={addedTrackSets}
                                     addTermToMetaSets={addTermToMetaSets}
+                                    genomeConfig={genomeConfig}
                                 />
                             </ModalMenuItem>
                             <ModalMenuItem itemLabel="Local Tracks">

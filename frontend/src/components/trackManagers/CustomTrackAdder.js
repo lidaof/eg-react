@@ -4,7 +4,7 @@ import { Tabs, Tab } from "react-bootstrap-tabs";
 import JSON5 from "json5";
 // import { notify } from 'react-notify-toast';
 import TrackModel from "../../model/TrackModel";
-import { getSpeciesInfo, allGenomes } from "../../model/genomes/allGenomes";
+import { getSecondaryGenomes } from '../../util';
 import CustomHubAdder from "./CustomHubAdder";
 import FacetTable from "./FacetTable";
 import { HELP_LINKS } from "../../util";
@@ -64,7 +64,7 @@ class CustomTrackAdder extends React.Component {
         onTracksAdded: PropTypes.func,
         onAddTracksToPool: PropTypes.func,
         addTermToMetaSets: PropTypes.func,
-        genomeConfig: PropTypes.object,
+        genomeConfig: PropTypes.object.isRequired,
         addedTrackSets: PropTypes.instanceOf(Set),
     };
 
@@ -76,7 +76,7 @@ class CustomTrackAdder extends React.Component {
             url: "",
             name: "",
             urlError: "",
-            metadata: {"genome":""},
+            metadata: {"genome":this.props.genomeConfig.genome.getName()},
             trackAdded: false,
             selectedTabIndex: 0,
             options: null, // custom track options
@@ -113,6 +113,14 @@ class CustomTrackAdder extends React.Component {
         ));
     }
 
+    renderGenomeOptions(allGenomes) {
+        return allGenomes.map(genome => 
+            <option key={genome} value={genome}>
+                {genome}
+            </option>
+        );
+    }
+
     renderButtons() {
         if (this.state.trackAdded) {
             return (
@@ -146,6 +154,10 @@ class CustomTrackAdder extends React.Component {
 
     renderCustomTrackAdder() {
         const { type, url, name, metadata, urlError } = this.state;
+        const primaryGenome = this.props.genomeConfig.genome.getName();
+        var allGenomes = getSecondaryGenomes(primaryGenome, this.props.addedTracks);
+        allGenomes.unshift(primaryGenome);
+        console.log(allGenomes);
         return (
             <form>
                 <h1>Add remote track</h1>
@@ -185,12 +197,13 @@ class CustomTrackAdder extends React.Component {
                 </div>
                 <div className="form-group">
                     <label>genome</label>
-                    <input
-                        type="text"
+                    <select
                         className="form-control"
                         value={metadata.genome}
                         onChange={(event) => this.setState({ metadata: {genome:event.target.value} })}
-                    />
+                    >
+                        {this.renderGenomeOptions(allGenomes)}
+                    </select>
                 </div>
                 <TrackOptionsUI onGetOptions={(value) => this.getOptions(value)} />
                 {this.renderButtons()}
