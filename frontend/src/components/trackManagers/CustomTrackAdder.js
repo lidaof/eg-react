@@ -157,7 +157,6 @@ class CustomTrackAdder extends React.Component {
         const primaryGenome = this.props.genomeConfig.genome.getName();
         var allGenomes = getSecondaryGenomes(primaryGenome, this.props.addedTracks);
         allGenomes.unshift(primaryGenome);
-        console.log(allGenomes);
         return (
             <form>
                 <h1>Add remote track</h1>
