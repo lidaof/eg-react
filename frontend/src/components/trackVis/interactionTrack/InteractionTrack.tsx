@@ -8,7 +8,7 @@ import { Heatmap } from "./Heatmap";
 import { ArcDisplay } from "./ArcDisplay";
 import { CubicCurveDisplay } from "./CubicCurveDisplay";
 import { SquareDisplay } from "./SquareDisplay";
-import { SashimiDisplay } from "./SashimiDisplay";
+// import { SashimiDisplay } from "./SashimiDisplay";
 
 import Track, { PropsFromTrackContainer } from "../commonComponents/Track";
 import TrackLegend from "../commonComponents/TrackLegend";
@@ -193,9 +193,9 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             case InteractionDisplayMode.SQUARE:
                 visualizer = <SquareDisplay {...visualizerProps} />;
                 break;
-            case InteractionDisplayMode.SASHIMI:
-                visualizer = <SashimiDisplay {...visualizerProps} />;
-                break;
+            // case InteractionDisplayMode.SASHIMI:
+            //     visualizer = <SashimiDisplay {...visualizerProps} />;
+            //     break;
             default:
                 visualizer = <ArcDisplay {...visualizerProps} />;
         }
