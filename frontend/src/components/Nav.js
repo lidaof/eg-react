@@ -280,6 +280,7 @@ class Nav extends React.Component {
                                     onAddTracksToPool={onAddTracksToPool}
                                     publicTracksPool={publicTracksPool}
                                     publicHubs={publicHubs}
+                                    genomeConfig={genomeConfig}
                                     onHubUpdated={onHubUpdated}
                                     publicTrackSets={publicTrackSets}
                                     addedTrackSets={addedTrackSets}

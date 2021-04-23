@@ -24,6 +24,7 @@ class FacetTable extends Component {
         onTracksAdded: PropTypes.func,
         addTermToMetaSets: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
+        genomeName: PropTypes.string,
         publicTrackSets: PropTypes.instanceOf(Set)
     };
 
@@ -43,7 +44,7 @@ class FacetTable extends Component {
             rowHeader: "",
             columnHeader: "",
             showModalId: null,
-            metaKeys: []
+            metaKeys: ["genome"]
         };
 
         this.toggleHeader = this.toggleHeader.bind(this);
@@ -78,7 +79,7 @@ class FacetTable extends Component {
             child2ancestor[meta] = meta; // add 'sample': sample as well
         }
         for (let track of allTracks) {
-            let metadata = {};
+            let metadata = {"genome": this.props.genomeName};
             for (let [metaKey, metaValue] of Object.entries(track.metadata)) {
                 if (Array.isArray(metaValue)) {
                     metaValue = _.uniq(metaValue);
@@ -119,7 +120,7 @@ class FacetTable extends Component {
         //    right liver
         //    left liver
         for (let track of rawtracks) {
-            let metadata = {};
+            let metadata = {"genome": this.props.genomeName};
             for (let [metaKey, metaValue] of Object.entries(track.metadata)) {
                 let lastValue, newValue;
                 if (Array.isArray(metaValue)) {
