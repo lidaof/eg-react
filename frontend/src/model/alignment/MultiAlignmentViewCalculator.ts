@@ -129,7 +129,7 @@ export class MultiAlignmentViewCalculator {
             return recordsArray.reduce(
                 (multiAlign, records) => ({
                     ...multiAlign,
-                    [records.query]: this.alignFine(records.query, records.records, visData, primaryVisData),
+                    [records.query]: this.alignFine(records.query, records.records, visData, primaryVisData, allGaps),
                 }),
                 {}
             );
@@ -283,7 +283,7 @@ export class MultiAlignmentViewCalculator {
             return index;
         }
     }
-    alignFine(query: string, records: AlignmentRecord[], oldVisData: ViewExpansion, visData: ViewExpansion): Alignment {
+    alignFine(query: string, records: AlignmentRecord[], oldVisData: ViewExpansion, visData: ViewExpansion, allGaps: Gap[]): Alignment {
         // There's a lot of steps, so bear with me...
         const { visRegion, visWidth } = visData;
         // drawModel is derived from visData:
@@ -295,9 +295,9 @@ export class MultiAlignmentViewCalculator {
         // calculate navContext and placements using oldVisData so small gaps won't seperate different features:
         const navContext = oldVisData.visRegion.getNavigationContext();
         const placements = this._computeContextLocations(records, oldVisData);
-        const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
+        // const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);  // Use allGaps to properly align all the tracks.
         const navContextBuilder = new NavContextBuilder(navContext);
-        navContextBuilder.setGaps(primaryGaps);
+        navContextBuilder.setGaps(allGaps);
         // With the draw model, we can set x spans for each placed alignment
         // Adjust contextSpan and xSpan in placements using visData:
         for (const placement of placements) {
