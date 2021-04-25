@@ -295,9 +295,9 @@ export class MultiAlignmentViewCalculator {
         // calculate navContext and placements using oldVisData so small gaps won't seperate different features:
         const navContext = oldVisData.visRegion.getNavigationContext();
         const placements = this._computeContextLocations(records, oldVisData);
-        // const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);  // Use allGaps to properly align all the tracks.
+        // const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
         const navContextBuilder = new NavContextBuilder(navContext);
-        navContextBuilder.setGaps(allGaps);
+        navContextBuilder.setGaps(allGaps);  // Use allGaps instead of primaryGaps here so gaps between placements were also included here.
         // With the draw model, we can set x spans for each placed alignment
         // Adjust contextSpan and xSpan in placements using visData:
         for (const placement of placements) {
