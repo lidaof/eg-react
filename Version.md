@@ -1,5 +1,21 @@
 # Version History
 
+## 52.5.0
+
+-   Dynamic sequence track type `dynseq` added, the track type is proposed and initially developped by Surag Nai from Anshul Kundaje's lab at Stanford University
+
+## 52.4.1
+
+-   bug fix: numerical track y-scale threshold not working for negative values
+-   bug fix: local data hub missed track's `metadata` attibute
+
+## 52.4.0
+
+-   added percentile scale for interaction tracks (`hic`, `longrange` etc.)
+-   improved fixed scale config for numerical tracks
+-   video output for dynamic track
+-   added the highlight beams for interaction track at `heatmap` mode
+
 ## 52.3.0
 
 -   fixed a bug that hic track fetches whole hic file when switch to other norm options with updated hic-straw package
@@ -8,6 +24,7 @@
 -   new `noDefaultTracks` url parameter remove the default tracks while loading a remote hub
 -   removed limitation that querygenome of `genomealign` track need be preconfigured
 -   added default width and height for `withAutoDimensions` module
+-   enhanced `genomeailgn` track by Silas Hsu
 
 ## 52.2.0
 

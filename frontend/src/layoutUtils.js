@@ -7,8 +7,8 @@ import shortid from "shortid";
  * @author Daofeng Li
  */
 
-export const global0 = { tabSetHeaderHeight: 0, tabSetTabStripHeight: 0 };
-export const global25 = { tabSetHeaderHeight: 25, tabSetTabStripHeight: 25 };
+export const global0 = { tabSetHeaderHeight: 0, tabSetTabStripHeight: 0, splitterSize: 0 };
+export const global25 = { tabSetHeaderHeight: 25, tabSetTabStripHeight: 25, splitterSize: 8 };
 
 export const initialLayout = {
     global: global0,

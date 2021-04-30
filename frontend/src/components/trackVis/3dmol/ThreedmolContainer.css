@@ -1,0 +1,134 @@
+#threed-mol-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* #box1 {
+    border: 1px red solid;
+} */
+
+/* #box2 {
+    
+} */
+
+.picture {
+    position: relative;
+    display: block;
+}
+
+.side {
+    position: relative;
+    display: flex;
+}
+.picture .box1 {
+    position: relative;
+}
+.picture .box2 {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    border: 1px black solid;
+    z-index: 2;
+}
+.side .box1 {
+    position: relative;
+}
+.side .box2 {
+    position: relative;
+    border-left: 1px black solid;
+}
+
+#accordion p {
+    margin-bottom: 0;
+}
+
+#accordion ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#accordion input[type="text"] {
+    width: 100%;
+}
+
+#accordion input,
+#accordion button,
+#accordion select {
+    margin-right: 1ch;
+    margin-bottom: 1ch;
+}
+
+#accordion select {
+    margin-left: 1ch;
+}
+
+.thumb-control label {
+    display: block;
+}
+
+#hoverbox {
+    position: absolute;
+    left: 5px;
+    bottom: 5px;
+    z-index: 3;
+    background: lightcyan;
+    text-align: left;
+}
+
+.toggle-model-container {
+    display: flex;
+    justify-content: space-between;
+    background-color: aquamarine;
+    margin-bottom: 2px;
+}
+
+.toggle-model {
+    cursor: pointer;
+}
+
+.card-body {
+    padding: 0.75rem;
+}
+
+#accordion {
+    display: flex;
+}
+
+.placement-container {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    z-index: 2;
+}
+
+.placement-container span {
+    display: inline-block;
+}
+
+.drawer {
+    z-index: 3;
+}
+
+.drawer-handle {
+    background: hotpink;
+}
+
+.drawer-top .drawer-handle,
+.drawer-bottom .drawer-handle {
+    right: 25%;
+    margin-left: -20px;
+}
+.drawer-left .drawer-handle {
+    top: 17%;
+}
+
+.card-header button {
+    margin-bottom: 0 !important;
+}
+
+.card-header {
+    padding: 0;
+}

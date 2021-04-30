@@ -24,11 +24,12 @@ export const TRACK_TYPES = {
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
     Image: ["omero4dn", "omeroidr"],
+    "Dynamic sequence": ["dynseq"],
 };
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
 
-const TYPES_DESC = {
+export const TYPES_DESC = {
     bigWig: "numerical data",
     bedGraph: "numerical data, processed by tabix in .gz format",
     methylC: "methylation data, processed by tabix in .gz format",
@@ -50,6 +51,7 @@ const TYPES_DESC = {
     dbedgraph: "Dynamic bedgraph data",
     omero4dn: "image data from 4DN (4D Nucleome Data Portal)",
     omeroidr: "image data from IDR (Image Data Resource)",
+    dynseq: "dynamic sequence",
 };
 
 /**

@@ -1,3 +1,4 @@
+import { ScaleChoices } from './../../model/ScaleChoices';
 import LabelConfig from "../trackContextMenu/LabelConfig";
 import { TrackConfig } from "./TrackConfig";
 
@@ -10,6 +11,7 @@ import { BinSize, NormalizationMode } from "../..//model/HicDataModes";
 import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from "../trackContextMenu/ColorConfig";
 import { InteractionDisplayModeConfig } from "../trackContextMenu/DisplayModeConfig";
 import ScoreConfig from "../trackContextMenu/ScoreConfig";
+import ScalePercentileConfig from "../trackContextMenu/ScalePercentileConfig";
 import { BinSizeConfig, HicNormalizationConfig } from "../trackContextMenu/HicDataConfig";
 import HeightConfig from "../trackContextMenu/HeightConfig";
 import LineWidthConfig from "../trackContextMenu/LineWidthConfig";
@@ -68,6 +70,9 @@ export class HicTrackConfig extends TrackConfig {
             FetchViewWindowConfig,
             BothAnchorsInViewConfig,
         ];
+        if (this.getOptions().scoreScale === ScaleChoices.AUTO) {
+            items.splice(5, 0, ScalePercentileConfig);
+        }
         if (this.getOptions().displayMode !== InteractionDisplayMode.HEATMAP) {
             items.splice(2, 0, LineWidthConfig);
         }

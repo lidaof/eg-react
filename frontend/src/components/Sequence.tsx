@@ -12,7 +12,7 @@ function getReverseComplement(sequence: string): string {
     let result = '';
     for (let i = sequence.length - 1; i >= 0; i--) {
         const char = sequence.charAt(i);
-        const complement = COMPLEMENT_BASE[ char.toUpperCase() ];
+        const complement = COMPLEMENT_BASE[char.toUpperCase()];
         result += complement || char; // Default to the unmodified char if there is no complement
     }
     return result;
@@ -35,6 +35,9 @@ interface SequenceProps {
     height?: number;
     letterSize?: number;
     isReverseComplement?: boolean;
+    minXwidthPerBase?: number;
+    drawHeights?: any;
+    zeroLine?: number;
 }
 
 /**
@@ -49,17 +52,18 @@ export class Sequence extends React.PureComponent<SequenceProps> {
         isDrawBackground: true,
         height: 15,
         letterSize: 12,
-        y: 0
+        y: 0,
+        minXwidthPerBase: 1,
     };
 
     render() {
-        const {sequence, xSpan, y, isDrawBackground, height, letterSize, isReverseComplement} = this.props;
+        const { sequence, xSpan, y, isDrawBackground, height, letterSize, isReverseComplement, minXwidthPerBase, drawHeights, zeroLine } = this.props;
         if (!sequence) {
             return null;
         }
 
         const baseWidth = xSpan.getLength() / sequence.length;
-        if (baseWidth < Sequence.MIN_X_WIDTH_PER_BASE) {
+        if (baseWidth < minXwidthPerBase) {
             return null;
         }
 
@@ -75,30 +79,58 @@ export class Sequence extends React.PureComponent<SequenceProps> {
                     y={y}
                     width={baseWidth}
                     height={height}
-                    style={{fill: BASE_COLORS[base.toUpperCase()] || UNKNOWN_BASE_COLOR}}
+                    style={{ fill: BASE_COLORS[base.toUpperCase()] || UNKNOWN_BASE_COLOR }}
                 />);
                 x += baseWidth;
             }
         }
 
         const letters = [];
-        if (baseWidth >= letterSize) {
-            let x = xSpan.start;
-            for (const base of sequenceToDraw) {
-                letters.push(
-                    <text
-                        key={x}
-                        x={x + baseWidth/2}
-                        y={y + height/2 + 1}
-                        dominantBaseline="middle"
-                        style={{textAnchor: "middle", fill: 'white', fontSize: letterSize}}
-                    >
-                        {base}
-                    </text>
-                );
-                x += baseWidth;
+        if (drawHeights && drawHeights.length) {
+            if (baseWidth >= letterSize) {
+                let x = xSpan.start;
+                for (const base of sequenceToDraw) {
+                    const x_mid = x + baseWidth / 2;
+                    // this scale factor somehow miraculously works
+                    // don't exactly know the height size fontsize = 1.4*baseWidth
+                    const scale_fac = drawHeights[Math.floor(x_mid)] / baseWidth;
+
+                    letters.push(
+                        <text
+                            key={x}
+                            dominantBaseline="baseline"
+                            style={{
+                                textAnchor: "middle", fill: BASE_COLORS[base.toUpperCase()],
+                                transform: `translate(${x_mid}px, ${y + zeroLine}px) scaleY(${scale_fac})`,
+                                fontSize: 1.4 * baseWidth
+                            }}
+                        >
+                            {base}
+                        </text>
+                    );
+                    x += baseWidth;
+                }
+            }
+        } else {
+            if (baseWidth >= letterSize) {
+                let x = xSpan.start;
+                for (const base of sequenceToDraw) {
+                    letters.push(
+                        <text
+                            key={x}
+                            x={x + baseWidth / 2}
+                            y={y + height / 2 + 1}
+                            dominantBaseline="middle"
+                            style={{ textAnchor: "middle", fill: 'white', fontSize: letterSize }}
+                        >
+                            {base}
+                        </text>
+                    );
+                    x += baseWidth;
+                }
             }
         }
+
 
         return <React.Fragment>{rects}{letters}</React.Fragment>;
     }

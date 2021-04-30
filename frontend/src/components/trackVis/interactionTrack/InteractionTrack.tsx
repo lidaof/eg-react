@@ -1,8 +1,9 @@
 import React from "react";
-import _ from "lodash";
+// import _ from "lodash";
 import memoizeOne from "memoize-one";
 import { scaleLinear } from "d3-scale";
 import { notify } from "react-notify-toast";
+import percentile from 'percentile';
 
 import { Heatmap } from "./Heatmap";
 import { ArcDisplay } from "./ArcDisplay";
@@ -33,6 +34,7 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
         displayMode: InteractionDisplayMode;
         binSize?: number;
         scoreScale?: string;
+        scalePercentile?: number;
         scoreMax?: number;
         scoreMin?: number;
         height: number;
@@ -45,6 +47,7 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
 
     };
     forceSvg?: boolean;
+    getBeamRefs?: any;
 }
 
 export const DEFAULT_OPTIONS = {
@@ -54,6 +57,7 @@ export const DEFAULT_OPTIONS = {
     displayMode: InteractionDisplayMode.HEATMAP,
     scoreScale: ScaleChoices.AUTO,
     scoreMax: 10,
+    scalePercentile: 95,
     scoreMin: 0,
     height: 500,
     lineWidth: 2,
@@ -80,9 +84,14 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
     }
 
     computeScale = () => {
-        const { scoreScale, scoreMin, scoreMax, height } = this.props.options;
+        const { data } = this.props;
+        const { scoreScale, scoreMin, scoreMax, height, scalePercentile } = this.props.options;
         if (scoreScale === ScaleChoices.AUTO) {
-            const maxScore = this.props.data.length > 0 ? _.maxBy(this.props.data, "score").score : 10;
+            // const maxScore = this.props.data.length > 0 ? _.maxBy(this.props.data, "score").score : 10;
+            const item = percentile(scalePercentile, data, item => item.score);
+            // console.log(item)
+            const maxScore = data.length > 0 ? (item as GenomeInteraction).score : 10;
+            // console.log(maxScore)
             return {
                 opacityScale: scaleLinear().domain([0, maxScore]).range([0, 1]).clamp(true),
                 heightScale: scaleLinear()
@@ -152,7 +161,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
     }
 
     render(): JSX.Element {
-        const { data, trackModel, visRegion, width, viewWindow, options, forceSvg } = this.props;
+        const { data, trackModel, visRegion, width, viewWindow, options, forceSvg, getBeamRefs } = this.props;
         const filteredData = this.filterData(data);
         this.scales = this.computeScale();
         const visualizerProps = {
@@ -182,7 +191,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
         // }
         switch (options.displayMode) {
             case InteractionDisplayMode.HEATMAP:
-                visualizer = <Heatmap {...visualizerProps} />;
+                visualizer = <Heatmap {...visualizerProps} getBeamRefs={getBeamRefs} />;
                 break;
             case InteractionDisplayMode.FLATARC:
                 visualizer = <CubicCurveDisplay {...visualizerProps} />;

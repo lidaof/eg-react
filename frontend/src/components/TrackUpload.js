@@ -6,8 +6,9 @@ import { Tabs, Tab } from "react-bootstrap-tabs";
 import JSON5 from "json5";
 import { readFileAsText, HELP_LINKS } from "../util";
 import { TrackOptionsUI } from "./trackManagers/TrackOptionsUI";
+import { TYPES_DESC } from "./trackManagers/CustomTrackAdder";
 
-const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract", "g3d"]; // all lower case
+const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract", "g3d", "dynseq"]; // all lower case
 
 /**
  * handles local track file upload using FileReader API
@@ -125,6 +126,7 @@ export class TrackUpload extends React.Component {
                         label: item.label || item.name || item.filename,
                         files: null,
                         options: item.options || {},
+                        metadata: item.metadata || {},
                     });
                 } else {
                     track = new TrackModel({
@@ -135,6 +137,7 @@ export class TrackUpload extends React.Component {
                         label: item.label || item.name || item.filename,
                         files: [fileHash[item.filename], idxHash[item.filename + indexSuffix]],
                         options: item.options || {},
+                        metadata: item.metadata || {},
                     });
                 }
                 tracks.push(track);
@@ -168,21 +171,22 @@ export class TrackUpload extends React.Component {
                     <h3>1. Choose track file type:</h3>
                     <select value={this.state.fileType} onChange={this.handleTypeChange}>
                         <optgroup label="select only the track file (can select many of same type)">
-                            <option value="bigWig">bigWig</option>
-                            <option value="bigBed">bigBed</option>
-                            <option value="hic">HiC</option>
-                            <option value="bigInteract">bigInteract</option>
-                            <option value="g3d">G3D</option>
+                            <option value="bigWig">bigWig - {TYPES_DESC.bigWig}</option>
+                            <option value="bigBed">bigBed - {TYPES_DESC.bigBed}</option>
+                            <option value="hic">HiC - {TYPES_DESC.hic}</option>
+                            <option value="bigInteract">bigInteract - {TYPES_DESC.bigInteract}</option>
+                            <option value="dynseq">dynseq - {TYPES_DESC.dynseq}</option>
+                            <option value="g3d">G3D - {TYPES_DESC.g3d}</option>
                         </optgroup>
                         <optgroup label="select both the track file and index file (only select 1 pair)">
-                            <option value="bedGraph">bedGraph</option>
-                            <option value="methylC">methylC</option>
-                            <option value="categorical">categorical</option>
-                            <option value="bed">bed</option>
-                            <option value="refBed">refBed</option>
-                            <option value="longrange">longrange</option>
-                            <option value="qbed">qBED</option>
-                            <option value="bam">BAM</option>
+                            <option value="bedGraph">bedGraph - {TYPES_DESC.bedGraph}</option>
+                            <option value="methylC">methylC - {TYPES_DESC.methylC}</option>
+                            <option value="categorical">categorical - {TYPES_DESC.categorical}</option>
+                            <option value="bed">bed - {TYPES_DESC.bed}</option>
+                            <option value="refBed">refBed - {TYPES_DESC.refBed}</option>
+                            <option value="longrange">longrange - {TYPES_DESC.longrange}</option>
+                            <option value="qbed">qBED - {TYPES_DESC.qBED}</option>
+                            <option value="bam">BAM - {TYPES_DESC.bam}</option>
                         </optgroup>
                     </select>
                 </label>

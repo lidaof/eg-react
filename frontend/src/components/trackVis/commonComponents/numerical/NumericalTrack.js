@@ -82,7 +82,7 @@ class NumericalTrack extends React.PureComponent {
 
     computeScales(xToValue, xToValue2, height) {
         const { yScale, yMin, yMax } = this.props.options;
-        if (yMin > yMax) {
+        if (yMin >= yMax) {
             notify.show("Y-axis min must less than max", "error", 2000);
         }
         /*
@@ -101,32 +101,41 @@ class NumericalTrack extends React.PureComponent {
         min = xValues2.length ? -maxBoth : 0;
         if (yScale === ScaleChoices.FIXED) {
             max = yMax ? yMax : max;
-            min = yMin ? yMin : min;
+            min = yMin !== undefined ? yMin : min;
+            // if (xValues2.length && yMin > 0) {
+            //     notify.show("Please set Y-axis min <=0 when there are negative values", "warning", 5000);
+            //     min = 0;
+            // }
         }
         if (min > max) {
-            min = max;
+            notify.show("Y-axis min should less than Y-axis max", "warning", 5000);
+            min = 0;
         }
-        if (xValues2.length) {
+        // determines the distance of y=0 from the top
+        const zeroLine = min < 0 ? TOP_PADDING + ((height - TOP_PADDING) * max) / (max + Math.abs(min)) : height;
+
+        if (xValues2.length && (yScale === ScaleChoices.AUTO || (yScale === ScaleChoices.FIXED && yMin < 0))) {
             return {
-                valueToY: scaleLinear()
-                    .domain([max, 0])
-                    .range([TOP_PADDING, height * 0.5])
-                    .clamp(true),
+                axisScale: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
+                valueToY: scaleLinear().domain([max, 0]).range([TOP_PADDING, zeroLine]).clamp(true),
                 valueToYReverse: scaleLinear()
                     .domain([0, min])
-                    .range([0, height * 0.5 - TOP_PADDING])
+                    .range([0, height - zeroLine - TOP_PADDING])
                     .clamp(true),
                 valueToOpacity: scaleLinear().domain([0, max]).range([0, 1]).clamp(true),
                 valueToOpacityReverse: scaleLinear().domain([0, min]).range([0, 1]).clamp(true),
                 min,
                 max,
+                zeroLine,
             };
         } else {
             return {
+                axisScale: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
                 valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
                 valueToOpacity: scaleLinear().domain([min, max]).range([0, 1]).clamp(true),
                 min,
                 max,
+                zeroLine,
             };
         }
     }
@@ -179,8 +188,7 @@ class NumericalTrack extends React.PureComponent {
 
     render() {
         const { data, viewRegion, width, trackModel, unit, options, forceSvg } = this.props;
-        const { height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin, smooth } = options;
-        const halfHeight = height * 0.5;
+        const { height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin, smooth, yScale, yMin } = options;
         const dataForward = data.filter((feature) => feature.value === undefined || feature.value >= 0); // bed track to density mode
         const dataReverse = data.filter((feature) => feature.value < 0);
         let xToValue2BeforeSmooth;
@@ -189,21 +197,12 @@ class NumericalTrack extends React.PureComponent {
         } else {
             xToValue2BeforeSmooth = [];
         }
-        // if (options.yScale === ScaleChoices.FIXED && options.yMin !== undefined) {
-        //     xToValue2BeforeSmooth = xToValue2BeforeSmooth.map((x) => {
-        //         if (x >= options.yMin) {
-        //             return x;
-        //         }
-        //         return undefined;
-        //     });
-        // }
         const smoothNumber = Number.parseInt(smooth) || 0;
         this.xToValue2 = smoothNumber === 0 ? xToValue2BeforeSmooth : Smooth(xToValue2BeforeSmooth, smoothNumber);
         const xValues2 = this.xToValue2.filter((x) => x);
-        if (xValues2.length) {
+        this.hasReverse = false;
+        if (xValues2.length && (yScale === ScaleChoices.AUTO || (yScale === ScaleChoices.FIXED && yMin < 0))) {
             this.hasReverse = true;
-        } else {
-            this.hasReverse = false;
         }
         const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
         const xToValueBeforeSmooth =
@@ -214,8 +213,9 @@ class NumericalTrack extends React.PureComponent {
             <TrackLegend
                 trackModel={trackModel}
                 height={height}
-                axisScale={isDrawingBars ? this.scales.valueToY : undefined}
-                axisScaleReverse={isDrawingBars ? this.scales.valueToYReverse : undefined}
+                axisScale={isDrawingBars ? this.scales.axisScale : undefined}
+                // axisScale={isDrawingBars ? this.scales.valueToY : undefined}
+                // axisScaleReverse={isDrawingBars ? this.scales.valueToYReverse : undefined}
                 axisLegend={unit}
             />
         );
@@ -225,7 +225,7 @@ class NumericalTrack extends React.PureComponent {
                     <ValuePlot
                         xToValue={this.xToValue}
                         scales={this.scales}
-                        height={halfHeight}
+                        height={this.scales.zeroLine}
                         color={color}
                         colorOut={colorAboveMax}
                         isDrawingBars={isDrawingBars}
@@ -235,7 +235,7 @@ class NumericalTrack extends React.PureComponent {
                     <ValuePlot
                         xToValue={this.xToValue2}
                         scales={this.scales}
-                        height={halfHeight}
+                        height={height - this.scales.zeroLine}
                         color={color2}
                         colorOut={color2BelowMin}
                         isDrawingBars={isDrawingBars}
@@ -267,7 +267,7 @@ class NumericalTrack extends React.PureComponent {
     }
 }
 
-class ValuePlot extends React.PureComponent {
+export class ValuePlot extends React.PureComponent {
     static propTypes = {
         xToValue: PropTypes.array.isRequired,
         scales: PropTypes.object.isRequired,

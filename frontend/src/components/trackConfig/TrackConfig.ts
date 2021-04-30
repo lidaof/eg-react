@@ -1,7 +1,8 @@
-import UnknownTrack from '../trackVis/UnknownTrack';
-import LabelConfig from '../trackContextMenu/LabelConfig';
-import { TrackModel, TrackOptions } from '../../model/TrackModel';
-import DataSource from '../../dataSources/DataSource';
+import UnknownTrack from "../trackVis/UnknownTrack";
+import LabelConfig from "../trackContextMenu/LabelConfig";
+import { TrackModel, TrackOptions } from "../../model/TrackModel";
+import DataSource from "../../dataSources/DataSource";
+import { DYNAMIC_TYPES } from "./getTrackConfig";
 
 export class TrackConfig {
     public defaultOptions: TrackOptions;
@@ -47,6 +48,15 @@ export class TrackConfig {
 
     isGenomeAlignTrack(): boolean {
         return this.trackModel.type === "genomealign" || this.trackModel.filetype === "genomealign";
+    }
+
+    isDynamicTrack(): boolean {
+        const trackType = this.trackModel.type || this.trackModel.filetype;
+        return DYNAMIC_TYPES.includes(trackType);
+    }
+
+    isBigwigTrack(): boolean {
+        return this.trackModel.type === "bigwig";
     }
 
     /**
