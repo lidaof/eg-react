@@ -177,6 +177,7 @@ export const HELP_LINKS = {
     trackOptions: "https://eg.readthedocs.io/en/latest/datahub.html#track-properties",
     textTrack: "https://eg.readthedocs.io/en/latest/text.html",
     publish: "https://eg.readthedocs.io/en/latest/faq.html#publish-with-the-browser",
+    threed: "https://eg.readthedocs.io/en/latest/3d.html#compartment-paint-on-3d",
 };
 
 // /**

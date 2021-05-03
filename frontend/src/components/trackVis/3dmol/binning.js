@@ -106,9 +106,9 @@ function overlapHalf(s1, e1, start, end) {
  * @param {*} start
  * @param {*} end
  */
-export function findAtomsWithRegion(keeper, chr, start, end, resolution) {
+export function findAtomsWithRegion(keeper, chr, start, end, resolution, displayedModelKeys) {
     const atoms = [];
-    Object.keys(keeper).forEach((hap) => {
+    displayedModelKeys.forEach((hap) => {
         if (keeper[hap].hasOwnProperty(chr)) {
             const binkeys = reg2bins(start, end).map((k) => k.toString());
             let found = false,
@@ -157,6 +157,25 @@ export function getBigwigValueForAtom(keepers, atom, resolution) {
     });
     // console.log(values);
     return values.length ? _.mean(values) : undefined;
+}
+
+export function getCompartmentNameForAtom(keepers, atom, resolution) {
+    // console.log(keepers, atom);
+    if (!keepers.hasOwnProperty(atom.chain)) {
+        return undefined;
+    }
+    const binkeys = reg2bins(atom.properties.start, atom.properties.start + resolution).map((k) => k.toString());
+    for (let i = 0; i < binkeys.length; i++) {
+        const items = keepers[atom.chain][binkeys[i]];
+        if (items && items.length) {
+            for (let j = 0; j < items.length; j++) {
+                if (atom.properties.start >= items[j].start && items[j].end >= atom.properties.start) {
+                    return items[j].name;
+                }
+            }
+        }
+    }
+    return undefined;
 }
 
 export function atomInFilterRegions(atom, filterRegions) {

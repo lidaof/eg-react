@@ -11,7 +11,7 @@ import Drawer from "rc-drawer";
 import TrackModel from "model/TrackModel";
 import DisplayedRegionModel from "model/DisplayedRegionModel";
 import { BigwigSource } from "./BigwigSource";
-import { chromColors, colorAsNumber, g3dParser } from "./helpers-3dmol";
+import { chromColors, colorAsNumber, g3dParser, getClosestValueIndex } from "./helpers-3dmol";
 import { Legend } from "./Legend";
 import { HoverInfo } from "./HoverInfo";
 import { CategoryLegend } from "./CategoryLegend";
@@ -19,8 +19,16 @@ import { ResolutionList } from "./ResolutionList";
 import { ModelListMenu } from "./ModelListMenu";
 import { FrameListMenu } from "./FrameListMenu";
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
-import { reg2bin, reg2bins, getBigwigValueForAtom, atomInFilterRegions, findAtomsWithRegion } from "./binning";
-import { arraysEqual, readFileAsText, readFileAsBuffer } from "../../../util";
+import {
+    reg2bin,
+    reg2bins,
+    getBigwigValueForAtom,
+    atomInFilterRegions,
+    findAtomsWithRegion,
+    getCompartmentNameForAtom,
+} from "./binning";
+import { arraysEqual, readFileAsText, readFileAsBuffer, HELP_LINKS } from "../../../util";
+import { GLViewer } from "./glviewer";
 
 import "rc-drawer/assets/index.css";
 import "./ThreedmolContainer.css";
@@ -28,14 +36,14 @@ import "./ThreedmolContainer.css";
 const unzip = util.promisify(zlib.unzip);
 
 /**
- * the container for holding 3D structore rendered by 3Dmol.js
+ * the container for holding 3D structure rendered by 3Dmol.js
  * @author Daofeng Li
  */
 
 class ThreedmolContainer extends React.Component {
     static propTypes = {
-        tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired, // g3d Tracks to render
-        g3dtrack: PropTypes.instanceOf(TrackModel).isRequired,
+        tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
+        g3dtrack: PropTypes.instanceOf(TrackModel).isRequired, // g3d track to render
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
         containerWidth: PropTypes.number,
         containerHeight: PropTypes.number,
@@ -44,6 +52,7 @@ class ThreedmolContainer extends React.Component {
     constructor(props) {
         super(props);
         this.mol = window.$3Dmol;
+        this.mol.GLViewer = GLViewer;
         // this.mol.Parsers.g3d = g3dParser;
         this.viewer = null;
         this.viewer2 = null;
@@ -53,9 +62,10 @@ class ThreedmolContainer extends React.Component {
         this.g3dFile = null;
         this.bwData = {};
         this.compData = [];
-        this.atomData = {}; //resolution as key, value: [{hap: [atoms...]}, ]
+        this.atomData = {}; //resolution string as key, value: {hap: [atoms...]}
+        this.atomStartsByChrom = {}; // resolution string as key, value: {chrom: [list of sorted atoms' starts]}
         this.newAtoms = {}; // holder for addtional models for animation, key: file name, value {hap: [list of atoms]}
-        this.atomKeeper = {}; // resolution as key, value: {hap: keeper}
+        this.atomKeeper = {}; // resolution string as key, value: {hap: keeper}
         // this.mol.chrom = {};
         // this.mol.chrom.atom = chromColors;
         this.chromHash = {}; // key: chrom, value: length
@@ -84,15 +94,24 @@ class ThreedmolContainer extends React.Component {
             paintMethod: "score", // other way is compartmemt
             paintRegion: "none", // region, chrom, genome, or new when switch bw url
             paintCompartmentRegion: "none",
-            compAcolor: "green",
-            compBcolor: "red",
+            A: "green", //  color for compartment A, same as below
+            B: "red",
+            A1: "rgb(34,139,34)",
+            A2: "rgb(152,251,152)",
+            B1: "rgb(220,20,60)",
+            B2: "rgb(255,255,0)",
+            B3: "rgb(112,128,144)",
+            B4: "rgb(75,0,130)",
+            NA: "rgb(255,255,255)",
+            compFormat: "4dn", // default use 4DN format, or the 2014 Cell paper from Rao et.al
             resolutions: [],
             resolution: 0, //auto, choose the lowest one, or dynamic in future with zoom level
             message: "",
-            modelDisplayConfig: null,
-            highlightingOn: true,
+            modelDisplayConfig: null, // key: hap, value: true or false, true for display, false for hidden
+            highlightingOn: false,
             highlightingColor: "yellow",
-            highlightingChromColor: "grey",
+            // highlightingChromColor: "grey",
+            highlightingChromColor: "#f2f2f2",
             mainBoxWidth: 600,
             mainBoxHeight: 400,
             thumbBoxWidth: 300,
@@ -120,8 +139,8 @@ class ThreedmolContainer extends React.Component {
         const element = this.myRef.current;
         const element2 = this.myRef2.current;
         const config = { backgroundColor: "white" };
-        this.viewer = this.mol.createViewer(element, { ...config, id: "box1" });
-        this.viewer2 = this.mol.createViewer(element2, { ...config, id: "box2" });
+        this.viewer = this.mol.createViewer(element, { ...config, id: "box1" }); // main
+        this.viewer2 = this.mol.createViewer(element2, { ...config, id: "box2" }); // thumbnail
         this.viewer.linkViewer(this.viewer2);
         this.viewer2.linkViewer(this.viewer);
         const trackModel = this.props.g3dtrack;
@@ -142,6 +161,7 @@ class ThreedmolContainer extends React.Component {
             paintCompartmentRegion,
             frameLabels,
             animateMode,
+            modelDisplayConfig,
         } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
@@ -151,7 +171,16 @@ class ThreedmolContainer extends React.Component {
         ) {
             await this.paintBigwig(paintRegion);
         }
-        if (this.state.compAcolor !== prevState.compAcolor || this.state.compBcolor !== prevState.compBcolor) {
+        if (
+            this.state.A !== prevState.A ||
+            this.state.B !== prevState.B ||
+            this.state.A1 !== prevState.A1 ||
+            this.state.A2 !== prevState.A2 ||
+            this.state.B1 !== prevState.B1 ||
+            this.state.B2 !== prevState.B2 ||
+            this.state.B3 !== prevState.B3 ||
+            this.state.B4 !== prevState.B4
+        ) {
             await this.paintCompartment(paintCompartmentRegion);
         }
         if (this.state.thumbStyle !== prevState.thumbStyle) {
@@ -181,6 +210,7 @@ class ThreedmolContainer extends React.Component {
             this.viewer2.render();
         }
         if (this.state.resolution !== prevState.resolution) {
+            this.removeHover();
             await this.prepareAtomData();
         }
         if (this.state.highlightingOn !== prevState.highlightingOn) {
@@ -195,20 +225,27 @@ class ThreedmolContainer extends React.Component {
         }
         if (this.props.anchors3d !== prevProps.anchors3d) {
             if (this.props.anchors3d.length) {
-                this.drawAnchors3d();
+                this.drawAnchors3d(modelDisplayConfig);
             } else {
                 this.removeAnchors3d();
             }
         }
         if (prevProps.viewRegion !== this.props.viewRegion) {
+            const chroms = this.viewRegionToChroms();
+            const prevChroms = prevProps.viewRegion.getFeatureSegments().map((region) => region.getName());
+            if (!arraysEqual(prevChroms, chroms)) {
+                // this.updateMainViewerClickable();
+                // this.updateMainViewer();
+                if (this.state.highlightingOn) {
+                    this.highlightRegions();
+                }
+            }
             if (this.state.highlightingOn) {
                 this.highlightRegions();
             }
             if (paintRegion === "region") {
                 await this.paintBigwig("region");
             } else if (paintRegion === "chrom") {
-                const chroms = this.viewRegionToChroms();
-                const prevChroms = prevProps.viewRegion.getFeatureSegments().map((region) => region.getName());
                 if (!arraysEqual(prevChroms, chroms)) {
                     await this.paintBigwig("chrom");
                 }
@@ -216,8 +253,6 @@ class ThreedmolContainer extends React.Component {
             if (paintCompartmentRegion === "region") {
                 await this.paintCompartment("region");
             } else if (paintRegion === "chrom") {
-                const chroms = this.viewRegionToChroms();
-                const prevChroms = prevProps.viewRegion.getFeatureSegments().map((region) => region.getName());
                 if (!arraysEqual(prevChroms, chroms)) {
                     await this.paintCompartment("chrom");
                 }
@@ -255,21 +290,35 @@ class ThreedmolContainer extends React.Component {
         this.compData = [];
         this.atomData = {};
         this.newAtoms = {};
+        this.atomStartsByChrom = {};
+        if (this.props.anchors3d.length && this.props.onSetAnchors3d) {
+            this.props.onSetAnchors3d([]);
+        }
     }
 
     removeHover = () => {
         this.setState({ hoveringAtom: null, hoveringX: 0, hoveringY: 0 });
     };
 
-    drawAnchors3d = () => {
+    drawAnchors3d = (displayConfig = undefined) => {
         const { resolution } = this.state;
         const resString = resolution.toString();
+        if (_.isEmpty(this.atomKeeper) || !this.atomKeeper.hasOwnProperty(resString)) {
+            this.buildAtomKeeper();
+        }
+        let displayedModelKeys = Object.keys(this.atomKeeper[resString]);
+        if (displayConfig) {
+            displayedModelKeys = [];
+            Object.keys(displayConfig).forEach((key) => {
+                if (displayConfig[key]) {
+                    displayedModelKeys.push(key);
+                }
+            });
+        }
+        // console.log(displayedModelKeys);
         //clean existing arrows
         if (this.arrows.length) {
             this.removeAnchors3d(false);
-        }
-        if (_.isEmpty(this.atomKeeper) || !this.atomKeeper.hasOwnProperty(resString)) {
-            this.buildAtomKeeper();
         }
         const already = {}; // to avoid duplication
         this.props.anchors3d.forEach((anchor, idx) => {
@@ -281,7 +330,8 @@ class ThreedmolContainer extends React.Component {
                     anchor.chr,
                     anchor.start,
                     anchor.end,
-                    resolution
+                    resolution,
+                    displayedModelKeys
                 );
                 atoms.forEach((atom) => {
                     this.arrows.push(
@@ -299,7 +349,8 @@ class ThreedmolContainer extends React.Component {
             already[str] = 1;
         });
         if (!this.arrows.length) {
-            this.setState({ message: "cannot find matched atoms to point, skip" });
+            this.removeAnchors3d();
+            this.setState({ message: "cannot find matched atoms to point or no model is displaying, skip" });
             return;
         }
         this.viewer.render();
@@ -325,7 +376,7 @@ class ThreedmolContainer extends React.Component {
             return;
         }
         this.atomKeeper[resString] = {};
-        const [atoms2] = this.atomData[resString];
+        const atoms2 = this.atomData[resString];
         Object.keys(atoms2).forEach((hap) => {
             if (!this.atomKeeper[resString].hasOwnProperty(hap)) {
                 this.atomKeeper[resString][hap] = {};
@@ -380,46 +431,53 @@ class ThreedmolContainer extends React.Component {
      * add click event instead, hover seems slow
      * @param {*} atoms2
      */
-    assginAtomsCallbacks = (atoms2) => {
-        const atoms = {};
-        Object.keys(atoms2).forEach((hap) => {
-            const addevents = atoms2[hap].map((atom2) => {
-                // mouse over and click handler
-                const atom = Object.assign({}, atom2);
-                // atom.hoverable = true;
-                // let oldStyle;
-                // atom.hover_callback = (at) => {
-                //     // console.log('hover', at.resi)
-                //     this.setState({ hoveringAtom: at });
-                //     oldStyle = { ...at.style };
-                //     // console.log(oldStyle)
-                //     // this.viewer.setStyle({resi: at.resi}, {sphere: {color: 'pink', opacity: 1, radius: 2}});
-                //     // this.viewer.setStyle({resi: at.resi}, {cross: {color: 'pink', opacity: 1, radius: 2}});
-                //     this.viewer.setStyle(
-                //         { resi: [`${at.resi}-${at.resi + 1}`] },
-                //         { cartoon: { color: "#ff3399", style: "trace", thickness: 1 } }
-                //     );
-                //     this.viewer.render();
-                // };
-                // atom.unhover_callback = (at) => {
-                //     // console.log('unhover', at);
-                //     this.setState({ hoveringAtom: null });
-                //     this.viewer.setStyle({ resi: [`${at.resi}-${at.resi + 1}`] }, oldStyle);
-                //     this.viewer.render();
-                // };
-                atom.clickable = true;
-                atom.callback = (at) => {
-                    // at.color = 0x0000ff;
-                    // at.style= {cartoon: {color: '#ff3399', style: 'trace', thickness: 1}}
-                    // console.log("clicked", at, this.viewer.modelToScreen(at));
-                    const screenXY = this.viewer.modelToScreen(at);
-                    this.setState({ hoveringAtom: at, hoveringX: screenXY.x, hoveringY: screenXY.y });
-                };
-                return atom;
-            });
-            atoms[hap] = addevents;
-        });
-        return atoms;
+    // assginAtomsCallbacks = (atoms2) => {
+    //     const atoms = {};
+    //     const chroms = this.viewRegionToChroms();
+    //     Object.keys(atoms2).forEach((hap) => {
+    //         const addevents = atoms2[hap].map((atom2) => {
+    //             // mouse over and click handler
+    //             const atom = Object.assign({}, atom2);
+    //             // atom.hoverable = true;
+    //             // let oldStyle;
+    //             // atom.hover_callback = (at) => {
+    //             //     // console.log('hover', at.resi)
+    //             //     this.setState({ hoveringAtom: at });
+    //             //     oldStyle = { ...at.style };
+    //             //     // console.log(oldStyle)
+    //             //     // this.viewer.setStyle({resi: at.resi}, {sphere: {color: 'pink', opacity: 1, radius: 2}});
+    //             //     // this.viewer.setStyle({resi: at.resi}, {cross: {color: 'pink', opacity: 1, radius: 2}});
+    //             //     this.viewer.setStyle(
+    //             //         { resi: [`${at.resi}-${at.resi + 1}`] },
+    //             //         { cartoon: { color: "#ff3399", style: "trace", thickness: 1 } }
+    //             //     );
+    //             //     this.viewer.render();
+    //             // };
+    //             // atom.unhover_callback = (at) => {
+    //             //     // console.log('unhover', at);
+    //             //     this.setState({ hoveringAtom: null });
+    //             //     this.viewer.setStyle({ resi: [`${at.resi}-${at.resi + 1}`] }, oldStyle);
+    //             //     this.viewer.render();
+    //             // };
+    //             if (chroms.includes(atom.chain)) {
+    //                 atom.clickable = true;
+    //                 atom.callback = (at) => {
+    //                     // at.color = 0x0000ff;
+    //                     // at.style= {cartoon: {color: '#ff3399', style: 'trace', thickness: 1}}
+    //                     // console.log("clicked", at, this.viewer.modelToScreen(at));
+
+    //                 };
+    //             }
+    //             return atom;
+    //         });
+    //         atoms[hap] = addevents;
+    //     });
+    //     return atoms;
+    // };
+
+    setAtomClickable = (at) => {
+        const screenXY = this.viewer.modelToScreen(at);
+        this.setState({ hoveringAtom: at, hoveringX: screenXY.x, hoveringY: screenXY.y });
     };
 
     clearScene = () => {
@@ -429,6 +487,32 @@ class ThreedmolContainer extends React.Component {
         this.model = {};
     };
 
+    // clearMainScene = () => {
+    //     this.viewer.clear();
+    //     this.model = {};
+    // };
+
+    // updateMainViewerClickable = () => {
+    //     const { resolution } = this.state;
+    //     const resString = resolution.toString();
+    //     const atoms = this.assginAtomsCallbacks(this.atomData[resString][0]);
+    //     this.atomData[resString][1] = atoms;
+    // };
+
+    // updateMainViewer = () => {
+    //     this.clearMainScene();
+    //     const { resolution } = this.state;
+    //     const resString = resolution.toString();
+    //     const atoms = this.atomData[resString][1];
+    //     Object.keys(atoms).forEach((hap) => {
+    //         this.model[hap] = this.viewer.addModel();
+    //         this.model[hap].addAtoms(atoms[hap]);
+    //     });
+    //     this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } });
+    //     this.viewer.zoomTo();
+    //     this.viewer.render();
+    // };
+
     prepareAtomData = async () => {
         this.setState({ message: "updating...", frameAtoms: [], frameLabels: [] });
         this.clearScene();
@@ -436,14 +520,25 @@ class ThreedmolContainer extends React.Component {
         const resString = resolution.toString();
         const stateAtoms = [],
             stateLabels = [];
-        let atoms2, atoms; // atoms2 original object, atoms with added events callback
+        let atoms2; //, atoms; // atoms2 original object, atoms with added events callback
         if (this.atomData.hasOwnProperty(resString)) {
-            [atoms2, atoms] = this.atomData[resString];
+            // [atoms2, atoms] = this.atomData[resString];
+            atoms2 = this.atomData[resString];
         } else {
             const data = await this.g3dFile.readData(resolution);
-            atoms2 = g3dParser(data);
-            atoms = this.assginAtomsCallbacks(atoms2);
-            this.atomData[resString] = [atoms2, atoms];
+            atoms2 = g3dParser(data, this.setAtomClickable);
+            // atoms = this.assginAtomsCallbacks(atoms2);
+            // this.atomData[resString] = [atoms2, atoms];
+            this.atomData[resString] = atoms2;
+            // fill starts array
+            this.atomStartsByChrom[resString] = {};
+            atoms2[Object.keys(atoms2)[0]].forEach((atom) => {
+                if (!this.atomStartsByChrom[resString].hasOwnProperty(atom.chain)) {
+                    this.atomStartsByChrom[resString][atom.chain] = [atom.properties.start];
+                } else {
+                    this.atomStartsByChrom[resString][atom.chain].push(atom.properties.start);
+                }
+            });
         }
         const modelDisplayConfig = {};
         Object.keys(atoms2).forEach((hap) => (modelDisplayConfig[hap] = true));
@@ -452,7 +547,7 @@ class ThreedmolContainer extends React.Component {
             this.model2[hap] = this.viewer2.addModel();
             this.model2[hap].addAtoms(atoms2[hap]);
             this.model[hap] = this.viewer.addModel();
-            this.model[hap].addAtoms(atoms[hap]);
+            this.model[hap].addAtoms(atoms2[hap]);
         });
 
         //set atoms for animation
@@ -462,13 +557,13 @@ class ThreedmolContainer extends React.Component {
             stateLabels.push(hap);
         });
 
-        this.viewer2.setStyle({}, { cartoon: { colorscheme: "chrom", style: "trace", thickness: 1 } });
+        this.viewer2.setStyle({}, { cartoon: { colorscheme: "chrom", style: "trace", thickness: 0.2 } });
         this.viewer2.render();
 
         // the main viewer
 
         // this.viewer.setBackgroundColor('white');
-        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } });
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.7 } });
         this.viewer.zoomTo();
         this.viewer.render();
         // this.viewer.zoom(1.2, 1000);
@@ -525,8 +620,12 @@ class ThreedmolContainer extends React.Component {
             this.model[hap].hide();
         }
         this.viewer2.render();
-        this.viewer.render();
         this.setState({ modelDisplayConfig: newDisplayConfig });
+        if (this.props.anchors3d.length) {
+            this.drawAnchors3d(newDisplayConfig);
+        } else {
+            this.viewer.render(); //avoid dup render in drawAnchors3d
+        }
     };
 
     updateLegendColor = (k, color) => {
@@ -538,38 +637,59 @@ class ThreedmolContainer extends React.Component {
     };
 
     highlightRegions = () => {
-        const { highlightingColor, highlightingChromColor } = this.state;
+        const { highlightingColor, resolution } = this.state;
         const regions = this.viewRegionToRegions();
-        const colorByRegion = function (atom, region) {
-            if (
-                atom.chain === region.chrom &&
-                atom.properties.start >= region.start &&
-                atom.properties.start <= region.end
-            ) {
-                return highlightingColor;
-            } else {
-                return highlightingChromColor;
-            }
-        };
+        // const colorByRegion = function (atom, region) {
+        //     if (
+        //         atom.chain === region.chrom &&
+        //         atom.properties.start >= region.start &&
+        //         atom.properties.start <= region.end
+        //     ) {
+        //         return highlightingColor;
+        //     } else {
+        //         return highlightingChromColor;
+        //     }
+        // };
+        const regionRange = {}; // key: chrom, value: [lower resi, higher resi] used for selection
+        // to be fixed, to deal with multiple model data, currently using first model to determin resn range due to limited selection in 3dmol
+        const resString = resolution.toString();
+        regions.forEach((reg) => {
+            const leftResi = getClosestValueIndex(this.atomStartsByChrom[resString][reg.chrom], reg.start)[1];
+            const rightResi = getClosestValueIndex(this.atomStartsByChrom[resString][reg.chrom], reg.end)[0];
+            regionRange[reg.chrom] = [leftResi, rightResi];
+        });
         // this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3, hidden: true } }); //remove existing style
         this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } }); //remove existing style
+        // regions.forEach((region) => {
+        //     this.viewer.setStyle(
+        //         { chain: region.chrom },
+        //         { cartoon: { colorfunc: (atom) => colorByRegion(atom, region), style: "trace", thickness: 1 } }
+        //     );
+        // });
+        let validateRegion = false;
         regions.forEach((region) => {
-            this.viewer.setStyle(
-                { chain: region.chrom },
-                { cartoon: { colorfunc: (atom) => colorByRegion(atom, region), style: "trace", thickness: 1 } }
-            );
+            if (regionRange[region.chrom][0] && regionRange[region.chrom][1]) {
+                const resiSelect = `${regionRange[region.chrom][0]}-${regionRange[region.chrom][1]}`;
+                this.viewer.setStyle(
+                    { chain: region.chrom, resi: [resiSelect] },
+                    { cartoon: { color: highlightingColor, style: "trace", thickness: 0.2 } }
+                );
+                validateRegion = true;
+            }
         });
-        this.setState({ highlightingOn: true });
-        this.viewer.render();
+        if (validateRegion) {
+            this.setState({ highlightingOn: true });
+            this.viewer.render();
+        } else {
+            this.setState({ message: "cannot find matched region to highlight, skip" });
+            return;
+        }
     };
 
     removeHighlightRegions = () => {
         const regions = this.viewRegionToRegions();
         regions.forEach((region) => {
-            this.viewer.setStyle(
-                { chain: region.chrom },
-                { line: { colorscheme: "chrom", opacity: 0.3, hidden: true } }
-            );
+            this.viewer.setStyle({ chain: region.chrom }, { line: { colorscheme: "chrom", opacity: 0.3 } });
         });
         this.setState({ highlightingOn: false });
         this.viewer.render();
@@ -674,16 +794,16 @@ class ThreedmolContainer extends React.Component {
                 if (value) {
                     return colorAsNumber(colorScale(value));
                 } else {
-                    return "grey";
+                    return "yellow";
                 }
             } else {
-                return "grey";
+                return "yellow";
             }
         };
         queryChroms.forEach((chrom) => {
             this.viewer.setStyle(
                 { chain: chrom },
-                { cartoon: { colorfunc: colorByValue, style: "trace", thickness: 1 } }
+                { cartoon: { colorfunc: colorByValue, style: "trace", thickness: 0.3 } }
             );
         });
         this.viewer.render();
@@ -798,16 +918,16 @@ class ThreedmolContainer extends React.Component {
     parseAnnotationFile = async (fileobj) => {
         // console.log(fileobj);
         try {
-            const textFile = /text.*/;
+            const gzipFile = /gzip/;
             let dataString;
-            if (fileobj.type.match(textFile)) {
-                dataString = await readFileAsText(fileobj);
-            } else {
+            if (fileobj.type.match(gzipFile)) {
                 const zipped = await readFileAsBuffer(fileobj);
                 const unzipped = await unzip(zipped);
                 dataString = unzipped.toString();
+            } else {
+                dataString = await readFileAsText(fileobj);
             }
-            return dataString.split("\n");
+            return dataString.trim().split("\n");
         } catch (error) {
             this.setState({ message: "error parse uploaded annotation file" });
             return;
@@ -829,17 +949,28 @@ class ThreedmolContainer extends React.Component {
             : await this.parseRemoteAnnotationData(compartmentFileUrl);
         // console.log(data);
         if (!data) {
-            this.setState({ message: "file empty or error parse annotation file, please check your file" });
+            this.setState({ message: "file empty or error parse annotation file, please check your file 1" });
             return;
         }
         const comp = {};
-        data.slice(1).forEach((line) => {
+        let compFormat = "4dn",
+            dataToUse;
+        if (!data[0].startsWith("chrom")) {
+            compFormat = "cell";
+            this.setState({ compFormat });
+            dataToUse = data;
+        } else {
+            dataToUse = data.slice(1);
+        }
+        // console.log(key, compFormat, dataToUse);
+        dataToUse.forEach((line) => {
             const t = line.trim().split("\t");
-            if (t.length === 8) {
+            if (t.length >= 8) {
+                let score, compName;
                 const chrom = t[0];
                 const start = Number.parseInt(t[1], 10);
                 const end = Number.parseInt(t[2], 10);
-                const score = Number.parseFloat(t[7]);
+
                 const binkey = reg2bin(start, end).toString();
                 if (!comp.hasOwnProperty(chrom)) {
                     comp[chrom] = {};
@@ -847,15 +978,27 @@ class ThreedmolContainer extends React.Component {
                 if (!comp[chrom].hasOwnProperty(binkey)) {
                     comp[chrom][binkey] = [];
                 }
-                comp[chrom][binkey].push({
-                    chrom,
-                    start,
-                    end,
-                    score,
-                });
+                if (compFormat === "4dn") {
+                    score = Number.parseFloat(t[7]);
+                    comp[chrom][binkey].push({
+                        chrom,
+                        start,
+                        end,
+                        score,
+                    });
+                } else {
+                    compName = t[3];
+                    comp[chrom][binkey].push({
+                        chrom,
+                        start,
+                        end,
+                        name: compName,
+                    });
+                }
             }
         });
         this.compData[key] = comp;
+        // console.log(comp);
         return comp;
     };
 
@@ -867,7 +1010,7 @@ class ThreedmolContainer extends React.Component {
         });
         const comp = await this.getAnnotationData();
         if (_.isEmpty(comp)) {
-            this.setState({ message: "file empty or error parse annotation file, please check your file" });
+            this.setState({ message: "file empty or error parse annotation file, please check your file 2" });
             return;
         }
         const regions = this.viewRegionToRegions();
@@ -890,7 +1033,7 @@ class ThreedmolContainer extends React.Component {
     };
 
     paintWithComparment = (comp, regions, chooseRegion) => {
-        const { compAcolor, compBcolor, resolution } = this.state; // resolution for atom end pos
+        const { A, B, A1, A2, B1, B2, B3, B4, NA, compFormat, resolution } = this.state; // resolution for atom end pos
         const queryChroms = chooseRegion === "region" ? regions.map((r) => r.chrom) : regions;
         const filterRegions = {}; // key, chrom, value, list of [start, end] , for GSV later
         if (chooseRegion === "region") {
@@ -909,11 +1052,16 @@ class ThreedmolContainer extends React.Component {
             });
         }
         // console.log(filterRegions);
-        const colorByCompartment = function (atom) {
+        const overlapFunc = compFormat === "4dn" ? getBigwigValueForAtom : getCompartmentNameForAtom;
+        const colorByCompartment = (atom) => {
             if (atomInFilterRegions(atom, filterRegions)) {
-                const value = getBigwigValueForAtom(comp, atom, resolution);
+                const value = overlapFunc(comp, atom, resolution);
                 if (value !== undefined) {
-                    return value >= 0 ? compAcolor : compBcolor;
+                    if (typeof value === "number") {
+                        return value >= 0 ? A : B;
+                    } else {
+                        return colorAsNumber(this.state[value]);
+                    }
                 } else {
                     return "grey";
                 }
@@ -924,11 +1072,15 @@ class ThreedmolContainer extends React.Component {
         queryChroms.forEach((chrom) => {
             this.viewer.setStyle(
                 { chain: chrom },
-                { cartoon: { colorfunc: colorByCompartment, style: "trace", thickness: 1 } }
+                { cartoon: { colorfunc: colorByCompartment, style: "trace", thickness: 0.5 } }
             );
         });
         this.viewer.render();
-        this.setState({ categories: { A: compAcolor, B: compBcolor } });
+        if (compFormat === "4dn") {
+            this.setState({ categories: { A, B } });
+        } else {
+            this.setState({ categories: { A1, A2, B1, B2, B3, B4, NA } });
+        }
     };
 
     removeCompartmentPaint = () => {
@@ -1027,9 +1179,10 @@ class ThreedmolContainer extends React.Component {
         });
         model.setFrame(0);
         // this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 1 } });
-        this.viewer.setStyle({}, { cartoon: { colorscheme: "chrom", style: "trace", thickness: 1 } });
+        // this.viewer.setStyle({}, { cartoon: { colorscheme: "chrom", style: "trace", thickness: 1 } });
         // this.viewer.zoomTo();
-        this.viewer.render();
+        // this.viewer.render();
+        this.highlightRegions();
     };
 
     animate = async () => {
@@ -1410,7 +1563,16 @@ class ThreedmolContainer extends React.Component {
                                     <div className="card-body">
                                         <div>
                                             <p>
-                                                <strong>4DN compartment data:</strong>
+                                                <strong>Compartment data:</strong>{" "}
+                                                <span className="font-italic">
+                                                    <a
+                                                        href={HELP_LINKS.threed}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        formats requirement
+                                                    </a>
+                                                </span>
                                             </p>
                                             <label>
                                                 <input

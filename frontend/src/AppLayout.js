@@ -225,6 +225,7 @@ class AppLayout extends React.PureComponent {
                 x={x}
                 y={y}
                 anchors3d={this.state.anchors3d}
+                onSetAnchors3d={this.setAnchors3d}
                 onNewViewRegion={onNewViewRegion}
                 sync3d={this.state.sync3d}
                 onToggleSync3d={this.toggleSync3d}

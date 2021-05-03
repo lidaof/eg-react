@@ -1,22 +1,34 @@
-import React from 'react';
-import {ColorPicker} from './ColorPicker';
+import React from "react";
+import { ColorPicker } from "./ColorPicker";
 
 export const CategoryLegend = (props) => {
-    const {categories, onUpdateLegendColor} = props;
+    const { categories, onUpdateLegendColor } = props;
     // console.log(props)
-    if(!categories) return null;
+    if (!categories) return null;
     return (
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <div>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            {/* <div>
                 <ColorPicker onUpdateLegendColor={onUpdateLegendColor} colorKey="compAcolor" label="A" initColor={categories.A} />
             </div>
             <div>
                 <ColorPicker onUpdateLegendColor={onUpdateLegendColor} colorKey="compBcolor" label="B" initColor={categories.B}/>
-            </div>
+            </div> */}
+            {Object.keys(categories).map((k) => {
+                return (
+                    <div key={k}>
+                        <ColorPicker
+                            onUpdateLegendColor={onUpdateLegendColor}
+                            colorKey={k}
+                            label={k}
+                            initColor={categories[k]}
+                        />
+                    </div>
+                );
+            })}
         </div>
     );
-}
+};
 
 CategoryLegend.defaultProps = {
     categories: null,
-}
+};

@@ -15,7 +15,7 @@ import configOptionMerging from "../commonComponents/configOptionMerging";
 import { ScaleChoices } from "model/ScaleChoices";
 import { getGenomeConfig } from "model/genomes/allGenomes";
 import TrackLegend from "../commonComponents/TrackLegend";
-import { ValuePlot } from "../commonComponents/numerical/NumericalTrack";
+import NumericalTrack from "../commonComponents/numerical/NumericalTrack";
 
 const CHROMOSOMES_Y = 60;
 const TOP_PADDING = 2;
@@ -174,8 +174,8 @@ class DynseqTrack extends PureComponent {
     };
 
     render() {
-        const { data, viewRegion, width, trackModel, options, forceSvg, unit } = this.props;
-        const { height, aggregateMethod, color } = options;
+        const { data, viewRegion, width, trackModel, options, unit } = this.props;
+        const { height, aggregateMethod } = options;
         const dataForward = data.filter((feature) => feature.value === undefined || feature.value >= 0); // bed track to density mode
         const dataReverse = data.filter((feature) => feature.value < 0);
         if (dataReverse.length > 0) {
@@ -194,54 +194,40 @@ class DynseqTrack extends PureComponent {
             this.drawHeights = this.drawHeights.map((num, idx) => num + negHeights[idx]);
             this.allValues = this.allValues.map((num, idx) => num + (this.xToValue2[idx] || 0));
         }
-        // console.log(drawHeights);
         const drawModel = new LinearDrawingModel(viewRegion, width);
         const seqmode = drawModel.basesToXWidth(1) > 2;
-        const legend = (
-            <TrackLegend
-                trackModel={trackModel}
-                height={height}
-                axisScale={seqmode ? this.scales.axisScale : undefined}
-                axisLegend={unit}
-            />
-        );
         const genomeConfig = getGenomeConfig(trackModel.getMetadata("genome")) || this.props.genomeConfig;
-        let renderer;
         if (seqmode) {
-            renderer = (
-                <svg width={width} height={height} style={{ display: "block" }}>
-                    <Chromosomes
-                        genomeConfig={genomeConfig}
-                        viewRegion={viewRegion}
-                        width={width}
-                        labelOffset={CHROMOSOMES_Y}
-                        hideChromName={true}
-                        drawHeights={this.drawHeights}
-                        zeroLine={this.scales.zeroLine}
-                        height={height}
-                        hideCytoband={true}
-                        minXwidthPerBase={2}
-                    />
-                </svg>
-            );
-        } else {
-            renderer = (
-                <ValuePlot
-                    xToValue={this.allValues}
-                    scales={this.scales}
+            const legend = (
+                <TrackLegend
+                    trackModel={trackModel}
                     height={height}
-                    color={color}
-                    forceSvg={forceSvg}
-                    isDrawingBars={false}
+                    axisScale={this.scales.axisScale}
+                    axisLegend={unit}
                 />
             );
+            const visualizer = (
+                <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip}>
+                    <svg width={width} height={height} style={{ display: "block" }}>
+                        <Chromosomes
+                            genomeConfig={genomeConfig}
+                            viewRegion={viewRegion}
+                            width={width}
+                            labelOffset={CHROMOSOMES_Y}
+                            hideChromName={true}
+                            drawHeights={this.drawHeights}
+                            zeroLine={this.scales.zeroLine}
+                            height={height}
+                            hideCytoband={true}
+                            minXwidthPerBase={2}
+                        />
+                    </svg>
+                </HoverTooltipContext>
+            );
+            return <Track {...this.props} legend={legend} visualizer={visualizer} />;
+        } else {
+            return <NumericalTrack {...this.props} />;
         }
-        const visualizer = (
-            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip}>
-                {renderer}
-            </HoverTooltipContext>
-        );
-        return <Track {...this.props} legend={legend} visualizer={visualizer} />;
     }
 }
 
