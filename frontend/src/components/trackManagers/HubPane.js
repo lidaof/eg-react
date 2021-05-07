@@ -28,6 +28,10 @@ class HubPane extends React.PureComponent {
             // availableTracks: [],
             secondConfigs: this.getSecondConfigs()
         };
+        props.publicHubs.map(x => x.genome = this.props.genomeConfig.genome.getName());
+        this.state.secondConfigs.map(x => x.publicHubList.map(y => y.genome = x.genome.getName()));
+        this.state.publicHubs = props.publicHubs.concat(this.state.secondConfigs[0].publicHubList);
+        
         // this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
     }
 
@@ -50,27 +54,7 @@ class HubPane extends React.PureComponent {
         return secondaryGenomes.map(g => getGenomeConfig(g));
     }
 
-    SecondaryTables (publicHubs, publicTracksPool) {
-        return (
-            <div>
-            <HubTable 
-                onHubLoaded={this.props.onAddTracksToPool}
-                onTracksAdded={this.props.onTracksAdded}
-                publicHubs={this.state.secondConfigs[0].publicHubList.slice()}
-                onHubUpdated={this.props.onHubUpdated}
-            />
-            <FacetTable
-                tracks={this.props.publicTracksPool} // need include add tracks, also need consider track remove to just remove from sets
-                addedTracks={this.props.addedTracks}
-                onTracksAdded={this.props.onTracksAdded}
-                publicTrackSets={this.props.publicTrackSets}
-                addedTrackSets={this.props.addedTrackSets}
-                addTermToMetaSets={this.props.addTermToMetaSets}
-                genomeName={this.props.genomeConfig.genome.getName()}
-            />
-            </div>
-        );
-    }
+
     /**
      * Renders:
      *     Conditionally, public track hub list
@@ -82,14 +66,12 @@ class HubPane extends React.PureComponent {
      * @override
      */
     render() {
-        console.log(this.props);
-        console.log(this.state.secondConfigs);
         return (
         <div>
              <HubTable 
                 onHubLoaded={this.props.onAddTracksToPool}
                 onTracksAdded={this.props.onTracksAdded}
-                publicHubs={this.props.publicHubs} 
+                publicHubs={this.state.publicHubs}
                 onHubUpdated={this.props.onHubUpdated}
              />
             {
@@ -101,26 +83,6 @@ class HubPane extends React.PureComponent {
                     publicTrackSets={this.props.publicTrackSets}
                     addedTrackSets={this.props.addedTrackSets}
                     addTermToMetaSets={this.props.addTermToMetaSets}
-                    genomeName={this.props.genomeConfig.genome.getName()}
-                /> :
-                <p>No tracks from data hubs yet.  Load a hub first.</p>
-            }
-            <HubTable 
-                onHubLoaded={this.props.onAddTracksToPool}
-                onTracksAdded={this.props.onTracksAdded}
-                publicHubs={this.state.secondConfigs[0].publicHubList.slice()} 
-                onHubUpdated={this.props.onHubUpdated}
-             />
-            {
-            this.props.publicTracksPool.length > 0 ?
-                <FacetTable
-                    tracks={this.props.publicTracksPool} // need include add tracks, also need consider track remove to just remove from sets
-                    addedTracks={this.props.addedTracks}
-                    onTracksAdded={this.props.onTracksAdded}
-                    publicTrackSets={this.props.publicTrackSets}
-                    addedTrackSets={this.props.addedTrackSets}
-                    addTermToMetaSets={this.props.addTermToMetaSets}
-                    genomeName={this.state.secondConfigs[0].genome.getName()}
                 /> :
                 <p>No tracks from data hubs yet.  Load a hub first.</p>
             }

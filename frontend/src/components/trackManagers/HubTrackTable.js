@@ -152,6 +152,12 @@ class HubTrackTable extends React.PureComponent {
     const { rowHeader, columnHeader } = this.props;
     let columns = [];
     columns.push({
+      Header: "Genome",
+      id: "genome",
+      accessor: data => data.getMetadata("Genome"),
+      width: 100
+    });
+    columns.push({
       Header: "Name",
       accessor: "name"
     });
