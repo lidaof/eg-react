@@ -110,6 +110,7 @@ class FacetTable extends Component {
                 }
                 metadata[metaKey] = metaValue;
             }
+            // console.log(metadata);
             let newTrack = { ...track, metadata: metadata };
             rawtracks.push(newTrack);
         }
@@ -121,6 +122,7 @@ class FacetTable extends Component {
         //    left liver
         for (let track of rawtracks) {
             let metadata = {"genome": this.props.genomeName};
+            // let metadata = {};
             for (let [metaKey, metaValue] of Object.entries(track.metadata)) {
                 let lastValue, newValue;
                 if (Array.isArray(metaValue)) {
