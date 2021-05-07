@@ -31,6 +31,7 @@ class HubPane extends React.PureComponent {
         props.publicHubs.map(x => x.genome = this.props.genomeConfig.genome.getName());
         this.state.secondConfigs.map(x => x.publicHubList.map(y => y.genome = x.genome.getName()));
         this.state.publicHubs = props.publicHubs.concat(this.state.secondConfigs[0].publicHubList);
+        // props.publicHubs = props.publicHubs.concat(this.state.secondConfigs[0].publicHubList);
         
         // this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
     }
