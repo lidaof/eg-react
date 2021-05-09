@@ -41,8 +41,6 @@ class HubPane extends React.PureComponent {
     //     }
     // }
 
-    // copied from AnnotationTrackUI.js:
-
     /**
      * Renders:
      *     Conditionally, public track hub list

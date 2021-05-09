@@ -109,7 +109,6 @@ class FacetTable extends Component {
                 }
                 metadata[metaKey] = metaValue;
             }
-            // console.log(metadata);
             let newTrack = { ...track, metadata: metadata };
             rawtracks.push(newTrack);
         }
