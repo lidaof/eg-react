@@ -229,9 +229,7 @@ class App extends React.PureComponent {
 
     updateOtherPublicHubs = (tracks) => {
         const { genomeConfig } = this.props;
-        console.log(tracks);
         const secondaryGenomes = getSecondaryGenomes(genomeConfig.genome.getName(), tracks);
-        console.log(secondaryGenomes);
         const secondConfigs = secondaryGenomes.map(g => getGenomeConfig(g));
         secondConfigs.filter(x => x.publicHubList).map(x => x.publicHubList.map(y => y.genome = x.genome.getName()));
         let secondHubList = secondConfigs.filter(x => x.publicHubList).reduce((secondHubList, x) => secondHubList.concat(x.publicHubList),[]);
