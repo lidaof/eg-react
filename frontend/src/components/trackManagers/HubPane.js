@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import HubTable from './HubTable';
 import TrackModel from '../../model/TrackModel';
 import FacetTable from './FacetTable';
-import { getSecondaryGenomes } from '../../util';
-import { getGenomeConfig } from '../../model/genomes/allGenomes';
 
 /**
  * The window containing UI for loading public track hubs and adding tracks from hubs.
@@ -22,19 +20,13 @@ class HubPane extends React.PureComponent {
         publicTrackSets: PropTypes.instanceOf(Set),
     };
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            // availableTracks: [],
-            secondConfigs: this.getSecondConfigs()
-        };
-        props.publicHubs.map(x => x.genome = this.props.genomeConfig.genome.getName());
-        this.state.secondConfigs.map(x => x.publicHubList.map(y => y.genome = x.genome.getName()));
-        this.state.publicHubs = props.publicHubs.concat(this.state.secondConfigs[0].publicHubList);
-        // props.publicHubs = props.publicHubs.concat(this.state.secondConfigs[0].publicHubList);
-        
-        // this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
-    }
+    // constructor(props) {
+    //     super(props);
+    //     // this.state = {
+    //     //     availableTracks: [],
+    //     // };
+    //     // this.addToAvailableTracks = this.addToAvailableTracks.bind(this);
+    // }
 
     /**
      * Adds a list of tracks to the list of all tracks available from a hub.
@@ -50,11 +42,6 @@ class HubPane extends React.PureComponent {
     // }
 
     // copied from AnnotationTrackUI.js:
-    getSecondConfigs = () => {
-        const secondaryGenomes = getSecondaryGenomes(this.props.genomeConfig.genome.getName(), this.props.addedTracks);
-        return secondaryGenomes.map(g => getGenomeConfig(g));
-    }
-
 
     /**
      * Renders:
@@ -72,7 +59,7 @@ class HubPane extends React.PureComponent {
              <HubTable 
                 onHubLoaded={this.props.onAddTracksToPool}
                 onTracksAdded={this.props.onTracksAdded}
-                publicHubs={this.state.publicHubs}
+                publicHubs={this.props.publicHubs}
                 onHubUpdated={this.props.onHubUpdated}
              />
             {
