@@ -18,12 +18,12 @@ const defaultTracks = [
     type: "refbed",
     name: "refGene",
     genome: "monDom5",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/monDom5/monDom5.refbed.gz"
+    url: "https://vizhub.wustl.edu/public/monDom5/monDom5.refbed.gz"
   }),
   new TrackModel({
     type: "repeatmasker",
     name: "RepeatMasker",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/monDom5/monDom5.bb"
+    url: "https://vizhub.wustl.edu/public/monDom5/monDom5.bb"
   })
 ];
 
@@ -33,7 +33,7 @@ const monDom5 = {
   cytobands: cytobands,
   defaultRegion: defaultRegion,
   defaultTracks: defaultTracks,
-  twoBitURL: "https://wangftp.wustl.edu/~xzhuo/browser/monDom5/monDom5.2bit",
+  twoBitURL: "https://vizhub.wustl.edu/public/monDom5/monDom5.2bit",
   annotationTracks
 };
 

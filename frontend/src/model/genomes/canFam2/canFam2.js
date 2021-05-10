@@ -17,12 +17,12 @@ const defaultTracks = [
     type: "refbed",
     name: "refGene",
     genome: "canFam2",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/canFam2/canFam2.refbed.gz"
+    url: "https://vizhub.wustl.edu/public/canFam2/canFam2.refbed.gz"
   }),
   new TrackModel({
     type: "repeatmasker",
     name: "RepeatMasker",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/canFam2/canFam2.bb"
+    url: "https://vizhub.wustl.edu/public/canFam2/canFam2.bb"
   })
 ];
 
@@ -31,7 +31,7 @@ const canFam2 = {
   navContext: navContext,
   defaultRegion: defaultRegion,
   defaultTracks: defaultTracks,
-  twoBitURL: "https://wangftp.wustl.edu/~xzhuo/browser/canFam2/canFam2.2bit",
+  twoBitURL: "https://vizhub.wustl.edu/public/canFam2/canFam2.2bit",
   annotationTracks
 };
 

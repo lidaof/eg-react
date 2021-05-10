@@ -253,21 +253,21 @@
             "label": "Rhesus macaque rheMac2 to hg19 blastz",
             "querygenome": "rheMac2",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/hg19.rheMac2.gz"
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.rheMac2.gz"
         },
         {
             "name": "canFam2tohg19",
             "label": "Dog canFam2 to hg19 blastz",
             "querygenome": "canFam2",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/hg19.canFam2.gz"
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.canFam2.gz"
         },
         {
             "name": "monDom5tohg19",
             "label": "Opossum monDom5 to hg19 blastz",
             "querygenome": "monDom5",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/hg19.monDom5.gz"
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.monDom5.gz"
         },
         {
             "name": "rheMac3tohg19",

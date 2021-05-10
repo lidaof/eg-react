@@ -219,7 +219,7 @@
             "label": "Dog canFam3 to mm10 blastz",
             "querygenome": "canFam3",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/mm10.canFam3.gz"
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10.canFam3.gz"
         },
         {
             "name": "cavPor3tomm10",
@@ -268,7 +268,7 @@
             "label": "Rat rn6 to mm10 blastz",
             "querygenome": "rn6",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/mm10.rn6.gz"
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10.rn6.gz"
         }
     ],
     "Mappability": [

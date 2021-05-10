@@ -144,12 +144,12 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     color: "yellow"
   },
   rabbit: {
-    logoUrl: "https://wangftp.wustl.edu/~xzhuo/browser/oryCun2/rabbit.png",
+    logoUrl: "https://vizhub.wustl.edu/public/oryCun2/rabbit.png",
     assemblies: [oryCun2.genome.getName()],
     color: "yellow"
   },
   dog: {
-    logoUrl: "https://wangftp.wustl.edu/~xzhuo/browser/canFam3/dog.png",
+    logoUrl: "https://vizhub.wustl.edu/public/canFam3/dog.png",
     assemblies: [canFam3.genome.getName(), canFam2.genome.getName()],
     color: "yellow"
   },
@@ -164,7 +164,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     color: "white"
   },
   opossum: {
-    logoUrl: "https://wangftp.wustl.edu/~xzhuo/browser/monDom5/opossum.png",
+    logoUrl: "https://vizhub.wustl.edu/public/monDom5/opossum.png",
     assemblies: [monDom5.genome.getName()],
     color: "white"
   },

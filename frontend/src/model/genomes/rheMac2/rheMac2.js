@@ -17,12 +17,12 @@ const defaultTracks = [
     type: "refbed",
     name: "refGene",
     genome: "rheMac2",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/rheMac2/rheMac2.refbed.gz"
+    url: "https://vizhub.wustl.edu/public/rheMac2/rheMac2.refbed.gz"
   }),
   new TrackModel({
     type: "repeatmasker",
     name: "RepeatMasker",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/rheMac2/rheMac2.bb"
+    url: "https://vizhub.wustl.edu/public/rheMac2/rheMac2.bb"
   })
 ];
 
@@ -32,7 +32,7 @@ const rheMac2 = {
   cytobands: {},
   defaultRegion: defaultRegion,
   defaultTracks: defaultTracks,
-  twoBitURL: "https://wangftp.wustl.edu/~xzhuo/browser/rheMac2/rheMac2.2bit",
+  twoBitURL: "https://vizhub.wustl.edu/public/rheMac2/rheMac2.2bit",
   annotationTracks
 };
 

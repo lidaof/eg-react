@@ -181,7 +181,7 @@
             "label": "Chimpanzee panTro6 to hg38 blastz",
             "querygenome": "panTro6",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/panTro6/hg38TopanTro6.gz",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38TopanTro6.gz",
             "details": {
                 "source": "UCSC Genome Browser",
                 "download url": "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsPanTro6/"
@@ -192,7 +192,7 @@
             "label": "Gorilla gorGor4 to hg38 blastz",
             "querygenome": "gorGor4",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/HiC/hg38.gorGor4.gz",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38.gorGor4.gz",
             "details": {
                 "source": "UCSC Genome Browser"
             }
@@ -216,7 +216,7 @@
             "label": "Rat rn6 to hg38 blastz",
             "querygenome": "rn6",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/hg38.rn6.gz"
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38.rn6.gz"
         }
     ],
     "Mappability": [

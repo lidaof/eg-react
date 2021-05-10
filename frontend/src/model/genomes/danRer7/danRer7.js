@@ -19,7 +19,7 @@ const defaultTracks = [
     new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
-        url: 'https://wangftp.wustl.edu/~xzhuo/browser/danRer7/danRer7.bb',
+        url: 'https://vizhub.wustl.edu/public/danRer7/danRer7.bb',
     })
 ];
 
@@ -30,7 +30,7 @@ const DAN_RER7 = {
     cytobands: cytobands,
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
-    twoBitURL: "https://wangftp.wustl.edu/~xzhuo/browser/danRer7/danRer7.2bit",
+    twoBitURL: "https://vizhub.wustl.edu/public/danRer7/danRer7.2bit",
     annotationTracks,
 };
 

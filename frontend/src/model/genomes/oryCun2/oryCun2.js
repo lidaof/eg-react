@@ -18,12 +18,12 @@ const defaultTracks = [
     type: "refbed",
     name: "refGene",
     genome: "oryCun2",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/oryCun2/oryCun2.refbed.gz"
+    url: "https://vizhub.wustl.edu/public/oryCun2/oryCun2.refbed.gz"
   }),
   new TrackModel({
     type: "repeatmasker",
     name: "RepeatMasker",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/oryCun2/oryCun2.bb"
+    url: "https://vizhub.wustl.edu/public/oryCun2/oryCun2.bb"
   })
 ];
 
@@ -33,7 +33,7 @@ const oryCun2 = {
   cytobands: cytobands,
   defaultRegion: defaultRegion,
   defaultTracks: defaultTracks,
-  twoBitURL: "https://wangftp.wustl.edu/~xzhuo/browser/oryCun2/oryCun2.2bit",
+  twoBitURL: "https://vizhub.wustl.edu/public/oryCun2/oryCun2.2bit",
   annotationTracks
 };
 

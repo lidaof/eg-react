@@ -18,12 +18,12 @@ const defaultTracks = [
     type: "refbed",
     name: "refGene",
     genome: "rn4",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/rn4/rn4.refbed.gz"
+    url: "https://vizhub.wustl.edu/public/rn4/rn4.refbed.gz"
   }),
   new TrackModel({
     type: "repeatmasker",
     name: "RepeatMasker",
-    url: "https://wangftp.wustl.edu/~xzhuo/browser/rn4/rn4.bb"
+    url: "https://vizhub.wustl.edu/public/rn4/rn4.bb"
   })
 ];
 
@@ -33,7 +33,7 @@ const rn4 = {
   cytobands: cytobands,
   defaultRegion: defaultRegion,
   defaultTracks: defaultTracks,
-  twoBitURL: "https://wangftp.wustl.edu/~xzhuo/browser/rn4/rn4.2bit",
+  twoBitURL: "https://vizhub.wustl.edu/public/rn4/rn4.2bit",
   annotationTracks
 };
 

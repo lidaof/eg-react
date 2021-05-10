@@ -11,7 +11,7 @@
             "name": "refGene",
             "label": "RefSeq genes",
             "filetype": "refbed",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/oryCun2/oryCun2.refbed.gz"
+            "url": "https://vizhub.wustl.edu/public/oryCun2/oryCun2.refbed.gz"
         }
     ],
     "RepeatMasker": {
@@ -20,7 +20,7 @@
                 "name": "rmsk_all",
                 "label": "RepeatMasker",
                 "filetype": "repeatmasker",
-                "url": "https://wangftp.wustl.edu/~xzhuo/browser/oryCun2/oryCun2.bb",
+                "url": "https://vizhub.wustl.edu/public/oryCun2/oryCun2.bb",
                 "height": 30
             }
         ]
