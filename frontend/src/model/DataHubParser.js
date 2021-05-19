@@ -23,7 +23,9 @@ class HubParser {
                 newTrack = new TrackModel(plainObject);
             }
             newTrack.datahub = hubName;
-            newTrack.metadata.genome = hubGenome;
+            if (!newTrack.metadata.genome && hubGenome !== "") {  // Don't overwrite existing metadata.genome in hubs
+                newTrack.metadata.genome = hubGenome;
+            }
             if (oldHubFormat) {
                 let assay = assayDict[newTrack.metadata.Assay] || ["unknown"];
                 let sample = sampleDict[newTrack.metadata.Sample] || ["unknown"];
