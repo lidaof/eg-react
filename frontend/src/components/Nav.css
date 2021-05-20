@@ -146,3 +146,14 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
 .italic {
     font-style: italic;
 }
+
+.otherGenome-container {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(6, auto);
+}
+
+.otherGenome-label:hover {
+    cursor: pointer;
+    border-bottom: 1px solid blue;
+}

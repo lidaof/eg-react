@@ -7,6 +7,8 @@ import { GenomeInteraction } from "../../../model/GenomeInteraction";
 import DesignRenderer, { RenderTypes } from "../../../art/DesignRenderer";
 import HoverTooltipContext from "../commonComponents/tooltip/HoverTooltipContext";
 import { sameLoci } from "../../../util";
+import Tooltip from '../commonComponents/tooltip/Tooltip';
+import { getRelativeCoordinates } from '../../../util';
 
 import "./ArcDisplay.css";
 
@@ -24,6 +26,10 @@ interface ArcDisplayProps {
     forceSvg?: boolean;
     greedyTooltip?: boolean;
     bothAnchorsInView?: boolean;
+    onSetAnchors3d?: any;
+    onShowTooltip?: any;
+    onHideTooltip?: any;
+    isThereG3dTrack?: boolean;
 }
 
 // const ITEM_LIMIT = 1000;
@@ -163,6 +169,33 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         return items;
     };
 
+    set3dAnchors = (anchors: any) => {
+        if (this.props.onSetAnchors3d) {
+            this.props.onSetAnchors3d(anchors)
+        }
+        this.props.onHideTooltip()
+    }
+
+    clickTooltip = (event: React.MouseEvent) => {
+        if (this.props.isThereG3dTrack) {
+            const { x, y } = getRelativeCoordinates(event);
+            const arc = this.findArc(x, y);
+            if (arc) {
+                const tooltip = (
+                    <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip}>
+                        <div>
+                            <button className="btn btn-sm btn-primary" onClick={() => this.set3dAnchors([arc[4].locus1, arc[4].locus2])}>Show in 3D</button>
+                        </div>
+                        {/* <div>
+                        <button className="btn btn-sm btn-secondary" onClick={this.clear3dAnchors} >Clear in 3D</button>
+                    </div> */}
+                    </Tooltip>
+                );
+                this.props.onShowTooltip(tooltip);
+            }
+        }
+    }
+
     render() {
         this.arcData = [];
         const { placedInteractions, width, forceSvg, height } = this.props;
@@ -171,7 +204,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         // const slicedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores
         return (
             <HoverTooltipContext getTooltipContents={this.renderTooltip} useRelativeY={true}>
-                <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} width={width} height={height}>
+                <DesignRenderer type={forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS} width={width} height={height} onClick={this.clickTooltip} >
                     {placedInteractions.map(this.renderArc)}
                 </DesignRenderer>
             </HoverTooltipContext>

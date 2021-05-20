@@ -1,6 +1,6 @@
 {
     "name": "epgg",
-    "version": "52.5.2",
+    "version": "53.1.0",
     "author": "Ting Wang Lab @WUSTL",
     "repository": {
         "type": "git",
@@ -17,7 +17,6 @@
         "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
         "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules"
     },
-    "dependencies": {},
     "peerDependencies": {
         "prop-types": "^15.6.0",
         "react": "^16.3.0",
@@ -35,7 +34,9 @@
         "@firebase/app": "^0.6.6",
         "@gmod/bam": "^1.0.37",
         "@gmod/bbi": "^1.0.30",
+        "@gmod/tabix": "^1.5.0",
         "@gmod/twobit": "^1.1.10",
+        "@gmod/vcf": "^4.0.3",
         "@juggle/resize-observer": "^3.2.0",
         "@primer/octicons-react": "^11.3.0",
         "@storybook/addon-actions": "^3.3.15",

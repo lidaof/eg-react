@@ -549,7 +549,9 @@ class TrackContainer extends React.Component {
             viewRegion,
             layoutModel,
             onSetAnchors3d,
+            onSetGeneFor3d,
             viewer3dNumFrames,
+            isThereG3dTrack,
         } = this.props;
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
@@ -574,7 +576,9 @@ class TrackContainer extends React.Component {
                     layoutModel={layoutModel}
                     getBeamRefs={this.getBeamRefs}
                     onSetAnchors3d={onSetAnchors3d}
+                    onSetGeneFor3d={onSetGeneFor3d}
                     viewer3dNumFrames={viewer3dNumFrames}
+                    isThereG3dTrack={isThereG3dTrack}
                 />
             );
         });

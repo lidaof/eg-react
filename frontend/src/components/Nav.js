@@ -128,7 +128,7 @@ class Nav extends React.Component {
         const radios = otherGenomes.map((g) => {
             const { name } = getSpeciesInfo(g);
             return (
-                <label key={g}>
+                <label key={g} className="otherGenome-label">
                     <Radio value={g} /> <span className="capitalize">{name}</span> <span className="italic">{g}</span>
                 </label>
             );
@@ -138,7 +138,7 @@ class Nav extends React.Component {
                 name="otherGenome"
                 selectedValue={this.state.otherGenome}
                 onChange={this.handleOtherGenomeChange}
-                style={{ display: "grid" }}
+                className="otherGenome-container"
             >
                 {radios}
             </RadioGroup>
@@ -226,11 +226,11 @@ class Nav extends React.Component {
                                 shouldCloseOnOverlayClick={true}
                                 style={{
                                     content: {
-                                        right: "unset",
-                                        bottom: "unset",
-                                        top: 0,
-                                        left: 0,
-                                        height: "100%",
+                                        // right: "unset",
+                                        // bottom: "unset",
+                                        // top: 0,
+                                        // left: 0,
+                                        // height: "100%",
                                         zIndex: 5,
                                     },
                                     overlay: {

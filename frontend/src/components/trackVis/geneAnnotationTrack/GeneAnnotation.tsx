@@ -1,11 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
-
+import shortid from 'shortid';
 import AnnotationArrows from '../commonComponents/annotation/AnnotationArrows';
-
 import Gene from '../../../model/Gene';
 import { FeaturePlacer, PlacedFeature, PlacedSegment } from '../../../model/FeaturePlacer';
-import shortid from 'shortid';
 
 const FEATURE_PLACER = new FeaturePlacer();
 const HEIGHT = 9;

@@ -69,7 +69,7 @@ export interface AppState {
     genomeConfig?: object;
     virusBrowserMode?: boolean;
     layout?: object;
-    // threedTracks?: TrackModel[];
+    // g3dtracks?: TrackModel[];
 }
 
 const bundleId = uuid.v1();
@@ -88,7 +88,7 @@ const initialState: AppState = {
     isShowingVR: false,
     customTracksPool: [],
     layout: {},
-    // threedTracks: [],
+    // g3dtracks: [],
 };
 
 enum ActionType {
@@ -110,7 +110,7 @@ enum ActionType {
     SET_VIRUS_BROWSER_MODE = "SET_VIRUS_BROWSER_MODE",
     SET_HUB_SESSION_STORAGE = "SET_HUB_SESSION_STORAGE",
     SET_LAYOUT = "SET_LAYOUT",
-    // SET_THREED_TRACKS = "SET_THREED_TRACKS",
+    // SET_G3D_TRACKS = "SET_G3D_TRACKS",
 }
 
 interface AppAction {
@@ -194,7 +194,11 @@ export const ActionCreators = {
         return { type: ActionType.SET_CUSTOM_TRACKS_POOL, customTracksPool };
     },
 
-    setTracksCustomTracksPool: (tracks: TrackModel[], customTracksPool: TrackModel[], withDefaultTracks: boolean = true) => {
+    setTracksCustomTracksPool: (
+        tracks: TrackModel[],
+        customTracksPool: TrackModel[],
+        withDefaultTracks: boolean = true
+    ) => {
         return {
             type: ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL,
             tracks,
@@ -227,7 +231,7 @@ export const ActionCreators = {
     },
 
     // setThreedTracks: (newTracks: TrackModel[]) => {
-    //     return { type: ActionType.SET_THREED_TRACKS, threedTracks: newTracks };
+    //     return { type: ActionType.SET_G3D_TRACKS, threedTracks: newTracks };
     // },
 };
 
@@ -390,7 +394,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 isShowingVR: !prevState.isShowingVR,
             };
         case ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL:
-            const tracks = action.withDefaultTracks ? [...prevState.tracks, ...action.tracks]: [...action.tracks];
+            const tracks = action.withDefaultTracks ? [...prevState.tracks, ...action.tracks] : [...action.tracks];
             return {
                 ...prevState,
                 tracks,
@@ -410,7 +414,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             };
         case ActionType.SET_LAYOUT:
             return { ...prevState, layout: action.layout };
-        // case ActionType.SET_THREED_TRACKS:
+        // case ActionType.SET_G3D_TRACKS:
         //     return { ...prevState, threedTracks: action.tracks };
         default:
             // console.warn("Unknown change state action; ignoring.");
@@ -493,12 +497,14 @@ async function asyncInitState() {
     const { query } = querySting.parseUrl(window.location.href);
     if (!_.isEmpty(query)) {
         if (query.hub) {
-            const withDefaultTracks = !query.noDefaultTracks || (query.noDefaultTracks ? false: true);
+            const withDefaultTracks = !query.noDefaultTracks || (query.noDefaultTracks ? false : true);
             const customTracksPool = await getTracksFromHubURL(query.hub as string);
             if (customTracksPool) {
                 const tracks = customTracksPool.filter((track: any) => track.showOnHubLoad);
                 if (tracks.length > 0) {
-                    AppState.dispatch(ActionCreators.setTracksCustomTracksPool(tracks, customTracksPool, withDefaultTracks));
+                    AppState.dispatch(
+                        ActionCreators.setTracksCustomTracksPool(tracks, customTracksPool, withDefaultTracks)
+                    );
                 } else {
                     AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
                 }

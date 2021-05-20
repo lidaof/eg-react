@@ -6,6 +6,8 @@ import {
     InteractionDisplayMode,
     DynamicInteractionDisplayMode,
     BigWigZoomLevels,
+    VcfColorScaleKeys,
+    VcfDisplayModes,
 } from "../../model/DisplayModes";
 
 /**
@@ -76,6 +78,30 @@ export function BigWigZoomLevelConfig(props) {
             label="Zoom level:"
             defaultValue={BigWigZoomLevels.AUTO}
             choices={BigWigZoomLevels}
+        />
+    );
+}
+
+export function VcfColorScaleKeyConfig(props) {
+    return (
+        <SelectConfig
+            {...props}
+            optionName="colorScaleKey"
+            label="Color variant by:"
+            defaultValue={VcfColorScaleKeys.AF}
+            choices={VcfColorScaleKeys}
+        />
+    );
+}
+
+export function VcfDisplayModeConfig(props) {
+    return (
+        <SelectConfig
+            {...props}
+            optionName="displayMode"
+            label="Display mode:"
+            defaultValue={VcfDisplayModes.AUTO}
+            choices={VcfDisplayModes}
         />
     );
 }

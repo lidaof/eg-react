@@ -14,6 +14,7 @@ import { TrackOptionsUI } from "./TrackOptionsUI";
 
 export const TRACK_TYPES = {
     Numerical: ["bigWig", "bedGraph", "qBED"],
+    Variant: ["vcf"],
     "Dynamic sequence": ["dynseq"],
     Annotation: ["bed", "bigBed", "refBed"],
     Peak: ["rgbpeak"],
@@ -53,6 +54,7 @@ export const TYPES_DESC = {
     omeroidr: "image data from IDR (Image Data Resource)",
     dynseq: "dynamic sequence",
     rgbpeak: "peak in bigbed format with RGB value",
+    vcf: "Variant Call Format",
 };
 
 /**

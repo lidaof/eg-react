@@ -158,14 +158,14 @@ export const getClosestValueIndex = (a, x) => {
     if (!a.length) {
         return [undefined, undefined];
     }
-    if (x < a[0]) {
-        return 0;
-    }
-    if (x > a[a.length - 1]) {
-        return a.length - 1;
-    }
     let lo = -1,
         hi = a.length;
+    if (x < a[0]) {
+        lo = 0;
+    }
+    if (x > a[a.length - 1]) {
+        hi = a.length;
+    }
     while (hi - lo > 1) {
         let mid = Math.round((lo + hi) / 2);
         if (a[mid] <= x) {

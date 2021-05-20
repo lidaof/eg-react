@@ -178,7 +178,7 @@ class App extends React.PureComponent {
     }
 
     removeTrack(indexToRemove) {
-        let newTracks = this.props.tracks.filter((track, index) => index !== indexToRemove);
+        const newTracks = this.props.tracks.filter((track, index) => index !== indexToRemove);
         this.props.onTracksChanged(newTracks);
     }
 
@@ -239,7 +239,9 @@ class App extends React.PureComponent {
             virusBrowserMode,
             layoutModel,
             onSetAnchors3d,
+            onSetGeneFor3d,
             viewer3dNumFrames,
+            isThereG3dTrack,
         } = this.props;
         if (sessionFromUrl) {
             return (
@@ -323,7 +325,9 @@ class App extends React.PureComponent {
                     tracks={tracks.filter((tk) => tk.type !== "g3d")}
                     layoutModel={layoutModel}
                     onSetAnchors3d={onSetAnchors3d}
+                    onSetGeneFor3d={onSetGeneFor3d}
                     viewer3dNumFrames={viewer3dNumFrames}
+                    isThereG3dTrack={isThereG3dTrack}
                 />
                 {!embeddingMode && <Footer />}
             </div>

@@ -33,7 +33,7 @@ function* xrange(start, stop, step) {
 export function reg2bin(beg, end) {
     if (Number.isNaN(beg) || Number.isNaN(end)) {
         console.error("beg and end must be numbers");
-        return;
+        return 0;
     }
     end -= 1;
     if (beg >> 14 === end >> 14) {
@@ -97,6 +97,14 @@ export function reg2bins(beg, end) {
 function overlapHalf(s1, e1, start, end) {
     return (Math.min(e1, end) - Math.max(s1, start)) / (e1 - s1) >= 0.5;
 }
+
+// function justOverlap(s1, e1, start, end) {
+//     return Math.min(e1, end) - Math.max(s1, start) > 0;
+// }
+
+// function overlapBase(s1, e1, start, end) {
+//     return Math.min(e1, end) - Math.max(s1, start);
+// }
 
 /**
  * find atoms based on give region, since there are different haplotyps, so return an array instead, just return the first one in each hap
@@ -169,6 +177,7 @@ export function getCompartmentNameForAtom(keepers, atom, resolution) {
         const items = keepers[atom.chain][binkeys[i]];
         if (items && items.length) {
             for (let j = 0; j < items.length; j++) {
+                // if (justOverlap(items[j].start, items[j].end, atom.properties.start, atom.properties.end)) {
                 if (atom.properties.start >= items[j].start && items[j].end >= atom.properties.start) {
                     return items[j].name;
                 }

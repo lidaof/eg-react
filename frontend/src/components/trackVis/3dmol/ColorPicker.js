@@ -6,6 +6,7 @@ import colorParse from "color-parse";
 export class ColorPicker extends React.Component {
     static defaultProps = {
         label: "",
+        fullWidth: false,
     };
 
     constructor(props) {
@@ -32,18 +33,24 @@ export class ColorPicker extends React.Component {
 
     handleChange = (color) => {
         this.setState({ color: color.rgb });
-        const { onUpdateLegendColor, colorKey } = this.props;
-        onUpdateLegendColor(colorKey, color.hex);
+        const { onUpdateLegendColor, colorKey, getChangedColor } = this.props;
+        if (onUpdateLegendColor) {
+            onUpdateLegendColor(colorKey, color.hex);
+        }
+        if (getChangedColor) {
+            getChangedColor(color.hex);
+        }
     };
 
     render() {
         const brightness = (0.299 * this.state.color.r + 0.587 * this.state.color.g + 0.114 * this.state.color.b) / 255;
         const color = brightness < 0.5 ? "white" : "black";
+        const width = this.props.fullWidth ? "unset" : "24px";
         const styles = reactCSS({
             default: {
                 color: {
                     color,
-                    width: "24px",
+                    width,
                     height: "24px",
                     borderRadius: "2px",
                     textAlign: "center",

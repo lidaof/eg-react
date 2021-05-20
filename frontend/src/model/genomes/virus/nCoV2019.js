@@ -38,8 +38,7 @@ const defaultTracks = [
                     color: "#FFC300",
                 },
                 "S1,S2 cleavage site": {
-                    name:
-                        "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
+                    name: "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
                     color: "#18872F",
                 },
                 "heptad repeat 1 (HR1)": {
@@ -166,8 +165,7 @@ const annotationTracks = {
                         color: "#FFC300",
                     },
                     "S1,S2 cleavage site": {
-                        name:
-                            "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
+                        name: "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
                         color: "#18872F",
                     },
                     "heptad repeat 1 (HR1)": {
@@ -256,6 +254,147 @@ const publicHubData = {
 
 const publicHubList = [
     {
+        collection: "Diagnostics",
+        name: "Primers",
+        numTracks: "Updating",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/primers/primers.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "hub info": "CDC primers and WHO non-CDC primers",
+            "data source:":
+                "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/technical-guidance/laboratory-guidance",
+        },
+    },
+    {
+        collection: "Diagnostics",
+        name: "CRISPR-based diagnostic tests",
+        numTracks: 2,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/crispr_diagnostic_tests.json",
+        description: {
+            "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
+            "hub info": "CRISPR-based assays for detecting SARS-CoV-2.",
+            "SHERLOCK diagnostic test track":
+                "Primer and guide RNA sequences used in the CRISPR-Cas13a-based SHERLOCK assay for detecting SARS-CoV-2 (source: https://www.broadinstitute.org/files/publications/special/COVID-19%20detection%20(updated).pdf; accessed on 05-08-20).",
+            "DETECTR diagnostic test track":
+                "Primer and guide RNA sequences used in the CRISPR-Cas12-based DETECTR assay for detecting SARS-CoV-2 (source: Broughton et al., 2020; doi: https://doi.org/10.1038/s41587-020-0513-4).",
+        },
+    },
+    {
+        collection: "Putative SARS-CoV-2 Immune Epitopes",
+        name: "SARS-CoV-2 Epitopes Predicted to Bind HLA Class 1 Proteins Database",
+        numTracks: "1",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/Campbell_et_al/campbell_et_al.json",
+        description: {
+            "hub built by": "Jennifer Flynn (jaflynn@wustl.edu)",
+            "hub info": "Predicted SARS-CoV-2 epitopes that bind to class 1 HLA proteins",
+            values: "Values represent number of strains with the predicted epitope. Only epitope predictions with 100% sequence identity in SARS-CoV-2 are displayed.",
+            "data source": "Campbell, et al. (2020) pre-print (DOI: 10.1101/2020.03.30.016931)",
+        },
+    },
+    {
+        collection: "Putative SARS-CoV-2 Immune Epitopes",
+        name: "Congeneric (or Closely-related) Putative SARS Immune Epitopes Locations (this publication)",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/IEDB_NC_045512.2_SARS-tblastn-nCoV_3H3V6ZBF01R.hub",
+        description: {
+            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
+            "hub info":
+                "Congeneric (or closely-related) putative SARS linear immune epitopes catalogued in IEDB mapped to exact-match locations in SARS-CoV-2",
+        },
+    },
+    {
+        collection: "Putative SARS-CoV-2 Immune Epitopes",
+        name: "Putative SARS-CoV-2 Epitopes",
+        numTracks: 14,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/SARS-CoV-2_immune_epitopes.hub",
+        description: {
+            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
+            "hub info": "SARS-CoV-2 Immune Epitopes from various pre-prints and publications",
+        },
+    },
+    {
+        collection: "Recombination events",
+        name: "Recombination events (Kim et al., 2020)",
+        numTracks: 3,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/recombinationEvents.json",
+        description: {
+            "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
+            "hub info":
+                "Coordinates of transcription regulatory sequences (TRSs) were retrieved from (Wu et al., 2020; DOI: 10.1038/s41586-020-2008-3). Recombination events were detected by junction-spanning RNA-seq reads that were generated by (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011). The color intensity of the arc corresponds to the number of reads supporting the recombination event.",
+            TRS: "Transcription regulatory sequences (TRSs). The leader TRS (TRS-L) is colored black and body TRSs (TRS-B) are colored red.",
+            "TRS-L-dependent recombination track": "Recombination events mediated by TRS-L. Scale 0-7000000 reads.",
+            "TRS-L-independent recombination track": "Recombination events not mediated by TRS-L. Scale 0-1000 reads.",
+        },
+    },
+    {
+        collection: "Viral RNA modifications",
+        name: "Viral RNA modifications (Kim et al., 2020)",
+        numTracks: 10,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/studies/kim-2020/rnamodifications.json",
+        description: {
+            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
+            "hub info":
+                "RNA modifications detected using Nanopore direct RNA sequencing (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011). Values are displayed as fractions",
+            "data source": "Supplementary Table 5, Kim et al 2020",
+        },
+    },
+    {
+        collection: "Viral RNA expression",
+        name: "Viral RNA expression (Kim et al., 2020)",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~xzhuo/viralBrowser/nanoporeBW.json",
+        description: {
+            "hub built by": "Xiaoyu Zhuo (xzhuo@wustl.edu)",
+            "hub info":
+                "a bigwig track displaying nanopore expression from SARS-CoV-2 infected Vero cells (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011).",
+        },
+    },
+    {
+        collection: "Sequence variation",
+        name: "D614G prevalence across time",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/D614G_byweek.hub",
+        description: {
+            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
+            "hub info":
+                "Percentage of strains with D614G mutation collected in each week between 12/23/2019 and 05/04/2020",
+        },
+    },
+    {
+        collection: "SARS-CoV-2 database",
+        name: "Non-canonical ORFs",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_finkel2020_novelORFs.json",
+        description: {
+            "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
+            "hub info":
+                "Non-canonical open reading frames (ORFs) in SARS-CoV-2. Abbreviations: iORF = internal ORF; uORF = upstream ORF; ext = extended ORF.",
+            "data source": "Finkel et al., 2020 (PMID: 32906143)",
+        },
+    },
+    {
+        collection: "Image data from IDR",
+        name: "Images from IDR (https://idr.openmicroscopy.org/)",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/virus/imagehub.json",
+        description: {
+            "hub built by": "Daofeng Li (dli23@wustl.edu)",
+            "hub info": "Images are displayed through API provided by IDR.",
+            "data source": "https://idr.openmicroscopy.org/",
+        },
+    },
+    {
         collection: "NCBI database",
         name: "All NCBI SARS-CoV-2 isolates",
         numTracks: "53248",
@@ -289,9 +428,9 @@ const publicHubList = [
     {
         collection: "Nextstrain database",
         name: "All Nextstrain SARS-CoV-2 isolates",
-        numTracks: "3927",
+        numTracks: 3890,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/nextstrain/2021-02-16/browser_strains.json",
+        url: "https://wangftp.wustl.edu/~cfan/nextstrain/2021-04-27/browser_strains.json",
         description: {
             "hub built by": "Changxu Fan (fanc@wustl.edu)",
             "track type":
@@ -302,9 +441,9 @@ const publicHubList = [
     {
         collection: "Nextstrain database",
         name: "All Nextstrain SARS-CoV-2 isolates, in SNV2 format",
-        numTracks: "3927",
+        numTracks: 3890,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/nextstrain/2021-02-16/browser_strains_snv2.json",
+        url: "https://wangftp.wustl.edu/~cfan/nextstrain/2021-04-27/browser_strains_snv2.json",
         description: {
             "hub built by": "Changxu Fan (fanc@wustl.edu)",
             "track type":
@@ -379,7 +518,7 @@ const publicHubList = [
     },
     {
         collection: "GISAID database",
-        name: "GISAID database (7/28/2020 - 9/21/2020) ",
+        name: "GISAID database (7/28/2020 - 9/21/2020)",
         numTracks: "33785",
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/9-21/browser_strains_new.json",
@@ -395,7 +534,7 @@ const publicHubList = [
     },
     {
         collection: "GISAID database",
-        name: "GISAID database SNV2 format (7/28/2020 - 9/21/2020) ",
+        name: "GISAID database SNV2 format (7/28/2020 - 9/21/2020)",
         numTracks: "33785",
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/9-21/browser_strains_new_snv2.json",
@@ -411,7 +550,7 @@ const publicHubList = [
     },
     {
         collection: "GISAID database",
-        name: "GISAID database (9/21/2020 - 10/28/2020) ",
+        name: "GISAID database (9/21/2020 - 10/28/2020)",
         numTracks: "59667",
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/10-28/browser_strains_new.json",
@@ -427,7 +566,7 @@ const publicHubList = [
     },
     {
         collection: "GISAID database",
-        name: "GISAID database SNV2 format (9/21/2020 - 10/28/2020) ",
+        name: "GISAID database SNV2 format (9/21/2020 - 10/28/2020)",
         numTracks: "59667",
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/10-28/browser_strains_new_snv2.json",
@@ -443,7 +582,7 @@ const publicHubList = [
     },
     {
         collection: "GISAID database",
-        name: "GISAID database (10/28/2020 - 12/5/2020) ",
+        name: "GISAID database (10/28/2020 - 12/5/2020)",
         numTracks: "74375",
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/12-5/browser_strains_new.json",
@@ -459,7 +598,7 @@ const publicHubList = [
     },
     {
         collection: "GISAID database",
-        name: "GISAID database SNV2 format (10/28/2020 - 12/5/2020) ",
+        name: "GISAID database SNV2 format (10/28/2020 - 12/5/2020)",
         numTracks: "74375",
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/12-5/browser_strains_new_snv2.json",
@@ -634,146 +773,283 @@ const publicHubList = [
         },
     },
     {
-        collection: "Diagnostics",
-        name: "Primers",
-        numTracks: "Updating",
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 1",
+        numTracks: 74745,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/primers/primers.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part1.json",
         description: {
-            "hub built by": "Changxu Fan (fanc@wustl.edu)",
-            "hub info": "CDC primers and WHO non-CDC primers",
-            "data source:":
-                "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/technical-guidance/laboratory-guidance",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "Diagnostics",
-        name: "CRISPR-based diagnostic tests",
-        numTracks: 2,
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 2",
+        numTracks: 74747,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/crispr_diagnostic_tests.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part2.json",
         description: {
-            "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
-            "hub info": "CRISPR-based assays for detecting SARS-CoV-2.",
-            "SHERLOCK diagnostic test track":
-                "Primer and guide RNA sequences used in the CRISPR-Cas13a-based SHERLOCK assay for detecting SARS-CoV-2 (source: https://www.broadinstitute.org/files/publications/special/COVID-19%20detection%20(updated).pdf; accessed on 05-08-20).",
-            "DETECTR diagnostic test track":
-                "Primer and guide RNA sequences used in the CRISPR-Cas12-based DETECTR assay for detecting SARS-CoV-2 (source: Broughton et al., 2020; doi: https://doi.org/10.1038/s41587-020-0513-4).",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "Putative SARS-CoV-2 Immune Epitopes",
-        name: "SARS-CoV-2 Epitopes Predicted to Bind HLA Class 1 Proteins Database",
-        numTracks: "1",
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 3",
+        numTracks: 74785,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/Campbell_et_al/campbell_et_al.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part3.json",
         description: {
-            "hub built by": "Jennifer Flynn (jaflynn@wustl.edu)",
-            "hub info": "Predicted SARS-CoV-2 epitopes that bind to class 1 HLA proteins",
-            values:
-                "Values represent number of strains with the predicted epitope. Only epitope predictions with 100% sequence identity in SARS-CoV-2 are displayed.",
-            "data source": "Campbell, et al. (2020) pre-print (DOI: 10.1101/2020.03.30.016931)",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "Putative SARS-CoV-2 Immune Epitopes",
-        name: "Congeneric (or Closely-related) Putative SARS Immune Epitopes Locations (this publication)",
-        numTracks: 1,
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 4",
+        numTracks: 74749,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/IEDB_NC_045512.2_SARS-tblastn-nCoV_3H3V6ZBF01R.hub",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part4.json",
         description: {
-            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
-            "hub info":
-                "Congeneric (or closely-related) putative SARS linear immune epitopes catalogued in IEDB mapped to exact-match locations in SARS-CoV-2",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "Putative SARS-CoV-2 Immune Epitopes",
-        name: "Putative SARS-CoV-2 Epitopes",
-        numTracks: 14,
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 5",
+        numTracks: 74781,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/SARS-CoV-2_immune_epitopes.hub",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part5.json",
         description: {
-            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
-            "hub info": "SARS-CoV-2 Immune Epitopes from various pre-prints and publications",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "Recombination events",
-        name: "Recombination events (Kim et al., 2020)",
-        numTracks: 3,
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 6",
+        numTracks: 74781,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/recombinationEvents.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part6.json",
         description: {
-            "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
-            "hub info":
-                "Coordinates of transcription regulatory sequences (TRSs) were retrieved from (Wu et al., 2020; DOI: 10.1038/s41586-020-2008-3). Recombination events were detected by junction-spanning RNA-seq reads that were generated by (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011). The color intensity of the arc corresponds to the number of reads supporting the recombination event.",
-            TRS:
-                "Transcription regulatory sequences (TRSs). The leader TRS (TRS-L) is colored black and body TRSs (TRS-B) are colored red.",
-            "TRS-L-dependent recombination track": "Recombination events mediated by TRS-L. Scale 0-7000000 reads.",
-            "TRS-L-independent recombination track": "Recombination events not mediated by TRS-L. Scale 0-1000 reads.",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "Viral RNA modifications",
-        name: "Viral RNA modifications (Kim et al., 2020)",
-        numTracks: 10,
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 7",
+        numTracks: 74755,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/studies/kim-2020/rnamodifications.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part7.json",
         description: {
-            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
-            "hub info":
-                "RNA modifications detected using Nanopore direct RNA sequencing (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011). Values are displayed as fractions",
-            "data source": "Supplementary Table 5, Kim et al 2020",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "Viral RNA expression",
-        name: "Viral RNA expression (Kim et al., 2020)",
-        numTracks: 1,
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 8",
+        numTracks: 74759,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~xzhuo/viralBrowser/nanoporeBW.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part8.json",
         description: {
-            "hub built by": "Xiaoyu Zhuo (xzhuo@wustl.edu)",
-            "hub info":
-                "a bigwig track displaying nanopore expression from SARS-CoV-2 infected Vero cells (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011).",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "Sequence variation",
-        name: "D614G prevalence across time",
-        numTracks: 1,
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 9",
+        numTracks: 74747,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/D614G_byweek.hub",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part9.json",
         description: {
-            "hub built by": "Mayank Choudhary (mayank-choudhary@wustl.edu)",
-            "hub info":
-                "Percentage of strains with D614G mutation collected in each week between 12/23/2019 and 05/04/2020",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "SARS-CoV-2 database",
-        name: "Non-canonical ORFs",
-        numTracks: 1,
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 10",
+        numTracks: 74736,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_finkel2020_novelORFs.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part10.json",
         description: {
-            "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
-            "hub info":
-                "Non-canonical open reading frames (ORFs) in SARS-CoV-2. Abbreviations: iORF = internal ORF; uORF = upstream ORF; ext = extended ORF.",
-            "data source": "Finkel et al., 2020 (PMID: 32906143)",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
     {
-        collection: "Image data from IDR",
-        name: "Images from IDR (https://idr.openmicroscopy.org/)",
-        numTracks: 1,
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 1, in SNV2 format ",
+        numTracks: 74745,
         oldHubFormat: false,
-        url: "https://vizhub.wustl.edu/public/virus/imagehub.json",
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part1.json",
         description: {
-            "hub built by": "Daofeng Li (dli23@wustl.edu)",
-            "hub info": "Images are displayed through API provided by IDR.",
-            "data source": "https://idr.openmicroscopy.org/",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 2, in SNV2 format ",
+        numTracks: 74747,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part2.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 3, in SNV2 format ",
+        numTracks: 74785,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part3.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 4, in SNV2 format ",
+        numTracks: 74749,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part4.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 5, in SNV2 format ",
+        numTracks: 74781,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part5.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 6, in SNV2 format ",
+        numTracks: 74781,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part6.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 7, in SNV2 format ",
+        numTracks: 74755,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part7.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 8, in SNV2 format ",
+        numTracks: 74759,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part8.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 9, in SNV2 format ",
+        numTracks: 74747,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part9.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 10, in SNV2 format ",
+        numTracks: 74736,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part10.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
 ];

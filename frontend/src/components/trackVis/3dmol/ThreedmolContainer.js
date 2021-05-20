@@ -7,9 +7,13 @@ import zlib from "zlib";
 import util from "util";
 import axios from "axios";
 import percentile from "percentile";
+import { notify } from "react-notify-toast";
 import Drawer from "rc-drawer";
 import TrackModel from "model/TrackModel";
 import DisplayedRegionModel from "model/DisplayedRegionModel";
+import ChromosomeInterval from "model/interval/ChromosomeInterval";
+import { getTrackConfig } from "components/trackConfig/getTrackConfig";
+import GeneSearchBoxSimple from "components/genomeNavigator/GeneSearchBoxSimple";
 import { BigwigSource } from "./BigwigSource";
 import { chromColors, colorAsNumber, g3dParser, getClosestValueIndex } from "./helpers-3dmol";
 import { Legend } from "./Legend";
@@ -18,7 +22,10 @@ import { CategoryLegend } from "./CategoryLegend";
 import { ResolutionList } from "./ResolutionList";
 import { ModelListMenu } from "./ModelListMenu";
 import { FrameListMenu } from "./FrameListMenu";
-import { getTrackConfig } from "components/trackConfig/getTrackConfig";
+import { ShapeList } from "./ShapeList";
+import { OpacityThickness } from "./OpacityThickness";
+import { ColorPicker } from "./ColorPicker";
+import { ArrowList } from "./ArrowList";
 import {
     reg2bin,
     reg2bins,
@@ -27,8 +34,14 @@ import {
     findAtomsWithRegion,
     getCompartmentNameForAtom,
 } from "./binning";
-import { arraysEqual, readFileAsText, readFileAsBuffer, HELP_LINKS } from "../../../util";
-import { GLViewer } from "./glviewer";
+import {
+    arraysEqual,
+    readFileAsText,
+    readFileAsBuffer,
+    HELP_LINKS,
+    getContrastingColor,
+    getSymbolRegions,
+} from "../../../util";
 
 import "rc-drawer/assets/index.css";
 import "./ThreedmolContainer.css";
@@ -43,22 +56,27 @@ const unzip = util.promisify(zlib.unzip);
 class ThreedmolContainer extends React.Component {
     static propTypes = {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
-        g3dtrack: PropTypes.instanceOf(TrackModel).isRequired, // g3d track to render
+        g3dtrack: PropTypes.instanceOf(TrackModel).isRequired, // g3d track id to get g3d track to render
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
-        containerWidth: PropTypes.number,
-        containerHeight: PropTypes.number,
+        width: PropTypes.number,
+        height: PropTypes.number,
+        x: PropTypes.number, // x position to left screen from flex layout
+        y: PropTypes.number, // y position
     };
 
     constructor(props) {
         super(props);
         this.mol = window.$3Dmol;
-        this.mol.GLViewer = GLViewer;
         // this.mol.Parsers.g3d = g3dParser;
         this.viewer = null;
         this.viewer2 = null;
         this.model = {}; // hap as key, model as value
         this.model2 = {};
         this.arrows = [];
+        this.spheres = [];
+        this.sphereLabels = [];
+        this.shapes = [];
+        this.shapeLabels = [];
         this.g3dFile = null;
         this.bwData = {};
         this.compData = [];
@@ -74,13 +92,13 @@ class ThreedmolContainer extends React.Component {
         this.myRef2 = React.createRef();
         this.state = {
             placement: "left",
-            childShow: true,
+            childShow: false,
             width: "25vw",
             height: null,
             menuFlexDirection: "column",
             layout: "picture",
             legendMin: 0,
-            legendMax: 0,
+            legendMax: 10,
             legendMinColor: "yellow", //yellow
             legendMaxColor: "red", //red
             colorScale: null,
@@ -109,7 +127,8 @@ class ThreedmolContainer extends React.Component {
             message: "",
             modelDisplayConfig: null, // key: hap, value: true or false, true for display, false for hidden
             highlightingOn: false,
-            highlightingColor: "yellow",
+            highlightingColor: "#ffff00", // yellow
+            highlightingColorChanged: false,
             // highlightingChromColor: "grey",
             highlightingChromColor: "#f2f2f2",
             mainBoxWidth: 600,
@@ -127,12 +146,23 @@ class ThreedmolContainer extends React.Component {
             frameAtoms: [],
             frameLabels: [],
             currentFrame: 0,
+            myShapes: {},
+            myShapeLabel: "",
+            myShapeRegion: "",
+            lineOpacity: 0.7,
+            cartoonThickness: 0.3,
+            useLegengMin: 0,
+            useLegengMax: 10,
+            autoLegendScale: true,
+            myArrows: {},
+            labelStyle: "shape", // or arrow
         };
         this.paintWithBigwig = _.debounce(this.paintWithBigwig, 150);
+        this.paintWithComparment = _.debounce(this.paintWithComparment, 150);
     }
 
     async componentDidMount() {
-        const { width, height, viewRegion } = this.props;
+        const { width, height, viewRegion, g3dtrack } = this.props;
         this.setState({ mainBoxHeight: height, mainBoxWidth: width });
         const features = viewRegion.getNavigationContext().getFeatures();
         features.forEach((feature) => (this.chromHash[feature.name] = feature.locus.end));
@@ -143,10 +173,22 @@ class ThreedmolContainer extends React.Component {
         this.viewer2 = this.mol.createViewer(element2, { ...config, id: "box2" }); // thumbnail
         this.viewer.linkViewer(this.viewer2);
         this.viewer2.linkViewer(this.viewer);
-        const trackModel = this.props.g3dtrack;
-        // const url = "https://target.wustl.edu/dli/tmp/test2.g3d";
-        // const url = "https://target.wustl.edu/dli/tmp/k562_1.g3d";
-        this.g3dFile = new G3dFile({ url: trackModel.url });
+        if (!g3dtrack) {
+            this.setMessage("cannot parse g3d file error, please check your file or contact the browser team.");
+            return;
+        }
+        let g3dconfig;
+        if (g3dtrack.fileObj) {
+            g3dconfig = { blob: g3dtrack.fileObj };
+        } else {
+            g3dconfig = { url: g3dtrack.url };
+        }
+        try {
+            this.g3dFile = new G3dFile(g3dconfig);
+        } catch (error) {
+            this.setMessage("parse g3d file error, please check your file or contact the browser team.");
+            return;
+        }
         await this.g3dFile.readHeader();
         const reso = Math.max(...this.g3dFile.meta.resolutions);
         this.setState({ resolutions: this.g3dFile.meta.resolutions, resolution: reso });
@@ -162,29 +204,48 @@ class ThreedmolContainer extends React.Component {
             frameLabels,
             animateMode,
             modelDisplayConfig,
+            mainBoxHeight,
+            mainBoxWidth,
+            highlightingColor,
+            lineOpacity,
+            cartoonThickness,
+            autoLegendScale,
+            layout,
+            thumbStyle,
+            highlightingOn,
+            myShapes,
+            myArrows,
+            A,
+            B,
+            A1,
+            A2,
+            B1,
+            B2,
+            B3,
+            B4,
+            legendMaxColor,
+            legendMinColor,
+            resolution,
         } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
-        if (
-            this.state.legendMaxColor !== prevState.legendMaxColor ||
-            this.state.legendMinColor !== prevState.legendMinColor
-        ) {
+        if (legendMaxColor !== prevState.legendMaxColor || legendMinColor !== prevState.legendMinColor) {
             await this.paintBigwig(paintRegion);
         }
         if (
-            this.state.A !== prevState.A ||
-            this.state.B !== prevState.B ||
-            this.state.A1 !== prevState.A1 ||
-            this.state.A2 !== prevState.A2 ||
-            this.state.B1 !== prevState.B1 ||
-            this.state.B2 !== prevState.B2 ||
-            this.state.B3 !== prevState.B3 ||
-            this.state.B4 !== prevState.B4
+            A !== prevState.A ||
+            B !== prevState.B ||
+            A1 !== prevState.A1 ||
+            A2 !== prevState.A2 ||
+            B1 !== prevState.B1 ||
+            B2 !== prevState.B2 ||
+            B3 !== prevState.B3 ||
+            B4 !== prevState.B4
         ) {
             await this.paintCompartment(paintCompartmentRegion);
         }
-        if (this.state.thumbStyle !== prevState.thumbStyle) {
-            switch (this.state.thumbStyle) {
+        if (thumbStyle !== prevState.thumbStyle) {
+            switch (thumbStyle) {
                 case "cartoon":
                     Object.keys(this.model2).forEach((hap) => this.model2[hap].show());
                     this.viewer2.setStyle({}, { cartoon: { colorscheme: "chrom", style: "trace", thickness: 1 } });
@@ -209,12 +270,12 @@ class ThreedmolContainer extends React.Component {
             }
             this.viewer2.render();
         }
-        if (this.state.resolution !== prevState.resolution) {
+        if (resolution !== prevState.resolution) {
             this.removeHover();
             await this.prepareAtomData();
         }
-        if (this.state.highlightingOn !== prevState.highlightingOn) {
-            if (this.state.highlightingOn) {
+        if (highlightingOn !== prevState.highlightingOn) {
+            if (highlightingOn) {
                 this.highlightRegions();
             } else {
                 this.removeHighlightRegions();
@@ -225,9 +286,26 @@ class ThreedmolContainer extends React.Component {
         }
         if (this.props.anchors3d !== prevProps.anchors3d) {
             if (this.props.anchors3d.length) {
+                this.addAnchors3dToMyArrows(this.props.anchors3d);
+            }
+        }
+        if (!_.isEqual(myArrows, prevState.myArrows)) {
+            if (!_.isEmpty(myArrows)) {
                 this.drawAnchors3d(modelDisplayConfig);
             } else {
                 this.removeAnchors3d();
+            }
+        }
+        if (this.props.geneFor3d !== prevProps.geneFor3d) {
+            if (this.props.geneFor3d) {
+                this.addGeneToMyShapes(this.props.geneFor3d);
+            }
+        }
+        if (!_.isEqual(myShapes, prevState.myShapes)) {
+            if (!_.isEmpty(myShapes)) {
+                this.drawMyShapes(modelDisplayConfig);
+            } else {
+                this.removeMyShapes();
             }
         }
         if (prevProps.viewRegion !== this.props.viewRegion) {
@@ -236,11 +314,11 @@ class ThreedmolContainer extends React.Component {
             if (!arraysEqual(prevChroms, chroms)) {
                 // this.updateMainViewerClickable();
                 // this.updateMainViewer();
-                if (this.state.highlightingOn) {
+                if (highlightingOn) {
                     this.highlightRegions();
                 }
             }
-            if (this.state.highlightingOn) {
+            if (highlightingOn) {
                 this.highlightRegions();
             }
             if (paintRegion === "region") {
@@ -265,8 +343,8 @@ class ThreedmolContainer extends React.Component {
         ) {
             this.setState({ paintRegion: "new" });
         }
-        if (this.state.layout !== prevState.layout) {
-            if (this.state.layout === "side" && this.state.thumbStyle !== "hide") {
+        if (layout !== prevState.layout) {
+            if (layout === "side" && thumbStyle !== "hide") {
                 this.setState({
                     mainBoxHeight: height,
                     mainBoxWidth: halftWidth,
@@ -282,6 +360,22 @@ class ThreedmolContainer extends React.Component {
                 });
             }
         }
+        if (width !== prevProps.width || height !== prevProps.height) {
+            this.setState({ mainBoxHeight: height, mainBoxWidth: width });
+        }
+        if (mainBoxHeight !== prevState.mainBoxHeight || mainBoxWidth !== prevState.mainBoxWidth) {
+            this.viewer.render();
+            this.viewer2.render();
+        }
+        if (highlightingColor !== prevState.highlightingColor) {
+            this.setState({ highlightingColorChanged: true });
+        }
+        if (lineOpacity !== prevState.lineOpacity || cartoonThickness !== prevState.cartoonThickness) {
+            this.setState({ highlightingColorChanged: true, paintRegion: "none", paintCompartmentRegion: "none" });
+        }
+        if (autoLegendScale !== prevState.autoLegendScale) {
+            this.setState({ paintRegion: "none" });
+        }
     }
 
     componentWillUnmount() {
@@ -291,21 +385,138 @@ class ThreedmolContainer extends React.Component {
         this.atomData = {};
         this.newAtoms = {};
         this.atomStartsByChrom = {};
-        if (this.props.anchors3d.length && this.props.onSetAnchors3d) {
-            this.props.onSetAnchors3d([]);
-        }
+        // if (this.props.anchors3d.length && this.props.onSetAnchors3d) {
+        //     this.props.onSetAnchors3d([]);
+        // }
     }
+
+    onSwitch = () => {
+        this.setState((prevState) => {
+            return { childShow: !prevState.childShow };
+        });
+    };
 
     removeHover = () => {
         this.setState({ hoveringAtom: null, hoveringX: 0, hoveringY: 0 });
     };
 
-    drawAnchors3d = (displayConfig = undefined) => {
+    drawMyShapes = (displayConfig) => {
+        const { resolution, myShapes } = this.state;
+        const resString = resolution.toString();
+        this.prepareAtomKeeper();
+        const displayedModelKeys = this.getDisplayedModelKeys(displayConfig);
+        if (this.shapes.length) {
+            this.removeMyShapes(false);
+        }
+        Object.keys(myShapes).forEach((s) => {
+            if (myShapes[s].locus) {
+                const locus = myShapes[s].locus;
+                const atoms = findAtomsWithRegion(
+                    this.atomKeeper[resString],
+                    locus.chr,
+                    locus.start,
+                    locus.end,
+                    resolution,
+                    displayedModelKeys
+                );
+                atoms.forEach((atom) => {
+                    let addingShape;
+                    if (myShapes[s].outline === "sphere") {
+                        addingShape = this.viewer.addSphere({
+                            center: { x: atom.x, y: atom.y, z: atom.z },
+                            radius: myShapes[s].size,
+                            color: myShapes[s].color,
+                            wireframe: myShapes[s].wireframe,
+                        });
+                    } else if (myShapes[s].outline === "box") {
+                        addingShape = this.viewer.addBox({
+                            corner: { x: atom.x, y: atom.y, z: atom.z },
+                            dimensions: { w: myShapes[s].size, h: myShapes[s].size, d: myShapes[s].size },
+                            color: myShapes[s].color,
+                            wireframe: myShapes[s].wireframe,
+                        });
+                    }
+                    this.shapes.push(addingShape);
+                    this.shapeLabels.push(
+                        this.viewer.addLabel(myShapes[s].label, {
+                            position: { x: atom.x, y: atom.y, z: atom.z },
+                            fontColor: myShapes[s].color,
+                            backgroundColor: getContrastingColor(myShapes[s].color),
+                            backgroundOpacity: 0.8,
+                        })
+                    );
+                });
+            } else if (myShapes[s].loci) {
+                myShapes[s].loci.forEach((locusObj) => {
+                    const { locus, label } = locusObj;
+                    const atoms = findAtomsWithRegion(
+                        this.atomKeeper[resString],
+                        locus.chr,
+                        locus.start,
+                        locus.end,
+                        resolution,
+                        displayedModelKeys
+                    );
+                    atoms.forEach((atom) => {
+                        let addingShape;
+                        if (myShapes[s].outline === "sphere") {
+                            addingShape = this.viewer.addSphere({
+                                center: { x: atom.x, y: atom.y, z: atom.z },
+                                radius: myShapes[s].size,
+                                color: myShapes[s].color,
+                                wireframe: myShapes[s].wireframe,
+                            });
+                        } else if (myShapes[s].outline === "box") {
+                            addingShape = this.viewer.addBox({
+                                corner: { x: atom.x, y: atom.y, z: atom.z },
+                                dimensions: { w: myShapes[s].size, h: myShapes[s].size, d: myShapes[s].size },
+                                color: myShapes[s].color,
+                                wireframe: myShapes[s].wireframe,
+                            });
+                        }
+                        this.shapes.push(addingShape);
+                        this.shapeLabels.push(
+                            this.viewer.addLabel(label, {
+                                position: { x: atom.x, y: atom.y, z: atom.z },
+                                fontColor: myShapes[s].color,
+                                backgroundColor: getContrastingColor(myShapes[s].color),
+                                backgroundOpacity: 0.8,
+                            })
+                        );
+                    });
+                });
+            }
+        });
+        if (!this.shapes.length) {
+            this.removeMyShapes();
+            this.setState({ message: "cannot find matched atoms to point or no model is displaying, skip" });
+            return;
+        }
+        this.viewer.render();
+    };
+
+    removeMyShapes = (updateRender = true) => {
+        this.shapes.forEach((shape) => this.viewer.removeShape(shape));
+        this.shapeLabels.forEach((label) => this.viewer.removeLabel(label));
+        this.shapes = [];
+        this.shapeLabels = [];
+        if (updateRender) {
+            this.viewer.render();
+            this.setState({ message: "" });
+        }
+    };
+
+    prepareAtomKeeper = () => {
         const { resolution } = this.state;
         const resString = resolution.toString();
         if (_.isEmpty(this.atomKeeper) || !this.atomKeeper.hasOwnProperty(resString)) {
             this.buildAtomKeeper();
         }
+    };
+
+    getDisplayedModelKeys = (displayConfig) => {
+        const { resolution } = this.state;
+        const resString = resolution.toString();
         let displayedModelKeys = Object.keys(this.atomKeeper[resString]);
         if (displayConfig) {
             displayedModelKeys = [];
@@ -315,38 +526,66 @@ class ThreedmolContainer extends React.Component {
                 }
             });
         }
+        return displayedModelKeys;
+    };
+
+    drawAnchors3d = (displayConfig) => {
+        const { resolution, myArrows } = this.state;
+        const resString = resolution.toString();
+        this.prepareAtomKeeper();
+        const displayedModelKeys = this.getDisplayedModelKeys(displayConfig);
         // console.log(displayedModelKeys);
         //clean existing arrows
         if (this.arrows.length) {
             this.removeAnchors3d(false);
         }
-        const already = {}; // to avoid duplication
-        this.props.anchors3d.forEach((anchor, idx) => {
-            const color = idx % 2 ? "red" : "blue";
-            const str = anchor.toString();
-            if (!already.hasOwnProperty(str)) {
+        Object.keys(myArrows).forEach((s) => {
+            const anchor = myArrows[s];
+            if (anchor.locus) {
                 const atoms = findAtomsWithRegion(
                     this.atomKeeper[resString],
-                    anchor.chr,
-                    anchor.start,
-                    anchor.end,
+                    anchor.locus.chr,
+                    anchor.locus.start,
+                    anchor.locus.end,
                     resolution,
                     displayedModelKeys
                 );
                 atoms.forEach((atom) => {
                     this.arrows.push(
                         this.viewer.addArrow({
-                            start: { x: 0, y: 0.0, z: 0.0 },
+                            start: anchor.start,
                             end: { x: atom.x, y: atom.y, z: atom.z },
-                            radius: 0.2,
-                            radiusRadio: 0.2,
-                            mid: 1.0,
-                            color,
+                            radius: anchor.radius,
+                            color: anchor.color,
+                            radiusRadio: 0.2, //hard-coded
+                            mid: 1.0, //hard-coded
                         })
                     );
                 });
+            } else if (anchor.loci) {
+                anchor.loci.forEach((locus) => {
+                    const atoms = findAtomsWithRegion(
+                        this.atomKeeper[resString],
+                        locus.chr,
+                        locus.start,
+                        locus.end,
+                        resolution,
+                        displayedModelKeys
+                    );
+                    atoms.forEach((atom) => {
+                        this.arrows.push(
+                            this.viewer.addArrow({
+                                start: anchor.start,
+                                end: { x: atom.x, y: atom.y, z: atom.z },
+                                radius: anchor.radius,
+                                color: anchor.color,
+                                radiusRadio: 0.2, //hard-coded
+                                mid: 1.0, //hard-coded
+                            })
+                        );
+                    });
+                });
             }
-            already[str] = 1;
         });
         if (!this.arrows.length) {
             this.removeAnchors3d();
@@ -426,55 +665,6 @@ class ThreedmolContainer extends React.Component {
         );
     };
 
-    /**
-     * atoms with hover event added
-     * add click event instead, hover seems slow
-     * @param {*} atoms2
-     */
-    // assginAtomsCallbacks = (atoms2) => {
-    //     const atoms = {};
-    //     const chroms = this.viewRegionToChroms();
-    //     Object.keys(atoms2).forEach((hap) => {
-    //         const addevents = atoms2[hap].map((atom2) => {
-    //             // mouse over and click handler
-    //             const atom = Object.assign({}, atom2);
-    //             // atom.hoverable = true;
-    //             // let oldStyle;
-    //             // atom.hover_callback = (at) => {
-    //             //     // console.log('hover', at.resi)
-    //             //     this.setState({ hoveringAtom: at });
-    //             //     oldStyle = { ...at.style };
-    //             //     // console.log(oldStyle)
-    //             //     // this.viewer.setStyle({resi: at.resi}, {sphere: {color: 'pink', opacity: 1, radius: 2}});
-    //             //     // this.viewer.setStyle({resi: at.resi}, {cross: {color: 'pink', opacity: 1, radius: 2}});
-    //             //     this.viewer.setStyle(
-    //             //         { resi: [`${at.resi}-${at.resi + 1}`] },
-    //             //         { cartoon: { color: "#ff3399", style: "trace", thickness: 1 } }
-    //             //     );
-    //             //     this.viewer.render();
-    //             // };
-    //             // atom.unhover_callback = (at) => {
-    //             //     // console.log('unhover', at);
-    //             //     this.setState({ hoveringAtom: null });
-    //             //     this.viewer.setStyle({ resi: [`${at.resi}-${at.resi + 1}`] }, oldStyle);
-    //             //     this.viewer.render();
-    //             // };
-    //             if (chroms.includes(atom.chain)) {
-    //                 atom.clickable = true;
-    //                 atom.callback = (at) => {
-    //                     // at.color = 0x0000ff;
-    //                     // at.style= {cartoon: {color: '#ff3399', style: 'trace', thickness: 1}}
-    //                     // console.log("clicked", at, this.viewer.modelToScreen(at));
-
-    //                 };
-    //             }
-    //             return atom;
-    //         });
-    //         atoms[hap] = addevents;
-    //     });
-    //     return atoms;
-    // };
-
     setAtomClickable = (at) => {
         const screenXY = this.viewer.modelToScreen(at);
         this.setState({ hoveringAtom: at, hoveringX: screenXY.x, hoveringY: screenXY.y });
@@ -487,36 +677,10 @@ class ThreedmolContainer extends React.Component {
         this.model = {};
     };
 
-    // clearMainScene = () => {
-    //     this.viewer.clear();
-    //     this.model = {};
-    // };
-
-    // updateMainViewerClickable = () => {
-    //     const { resolution } = this.state;
-    //     const resString = resolution.toString();
-    //     const atoms = this.assginAtomsCallbacks(this.atomData[resString][0]);
-    //     this.atomData[resString][1] = atoms;
-    // };
-
-    // updateMainViewer = () => {
-    //     this.clearMainScene();
-    //     const { resolution } = this.state;
-    //     const resString = resolution.toString();
-    //     const atoms = this.atomData[resString][1];
-    //     Object.keys(atoms).forEach((hap) => {
-    //         this.model[hap] = this.viewer.addModel();
-    //         this.model[hap].addAtoms(atoms[hap]);
-    //     });
-    //     this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } });
-    //     this.viewer.zoomTo();
-    //     this.viewer.render();
-    // };
-
     prepareAtomData = async () => {
         this.setState({ message: "updating...", frameAtoms: [], frameLabels: [] });
         this.clearScene();
-        const { resolution } = this.state;
+        const { resolution, lineOpacity, cartoonThickness } = this.state;
         const resString = resolution.toString();
         const stateAtoms = [],
             stateLabels = [];
@@ -557,13 +721,13 @@ class ThreedmolContainer extends React.Component {
             stateLabels.push(hap);
         });
 
-        this.viewer2.setStyle({}, { cartoon: { colorscheme: "chrom", style: "trace", thickness: 0.2 } });
+        this.viewer2.setStyle({}, { cartoon: { colorscheme: "chrom", style: "trace", thickness: cartoonThickness } });
         this.viewer2.render();
 
         // the main viewer
 
         // this.viewer.setBackgroundColor('white');
-        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.7 } });
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } });
         this.viewer.zoomTo();
         this.viewer.render();
         // this.viewer.zoom(1.2, 1000);
@@ -626,6 +790,11 @@ class ThreedmolContainer extends React.Component {
         } else {
             this.viewer.render(); //avoid dup render in drawAnchors3d
         }
+        if (!_.isEmpty(this.state.myShapes)) {
+            this.drawMyShapes(newDisplayConfig);
+        } else {
+            this.viewer.render(); //avoid dup render in drawAnchors3d
+        }
     };
 
     updateLegendColor = (k, color) => {
@@ -637,7 +806,7 @@ class ThreedmolContainer extends React.Component {
     };
 
     highlightRegions = () => {
-        const { highlightingColor, resolution } = this.state;
+        const { highlightingColor, resolution, lineOpacity, cartoonThickness } = this.state;
         const regions = this.viewRegionToRegions();
         // const colorByRegion = function (atom, region) {
         //     if (
@@ -659,7 +828,7 @@ class ThreedmolContainer extends React.Component {
             regionRange[reg.chrom] = [leftResi, rightResi];
         });
         // this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3, hidden: true } }); //remove existing style
-        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } }); //remove existing style
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } }); //remove existing style
         // regions.forEach((region) => {
         //     this.viewer.setStyle(
         //         { chain: region.chrom },
@@ -668,17 +837,17 @@ class ThreedmolContainer extends React.Component {
         // });
         let validateRegion = false;
         regions.forEach((region) => {
-            if (regionRange[region.chrom][0] && regionRange[region.chrom][1]) {
+            if (regionRange[region.chrom][0] !== undefined && regionRange[region.chrom][1] !== undefined) {
                 const resiSelect = `${regionRange[region.chrom][0]}-${regionRange[region.chrom][1]}`;
                 this.viewer.setStyle(
                     { chain: region.chrom, resi: [resiSelect] },
-                    { cartoon: { color: highlightingColor, style: "trace", thickness: 0.2 } }
+                    { cartoon: { color: highlightingColor, style: "trace", thickness: cartoonThickness } }
                 );
                 validateRegion = true;
             }
         });
         if (validateRegion) {
-            this.setState({ highlightingOn: true });
+            this.setState({ highlightingOn: true, highlightingColorChanged: false });
             this.viewer.render();
         } else {
             this.setState({ message: "cannot find matched region to highlight, skip" });
@@ -687,9 +856,10 @@ class ThreedmolContainer extends React.Component {
     };
 
     removeHighlightRegions = () => {
+        const { lineOpacity } = this.state;
         const regions = this.viewRegionToRegions();
         regions.forEach((region) => {
-            this.viewer.setStyle({ chain: region.chrom }, { line: { colorscheme: "chrom", opacity: 0.3 } });
+            this.viewer.setStyle({ chain: region.chrom }, { line: { colorscheme: "chrom", opacity: lineOpacity } });
         });
         this.setState({ highlightingOn: false });
         this.viewer.render();
@@ -731,12 +901,13 @@ class ThreedmolContainer extends React.Component {
                 });
             });
         }
-        return values.length ? percentile([5, 95], values) : [0, 0]; // use percentile instead for better visual
+        return values.length ? percentile([5, 95], values).map((n) => n.toFixed(2)) : [0, 0]; // use percentile instead for better visual
     };
 
     paintWithBigwig = async (bwUrl, resolution, regions, chooseRegion) => {
         this.setState({ paintMethod: "score", paintRegion: chooseRegion });
-        const { legendMinColor, legendMaxColor } = this.state;
+        const { legendMinColor, legendMaxColor, cartoonThickness, useLegengMax, useLegengMin, autoLegendScale } =
+            this.state;
         const keepers = {};
         const queryChroms = chooseRegion === "region" ? regions.map((r) => r.chrom) : regions;
         const fetchedChroms = [];
@@ -763,7 +934,10 @@ class ThreedmolContainer extends React.Component {
             }
         }
         if (_.isEmpty(keepers)) {
-            this.setState({ message: "bigwig file empty or error parse bigwig file, please check your file" });
+            this.setState({
+                message: "bigwig file empty or error parse bigwig file, please check your file",
+                paintRegion: "none",
+            });
             return;
         }
         const [minScore, maxScore] = this.minMaxOfKeepers(keepers, regions, chooseRegion === "region");
@@ -783,9 +957,19 @@ class ThreedmolContainer extends React.Component {
                 filterRegions[chrom].push([0, this.chromHash[chrom]]);
             });
         }
+        let minValue, maxValue;
+        if (autoLegendScale) {
+            [minValue, maxValue] = [minScore, maxScore];
+        } else {
+            [minValue, maxValue] = [useLegengMin, useLegengMax];
+            if (minValue > maxValue) {
+                this.setMessage("min value much smaller than max value, abort");
+                return;
+            }
+        }
         // console.log(filterRegions);
         const colorScale = scaleLinear()
-            .domain([minScore, maxScore])
+            .domain([minValue, maxValue])
             .range([legendMinColor, legendMaxColor])
             .clamp(true);
         const colorByValue = function (atom) {
@@ -794,16 +978,16 @@ class ThreedmolContainer extends React.Component {
                 if (value) {
                     return colorAsNumber(colorScale(value));
                 } else {
-                    return "yellow";
+                    return "grey";
                 }
             } else {
-                return "yellow";
+                return "grey";
             }
         };
         queryChroms.forEach((chrom) => {
             this.viewer.setStyle(
                 { chain: chrom },
-                { cartoon: { colorfunc: colorByValue, style: "trace", thickness: 0.3 } }
+                { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
             );
         });
         this.viewer.render();
@@ -816,9 +1000,10 @@ class ThreedmolContainer extends React.Component {
 
     removePaint = () => {
         if (!this.state.colorScale) return;
+        const { lineOpacity } = this.state;
         this.setState({ paintRegion: "none" });
         // this.viewer.setStyle({}, { cartoon: { color: "grey", style: "trace", thickness: 1 } });
-        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } });
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } });
         this.viewer.render();
         this.setState({
             legendMax: 0,
@@ -830,15 +1015,15 @@ class ThreedmolContainer extends React.Component {
 
     paintBigwig = async (chooseRegion) => {
         this.setState({ paintRegion: chooseRegion, message: "numerical painting..." });
-        const { useExistingBigwig, bigWigUrl, bigWigInputUrl, resolution } = this.state;
+        const { useExistingBigwig, bigWigUrl, bigWigInputUrl, resolution, lineOpacity } = this.state;
         const bwUrl = useExistingBigwig ? bigWigUrl : bigWigInputUrl;
         if (!bwUrl.length) {
-            this.setState({ message: "bigwig url for paint is empty, abort..." });
+            this.setState({ message: "bigwig url for paint is empty, abort...", paintRegion: "none" });
             return;
         }
         const regions = this.viewRegionToRegions();
         const chroms = this.viewRegionToChroms();
-        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } });
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } });
         switch (chooseRegion) {
             case "region":
                 await this.paintWithBigwig(bwUrl, resolution, regions, chooseRegion);
@@ -957,6 +1142,9 @@ class ThreedmolContainer extends React.Component {
             dataToUse;
         if (!data[0].startsWith("chrom")) {
             compFormat = "cell";
+            if (data[0].trim().split("\t").length === 4) {
+                compFormat = "custom";
+            }
             this.setState({ compFormat });
             dataToUse = data;
         } else {
@@ -965,36 +1153,34 @@ class ThreedmolContainer extends React.Component {
         // console.log(key, compFormat, dataToUse);
         dataToUse.forEach((line) => {
             const t = line.trim().split("\t");
-            if (t.length >= 8) {
-                let score, compName;
-                const chrom = t[0];
-                const start = Number.parseInt(t[1], 10);
-                const end = Number.parseInt(t[2], 10);
-
-                const binkey = reg2bin(start, end).toString();
-                if (!comp.hasOwnProperty(chrom)) {
-                    comp[chrom] = {};
-                }
-                if (!comp[chrom].hasOwnProperty(binkey)) {
-                    comp[chrom][binkey] = [];
-                }
-                if (compFormat === "4dn") {
-                    score = Number.parseFloat(t[7]);
-                    comp[chrom][binkey].push({
-                        chrom,
-                        start,
-                        end,
-                        score,
-                    });
-                } else {
-                    compName = t[3];
-                    comp[chrom][binkey].push({
-                        chrom,
-                        start,
-                        end,
-                        name: compName,
-                    });
-                }
+            let score, compName;
+            const chrom = t[0];
+            const start = Number.parseInt(t[1], 10);
+            const end = Number.parseInt(t[2], 10);
+            // console.log(start, end, reg2bin(start, end));
+            const binkey = reg2bin(start, end).toString();
+            if (!comp.hasOwnProperty(chrom)) {
+                comp[chrom] = {};
+            }
+            if (!comp[chrom].hasOwnProperty(binkey)) {
+                comp[chrom][binkey] = [];
+            }
+            if (compFormat === "4dn") {
+                score = Number.parseFloat(t[7]);
+                comp[chrom][binkey].push({
+                    chrom,
+                    start,
+                    end,
+                    score,
+                });
+            } else {
+                compName = t[3];
+                comp[chrom][binkey].push({
+                    chrom,
+                    start,
+                    end,
+                    name: compName,
+                });
             }
         });
         this.compData[key] = comp;
@@ -1003,6 +1189,7 @@ class ThreedmolContainer extends React.Component {
     };
 
     paintCompartment = async (chooseRegion) => {
+        const { lineOpacity } = this.state;
         this.setState({
             paintCompartmentRegion: chooseRegion,
             paintMethod: "compartment",
@@ -1010,12 +1197,15 @@ class ThreedmolContainer extends React.Component {
         });
         const comp = await this.getAnnotationData();
         if (_.isEmpty(comp)) {
-            this.setState({ message: "file empty or error parse annotation file, please check your file 2" });
+            this.setState({
+                message: "file empty or error parse annotation file, please check your file 2",
+                paintCompartmentRegion: "none",
+            });
             return;
         }
         const regions = this.viewRegionToRegions();
         const chroms = this.viewRegionToChroms();
-        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } });
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } });
         switch (chooseRegion) {
             case "region":
                 this.paintWithComparment(comp, regions, chooseRegion);
@@ -1033,7 +1223,7 @@ class ThreedmolContainer extends React.Component {
     };
 
     paintWithComparment = (comp, regions, chooseRegion) => {
-        const { A, B, A1, A2, B1, B2, B3, B4, NA, compFormat, resolution } = this.state; // resolution for atom end pos
+        const { A, B, A1, A2, B1, B2, B3, B4, NA, compFormat, resolution, cartoonThickness } = this.state; // resolution for atom end pos
         const queryChroms = chooseRegion === "region" ? regions.map((r) => r.chrom) : regions;
         const filterRegions = {}; // key, chrom, value, list of [start, end] , for GSV later
         if (chooseRegion === "region") {
@@ -1060,7 +1250,7 @@ class ThreedmolContainer extends React.Component {
                     if (typeof value === "number") {
                         return value >= 0 ? A : B;
                     } else {
-                        return colorAsNumber(this.state[value]);
+                        return value.startsWith("#") ? value : colorAsNumber(this.state[value]);
                     }
                 } else {
                     return "grey";
@@ -1072,20 +1262,21 @@ class ThreedmolContainer extends React.Component {
         queryChroms.forEach((chrom) => {
             this.viewer.setStyle(
                 { chain: chrom },
-                { cartoon: { colorfunc: colorByCompartment, style: "trace", thickness: 0.5 } }
+                { cartoon: { colorfunc: colorByCompartment, style: "trace", thickness: cartoonThickness } }
             );
         });
         this.viewer.render();
         if (compFormat === "4dn") {
             this.setState({ categories: { A, B } });
-        } else {
+        } else if (compFormat === "cell") {
             this.setState({ categories: { A1, A2, B1, B2, B3, B4, NA } });
         }
     };
 
     removeCompartmentPaint = () => {
+        const { lineOpacity } = this.state;
         this.setState({ paintCompartmentRegion: "none" });
-        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3 } });
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } });
         this.viewer.render();
         this.setState({
             highlightingOn: false,
@@ -1236,6 +1427,283 @@ class ThreedmolContainer extends React.Component {
         document.body.removeChild(dl);
     };
 
+    setUseLegendMax = (e) => {
+        // console.log(e.target.value, Number.parseFloat(e.target.value));
+        this.setState({ useLegengMax: Number.parseFloat(e.target.value) });
+    };
+
+    setUseLegendMin = (e) => {
+        this.setState({ useLegengMin: Number.parseFloat(e.target.value) });
+    };
+
+    handleAutoLegendScaleChange = () => {
+        this.setState((prevState) => {
+            return { autoLegendScale: !prevState.autoLegendScale };
+        });
+    };
+
+    setLabelStyle = (e) => {
+        this.setState({ labelStyle: e.target.value });
+    };
+
+    handleMyShapeLabelChange = (e) => {
+        this.setState({ myShapeLabel: e.target.value.trim() });
+    };
+
+    handleMyShapeRegionChange = (e) => {
+        this.setState({ myShapeRegion: e.target.value.trim() });
+    };
+
+    addAnchors3dToMyArrows = (anchors) => {
+        const newArrows = { ...this.state.myArrows };
+        anchors.forEach((locus, idx) => {
+            const color = idx % 2 ? "red" : "blue";
+            const regionStr = locus.toString();
+            if (!newArrows.hasOwnProperty(regionStr)) {
+                newArrows[regionStr] = {
+                    start: { x: 0, y: 0.0, z: 0.0 },
+                    locus,
+                    loci: null,
+                    radius: 0.2,
+                    color,
+                };
+            } else {
+                this.setState({ message: "warning, duplicated arrow region" });
+                // return;
+            }
+        });
+        this.setState({ myArrows: newArrows });
+    };
+
+    addRegionToMyShapes = () => {
+        const { labelStyle } = this.state;
+        if (labelStyle === "shape") {
+            const { myShapeRegion, myShapeLabel, myShapes } = this.state;
+            const newShapes = { ...myShapes };
+            try {
+                const locus = ChromosomeInterval.parse(myShapeRegion);
+                const regionStr = locus.toString();
+                if (!newShapes.hasOwnProperty(regionStr)) {
+                    newShapes[regionStr] = {
+                        label: myShapeLabel,
+                        color: "blue",
+                        outline: "sphere",
+                        locus,
+                        loci: null,
+                        size: 2,
+                        wireframe: false,
+                    };
+                    this.setState({ myShapeRegion: "", myShapeLabel: "", myShapes: newShapes });
+                } else {
+                    this.setState({ message: "error, duplicated label region, skip" });
+                    return;
+                }
+            } catch (error) {
+                this.setState({
+                    message: "error parse the region, format should like: chr:start-end, chr start end etc.",
+                });
+                return;
+            }
+        } else if (labelStyle === "arrow") {
+            const { myShapeRegion, myArrows } = this.state;
+            const newArrows = { ...myArrows };
+            try {
+                const locus = ChromosomeInterval.parse(myShapeRegion);
+                const regionStr = locus.toString();
+                if (!newArrows.hasOwnProperty(regionStr)) {
+                    newArrows[regionStr] = {
+                        start: { x: 0, y: 0.0, z: 0.0 },
+                        locus,
+                        loci: null,
+                        radius: 0.2,
+                        color: "blue",
+                    };
+                    this.setState({ myShapeRegion: "", myShapeLabel: "", myArrows: newArrows });
+                } else {
+                    this.setState({ message: "error, duplicated label region, skip" });
+                    return;
+                }
+            } catch (error) {
+                this.setState({
+                    message: "error parse the region, format should like: chr:start-end, chr start end etc.",
+                });
+                return;
+            }
+        }
+    };
+
+    addGeneToMyShapes = (gene) => {
+        const { labelStyle } = this.state;
+        if (labelStyle === "shape") {
+            const { myShapes } = this.state;
+            const newShapes = { ...myShapes };
+
+            const locus = gene.getLocus();
+            const regionStr = locus.toString();
+            if (!newShapes.hasOwnProperty(regionStr)) {
+                newShapes[regionStr] = {
+                    label: gene.getName(),
+                    color: "blue",
+                    outline: "sphere",
+                    locus,
+                    loci: null,
+                    size: 2,
+                    wireframe: false,
+                };
+                this.setState({ myShapes: newShapes });
+            } else {
+                this.setState({ message: "error, duplicated gene region, skip" });
+                return;
+            }
+        } else if (labelStyle === "arrow") {
+            const { myArrows } = this.state;
+            const newArrows = { ...myArrows };
+
+            const locus = gene.getLocus();
+            const regionStr = locus.toString();
+            if (!newArrows.hasOwnProperty(regionStr)) {
+                newArrows[regionStr] = {
+                    start: { x: 0, y: 0.0, z: 0.0 },
+                    locus,
+                    loci: null,
+                    radius: 0.2,
+                    color: "blue",
+                };
+                this.setState({ myArrows: newArrows });
+            } else {
+                this.setState({ message: "error, duplicated gene region, skip" });
+                return;
+            }
+        }
+    };
+
+    handleRegionFileUpload = async (e) => {
+        const fileobj = e.target.files[0];
+        const label = fileobj.name;
+        const loci = await this.parseUploadedRegionFile(fileobj);
+        const { labelStyle } = this.state;
+        if (labelStyle === "shape") {
+            const { myShapes } = this.state;
+            const newShapes = { ...myShapes };
+
+            if (!newShapes.hasOwnProperty(label)) {
+                newShapes[label] = {
+                    label,
+                    color: "blue",
+                    outline: "sphere",
+                    loci,
+                    locus: null,
+                    size: 2,
+                    wireframe: false,
+                };
+                this.setState({ myShapes: newShapes });
+            } else {
+                this.setState({ message: "error, duplicated file name, skip" });
+                return;
+            }
+        } else if (labelStyle === "arrow") {
+            const { myArrows } = this.state;
+            const newArrows = { ...myArrows };
+
+            if (!newArrows.hasOwnProperty(label)) {
+                newArrows[label] = {
+                    loci,
+                    locus: null,
+                    start: { x: 0, y: 0.0, z: 0.0 },
+                    radius: 0.2,
+                    color: "blue",
+                };
+                this.setState({ myArrows: newArrows });
+            } else {
+                this.setState({ message: "error, duplicated file name, skip" });
+                return;
+            }
+        }
+    };
+
+    parseUploadedRegionFile = async (fileobj) => {
+        const dataString = await readFileAsText(fileobj);
+        const inputListRaw = dataString.trim().split("\n");
+        const inputListRaw2 = inputListRaw.map((item) => item.trim());
+        const inputList = inputListRaw2.filter((item) => item !== "");
+        if (inputList.length === 0) {
+            this.setMessage("region file is empty or cannot find any location on genome, skip");
+            return;
+        }
+        const genomeName = this.props.genomeConfig.genome.getName();
+        const promise = inputList.map((symbol) => {
+            try {
+                const locus = ChromosomeInterval.parse(symbol);
+                if (locus) {
+                    return { label: symbol, locus };
+                }
+            } catch (error) {}
+            return getSymbolRegions(genomeName, symbol);
+        });
+        const parsed = await Promise.all(promise);
+        const parsed2 = parsed.map((item, index) => {
+            if (Array.isArray(item)) {
+                if (item.length === 0) {
+                    return null;
+                }
+                // eslint-disable-next-line array-callback-return
+                const hits = item.map((gene) => {
+                    if (gene.name.toLowerCase() === inputList[index].toLowerCase()) {
+                        return {
+                            label: gene.name,
+                            locus: new ChromosomeInterval(gene.chrom, gene.txStart, gene.txEnd),
+                        };
+                    }
+                });
+                const hits2 = hits.filter((hit) => hit); // removes undefined
+                if (hits2.length === 0) {
+                    return null;
+                }
+                // console.log(hits2);
+                return hits2[0] || null;
+            } else {
+                return item;
+            }
+        });
+        const nullList = parsed2.filter((item) => item === null);
+        if (nullList.length > 0) {
+            notify.show(`${nullList.length} item(s) cannot find location(s) on genome`, "error", 2000);
+        } else {
+            notify.show(`${parsed2.length} region(s) added`, "success", 2000);
+        }
+        const parsed3 = parsed2.filter((item) => item);
+        if (parsed3.length === 0) {
+            this.setMessage("region file is empty or cannot find any location on genome, skip");
+            return;
+        }
+        return parsed3;
+    };
+
+    updateMyShapes = (shapeKey, shape) => {
+        const newShapes = { ...this.state.myShapes, [shapeKey]: shape };
+        this.setState({ myShapes: newShapes });
+        // this.drawMyShapes(this.state.modelDisplayConfig);
+    };
+
+    deleteShapeByKey = (shapekey) => {
+        const { [shapekey]: remove, ...newShapes } = this.state.myShapes;
+        this.setState({ myShapes: newShapes });
+    };
+
+    updateMyArrows = (arrowKey, arrow) => {
+        const newArrows = { ...this.state.myArrows, [arrowKey]: arrow };
+        this.setState({ myArrows: newArrows });
+    };
+
+    deleteArrowByKey = (arrowkey) => {
+        const { [arrowkey]: remove, ...newArrows } = this.state.myArrows;
+        this.setState({ myArrows: newArrows });
+    };
+
+    setMessage = (message) => {
+        this.setState({ message });
+    };
+
     render() {
         const {
             legendMax,
@@ -1268,6 +1736,18 @@ class ThreedmolContainer extends React.Component {
             categories,
             newG3dUrl,
             frameLabels,
+            myShapeLabel,
+            myShapeRegion,
+            myShapes,
+            highlightingColor,
+            highlightingColorChanged,
+            lineOpacity,
+            cartoonThickness,
+            autoLegendScale,
+            useLegengMin,
+            useLegengMax,
+            labelStyle,
+            myArrows,
         } = this.state;
         const { tracks, x, y, onNewViewRegion, viewRegion, sync3d } = this.props;
         const bwTracks = tracks.filter((track) => getTrackConfig(track).isBigwigTrack());
@@ -1279,8 +1759,14 @@ class ThreedmolContainer extends React.Component {
                         width={this.state.width}
                         height={this.state.height}
                         level={null}
+                        open={childShow}
+                        handler={false}
+                        showMask={false}
                     >
                         <div id="accordion" style={{ flexDirection: menuFlexDirection }}>
+                            <div className="closeMenu-3d" onClick={this.onSwitch}>
+                                &times;
+                            </div>
                             <div className="card">
                                 <div className="card-header" id="headingOne">
                                     <h5 className="mb-0">
@@ -1426,16 +1912,27 @@ class ThreedmolContainer extends React.Component {
                                             aria-expanded="true"
                                             aria-controls="collapseThree"
                                         >
-                                            Highlighting
+                                            Highlighting &amp; Labeling
                                         </button>
                                     </h5>
                                 </div>
                                 <div id="collapseThree" className="collapse show" aria-labelledby="headingThree">
                                     <div className="card-body">
-                                        <p>
+                                        <OpacityThickness
+                                            opacity={lineOpacity}
+                                            thickness={cartoonThickness}
+                                            onUpdate={this.updateLegendColor}
+                                        />
+                                        <div style={{ display: "flex", alignItems: "flex-start" }}>
+                                            <ColorPicker
+                                                onUpdateLegendColor={this.updateLegendColor}
+                                                colorKey={"highlightingColor"}
+                                                initColor={highlightingColor}
+                                            />
+
                                             <button
                                                 className="btn btn-primary btn-sm"
-                                                disabled={highlightingOn}
+                                                disabled={highlightingOn && !highlightingColorChanged}
                                                 onClick={this.highlightRegions}
                                             >
                                                 Highlight
@@ -1447,7 +1944,71 @@ class ThreedmolContainer extends React.Component {
                                             >
                                                 Remove highlight
                                             </button>
+                                        </div>
+                                        <div>
+                                            <label style={{ marginBottom: 0 }}>
+                                                <strong>Labeling style</strong>{" "}
+                                                <select value={labelStyle} onChange={this.setLabelStyle}>
+                                                    <option value="shape">shape</option>
+                                                    <option value="arrow">arrow</option>
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <p>
+                                            <strong>Gene labeling</strong>
                                         </p>
+                                        <div>
+                                            <GeneSearchBoxSimple setGeneCallback={this.addGeneToMyShapes} />
+                                        </div>
+                                        <p>
+                                            <strong>Region labeling</strong>
+                                        </p>
+                                        <div style={{ display: "flex", alignItems: "baseline" }}>
+                                            <span>Region:</span>{" "}
+                                            <input
+                                                type="text"
+                                                placeholder="chr start end"
+                                                value={myShapeRegion}
+                                                onChange={this.handleMyShapeRegionChange}
+                                            />
+                                        </div>
+                                        <div style={{ display: "flex", alignItems: "baseline" }}>
+                                            <span>Label:</span>{" "}
+                                            <input
+                                                type="text"
+                                                placeholder="my region"
+                                                value={myShapeLabel}
+                                                onChange={this.handleMyShapeLabelChange}
+                                            />
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                onClick={this.addRegionToMyShapes}
+                                            >
+                                                Add
+                                            </button>
+                                        </div>
+
+                                        <div>
+                                            Upload a text file with genes/regions:
+                                            <input type="file" onChange={this.handleRegionFileUpload} />
+                                        </div>
+
+                                        <div>
+                                            <ShapeList
+                                                shapes={myShapes}
+                                                onUpdateMyShapes={this.updateMyShapes}
+                                                onDeleteShapeByKey={this.deleteShapeByKey}
+                                                onSetMessage={this.setMessage}
+                                            />
+                                        </div>
+                                        <div>
+                                            <ArrowList
+                                                arrows={myArrows}
+                                                onUpdateMyArrows={this.updateMyArrows}
+                                                onDeleteArrowByKey={this.deleteArrowByKey}
+                                                onSetMessage={this.setMessage}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1490,8 +2051,8 @@ class ThreedmolContainer extends React.Component {
                                                     defaultValue={bigWigUrl}
                                                 >
                                                     <option value="">--</option>
-                                                    {bwTracks.map((tk) => (
-                                                        <option key={tk.url} value={tk.url}>
+                                                    {bwTracks.map((tk, idx) => (
+                                                        <option key={idx} value={tk.url}>
                                                             {tk.getDisplayLabel() || tk.url}
                                                         </option>
                                                     ))}
@@ -1510,7 +2071,46 @@ class ThreedmolContainer extends React.Component {
                                                 onChange={this.handleBigWigInputUrlChange}
                                             />
                                         )}
-
+                                        <OpacityThickness
+                                            opacity={lineOpacity}
+                                            thickness={cartoonThickness}
+                                            onUpdate={this.updateLegendColor}
+                                        />
+                                        {colorScale && (
+                                            <div>
+                                                <label>
+                                                    auto scale:{" "}
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={autoLegendScale}
+                                                        onChange={this.handleAutoLegendScaleChange}
+                                                    />
+                                                    current data: (min {legendMin}: max: {legendMax})
+                                                </label>
+                                                <div>
+                                                    <label>
+                                                        min:{" "}
+                                                        <input
+                                                            style={{ width: "9ch" }}
+                                                            type="number"
+                                                            value={useLegengMin}
+                                                            onChange={this.setUseLegendMin}
+                                                            disabled={autoLegendScale}
+                                                        />
+                                                    </label>
+                                                    <label>
+                                                        max:{" "}
+                                                        <input
+                                                            style={{ width: "9ch" }}
+                                                            type="number"
+                                                            value={useLegengMax}
+                                                            onChange={this.setUseLegendMax}
+                                                            disabled={autoLegendScale}
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        )}
                                         <p>
                                             <button
                                                 className="btn btn-primary btn-sm"
@@ -1599,6 +2199,11 @@ class ThreedmolContainer extends React.Component {
                                             />
                                             {/* <button className="btn btn-warning btn-sm" onClick={this.set4DNExampleURL}>Example</button> */}
                                         </div>
+                                        <OpacityThickness
+                                            opacity={lineOpacity}
+                                            thickness={cartoonThickness}
+                                            onUpdate={this.updateLegendColor}
+                                        />
                                         <p>
                                             <button
                                                 className="btn btn-primary btn-sm"
@@ -1754,6 +2359,21 @@ class ThreedmolContainer extends React.Component {
                 <div>
                     <div className="placement-container">
                         <div className="text-left">
+                            <div>
+                                <button className="btn btn-primary btn-sm" onClick={this.onSwitch}>
+                                    {childShow ? "Close menu" : "Open menu"}
+                                </button>{" "}
+                                <span className="text-danger font-italic">
+                                    {message.length ? (
+                                        <div>
+                                            {message}{" "}
+                                            <button className="btn btn-danger btn-sm" onClick={this.clearMessage}>
+                                                X
+                                            </button>
+                                        </div>
+                                    ) : null}
+                                </span>
+                            </div>
                             <label>
                                 Menu position:
                                 <select
@@ -1767,26 +2387,11 @@ class ThreedmolContainer extends React.Component {
                                     <option value="bottom">Bottom</option>
                                 </select>
                             </label>
-                            <span className="text-danger font-italic">
-                                {message.length ? (
-                                    <div>
-                                        {message}{" "}
-                                        <button className="btn btn-danger btn-sm" onClick={this.clearMessage}>
-                                            X
-                                        </button>
-                                    </div>
-                                ) : null}
-                            </span>
                         </div>
 
                         <div id="legend">
                             {paintMethod === "score" ? (
-                                <Legend
-                                    min={legendMin}
-                                    max={legendMax}
-                                    colorScale={colorScale}
-                                    onUpdateLegendColor={this.updateLegendColor}
-                                />
+                                <Legend colorScale={colorScale} onUpdateLegendColor={this.updateLegendColor} />
                             ) : (
                                 <CategoryLegend categories={categories} onUpdateLegendColor={this.updateLegendColor} />
                             )}

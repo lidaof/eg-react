@@ -32,3 +32,8 @@
     color: red;
     background-color: whitesmoke;
 }
+
+.btn-dense {
+    margin-right: 2px !important;
+    margin-bottom: 0 !important;
+}

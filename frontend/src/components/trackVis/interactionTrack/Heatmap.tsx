@@ -28,6 +28,7 @@ interface HeatmapProps {
     onSetAnchors3d?: any;
     onShowTooltip?: any;
     onHideTooltip?: any;
+    isThereG3dTrack?: boolean;
 }
 
 class HeatmapNoLegendWidth extends React.PureComponent<HeatmapProps, {}> {
@@ -171,31 +172,34 @@ class HeatmapNoLegendWidth extends React.PureComponent<HeatmapProps, {}> {
         if (this.props.onSetAnchors3d) {
             this.props.onSetAnchors3d(anchors)
         }
-    }
-
-    clear3dAnchors = () => {
-        if (this.props.onSetAnchors3d) {
-            this.props.onSetAnchors3d([]);
-        }
         this.props.onHideTooltip()
     }
 
+    // clear3dAnchors = () => {
+    //     if (this.props.onSetAnchors3d) {
+    //         this.props.onSetAnchors3d([]);
+    //     }
+    //     this.props.onHideTooltip()
+    // }
+
     clickTooltip = (event: React.MouseEvent) => {
-        const { x, y } = getRelativeCoordinates(event);
-        const polygon = this.findPolygon(x, y);
-        if (polygon) {
-            const { interaction } = polygon;
-            const tooltip = (
-                <Tooltip pageX={event.pageX} pageY={event.pageY}>
-                    <div>
-                        <button className="btn btn-sm btn-primary" onClick={() => this.set3dAnchors([interaction.locus1, interaction.locus2])}>Show in 3D</button>
-                    </div>
-                    <div>
+        if (this.props.isThereG3dTrack) {
+            const { x, y } = getRelativeCoordinates(event);
+            const polygon = this.findPolygon(x, y);
+            if (polygon) {
+                const { interaction } = polygon;
+                const tooltip = (
+                    <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip}>
+                        <div>
+                            <button className="btn btn-sm btn-primary" onClick={() => this.set3dAnchors([interaction.locus1, interaction.locus2])}>Show in 3D</button>
+                        </div>
+                        {/* <div>
                         <button className="btn btn-sm btn-secondary" onClick={this.clear3dAnchors} >Clear in 3D</button>
-                    </div>
-                </Tooltip>
-            );
-            this.props.onShowTooltip(tooltip);
+                    </div> */}
+                    </Tooltip>
+                );
+                this.props.onShowTooltip(tooltip);
+            }
         }
     }
 

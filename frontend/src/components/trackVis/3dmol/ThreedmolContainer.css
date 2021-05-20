@@ -72,11 +72,15 @@
 .toggle-model-container {
     display: flex;
     justify-content: space-between;
-    background-color: aquamarine;
     margin-bottom: 2px;
 }
 
-.toggle-model {
+.toggle-model-container:hover {
+    border-bottom: 1px solid orange;
+}
+
+.toggle-model:hover {
+    background-color: orange;
     cursor: pointer;
 }
 
@@ -92,18 +96,18 @@
     position: absolute;
     left: 2px;
     top: 2px;
-    z-index: 2;
+    z-index: 1;
 }
 
 .placement-container span {
     display: inline-block;
 }
 
-.drawer {
+/* .drawer {
     z-index: 3;
-}
+} */
 
-.drawer-handle {
+/* .drawer-handle {
     background: hotpink;
 }
 
@@ -114,11 +118,11 @@
 }
 .drawer-left .drawer-handle {
     top: 17%;
-}
+} */
 
-.drawer.drawer-open .drawer-mask {
+/* .drawer.drawer-open .drawer-mask {
     opacity: 0.1;
-}
+} */
 
 .card-header button {
     margin-bottom: 0 !important;
@@ -138,4 +142,20 @@
 
 .hoverButtons button {
     line-height: 1;
+}
+
+.closeMenu-3d {
+    font-size: 36px;
+    cursor: pointer;
+    color: red;
+    position: absolute;
+    right: 10px;
+    top: -8px;
+    z-index: 5;
+}
+
+.arrow-list input[type="number"] {
+    margin-bottom: 0 !important;
+    margin-right: 2px !important;
+    width: 8ch;
 }

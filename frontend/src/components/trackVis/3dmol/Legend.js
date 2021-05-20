@@ -2,9 +2,10 @@ import React from "react";
 import { ColorPicker } from "./ColorPicker";
 
 export const Legend = (props) => {
-    const { min, max, colorScale, onUpdateLegendColor } = props;
-    // console.log(props)
+    const { colorScale, onUpdateLegendColor } = props;
     if (!colorScale) return null;
+    const [min, max] = colorScale.domain();
+    // console.log(props)
     const color1 = colorScale(min);
     const color2 = colorScale((min + max) * 0.25);
     const color3 = colorScale((min + max) * 0.5);
@@ -28,10 +29,10 @@ export const Legend = (props) => {
                 </defs>
                 <rect x="50" y="0" width="200" height="40" fill="url(#grad1)" />
                 <text fill="#000" fontSize="16" fontFamily="Arial" x="6" y="28">
-                    {min.toFixed(2)}
+                    {min}
                 </text>
                 <text fill="#000" fontSize="16" fontFamily="Arial" x="253" y="28">
-                    {max.toFixed(2)}
+                    {max}
                 </text>
                 Sorry, your browser does not support inline SVG.
             </svg>
@@ -43,7 +44,5 @@ export const Legend = (props) => {
 };
 
 Legend.defaultProps = {
-    min: 0,
-    max: 0,
     colorScale: null,
 };

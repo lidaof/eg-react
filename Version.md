@@ -1,5 +1,15 @@
 # Version History
 
+## 53.1.0
+
+-   `vcf` track bug fix for certain tooltip clicking
+-   updated SARS-CoV-2 data hubs by Changxu Fan
+
+## 53.0.0
+
+-   3D structure view module added, for more please check [the 3D documentation](https://eg.readthedocs.io/en/latest/3d.html)
+-   basic support for `vcf` format
+
 ## 52.5.2
 
 -   add an option `queryEndpoint` to `TrackModel` allow customization of gene/feature annotaion query

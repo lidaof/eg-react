@@ -70,6 +70,18 @@ class GeneAnnotationTrack extends React.Component {
         );
     }
 
+    setGene3d = (gene) => {
+        if (this.props.onSetGeneFor3d) {
+            this.props.onSetGeneFor3d(gene);
+        }
+    };
+
+    // clearGene3d = () => {
+    //     if (this.props.onSetGeneFor3d) {
+    //         this.props.onSetGeneFor3d(null);
+    //     }
+    // };
+
     /**
      * Renders the tooltip for a gene.
      *
@@ -84,6 +96,17 @@ class GeneAnnotationTrack extends React.Component {
                     collectionName={this.props.trackModel.name}
                     queryEndpoint={this.props.trackModel.queryEndpoint}
                 />
+                {this.props.isThereG3dTrack && (
+                    <div>
+                        <button className="btn btn-sm btn-primary" onClick={() => this.setGene3d(gene)}>
+                            Show in 3D
+                        </button>
+                        {/* {" "}
+                    <button className="btn btn-sm btn-secondary" onClick={this.clearGene3d}>
+                        Clear in 3D
+                    </button> */}
+                    </div>
+                )}
             </Tooltip>
         );
         this.props.onShowTooltip(tooltip);
