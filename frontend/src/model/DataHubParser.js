@@ -3,7 +3,7 @@ import sampleDict from './genomes/hg19/samples.json';
 import assayDict from './genomes/hg19/assays.json';
 
 class HubParser {
-    getTracksInHub(parsedJson, hubName, oldHubFormat, tracksStartIndex=0, hubBase="") {
+    getTracksInHub(parsedJson, hubName, hubGenome, oldHubFormat, tracksStartIndex=0, hubBase="") {
         let tracks = [], url, newTrack;
         for (let plainObject of parsedJson.slice(tracksStartIndex)) {
             if (plainObject.url) {
@@ -23,6 +23,9 @@ class HubParser {
                 newTrack = new TrackModel(plainObject);
             }
             newTrack.datahub = hubName;
+            if (!newTrack.metadata.genome && hubGenome !== "") {  // Don't overwrite existing metadata.genome in hubs
+                newTrack.metadata.genome = hubGenome;
+            }
             if (oldHubFormat) {
                 let assay = assayDict[newTrack.metadata.Assay] || ["unknown"];
                 let sample = sampleDict[newTrack.metadata.Sample] || ["unknown"];

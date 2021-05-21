@@ -181,10 +181,20 @@
             "label": "Chimpanzee panTro6 to hg38 blastz",
             "querygenome": "panTro6",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/panTro6/hg38TopanTro6.gz",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38TopanTro6.gz",
             "details": {
                 "source": "UCSC Genome Browser",
                 "download url": "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsPanTro6/"
+            }
+        },
+        {
+            "name": "gorGor4tohg38",
+            "label": "Gorilla gorGor4 to hg38 blastz",
+            "querygenome": "gorGor4",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38.gorGor4.gz",
+            "details": {
+                "source": "UCSC Genome Browser"
             }
         },
         {
@@ -194,12 +204,19 @@
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rheMac3_axt.gz"
         },
-         {
+        {
             "name": "rn5tohg38",
             "label": "Rat rn5 to hg38 blastz",
             "querygenome": "rn5",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rn5_axt.gz"
+        },
+        {
+            "name": "rn6tohg38",
+            "label": "Rat rn6 to hg38 blastz",
+            "querygenome": "rn6",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38.rn6.gz"
         }
     ],
     "Mappability": [

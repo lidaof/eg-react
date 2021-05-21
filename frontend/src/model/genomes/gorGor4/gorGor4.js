@@ -18,7 +18,7 @@ const defaultTracks = [
     new TrackModel({
         type: 'repeatmasker',
         name: 'RepeatMasker',
-        url: 'https://wangftp.wustl.edu/~xzhuo/browser/panTro4/gorGor4.bb',
+        url: 'https://vizhub.wustl.edu/public/gorGor4/gorGor4.bb',
     })
 ];
 
@@ -28,7 +28,7 @@ const GORGOR4 = {
     cytobands: cytobands,
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
-    twoBitURL: "https://wangftp.wustl.edu/~xzhuo/browser/panTro4/gorGor4.2bit",
+    twoBitURL: "https://vizhub.wustl.edu/public/gorGor4/gorGor4.2bit",
     annotationTracks,
 };
 

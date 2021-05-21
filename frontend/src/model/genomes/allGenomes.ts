@@ -7,9 +7,12 @@ import DAN_RER11 from "./danRer11/danRer11";
 import DAN_RER7 from "./danRer7/danRer7";
 import PANTRO5 from "./panTro5/panTro5";
 import PANTRO6 from "./panTro6/panTro6";
+import rn4 from "./rn4/rn4";
 import RN6 from "./rn6/rn6";
 import MM9 from "./mm9/mm9";
 import BosTau8 from "./bosTau8/bosTau8";
+import rheMac2 from "./rheMac2/rheMac2";
+import rheMac3 from "./rheMac3/rheMac3";
 import RheMac8 from "./rheMac8/rheMac8";
 import GalGal6 from "./galGal6/galGal6";
 import GalGal5 from "./galGal5/galGal5";
@@ -29,7 +32,10 @@ import gorGor4 from "./gorGor4/gorGor4";
 import gorGor3 from "./gorGor3/gorGor3";
 import nomLeu3 from "./nomLeu3/nomLeu3";
 import papAnu2 from "./papAnu2/papAnu2";
-import rheMac3 from "./rheMac3/rheMac3";
+import oryCun2 from "./oryCun2/oryCun2";
+import canFam2 from "./canFam2/canFam2";
+import canFam3 from "./canFam3/canFam3";
+import monDom5 from "./monDom5/monDom5";
 import calJac3 from "./calJac3/calJac3";
 import Pfal3D7 from "./pfal3d7/pfal3d7";
 import TbruceiTREU927 from "./trypanosome/TbruceiTREU927";
@@ -40,6 +46,7 @@ import { GenomeConfig } from "./GenomeConfig";
 /**
  * All available genomes.
  */
+
 export const allGenomes = [
     // order matters, shows same order in genome list after click genome logo
     HG38,
@@ -47,14 +54,18 @@ export const allGenomes = [
     MM39,
     MM10,
     MM9,
+    PANTRO6,
     PANTRO5,
+    panTro4,
     BosTau8,
-    DAN_RER10,
     DAN_RER11,
+    DAN_RER10,
     DAN_RER7,
     RN6,
-    AraTha1,
+    rn4,
     RheMac8,
+    rheMac3,
+    rheMac2,
     GalGal6,
     GalGal5,
     DM6,
@@ -67,14 +78,16 @@ export const allGenomes = [
     nCoV2019,
     hpv16,
     LEPOCU1,
-    panTro4,
     gorGor4,
     gorGor3,
     nomLeu3,
     papAnu2,
-    rheMac3,
+    oryCun2,
+    canFam3,
+    canFam2,
+    monDom5,
     calJac3,
-    PANTRO6,
+    AraTha1,
     Pfal3D7,
     Creinhardtii506,
     TbruceiTREU927,
@@ -125,7 +138,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     rhesus: {
         logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
-        assemblies: [RheMac8.genome.getName(), rheMac3.genome.getName()],
+        assemblies: [RheMac8.genome.getName(), rheMac3.genome.getName(), rheMac2.genome.getName()],
         color: "yellow",
     },
     marmoset: {
@@ -138,6 +151,16 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         assemblies: [BosTau8.genome.getName()],
         color: "yellow",
     },
+    rabbit: {
+        logoUrl: "https://vizhub.wustl.edu/public/oryCun2/rabbit.png",
+        assemblies: [oryCun2.genome.getName()],
+        color: "yellow",
+    },
+    dog: {
+        logoUrl: "https://vizhub.wustl.edu/public/canFam3/dog.png",
+        assemblies: [canFam3.genome.getName(), canFam2.genome.getName()],
+        color: "yellow",
+    },
     mouse: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Mouse.png",
         assemblies: [MM39.genome.getName(), MM10.genome.getName(), MM9.genome.getName()],
@@ -145,7 +168,12 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     rat: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Rat.png",
-        assemblies: [RN6.genome.getName()],
+        assemblies: [RN6.genome.getName(), rn4.genome.getName()],
+        color: "white",
+    },
+    opossum: {
+        logoUrl: "https://vizhub.wustl.edu/public/monDom5/opossum.png",
+        assemblies: [monDom5.genome.getName()],
         color: "white",
     },
     chicken: {

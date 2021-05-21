@@ -73,7 +73,7 @@ const defaultTracks = [
     new TrackModel({
         name: "Viral RNA expression (nanopore)",
         type: "bigwig",
-        url: "https://wangftp.wustl.edu/~xzhuo/bat_genomes/VeroInf24h.bw",
+        url: "https://vizhub.wustl.edu/public/virus/VeroInf24h.bw",
         options: {
             zoomLevel: "0",
         },
@@ -350,7 +350,7 @@ const publicHubList = [
         name: "Viral RNA expression (Kim et al., 2020)",
         numTracks: 1,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~xzhuo/viralBrowser/nanoporeBW.json",
+        url: "https://vizhub.wustl.edu/public/virus/nanoporeBW.json",
         description: {
             "hub built by": "Xiaoyu Zhuo (xzhuo@wustl.edu)",
             "hub info":

@@ -426,7 +426,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
 async function getTracksFromHubURL(url: string): Promise<any> {
     const json = await new Json5Fetcher().get(url);
     const hubParser = new DataHubParser();
-    return await hubParser.getTracksInHub(json, "URL hub", false, 0);
+    return await hubParser.getTracksInHub(json, "URL hub", "", false, 0);
 }
 
 /**

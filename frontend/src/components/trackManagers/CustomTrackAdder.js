@@ -4,6 +4,7 @@ import { Tabs, Tab } from "react-bootstrap-tabs";
 import JSON5 from "json5";
 // import { notify } from 'react-notify-toast';
 import TrackModel from "../../model/TrackModel";
+import { getSecondaryGenomes } from '../../util';
 import CustomHubAdder from "./CustomHubAdder";
 import FacetTable from "./FacetTable";
 import { HELP_LINKS } from "../../util";
@@ -69,6 +70,7 @@ class CustomTrackAdder extends React.Component {
         onTracksAdded: PropTypes.func,
         onAddTracksToPool: PropTypes.func,
         addTermToMetaSets: PropTypes.func,
+        genomeConfig: PropTypes.object.isRequired,
         addedTrackSets: PropTypes.instanceOf(Set),
     };
 
@@ -80,6 +82,7 @@ class CustomTrackAdder extends React.Component {
             url: "",
             name: "",
             urlError: "",
+            metadata: {"genome":this.props.genomeConfig.genome.getName()},
             trackAdded: false,
             selectedTabIndex: 0,
             options: null, // custom track options
@@ -116,6 +119,14 @@ class CustomTrackAdder extends React.Component {
         ));
     }
 
+    renderGenomeOptions(allGenomes) {
+        return allGenomes.map(genome => 
+            <option key={genome} value={genome}>
+                {genome}
+            </option>
+        );
+    }
+
     renderButtons() {
         if (this.state.trackAdded) {
             return (
@@ -148,7 +159,10 @@ class CustomTrackAdder extends React.Component {
     };
 
     renderCustomTrackAdder() {
-        const { type, url, name, urlError } = this.state;
+        const { type, url, name, metadata, urlError } = this.state;
+        const primaryGenome = this.props.genomeConfig.genome.getName();
+        var allGenomes = getSecondaryGenomes(primaryGenome, this.props.addedTracks);
+        allGenomes.unshift(primaryGenome);
         return (
             <form>
                 <h1>Add remote track</h1>
@@ -185,6 +199,16 @@ class CustomTrackAdder extends React.Component {
                         value={name}
                         onChange={(event) => this.setState({ name: event.target.value })}
                     />
+                </div>
+                <div className="form-group">
+                    <label>genome</label>
+                    <select
+                        className="form-control"
+                        value={metadata.genome}
+                        onChange={(event) => this.setState({ metadata: {genome:event.target.value} })}
+                    >
+                        {this.renderGenomeOptions(allGenomes)}
+                    </select>
                 </div>
                 <TrackOptionsUI onGetOptions={(value) => this.getOptions(value)} />
                 {this.renderButtons()}

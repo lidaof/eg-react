@@ -55,7 +55,7 @@ class RemoteHubAdder extends React.Component {
         const lastSlashIndex = this.state.inputUrl.lastIndexOf("/");
         const hubBase = this.state.inputUrl.substring(0, lastSlashIndex).trimRight("/");
         const parser = new DataHubParser(0);
-        const tracks = await parser.getTracksInHub(json, "Custom hub", false, 0, hubBase);
+        const tracks = await parser.getTracksInHub(json, "Custom hub", "", false, 0, hubBase);
         if (tracks) {
             this.props.onAddTracksToPool(tracks, false);
             const tracksToShow = tracks.filter((track) => track.showOnHubLoad);

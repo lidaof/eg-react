@@ -28,6 +28,11 @@ class HubTable extends React.PureComponent {
 
         this.columns = [
             {
+                Header: "Genome",
+                accessor: "genome",
+                width: 100,
+            },
+            {
                 Header: "Collection",
                 accessor: "collection",
             },
@@ -84,6 +89,7 @@ class HubTable extends React.PureComponent {
                 const tracks = await this.hubParser.getTracksInHub(
                     json,
                     hub.name,
+                    hub.genome,
                     hub.oldHubFormat,
                     tracksStartIndex,
                     hubBase
@@ -140,6 +146,7 @@ class HubTable extends React.PureComponent {
                     columns={this.columns}
                     minRows={Math.min(this.props.publicHubs.length, 10)}
                     SubComponent={(row) => {
+                        let genome = row.original.genome;
                         let collectionDetails = publicHubData[row.original.collection] || <i>No details available.</i>;
                         let hubDetails = row.original.description ? (
                             <ObjectAsTable content={row.original.description} />
@@ -148,6 +155,8 @@ class HubTable extends React.PureComponent {
                         );
                         return (
                             <div style={{ padding: "20px" }}>
+                                <h3>Genome</h3>
+                                {genome}
                                 <h3>Collection details</h3>
                                 {collectionDetails}
                                 <h3>Hub details</h3>
