@@ -13,8 +13,9 @@ import TrackModel from "model/TrackModel";
 import DisplayedRegionModel from "model/DisplayedRegionModel";
 import ChromosomeInterval from "model/interval/ChromosomeInterval";
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
-import GeneSearchBoxSimple from "components/genomeNavigator/GeneSearchBoxSimple";
+import GeneSearchBox3D from "components/genomeNavigator/GeneSearchBox3D";
 import { BigwigSource } from "./BigwigSource";
+import { CORS_PROXY } from "../imageTrack/OmeroSvgVisualizer";
 import { chromColors, colorAsNumber, g3dParser, getClosestValueIndex } from "./helpers-3dmol";
 import { Legend } from "./Legend";
 import { HoverInfo } from "./HoverInfo";
@@ -77,6 +78,7 @@ class ThreedmolContainer extends React.Component {
         this.sphereLabels = [];
         this.shapes = [];
         this.shapeLabels = [];
+        this.imageLabels = [];
         this.g3dFile = null;
         this.bwData = {};
         this.compData = [];
@@ -308,6 +310,13 @@ class ThreedmolContainer extends React.Component {
                 this.removeMyShapes();
             }
         }
+        if (!_.isEqual(prevProps.imageInfo, this.props.imageInfo)) {
+            if (this.props.imageInfo) {
+                this.drawImageLabel(modelDisplayConfig);
+            } else {
+                this.removeImageLabel();
+            }
+        }
         if (prevProps.viewRegion !== this.props.viewRegion) {
             const chroms = this.viewRegionToChroms();
             const prevChroms = prevProps.viewRegion.getFeatureSegments().map((region) => region.getName());
@@ -398,6 +407,57 @@ class ThreedmolContainer extends React.Component {
 
     removeHover = () => {
         this.setState({ hoveringAtom: null, hoveringX: 0, hoveringY: 0 });
+    };
+
+    drawImageLabel = (displayConfig) => {
+        const { resolution } = this.state;
+        const { imageInfo } = this.props;
+        const resString = resolution.toString();
+        this.prepareAtomKeeper();
+        const displayedModelKeys = this.getDisplayedModelKeys(displayConfig);
+        if (this.imageLabels.length) {
+            this.removeImageLabel();
+        }
+        if (imageInfo) {
+            //"assay_info": "Chromosomes, Nucleolus, GRCm38:11:16745166-16937185 mouse region"
+            const splits = imageInfo.details.assay_info.split(":");
+            const regionstr = "chr" + splits[1] + ":" + splits[2].split(" ")[0]; // tmp solution, to be fixed
+            // console.log(imageInfo, regionstr);
+            const locus = ChromosomeInterval.parse(regionstr);
+            const atoms = findAtomsWithRegion(
+                this.atomKeeper[resString],
+                locus.chr,
+                locus.start,
+                locus.end,
+                resolution,
+                displayedModelKeys
+            );
+            // const img = document.createElement("img");
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.alt = imageInfo.imageId;
+            img.width = 100;
+            img.height = 100;
+            // console.log(img);
+            img.addEventListener("load", () => {
+                atoms.forEach((atom) => {
+                    this.imageLabels.push(
+                        this.viewer.addLabel("", {
+                            position: { x: atom.x, y: atom.y, z: atom.z },
+                            backgroundImage: img,
+                            // screenOffset: { x: 0, y: 0 },
+                        })
+                    );
+                });
+            });
+            document.body.appendChild(img);
+            img.src = `${CORS_PROXY}/${imageInfo.thumbnail}`;
+        }
+    };
+
+    removeImageLabel = () => {
+        this.imageLabels.forEach((label) => this.viewer.removeLabel(label));
+        this.imageLabels = [];
     };
 
     drawMyShapes = (displayConfig) => {
@@ -794,6 +854,11 @@ class ThreedmolContainer extends React.Component {
             this.drawMyShapes(newDisplayConfig);
         } else {
             this.viewer.render(); //avoid dup render in drawAnchors3d
+        }
+        if (this.props.imageInfo) {
+            this.drawImageLabel(newDisplayConfig);
+        } else {
+            this.viewer.render();
         }
     };
 
@@ -1454,25 +1519,48 @@ class ThreedmolContainer extends React.Component {
         this.setState({ myShapeRegion: e.target.value.trim() });
     };
 
-    addAnchors3dToMyArrows = (anchors) => {
-        const newArrows = { ...this.state.myArrows };
-        anchors.forEach((locus, idx) => {
-            const color = idx % 2 ? "red" : "blue";
-            const regionStr = locus.toString();
-            if (!newArrows.hasOwnProperty(regionStr)) {
-                newArrows[regionStr] = {
-                    start: { x: 0, y: 0.0, z: 0.0 },
-                    locus,
-                    loci: null,
-                    radius: 0.2,
-                    color,
-                };
-            } else {
-                this.setState({ message: "warning, duplicated arrow region" });
-                // return;
-            }
-        });
-        this.setState({ myArrows: newArrows });
+    addAnchors3dToMyArrows = (anchors, asShape = false) => {
+        const newShapes = { ...this.state.myShapes };
+        if (asShape) {
+            anchors.forEach((locus, idx) => {
+                const color = idx % 2 ? "red" : "blue";
+                const regionStr = locus.toString();
+                if (!newShapes.hasOwnProperty(regionStr)) {
+                    newShapes[regionStr] = {
+                        label: regionStr,
+                        outline: "sphere",
+                        locus,
+                        loci: null,
+                        size: 2,
+                        wireframe: false,
+                        color,
+                    };
+                } else {
+                    this.setState({ message: "warning, duplicated arrow region" });
+                    // return;
+                }
+            });
+            this.setState({ myShapes: newShapes });
+        } else {
+            const newArrows = { ...this.state.myArrows };
+            anchors.forEach((locus, idx) => {
+                const color = idx % 2 ? "red" : "blue";
+                const regionStr = locus.toString();
+                if (!newArrows.hasOwnProperty(regionStr)) {
+                    newArrows[regionStr] = {
+                        start: { x: 0, y: 0.0, z: 0.0 },
+                        locus,
+                        loci: null,
+                        radius: 0.2,
+                        color,
+                    };
+                } else {
+                    this.setState({ message: "warning, duplicated arrow region" });
+                    // return;
+                }
+            });
+            this.setState({ myArrows: newArrows });
+        }
     };
 
     addRegionToMyShapes = () => {
@@ -1958,7 +2046,7 @@ class ThreedmolContainer extends React.Component {
                                             <strong>Gene labeling</strong>
                                         </p>
                                         <div>
-                                            <GeneSearchBoxSimple setGeneCallback={this.addGeneToMyShapes} />
+                                            <GeneSearchBox3D setGeneCallback={this.addGeneToMyShapes} />
                                         </div>
                                         <p>
                                             <strong>Region labeling</strong>
@@ -2407,6 +2495,7 @@ class ThreedmolContainer extends React.Component {
                             viewRegion={viewRegion}
                             onNewViewRegion={onNewViewRegion}
                             removeHover={this.removeHover}
+                            addToLabel={this.addAnchors3dToMyArrows}
                         />
                         <div
                             className="box1"

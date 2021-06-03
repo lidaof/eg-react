@@ -1,6 +1,6 @@
+import { TrackConfig } from "./TrackConfig";
 import { NumericalTrackConfig } from "./NumericalTrackConfig";
-import NumericalTrack from "../trackVis/commonComponents/numerical/NumericalTrack";
-
+import NumericalTrack, { DEFAULT_OPTIONS } from "../trackVis/commonComponents/numerical/NumericalTrack";
 import { BigWorker } from "../../dataSources/WorkerTSHook";
 import LocalBigSource from "../../dataSources/big/LocalBigSource";
 import WorkerSource from "../../dataSources/worker/WorkerSource";
@@ -9,10 +9,12 @@ import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 import { BigWigZoomLevelConfig } from "components/trackContextMenu/DisplayModeConfig";
 import TrackModel, { TrackOptions } from "model/TrackModel";
 
-export class BigWigTrackConfig extends NumericalTrackConfig {
+export class BigWigTrackConfig extends TrackConfig {
+    private numericalTrackConfig: NumericalTrackConfig;
     constructor(trackModel: TrackModel) {
         super(trackModel);
-        this.setDefaultOptions({ zoomLevel: "auto" });
+        this.numericalTrackConfig = new NumericalTrackConfig(trackModel);
+        this.setDefaultOptions({ ...DEFAULT_OPTIONS, zoomLevel: "auto" });
     }
 
     initDataSource() {
@@ -61,6 +63,6 @@ export class BigWigTrackConfig extends NumericalTrackConfig {
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), BigWigZoomLevelConfig];
+        return [...this.numericalTrackConfig.getMenuComponents(), BigWigZoomLevelConfig];
     }
 }

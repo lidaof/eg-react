@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import FlexLayout from "flexlayout-react";
 import OpenInterval from "model/interval/OpenInterval";
 import { MAX_NUMBER_THUMBNAILS } from "./OmeroTrack";
 import { ensureMaxListLength } from "../../../util";
@@ -10,7 +11,6 @@ import Tooltip from "../commonComponents/tooltip/Tooltip";
 import { ObjectAsTable } from "components/trackContextMenu/TrackContextMenu";
 import { ActionCreators } from "../../../AppState";
 import TrackModel from "model/TrackModel";
-import FlexLayout from "flexlayout-react";
 
 function mapStateToProps(state) {
     return {
@@ -65,9 +65,9 @@ class OmeroHtmlVisualizer extends React.PureComponent {
 
     renderTooltip = (event, imgHash, imgId, imageUrl, imageUrlSuffix, detailUrl) => {
         const dataTable = imgHash[imgId];
-        const detailButton = dataTable.id ? (
+        const detailButton = dataTable.details.id ? (
             <a
-                href={dataTable.id}
+                href={dataTable.details.id}
                 role="button"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -75,6 +75,16 @@ class OmeroHtmlVisualizer extends React.PureComponent {
             >
                 See details in 4DN data portal
             </a>
+        ) : null;
+        const button3d = this.props.isThereG3dTrack ? (
+            <button className="btn btn-sm btn-warning" onClick={() => this.props.onSetImageInfo(dataTable)}>
+                Show in 3D
+            </button>
+        ) : null;
+        const button3dClear = this.props.isThereG3dTrack ? (
+            <button className="btn btn-sm btn-secondary" onClick={() => this.props.onSetImageInfo(null)}>
+                Remove from 3D
+            </button>
         ) : null;
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} hideArrow={true}>
@@ -86,9 +96,9 @@ class OmeroHtmlVisualizer extends React.PureComponent {
                     >
                         View larger image
                     </button>{" "}
-                    {detailButton}
+                    {detailButton} {button3d} {button3dClear}
                 </div>
-                <ObjectAsTable content={dataTable} />
+                <ObjectAsTable content={dataTable.details} />
             </Tooltip>
         );
         this.props.onShowTooltip(tooltip);
@@ -99,7 +109,7 @@ class OmeroHtmlVisualizer extends React.PureComponent {
         const imageHash = {};
         data.forEach((d) => {
             d.images.forEach((img) => {
-                imageHash[img.imageId] = img.details;
+                imageHash[img.imageId] = img;
             });
         });
         const imageAllIds = Object.keys(imageHash);

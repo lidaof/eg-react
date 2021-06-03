@@ -551,7 +551,9 @@ class TrackContainer extends React.Component {
             onSetAnchors3d,
             onSetGeneFor3d,
             viewer3dNumFrames,
+            basesPerPixel,
             isThereG3dTrack,
+            onSetImageInfo,
         } = this.props;
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
@@ -578,7 +580,9 @@ class TrackContainer extends React.Component {
                     onSetAnchors3d={onSetAnchors3d}
                     onSetGeneFor3d={onSetGeneFor3d}
                     viewer3dNumFrames={viewer3dNumFrames}
+                    basesPerPixel={basesPerPixel}
                     isThereG3dTrack={isThereG3dTrack}
+                    onSetImageInfo={onSetImageInfo}
                 />
             );
         });
@@ -654,6 +658,7 @@ class TrackContainer extends React.Component {
             primaryView,
             viewRegion,
             highlightColor,
+            basesPerPixel,
         } = this.props;
         if (!primaryView) {
             return null;
@@ -670,6 +675,7 @@ class TrackContainer extends React.Component {
                 onApplyDynamicHic={this.applyDynamicHic}
                 onApplyDynamicLongrange={this.applyDynamicLongrange}
                 onApplyDynamicBed={this.applyDynamicBed}
+                basesPerPixel={basesPerPixel}
             />
         );
         const trackDivStyle = {

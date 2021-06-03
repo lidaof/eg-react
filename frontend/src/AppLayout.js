@@ -58,6 +58,7 @@ class AppLayout extends React.PureComponent {
             viewer3dNumFrames: null,
             geneFor3d: null,
             g3dcount: 0,
+            imageInfo: null,
         };
         this.handleNodeResize = _.debounce(this.handleNodeResize, 250);
     }
@@ -170,6 +171,10 @@ class AppLayout extends React.PureComponent {
         this.setState({ sync3d: isSync3d });
     };
 
+    setImageInfo = (info) => {
+        this.setState({ imageInfo: info });
+    };
+
     handleNodeResize = (node) => {
         const model = node.getModel();
         if (model) {
@@ -206,6 +211,7 @@ class AppLayout extends React.PureComponent {
                 onSetGeneFor3d={this.setGeneFor3d}
                 viewer3dNumFrames={this.state.viewer3dNumFrames}
                 isThereG3dTrack={this.state.g3dcount > 0}
+                onSetImageInfo={this.setImageInfo}
             />
         );
     };
@@ -310,6 +316,7 @@ class AppLayout extends React.PureComponent {
                 sync3d={this.state.sync3d}
                 onToggleSync3d={this.toggleSync3d}
                 onGetViewer3dAndNumFrames={this.getViewer3dAndNumFrames}
+                imageInfo={this.state.imageInfo}
             />
         );
     };

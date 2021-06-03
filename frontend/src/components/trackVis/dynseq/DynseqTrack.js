@@ -4,7 +4,6 @@ import _ from "lodash";
 import { scaleLinear } from "d3-scale";
 import memoizeOne from "memoize-one";
 import { notify } from "react-notify-toast";
-import LinearDrawingModel from "model/LinearDrawingModel";
 import HoverTooltipContext from "../commonComponents/tooltip/HoverTooltipContext";
 import Chromosomes from "components/genomeNavigator/Chromosomes";
 import withCurrentGenome from "components/withCurrentGenome";
@@ -19,6 +18,7 @@ import NumericalTrack from "../commonComponents/numerical/NumericalTrack";
 
 const CHROMOSOMES_Y = 60;
 const TOP_PADDING = 2;
+export const MAX_PIXELS_PER_BASE_NUMERIC = 0.5;
 
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN,
@@ -174,7 +174,7 @@ class DynseqTrack extends PureComponent {
     };
 
     render() {
-        const { data, viewRegion, width, trackModel, options, unit } = this.props;
+        const { data, viewRegion, width, trackModel, options, unit, basesPerPixel } = this.props;
         const { height, aggregateMethod } = options;
         const dataForward = data.filter((feature) => feature.value === undefined || feature.value >= 0); // bed track to density mode
         const dataReverse = data.filter((feature) => feature.value < 0);
@@ -194,10 +194,10 @@ class DynseqTrack extends PureComponent {
             this.drawHeights = this.drawHeights.map((num, idx) => num + negHeights[idx]);
             this.allValues = this.allValues.map((num, idx) => num + (this.xToValue2[idx] || 0));
         }
-        const drawModel = new LinearDrawingModel(viewRegion, width);
-        const seqmode = drawModel.basesToXWidth(1) > 2;
+        // const drawModel = new LinearDrawingModel(viewRegion, width);
+        // const seqmode = drawModel.basesToXWidth(1) > 2;
         const genomeConfig = getGenomeConfig(trackModel.getMetadata("genome")) || this.props.genomeConfig;
-        if (seqmode) {
+        if (basesPerPixel <= MAX_PIXELS_PER_BASE_NUMERIC) {
             const legend = (
                 <TrackLegend
                     trackModel={trackModel}

@@ -250,9 +250,39 @@ const publicHubData = {
     "Putative SARS-CoV-2 Immune Epitopes":
         "Datahubs with tracks providing predicted epitope sequences across the SARS-CoV-2 reference genome",
     "Image data from IDR": "Images from IDR (https://idr.openmicroscopy.org/)",
+    "SARS-CoV-2 CRISPR Screen Database":
+        "A database containing tracks displaying the log2 fold changes and p-values in SARS-CoV-2 infected populations vs uninfected control.",
+    "Variants of Interest and Variants of Concern":
+        "A database containing all 8 SARS-CoV-2 Variants of Interest and all 5 Variants of Concern, as defined by the CDC as of May 25, 2021: https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-info.html#Interest",
 };
 
 const publicHubList = [
+    {
+        collection: "SARS-CoV-2 CRISPR Screen Database",
+        name: "SARS-CoV-2 CRISPR Screen Database",
+        numTracks: 12,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/crispr_screen/crispr_screen.json",
+        description: {
+            "hub built by": "Jennifer Karlow (Flynn) (jaflynn@wustl.edu)",
+            "data source":
+                "Baggen, J., Persoons, L., Vanstreels, E. et al. Genome-wide CRISPR screening identifies TMEM106B as a proviral host factor for SARS-CoV-2. Nat Genet 53, 435–444 (2021). https://doi.org/10.1038/s41588-021-00805-2",
+            "hub info":
+                "This datahub contains 12 tracks - 4 for each stringency/adjustment levels: one showing log2 fold change values and the other 3 showing p-values for SARS-CoV-2 infected populations vs uninfected controls (14 days after exposure). The data displayed are from Supplementary Table 11: Supplementary Table 11. SARS-CoV-2 low stringency screen - gene-level analysis SARS-CoV-2 versus control - adjusted, Supplementary Table 7: Supplementary Table 7. SARS-CoV-2 high stringency screen - gene-level analysis, and Supplementary Table 10. SARS-CoV-2 low stringency screen - gene-level analysis SARS-CoV-2 versus control.",
+        },
+    },
+    {
+        collection: "Variants of Interest and Variants of Concern",
+        name: "Variants of Interest and Variants of Concern",
+        numTracks: 13,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/variants_of_concern/voi_and_voc.json",
+        description: {
+            "hub built by": "Jennifer Karlow (Flynn) (jaflynn@wustl.edu)",
+            "hub info":
+                "A database containing all 8 SARS-CoV-2 Variants of Interest and all 5 Variants of Concern, as defined by the CDC as of May 25, 2021: https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-info.html#Interest",
+        },
+    },
     {
         collection: "Diagnostics",
         name: "Primers",

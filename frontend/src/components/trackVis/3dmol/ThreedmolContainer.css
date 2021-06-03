@@ -141,7 +141,8 @@
 }
 
 .hoverButtons button {
-    line-height: 1;
+    margin: 2px 0;
+    display: block;
 }
 
 .closeMenu-3d {

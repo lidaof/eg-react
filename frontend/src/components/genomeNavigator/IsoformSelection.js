@@ -1,18 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-
 import { StandaloneGeneAnnotation } from "./StandaloneGeneAnnotation";
 import withCurrentGenome from "../withCurrentGenome";
-
 import Gene from "../../model/Gene";
 import { Genome } from "../../model/genomes/Genome";
 import LinearDrawingModel from "../../model/LinearDrawingModel";
 import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import NavigationContext from "../../model/NavigationContext";
+import { AWS_API } from "../../dataSources/GeneSource";
 
 import "./IsoformSelection.css";
-import { AWS_API } from "../../dataSources/GeneSource";
 
 const DRAW_WIDTH = 200;
 

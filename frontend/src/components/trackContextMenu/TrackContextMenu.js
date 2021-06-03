@@ -68,12 +68,13 @@ class TrackContextMenu extends React.PureComponent {
      * @return {JSX.Element[]} menu elements to render
      */
     renderTrackSpecificItems() {
+        const { basesPerPixel } = this.props;
         const selectedTracks = this.props.tracks.filter((track) => track.isSelected);
         const trackConfigs = selectedTracks.map(getTrackConfig);
         let menuComponents = []; // Array of arrays, one for each track
         let optionsObjects = [];
         for (const config of trackConfigs) {
-            const menuItems = config.getMenuComponents();
+            const menuItems = config.getMenuComponents(basesPerPixel);
             if (!menuItems) {
                 // Intersecting anything with the empty set is the empty set, so we can stop right here.
                 return [];

@@ -73,7 +73,7 @@ export class TrackConfig {
         return UnknownTrack;
     }
 
-    getMenuComponents(): React.ComponentType[] {
+    getMenuComponents(basesPerPixel?: number): React.ComponentType[] {
         return [LabelConfig];
     }
 }

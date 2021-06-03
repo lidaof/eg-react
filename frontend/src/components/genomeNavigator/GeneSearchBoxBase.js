@@ -4,6 +4,7 @@ import _ from "lodash";
 import axios from "axios";
 import Autosuggest from "react-autosuggest";
 import { Manager, Target, Popper } from "react-popper";
+import SpeechRecognition from "react-speech-recognition";
 import withCurrentGenome from "../withCurrentGenome";
 import IsoformSelection from "./IsoformSelection";
 import OutsideClickDetector from "../OutsideClickDetector";
@@ -23,19 +24,24 @@ const ISOFORM_POPOVER_STYLE = {
     overflow: "auto",
 };
 const DEBOUNCE_INTERVAL = 250;
+const options = {
+    autoStart: false,
+};
 
 /**
  * A box that accepts gene name queries, and gives suggestions as well.
  *
  * @author Daofeng Li and Silas Hsu
  */
-class GeneSearchBoxSimple extends React.PureComponent {
+class GeneSearchBoxBase extends React.PureComponent {
     static propTypes = {
         genomeConfig: PropTypes.shape({
             // Current genome
             genome: PropTypes.instanceOf(Genome).isRequired,
         }).isRequired,
-        setGeneCallback: PropTypes.func.isRequired,
+        onGeneSelected: PropTypes.func.isRequired,
+        voiceInput: PropTypes.bool,
+        simpleMode: PropTypes.bool,
     };
 
     constructor(props) {
@@ -45,6 +51,7 @@ class GeneSearchBoxSimple extends React.PureComponent {
             inputValue: "", //user's input
             suggestions: [], // Matching gene symbols for the current input
             isShowingIsoforms: false,
+            speechInput: false, // text search input or speech
         };
         this.getSuggestions = _.debounce(this.getSuggestions, DEBOUNCE_INTERVAL);
     }
@@ -80,9 +87,27 @@ class GeneSearchBoxSimple extends React.PureComponent {
     /**
      * @param {Gene} gene
      */
-    setGene = (gene) => {
-        this.props.setGeneCallback(gene);
+    setSelectedGene = (gene) => {
+        if (this.props.onGeneSelected) {
+            this.props.onGeneSelected(gene);
+        }
         this.setState({ isShowingIsoforms: false });
+    };
+
+    startListening = () => {
+        const { startListening } = this.props;
+        startListening();
+        this.setState({
+            speechInput: true,
+        });
+    };
+
+    stopListening = () => {
+        const { stopListening } = this.props;
+        stopListening();
+        this.setState({
+            speechInput: false,
+        });
     };
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -103,13 +128,36 @@ class GeneSearchBoxSimple extends React.PureComponent {
 
     render() {
         const { suggestions, isShowingIsoforms, inputValue } = this.state;
-
+        const { simpleMode, voiceInput } = this.props;
+        let speechSearchBox;
+        if (voiceInput) {
+            const { resetTranscript, browserSupportsSpeechRecognition } = this.props;
+            if (browserSupportsSpeechRecognition) {
+                speechSearchBox = (
+                    <div className="GeneSearchBox-speech">
+                        <button className="btn btn-success btn-sm" onClick={this.startListening}>
+                            Say a Gene
+                        </button>
+                        <button className="btn btn-info btn-sm" onClick={resetTranscript}>
+                            Reset
+                        </button>
+                        <button className="btn btn-danger btn-sm" onClick={this.stopListening}>
+                            Stop
+                        </button>
+                    </div>
+                );
+            }
+        }
         let isoformPane = null;
         if (isShowingIsoforms) {
             isoformPane = (
                 <Popper placement="bottom-start" style={ISOFORM_POPOVER_STYLE}>
                     <OutsideClickDetector onOutsideClick={() => this.setState({ isShowingIsoforms: false })}>
-                        <IsoformSelection geneName={inputValue} onGeneSelected={this.setGene} simpleMode={true} />
+                        <IsoformSelection
+                            geneName={inputValue}
+                            onGeneSelected={this.setSelectedGene}
+                            simpleMode={simpleMode}
+                        />
                     </OutsideClickDetector>
                 </Popper>
             );
@@ -117,6 +165,7 @@ class GeneSearchBoxSimple extends React.PureComponent {
 
         return (
             <div>
+                {speechSearchBox}
                 {/* <label style={{ marginBottom: 0 }}>Gene search</label> */}
                 <Manager>
                     <Target>
@@ -144,4 +193,4 @@ class GeneSearchBoxSimple extends React.PureComponent {
     }
 }
 
-export default withCurrentGenome(GeneSearchBoxSimple);
+export default withCurrentGenome(SpeechRecognition(options)(GeneSearchBoxBase));
