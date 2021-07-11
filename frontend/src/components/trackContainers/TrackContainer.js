@@ -4,9 +4,7 @@ import _ from "lodash";
 import connect from "react-redux/lib/connect/connect";
 import ReactModal from "react-modal";
 import Hotkeys from "react-hot-keys";
-
 import { ActionCreators } from "../../AppState";
-
 import { withTrackData } from "./TrackDataManager";
 import { withTrackView } from "./TrackViewManager";
 import TrackHandle from "./TrackHandle";
@@ -21,23 +19,21 @@ import ContextMenuManager from "../ContextMenuManager";
 import DivWithBullseye from "../DivWithBullseye";
 import withAutoDimensions from "../withAutoDimensions";
 import TrackContextMenu from "../trackContextMenu/TrackContextMenu";
-
 import TrackModel from "../../model/TrackModel";
 import TrackSelectionBehavior from "../../model/TrackSelectionBehavior";
 import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import UndoRedo from "./UndoRedo";
 import History from "./History";
-
 import HighlightRegion from "../HighlightRegion";
 import { VerticalDivider } from "./VerticalDivider";
 import { CircletView } from "./CircletView";
 import ButtonGroup from "./ButtonGroup";
 import TrackRegionController from "../genomeNavigator/TrackRegionController";
-
 import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
 
 import "./TrackContainer.css";
+import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManager";
 
 // import { DEFAULT_OPTIONS as DYNAMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack";
 
@@ -130,6 +126,56 @@ class TrackContainer extends React.Component {
         this.panLeftOrRight = this.panLeftOrRight.bind(this);
         this.zoomOut = this.zoomOut.bind(this);
     }
+
+    // componentDidMount() {
+    //     this.findGroups();
+    // }
+
+    // componentDidUpdate(prevProps) {
+    //     if (prevProps.tracks !== this.props.tracks) {
+    //         this.findGroups();
+    //     }
+    // }
+
+    // findGroups = () => {
+    //     const { tracks, trackData } = this.props;
+    //     // console.log(tracks);
+    //     const grouping = {}; // key: group id, value: {scale: 'auto'/'fixed', min: {trackid: xx,,,}, max: {trackid: xx,,,,}}
+    //     for (let i = 0; i < tracks.length; i++) {
+    //         if (tracks[i].options && tracks[i].options.group) {
+    //             const g = tracks[i].options.group;
+    //             const tid = tracks[i].getId();
+    //             const data = trackData[tid].data;
+    //             // console.log(data);
+    //             const values = data.map((f) => f.value).filter((x) => x);
+    //             if (!grouping.hasOwnProperty(g)) {
+    //                 grouping[g] = {
+    //                     scale: ScaleChoices.AUTO,
+    //                     min: { [tid]: _.min(values) },
+    //                     max: { [tid]: _.max(values) },
+    //                 };
+    //             } else {
+    //                 grouping[g].min[tid] = _.min(values);
+    //                 grouping[g].max[tid] = _.max(values);
+    //             }
+    //         }
+    //     }
+    //     console.log(grouping);
+    //     return grouping;
+    // };
+
+    // updateGroupScale = (groupId, scale) => {
+    //     const newScale = { ...this.state.groupScale, [groupId]: scale };
+    //     this.setState({ groupScale: newScale });
+    // };
+
+    // resetGroupScale = () => {
+    //     const scale = {};
+    //     Object.keys(this.state.groupScale).forEach((g) => {
+    //         scale[g] = { ...this.state.groupScale[g], min: 0, max: 0 };
+    //     });
+    //     this.setState({ groupScale: scale });
+    // };
 
     getBeamRefs = () => {
         return [this.leftBeam.current, this.rightBeam.current];
@@ -555,6 +601,12 @@ class TrackContainer extends React.Component {
             isThereG3dTrack,
             onSetImageInfo,
         } = this.props;
+        const groupScale = new GroupedTrackManager().getGroupScale(
+            tracks,
+            trackData,
+            primaryView.visWidth,
+            primaryView.viewWindow
+        );
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
@@ -583,6 +635,7 @@ class TrackContainer extends React.Component {
                     basesPerPixel={basesPerPixel}
                     isThereG3dTrack={isThereG3dTrack}
                     onSetImageInfo={onSetImageInfo}
+                    groupScale={groupScale}
                 />
             );
         });

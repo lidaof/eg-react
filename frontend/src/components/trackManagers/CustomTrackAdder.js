@@ -4,7 +4,7 @@ import { Tabs, Tab } from "react-bootstrap-tabs";
 import JSON5 from "json5";
 // import { notify } from 'react-notify-toast';
 import TrackModel from "../../model/TrackModel";
-import { getSecondaryGenomes } from '../../util';
+import { getSecondaryGenomes } from "../../util";
 import CustomHubAdder from "./CustomHubAdder";
 import FacetTable from "./FacetTable";
 import { HELP_LINKS } from "../../util";
@@ -22,6 +22,7 @@ export const TRACK_TYPES = {
     Categorical: ["categorical"],
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange"],
+    Stats: ["boxplot"],
     Repeats: ["repeatmasker"],
     Alignment: ["bam", "pairwise", "snv", "snv2"],
     "3D Structure": ["g3d"],
@@ -56,6 +57,7 @@ export const TYPES_DESC = {
     dynseq: "dynamic sequence",
     rgbpeak: "peak in bigbed format with RGB value",
     vcf: "Variant Call Format",
+    boxplot: "show numerical data as boxplots",
 };
 
 /**
@@ -82,7 +84,7 @@ class CustomTrackAdder extends React.Component {
             url: "",
             name: "",
             urlError: "",
-            metadata: {"genome":this.props.genomeConfig.genome.getName()},
+            metadata: { genome: this.props.genomeConfig.genome.getName() },
             trackAdded: false,
             selectedTabIndex: 0,
             options: null, // custom track options
@@ -120,11 +122,11 @@ class CustomTrackAdder extends React.Component {
     }
 
     renderGenomeOptions(allGenomes) {
-        return allGenomes.map(genome => 
+        return allGenomes.map((genome) => (
             <option key={genome} value={genome}>
                 {genome}
             </option>
-        );
+        ));
     }
 
     renderButtons() {
@@ -205,7 +207,7 @@ class CustomTrackAdder extends React.Component {
                     <select
                         className="form-control"
                         value={metadata.genome}
-                        onChange={(event) => this.setState({ metadata: {genome:event.target.value} })}
+                        onChange={(event) => this.setState({ metadata: { genome: event.target.value } })}
                     >
                         {this.renderGenomeOptions(allGenomes)}
                     </select>

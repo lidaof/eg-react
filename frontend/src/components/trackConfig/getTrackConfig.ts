@@ -34,6 +34,7 @@ import { Omero4dnTrackConfig } from "./Omero4dnTrackConfig";
 import { DynseqTrackConfig } from "./DynseqTrackConfig";
 import { RgbpeakTrackConfig } from "./RgbpeakTrackConfig";
 import { VcfTrackConfig } from "./VcfTrackConfig";
+import { BoxplotTrackConfig } from "./BoxplotTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 export const DYNAMIC_TYPES = ["dynamic", "dbedgraph", "dynamichic", "dynamiclongrange"];
@@ -74,6 +75,7 @@ const TYPE_NAME_TO_CONFIG = {
     dynseq: DynseqTrackConfig,
     rgbpeak: RgbpeakTrackConfig,
     vcf: VcfTrackConfig,
+    boxplot: BoxplotTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

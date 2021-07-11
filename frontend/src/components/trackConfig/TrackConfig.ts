@@ -3,6 +3,7 @@ import LabelConfig from "../trackContextMenu/LabelConfig";
 import { TrackModel, TrackOptions } from "../../model/TrackModel";
 import DataSource from "../../dataSources/DataSource";
 import { DYNAMIC_TYPES } from "./getTrackConfig";
+import { TrackGroupingBehavior } from "model/TrackGroupingBehavior";
 
 export class TrackConfig {
     public defaultOptions: TrackOptions;
@@ -59,6 +60,10 @@ export class TrackConfig {
         return this.trackModel.type === "bigwig";
     }
 
+    isNumericalTrack(): boolean {
+        return this.trackModel.type === "bigwig" || this.trackModel.type === 'bedgraph';
+    }
+
     /**
      *
      * @param oldRegion
@@ -75,5 +80,9 @@ export class TrackConfig {
 
     getMenuComponents(basesPerPixel?: number): React.ComponentType[] {
         return [LabelConfig];
+    }
+
+    getGroupingBehavior(): TrackGroupingBehavior<unknown> | null {
+        return null;
     }
 }

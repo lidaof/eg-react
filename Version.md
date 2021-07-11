@@ -1,5 +1,9 @@
 # Version History
 
+## 53.2.0
+
+- introduce `boxplot` track type show numerical data in small window as boxplots
+
 ## 53.1.0
 
 -   `vcf` track bug fix for certain tooltip clicking

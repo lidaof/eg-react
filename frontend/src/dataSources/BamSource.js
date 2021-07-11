@@ -5,21 +5,9 @@ import DataSource from './DataSource';
 import { BamFile } from '@gmod/bam';
 import { BlobFile } from 'generic-filehandle';
 
-/*
-BamRecord {
-    MD: "27",
-    NM: 0,
-    XA: 0,
-    cigar: "27M",
-    flag: 0,
-    mq: 255,
-    pos: 18360643,
-    quals: "IIIIIIIIIIIIIIIIIIIIIIIIIII",
-    readName: "Sti_22947383",
-    segment: "chr7",
-    seq: "ATCGCCATTTTTGTAGGCTACGTATTT"
-}
-*/
+/**
+ * Daofeng switched to use @gmod/bam instead
+ */
 
 class BamSource extends DataSource {
     constructor(param) {
@@ -60,6 +48,7 @@ class BamSource extends DataSource {
         }
         const promises = region.getGenomeIntervals().map(locus => this.bam.getRecordsForRange(locus.chr, locus.start, locus.end));
         const dataForEachSegment = await Promise.all(promises);
+        console.log(dataForEachSegment)
         const flattened = _.flatten(dataForEachSegment);
         const alignments = flattened.map(r => Object.assign(r, {ref: this.bam.indexToChr[r.get('seq_id')].refName}));
         return alignments;

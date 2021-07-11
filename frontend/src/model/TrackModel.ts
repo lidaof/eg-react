@@ -77,7 +77,6 @@ export class TrackModel {
     textConfig?: any;
     apiConfig?: any;
     queryEndpoint?: QueryEndpoint;
-    group?: string | number;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
@@ -98,7 +97,6 @@ export class TrackModel {
         this.textConfig = this.textConfig || {};
         this.apiConfig = this.apiConfig || {};
         this.queryEndpoint = this.queryEndpoint || {};
-        this.options.group = this.group || "";
 
         // in case user define height in string, like "25" instead of 25
         if (this.options.height && typeof this.options.height === "string") {

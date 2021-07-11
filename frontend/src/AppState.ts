@@ -237,13 +237,10 @@ export const ActionCreators = {
 
 function getInitialState(): AppState {
     let state = initialState;
-
     const { query } = querySting.parseUrl(window.location.href);
     let newState;
     if (!_.isEmpty(query)) {
-        if (query.bundle) {
-            newState = { ...state, bundleId: query.bundle, sessionFromUrl: true };
-        }
+        // console.log(query);
         if (query.session) {
             window.location.href = `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&session=${query.session}&statusId=${query.statusId}`;
         }
@@ -264,6 +261,13 @@ function getInitialState(): AppState {
                 type: ActionType.SET_GENOME,
                 genomeName: query.genome,
             });
+        }
+        if (query.bundle) {
+            if (query.genome) {
+                newState = { ...newState, bundleId: query.bundle, sessionFromUrl: true };
+            } else {
+                newState = { ...state, bundleId: query.bundle, sessionFromUrl: true };
+            }
         }
         if (query.hicUrl) {
             const tmpState = getNextState(state, {
@@ -294,6 +298,7 @@ function getInitialState(): AppState {
                 type: ActionType.SET_VIRUS_BROWSER_MODE,
             });
         }
+        // console.log(newState);
         return (newState as AppState) || (state as AppState);
     }
     const blob = STORAGE.getItem(SESSION_KEY);

@@ -137,3 +137,24 @@ export function highValueColorConfig(props) {
 export function lowValueColorConfig(props) {
     return <ColorConfig {...props} optionName="lowValueColor" label="Low value color" />;
 }
+
+
+/**
+ * A menu item that configures `trackModel.options.boxColor`
+ *
+ * @param {Object} props - object with shape ITEM_PROP_TYPES from TrackContextMenu
+ * @return {JSX.Element} element to render
+ */
+export function BoxColorConfig(props) {
+    return <ColorConfig {...props} optionName="boxColor" label="Box color" />;
+}
+
+/**
+ * A menu item that configures `trackModel.options.lineColor`
+ *
+ * @param {Object} props - object with shape ITEM_PROP_TYPES from TrackContextMenu
+ * @return {JSX.Element} element to render
+ */
+export function LineColorConfig(props) {
+    return <ColorConfig {...props} optionName="lineColor" label="Line color" />;
+}

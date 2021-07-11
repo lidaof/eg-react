@@ -13,7 +13,7 @@ import { GuaranteeMap } from "../../model/GuaranteeMap";
 import { Alignment } from "../../model/alignment/MultiAlignmentViewCalculator";
 import { GenomeConfig } from "../../model/genomes/GenomeConfig";
 
-interface TrackDataMap {
+export interface TrackDataMap {
     [id: number]: TrackData;
 }
 
@@ -110,7 +110,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
             this.setState(deletionUpdate);
         }
 
-        fetchAllTracks(filter=(trackConfig: TrackConfig) => true) {
+        fetchAllTracks(filter = (trackConfig: TrackConfig) => true) {
             for (const track of this.props.tracks) {
                 const config = getTrackConfig(track);
                 if (filter(config)) {
