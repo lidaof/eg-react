@@ -7,6 +7,7 @@ export class ColorPicker extends React.Component {
     static defaultProps = {
         label: "",
         fullWidth: false,
+        clickDisabled: false,
     };
 
     constructor(props) {
@@ -24,7 +25,9 @@ export class ColorPicker extends React.Component {
     }
 
     handleClick = () => {
-        this.setState({ displayColorPicker: !this.state.displayColorPicker });
+        if (!this.props.clickDisabled) {
+            this.setState({ displayColorPicker: !this.state.displayColorPicker });
+        }
     };
 
     handleClose = () => {
@@ -63,7 +66,7 @@ export class ColorPicker extends React.Component {
                     borderRadius: "1px",
                     //   boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
                     // display: "inline-block",
-                    cursor: "pointer",
+                    cursor: this.props.clickDisabled ? "auto" : "pointer",
                 },
                 popover: {
                     position: "absolute",

@@ -16,7 +16,7 @@ import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 import GeneSearchBox3D from "components/genomeNavigator/GeneSearchBox3D";
 import { BigwigSource } from "./BigwigSource";
 import { CORS_PROXY } from "../imageTrack/OmeroSvgVisualizer";
-import { chromColors, colorAsNumber, g3dParser, getClosestValueIndex } from "./helpers-3dmol";
+import { chromColors, colorAsNumber, g3dParser, getClosestValueIndex, CYTOBAND_COLORS_SIMPLE } from "./helpers-3dmol";
 import { Legend } from "./Legend";
 import { HoverInfo } from "./HoverInfo";
 import { CategoryLegend } from "./CategoryLegend";
@@ -27,6 +27,7 @@ import { ShapeList } from "./ShapeList";
 import { OpacityThickness } from "./OpacityThickness";
 import { ColorPicker } from "./ColorPicker";
 import { ArrowList } from "./ArrowList";
+import { StaticLegend } from "./StaticLegend";
 import {
     reg2bin,
     reg2bins,
@@ -81,7 +82,8 @@ class ThreedmolContainer extends React.Component {
         this.imageLabels = [];
         this.g3dFile = null;
         this.bwData = {};
-        this.compData = [];
+        this.compData = {};
+        this.annoData = {};
         this.atomData = {}; //resolution string as key, value: {hap: [atoms...]}
         this.atomStartsByChrom = {}; // resolution string as key, value: {chrom: [list of sorted atoms' starts]}
         this.newAtoms = {}; // holder for addtional models for animation, key: file name, value {hap: [list of atoms]}
@@ -111,9 +113,10 @@ class ThreedmolContainer extends React.Component {
             hoveringAtom: null,
             hoveringX: 0,
             hoveringY: 0,
-            paintMethod: "score", // other way is compartmemt
+            paintMethod: "score", // other ways are compartmemt, annotation
             paintRegion: "none", // region, chrom, genome, or new when switch bw url
             paintCompartmentRegion: "none",
+            paintAnnotationRegion: "none",
             A: "green", //  color for compartment A, same as below
             B: "red",
             A1: "rgb(34,139,34)",
@@ -140,9 +143,10 @@ class ThreedmolContainer extends React.Component {
             useExistingBigwig: true,
             bigWigUrl: "",
             bigWigInputUrl: "",
-            uploadCompartmentFile: false,
+            uploadCompartmentFile: true,
             compartmentFileUrl: "",
             compartmentFileObject: null,
+            annotationFileObject: null,
             newG3dUrl: "",
             animateMode: false,
             frameAtoms: [],
@@ -158,9 +162,16 @@ class ThreedmolContainer extends React.Component {
             autoLegendScale: true,
             myArrows: {},
             labelStyle: "shape", // or arrow
+            annoFormat: "cytoband",
+            annoUsePromoter: false,
+            gene: "green",
+            promoter: "green",
+            categories: null,
+            staticCategories: null,
         };
         this.paintWithBigwig = _.debounce(this.paintWithBigwig, 150);
         this.paintWithComparment = _.debounce(this.paintWithComparment, 150);
+        this.paintWithAnnotation = _.debounce(this.paintWithAnnotation, 150);
     }
 
     async componentDidMount() {
@@ -228,6 +239,11 @@ class ThreedmolContainer extends React.Component {
             legendMaxColor,
             legendMinColor,
             resolution,
+            annoUsePromoter,
+            gene,
+            promoter,
+            paintAnnotationRegion,
+            annoFormat,
         } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
@@ -245,6 +261,9 @@ class ThreedmolContainer extends React.Component {
             B4 !== prevState.B4
         ) {
             await this.paintCompartment(paintCompartmentRegion);
+        }
+        if (gene !== prevState.gene || promoter !== prevState.promoter) {
+            await this.paintAnnotation(paintAnnotationRegion);
         }
         if (thumbStyle !== prevState.thumbStyle) {
             switch (thumbStyle) {
@@ -380,17 +399,29 @@ class ThreedmolContainer extends React.Component {
             this.setState({ highlightingColorChanged: true });
         }
         if (lineOpacity !== prevState.lineOpacity || cartoonThickness !== prevState.cartoonThickness) {
-            this.setState({ highlightingColorChanged: true, paintRegion: "none", paintCompartmentRegion: "none" });
+            this.setState({
+                highlightingColorChanged: true,
+                paintRegion: "none",
+                paintCompartmentRegion: "none",
+                paintAnnotationRegion: "none",
+            });
         }
         if (autoLegendScale !== prevState.autoLegendScale) {
             this.setState({ paintRegion: "none" });
+        }
+        if (annoUsePromoter !== prevState.annoUsePromoter) {
+            this.setState({ paintAnnotationRegion: "none" });
+        }
+        if (annoFormat !== prevState.annoFormat) {
+            this.setState({ paintAnnotationRegion: "none", annotationFileObject: null });
         }
     }
 
     componentWillUnmount() {
         this.clearScene();
         this.bwData = {}; //clean
-        this.compData = [];
+        this.compData = {};
+        this.annoData = {};
         this.atomData = {};
         this.newAtoms = {};
         this.atomStartsByChrom = {};
@@ -807,6 +838,12 @@ class ThreedmolContainer extends React.Component {
         });
     };
 
+    toggleUsePromoter = () => {
+        this.setState((prevState) => {
+            return { annoUsePromoter: !prevState.annoUsePromoter };
+        });
+    };
+
     toggleUseCompartment = () => {
         this.setState((prevState) => {
             return { uploadCompartmentFile: !prevState.uploadCompartmentFile };
@@ -821,6 +858,10 @@ class ThreedmolContainer extends React.Component {
         this.setState({ bigWigUrl: e.target.value.trim() });
     };
 
+    handleAnnoFormatChange = (e) => {
+        this.setState({ annoFormat: e.target.value });
+    };
+
     handleBigWigInputUrlChange = (e) => {
         this.setState({ bigWigInputUrl: e.target.value.trim() });
     };
@@ -831,6 +872,10 @@ class ThreedmolContainer extends React.Component {
 
     handleCompartmentFileUpload = (e) => {
         this.setState({ compartmentFileObject: e.target.files[0] });
+    };
+
+    handleAnnotationFileUpload = (e) => {
+        this.setState({ annotationFileObject: e.target.files[0] });
     };
 
     toggleModelDisplay = (hap) => {
@@ -970,7 +1015,7 @@ class ThreedmolContainer extends React.Component {
     };
 
     paintWithBigwig = async (bwUrl, resolution, regions, chooseRegion) => {
-        this.setState({ paintMethod: "score", paintRegion: chooseRegion });
+        this.setState({ paintMethod: "score" });
         const { legendMinColor, legendMaxColor, cartoonThickness, useLegengMax, useLegengMin, autoLegendScale } =
             this.state;
         const keepers = {};
@@ -1043,9 +1088,11 @@ class ThreedmolContainer extends React.Component {
                 if (value) {
                     return colorAsNumber(colorScale(value));
                 } else {
+                    // console.log(atom, "no value");
                     return "grey";
                 }
             } else {
+                // console.log(atom, "not in region");
                 return "grey";
             }
         };
@@ -1061,6 +1108,11 @@ class ThreedmolContainer extends React.Component {
             legendMin: minScore,
             colorScale,
         });
+        if (chooseRegion === "chrom" || chooseRegion === "genome") {
+            this.setState({ staticCategories: { "no data": "grey" } });
+        } else {
+            this.setState({ staticCategories: null });
+        }
     };
 
     removePaint = () => {
@@ -1075,6 +1127,7 @@ class ThreedmolContainer extends React.Component {
             legendMin: 0,
             colorScale: null,
             highlightingOn: false,
+            staticCategories: null,
         });
     };
 
@@ -1116,6 +1169,7 @@ class ThreedmolContainer extends React.Component {
             const keeper = {};
             const bw = new BigwigSource(bwUrl);
             const bwData = await bw.getData(chrom, 0, this.chromHash[chrom], { scale: 1 / resolution });
+            // console.log(bwData);
             bwData.forEach((bw) => {
                 const binkey = reg2bin(bw.start, bw.end).toString();
                 if (!keeper.hasOwnProperty(binkey)) {
@@ -1130,29 +1184,22 @@ class ThreedmolContainer extends React.Component {
         }
     };
 
-    parseRemoteAnnotationData = async (url) => {
+    parseRemoteFileData = async (url) => {
         // console.log(url);
-        const headers = url.includes("4dnucleome")
-            ? {
-                  Authorization: process.env.REACT_APP_4DN_KEY,
-              }
-            : {};
+        // const headers = url.includes("4dnucleome")
+        //     ? {
+        //           Authorization: process.env.REACT_APP_4DN_KEY,
+        //       }
+        //     : {};
         // console.log(headers);
         try {
-            const response = await axios.get(url, { headers, responseType: "arraybuffer" });
-            // const response = await axios.get("https://wangftp.wustl.edu/~dli/tmp/4DNFIL65C8ZI.txt.gz", {
-            // responseType: "arraybuffer",
-            // });
-            //    const response = await axios.get(
-            //     'https://wangftp.wustl.edu/~dli/tmp/4DNFIL65C8ZI_copy.txt',
-            //     {responseType: 'arraybuffer'}
-            //  );
-            // console.log(response)
+            const response = await axios.get(url, { responseType: "arraybuffer" });
             const buffer = Buffer.from(response.data);
             //  console.log(buffer)
             let dataString;
-            if (response.headers["content-type"] === "text/plain") {
-                // text file
+            // if (response.headers["content-type"] === "text/plain") {
+            if (!url.endsWith(".gz")) {
+                // text file...amazon s3 for gzipped file also return text in headers...
                 dataString = buffer.toString();
             } else {
                 const unzipped = await unzip(buffer);
@@ -1165,7 +1212,7 @@ class ThreedmolContainer extends React.Component {
         }
     };
 
-    parseAnnotationFile = async (fileobj) => {
+    parseUploadedFile = async (fileobj) => {
         // console.log(fileobj);
         try {
             const gzipFile = /gzip/;
@@ -1184,7 +1231,7 @@ class ThreedmolContainer extends React.Component {
         }
     };
 
-    getAnnotationData = async () => {
+    getCompartmentData = async () => {
         const { compartmentFileUrl, compartmentFileObject, uploadCompartmentFile } = this.state;
         if (!compartmentFileUrl.length && !compartmentFileObject) {
             this.setState({ message: "compartment url or file empty, abort..." });
@@ -1195,11 +1242,11 @@ class ThreedmolContainer extends React.Component {
             return this.compData[key];
         }
         const data = uploadCompartmentFile
-            ? await this.parseAnnotationFile(compartmentFileObject)
-            : await this.parseRemoteAnnotationData(compartmentFileUrl);
+            ? await this.parseUploadedFile(compartmentFileObject)
+            : await this.parseRemoteFileData(compartmentFileUrl);
         // console.log(data);
         if (!data) {
-            this.setState({ message: "file empty or error parse annotation file, please check your file 1" });
+            this.setState({ message: "file empty or error parse compartment file, please check your file 1" });
             return;
         }
         const comp = {};
@@ -1218,34 +1265,39 @@ class ThreedmolContainer extends React.Component {
         // console.log(key, compFormat, dataToUse);
         dataToUse.forEach((line) => {
             const t = line.trim().split("\t");
-            let score, compName;
-            const chrom = t[0];
-            const start = Number.parseInt(t[1], 10);
-            const end = Number.parseInt(t[2], 10);
-            // console.log(start, end, reg2bin(start, end));
-            const binkey = reg2bin(start, end).toString();
-            if (!comp.hasOwnProperty(chrom)) {
-                comp[chrom] = {};
-            }
-            if (!comp[chrom].hasOwnProperty(binkey)) {
-                comp[chrom][binkey] = [];
-            }
-            if (compFormat === "4dn") {
-                score = Number.parseFloat(t[7]);
-                comp[chrom][binkey].push({
-                    chrom,
-                    start,
-                    end,
-                    score,
-                });
-            } else {
-                compName = t[3];
-                comp[chrom][binkey].push({
-                    chrom,
-                    start,
-                    end,
-                    name: compName,
-                });
+            // console.log(t);
+            // > ''.trim().split('\t').length
+            // 1;
+            if (t.length > 1) {
+                let score, compName;
+                const chrom = t[0];
+                const start = Number.parseInt(t[1], 10);
+                const end = Number.parseInt(t[2], 10);
+                // console.log(start, end, reg2bin(start, end));
+                const binkey = reg2bin(start, end).toString();
+                if (!comp.hasOwnProperty(chrom)) {
+                    comp[chrom] = {};
+                }
+                if (!comp[chrom].hasOwnProperty(binkey)) {
+                    comp[chrom][binkey] = [];
+                }
+                if (compFormat === "4dn") {
+                    score = Number.parseFloat(t[7]);
+                    comp[chrom][binkey].push({
+                        chrom,
+                        start,
+                        end,
+                        score,
+                    });
+                } else {
+                    compName = t[3];
+                    comp[chrom][binkey].push({
+                        chrom,
+                        start,
+                        end,
+                        name: compName,
+                    });
+                }
             }
         });
         this.compData[key] = comp;
@@ -1260,10 +1312,10 @@ class ThreedmolContainer extends React.Component {
             paintMethod: "compartment",
             message: "compartment painting...",
         });
-        const comp = await this.getAnnotationData();
+        const comp = await this.getCompartmentData();
         if (_.isEmpty(comp)) {
             this.setState({
-                message: "file empty or error parse annotation file, please check your file 2",
+                message: "file empty or error parse compartment file, please check your file 2",
                 paintCompartmentRegion: "none",
             });
             return;
@@ -1336,6 +1388,14 @@ class ThreedmolContainer extends React.Component {
         } else if (compFormat === "cell") {
             this.setState({ categories: { A1, A2, B1, B2, B3, B4, NA } });
         }
+        if (compFormat !== "cell") {
+            // cell data already has NA
+            if (chooseRegion === "chrom" || chooseRegion === "genome") {
+                this.setState({ staticCategories: { "no data": "grey" } });
+            } else {
+                this.setState({ staticCategories: null });
+            }
+        }
     };
 
     removeCompartmentPaint = () => {
@@ -1346,13 +1406,204 @@ class ThreedmolContainer extends React.Component {
         this.setState({
             highlightingOn: false,
             categories: null,
+            staticCategories: null,
+        });
+    };
+
+    getAnnotationData = async () => {
+        const { annotationFileObject, annoFormat } = this.state;
+        if (!annotationFileObject) {
+            this.setMessage("annotation file empty, abort...");
+            return;
+        }
+        const key = annotationFileObject.name;
+        if (this.annoData.hasOwnProperty(key)) {
+            return this.annoData[key];
+        }
+        const data = await this.parseUploadedFile(annotationFileObject);
+        // console.log(data);
+        if (!data) {
+            this.setMessage("file empty or error parse annotation file, please check your file 1");
+            return;
+        }
+        const anno = {};
+        const first = data[0].trim().split("\t");
+        if (annoFormat === "cytoband") {
+            if (first.length !== 5) {
+                this.setMessage("file is not a cytoband file, abort");
+                return;
+            }
+            data.forEach((line) => {
+                const t = line.trim().split("\t");
+                const chrom = t[0];
+                const start = Number.parseInt(t[1], 10);
+                const end = Number.parseInt(t[2], 10);
+                const binkey = reg2bin(start, end).toString();
+                if (!anno.hasOwnProperty(chrom)) {
+                    anno[chrom] = {};
+                }
+                if (!anno[chrom].hasOwnProperty(binkey)) {
+                    anno[chrom][binkey] = [];
+                }
+                anno[chrom][binkey].push({
+                    chrom,
+                    start,
+                    end,
+                    id: t[3],
+                    name: t[4],
+                });
+            });
+        }
+        if (annoFormat === "refgene") {
+            if (first.length !== 16) {
+                this.setMessage("file is not a refGene file, abort");
+                return;
+            }
+            data.forEach((line) => {
+                const t = line.trim().split("\t");
+                const chrom = t[2];
+                const start = Number.parseInt(t[4], 10);
+                const end = Number.parseInt(t[5], 10);
+                let startp, endp;
+                if (t[3] === "-") {
+                    startp = end - 500;
+                    endp = end + 1500;
+                } else {
+                    startp = start - 1500;
+                    endp = start + 500;
+                }
+                const binkey = reg2bin(start, end).toString();
+                if (!anno.hasOwnProperty(chrom)) {
+                    anno[chrom] = {};
+                }
+                if (!anno[chrom].hasOwnProperty(binkey)) {
+                    anno[chrom][binkey] = [];
+                }
+                anno[chrom][binkey].push({
+                    chrom,
+                    start,
+                    end,
+                    startp,
+                    endp,
+                    id: t[1],
+                    name: t[12],
+                });
+            });
+        }
+
+        this.annoData[key] = anno;
+        // console.log(anno);
+        return anno;
+    };
+
+    paintAnnotation = async (chooseRegion) => {
+        const { lineOpacity } = this.state;
+        this.setState({
+            paintAnnotationRegion: chooseRegion,
+            paintMethod: "annotation",
+            message: "annotation painting...",
+        });
+        const anndata = await this.getAnnotationData();
+        if (_.isEmpty(anndata)) {
+            this.setState({
+                message: "file empty or error parse annotation file, please check your file 2",
+                paintAnnotationRegion: "none",
+            });
+            return;
+        }
+        const regions = this.viewRegionToRegions();
+        const chroms = this.viewRegionToChroms();
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } });
+        switch (chooseRegion) {
+            case "region":
+                this.paintWithAnnotation(anndata, regions, chooseRegion);
+                break;
+            case "chrom":
+                this.paintWithAnnotation(anndata, chroms, chooseRegion);
+                break;
+            case "genome":
+                this.paintWithAnnotation(anndata, Object.keys(this.chromHash), chooseRegion);
+                break;
+            default:
+                break;
+        }
+        this.setState({ message: "" });
+    };
+
+    paintWithAnnotation = (anndata, regions, chooseRegion) => {
+        const { annoFormat, resolution, cartoonThickness, annoUsePromoter, gene, promoter } = this.state; // resolution for atom end pos
+        const queryChroms = chooseRegion === "region" ? regions.map((r) => r.chrom) : regions;
+        const filterRegions = {}; // key, chrom, value, list of [start, end] , for GSV later
+        if (chooseRegion === "region") {
+            regions.forEach((r) => {
+                if (!filterRegions.hasOwnProperty(r.chrom)) {
+                    filterRegions[r.chrom] = [];
+                }
+                filterRegions[r.chrom].push([r.start, r.end]);
+            });
+        } else {
+            regions.forEach((chrom) => {
+                if (!filterRegions.hasOwnProperty(chrom)) {
+                    filterRegions[chrom] = [];
+                }
+                filterRegions[chrom].push([0, this.chromHash[chrom]]);
+            });
+        }
+        // console.log(filterRegions);
+        const colorByAnnotation = (atom) => {
+            if (atomInFilterRegions(atom, filterRegions)) {
+                const value = getCompartmentNameForAtom(
+                    anndata,
+                    atom,
+                    resolution,
+                    annoFormat === "refgene",
+                    annoUsePromoter
+                );
+                if (value !== undefined) {
+                    if (typeof value === "number") {
+                        return annoUsePromoter ? promoter : gene;
+                    } else {
+                        return colorAsNumber(CYTOBAND_COLORS_SIMPLE[value]);
+                    }
+                } else {
+                    return "grey";
+                }
+            } else {
+                return "grey";
+            }
+        };
+        queryChroms.forEach((chrom) => {
+            this.viewer.setStyle(
+                { chain: chrom },
+                { cartoon: { colorfunc: colorByAnnotation, style: "trace", thickness: cartoonThickness } }
+            );
+        });
+        this.viewer.render();
+        if (annoFormat === "cytoband") {
+            this.setState({ staticCategories: CYTOBAND_COLORS_SIMPLE, categories: null });
+        } else {
+            const glabel = annoUsePromoter ? "promoter" : "gene";
+            this.setState({ categories: { [glabel]: this.state[glabel] }, staticCategories: null });
+        }
+    };
+
+    removeAnnotationPaint = () => {
+        const { lineOpacity } = this.state;
+        this.setState({ paintAnnotationRegion: "none" });
+        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } });
+        this.viewer.render();
+        this.setState({
+            highlightingOn: false,
+            staticCategories: null,
+            categories: null,
         });
     };
 
     set4DNExampleURL = () => {
         this.setState({
             compartmentFileUrl:
-                "https://data.4dnucleome.org/files-processed/4DNFIL65C8ZI/@@download/4DNFIL65C8ZI.txt.gz",
+                "https://4dn-open-data-public.s3.amazonaws.com/fourfront-webprod/wfoutput/808517c7-9913-494d-bab5-7c3681d17ae2/4DNFIL65C8ZI.txt.gz",
+            compFormat: "4dn",
         });
     };
 
@@ -1822,6 +2073,7 @@ class ThreedmolContainer extends React.Component {
             compartmentFileUrl,
             paintCompartmentRegion,
             categories,
+            staticCategories,
             newG3dUrl,
             frameLabels,
             myShapeLabel,
@@ -1836,6 +2088,9 @@ class ThreedmolContainer extends React.Component {
             useLegengMax,
             labelStyle,
             myArrows,
+            annoFormat,
+            paintAnnotationRegion,
+            annoUsePromoter,
         } = this.state;
         const { tracks, x, y, onNewViewRegion, viewRegion, sync3d } = this.props;
         const bwTracks = tracks.filter((track) => getTrackConfig(track).isBigwigTrack());
@@ -2285,7 +2540,13 @@ class ThreedmolContainer extends React.Component {
                                                 value={compartmentFileUrl}
                                                 onChange={this.handleCompartmentFileUrlChange}
                                             />
-                                            {/* <button className="btn btn-warning btn-sm" onClick={this.set4DNExampleURL}>Example</button> */}
+                                            <button
+                                                style={{ display: uploadCompartmentFile ? "none" : "block" }}
+                                                className="btn btn-warning btn-sm"
+                                                onClick={this.set4DNExampleURL}
+                                            >
+                                                Example
+                                            </button>
                                         </div>
                                         <OpacityThickness
                                             opacity={lineOpacity}
@@ -2318,6 +2579,101 @@ class ThreedmolContainer extends React.Component {
                                                 className="btn btn-secondary btn-sm"
                                                 disabled={paintCompartmentRegion === "none"}
                                                 onClick={this.removeCompartmentPaint}
+                                            >
+                                                Remove paint
+                                            </button>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="card">
+                                <div className="card-header" id="heading8">
+                                    <h5 className="mb-0">
+                                        <button
+                                            className="btn btn-link btn-block text-left"
+                                            data-toggle="collapse"
+                                            data-target="#collapse8"
+                                            aria-expanded="true"
+                                            aria-controls="collapse8"
+                                        >
+                                            Annotation Painting
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapse8" className="collapse show" aria-labelledby="heading8">
+                                    <div className="card-body">
+                                        <div>
+                                            <p>
+                                                <strong>Annotation data:</strong>{" "}
+                                                <span className="font-italic">
+                                                    <a
+                                                        href={HELP_LINKS.threed}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        formats requirement
+                                                    </a>
+                                                </span>
+                                            </p>
+                                            <p>
+                                                <span>File format:</span>{" "}
+                                                <select
+                                                    name="annoFormat"
+                                                    defaultValue={annoFormat}
+                                                    onChange={this.handleAnnoFormatChange}
+                                                >
+                                                    <option value="cytoband">Ideogram cytoband</option>
+                                                    <option value="refgene">UCSC refGene</option>
+                                                </select>
+                                            </p>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            name="annoFile"
+                                            onChange={this.handleAnnotationFileUpload}
+                                            key={annoFormat}
+                                        />
+                                        <OpacityThickness
+                                            opacity={lineOpacity}
+                                            thickness={cartoonThickness}
+                                            onUpdate={this.updateLegendColor}
+                                        />
+                                        <label style={{ display: annoFormat === "refgene" ? "block" : "none" }}>
+                                            <input
+                                                type="checkbox"
+                                                name="usePromoter"
+                                                checked={annoUsePromoter === true}
+                                                onChange={this.toggleUsePromoter}
+                                            />
+                                            <span>Use promoter only</span>
+                                        </label>
+                                        <p>
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                disabled={paintAnnotationRegion === "region"}
+                                                onClick={() => this.paintAnnotation("region")}
+                                            >
+                                                Paint region
+                                            </button>
+                                            <button
+                                                className="btn btn-success btn-sm"
+                                                disabled={paintAnnotationRegion === "chrom"}
+                                                onClick={() => this.paintAnnotation("chrom")}
+                                            >
+                                                Paint chromosome
+                                            </button>
+                                            <button
+                                                className="btn btn-info btn-sm"
+                                                disabled={paintAnnotationRegion === "genome"}
+                                                onClick={() => this.paintAnnotation("genome")}
+                                            >
+                                                Paint genome
+                                            </button>
+                                            <button
+                                                className="btn btn-secondary btn-sm"
+                                                disabled={paintAnnotationRegion === "none"}
+                                                onClick={this.removeAnnotationPaint}
                                             >
                                                 Remove paint
                                             </button>
@@ -2444,7 +2800,7 @@ class ThreedmolContainer extends React.Component {
                     </Drawer>
                 )}
 
-                <div>
+                <div style={{ position: "relative" }}>
                     <div className="placement-container">
                         <div className="text-left">
                             <div>
@@ -2476,14 +2832,23 @@ class ThreedmolContainer extends React.Component {
                                 </select>
                             </label>
                         </div>
+                    </div>
 
-                        <div id="legend">
-                            {paintMethod === "score" ? (
-                                <Legend colorScale={colorScale} onUpdateLegendColor={this.updateLegendColor} />
-                            ) : (
-                                <CategoryLegend categories={categories} onUpdateLegendColor={this.updateLegendColor} />
-                            )}
-                        </div>
+                    <div id="legend">
+                        {paintMethod === "score" && (
+                            <Legend colorScale={colorScale} onUpdateLegendColor={this.updateLegendColor} />
+                        )}
+
+                        {(paintMethod === "compartment" || paintMethod === "annotation") && (
+                            <CategoryLegend
+                                categories={categories}
+                                onUpdateLegendColor={this.updateLegendColor}
+                                fullWidth={paintMethod === "annotation"}
+                            />
+                        )}
+                    </div>
+                    <div id="static-legend">
+                        <StaticLegend categories={staticCategories} />
                     </div>
 
                     <div className={layout}>

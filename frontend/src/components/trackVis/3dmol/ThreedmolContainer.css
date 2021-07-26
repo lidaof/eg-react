@@ -160,3 +160,10 @@
     margin-right: 2px !important;
     width: 8ch;
 }
+
+#static-legend {
+    position: absolute;
+    z-index: 4;
+    left: 10px;
+    bottom: 50px;
+}

@@ -32,6 +32,7 @@ function* xrange(start, stop, step) {
  */
 export function reg2bin(beg, end) {
     if (Number.isNaN(beg) || Number.isNaN(end)) {
+        // console.log(beg, end);
         console.error("beg and end must be numbers");
         return 0;
     }
@@ -94,13 +95,13 @@ export function reg2bins(beg, end) {
     return lst;
 }
 
-function overlapHalf(s1, e1, start, end) {
-    return (Math.min(e1, end) - Math.max(s1, start)) / (e1 - s1) >= 0.5;
-}
-
-// function justOverlap(s1, e1, start, end) {
-//     return Math.min(e1, end) - Math.max(s1, start) > 0;
+// function overlapHalf(s1, e1, start, end) {
+//     return (Math.min(e1, end) - Math.max(s1, start)) / (e1 - s1) >= 0.5;
 // }
+
+function justOverlap(s1, e1, start, end) {
+    return Math.min(e1, end) - Math.max(s1, start) > 0;
+}
 
 // function overlapBase(s1, e1, start, end) {
 //     return Math.min(e1, end) - Math.max(s1, start);
@@ -156,7 +157,8 @@ export function getBigwigValueForAtom(keepers, atom, resolution) {
                 keepers[atom.chain][binkey].forEach((item) => {
                     //center not looking good, many data missing
                     // if (item.start >= atom.properties.start && item.end <= atom.properties.start + resolution) {
-                    if (overlapHalf(item.start, item.end, atom.properties.start, atom.properties.start + resolution)) {
+                    // if (overlapHalf(item.start, item.end, atom.properties.start, atom.properties.start + resolution)) {
+                    if (justOverlap(item.start, item.end, atom.properties.start, atom.properties.start + resolution)) {
                         values.push(item.score);
                     }
                 });
@@ -167,7 +169,7 @@ export function getBigwigValueForAtom(keepers, atom, resolution) {
     return values.length ? _.mean(values) : undefined;
 }
 
-export function getCompartmentNameForAtom(keepers, atom, resolution) {
+export function getCompartmentNameForAtom(keepers, atom, resolution, returnNumber = false, usePromoter = false) {
     // console.log(keepers, atom);
     if (!keepers.hasOwnProperty(atom.chain)) {
         return undefined;
@@ -177,9 +179,11 @@ export function getCompartmentNameForAtom(keepers, atom, resolution) {
         const items = keepers[atom.chain][binkeys[i]];
         if (items && items.length) {
             for (let j = 0; j < items.length; j++) {
-                // if (justOverlap(items[j].start, items[j].end, atom.properties.start, atom.properties.end)) {
-                if (atom.properties.start >= items[j].start && items[j].end >= atom.properties.start) {
-                    return items[j].name;
+                // if (justOverlap(items[j].start, items[j].end, atom.properties.start, atom.properties.start+resolution)) {
+                const start = usePromoter ? items[j].startp : items[j].start;
+                const end = usePromoter ? items[j].endp : items[j].end;
+                if (atom.properties.start >= start && end >= atom.properties.start) {
+                    return returnNumber ? 1 : items[j].name;
                 }
             }
         }

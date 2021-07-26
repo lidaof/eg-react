@@ -2,7 +2,7 @@ import React from "react";
 import { ColorPicker } from "./ColorPicker";
 
 export const CategoryLegend = (props) => {
-    const { categories, onUpdateLegendColor } = props;
+    const { categories, onUpdateLegendColor, fullWidth } = props;
     // console.log(props)
     if (!categories) return null;
     return (
@@ -21,6 +21,7 @@ export const CategoryLegend = (props) => {
                             colorKey={k}
                             label={k}
                             initColor={categories[k]}
+                            fullWidth={fullWidth}
                         />
                     </div>
                 );
@@ -31,4 +32,5 @@ export const CategoryLegend = (props) => {
 
 CategoryLegend.defaultProps = {
     categories: null,
+    fullWidth: false,
 };

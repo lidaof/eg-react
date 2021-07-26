@@ -51,9 +51,9 @@ export class HicSource extends DataSource {
         let config;
         if (typeof url === "string") {
             config = { url };
-            if(url.includes('4dnucleome')) {
-                config = {url, headers: {Authorization : process.env.REACT_APP_4DN_KEY}}
-            }
+            // if(url.includes('4dnucleome')) {
+            //     config = {url, headers: {Authorization : process.env.REACT_APP_4DN_KEY}}
+            // }
         } else {
             config = { blob: url };
         }

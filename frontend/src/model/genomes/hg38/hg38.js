@@ -94,12 +94,12 @@ const publicHubList = [
     {
         collection: "4D Nucleome Network",
         name: "4DN datasets",
-        numTracks: 344,
+        numTracks: 2876,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~dli/eg-hubs/4dn/2019/4dn-human.json",
+        url: "https://vizhub.wustl.edu/public/4dn/4dn-GRCh38-July2021.json",
         description: {
             "hub built by": "Daofeng Li (dli23@wustl.edu)",
-            "hub built date": "Dec 3 2019",
+            "last update": "Jul 14 2021",
             "hub built notes": "metadata information are obtained directly from 4DN data portal",
         },
     },

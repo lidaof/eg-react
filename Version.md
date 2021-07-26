@@ -1,8 +1,18 @@
 # Version History
 
+## 53.3.1
+
+-   switched to `@gmod/bbi` library for bigwig data fetching
+-   removed zoom level configuration for bigWig track
+
+## 53.3.0
+
+-   updated 4DN data hubs
+-   fixed a screenshot bug while tracks are grouped
+
 ## 53.2.0
 
-- introduce `boxplot` track type show numerical data in small window as boxplots
+-   introduce `boxplot` track type show numerical data in small window as boxplots
 
 ## 53.1.0
 

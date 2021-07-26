@@ -1,5 +1,19 @@
 import colorParse from "color-parse";
 
+export const CYTOBAND_COLORS_SIMPLE = {
+    gneg: "white",
+    gpos: "rgb(180,180,180)",
+    gpos25: "rgb(180,180,180)",
+    gpos50: "rgb(120,120,120)",
+    gpos75: "rgb(60,60,60)",
+    gpos100: "rgb(0,0,0)",
+    gvar: "rgb(0,0,0)",
+    stalk: "rgb(180,180,180)",
+    gpos33: "rgb(142,142,142)",
+    gpos66: "rgb(57,57,57)",
+    acen: "rgb(141,64,52)", // Centromere
+};
+
 const resnList = [
     "GLN",
     "THR",

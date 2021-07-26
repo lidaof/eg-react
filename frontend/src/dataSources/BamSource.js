@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import DataSource from './DataSource';
+import _ from "lodash";
+import DataSource from "./DataSource";
 // import bam from '../vendor/bbi-js/main/bam';
 // import bin from '../vendor/bbi-js/utils/bin';
-import { BamFile } from '@gmod/bam';
-import { BlobFile } from 'generic-filehandle';
+import { BamFile } from "@gmod/bam";
+import { BlobFile } from "generic-filehandle";
 
 /**
  * Daofeng switched to use @gmod/bam instead
@@ -26,11 +26,11 @@ class BamSource extends DataSource {
         if (typeof param === "string") {
             this.bam = new BamFile({
                 bamUrl: param,
-                baiUrl: param + '.bai',
+                baiUrl: param + ".bai",
             });
         } else {
-            const baiFilehandle = new BlobFile(param.filter(f => f.name.endsWith('.bai'))[0]);
-            const bamFilehandle = new BlobFile(param.filter(f => !f.name.endsWith('.bai'))[0]);
+            const baiFilehandle = new BlobFile(param.filter((f) => f.name.endsWith(".bai"))[0]);
+            const bamFilehandle = new BlobFile(param.filter((f) => !f.name.endsWith(".bai"))[0]);
             this.bam = new BamFile({
                 bamFilehandle,
                 baiFilehandle,
@@ -40,17 +40,21 @@ class BamSource extends DataSource {
         this.header = null;
     }
 
-    async getData(region, basesPerPixel, options={}) {
+    async getData(region, basesPerPixel, options = {}) {
         // const bamObj = await this.bamPromise;
         // let promises = region.getGenomeIntervals().map(locus => this._getDataInLocus(locus, bamObj));
-        if(!this.header){
+        if (!this.header) {
             this.header = await this.bam.getHeader();
         }
-        const promises = region.getGenomeIntervals().map(locus => this.bam.getRecordsForRange(locus.chr, locus.start, locus.end));
+        const promises = region
+            .getGenomeIntervals()
+            .map((locus) => this.bam.getRecordsForRange(locus.chr, locus.start, locus.end));
         const dataForEachSegment = await Promise.all(promises);
-        console.log(dataForEachSegment)
+        // console.log(dataForEachSegment)
         const flattened = _.flatten(dataForEachSegment);
-        const alignments = flattened.map(r => Object.assign(r, {ref: this.bam.indexToChr[r.get('seq_id')].refName}));
+        const alignments = flattened.map((r) =>
+            Object.assign(r, { ref: this.bam.indexToChr[r.get("seq_id")].refName })
+        );
         return alignments;
     }
 

@@ -1,27 +1,26 @@
 import { TrackConfig } from "./TrackConfig";
 import { NumericalTrackConfig } from "./NumericalTrackConfig";
 import NumericalTrack, { DEFAULT_OPTIONS } from "../trackVis/commonComponents/numerical/NumericalTrack";
-import { BigWorker } from "../../dataSources/WorkerTSHook";
-import LocalBigSource from "../../dataSources/big/LocalBigSource";
+import { BigGmodWorker } from "../../dataSources/WorkerTSHook";
+import LocalBigSourceGmod from "../../dataSources/big/LocalBigSourceGmod";
 import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { NumericalFeature } from "../../model/Feature";
 import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
-import { BigWigZoomLevelConfig } from "components/trackContextMenu/DisplayModeConfig";
-import TrackModel, { TrackOptions } from "model/TrackModel";
+import TrackModel from "model/TrackModel";
 
 export class BigWigTrackConfig extends TrackConfig {
     private numericalTrackConfig: NumericalTrackConfig;
     constructor(trackModel: TrackModel) {
         super(trackModel);
         this.numericalTrackConfig = new NumericalTrackConfig(trackModel);
-        this.setDefaultOptions({ ...DEFAULT_OPTIONS, zoomLevel: "auto" });
+        this.setDefaultOptions(DEFAULT_OPTIONS);
     }
 
     initDataSource() {
         if (this.trackModel.fileObj) {
-            return new LocalBigSource(this.trackModel.fileObj);
+            return new LocalBigSourceGmod(this.trackModel.fileObj);
         } else {
-            return new WorkerSource(BigWorker, this.trackModel.url);
+            return new WorkerSource(BigGmodWorker, this.trackModel.url);
         }
     }
 
@@ -42,27 +41,37 @@ export class BigWigTrackConfig extends TrackConfig {
      *
      * @param {DASFeature[]} data - DASFeatures to convert
      * @return {NumericalFeature[]} NumericalFeatures made from the input
+     *
+     */
+    /**
+     *
+     * Jul-24-2021 @Daofeng switched to use @gmod/bbi
      */
     formatData(data: any[]) {
-        return data.map((feature) =>
-            new NumericalFeature("", new ChromosomeInterval(feature.segment, feature.min, feature.max)).withValue(
-                feature.score
-            )
+        // console.log(data);
+        return data.map(
+            (feature) =>
+                new NumericalFeature("", new ChromosomeInterval(feature.chr, feature.start, feature.end)).withValue(
+                    feature.score
+                )
+            // new NumericalFeature("", new ChromosomeInterval(feature.segment, feature.min, feature.max)).withValue(
+            //     feature.score
+            // )
         );
     }
 
     /**
      * @override
      */
-    shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
-        return oldOptions.zoomLevel !== newOptions.zoomLevel;
-    }
+    // shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
+    //     return oldOptions.zoomLevel !== newOptions.zoomLevel;
+    // }
 
     getComponent() {
         return NumericalTrack;
     }
 
     getMenuComponents() {
-        return [...this.numericalTrackConfig.getMenuComponents(), BigWigZoomLevelConfig];
+        return [...this.numericalTrackConfig.getMenuComponents()];
     }
 }
