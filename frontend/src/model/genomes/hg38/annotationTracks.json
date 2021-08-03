@@ -181,20 +181,10 @@
             "label": "Chimpanzee panTro6 to hg38 blastz",
             "querygenome": "panTro6",
             "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38TopanTro6.gz",
+            "url": "https://wangftp.wustl.edu/~xzhuo/panTro6/hg38TopanTro6.gz",
             "details": {
                 "source": "UCSC Genome Browser",
                 "download url": "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsPanTro6/"
-            }
-        },
-        {
-            "name": "gorGor4tohg38",
-            "label": "Gorilla gorGor4 to hg38 blastz",
-            "querygenome": "gorGor4",
-            "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38.gorGor4.gz",
-            "details": {
-                "source": "UCSC Genome Browser"
             }
         },
         {
@@ -212,11 +202,103 @@
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rn5_axt.gz"
         },
         {
+            "name": "papAnu2tohg38",
+            "label": "Baboon papAnu2 to hg38 blastz",
+            "querygenome": "papAnu2",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xxing/sam/browser/hg38.papAnu2.net.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsPapAnu2/"
+            }
+        },
+        {
+            "name": "bosTau8tohg38",
+            "label": "Cow bosTau8 to hg38 blastz",
+            "querygenome": "bosTau8",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/comparison/hg38-bosTau8.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsBosTau8/"
+            }
+        },
+        {
+            "name": "calJac3tohg38",
+            "label": "Marmoset calJac3 to hg38 blastz",
+            "querygenome": "calJac3",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/comparison/hg38-calJac3.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsCalJac3/"
+            }
+        },
+        {
+            "name": "galGal6tohg38",
+            "label": "Chicken galGal6 to hg38 blastz",
+            "querygenome": "galGal6",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/comparison/hg38-galGal6.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsGalGal6/"
+            }
+        },
+        {
+            "name": "gorGor4tohg38",
+            "label": "Gorilla gorGor4 to hg38 blastz",
+            "querygenome": "gorGor4",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/comparison/hg38-gorGor4.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsGorGor4/"
+            }
+        },
+        {
+            "name": "mm39tohg38",
+            "label": "Mouse mm39 to hg38 blastz",
+            "querygenome": "mm39",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/comparison/hg38-mm39.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsMm39/"
+            }
+        },
+        {
+            "name": "panTro4tohg38",
+            "label": "Chimp panTro4 to hg38 blastz",
+            "querygenome": "panTro4",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/comparison/hg38-panTro4.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsPanTro4/"
+            }
+        },
+        {
+            "name": "rheMac8tohg38",
+            "label": "Rhesus rheMac8 to hg38 blastz",
+            "querygenome": "rheMac8",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/comparison/hg38-rheMac8.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsRheMac8/"
+            }
+        },
+        {
             "name": "rn6tohg38",
             "label": "Rat rn6 to hg38 blastz",
             "querygenome": "rn6",
             "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38.rn6.gz"
+            "url": "https://wangftp.wustl.edu/~xzhuo/browser/comparison/hg38-rn6.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsRn6/"
+            }
         }
     ],
     "Mappability": [
