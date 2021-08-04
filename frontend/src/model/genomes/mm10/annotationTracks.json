@@ -215,13 +215,6 @@
     ],
     "Genome Comparison": [
         {
-            "name": "cavPor3tomm10",
-            "label": "Guinea Pig cavPor3 to mm10 blastz",
-            "querygenome": "cavPor3",
-            "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_cavPor3_axt.gz"
-        },
-        {
             "name": "danRer7tomm10",
             "label": "Zebrafish danRer7 to mm10 blastz",
             "querygenome": "danRer7",
@@ -248,13 +241,6 @@
             "querygenome": "rheMac3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rheMac3_axt.gz"
-        },
-        {
-            "name": "rn5tomm10",
-            "label": "Rat rn5 to mm10 blastz",
-            "querygenome": "rn5",
-            "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rn5_axt.gz"
         },
         {
             "name": "rn6tomm10",

@@ -32,14 +32,7 @@
             "label": "Human hg19 to mm9 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
-            "url": "e"
-        },
-        {
-            "name": "hg38tomm9",
-            "label": "Human hg38 to mm9 blastz",
-            "querygenome": "hg38",
-            "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/mm9/weaver/mm9_hg38_axt.gz"
+            "url": "https://vizhub.wustl.edu/public/mm9/weaver/mm9_hg19_axt.gz"
         },
         {
             "name": "calJac3tomm9",

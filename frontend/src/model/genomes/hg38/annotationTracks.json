@@ -195,13 +195,6 @@
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rheMac3_axt.gz"
         },
         {
-            "name": "rn5tohg38",
-            "label": "Rat rn5 to hg38 blastz",
-            "querygenome": "rn5",
-            "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rn5_axt.gz"
-        },
-        {
             "name": "papAnu2tohg38",
             "label": "Baboon papAnu2 to hg38 blastz",
             "querygenome": "papAnu2",
