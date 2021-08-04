@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Hammer from 'react-hammerjs';
 import { MouseButton } from '../../util';
 import { RegionPanTracker } from '../RegionPanTracker';
 
@@ -34,19 +35,34 @@ export class PannableTrackContainer extends React.Component {
         this.viewDragStart = this.viewDragStart.bind(this);
         this.viewDrag = this.viewDrag.bind(this);
         this.viewDragEnd = this.viewDragEnd.bind(this);
+        this.handleTouchMove = this.handleTouchMove.bind(this);
+    }
+
+    /**
+     * Add event listeners to the track region. Prevents event default so we can drag the view region.
+     **/
+    componentDidMount() {
+        this.trackRegion.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+    }
+
+    /**
+     * Remove the event listener on unmount.
+     **/
+    componentWillUnmount() {
+        this.trackRegion.removeEventListener('touchmove', this.handleTouchMove);
     }
 
     /**
      * Saves the current track draw offsets.
      * 
-     * @param {React.SyntheticEvent} event - the event the triggered this
+     * @param {React.SyntheticEvent | null} event - the event the triggered this
      */
     viewDragStart(event) {
-        event.preventDefault();
+        event && event.preventDefault();
         this.offsetOnDragStart = this.props.xOffset;
     }
 
-    /**
+   /**
      * Called when the user drags the track around.  Sets track draw offsets.
      * 
      * @param {any} [unused] - unused
@@ -93,27 +109,33 @@ export class PannableTrackContainer extends React.Component {
         }
     }
 
+    handleTouchMove(event) {
+        event.preventDefault();
+    }
+
     /**
      * @inheritdoc
      */
     render() {
-        const {trackElements, visData, xOffset} = this.props;
-        const {visRegion, visWidth, viewWindowRegion} = visData;
+        const { trackElements, visData, xOffset } = this.props;
+        const { visRegion, visWidth, viewWindowRegion } = visData;
         const tracksWithXOffset = trackElements.map( // Give xOffset to tracks
-            trackElement => React.cloneElement(trackElement, { xOffset }) 
+            trackElement => React.cloneElement(trackElement, { xOffset })
         );
 
         return (
-        <RegionPanTracker
-            mouseButton={MouseButton.LEFT}
-            onViewDragStart={this.viewDragStart}
-            onViewDrag={this.viewDrag}
-            onViewDragEnd={this.viewDragEnd}
-            panRegion={viewWindowRegion}
-            basesPerPixel={visRegion.getWidth() / visWidth}
-        >
-            {tracksWithXOffset}
-        </RegionPanTracker>
+            <div ref={ref => this.trackRegion = ref}>
+                <RegionPanTracker
+                    mouseButton={MouseButton.LEFT}
+                    onViewDragStart={this.viewDragStart}
+                    onViewDrag={this.viewDrag}
+                    onViewDragEnd={this.viewDragEnd}
+                    panRegion={viewWindowRegion}
+                    basesPerPixel={visRegion.getWidth() / visWidth}
+                >
+                    {tracksWithXOffset}
+                </RegionPanTracker>
+            </div>
         );
     }
 }

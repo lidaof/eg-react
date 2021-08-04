@@ -5,6 +5,8 @@ import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { MouseButton } from '../util';
 import OpenInterval from '../model/interval/OpenInterval';
 
+import Hammer from 'react-hammerjs';
+
 interface RegionPanTrackProps {
     mouseButton: MouseButton; // Mouse button used to pan
     panRegion: DisplayedRegionModel; // The region to use in pan calculations
@@ -112,8 +114,8 @@ export class RegionPanTracker extends React.Component<RegionPanTrackProps> {
         const navContext = region.getNavigationContext();
         const [start, end] = region.getContextCoordinates();
 
-        const newStart = navContext.toGaplessCoordinate( Math.max(0, start + baseDiff) );
-        const newEnd = navContext.toGaplessCoordinate( Math.min(end + baseDiff, navContext.getTotalBases() - 1) );
+        const newStart = navContext.toGaplessCoordinate(Math.max(0, start + baseDiff));
+        const newEnd = navContext.toGaplessCoordinate(Math.min(end + baseDiff, navContext.getTotalBases() - 1));
         return new OpenInterval(newStart, newEnd);
     }
 
@@ -129,14 +131,15 @@ export class RegionPanTracker extends React.Component<RegionPanTrackProps> {
         } = this.props;
 
         return (
-        <DragAcrossDiv
-            onDragStart={this.dragStart}
-            onDrag={this.drag}
-            onDragEnd={this.dragEnd}
-            {...remainingProps}
-        >
-            {children}
-        </DragAcrossDiv>
+            <Hammer
+                onPanStart={() => this.dragStart(null)}
+                onPan={e => this.drag(null, { dx: e.deltaX, dy: e.deltaY })}
+                onPanEnd={e => this.dragEnd(null, { dx: e.deltaX, dy: e.deltaY })}
+            >
+                <div>
+                    {children}
+                </div>
+            </Hammer>
         );
     }
 }
