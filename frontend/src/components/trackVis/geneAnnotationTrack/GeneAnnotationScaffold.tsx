@@ -100,13 +100,17 @@ export class GeneAnnotationScaffold extends React.PureComponent<GeneAnnotationSc
             textAnchor = "start";
             labelHasBackground = true; // Need to add background for contrast purposes
         }
+        // misaligned lable issue when convert to pdf
+        // possible solution https://observablehq.com/@hastebrot/vertical-text-alignment-in-svg
         const label = (
             <BackgroundedText
                 x={labelX}
                 y={0}
                 height={GeneAnnotation.HEIGHT}
                 fill={color}
-                dominantBaseline="hanging"
+                // dominantBaseline="hanging"
+                // dominantBaseline="auto"
+                dy="0.65em"
                 textAnchor={textAnchor}
                 backgroundColor={backgroundColor}
                 backgroundOpacity={labelHasBackground ? 0.65 : 0}

@@ -6,7 +6,7 @@ import LocalBigSourceGmod from "../../dataSources/big/LocalBigSourceGmod";
 import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { NumericalFeature } from "../../model/Feature";
 import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
-import TrackModel from "model/TrackModel";
+import TrackModel, { TrackOptions } from "model/TrackModel";
 
 export class BigWigTrackConfig extends TrackConfig {
     private numericalTrackConfig: NumericalTrackConfig;
@@ -63,9 +63,9 @@ export class BigWigTrackConfig extends TrackConfig {
     /**
      * @override
      */
-    // shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
-    //     return oldOptions.zoomLevel !== newOptions.zoomLevel;
-    // }
+    shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
+        return oldOptions.ensemblStyle !== newOptions.ensemblStyle;
+    }
 
     getComponent() {
         return NumericalTrack;
