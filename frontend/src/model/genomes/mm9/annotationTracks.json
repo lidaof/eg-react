@@ -35,11 +35,15 @@
             "url": "https://vizhub.wustl.edu/public/mm9/weaver/mm9_hg19_axt.gz"
         },
         {
-            "name": "hg38tomm9",
-            "label": "Human hg38 to mm9 blastz",
-            "querygenome": "hg38",
+            "name": "calJac3tomm9",
+            "label": "Marmoset calJac3 to mm9 blastz",
+            "querygenome": "calJac3",
             "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/mm9/weaver/mm9_hg38_axt.gz"
+            "url": "https://vizhub.wustl.edu/public/mm9/weaver/mm9-calJac3.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm9/vsCalJac3/axtNet/"
+            }
         }
     ]
 }

@@ -1,452 +1,469 @@
 {
-    "Ruler": [
-          {
-              "type": "ruler",
-              "label": "Ruler",
-              "name": "Ruler"
-          }
-      ],
-      "Genes": [
-          {
-              "name": "refGene",
-              "label": "RefSeq genes",
-              "filetype": "geneAnnotation"
-          },
-          
-          {
-              "name": "gencodeV29",
-              "label": "GENCODE V29 genes",
-              "options": {
-                  "categoryColors": {
-                      "coding": "rgb(0,60,179)",
-                      "nonCoding": "rgb(0,128,0)",
-                      "pseudogene": "rgb(230,0,172)",
-                      "problem": "rgb(255,0,0)",
-                      "polyA": "rgb(0,0,51)"
-                  }
-              },
-              "filetype": "geneAnnotation"
-          },
-          {
-              "name": "gencodeV29Basic",
-              "label": "GENCODE V29 basic genes",
-              "options": {
-                  "categoryColors": {
-                      "coding": "rgb(0,60,179)",
-                      "nonCoding": "rgb(0,128,0)",
-                      "pseudogene": "rgb(230,0,172)",
-                      "problem": "rgb(255,0,0)",
-                      "polyA": "rgb(0,0,51)"
-                  }
-              },
-              "filetype": "geneAnnotation"
-          },
-          {
-              "name": "gencodeV19",
-              "label": "GENCODE V19 genes",
-              "url": "https://vizhub.wustl.edu/public/hg19/gencodeV19.refBed.gz",
-              "options": {
-                  "categoryColors": {
-                      "coding": "rgb(0,60,179)",
-                      "nonCoding": "rgb(0,128,0)",
-                      "pseudogene": "rgb(230,0,172)",
-                      "problem": "rgb(255,0,0)",
-                      "polyA": "rgb(0,0,51)"
-                  }
-              },
-              "filetype": "refbed"
-          }
-      ],
-      "Variation": [
-          {
-              "name": "Snp",
-              "label": "Snps from Ensembl",
-              "type": "snp"
-          }
-      ],
-      "RepeatMasker": {
-          "All Repeats": [
-              {
-                  "name": "rmsk_all",
-                  "label": "RepeatMasker",
-                  "filetype": "repeatmasker",
-                  "url": "https://vizhub.wustl.edu/public/hg19/rmsk16.bb",
-                  "height": 40
-              }
-          ]
-      },
-      "Conservation": [
-          {
-              "name": "vertebratephastCons46way",
-              "label": "Vertebrate PhastCons 46-way",
-              "filetype": "bedgraph",
-              "url": "https://egg.wustl.edu/d/hg19/vertebratephastCons46way.gz",
-              "height": 50,
-              "options": { "color": "#006385"}
-          },
-          {
-              "name": "primatephastCons46way",
-              "label": "Primate PhastCons 46-way",
-              "filetype": "bedgraph",
-              "url": "https://egg.wustl.edu/d/hg19/primatephastCons46way.gz",
-              "height": 50,
-              "options": { "color": "#006385"}
-          },
-          {
-              "name": "placentalphastCons46way",
-              "label": "Placental PhastCons 46-way",
-              "filetype": "bedgraph",
-              "url": "https://egg.wustl.edu/d/hg19/placentalphastCons46way.gz",
-              "height": 50,
-              "options": { "color": "#006385"}
-          },
-          {
-              "name": "vertebratephyloP46way",
-              "label": "Vertebrate PhyloP 46-way",
-              "filetype": "bedgraph",
-              "url": "https://egg.wustl.edu/d/hg19/vertebratephyloP46way.gz",
-              "height": 50,
-              "options": { "color": "#006385", "color2": "#852100"}
-          },
-          {
-              "name": "primatephyloP46way",
-              "label": "Primate PhyloP 46-way",
-              "filetype": "bedgraph",
-              "url": "https://egg.wustl.edu/d/hg19/primatephyloP46way.gz",
-              "height": 50,
-              "options": { "color": "#006385", "color2": "#852100"}
-          },
-          {
-              "name": "placentalphyloP46way",
-              "label": "Placental PhyloP 46-way",
-              "filetype": "bedgraph",
-              "url": "https://egg.wustl.edu/d/hg19/placentalphyloP46way.gz",
-              "height": 50,
-              "options": { "color": "#006385", "color2": "#852100"}
-          }
-      ],
-      "Genome Annotation": [
-          {
-              "name": "blacklist",
-              "label": "hg19 Encode Blacklist",
-              "filetype": "bed",
-              "url": "https://epgg-test.wustl.edu/d/hg19/hg19.blacklist.bed.gz",
-              "height": 21,
-              "options": {
-                  "color": "#000000"
-              },
-              "details": {
-                  "source": "mod/mouse/humanENCODE Blacklists",
-                  "download url": "http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/hg19-human/wgEncodeHg19ConsensusSignalArtifactRegions.bed.gz"
-              }
-           },
-          {
-              "type": "categorical",
-              "name": "CpG Context",
-              "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_Shores_Shelves.bed.gz",
-              "height": 30,
-              "options": {
-                "label": "CpG Context",
-                "category": {
-                  "Island": {"name": "Island", "color": "#05B678"},
-                  "Shore": { "name": "Shore", "color": "#F5DC69"},
-                  "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-                },
-                "backgroundColor":"#071CEC"
-              }
-          },
-          {
-              "type": "categorical",
-              "name": "CpG Context (unmasked)",
-              "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_Shores_Shelves.bed.gz",
-              "height": 30,
-              "options": {
-                "label": "CpG Context (unmasked)",
-                "category": {
-                  "Island": {"name": "Island", "color": "#05B678"},
-                  "Shore": { "name": "Shore", "color": "#F5DC69"},
-                  "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-                },
-                "backgroundColor":"#071CEC"
-              }
-          },
-          {
-              "type": "categorical",
-              "name": "CpG Islands",
-              "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_category.bed.gz",
-              "height": 30,
-              "options": {
-                "label": "CpG Context",
-                "category": {
-                  "CGI": {"name": "CGI", "color": "#FE8801"}
+  "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "refGene",
+            "label": "RefSeq genes",
+            "filetype": "geneAnnotation"
+        },
+        
+        {
+            "name": "gencodeV29",
+            "label": "GENCODE V29 genes",
+            "options": {
+                "categoryColors": {
+                    "coding": "rgb(0,60,179)",
+                    "nonCoding": "rgb(0,128,0)",
+                    "pseudogene": "rgb(230,0,172)",
+                    "problem": "rgb(255,0,0)",
+                    "polyA": "rgb(0,0,51)"
                 }
-              }
-          },
-          {
-              "type": "categorical",
-              "name": "CpG Islands (unmasked)",
-              "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_category.bed.gz",
-              "height": 30,
-              "options": {
-                "label": "CpG Context (unmasked)",
-                "category": {
-                  "CGI": {"name": "CGI", "color": "#FE8801"}
+            },
+            "filetype": "geneAnnotation"
+        },
+        {
+            "name": "gencodeV29Basic",
+            "label": "GENCODE V29 basic genes",
+            "options": {
+                "categoryColors": {
+                    "coding": "rgb(0,60,179)",
+                    "nonCoding": "rgb(0,128,0)",
+                    "pseudogene": "rgb(230,0,172)",
+                    "problem": "rgb(255,0,0)",
+                    "polyA": "rgb(0,0,51)"
                 }
-              }
-          },
-          {
-              "name": "CpGs",
-              "label": "CpGs",
-              "filetype": "bed",
-              "url": "https://egg.wustl.edu/d/hg19/CpGsites.gz",
-              "height": 21,
-              "options": {
-                  "color": "#cc00cc"
-              }
-          },
-          {
-              "name": "gc5Base",
-              "label": "GC percent",
-              "filetype": "bigwig",
-              "url": "https://egg.wustl.edu/d/hg19/gc5Base.bigWig",
-              "height": 30,
-              "options": {
-                  "color": "#4785C2",
-                  "color2": "#4747C2",
-                  "yScale": "fixed",
-                  "yMin": 0,
-                  "yMax": 100
-              }
-          }
-      ],
-      "Genome Comparison": [
-          {
-              "name": "mm9tohg19",
-              "label": "Mouse mm9 to hg19 blastz",
-              "querygenome": "mm9",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm9_axt.gz"
-          },
-          {
-              "name": "mm10tohg19",
-              "label": "Mouse mm10 to hg19 blastz",
-              "querygenome": "mm10",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm10_axt.gz"
-          },
-          {
-              "name": "rn4tohg19",
-              "label": "Rat rn4 to hg19 blastz",
-              "querygenome": "rn4",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_rn4_axt.gz"
-          },
-          {
-              "name": "rn5tohg19",
-              "label": "Rat rn5 to hg19 blastz",
-              "querygenome": "rn5",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_rn5_axt.gz"
-          },
-          {
-              "name": "rheMac2tohg19",
-              "label": "Rhesus macaque rheMac2 to hg19 blastz",
-              "querygenome": "rheMac2",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.rheMac2.gz"
-          },
-          {
-              "name": "rheMac3tohg19",
-              "label": "Rhesus macaque rheMac3 to hg19 blastz",
-              "querygenome": "rheMac3",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_rheMac3_axt.gz"
-          },
-          {
-              "name": "canFam2tohg19",
-              "label": "Dog canFam2 to hg19 blastz",
-              "querygenome": "canFam2",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.canFam2.gz"
-          },
-          {
-              "name": "monDom5tohg19",
-              "label": "Opossum monDom5 to hg19 blastz",
-              "querygenome": "monDom5",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.monDom5.gz"
-          },
-          {
-              "name": "panTro4tohg19",
-              "label": "Chimpanzee panTro4 to hg19 blastz",
-              "querygenome": "panTro4",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.panTro4.axt.gz"
-          },
-          {
-              "name": "gorGor3tohg19",
-              "label": "Gorilla gorGor3 to hg19 blastz",
-              "querygenome": "gorGor3",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.gorGor3.axt.gz"
-          },
-          {
-              "name": "nomLeu3tohg19",
-              "label": "Gibbon nomLeu3 to hg19 minimap2",
-              "querygenome": "nomLeu3",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.nomLeu3.gz"
-          },
-          {
-              "name": "papAnu2tohg19",
-              "label": "Baboon papAnu2 to hg19 blastz",
-              "querygenome": "papAnu2",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.papAnu2.axt.gz"
-          },
-          {
-              "name": "calJac3tohg19",
-              "label": "Marmoset calJac3 to hg19 blastz",
-              "querygenome": "calJac3",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19.calJac3.axt.gz"
-          },
-          {
-              "name": "cavPor3tohg19",
-              "label": "Guinea pig cavPor3 to hg19 blastz",
-              "querygenome": "cavPor3",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_cavPor3_axt.gz"
-          },
-          {
-              "name": "danRer7tohg19",
-              "label": "Zebrafish danRer7 to hg19 blastz",
-              "querygenome": "danRer7",
-              "filetype": "genomealign",
-              "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_danRer7_axt.gz"
-          }
-      ],
-      "Mappability": [
-          {
-              "name": "wgEncodeCrgMapabilityAlign100mer",
-              "label": "100mer alignability ENCODE/CRG(Guigo)",
-              "filetype": "bigwig",
-              "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign100mer.bigWig",
-              "height": 30,
-              "options": {
-                  "yScale": "fixed",
-                  "yMin": 0,
-                  "yMax": 1
+            },
+            "filetype": "geneAnnotation"
+        },
+        {
+            "name": "gencodeV19",
+            "label": "GENCODE V19 genes",
+            "url": "https://vizhub.wustl.edu/public/hg19/gencodeV19.refBed.gz",
+            "options": {
+                "categoryColors": {
+                    "coding": "rgb(0,60,179)",
+                    "nonCoding": "rgb(0,128,0)",
+                    "pseudogene": "rgb(230,0,172)",
+                    "problem": "rgb(255,0,0)",
+                    "polyA": "rgb(0,0,51)"
+                }
+            },
+            "filetype": "refbed"
+        }
+    ],
+    "Variation": [
+        {
+            "name": "Snp",
+            "label": "Snps from Ensembl",
+            "type": "snp"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://vizhub.wustl.edu/public/hg19/rmsk16.bb",
+                "height": 40
+            }
+        ]
+    },
+    "Conservation": [
+        {
+            "name": "vertebratephastCons46way",
+            "label": "Vertebrate PhastCons 46-way",
+            "filetype": "bedgraph",
+            "url": "https://egg.wustl.edu/d/hg19/vertebratephastCons46way.gz",
+            "height": 50,
+            "options": { "color": "#006385"}
+        },
+        {
+            "name": "primatephastCons46way",
+            "label": "Primate PhastCons 46-way",
+            "filetype": "bedgraph",
+            "url": "https://egg.wustl.edu/d/hg19/primatephastCons46way.gz",
+            "height": 50,
+            "options": { "color": "#006385"}
+        },
+        {
+            "name": "placentalphastCons46way",
+            "label": "Placental PhastCons 46-way",
+            "filetype": "bedgraph",
+            "url": "https://egg.wustl.edu/d/hg19/placentalphastCons46way.gz",
+            "height": 50,
+            "options": { "color": "#006385"}
+        },
+        {
+            "name": "vertebratephyloP46way",
+            "label": "Vertebrate PhyloP 46-way",
+            "filetype": "bedgraph",
+            "url": "https://egg.wustl.edu/d/hg19/vertebratephyloP46way.gz",
+            "height": 50,
+            "options": { "color": "#006385", "color2": "#852100"}
+        },
+        {
+            "name": "primatephyloP46way",
+            "label": "Primate PhyloP 46-way",
+            "filetype": "bedgraph",
+            "url": "https://egg.wustl.edu/d/hg19/primatephyloP46way.gz",
+            "height": 50,
+            "options": { "color": "#006385", "color2": "#852100"}
+        },
+        {
+            "name": "placentalphyloP46way",
+            "label": "Placental PhyloP 46-way",
+            "filetype": "bedgraph",
+            "url": "https://egg.wustl.edu/d/hg19/placentalphyloP46way.gz",
+            "height": 50,
+            "options": { "color": "#006385", "color2": "#852100"}
+        }
+    ],
+    "Genome Annotation": [
+        {
+            "name": "blacklist",
+            "label": "hg19 Encode Blacklist",
+            "filetype": "bed",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19.blacklist.bed.gz",
+            "height": 21,
+            "options": {
+                "color": "#000000"
+            },
+            "details": {
+                "source": "mod/mouse/humanENCODE Blacklists",
+                "download url": "http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/hg19-human/wgEncodeHg19ConsensusSignalArtifactRegions.bed.gz"
+            }
+         },
+        {
+            "type": "categorical",
+            "name": "CpG Context",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
               },
-              "details": {
-                  "datafiletype": "Mapability",
-                  "subId": 4945,
-                  "size": "100mer",
-                  "uniqueness": "no more than 2 mismatches",
-                  "software": "GEM",
-                  "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
-              }
-          },
-          {
-              "name": "wgEncodeCrgMapabilityAlign75mer",
-              "label": "75mer alignability ENCODE/CRG(Guigo)",
-              "filetype": "bigwig",
-              "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign75mer.bigWig",
-              "height": 30,
-              "options": {
-                  "yScale": "fixed",
-                  "yMin": 0,
-                  "yMax": 1
+              "backgroundColor":"#071CEC"
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Context (unmasked)",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_Shores_Shelves.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "Island": {"name": "Island", "color": "#05B678"},
+                "Shore": { "name": "Shore", "color": "#F5DC69"},
+                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
               },
-              "details": {
-                  "datafiletype": "Mapability",
-                  "subId": 4945,
-                  "size": "75mer",
-                  "uniqueness": "no more than 2 mismatches",
-                  "software": "GEM",
-                  "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
+              "backgroundColor":"#071CEC"
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
               }
-          },
-          {
-              "name": "wgEncodeCrgMapabilityAlign50mer",
-              "label": "50mer alignability ENCODE/CRG(Guigo)",
-              "filetype": "bigwig",
-              "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign50mer.bigWig",
-              "height": 50,
-              "options": {
-                  "yScale": "fixed",
-                  "yMin": 0,
-                  "yMax": 1
-              },
-              "details": {
-                  "datafiletype": "Mapability",
-                  "subId": 4945,
-                  "size": "50mer",
-                  "uniqueness": "no more than 2 mismatches",
-                  "software": "GEM",
-                  "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
+            }
+        },
+        {
+            "type": "categorical",
+            "name": "CpG Islands (unmasked)",
+            "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_category.bed.gz",
+            "height": 30,
+            "options": {
+              "label": "CpG Context (unmasked)",
+              "category": {
+                "CGI": {"name": "CGI", "color": "#FE8801"}
               }
-          },
-          {
-              "name": "wgEncodeCrgMapabilityAlign40mer",
-              "label": "40mer alignability ENCODE/CRG(Guigo)",
-              "filetype": "bigwig",
-              "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign40mer.bigWig",
-              "height": 30,
-              "options": {
-                  "yScale": "fixed",
-                  "yMin": 0,
-                  "yMax": 1
-              },
-              "details": {
-                  "datafiletype": "Mapability",
-                  "subId": 4945,
-                  "size": "40mer",
-                  "uniqueness": "no more than 2 mismatches",
-                  "software": "GEM",
-                  "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
-              }
-          },
-          {
-              "name": "wgEncodeCrgMapabilityAlign36mer",
-              "label": "36mer alignability ENCODE/CRG(Guigo)",
-              "filetype": "bigwig",
-              "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign36mer.bigWig",
-              "height": 30,
-              "options": {
-                  "yScale": "fixed",
-                  "yMin": 0,
-                  "yMax": 1
-              },
-              "details": {
-                  "datafiletype": "Mapability",
-                  "subId": 4945,
-                  "size": "36mer",
-                  "uniqueness": "no more than 2 mismatches",
-                  "software": "GEM",
-                  "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
-              }
-          },
-          {
-              "name": "wgEncodeCrgMapabilityAlign24mer",
-              "label": "24mer alignability ENCODE/CRG(Guigo)",
-              "filetype": "bigwig",
-              "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign24mer.bigWig",
-              "height": 30,
-              "options": {
-                  "yScale": "fixed",
-                  "yMin": 0,
-                  "yMax": 1
-              },
-              "details": {
-                  "datafiletype": "Mapability",
-                  "subId": 4945,
-                  "size": "24mer",
-                  "uniqueness": "no more than 2 mismatches",
-                  "software": "GEM",
-                  "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
-              }
-          }
-      ]
-  }
-  
+            }
+        },
+        {
+            "name": "CpGs",
+            "label": "CpGs",
+            "filetype": "bed",
+            "url": "https://egg.wustl.edu/d/hg19/CpGsites.gz",
+            "height": 21,
+            "options": {
+                "color": "#cc00cc"
+            }
+        },
+        {
+            "name": "gc5Base",
+            "label": "GC percent",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/hg19/gc5Base.bigWig",
+            "height": 30,
+            "options": {
+                "color": "#4785C2",
+                "color2": "#4747C2",
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 100
+            }
+        }
+    ],
+    "Genome Comparison": [
+        {
+            "name": "mm9tohg19",
+            "label": "Mouse mm9 to hg19 blastz",
+            "querygenome": "mm9",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm9_axt.gz"
+        },
+        {
+            "name": "mm10tohg19",
+            "label": "Mouse mm10 to hg19 blastz",
+            "querygenome": "mm10",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_mm10_axt.gz"
+        },
+        {
+            "name": "rn4tohg19",
+            "label": "Rat rn4 to hg19 blastz",
+            "querygenome": "rn4",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_rn4_axt.gz"
+        },
+        {
+            "name": "rheMac3tohg19",
+            "label": "Rhesus macaque rheMac3 to hg19 blastz",
+            "querygenome": "rheMac3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_rheMac3_axt.gz"
+        },
+        {
+            "name": "danRer7tohg19",
+            "label": "Zebrafish danRer7 to hg19 blastz",
+            "querygenome": "danRer7",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19_danRer7_axt.gz"
+        },
+        {
+            "name": "calJac3tohg19",
+            "label": "Marmoset calJac3 to hg19 blastz",
+            "querygenome": "calJac3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19-calJac3.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/vsCalJac3/axtNet/"
+            }
+        },
+        {
+            "name": "danRer10tohg19",
+            "label": "Zebrafish danRer10 to hg19 blastz",
+            "querygenome": "danRer10",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19-danRer10.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/vsDanRer10/axtNet/"
+            }
+        },
+        {
+            "name": "gorGor3tohg19",
+            "label": "Gorilla gorgor3 to hg19 blastz",
+            "querygenome": "gorGor3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19-gorGor3.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/vsGorGor3/axtNet/"
+            }
+        },
+        {
+            "name": "panTro4tohg19",
+            "label": "Chimp panTro4 to hg19 blastz",
+            "querygenome": "panTro4",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19-panTro4.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/vsPanTro4/axtNet/"
+            }
+        },
+        {
+            "name": "panTro5tohg19",
+            "label": "Chimp panTro5 to hg19 blastz",
+            "querygenome": "panTro5",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19-panTro5.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/vsPanTro5/axtNet/"
+            }
+        },
+        {
+            "name": "panTro6tohg19",
+            "label": "Chimp panTro6 to hg19 blastz",
+            "querygenome": "panTro6",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19-panTro6.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/vsPanTro6/"
+            }
+        },
+        {
+            "name": "papAnu2tohg19",
+            "label": "Baboon papAnu2 to hg19 blastz",
+            "querygenome": "papAnu2",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19-papAnu2.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/vsPapAnu2/axtNet/"
+            }
+        },
+        {
+            "name": "rn6tohg19",
+            "label": "Rat rn6 to hg19 blastz",
+            "querygenome": "rn6",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg19/weaver/hg19-rn6.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg19/vsRn6/axtNet/"
+            }
+        }
+    ],
+    "Mappability": [
+        {
+            "name": "wgEncodeCrgMapabilityAlign100mer",
+            "label": "100mer alignability ENCODE/CRG(Guigo)",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign100mer.bigWig",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "subId": 4945,
+                "size": "100mer",
+                "uniqueness": "no more than 2 mismatches",
+                "software": "GEM",
+                "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
+            }
+        },
+        {
+            "name": "wgEncodeCrgMapabilityAlign75mer",
+            "label": "75mer alignability ENCODE/CRG(Guigo)",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign75mer.bigWig",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "subId": 4945,
+                "size": "75mer",
+                "uniqueness": "no more than 2 mismatches",
+                "software": "GEM",
+                "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
+            }
+        },
+        {
+            "name": "wgEncodeCrgMapabilityAlign50mer",
+            "label": "50mer alignability ENCODE/CRG(Guigo)",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign50mer.bigWig",
+            "height": 50,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "subId": 4945,
+                "size": "50mer",
+                "uniqueness": "no more than 2 mismatches",
+                "software": "GEM",
+                "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
+            }
+        },
+        {
+            "name": "wgEncodeCrgMapabilityAlign40mer",
+            "label": "40mer alignability ENCODE/CRG(Guigo)",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign40mer.bigWig",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "subId": 4945,
+                "size": "40mer",
+                "uniqueness": "no more than 2 mismatches",
+                "software": "GEM",
+                "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
+            }
+        },
+        {
+            "name": "wgEncodeCrgMapabilityAlign36mer",
+            "label": "36mer alignability ENCODE/CRG(Guigo)",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign36mer.bigWig",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "subId": 4945,
+                "size": "36mer",
+                "uniqueness": "no more than 2 mismatches",
+                "software": "GEM",
+                "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
+            }
+        },
+        {
+            "name": "wgEncodeCrgMapabilityAlign24mer",
+            "label": "24mer alignability ENCODE/CRG(Guigo)",
+            "filetype": "bigwig",
+            "url": "https://egg.wustl.edu/d/hg19/wgEncodeCrgMapabilityAlign24mer.bigWig",
+            "height": 30,
+            "options": {
+                "yScale": "fixed",
+                "yMin": 0,
+                "yMax": 1
+            },
+            "details": {
+                "datafiletype": "Mapability",
+                "subId": 4945,
+                "size": "24mer",
+                "uniqueness": "no more than 2 mismatches",
+                "software": "GEM",
+                "download": "https://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/"
+            }
+        }
+    ]
+}
