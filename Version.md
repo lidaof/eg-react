@@ -3,6 +3,10 @@
 ## 53.3.2
 
 -   for `bigwig` track, specify `ensemblStyle` option to `true` can enable data with chromosome names as 1, 2, 3...work in the browser
+-   `bedcolor` track type
+-   4dn/roadmap hub update
+-   more genome alignment tracks
+-   pdf output label alignment improvement
 
 ## 53.3.1
 
