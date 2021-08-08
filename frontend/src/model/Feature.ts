@@ -41,7 +41,7 @@ export class Feature {
         return {
             name: this.name,
             locus: this.getLocus().serialize(),
-            strand: this.strand
+            strand: this.strand,
         };
     }
 
@@ -126,6 +126,26 @@ export class NumericalFeature extends Feature {
      */
     withValue(value: number): this {
         this.value = value;
+        return this;
+    }
+}
+
+/**
+ * Everything a Feature is, plus a `color` prop.
+ *
+ * @author Daofeng Li
+ */
+export class ColoredFeature extends Feature {
+    color: string;
+
+    /**
+     * Sets value and returns this.
+     *
+     * @param {number} value - value to attach to this instance.
+     * @return {this}
+     */
+    withColor(color: string): this {
+        this.color = color;
         return this;
     }
 }

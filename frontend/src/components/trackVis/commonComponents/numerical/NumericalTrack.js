@@ -27,6 +27,7 @@ export const DEFAULT_OPTIONS = {
     yMax: 10,
     yMin: 0,
     smooth: 0,
+    ensemblStyle: false,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 

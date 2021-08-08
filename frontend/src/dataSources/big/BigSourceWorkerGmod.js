@@ -31,8 +31,14 @@ class BigSourceWorkerGmod extends WorkerRunnableSource {
      * @override
      */
     async getData(loci, basesPerPixel, options) {
-        // console.log(loci);
-        const promises = loci.map((locus) => this.bw.getFeatures(locus.chr, locus.start, locus.end));
+        // console.log(options);
+        const promises = loci.map((locus) => {
+            let chrom = options.ensemblStyle ? locus.chr.replace("chr", "") : locus.chr;
+            if (chrom === "M") {
+                chrom = "MT";
+            }
+            return this.bw.getFeatures(chrom, locus.start, locus.end);
+        });
         const dataForEachLocus = await Promise.all(promises);
         loci.forEach((locus, index) => {
             dataForEachLocus[index].forEach((f) => (f.chr = locus.chr));

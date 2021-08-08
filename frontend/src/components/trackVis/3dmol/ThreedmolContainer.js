@@ -83,13 +83,16 @@ class ThreedmolContainer extends React.Component {
         this.g3dFile = null;
         this.bwData = {};
         this.compData = {};
-        this.annoData = {};
+        this.annoData = {}; // annotation data cache
+        this.expData = {}; // gene expression data cache
+        this.cytobandData = {};
         this.atomData = {}; //resolution string as key, value: {hap: [atoms...]}
-        this.atomStartsByChrom = {}; // resolution string as key, value: {chrom: [list of sorted atoms' starts]}
+        this.atomStartsByChrom = {}; // resolution string as key, value: {hap: {chrom: [list of sorted atoms' starts]} }
         this.newAtoms = {}; // holder for addtional models for animation, key: file name, value {hap: [list of atoms]}
         this.atomKeeper = {}; // resolution string as key, value: {hap: keeper}
         // this.mol.chrom = {};
         // this.mol.chrom.atom = chromColors;
+        this.bedLegend = {};
         this.chromHash = {}; // key: chrom, value: length
         this.mol.builtinColorSchemes.chrom = { prop: "chain", map: chromColors };
         this.myRef = React.createRef();
@@ -147,6 +150,7 @@ class ThreedmolContainer extends React.Component {
             compartmentFileUrl: "",
             compartmentFileObject: null,
             annotationFileObject: null,
+            numFileObject: null,
             newG3dUrl: "",
             animateMode: false,
             frameAtoms: [],
@@ -162,12 +166,13 @@ class ThreedmolContainer extends React.Component {
             autoLegendScale: true,
             myArrows: {},
             labelStyle: "shape", // or arrow
-            annoFormat: "cytoband",
+            annoFormat: "cytoband", // cytoband, refgene, bedrgb
             annoUsePromoter: false,
             gene: "green",
             promoter: "green",
             categories: null,
             staticCategories: null,
+            numFormat: "bwtrack", //bwtrack, geneexp
         };
         this.paintWithBigwig = _.debounce(this.paintWithBigwig, 150);
         this.paintWithComparment = _.debounce(this.paintWithComparment, 150);
@@ -244,6 +249,9 @@ class ThreedmolContainer extends React.Component {
             promoter,
             paintAnnotationRegion,
             annoFormat,
+            numFormat,
+            useLegengMax,
+            useLegengMin,
         } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
@@ -285,6 +293,9 @@ class ThreedmolContainer extends React.Component {
                     break;
                 case "hide":
                     Object.keys(this.model2).forEach((hap) => this.model2[hap].hide());
+                    this.setState({
+                        mainBoxWidth: width,
+                    });
                     break;
                 default:
                     break;
@@ -367,7 +378,9 @@ class ThreedmolContainer extends React.Component {
         if (
             bigWigUrl !== prevState.bigWigUrl ||
             bigWigInputUrl !== prevState.bigWigInputUrl ||
-            useExistingBigwig !== prevState.useExistingBigwig
+            useExistingBigwig !== prevState.useExistingBigwig ||
+            useLegengMax !== prevState.useLegengMax ||
+            useLegengMin !== prevState.useLegengMin
         ) {
             this.setState({ paintRegion: "new" });
         }
@@ -415,6 +428,9 @@ class ThreedmolContainer extends React.Component {
         if (annoFormat !== prevState.annoFormat) {
             this.setState({ paintAnnotationRegion: "none", annotationFileObject: null });
         }
+        if (numFormat !== prevState.numFormat) {
+            this.setState({ paintRegion: "none", numFileObject: null });
+        }
     }
 
     componentWillUnmount() {
@@ -422,9 +438,11 @@ class ThreedmolContainer extends React.Component {
         this.bwData = {}; //clean
         this.compData = {};
         this.annoData = {};
+        this.expData = {};
         this.atomData = {};
         this.newAtoms = {};
         this.atomStartsByChrom = {};
+        this.cytobandData = {};
         // if (this.props.anchors3d.length && this.props.onSetAnchors3d) {
         //     this.props.onSetAnchors3d([]);
         // }
@@ -580,7 +598,7 @@ class ThreedmolContainer extends React.Component {
         });
         if (!this.shapes.length) {
             this.removeMyShapes();
-            this.setState({ message: "cannot find matched atoms to point or no model is displaying, skip" });
+            this.setState({ message: "cannot find matched atoms to label or no model is displaying, skip" });
             return;
         }
         this.viewer.render();
@@ -654,7 +672,8 @@ class ThreedmolContainer extends React.Component {
                     );
                 });
             } else if (anchor.loci) {
-                anchor.loci.forEach((locus) => {
+                anchor.loci.forEach((lociItem) => {
+                    const { locus } = lociItem;
                     const atoms = findAtomsWithRegion(
                         this.atomKeeper[resString],
                         locus.chr,
@@ -663,6 +682,7 @@ class ThreedmolContainer extends React.Component {
                         resolution,
                         displayedModelKeys
                     );
+                    // console.log(atoms);
                     atoms.forEach((atom) => {
                         this.arrows.push(
                             this.viewer.addArrow({
@@ -785,14 +805,19 @@ class ThreedmolContainer extends React.Component {
             // atoms = this.assginAtomsCallbacks(atoms2);
             // this.atomData[resString] = [atoms2, atoms];
             this.atomData[resString] = atoms2;
-            // fill starts array
+            // fill starts object
             this.atomStartsByChrom[resString] = {};
-            atoms2[Object.keys(atoms2)[0]].forEach((atom) => {
-                if (!this.atomStartsByChrom[resString].hasOwnProperty(atom.chain)) {
-                    this.atomStartsByChrom[resString][atom.chain] = [atom.properties.start];
-                } else {
-                    this.atomStartsByChrom[resString][atom.chain].push(atom.properties.start);
+            Object.keys(atoms2).forEach((hap) => {
+                if (!this.atomStartsByChrom[resString].hasOwnProperty(hap)) {
+                    this.atomStartsByChrom[resString][hap] = {};
                 }
+                atoms2[hap].forEach((atom) => {
+                    if (!this.atomStartsByChrom[resString][hap].hasOwnProperty(atom.chain)) {
+                        this.atomStartsByChrom[resString][hap][atom.chain] = [atom.properties.start];
+                    } else {
+                        this.atomStartsByChrom[resString][hap][atom.chain].push(atom.properties.start);
+                    }
+                });
             });
         }
         const modelDisplayConfig = {};
@@ -862,6 +887,10 @@ class ThreedmolContainer extends React.Component {
         this.setState({ annoFormat: e.target.value });
     };
 
+    handleNumFormatChange = (e) => {
+        this.setState({ numFormat: e.target.value });
+    };
+
     handleBigWigInputUrlChange = (e) => {
         this.setState({ bigWigInputUrl: e.target.value.trim() });
     };
@@ -876,6 +905,10 @@ class ThreedmolContainer extends React.Component {
 
     handleAnnotationFileUpload = (e) => {
         this.setState({ annotationFileObject: e.target.files[0] });
+    };
+
+    handleNumFileUpload = (e) => {
+        this.setState({ numFileObject: e.target.files[0] });
     };
 
     toggleModelDisplay = (hap) => {
@@ -900,6 +933,11 @@ class ThreedmolContainer extends React.Component {
         } else {
             this.viewer.render(); //avoid dup render in drawAnchors3d
         }
+        if (!_.isEmpty(this.state.myArrows)) {
+            this.drawAnchors3d(newDisplayConfig);
+        } else {
+            this.viewer.render(); //avoid dup render in drawAnchors3d
+        }
         if (this.props.imageInfo) {
             this.drawImageLabel(newDisplayConfig);
         } else {
@@ -916,7 +954,7 @@ class ThreedmolContainer extends React.Component {
     };
 
     highlightRegions = () => {
-        const { highlightingColor, resolution, lineOpacity, cartoonThickness } = this.state;
+        const { highlightingColor, resolution, lineOpacity, cartoonThickness, modelDisplayConfig } = this.state;
         const regions = this.viewRegionToRegions();
         // const colorByRegion = function (atom, region) {
         //     if (
@@ -929,14 +967,17 @@ class ThreedmolContainer extends React.Component {
         //         return highlightingChromColor;
         //     }
         // };
-        const regionRange = {}; // key: chrom, value: [lower resi, higher resi] used for selection
-        // to be fixed, to deal with multiple model data, currently using first model to determin resn range due to limited selection in 3dmol
+        const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
         const resString = resolution.toString();
-        regions.forEach((reg) => {
-            const leftResi = getClosestValueIndex(this.atomStartsByChrom[resString][reg.chrom], reg.start)[1];
-            const rightResi = getClosestValueIndex(this.atomStartsByChrom[resString][reg.chrom], reg.end)[0];
-            regionRange[reg.chrom] = [leftResi, rightResi];
+        Object.keys(modelDisplayConfig).forEach((hap) => {
+            regions.forEach((reg) => {
+                const leftResi = getClosestValueIndex(this.atomStartsByChrom[resString][hap][reg.chrom], reg.start)[1];
+                const rightResi = getClosestValueIndex(this.atomStartsByChrom[resString][hap][reg.chrom], reg.end)[0];
+                regionRange[hap] = {};
+                regionRange[hap][reg.chrom] = [leftResi, rightResi];
+            });
         });
+
         // this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3, hidden: true } }); //remove existing style
         this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } }); //remove existing style
         // regions.forEach((region) => {
@@ -946,15 +987,20 @@ class ThreedmolContainer extends React.Component {
         //     );
         // });
         let validateRegion = false;
-        regions.forEach((region) => {
-            if (regionRange[region.chrom][0] !== undefined && regionRange[region.chrom][1] !== undefined) {
-                const resiSelect = `${regionRange[region.chrom][0]}-${regionRange[region.chrom][1]}`;
-                this.viewer.setStyle(
-                    { chain: region.chrom, resi: [resiSelect] },
-                    { cartoon: { color: highlightingColor, style: "trace", thickness: cartoonThickness } }
-                );
-                validateRegion = true;
-            }
+        Object.keys(modelDisplayConfig).forEach((hap) => {
+            regions.forEach((region) => {
+                if (
+                    regionRange[hap][region.chrom][0] !== undefined &&
+                    regionRange[hap][region.chrom][1] !== undefined
+                ) {
+                    const resiSelect = `${regionRange[hap][region.chrom][0]}-${regionRange[hap][region.chrom][1]}`;
+                    this.viewer.setStyle(
+                        { chain: region.chrom, resi: [resiSelect], properties: { hap: hap } },
+                        { cartoon: { color: highlightingColor, style: "trace", thickness: cartoonThickness } }
+                    );
+                    validateRegion = true;
+                }
+            });
         });
         if (validateRegion) {
             this.setState({ highlightingOn: true, highlightingColorChanged: false });
@@ -1016,36 +1062,49 @@ class ThreedmolContainer extends React.Component {
 
     paintWithBigwig = async (bwUrl, resolution, regions, chooseRegion) => {
         this.setState({ paintMethod: "score" });
-        const { legendMinColor, legendMaxColor, cartoonThickness, useLegengMax, useLegengMin, autoLegendScale } =
-            this.state;
-        const keepers = {};
+        const {
+            legendMinColor,
+            legendMaxColor,
+            cartoonThickness,
+            useLegengMax,
+            useLegengMin,
+            autoLegendScale,
+            numFormat,
+            modelDisplayConfig,
+        } = this.state;
+        let keepers = {};
         const queryChroms = chooseRegion === "region" ? regions.map((r) => r.chrom) : regions;
-        const fetchedChroms = [];
-        const promises = [];
-        const key = `${bwUrl}-${resolution}`;
-        if (!this.bwData.hasOwnProperty(key)) {
-            this.bwData[key] = {};
-        }
-        queryChroms.forEach((chrom) => {
-            if (!this.bwData[key].hasOwnProperty(chrom)) {
-                fetchedChroms.push(chrom);
-                promises.push(this.fetchBwData(bwUrl, resolution, chrom));
-            } else {
-                keepers[chrom] = this.bwData[key][chrom];
+        if (numFormat === "bwtrack") {
+            const fetchedChroms = [];
+            const promises = [];
+            const key = `${bwUrl}-${resolution}`;
+            if (!this.bwData.hasOwnProperty(key)) {
+                this.bwData[key] = {};
             }
-        });
+            queryChroms.forEach((chrom) => {
+                if (!this.bwData[key].hasOwnProperty(chrom)) {
+                    fetchedChroms.push(chrom);
+                    promises.push(this.fetchBwData(bwUrl, resolution, chrom));
+                } else {
+                    keepers[chrom] = this.bwData[key][chrom];
+                }
+            });
 
-        const fetchedData = await Promise.all(promises);
-        for (let i = 0; i < fetchedChroms.length; i++) {
-            if (fetchedData[i]) {
-                // only assign value is there is something
-                keepers[fetchedChroms[i]] = fetchedData[i];
-                this.bwData[key][fetchedChroms[i]] = fetchedData[i];
+            const fetchedData = await Promise.all(promises);
+            for (let i = 0; i < fetchedChroms.length; i++) {
+                if (fetchedData[i]) {
+                    // only assign value is there is something
+                    keepers[fetchedChroms[i]] = fetchedData[i];
+                    this.bwData[key][fetchedChroms[i]] = fetchedData[i];
+                }
             }
+        }
+        if (numFormat === "geneexp") {
+            keepers = await this.getGeneexpData();
         }
         if (_.isEmpty(keepers)) {
             this.setState({
-                message: "bigwig file empty or error parse bigwig file, please check your file",
+                message: "bigwig/expression file empty or error parse file, please check your file",
                 paintRegion: "none",
             });
             return;
@@ -1096,23 +1155,95 @@ class ThreedmolContainer extends React.Component {
                 return "grey";
             }
         };
-        queryChroms.forEach((chrom) => {
-            this.viewer.setStyle(
-                { chain: chrom },
-                { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
-            );
-        });
+        if (chooseRegion === "region") {
+            const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
+            const resString = resolution.toString();
+            Object.keys(modelDisplayConfig).forEach((hap) => {
+                regions.forEach((reg) => {
+                    const leftResi = getClosestValueIndex(
+                        this.atomStartsByChrom[resString][hap][reg.chrom],
+                        reg.start
+                    )[1];
+                    const rightResi = getClosestValueIndex(
+                        this.atomStartsByChrom[resString][hap][reg.chrom],
+                        reg.end
+                    )[0];
+                    regionRange[hap] = {};
+                    regionRange[hap][reg.chrom] = [leftResi, rightResi];
+                });
+            });
+            Object.keys(modelDisplayConfig).forEach((hap) => {
+                queryChroms.forEach((chrom) => {
+                    if (regionRange[hap][chrom][0] !== undefined && regionRange[hap][chrom][1] !== undefined) {
+                        const resiSelect = `${regionRange[hap][chrom][0]}-${regionRange[hap][chrom][1]}`;
+                        this.viewer.setStyle(
+                            { chain: chrom, resi: [resiSelect], properties: { hap: hap } },
+                            { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
+                        );
+                    }
+                });
+            });
+        } else {
+            queryChroms.forEach((chrom) => {
+                this.viewer.setStyle(
+                    { chain: chrom },
+                    { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
+                );
+            });
+        }
         this.viewer.render();
         this.setState({
             legendMax: maxScore,
             legendMin: minScore,
             colorScale,
+            staticCategories: { "no data": "grey" },
         });
-        if (chooseRegion === "chrom" || chooseRegion === "genome") {
-            this.setState({ staticCategories: { "no data": "grey" } });
-        } else {
-            this.setState({ staticCategories: null });
+    };
+
+    getGeneexpData = async () => {
+        const { numFileObject } = this.state;
+        if (!numFileObject) {
+            this.setMessage("gene expression file empty, abort...");
+            return;
         }
+        const key = numFileObject.name;
+        if (this.expData.hasOwnProperty(key)) {
+            return this.expData[key];
+        }
+        const data = await this.parseUploadedFile(numFileObject);
+        if (!data) {
+            this.setMessage("expression file empty or error parse file, please check your file 1");
+            return;
+        }
+        const exp = {};
+        const first = data[0].trim().split("\t");
+        if (first.length !== 5) {
+            this.setMessage("file is not a gene expression file, abort");
+            return;
+        }
+        data.forEach((line) => {
+            const t = line.trim().split("\t");
+            const chrom = t[0];
+            const start = Number.parseInt(t[1], 10);
+            const end = Number.parseInt(t[2], 10);
+            const binkey = reg2bin(start, end).toString();
+            if (!exp.hasOwnProperty(chrom)) {
+                exp[chrom] = {};
+            }
+            if (!exp[chrom].hasOwnProperty(binkey)) {
+                exp[chrom][binkey] = [];
+            }
+            exp[chrom][binkey].push({
+                chrom,
+                start,
+                end,
+                id: t[3],
+                score: Number.parseFloat(t[4]),
+            });
+        });
+        this.expData[key] = exp;
+        // console.log(exp);
+        return exp;
     };
 
     removePaint = () => {
@@ -1133,11 +1264,13 @@ class ThreedmolContainer extends React.Component {
 
     paintBigwig = async (chooseRegion) => {
         this.setState({ paintRegion: chooseRegion, message: "numerical painting..." });
-        const { useExistingBigwig, bigWigUrl, bigWigInputUrl, resolution, lineOpacity } = this.state;
+        const { useExistingBigwig, bigWigUrl, bigWigInputUrl, resolution, lineOpacity, numFormat } = this.state;
         const bwUrl = useExistingBigwig ? bigWigUrl : bigWigInputUrl;
-        if (!bwUrl.length) {
-            this.setState({ message: "bigwig url for paint is empty, abort...", paintRegion: "none" });
-            return;
+        if (numFormat === "bwtrack") {
+            if (!bwUrl.length) {
+                this.setState({ message: "bigwig url for paint is empty, abort...", paintRegion: "none" });
+                return;
+            }
         }
         const regions = this.viewRegionToRegions();
         const chroms = this.viewRegionToChroms();
@@ -1226,6 +1359,7 @@ class ThreedmolContainer extends React.Component {
             }
             return dataString.trim().split("\n");
         } catch (error) {
+            console.error("unzip error", error);
             this.setState({ message: "error parse uploaded annotation file" });
             return;
         }
@@ -1340,7 +1474,8 @@ class ThreedmolContainer extends React.Component {
     };
 
     paintWithComparment = (comp, regions, chooseRegion) => {
-        const { A, B, A1, A2, B1, B2, B3, B4, NA, compFormat, resolution, cartoonThickness } = this.state; // resolution for atom end pos
+        const { A, B, A1, A2, B1, B2, B3, B4, NA, compFormat, resolution, cartoonThickness, modelDisplayConfig } =
+            this.state; // resolution for atom end pos
         const queryChroms = chooseRegion === "region" ? regions.map((r) => r.chrom) : regions;
         const filterRegions = {}; // key, chrom, value, list of [start, end] , for GSV later
         if (chooseRegion === "region") {
@@ -1376,25 +1511,51 @@ class ThreedmolContainer extends React.Component {
                 return "grey";
             }
         };
-        queryChroms.forEach((chrom) => {
-            this.viewer.setStyle(
-                { chain: chrom },
-                { cartoon: { colorfunc: colorByCompartment, style: "trace", thickness: cartoonThickness } }
-            );
-        });
+        if (chooseRegion === "region") {
+            const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
+            const resString = resolution.toString();
+            Object.keys(modelDisplayConfig).forEach((hap) => {
+                regions.forEach((reg) => {
+                    const leftResi = getClosestValueIndex(
+                        this.atomStartsByChrom[resString][hap][reg.chrom],
+                        reg.start
+                    )[1];
+                    const rightResi = getClosestValueIndex(
+                        this.atomStartsByChrom[resString][hap][reg.chrom],
+                        reg.end
+                    )[0];
+                    regionRange[hap] = {};
+                    regionRange[hap][reg.chrom] = [leftResi, rightResi];
+                });
+            });
+            Object.keys(modelDisplayConfig).forEach((hap) => {
+                queryChroms.forEach((chrom) => {
+                    if (regionRange[hap][chrom][0] !== undefined && regionRange[hap][chrom][1] !== undefined) {
+                        const resiSelect = `${regionRange[hap][chrom][0]}-${regionRange[hap][chrom][1]}`;
+                        this.viewer.setStyle(
+                            { chain: chrom, resi: [resiSelect], properties: { hap: hap } },
+                            { cartoon: { colorfunc: colorByCompartment, style: "trace", thickness: cartoonThickness } }
+                        );
+                    }
+                });
+            });
+        } else {
+            queryChroms.forEach((chrom) => {
+                this.viewer.setStyle(
+                    { chain: chrom },
+                    { cartoon: { colorfunc: colorByCompartment, style: "trace", thickness: cartoonThickness } }
+                );
+            });
+        }
         this.viewer.render();
         if (compFormat === "4dn") {
-            this.setState({ categories: { A, B } });
+            this.setState({ categories: { A, B }, staticCategories: { "no data": "grey" } });
         } else if (compFormat === "cell") {
             this.setState({ categories: { A1, A2, B1, B2, B3, B4, NA } });
         }
         if (compFormat !== "cell") {
             // cell data already has NA
-            if (chooseRegion === "chrom" || chooseRegion === "genome") {
-                this.setState({ staticCategories: { "no data": "grey" } });
-            } else {
-                this.setState({ staticCategories: null });
-            }
+            this.setState({ staticCategories: { "no data": "grey" } });
         }
     };
 
@@ -1410,8 +1571,36 @@ class ThreedmolContainer extends React.Component {
         });
     };
 
+    formatCytoband = () => {
+        const { genomeConfig } = this.props;
+        Object.keys(genomeConfig.cytobands).forEach((chrom) => {
+            genomeConfig.cytobands[chrom].forEach((item) => {
+                const binkey = reg2bin(item.chromStart, item.chromEnd).toString();
+                if (!this.cytobandData.hasOwnProperty(item.chrom)) {
+                    this.cytobandData[item.chrom] = {};
+                }
+                if (!this.cytobandData[item.chrom].hasOwnProperty(binkey)) {
+                    this.cytobandData[item.chrom][binkey] = [];
+                }
+                this.cytobandData[item.chrom][binkey].push({
+                    chrom: item.chrom,
+                    start: item.chromStart,
+                    end: item.chromEnd,
+                    id: item.name,
+                    name: item.gieStain,
+                });
+            });
+        });
+    };
+
     getAnnotationData = async () => {
         const { annotationFileObject, annoFormat } = this.state;
+        if (annoFormat === "cytoband") {
+            if (_.isEmpty(this.cytobandData)) {
+                this.formatCytoband();
+            }
+            return this.cytobandData;
+        }
         if (!annotationFileObject) {
             this.setMessage("annotation file empty, abort...");
             return;
@@ -1428,9 +1617,10 @@ class ThreedmolContainer extends React.Component {
         }
         const anno = {};
         const first = data[0].trim().split("\t");
-        if (annoFormat === "cytoband") {
-            if (first.length !== 5) {
-                this.setMessage("file is not a cytoband file, abort");
+        // console.log(first);
+        if (annoFormat === "bedrgb") {
+            if (first.length < 9) {
+                this.setMessage("requires at least 9 columns for bed annotations, abort");
                 return;
             }
             data.forEach((line) => {
@@ -1449,9 +1639,11 @@ class ThreedmolContainer extends React.Component {
                     chrom,
                     start,
                     end,
-                    id: t[3],
-                    name: t[4],
+                    name: t[3],
                 });
+                if (!this.bedLegend.hasOwnProperty(t[3])) {
+                    this.bedLegend[t[3]] = "rgb(" + t[8] + ")";
+                }
             });
         }
         if (annoFormat === "refgene") {
@@ -1466,11 +1658,11 @@ class ThreedmolContainer extends React.Component {
                 const end = Number.parseInt(t[5], 10);
                 let startp, endp;
                 if (t[3] === "-") {
-                    startp = end - 500;
-                    endp = end + 1500;
+                    startp = end - 1000;
+                    endp = end + 2000;
                 } else {
-                    startp = start - 1500;
-                    endp = start + 500;
+                    startp = start - 2000;
+                    endp = start + 1000;
                 }
                 const binkey = reg2bin(start, end).toString();
                 if (!anno.hasOwnProperty(chrom)) {
@@ -1506,7 +1698,7 @@ class ThreedmolContainer extends React.Component {
         const anndata = await this.getAnnotationData();
         if (_.isEmpty(anndata)) {
             this.setState({
-                message: "file empty or error parse annotation file, please check your file 2",
+                message: "no system cytoband data, file empty or error parse annotation file, please check your file",
                 paintAnnotationRegion: "none",
             });
             return;
@@ -1563,7 +1755,9 @@ class ThreedmolContainer extends React.Component {
                     if (typeof value === "number") {
                         return annoUsePromoter ? promoter : gene;
                     } else {
-                        return colorAsNumber(CYTOBAND_COLORS_SIMPLE[value]);
+                        return annoFormat === "cytoband"
+                            ? colorAsNumber(CYTOBAND_COLORS_SIMPLE[value])
+                            : colorAsNumber(this.bedLegend[value]);
                     }
                 } else {
                     return "grey";
@@ -1581,6 +1775,8 @@ class ThreedmolContainer extends React.Component {
         this.viewer.render();
         if (annoFormat === "cytoband") {
             this.setState({ staticCategories: CYTOBAND_COLORS_SIMPLE, categories: null });
+        } else if (annoFormat === "bedrgb") {
+            this.setState({ staticCategories: this.bedLegend, categories: null });
         } else {
             const glabel = annoUsePromoter ? "promoter" : "gene";
             this.setState({ categories: { [glabel]: this.state[glabel] }, staticCategories: null });
@@ -1916,8 +2112,51 @@ class ThreedmolContainer extends React.Component {
         }
     };
 
+    handleLoopFileUpload = async (e) => {
+        const fileobj = e.target.files[0];
+        if (!fileobj) {
+            this.setMessage("loop file empty, abort");
+            return;
+        }
+        const data = await this.parseUploadedFile(fileobj);
+        if (!data) {
+            this.setMessage("loop file empty or error parse file, please check your file");
+            return;
+        }
+        const first = data[0].trim().split("\t");
+        if (first.length < 6) {
+            this.setMessage("loop file requires at least 6 columns, abort");
+            return;
+        }
+        const loci = [];
+        data.slice(1).forEach((line) => {
+            const t = line.trim().split("\t");
+            if (t.length >= 6) {
+                let chrom = t[0];
+                if (!chrom.startsWith("chr")) {
+                    chrom = "chr" + chrom;
+                }
+                const start = Number.parseInt(t[1], 10);
+                const end = Number.parseInt(t[2], 10);
+                let chrom2 = t[3];
+                if (!chrom2.startsWith("chr")) {
+                    chrom2 = "chr" + chrom2;
+                }
+                const start2 = Number.parseInt(t[4], 10);
+                const end2 = Number.parseInt(t[5], 10);
+                loci.push(new ChromosomeInterval(chrom, start, end));
+                loci.push(new ChromosomeInterval(chrom2, start2, end2));
+            }
+        });
+        this.addAnchors3dToMyArrows(loci, false);
+    };
+
     handleRegionFileUpload = async (e) => {
         const fileobj = e.target.files[0];
+        if (!fileobj) {
+            this.setMessage("region file empty, abort");
+            return;
+        }
         const label = fileobj.name;
         const loci = await this.parseUploadedRegionFile(fileobj);
         const { labelStyle } = this.state;
@@ -1943,7 +2182,6 @@ class ThreedmolContainer extends React.Component {
         } else if (labelStyle === "arrow") {
             const { myArrows } = this.state;
             const newArrows = { ...myArrows };
-
             if (!newArrows.hasOwnProperty(label)) {
                 newArrows[label] = {
                     loci,
@@ -1973,8 +2211,11 @@ class ThreedmolContainer extends React.Component {
         const promise = inputList.map((symbol) => {
             try {
                 const locus = ChromosomeInterval.parse(symbol);
+                const t = symbol.split("\t");
+                // console.log(t);
+                const label = t.length > 3 ? t[3] : symbol; // 4th column of bed used as label
                 if (locus) {
-                    return { label: symbol, locus };
+                    return { label, locus };
                 }
             } catch (error) {}
             return getSymbolRegions(genomeName, symbol);
@@ -2091,6 +2332,7 @@ class ThreedmolContainer extends React.Component {
             annoFormat,
             paintAnnotationRegion,
             annoUsePromoter,
+            numFormat,
         } = this.state;
         const { tracks, x, y, onNewViewRegion, viewRegion, sync3d } = this.props;
         const bwTracks = tracks.filter((track) => getTrackConfig(track).isBigwigTrack());
@@ -2159,7 +2401,7 @@ class ThreedmolContainer extends React.Component {
                                 <div id="collapseTwo" className="collapse show" aria-labelledby="headingTwo">
                                     <div className="card-body">
                                         <div>
-                                            <strong>Viwers:</strong>
+                                            <strong>Viewers:</strong>
                                             <ul>
                                                 <li>
                                                     <label>
@@ -2336,6 +2578,11 @@ class ThreedmolContainer extends React.Component {
                                             <input type="file" onChange={this.handleRegionFileUpload} />
                                         </div>
 
+                                        {/* <div>
+                                            Upload file with domain/loop anchors:
+                                            <input type="file" onChange={this.handleLoopFileUpload} />
+                                        </div> */}
+
                                         <div>
                                             <ShapeList
                                                 shapes={myShapes}
@@ -2372,10 +2619,18 @@ class ThreedmolContainer extends React.Component {
                                 </div>
                                 <div id="collapse4" className="collapse show" aria-labelledby="heading4">
                                     <div className="card-body">
-                                        <div>
-                                            <p>
-                                                <strong>BigWig data:</strong>
-                                            </p>
+                                        <p>
+                                            <span>Data:</span>{" "}
+                                            <select
+                                                name="numFormat"
+                                                defaultValue={numFormat}
+                                                onChange={this.handleNumFormatChange}
+                                            >
+                                                <option value="bwtrack">Bigwig track</option>
+                                                <option value="geneexp">Gene expression</option>
+                                            </select>
+                                        </p>
+                                        <div style={{ display: numFormat === "bwtrack" ? "block" : "none" }}>
                                             <label>
                                                 <input
                                                     type="checkbox"
@@ -2385,35 +2640,42 @@ class ThreedmolContainer extends React.Component {
                                                 />
                                                 <span>Use loaded tracks</span>
                                             </label>
-                                        </div>
-                                        {useExistingBigwig ? (
-                                            bwTracks.length ? (
-                                                <select
-                                                    name="bwUrlList"
-                                                    onChange={this.handleBigWigUrlChange}
-                                                    defaultValue={bigWigUrl}
-                                                >
-                                                    <option value="">--</option>
-                                                    {bwTracks.map((tk, idx) => (
-                                                        <option key={idx} value={tk.url}>
-                                                            {tk.getDisplayLabel() || tk.url}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                            {useExistingBigwig ? (
+                                                bwTracks.length ? (
+                                                    <select
+                                                        name="bwUrlList"
+                                                        onChange={this.handleBigWigUrlChange}
+                                                        defaultValue={bigWigUrl}
+                                                    >
+                                                        <option value="">--</option>
+                                                        {bwTracks.map((tk, idx) => (
+                                                            <option key={idx} value={tk.url}>
+                                                                {tk.getDisplayLabel() || tk.url}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                ) : (
+                                                    <span className="text-danger font-italic text-sm-left">
+                                                        No loaded bigwig track, please uncheck the option above and use
+                                                        a bigwig file URL.
+                                                    </span>
+                                                )
                                             ) : (
-                                                <span className="text-danger font-italic text-sm-left">
-                                                    No loaded bigwig track, please uncheck the option above and use a
-                                                    bigwig file URL.
-                                                </span>
-                                            )
-                                        ) : (
-                                            <input
-                                                type="text"
-                                                placeholder="bigwig url"
-                                                value={bigWigInputUrl}
-                                                onChange={this.handleBigWigInputUrlChange}
-                                            />
-                                        )}
+                                                <input
+                                                    type="text"
+                                                    placeholder="bigwig url"
+                                                    value={bigWigInputUrl}
+                                                    onChange={this.handleBigWigInputUrlChange}
+                                                />
+                                            )}
+                                        </div>
+                                        <input
+                                            style={{ display: numFormat === "geneexp" ? "block" : "none" }}
+                                            type="file"
+                                            name="numFile"
+                                            onChange={this.handleNumFileUpload}
+                                            key={numFormat}
+                                        />
                                         <OpacityThickness
                                             opacity={lineOpacity}
                                             thickness={cartoonThickness}
@@ -2625,10 +2887,12 @@ class ThreedmolContainer extends React.Component {
                                                 >
                                                     <option value="cytoband">Ideogram cytoband</option>
                                                     <option value="refgene">UCSC refGene</option>
+                                                    <option value="bedrgb">Bed (9 columns)</option>
                                                 </select>
                                             </p>
                                         </div>
                                         <input
+                                            style={{ display: annoFormat === "cytoband" ? "none" : "block" }}
                                             type="file"
                                             name="annoFile"
                                             onChange={this.handleAnnotationFileUpload}

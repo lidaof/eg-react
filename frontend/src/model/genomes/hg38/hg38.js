@@ -72,9 +72,36 @@ const publicHubData = {
         "cells and circumstances in which a gene is active.",
     "SARS-CoV-2 Host Transcriptional Responses (Blanco-Melo, et al. 2020) Database":
         "A database consisting of host (human) transcriptional changes resulting from SARS-CoV-2 and other respiratory infections in in vitro, ex vivo, and in vivo systems.",
+    "Reference human epigenomes from Roadmap Epigenomics Consortium":
+        "The NIH Roadmap Epigenomics Mapping Consortium was launched with the goal of producing a public resource of human epigenomic data to catalyze basic biology and disease-oriented research. The Consortium leverages experimental pipelines built around next-generation sequencing technologies to map DNA methylation, histone modifications, chromatin accessibility and small RNA transcripts in stem cells and primary ex vivo tissues selected to represent the normal counterparts of tissues and organ systems frequently involved in human disease (quoted from Roadmap website).",
 };
 
 const publicHubList = [
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "All Chromatin states tracks",
+        numTracks: 352,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/roadmap_hmm.json",
+        description:
+            "include 15 state core model from observed data, 18 state expanded model from observed data and 25 state model from imputed data. Lifted from hg19 results.",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Roadmap ChIP-seq datasets",
+        numTracks: 12494,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/Roadmap_hg38_ChIPseq_June2021.json",
+        description: "Roadmap ChIP-seq data. Data are hosted by ENCODE data portal.",
+    },
+    {
+        collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
+        name: "Roadmap RNA-seq, WGBS etc. datasets",
+        numTracks: 5586,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/Roadmap_hg38_others_June2021.json",
+        description: "Roadmap RNA-seq, WGBS etc. Data are hosted by ENCODE data portal.",
+    },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",
         name: "ENCODE signal of unique reads",

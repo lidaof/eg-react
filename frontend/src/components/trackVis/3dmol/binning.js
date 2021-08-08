@@ -143,6 +143,7 @@ export function findAtomsWithRegion(keeper, chr, start, end, resolution, display
             }
         }
     });
+    // console.log(atoms);
     return atoms;
 }
 
