@@ -1,13 +1,11 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
-import Hammer from 'react-hammerjs';
-import { MouseButton } from '../../util';
-import { RegionPanTracker } from '../RegionPanTracker';
+import React from "react";
+import PropTypes from "prop-types";
+import { MouseButton } from "../../util";
+import { RegionPanTracker } from "../RegionPanTracker";
 
 /**
  * Track container where dragging across scrolls the view region.
- * 
+ *
  * @author Silas Hsu
  */
 export class PannableTrackContainer extends React.Component {
@@ -26,7 +24,7 @@ export class PannableTrackContainer extends React.Component {
     };
 
     static defaultProps = {
-        onNewRegion: () => undefined
+        onNewRegion: () => undefined,
     };
 
     constructor(props) {
@@ -42,19 +40,19 @@ export class PannableTrackContainer extends React.Component {
      * Add event listeners to the track region. Prevents event default so we can drag the view region.
      **/
     componentDidMount() {
-        this.trackRegion.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+        this.trackRegion.addEventListener("touchmove", this.handleTouchMove, { passive: false });
     }
 
     /**
      * Remove the event listener on unmount.
      **/
     componentWillUnmount() {
-        this.trackRegion.removeEventListener('touchmove', this.handleTouchMove);
+        this.trackRegion.removeEventListener("touchmove", this.handleTouchMove);
     }
 
     /**
      * Saves the current track draw offsets.
-     * 
+     *
      * @param {React.SyntheticEvent | null} event - the event the triggered this
      */
     viewDragStart(event) {
@@ -62,16 +60,16 @@ export class PannableTrackContainer extends React.Component {
         this.offsetOnDragStart = this.props.xOffset;
     }
 
-   /**
+    /**
      * Called when the user drags the track around.  Sets track draw offsets.
-     * 
+     *
      * @param {any} [unused] - unused
      * @param {any} [unused2] - unused
      * @param {React.SyntheticEvent} [unusedEvent] - unused
      * @param {object} coordinateDiff - an object with keys `dx` and `dy`, how far the mouse has moved since drag start
      */
     viewDrag(unused, unused2, unusedEvent, coordinateDiff) {
-        const {visWidth, viewWindow} = this.props.visData;
+        const { visWidth, viewWindow } = this.props.visData;
         const numPixelsOnLeft = viewWindow.start;
         const numPixelsOnRight = visWidth - viewWindow.end;
         const newXOffset = this.offsetOnDragStart + coordinateDiff.dx;
@@ -88,7 +86,7 @@ export class PannableTrackContainer extends React.Component {
 
     /**
      * Called when the user finishes dragging the track, signaling a new track display region.
-     * 
+     *
      * @param {number} newStart - start of the new display region in nav context coordinates
      * @param {number} newEnd - end of the new display region in nav context coordinates
      * @param {React.SyntheticEvent} [unusedEvent] - unused
@@ -119,12 +117,13 @@ export class PannableTrackContainer extends React.Component {
     render() {
         const { trackElements, visData, xOffset } = this.props;
         const { visRegion, visWidth, viewWindowRegion } = visData;
-        const tracksWithXOffset = trackElements.map( // Give xOffset to tracks
-            trackElement => React.cloneElement(trackElement, { xOffset })
+        const tracksWithXOffset = trackElements.map(
+            // Give xOffset to tracks
+            (trackElement) => React.cloneElement(trackElement, { xOffset })
         );
 
         return (
-            <div ref={ref => this.trackRegion = ref}>
+            <div ref={(ref) => (this.trackRegion = ref)}>
                 <RegionPanTracker
                     mouseButton={MouseButton.LEFT}
                     onViewDragStart={this.viewDragStart}
