@@ -284,12 +284,12 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
 
     render() {
         return (
-            <div>
+            <div style={{ margin: "20px", display: this.props.withGenomePicker ? 'flex' : 'block', flexDirection: 'column', alignItems: "center" }}>
                 <div>
                     <label htmlFor="retrieveId">
                         <input
                             type="text"
-                            size={40}
+                            size={50}
                             placeholder="Session bundle Id"
                             value={this.state.retrieveId}
                             onChange={this.setRetrieveId}
@@ -314,7 +314,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                                 <input
                                     type="text"
                                     value={this.state.newSessionLabel}
-                                    size={30}
+                                    size={40}
                                     onChange={this.setSessionLabel}
                                 />{" "}
                                 or use a{" "}
@@ -340,10 +340,10 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                     </React.Fragment>
                 )}
                 {this.renderSavedSessions()}
-                <div className="font-italic" style={{ maxWidth: "600px" }}>
+                <div className="font-italic" style={{ maxWidth: "480px" }}>
                     Disclaimer: please use <span className="font-weight-bold">sessionFile</span> or{" "}
                     <span className="font-weight-bold">hub</span> URL for publishing using the Browser. Session id is
-                    suppose to be shared with trusted people only. Please check our docs for{" "}
+                    supposed to be shared with trusted people only. Please check our docs for{" "}
                     <a href={HELP_LINKS.publish} target="_blank" rel="noopener noreferrer">
                         Publish with the browser
                     </a>

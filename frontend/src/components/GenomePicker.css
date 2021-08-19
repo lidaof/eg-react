@@ -58,6 +58,10 @@
     grid-template-columns: auto auto;
 }
 
+.searchFieldRounded .MuiOutlinedInput-root{
+    border-radius: 50px;
+ }
+
 /* .GenomePicker-img {
     height: auto;
     width: 200px;
