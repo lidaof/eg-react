@@ -14,7 +14,6 @@ import Notifications from "react-notify-toast";
 import LoadSession from "./components/LoadSession";
 import { RegionExpander } from "./model/RegionExpander";
 import { Footer } from "./components/Footer";
-import { SessionUI } from "./components/SessionUI";
 import { Offline } from "react-detect-offline";
 import { HELP_LINKS, getSecondaryGenomes } from "./util";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
@@ -276,9 +275,8 @@ class App extends React.PureComponent {
         }
         if (!genomeConfig) {
             return (
-                <div className="container-fluid">
-                    <GenomePicker />
-                    {!process.env.REACT_APP_NO_FIREBASE && <SessionUI bundleId={bundleId} withGenomePicker={true} />}
+                <div>
+                    <GenomePicker bundleId={bundleId} />
                     <hr />
                     <Footer />
                     <Notifications />
