@@ -276,7 +276,7 @@ class App extends React.PureComponent {
         }
         if (!genomeConfig) {
             return (
-                <div className="container-fluid">
+                <div>
                     <GenomePicker />
                     {!process.env.REACT_APP_NO_FIREBASE && <SessionUI bundleId={bundleId} withGenomePicker={true} />}
                     <hr />

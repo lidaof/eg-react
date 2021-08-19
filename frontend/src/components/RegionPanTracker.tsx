@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DragAcrossDiv, CoordinateDiff } from './DragAcrossDiv';
+import { CoordinateDiff } from './DragAcrossDiv';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { MouseButton } from '../util';
 import OpenInterval from '../model/interval/OpenInterval';
@@ -121,13 +121,7 @@ export class RegionPanTracker extends React.Component<RegionPanTrackProps> {
 
     render(): JSX.Element {
         const {
-            panRegion,
-            onViewDragStart,
-            onViewDrag,
-            onViewDragEnd,
-            basesPerPixel,
             children,
-            ...remainingProps
         } = this.props;
 
         return (
