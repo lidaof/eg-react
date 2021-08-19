@@ -170,7 +170,7 @@ export function getBigwigValueForAtom(keepers, atom, resolution) {
     return values.length ? _.mean(values) : undefined;
 }
 
-export function getCompartmentNameForAtom(keepers, atom, resolution, returnNumber = false, usePromoter = false) {
+export function getCompartmentNameForAtom(keepers, atom, resolution, usePromoter = false) {
     // console.log(keepers, atom);
     if (!keepers.hasOwnProperty(atom.chain)) {
         return undefined;
@@ -184,7 +184,7 @@ export function getCompartmentNameForAtom(keepers, atom, resolution, returnNumbe
                 const start = usePromoter ? items[j].startp : items[j].start;
                 const end = usePromoter ? items[j].endp : items[j].end;
                 if (atom.properties.start >= start && end >= atom.properties.start) {
-                    return returnNumber ? 1 : items[j].name;
+                    return items[j].name;
                 }
             }
         }

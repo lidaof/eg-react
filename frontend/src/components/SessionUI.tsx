@@ -343,7 +343,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                 <div className="font-italic" style={{ maxWidth: "600px" }}>
                     Disclaimer: please use <span className="font-weight-bold">sessionFile</span> or{" "}
                     <span className="font-weight-bold">hub</span> URL for publishing using the Browser. Session id is
-                    suppose to be shared with trusted people only. Please check our docs for{" "}
+                    supposed to be shared with trusted people only. Please check our docs for{" "}
                     <a href={HELP_LINKS.publish} target="_blank" rel="noopener noreferrer">
                         Publish with the browser
                     </a>
