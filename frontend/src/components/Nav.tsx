@@ -1,42 +1,47 @@
-import React from "react";
-import PropTypes from "prop-types";
-import ReactModal from "react-modal";
 import _ from "lodash";
+import PropTypes from "prop-types";
+import React from "react";
+import ReactModal from "react-modal";
+import { Radio, RadioGroup } from "react-radio-group";
 import { connect } from "react-redux";
-import { RadioGroup, Radio } from "react-radio-group";
-import { ActionCreators } from "../AppState";
+import { StateWithHistory } from 'redux-undo';
+import packageJson from "../../package.json";
+import AppState, { ActionCreators, NO_SAVE_SESSION, SESSION_KEY, STORAGE } from "../AppState";
 import DisplayedRegionModel from "../model/DisplayedRegionModel";
-import { getSpeciesInfo, allGenomes } from "../model/genomes/allGenomes";
-import TrackRegionController from "./genomeNavigator/TrackRegionController";
-import RegionSetSelector from "./RegionSetSelector";
-import Geneplot from "./Geneplot/Geneplot";
-import TrackList from "./trackManagers/TrackList";
-import { TrackModel } from "../model/TrackModel";
-import { AnnotationTrackUI } from "./trackManagers/AnnotationTrackUI";
-import HubPane from "./trackManagers/HubPane";
-import CustomTrackAdder from "./trackManagers/CustomTrackAdder";
-import { SessionUI } from "./SessionUI";
-import LiveUI from "./LiveUI";
+import { allGenomes, getSpeciesInfo } from "../model/genomes/allGenomes";
 import { RegionExpander } from "../model/RegionExpander";
-import { ScreenshotUI } from "./ScreenshotUI";
+import { TrackModel } from "../model/TrackModel";
+import ColorPicker from "./ColorPicker";
 import { DynamicRecordUI } from "./DynamicRecordUI";
 import FacetTableUI from "./FacetTableUI";
-import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "../AppState";
-import { HotKeyInfo } from "./HotKeyInfo";
-import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
-import { TrackUpload } from "./TrackUpload";
 import { FetchSequence } from "./FetchSequence";
-import packageJson from "../../package.json";
+import Geneplot from "./Geneplot/Geneplot";
 import ScatterPlot from "./Geneplot/ScatterPlot";
-import ColorPicker from "./ColorPicker";
-import { TextTrack } from "./TextTrack";
-
+import TrackRegionController from "./genomeNavigator/TrackRegionController";
+import { HotKeyInfo } from "./HotKeyInfo";
+import LiveUI from "./LiveUI";
 import "./Nav.css";
+import RegionSetSelector from "./RegionSetSelector";
+import { ScreenshotUI } from "./ScreenshotUI";
+import { SessionUI } from "./SessionUI";
+import { TextTrack } from "./TextTrack";
+import { INTERACTION_TYPES } from "./trackConfig/getTrackConfig";
+import { AnnotationTrackUI } from "./trackManagers/AnnotationTrackUI";
+import CustomTrackAdder from "./trackManagers/CustomTrackAdder";
+import HubPane from "./trackManagers/HubPane";
+import TrackList from "./trackManagers/TrackList";
+import { TrackUpload } from "./TrackUpload";
+
 
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
 
-function mapStateToProps(state) {
+interface CombinedAppState {
+	browser: StateWithHistory<AppState>;
+	firebase: any;
+}
+
+function mapStateToProps(state: CombinedAppState) {
     return {
         isShowingNavigator: state.browser.present.isShowingNavigator,
         isShowingVR: state.browser.present.isShowingVR,
@@ -48,6 +53,11 @@ const callbacks = {
     onToggleNavigator: ActionCreators.toggleNavigator,
     onToggleVR: ActionCreators.toggleVR,
 };
+
+interface NavProps {
+	selectedRegion: DisplayedRegionModel;
+	
+}
 
 /**
  * the top navigation bar for browser

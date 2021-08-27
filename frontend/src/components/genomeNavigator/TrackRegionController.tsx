@@ -1,10 +1,10 @@
-import React from "react";
 import PropTypes from "prop-types";
+import React from "react";
 import ReactModal from "react-modal";
 import DisplayedRegionModel from "../../model/DisplayedRegionModel";
+import { CopyToClip } from "../CopyToClipboard";
 import GeneSearchBox from "./GeneSearchBox";
 import SnpSearchBox from "./SnpSearchBox";
-import { CopyToClip } from "../CopyToClipboard";
 
 const MODAL_STYLE = {
     content: {
@@ -30,6 +30,11 @@ const X_BUTTON_STYLE = {
     top: "-5px",
     right: "15px",
 };
+
+interface TrackRegionControllerProps {
+	selectedRegion: DisplayedRegionModel;
+	onRegionSelected: ()
+}
 
 /**
  * The display that is above the main pane of the genome navigator, which shows the current track region and a text
