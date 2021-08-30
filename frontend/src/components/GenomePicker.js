@@ -7,6 +7,11 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import SearchIcon from "@material-ui/icons/Search";
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import Checkbox from '@material-ui/core/Checkbox';
+
 import {
     CardMedia,
     Container,
@@ -108,11 +113,11 @@ function GenomePicker(props) {
                     );
                 }
                 return (
-                    <Grid item xs={12} md={4} align="center" key={idx}>
+                    <Grid item xs={12} md={12} align="center" key={idx}>
                         <GenomePickerCard
                             species={species2}
                             details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
-                            onChoose={(genomeName) => props.onGenomeSelected(genomeName)}
+                            // onChoose={(genomeName) => props.onGenomeSelected(genomeName)}
                         />
                     </Grid>
                 );
@@ -168,7 +173,9 @@ function GenomePicker(props) {
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
-                            {renderTreeCards()}
+                            <RadioGroup row aria-label="list" name="list1">
+                                {renderTreeCards()}
+                            </RadioGroup>
                         </Grid>
                     </Container>
                 </TabPanel>
@@ -225,14 +232,23 @@ function GenomePickerCard(props) {
     const { species, details, onChoose } = props;
     const { logoUrl, assemblies } = details;
 
+    const [checked, setChecked] = React.useState(true);
+    const handleChange = (event) => {
+        setChecked(event.target.checked);
+      };
+
+
     const renderAssemblies = () => {
         return assemblies.map((assembly, idx) => {
             return (
-                <ListItem key={idx} button onClick={() => onChoose(assembly)} style={{ height: 25 }}>
-                    <ListItemIcon>
-                        <ChevronRightIcon />
-                    </ListItemIcon>
+                <ListItem key={idx} style={{ height: 25 }}>
                     <ListItemText primary={assembly} />
+                    <FormControlLabel
+                        value={assembly} control={<Radio />} label={assembly}
+                    />
+                    <FormControlLabel
+                        control={<Checkbox onChange={handleChange} name={assembly} />} label={assembly}
+                    />
                 </ListItem>
             );
         });
@@ -266,7 +282,7 @@ const useStyles = makeStyles({
     card: {
         borderRadius: "10px",
         height: "100%",
-        width: "270px",
+        width: "540px",
     },
     alignRight: {
         marginRight: 15,
