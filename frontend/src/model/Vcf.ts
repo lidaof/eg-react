@@ -62,7 +62,8 @@ class Vcf extends Feature {
     variant: Variant;
     constructor(variant: any) {
         const locus = new ChromosomeInterval(variant.CHROM, variant.POS - 1, variant.POS - 1 + variant.REF.length);
-        super(variant.ID ? variant.ID : "", locus);
+        super("", locus);
+        // super(variant.ID ? variant.ID : "", locus);
         // this.info = variant.INFO;
         // this.ref = variant.REF;
         // this.alt = variant.ALT;

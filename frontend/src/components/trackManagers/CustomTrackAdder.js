@@ -23,7 +23,7 @@ export const TRACK_TYPES = {
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange"],
     Stats: ["boxplot"],
-    Repeats: ["repeatmasker"],
+    Repeats: ["rmskv2", "repeatmasker"],
     Alignment: ["bam", "pairwise", "snv", "snv2"],
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
@@ -58,6 +58,7 @@ export const TYPES_DESC = {
     rgbpeak: "peak in bigbed format with RGB value",
     vcf: "Variant Call Format",
     boxplot: "show numerical data as boxplots",
+    rmskv2: "RepeatMasker V2 structure with color",
 };
 
 /**

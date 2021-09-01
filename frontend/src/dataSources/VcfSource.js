@@ -22,24 +22,36 @@ class VcfSource extends DataSource {
         this.parser = null;
     }
 
-    async getData(region, basesPerPixel, options = {}) {
+    async getData(region, basesPerPixel, options) {
         if (!this.header) {
             this.header = await this.vcf.getHeader();
         }
         if (!this.parser) {
             this.parser = new VCF({ header: this.header });
         }
-        const promises = region.getGenomeIntervals().map((locus) => this._getDataInLocus(locus));
+        const promises = region.getGenomeIntervals().map((locus) => this._getDataInLocus(locus, options));
         const dataForEachSegment = await Promise.all(promises);
         const flattened = _.flatten(dataForEachSegment);
         return flattened;
     }
 
-    async _getDataInLocus(locus) {
+    async _getDataInLocus(locus, options) {
         const variants = [];
-        await this.vcf.getLines(locus.chr, locus.start + 1, locus.end, (line) =>
+        let chrom = options.ensemblStyle ? locus.chr.replace("chr", "") : locus.chr;
+        if (chrom === "M") {
+            chrom = "MT";
+        }
+        //vcf is 1 based
+        // -1 compensation happened in Vcf feature constructor
+        await this.vcf.getLines(chrom, locus.start + 1, locus.end, (line) =>
             variants.push(this.parser.parseLine(line))
         );
+        if (options.ensemblStyle) {
+            for (let variant of variants) {
+                variant.CHROM = locus.chr;
+            }
+        }
+        // console.log(variants);
         return variants;
     }
 }

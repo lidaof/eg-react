@@ -90,6 +90,7 @@ class ThreedmolContainer extends React.Component {
         this.atomStartsByChrom = {}; // resolution string as key, value: {hap: {chrom: [list of sorted atoms' starts]} }
         this.newAtoms = {}; // holder for addtional models for animation, key: file name, value {hap: [list of atoms]}
         this.atomKeeper = {}; // resolution string as key, value: {hap: keeper}
+        this.envelop = null;
         // this.mol.chrom = {};
         // this.mol.chrom.atom = chromColors;
         this.bedLegend = {};
@@ -159,8 +160,9 @@ class ThreedmolContainer extends React.Component {
             myShapes: {},
             myShapeLabel: "",
             myShapeRegion: "",
-            lineOpacity: 0.7,
-            cartoonThickness: 0.3,
+            lineOpacity: 1,
+            cartoonThickness: 0.5,
+            highlightStyle: "cartoon",
             useLegengMin: 0,
             useLegengMax: 10,
             autoLegendScale: true,
@@ -173,6 +175,11 @@ class ThreedmolContainer extends React.Component {
             categories: null,
             staticCategories: null,
             numFormat: "bwtrack", //bwtrack, geneexp
+            envelopCenter: null,
+            envelopRadius: 0,
+            showEnvelop: false,
+            envelopColor: "grey",
+            envelopOpacity: "0.3",
         };
         this.paintWithBigwig = _.debounce(this.paintWithBigwig, 150);
         // this.paintWithComparment = _.debounce(this.paintWithComparment, 150);
@@ -227,6 +234,7 @@ class ThreedmolContainer extends React.Component {
             highlightingColor,
             lineOpacity,
             cartoonThickness,
+            highlightStyle,
             autoLegendScale,
             layout,
             thumbStyle,
@@ -252,6 +260,9 @@ class ThreedmolContainer extends React.Component {
             numFormat,
             useLegengMax,
             useLegengMin,
+            showEnvelop,
+            envelopColor,
+            envelopOpacity,
         } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
@@ -270,6 +281,16 @@ class ThreedmolContainer extends React.Component {
         // ) {
         //     await this.paintCompartment(paintCompartmentRegion);
         // }
+        if (showEnvelop !== prevState.showEnvelop) {
+            if (showEnvelop) {
+                this.displayEnvelop();
+            } else {
+                this.removeEnvelop(true);
+            }
+        }
+        if (envelopColor !== prevState.envelopColor || envelopOpacity !== prevState.envelopOpacity) {
+            this.updateEnvelop();
+        }
         if (
             A !== prevState.A ||
             B !== prevState.B ||
@@ -300,7 +321,7 @@ class ThreedmolContainer extends React.Component {
                     break;
                 case "line":
                     Object.keys(this.model2).forEach((hap) => this.model2[hap].show());
-                    this.viewer2.setStyle({}, { line: { colorscheme: "chrom", opacity: 1, radius: 0.8 } });
+                    this.viewer2.setStyle({}, { line: { colorscheme: "chrom", opacity: 1 } });
                     break;
                 case "hide":
                     Object.keys(this.model2).forEach((hap) => this.model2[hap].hide());
@@ -429,7 +450,11 @@ class ThreedmolContainer extends React.Component {
         if (highlightingColor !== prevState.highlightingColor) {
             this.setState({ highlightingColorChanged: true });
         }
-        if (lineOpacity !== prevState.lineOpacity || cartoonThickness !== prevState.cartoonThickness) {
+        if (
+            lineOpacity !== prevState.lineOpacity ||
+            cartoonThickness !== prevState.cartoonThickness ||
+            highlightStyle !== prevState.highlightStyle
+        ) {
             this.setState({
                 highlightingColorChanged: true,
                 paintRegion: "none",
@@ -848,6 +873,29 @@ class ThreedmolContainer extends React.Component {
             this.model[hap].addAtoms(atoms2[hap]);
         });
 
+        // get max/min of x, y, z
+        const xS = [],
+            yS = [],
+            zS = [];
+        Object.keys(atoms2).forEach((hap) => {
+            atoms2[hap].forEach((atom) => {
+                xS.push(atom.x);
+                yS.push(atom.y);
+                zS.push(atom.z);
+            });
+        });
+        const maxX = _.max(xS);
+        const minX = _.min(xS);
+        const maxY = _.max(yS);
+        const minY = _.min(yS);
+        const maxZ = _.max(zS);
+        const minZ = _.min(zS);
+        const p1 = new this.mol.Vector3(minX, minY, minZ);
+        const p2 = new this.mol.Vector3(maxX, maxY, maxZ);
+        const envelopCenter = new this.mol.Vector3((maxX + minX) * 0.5, (maxY + minY) * 0.5, (maxZ + minZ) * 0.5);
+        const envelopRadius = (2 / 3) * Math.min(envelopCenter.distanceTo(p1), envelopCenter.distanceTo(p2));
+        this.setState({ envelopCenter, envelopRadius });
+
         //set atoms for animation
 
         Object.keys(atoms2).forEach((hap) => {
@@ -929,6 +977,46 @@ class ThreedmolContainer extends React.Component {
         this.setState({ numFileObject: e.target.files[0] });
     };
 
+    initEnvelop = () => {
+        const { envelopRadius, envelopCenter, envelopOpacity, envelopColor } = this.state;
+        // using shape generating not perfect sphere
+        // this.envelop = this.viewer.addSphere({ center, radius, color: envelopColor, opacity: envelopOpacity });
+        this.envelop = this.viewer.addModel();
+        this.envelop.addAtoms([
+            { elem: "C", x: envelopCenter.x, y: envelopCenter.y, z: envelopCenter.z, bonds: [1], bondOrder: [1] },
+        ]);
+        this.envelop.setStyle({}, { sphere: { radius: envelopRadius, color: envelopColor, opacity: envelopOpacity } });
+    };
+
+    displayEnvelop = () => {
+        if (!this.envelop) {
+            this.initEnvelop();
+        }
+        this.viewer.render();
+    };
+
+    updateEnvelop = (needRender = true) => {
+        const { envelopRadius, envelopOpacity, envelopColor } = this.state;
+        this.envelop.setStyle({}, { sphere: { radius: envelopRadius, color: envelopColor, opacity: envelopOpacity } });
+        if (needRender) {
+            this.viewer.render();
+        }
+    };
+
+    removeEnvelop = () => {
+        if (this.envelop) {
+            this.viewer.removeModel(this.envelop);
+            this.envelop = null;
+            this.viewer.render();
+        }
+    };
+
+    toggleDisplayEnvelop = () => {
+        this.setState((prevState) => {
+            return { showEnvelop: !prevState.showEnvelop };
+        });
+    };
+
     toggleModelDisplay = (hap) => {
         const newDisplayConfig = { ...this.state.modelDisplayConfig, [hap]: !this.state.modelDisplayConfig[hap] };
         // console.log(newDisplayConfig, hap);
@@ -972,7 +1060,15 @@ class ThreedmolContainer extends React.Component {
     };
 
     highlightRegions = () => {
-        const { highlightingColor, resolution, lineOpacity, cartoonThickness, modelDisplayConfig } = this.state;
+        const {
+            highlightStyle,
+            highlightingColor,
+            cartoonThickness,
+            resolution,
+            lineOpacity,
+            modelDisplayConfig,
+            showEnvelop,
+        } = this.state;
         const regions = this.viewRegionToRegions();
         // const colorByRegion = function (atom, region) {
         //     if (
@@ -1004,6 +1100,18 @@ class ThreedmolContainer extends React.Component {
         //         { cartoon: { colorfunc: (atom) => colorByRegion(atom, region), style: "trace", thickness: 1 } }
         //     );
         // });
+        const usedHighlightStyle =
+            highlightStyle === "cartoon"
+                ? {
+                      cartoon: { color: highlightingColor, style: "trace", thickness: cartoonThickness },
+                  }
+                : {
+                      sphere: {
+                          color: highlightingColor,
+                          opacity: 1,
+                          radius: cartoonThickness,
+                      },
+                  };
         let validateRegion = false;
         Object.keys(modelDisplayConfig).forEach((hap) => {
             regions.forEach((region) => {
@@ -1014,7 +1122,7 @@ class ThreedmolContainer extends React.Component {
                     const resiSelect = `${regionRange[hap][region.chrom][0]}-${regionRange[hap][region.chrom][1]}`;
                     this.viewer.setStyle(
                         { chain: region.chrom, resi: [resiSelect], properties: { hap: hap } },
-                        { cartoon: { color: highlightingColor, style: "trace", thickness: cartoonThickness } }
+                        usedHighlightStyle
                     );
                     validateRegion = true;
                 }
@@ -1022,6 +1130,9 @@ class ThreedmolContainer extends React.Component {
         });
         if (validateRegion) {
             this.setState({ highlightingOn: true, highlightingColorChanged: false });
+            if (showEnvelop && this.envelop) {
+                this.updateEnvelop(false);
+            }
             this.viewer.render();
         } else {
             this.setState({ message: "cannot find matched region to highlight, skip" });
@@ -1089,6 +1200,8 @@ class ThreedmolContainer extends React.Component {
             autoLegendScale,
             numFormat,
             modelDisplayConfig,
+            showEnvelop,
+            highlightStyle,
         } = this.state;
         let keepers = {};
         const queryChroms = chooseRegion === "region" ? regions.map((r) => r.chrom) : regions;
@@ -1173,6 +1286,16 @@ class ThreedmolContainer extends React.Component {
                 return "grey";
             }
         };
+        const usedHighlightStyle =
+            highlightStyle === "cartoon"
+                ? { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
+                : {
+                      sphere: {
+                          colorfunc: colorByValue,
+                          opacity: 1,
+                          radius: cartoonThickness,
+                      },
+                  };
         if (chooseRegion === "region") {
             const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
             const resString = resolution.toString();
@@ -1196,18 +1319,18 @@ class ThreedmolContainer extends React.Component {
                         const resiSelect = `${regionRange[hap][chrom][0]}-${regionRange[hap][chrom][1]}`;
                         this.viewer.setStyle(
                             { chain: chrom, resi: [resiSelect], properties: { hap: hap } },
-                            { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
+                            usedHighlightStyle
                         );
                     }
                 });
             });
         } else {
             queryChroms.forEach((chrom) => {
-                this.viewer.setStyle(
-                    { chain: chrom },
-                    { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
-                );
+                this.viewer.setStyle({ chain: chrom }, usedHighlightStyle);
             });
+        }
+        if (showEnvelop && this.envelop) {
+            this.updateEnvelop(false);
         }
         this.viewer.render();
         this.setState({
@@ -1266,10 +1389,13 @@ class ThreedmolContainer extends React.Component {
 
     removePaint = () => {
         if (!this.state.colorScale) return;
-        const { lineOpacity } = this.state;
+        const { lineOpacity, showEnvelop } = this.state;
         this.setState({ paintRegion: "none" });
         // this.viewer.setStyle({}, { cartoon: { color: "grey", style: "trace", thickness: 1 } });
         this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } });
+        if (showEnvelop && this.envelop) {
+            this.updateEnvelop(false);
+        }
         this.viewer.render();
         this.setState({
             legendMax: 0,
@@ -1824,6 +1950,8 @@ class ThreedmolContainer extends React.Component {
             gene,
             promoter,
             modelDisplayConfig,
+            showEnvelop,
+            highlightStyle,
         } = this.state; // resolution for atom end pos
         const queryChroms = chooseRegion === "region" ? regions.map((r) => r.chrom) : regions;
         const filterRegions = {}; // key, chrom, value, list of [start, end] , for GSV later
@@ -1869,6 +1997,16 @@ class ThreedmolContainer extends React.Component {
                 return "grey";
             }
         };
+        const usedHighlightStyle =
+            highlightStyle === "cartoon"
+                ? { cartoon: { colorfunc: colorByAnnotation, style: "trace", thickness: cartoonThickness } }
+                : {
+                      sphere: {
+                          colorfunc: colorByAnnotation,
+                          opacity: 1,
+                          radius: cartoonThickness,
+                      },
+                  };
         if (chooseRegion === "region") {
             const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
             const resString = resolution.toString();
@@ -1892,18 +2030,18 @@ class ThreedmolContainer extends React.Component {
                         const resiSelect = `${regionRange[hap][chrom][0]}-${regionRange[hap][chrom][1]}`;
                         this.viewer.setStyle(
                             { chain: chrom, resi: [resiSelect], properties: { hap: hap } },
-                            { cartoon: { colorfunc: colorByAnnotation, style: "trace", thickness: cartoonThickness } }
+                            usedHighlightStyle
                         );
                     }
                 });
             });
         } else {
             queryChroms.forEach((chrom) => {
-                this.viewer.setStyle(
-                    { chain: chrom },
-                    { cartoon: { colorfunc: colorByAnnotation, style: "trace", thickness: cartoonThickness } }
-                );
+                this.viewer.setStyle({ chain: chrom }, usedHighlightStyle);
             });
+        }
+        if (showEnvelop && this.envelop) {
+            this.updateEnvelop(false);
         }
         this.viewer.render();
         switch (annoFormat) {
@@ -1932,9 +2070,12 @@ class ThreedmolContainer extends React.Component {
     };
 
     removeAnnotationPaint = () => {
-        const { lineOpacity } = this.state;
+        const { lineOpacity, showEnvelop } = this.state;
         this.setState({ paintAnnotationRegion: "none" });
         this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } });
+        if (showEnvelop && this.envelop) {
+            this.updateEnvelop(false);
+        }
         this.viewer.render();
         this.setState({
             highlightingOn: false,
@@ -2112,6 +2253,14 @@ class ThreedmolContainer extends React.Component {
 
     handleMyShapeRegionChange = (e) => {
         this.setState({ myShapeRegion: e.target.value.trim() });
+    };
+
+    handleEnvelopOpacityChange = (e) => {
+        this.setState({ envelopOpacity: e.target.value });
+    };
+
+    handleEnvelopColorChange = (e) => {
+        this.setState({ envelopOpacity: e.target.value });
     };
 
     addAnchors3dToMyArrows = (anchors, asShape = false) => {
@@ -2472,6 +2621,7 @@ class ThreedmolContainer extends React.Component {
             highlightingColorChanged,
             lineOpacity,
             cartoonThickness,
+            highlightStyle,
             autoLegendScale,
             useLegengMin,
             useLegengMax,
@@ -2481,6 +2631,9 @@ class ThreedmolContainer extends React.Component {
             paintAnnotationRegion,
             annoUsePromoter,
             numFormat,
+            showEnvelop,
+            envelopColor,
+            envelopOpacity,
         } = this.state;
         const { tracks, x, y, onNewViewRegion, viewRegion, sync3d } = this.props;
         const bwTracks = tracks.filter((track) => getTrackConfig(track).isBigwigTrack());
@@ -2528,6 +2681,38 @@ class ThreedmolContainer extends React.Component {
                                                 modelDisplay={modelDisplayConfig}
                                                 onToggleModelDisplay={this.toggleModelDisplay}
                                             />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="envelop">
+                                                Show envelop:{" "}
+                                                <input
+                                                    type="checkbox"
+                                                    name="envelop"
+                                                    checked={showEnvelop}
+                                                    onChange={this.toggleDisplayEnvelop}
+                                                />
+                                            </label>
+                                        </div>
+                                        <div style={{ display: showEnvelop ? "flex" : "none", alignItems: "center" }}>
+                                            <label style={{ display: "flex" }}>
+                                                <span>envelop color:</span>
+                                                <ColorPicker
+                                                    onUpdateLegendColor={this.updateLegendColor}
+                                                    colorKey={"envelopColor"}
+                                                    initColor={envelopColor}
+                                                />
+                                            </label>
+                                            <label>
+                                                opacity:{" "}
+                                                <input
+                                                    type="number"
+                                                    min={0}
+                                                    max={1}
+                                                    step={0.1}
+                                                    value={envelopOpacity}
+                                                    onChange={this.handleEnvelopOpacityChange}
+                                                />
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -2654,6 +2839,7 @@ class ThreedmolContainer extends React.Component {
                                         <OpacityThickness
                                             opacity={lineOpacity}
                                             thickness={cartoonThickness}
+                                            highlightStyle={highlightStyle}
                                             onUpdate={this.updateLegendColor}
                                         />
                                         <div style={{ display: "flex", alignItems: "flex-start" }}>
@@ -2827,6 +3013,7 @@ class ThreedmolContainer extends React.Component {
                                         <OpacityThickness
                                             opacity={lineOpacity}
                                             thickness={cartoonThickness}
+                                            highlightStyle={highlightStyle}
                                             onUpdate={this.updateLegendColor}
                                         />
                                         {colorScale && (
@@ -3052,6 +3239,7 @@ class ThreedmolContainer extends React.Component {
                                         <OpacityThickness
                                             opacity={lineOpacity}
                                             thickness={cartoonThickness}
+                                            highlightStyle={highlightStyle}
                                             onUpdate={this.updateLegendColor}
                                         />
                                         <label style={{ display: annoFormat === "refgene" ? "block" : "none" }}>

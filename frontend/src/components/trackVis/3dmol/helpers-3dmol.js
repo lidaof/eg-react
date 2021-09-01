@@ -48,7 +48,7 @@ export const g3dParser = function (data, clickCallback) {
      */
     // const atoms = []; //array of models, maybe for different haplotypes, or cells/clusters for single cell data
     const atoms = {}; // hap as key, atom array as value
-    const p = [new window.$3Dmol.Vector3(), new window.$3Dmol.Vector3(), new window.$3Dmol.Vector3()];
+    // const p = [new window.$3Dmol.Vector3(), new window.$3Dmol.Vector3(), new window.$3Dmol.Vector3()];
 
     for (const hap of Object.keys(data)) {
         const hapAtoms = [];
@@ -63,8 +63,8 @@ export const g3dParser = function (data, clickCallback) {
             x /= scale;
             y /= scale;
             z /= scale;
-            p[0].set(x, y, z);
-            p[2].set(x, y, z);
+            // p[0].set(x, y, z);
+            // p[2].set(x, y, z);
             for (let i = 0; i < data[hap][chr].start.length; i++) {
                 bi += 1;
                 ri += 1;
@@ -73,14 +73,14 @@ export const g3dParser = function (data, clickCallback) {
                 x = data[hap][chr].x[i] / scale;
                 y = data[hap][chr].y[i] / scale;
                 z = data[hap][chr].z[i] / scale;
-                p[1].set(x, y, z);
-                if (i + 1 < data[hap][chr].start.length)
-                    p[2].set(data[hap][chr].x[i + 1], data[hap][chr].y[i + 1], data[hap][chr].z[i + 1]);
-                else p[2].set(x, y, z);
+                // p[1].set(x, y, z);
+                // if (i + 1 < data[hap][chr].start.length)
+                //     p[2].set(data[hap][chr].x[i + 1], data[hap][chr].y[i + 1], data[hap][chr].z[i + 1]);
+                // else p[2].set(x, y, z);
                 atom.x = x;
                 atom.y = y;
                 atom.z = z;
-                const r = (2 / 3) * Math.min(p[0].distanceTo(p[1]), p[2].distanceTo(p[1]));
+                // const r = (2 / 3) * Math.min(p[0].distanceTo(p[1]), p[2].distanceTo(p[1]));
                 atom.resi = ri;
                 atom.resn = resnList[i % resnList.length];
                 atom.atom = "CA";
@@ -104,7 +104,7 @@ export const g3dParser = function (data, clickCallback) {
                 //   atom.properties.value = Math.floor(Math.random() * 201) - 100; // random value for test color assignment
                 //   atom.properties.chrom = chr;
                 atom.properties.start = start;
-                atom.properties.radius = r;
+                // atom.properties.radius = r;
                 atom.properties.hap = hap;
 
                 if (clickCallback) {
@@ -116,9 +116,9 @@ export const g3dParser = function (data, clickCallback) {
 
                 hapAtoms.push(atom);
 
-                const _p = p[0];
-                p[0] = p[1];
-                p[1] = _p;
+                // const _p = p[0];
+                // p[0] = p[1];
+                // p[1] = _p;
             }
             if (data[hap][chr].start.length === 1) {
                 hapAtoms[0].properties.radius = 1;

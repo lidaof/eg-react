@@ -26,6 +26,7 @@ export const DEFAULT_OPTIONS = {
     hiddenPixels: 0,
     colorScaleKey: VcfColorScaleKeys.AF,
     displayMode: VcfDisplayModes.AUTO,
+    ensemblStyle: false,
 };
 
 interface VcfTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
@@ -66,7 +67,12 @@ class VcfTrackNoTooltip extends React.Component<VcfTrackProps> {
         if (colorKey === VcfColorScaleKeys.QUAL) {
             values = data.map(v => v.variant.QUAL)
         } else if (colorKey === VcfColorScaleKeys.AF) {
-            values = data.map(v => v.variant.INFO.AF[0])
+            values = data.map(v => {
+                if (v.variant.INFO.hasOwnProperty('AF')) {
+                    return v.variant.INFO.AF[0]
+                }
+                return 0;
+            })
         } else {
             values = []
         }
