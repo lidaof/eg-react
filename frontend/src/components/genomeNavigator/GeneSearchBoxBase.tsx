@@ -1,13 +1,13 @@
 import axios from 'axios';
 import _ from 'lodash';
 import Gene from 'model/Gene';
+import { GenomeConfig } from 'model/genomes/GenomeConfig';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Autosuggest from 'react-autosuggest';
 import { Manager, Popper, Target } from 'react-popper';
 import { useSpeechRecognition } from 'react-speech-recognition';
 import '../../autosuggest.css';
 import { AWS_API } from '../../dataSources/GeneSource';
-import { Genome } from '../../model/genomes/Genome';
 import OutsideClickDetector from '../OutsideClickDetector';
 import withCurrentGenome from '../withCurrentGenome';
 import './GeneSearchBox.css';
@@ -28,10 +28,7 @@ const options = {
 };
 
 interface GeneSearchBoxBaseProps {
-	genomeConfig: {
-		// Current genome
-		genome: Genome;
-	};
+	genomeConfig: GenomeConfig;
 	onGeneSelected: (gene: Gene) => void;
 	voiceInput: boolean;
 	simpleMode: boolean;

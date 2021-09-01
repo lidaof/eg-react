@@ -1,9 +1,11 @@
-import React from "react";
-import PropTypes from "prop-types";
 import JSON5 from "json5";
-import Json5Fetcher from "../../model/Json5Fetcher";
+import PropTypes from "prop-types";
+import React from "react";
 import DataHubParser from "../../model/DataHubParser";
-import { readFileAsText, HELP_LINKS } from "../../util";
+import Json5Fetcher from "../../model/Json5Fetcher";
+import { HELP_LINKS, readFileAsText } from "../../util";
+
+
 
 /**
  * custom hub add UI
@@ -55,7 +57,7 @@ class RemoteHubAdder extends React.Component {
         const lastSlashIndex = this.state.inputUrl.lastIndexOf("/");
         const hubBase = this.state.inputUrl.substring(0, lastSlashIndex).trimRight("/");
         const parser = new DataHubParser(0);
-        const tracks = await parser.getTracksInHub(json, "Custom hub", "", false, 0, hubBase);
+        const tracks = parser.getTracksInHub(json, "Custom hub", "", false, 0, hubBase);
         if (tracks) {
             this.props.onAddTracksToPool(tracks, false);
             const tracksToShow = tracks.filter((track) => track.showOnHubLoad);
@@ -110,7 +112,7 @@ class FileHubAdder extends React.Component {
         const contents = await readFileAsText(event.target.files[0]);
         const json = JSON5.parse(contents);
         const parser = new DataHubParser(0);
-        const tracks = await parser.getTracksInHub(json, "Custom hub");
+        const tracks = parser.getTracksInHub(json, "Custom hub");
         if (tracks) {
             this.props.onAddTracksToPool(tracks, false);
             const tracksToShow = tracks.filter((track) => track.showOnHubLoad);

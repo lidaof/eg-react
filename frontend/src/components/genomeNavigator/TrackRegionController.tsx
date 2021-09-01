@@ -1,39 +1,47 @@
-import PropTypes from "prop-types";
-import React from "react";
-import ReactModal from "react-modal";
-import DisplayedRegionModel from "../../model/DisplayedRegionModel";
-import { CopyToClip } from "../CopyToClipboard";
-import GeneSearchBox from "./GeneSearchBox";
-import SnpSearchBox from "./SnpSearchBox";
+import ChromosomeInterval from 'model/interval/ChromosomeInterval';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import ReactModal from 'react-modal';
+import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import { CopyToClip } from '../CopyToClipboard';
+import GeneSearchBox from './GeneSearchBox';
+import SnpSearchBox from './SnpSearchBox';
 
 const MODAL_STYLE = {
-    content: {
-        top: "40px",
-        left: "300px",
-        right: "unset",
-        bottom: "unset",
-        overflow: "visible",
-        padding: "5px",
-        color: "black",
-    },
-    overlay: {
-        backgroundColor: "rgba(111,107,101, 0.7)",
-        zIndex: 4,
-    },
+	content: {
+		top: '40px',
+		left: '300px',
+		right: 'unset',
+		bottom: 'unset',
+		overflow: 'visible',
+		padding: '5px',
+		color: 'black'
+	},
+	overlay: {
+		backgroundColor: 'rgba(111,107,101, 0.7)',
+		zIndex: 4
+	}
 };
 
 const X_BUTTON_STYLE = {
-    cursor: "pointer",
-    color: "red",
-    fontSize: "2em",
-    position: "absolute",
-    top: "-5px",
-    right: "15px",
-};
+	cursor: 'pointer',
+	color: 'red',
+	fontSize: '2em',
+	position: 'absolute',
+	top: '-5px',
+	right: '15px'
+} as const;
 
 interface TrackRegionControllerProps {
 	selectedRegion: DisplayedRegionModel;
-	onRegionSelected: ()
+	virusBrowserMode: boolean;
+	/**
+	 * Called when the user types a region to go to and it is successfully parsed.  Has the signature
+	 *     (newStart: number, newEnd: number): void
+	 *         `newStart`: the nav context coordinate of the start of the interval
+	 *         `newEnd`: the nav context coordinate of the end of the interval
+	 */
+	onRegionSelected: (...interval: number[]) => void;
+	onSetEnteredRegion: (interval: ChromosomeInterval) => void;
 }
 
 /**
@@ -42,142 +50,110 @@ interface TrackRegionControllerProps {
  *
  * @author Silas Hsu
  */
-class TrackRegionController extends React.Component {
-    static propTypes = {
-        selectedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired, // The current view of the genome navigator
+const TrackRegionController: React.FC<TrackRegionControllerProps> = ({ onRegionSelected, onSetEnteredRegion, selectedRegion, virusBrowserMode }) => {
+	const inputRef = useRef<HTMLInputElement | null>(null);
+	const [badInputMessage, setBadInputMessage] = useState<string>('');
+	const [showModal, setShowModal] = useState<boolean>(false);
+	const coordinates = useMemo(() => selectedRegion.currentRegionAsString(), [selectedRegion]);
 
-        /**
-         * Called when the user types a region to go to and it is successfully parsed.  Has the signature
-         *     (newStart: number, newEnd: number): void
-         *         `newStart`: the nav context coordinate of the start of the interval
-         *         `newEnd`: the nav context coordinate of the end of the interval
-         */
-        onRegionSelected: PropTypes.func.isRequired,
-    };
+	const handleOpenModal = useCallback(() => {
+		setShowModal(true);
+	}, []);
 
-    constructor(props) {
-        super(props);
-        this.input = null;
-        this.state = {
-            badInputMessage: "",
-            showModal: false,
-        };
-        this.handleOpenModal = this.handleOpenModal.bind(this);
-        this.handleCloseModal = this.handleCloseModal.bind(this);
-        this.parseRegion = this.parseRegion.bind(this);
-        this.keyPress = this.keyPress.bind(this);
-    }
+	const handleCloseModal = useCallback(() => {
+		setShowModal(false);
+	}, []);
 
-    handleOpenModal() {
-        this.setState({ showModal: true });
-    }
+	/**
+	 * Parses user input that expresses a desired region for tracks to display.
+	 */
+	const parseRegion = useCallback(() => {
+		let parsedRegion = null;
+		const navContext = selectedRegion.getNavigationContext();
 
-    handleCloseModal() {
-        this.setState({ showModal: false });
-    }
+		try {
+			parsedRegion = navContext.parse(inputRef.current.value);
+		} catch (error) {
+			if (error instanceof RangeError) {
+				setBadInputMessage(error.message);
+				return;
+			} else {
+				throw error;
+			}
+		}
 
-    keyPress(e) {
-        if (e.keyCode === 13) {
-            this.parseRegion();
-        }
-    }
+		// Yay, parsing successful!
+		if (badInputMessage.length > 0) {
+			setBadInputMessage('');
+		}
 
-    /**
-     * Parses user input that expresses a desired region for tracks to display.
-     */
-    parseRegion() {
-        let parsedRegion = null;
-        const navContext = this.props.selectedRegion.getNavigationContext();
-        try {
-            parsedRegion = navContext.parse(this.input.value);
-        } catch (error) {
-            if (error instanceof RangeError) {
-                this.setState({ badInputMessage: error.message });
-                return;
-            } else {
-                throw error;
-            }
-        }
+		onRegionSelected(parsedRegion.start, parsedRegion.end);
+		onSetEnteredRegion(navContext.getLociInInterval(parsedRegion.start, parsedRegion.end)[0]);
+		handleCloseModal();
+	}, [onRegionSelected, onSetEnteredRegion, handleCloseModal]);
 
-        // Yay, parsing successful!
-        if (this.state.badInputMessage.length > 0) {
-            this.setState({ badInputMessage: "" });
-        }
-        this.props.onRegionSelected(parsedRegion.start, parsedRegion.end);
-        this.props.onSetEnteredRegion(navContext.getLociInInterval(parsedRegion.start, parsedRegion.end)[0]);
-        this.handleCloseModal();
-    }
+	const keyPress = useCallback(
+		(e: React.KeyboardEvent<HTMLInputElement>) => {
+			if (e.keyCode === 13) {
+				parseRegion();
+			}
+		},
+		[parseRegion]
+	);
 
-    // handleClick(event) {
-    //     event.currentTarget.select();
-    // }
-
-    /**
-     * @inheritdoc
-     */
-    render() {
-        const coordinates = this.props.selectedRegion.currentRegionAsString();
-        return (
-            <div className="tool-element">
-                <button className="btn btn-secondary" onClick={this.handleOpenModal}>
-                    {coordinates}
-                </button>
-                <ReactModal
-                    isOpen={this.state.showModal}
-                    contentLabel="Gene & Region search"
-                    ariaHideApp={false}
-                    onRequestClose={this.handleCloseModal}
-                    shouldCloseOnOverlayClick={true}
-                    style={MODAL_STYLE}
-                >
-                    <span className="text-right" style={X_BUTTON_STYLE} onClick={this.handleCloseModal}>
-                        ×
-                    </span>
-                    <h6>Gene search</h6>
-                    <GeneSearchBox
-                        navContext={this.props.selectedRegion.getNavigationContext()}
-                        onRegionSelected={this.props.onRegionSelected}
-                        handleCloseModal={this.handleCloseModal}
-                        onToggleHighlight={this.props.onToggleHighlight}
-                        onSetEnteredRegion={this.props.onSetEnteredRegion}
-                    />
-                    {!this.props.virusBrowserMode && (
-                        <>
-                            <h6 style={{ marginTop: "5px" }}>SNP search</h6>
-                            <SnpSearchBox
-                                navContext={this.props.selectedRegion.getNavigationContext()}
-                                onRegionSelected={this.props.onRegionSelected}
-                                handleCloseModal={this.handleCloseModal}
-                                onToggleHighlight={this.props.onToggleHighlight}
-                                onSetEnteredRegion={this.props.onSetEnteredRegion}
-                            />
-                        </>
-                    )}
-                    <h6>
-                        Region search (current region is {coordinates} <CopyToClip value={coordinates} />)
-                    </h6>
-                    <input
-                        ref={(input) => (this.input = input)}
-                        type="text"
-                        size="30"
-                        placeholder="Coordinate"
-                        // onClick={this.handleClick}
-                        onKeyDown={this.keyPress}
-                    />
-                    <button
-                        className="btn btn-secondary btn-sm"
-                        style={{ marginLeft: "2px" }}
-                        onClick={this.parseRegion}
-                    >
-                        Go
-                    </button>
-                    {this.state.badInputMessage.length > 0 && (
-                        <span className="alert-danger">{this.state.badInputMessage}</span>
-                    )}
-                </ReactModal>
-            </div>
-        );
-    }
-}
+	return (
+		<div className="tool-element">
+			<button className="btn btn-secondary" onClick={handleOpenModal}>
+				{coordinates}
+			</button>
+			<ReactModal
+				isOpen={showModal}
+				contentLabel="Gene & Region search"
+				ariaHideApp={false}
+				onRequestClose={handleCloseModal}
+				shouldCloseOnOverlayClick={true}
+				style={MODAL_STYLE}>
+				<span className="text-right" style={X_BUTTON_STYLE} onClick={handleCloseModal}>
+					×
+				</span>
+				<h6>Gene search</h6>
+				<GeneSearchBox
+					navContext={selectedRegion.getNavigationContext()}
+					onRegionSelected={onRegionSelected}
+					handleCloseModal={handleCloseModal}
+					// onToggleHighlight={onToggleHighlight}
+					onSetEnteredRegion={onSetEnteredRegion}
+				/>
+				{!virusBrowserMode && (
+					<>
+						<h6 style={{ marginTop: '5px' }}>SNP search</h6>
+						<SnpSearchBox
+							navContext={selectedRegion.getNavigationContext()}
+							onRegionSelected={onRegionSelected}
+							handleCloseModal={handleCloseModal}
+							// onToggleHighlight={onToggleHighlight}
+							onSetEnteredRegion={onSetEnteredRegion}
+						/>
+					</>
+				)}
+				<h6>
+					Region search (current region is {coordinates} <CopyToClip value={coordinates} />)
+				</h6>
+				<input
+					ref={(input) => (inputRef.current = input)}
+					type="text"
+					size={30}
+					placeholder="Coordinate"
+					// onClick={this.handleClick}
+					onKeyDown={keyPress}
+				/>
+				<button className="btn btn-secondary btn-sm" style={{ marginLeft: '2px' }} onClick={parseRegion}>
+					Go
+				</button>
+				{badInputMessage.length > 0 && <span className="alert-danger">{badInputMessage}</span>}
+			</ReactModal>
+		</div>
+	);
+};
 
 export default TrackRegionController;

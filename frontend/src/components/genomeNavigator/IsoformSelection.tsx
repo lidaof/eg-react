@@ -1,11 +1,10 @@
 import axios from 'axios';
+import { GenomeConfig } from 'model/genomes/GenomeConfig';
 import React, { useEffect, useState } from 'react';
 import { AWS_API } from '../../dataSources/GeneSource';
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
 import Gene, { IdbRecord } from '../../model/Gene';
-import { Genome } from '../../model/genomes/Genome';
 import LinearDrawingModel from '../../model/LinearDrawingModel';
-import NavigationContext from '../../model/NavigationContext';
 import withCurrentGenome from '../withCurrentGenome';
 import './IsoformSelection.css';
 import { StandaloneGeneAnnotation } from './StandaloneGeneAnnotation';
@@ -17,10 +16,7 @@ interface IsoformSelectionProps {
 	 * Genome config to use.  Needed because if genes are on different chromosomes, we need to know chromosome
 	 * lengths to draw gene locations to scale.
 	 */
-	genomeConfig: {
-		genome: Genome;
-		navContext: NavigationContext;
-	};
+	genomeConfig: GenomeConfig;
 	geneName: string; // Gene name to query
 	onGeneSelected: (gene: Gene) => void; // Callback for when a gene is selected.
 	simpleMode: boolean;

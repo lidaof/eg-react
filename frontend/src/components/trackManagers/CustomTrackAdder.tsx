@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import { Tabs, Tab } from "react-bootstrap-tabs";
 import JSON5 from "json5";
 // import { notify } from 'react-notify-toast';
-import TrackModel from "../../model/TrackModel";
+import TrackModel, { TrackOptions } from "../../model/TrackModel";
 import { getSecondaryGenomes } from "../../util";
 import CustomHubAdder from "./CustomHubAdder";
 import FacetTable from "./FacetTable";
 import { HELP_LINKS } from "../../util";
 import { TrackOptionsUI } from "./TrackOptionsUI";
+import { GenomeConfig } from "model/genomes/GenomeConfig";
 
 // Just add a new entry here to support adding a new track type.
 // const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'cool', 'bam'];
@@ -60,56 +61,51 @@ export const TYPES_DESC = {
     boxplot: "show numerical data as boxplots",
 };
 
+interface CustomTrackAdderProps {
+	addedTracks: TrackModel[];
+	customTracksPool: TrackModel[];
+	onTracksAdded: (tracks: TrackModel[]) => void;
+	// FIXME: i have no idea what the boolean does
+	onAddTracksToPool: (tracks: TrackModel[], bool: boolean) => void;
+	addTermToMetaSets: (terms: string[]) => void;
+	genomeConfig: GenomeConfig;
+	addedTrackSets: Set<TrackModel>;
+}
+
 /**
  * UI for adding custom tracks.
  *
  * @author Silas Hsu and Daofeng Li
  */
-class CustomTrackAdder extends React.Component {
-    static propTypes = {
-        addedTracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
-        customTracksPool: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
-        onTracksAdded: PropTypes.func,
-        onAddTracksToPool: PropTypes.func,
-        addTermToMetaSets: PropTypes.func,
-        genomeConfig: PropTypes.object.isRequired,
-        addedTrackSets: PropTypes.instanceOf(Set),
-    };
+const CustomTrackAdder: React.FC<CustomTrackAdderProps> = ({ addTermToMetaSets, addedTrackSets, addedTracks, customTracksPool, genomeConfig, onAddTracksToPool, onTracksAdded }) => {
+	const [type, setType] = useState<string>(TRACK_TYPES.Numerical[0]);
+	const [url, setUrl] = useState<string>('');
+	const [name, setName] = useState<string>('');
+	const [urlError, setUrlError] = useState<string>('');
+	const [metadata, setMetadata] = useState<{ genome: string }>({ genome: genomeConfig.genome.getName() });
+	const [trackAdded, setTrackAdded] = useState<boolean>(false);
+	const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
+	const [options, setOptions] = useState<TrackOptions | null>(null);
 
-    constructor(props) {
-        super(props);
-        this.trackUI = null;
-        this.state = {
-            type: TRACK_TYPES.Numerical[0],
-            url: "",
-            name: "",
-            urlError: "",
-            metadata: { genome: this.props.genomeConfig.genome.getName() },
-            trackAdded: false,
-            selectedTabIndex: 0,
-            options: null, // custom track options
-        };
-        this.handleSubmitClick = this.handleSubmitClick.bind(this);
-    }
-
-    handleSubmitClick(e) {
+    const handleSubmitClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        if (!this.props.onTracksAdded) {
+        if (!onTracksAdded) {
             return;
         }
 
-        if (!this.state.url) {
-            this.setState({ urlError: "Enter a URL" });
+        if (!url) {
+			setUrlError('Enter a URL');
             return;
         } else {
-            const newTrack = new TrackModel({ ...this.state, datahub: "Custom track" });
-            this.props.onTracksAdded([newTrack]);
-            this.props.onAddTracksToPool([newTrack], false);
-            this.setState({ urlError: "", trackAdded: true });
+            const newTrack = new TrackModel({ datahub: "Custom track", metadata, name, options, url });
+            onTracksAdded([newTrack]);
+            onAddTracksToPool([newTrack], false);
+			setUrlError('');
+			setTrackAdded(true);
         }
-    }
+    }, [onTracksAdded, onAddTracksToPool, metadata, name, options, url]);
 
-    renderTypeOptions() {
+    const renderTypeOptions = useCallback(() => {
         return Object.entries(TRACK_TYPES).map((types) => (
             <optgroup label={types[0]} key={types[0]}>
                 {types[1].map((type) => (
@@ -119,51 +115,50 @@ class CustomTrackAdder extends React.Component {
                 ))}
             </optgroup>
         ));
-    }
+    }, []);
 
-    renderGenomeOptions(allGenomes) {
+    const renderGenomeOptions = useCallback((allGenomes: string[]) => {
         return allGenomes.map((genome) => (
             <option key={genome} value={genome}>
                 {genome}
             </option>
         ));
-    }
+    }, []);
 
-    renderButtons() {
-        if (this.state.trackAdded) {
+    const renderButtons = () => {
+        if (trackAdded) {
             return (
-                <React.Fragment>
+                <>
                     <button className="btn btn-success" disabled={true}>
                         Success
                     </button>
-                    <button className="btn btn-link" onClick={() => this.setState({ trackAdded: false })}>
+                    <button className="btn btn-link" onClick={() => setTrackAdded(false)}>
                         Add another track
                     </button>
-                </React.Fragment>
+                </>
             );
         } else {
             return (
-                <button className="btn btn-primary" onClick={this.handleSubmitClick}>
+                <button className="btn btn-primary" onClick={handleSubmitClick}>
                     Submit
                 </button>
             );
         }
     }
 
-    getOptions = (value) => {
+    const getOptions = useCallback((value: string) => {
         let options = null;
         try {
-            options = JSON5.parse(value);
+            options = JSON5.parse(value) as TrackOptions;
         } catch (error) {
             // notify.show('Option syntax is not correct, ignored', 'error', 3000);
         }
-        this.setState({ options });
-    };
+		setOptions(options);
+    }, []);
 
-    renderCustomTrackAdder() {
-        const { type, url, name, metadata, urlError } = this.state;
-        const primaryGenome = this.props.genomeConfig.genome.getName();
-        var allGenomes = getSecondaryGenomes(primaryGenome, this.props.addedTracks);
+    const renderCustomTrackAdder = useCallback(() => {
+        const primaryGenome = genomeConfig.genome.getName();
+        var allGenomes = getSecondaryGenomes(primaryGenome, addedTracks);
         allGenomes.unshift(primaryGenome);
         return (
             <form>
@@ -178,9 +173,9 @@ class CustomTrackAdder extends React.Component {
                     <select
                         className="form-control"
                         value={type}
-                        onChange={(event) => this.setState({ type: event.target.value })}
+                        onChange={(event) => setType(event.target.value)}
                     >
-                        {this.renderTypeOptions()}
+                        {renderTypeOptions()}
                     </select>
                 </div>
                 <div className="form-group">
@@ -189,7 +184,7 @@ class CustomTrackAdder extends React.Component {
                         type="text"
                         className="form-control"
                         value={url}
-                        onChange={(event) => this.setState({ url: event.target.value })}
+                        onChange={(event) => setUrl(event.target.value)}
                     />
                     <span style={{ color: "red" }}>{urlError}</span>
                 </div>
@@ -199,7 +194,7 @@ class CustomTrackAdder extends React.Component {
                         type="text"
                         className="form-control"
                         value={name}
-                        onChange={(event) => this.setState({ name: event.target.value })}
+                        onChange={(event) => setName(event.target.value)}
                     />
                 </div>
                 <div className="form-group">
@@ -207,25 +202,25 @@ class CustomTrackAdder extends React.Component {
                     <select
                         className="form-control"
                         value={metadata.genome}
-                        onChange={(event) => this.setState({ metadata: { genome: event.target.value } })}
+                        onChange={(event) => setMetadata({ genome: event.target.value })}
                     >
-                        {this.renderGenomeOptions(allGenomes)}
+                        {renderGenomeOptions(allGenomes)}
                     </select>
                 </div>
-                <TrackOptionsUI onGetOptions={(value) => this.getOptions(value)} />
-                {this.renderButtons()}
+                <TrackOptionsUI onGetOptions={(value: string) => getOptions(value)} />
+                {renderButtons()}
             </form>
         );
-    }
+    }, [genomeConfig, addedTracks, getOptions, renderButtons, renderTypeOptions]);
 
-    renderCustomHubAdder() {
+    const renderCustomHubAdder = useCallback(() => {
         return (
             <CustomHubAdder
                 onTracksAdded={(tracks) => this.props.onTracksAdded(tracks)}
                 onAddTracksToPool={(tracks) => this.props.onAddTracksToPool(tracks, false)}
             />
         );
-    }
+    }, []);
 
     render() {
         return (

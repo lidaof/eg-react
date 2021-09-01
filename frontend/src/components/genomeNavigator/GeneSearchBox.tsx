@@ -1,4 +1,5 @@
 import Gene from 'model/Gene';
+import ChromosomeInterval from 'model/interval/ChromosomeInterval';
 import NavigationContext from 'model/NavigationContext';
 import React, { useCallback } from 'react';
 import { notify } from 'react-notify-toast';
@@ -14,7 +15,7 @@ interface GeneSearchBoxProps {
 	 */
 	onRegionSelected: (...interval: number[]) => void;
 	handleCloseModal: () => void;
-	onSetEnteredRegion: (gene: Gene) => void;
+	onSetEnteredRegion: (gene: ChromosomeInterval) => void;
 }
 
 /**
@@ -26,7 +27,7 @@ const GeneSearchBox: React.FC<GeneSearchBoxProps> = ({ handleCloseModal, navCont
 	/**
 	 * @param {Gene} gene
 	 */
-	const setViewToGene = useCallback((gene) => {
+	const setViewToGene = useCallback((gene: Gene) => {
 		const interval = navContext.convertGenomeIntervalToBases(gene.getLocus())[0];
 		if (interval) {
 			onRegionSelected(...interval);
