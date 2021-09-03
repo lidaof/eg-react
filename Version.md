@@ -1,5 +1,11 @@
 # Version History
 
+## 53.4.1
+
+-   added `bigchain` format support
+-   `bigchain` and `genomealign` can be added from remote track UI with specify a query genome
+-   layout header height bug fix
+
 ## 53.4.0
 
 -   new T2T genome assembly `t2t-chm13-v1.1` added
