@@ -788,17 +788,39 @@ class ThreedmolContainer extends React.Component {
     };
 
     viewRegionToChroms = () => {
-        const regions = this.props.viewRegion.getFeatureSegments();
-        return regions.map((region) => region.getName());
+        const { viewRegion, genomeConfig } = this.props;
+        const regions = viewRegion.getFeatureSegments();
+        const navContext = genomeConfig.navContext;
+        return regions.map((region) => {
+            if (navContext.hasFeatureWithName(region.feature)) {
+                return region.getName();
+            } else {
+                return region.feature.locus.chr;
+            }
+        });
     };
 
     viewRegionToRegions = () => {
-        const regions = this.props.viewRegion.getFeatureSegments();
-        return regions.map((region) => ({
-            chrom: region.getName(),
-            start: region.relativeStart,
-            end: region.relativeEnd,
-        }));
+        const { viewRegion, genomeConfig } = this.props;
+        const regions = viewRegion.getFeatureSegments();
+        const navContext = genomeConfig.navContext;
+        // console.log(regions);
+        return regions.map((region) => {
+            if (navContext.hasFeatureWithName(region.feature)) {
+                return {
+                    chrom: region.getName(),
+                    start: region.relativeStart,
+                    end: region.relativeEnd,
+                };
+            } else {
+                // region set view
+                return {
+                    chrom: region.feature.locus.chr,
+                    start: region.feature.locus.start,
+                    end: region.feature.locus.end,
+                };
+            }
+        });
     };
 
     onMenuPositionChange = (e) => {
@@ -1070,6 +1092,7 @@ class ThreedmolContainer extends React.Component {
             showEnvelop,
         } = this.state;
         const regions = this.viewRegionToRegions();
+        // console.log(regions);
         // const colorByRegion = function (atom, region) {
         //     if (
         //         atom.chain === region.chrom &&
@@ -1084,10 +1107,10 @@ class ThreedmolContainer extends React.Component {
         const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
         const resString = resolution.toString();
         Object.keys(modelDisplayConfig).forEach((hap) => {
+            regionRange[hap] = {};
             regions.forEach((reg) => {
                 const leftResi = getClosestValueIndex(this.atomStartsByChrom[resString][hap][reg.chrom], reg.start)[1];
                 const rightResi = getClosestValueIndex(this.atomStartsByChrom[resString][hap][reg.chrom], reg.end)[0];
-                regionRange[hap] = {};
                 regionRange[hap][reg.chrom] = [leftResi, rightResi];
             });
         });
@@ -1113,6 +1136,7 @@ class ThreedmolContainer extends React.Component {
                       },
                   };
         let validateRegion = false;
+        // console.log(regionRange);
         Object.keys(modelDisplayConfig).forEach((hap) => {
             regions.forEach((region) => {
                 if (
@@ -1300,6 +1324,7 @@ class ThreedmolContainer extends React.Component {
             const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
             const resString = resolution.toString();
             Object.keys(modelDisplayConfig).forEach((hap) => {
+                regionRange[hap] = {};
                 regions.forEach((reg) => {
                     const leftResi = getClosestValueIndex(
                         this.atomStartsByChrom[resString][hap][reg.chrom],
@@ -1309,7 +1334,6 @@ class ThreedmolContainer extends React.Component {
                         this.atomStartsByChrom[resString][hap][reg.chrom],
                         reg.end
                     )[0];
-                    regionRange[hap] = {};
                     regionRange[hap][reg.chrom] = [leftResi, rightResi];
                 });
             });
@@ -2011,6 +2035,7 @@ class ThreedmolContainer extends React.Component {
             const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
             const resString = resolution.toString();
             Object.keys(modelDisplayConfig).forEach((hap) => {
+                regionRange[hap] = {};
                 regions.forEach((reg) => {
                     const leftResi = getClosestValueIndex(
                         this.atomStartsByChrom[resString][hap][reg.chrom],
@@ -2020,7 +2045,6 @@ class ThreedmolContainer extends React.Component {
                         this.atomStartsByChrom[resString][hap][reg.chrom],
                         reg.end
                     )[0];
-                    regionRange[hap] = {};
                     regionRange[hap][reg.chrom] = [leftResi, rightResi];
                 });
             });

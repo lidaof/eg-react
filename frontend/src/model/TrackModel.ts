@@ -42,6 +42,7 @@ interface ITrackModel {
     metadata: ITrackModelMetadata;
     fileObj?: Blob;
     queryEndpoint?: QueryEndpoint;
+    querygenome?: string;
 }
 
 let nextId = 0;
@@ -97,6 +98,10 @@ export class TrackModel {
         this.textConfig = this.textConfig || {};
         this.apiConfig = this.apiConfig || {};
         this.queryEndpoint = this.queryEndpoint || {};
+        if (plainObject.querygenome) {
+            // only set if there is value
+            this.querygenome = plainObject.querygenome;
+        }
 
         // in case user define height in string, like "25" instead of 25
         if (this.options.height && typeof this.options.height === "string") {

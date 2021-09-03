@@ -80,6 +80,7 @@ const TYPE_NAME_TO_CONFIG = {
     boxplot: BoxplotTrackConfig,
     bedcolor: BedcolorTrackConfig,
     rmskv2: Rmskv2TrackConfig,
+    bigchain: GenomeAlignTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

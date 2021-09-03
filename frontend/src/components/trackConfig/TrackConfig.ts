@@ -48,12 +48,11 @@ export class TrackConfig {
     }
 
     isGenomeAlignTrack(): boolean {
-        return this.trackModel.type === "genomealign" || this.trackModel.filetype === "genomealign";
+        return this.trackModel.type === "genomealign" || this.trackModel.type === "bigchain";
     }
 
     isDynamicTrack(): boolean {
-        const trackType = this.trackModel.type || this.trackModel.filetype;
-        return DYNAMIC_TYPES.includes(trackType);
+        return DYNAMIC_TYPES.includes(this.trackModel.type);
     }
 
     isBigwigTrack(): boolean {
@@ -61,7 +60,7 @@ export class TrackConfig {
     }
 
     isNumericalTrack(): boolean {
-        return this.trackModel.type === "bigwig" || this.trackModel.type === 'bedgraph';
+        return this.trackModel.type === "bigwig" || this.trackModel.type === "bedgraph";
     }
 
     /**
