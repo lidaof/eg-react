@@ -1,3 +1,4 @@
+import HG00741m from "./HG00741m/HG00741m";
 import HG19 from "./hg19/hg19";
 import HG38 from "./hg38/hg38";
 import MM10 from "./mm10/mm10";
@@ -38,6 +39,7 @@ import { GenomeConfig } from "./GenomeConfig";
  * All available genomes.
  */
 export const allGenomes = [  // order matters, shows same order in genome list after click genome logo
+  HG00741m,
   HG38,
   HG19,
   MM39,
@@ -93,7 +95,7 @@ interface SpeciesConfig {
 export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
   human: {
     logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
-    assemblies: [HG19.genome.getName(), HG38.genome.getName()],
+    assemblies: [HG19.genome.getName(), HG38.genome.getName(), HG00741m.genome.getName()],
     color: "white"
   },
   chimp: {

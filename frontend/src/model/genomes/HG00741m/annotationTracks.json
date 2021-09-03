@@ -1,0 +1,28 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_HG00741m",
+                "filetype": "repeatmasker",
+                "url": "https://wangftp.wustl.edu/~cfan/genomes/HG00741m/rmsk/HG00741m.rm.bb",
+                "height": 30
+            }
+        ]
+    },
+
+    "Genome Comparison": [
+        {
+            "name": "hg38.to.HG00741m.unique",
+            "querygenome": "hg38",
+            "filetype": "genomealign",
+            "url": "https://wangftp.wustl.edu/~cfan/genomes/HG00741m/genomeAlign/xiaoyu/hg38.to.HG00741m.unique.gz"
+        }
+    ]
+}
