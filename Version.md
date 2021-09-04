@@ -5,6 +5,7 @@
 -   added `bigchain` format support
 -   `bigchain` and `genomealign` can be added from remote track UI with specify a query genome
 -   layout header height bug fix
+-   region jumping following UCSC Browser: position coordinates `chr6:130129863-130129899` (1 based, 37bp), bed coordinate `chr6 130129863 130129899` (0 based, 36bp)
 
 ## 53.4.0
 

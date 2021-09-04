@@ -1,10 +1,10 @@
-import OpenInterval from './OpenInterval';
-import ChromosomeInterval from './ChromosomeInterval';
-import { Feature } from '../Feature';
+import OpenInterval from "./OpenInterval";
+import ChromosomeInterval from "./ChromosomeInterval";
+import { Feature } from "../Feature";
 
 /**
  * A 0-indexed open interval within a Feature.  Or, put another way, attaches an interval to a Feature.
- * 
+ *
  * @author Silas Hsu
  * @see Feature
  */
@@ -16,13 +16,13 @@ export class FeatureSegment {
      * Makes a new instance, attaching a interval to a Feature.  If start and end are not provided, the interval
      * defaults to the entire length of the feature.  The start and end parameters should express a *0-indexed open
      * interval*.
-     * 
+     *
      * @param {Feature} feature - the interval's feature
      * @param {number} [start] - start base of the interval, relative to the feature's start
      * @param {number} [end] - end base of the interval, relative to the feature's start
      * @throws {RangeError} if end is before start or the interval lies outside the feature
      */
-    constructor(public readonly feature: Feature, start: number=0, end?: number) {
+    constructor(public readonly feature: Feature, start: number = 0, end?: number) {
         if (end === undefined) {
             end = feature.getLength();
         }
@@ -86,7 +86,7 @@ export class FeatureSegment {
     /**
      * Intersects this and another FeatureSegment, and returns the result as a new FeatureSegment.  Returns `null` if
      * the *segments' features are different* or if there is no overlap.
-     * 
+     *
      * @param {FeatureSegment} other - other FeatureSegment to intersect
      * @return {FeatureSegment} intersection of this segment and the other one, or null if none exists
      */
@@ -102,7 +102,7 @@ export class FeatureSegment {
     /**
      * Intersects this and a genome location, and returns the result as a new FeatureSegment using the same Feature
      * that is attached to this.  Returns null if the genome location does not intersect with this location at all.
-     * 
+     *
      * @param {ChromosomeInterval} chrInterval - input genome location
      * @return {FeatureSegment} intersection of this and the input genomic location
      */
@@ -122,17 +122,19 @@ export class FeatureSegment {
      * @return {string} human-readable representation of this interval
      */
     toString(): string {
-        return `${this.getName()}:${this.relativeStart}-${this.relativeEnd}`;
+        // web 1 based
+        return `${this.getName()}:${this.relativeStart + 1}-${this.relativeEnd}`;
     }
 
     /**
      * Interprets this and another interval as a multi-feature interval, with this being the start and the other being
      * the end.  Returns a human-readable representation of that interpretation.
-     * 
+     *
      * @param {FeatureSegment} other - the end of the multi-feature interval
      * @return {string} a human-readable representation of a multi-feature interval
      */
     toStringWithOther(other: FeatureSegment): string {
-        return `${this.getName()}:${this.relativeStart}-${other.getName()}:${other.relativeEnd}`;
+        // web 1 based
+        return `${this.getName()}:${this.relativeStart + 1}-${other.getName()}:${other.relativeEnd}`;
     }
 }
