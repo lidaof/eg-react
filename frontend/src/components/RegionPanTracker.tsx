@@ -105,13 +105,14 @@ export class RegionPanTracker extends React.Component<RegionPanTrackProps> {
      * @return {object} - region resulting from panning the input region
      */
     _getRegionOffsetByX(region: DisplayedRegionModel, event: React.MouseEvent, xDiff: number): OpenInterval {
+        const [start, end] = region.getContextCoordinates();
+        if (!event) return new OpenInterval(start, end);
         const basesPerPixel = this.props.basesPerPixel ||
             (this.props.panRegion.getWidth() / event.currentTarget.clientWidth);
         // Why -1?  When the mouse moves to the right, parts on the left move into view.  Ergo, we're moving the view
         // region to the left.  Vice-versa for moving the mouse to the left.
         const baseDiff = Math.round(-1 * basesPerPixel * xDiff);
         const navContext = region.getNavigationContext();
-        const [start, end] = region.getContextCoordinates();
 
         const newStart = navContext.toGaplessCoordinate(Math.max(0, start + baseDiff));
         const newEnd = navContext.toGaplessCoordinate(Math.min(end + baseDiff, navContext.getTotalBases() - 1));
