@@ -589,14 +589,16 @@ class ThreedmolContainer extends React.Component {
                         });
                     }
                     this.shapes.push(addingShape);
-                    this.shapeLabels.push(
-                        this.viewer.addLabel(myShapes[s].label, {
-                            position: { x: atom.x, y: atom.y, z: atom.z },
-                            fontColor: myShapes[s].color,
-                            backgroundColor: getContrastingColor(myShapes[s].color),
-                            backgroundOpacity: 0.8,
-                        })
-                    );
+                    if (myShapes[s].showLabel) {
+                        this.shapeLabels.push(
+                            this.viewer.addLabel(myShapes[s].label, {
+                                position: { x: atom.x, y: atom.y, z: atom.z },
+                                fontColor: myShapes[s].color,
+                                backgroundColor: getContrastingColor(myShapes[s].color),
+                                backgroundOpacity: 0.8,
+                            })
+                        );
+                    }
                 });
             } else if (myShapes[s].loci) {
                 myShapes[s].loci.forEach((locusObj) => {
@@ -627,14 +629,16 @@ class ThreedmolContainer extends React.Component {
                             });
                         }
                         this.shapes.push(addingShape);
-                        this.shapeLabels.push(
-                            this.viewer.addLabel(label, {
-                                position: { x: atom.x, y: atom.y, z: atom.z },
-                                fontColor: myShapes[s].color,
-                                backgroundColor: getContrastingColor(myShapes[s].color),
-                                backgroundOpacity: 0.8,
-                            })
-                        );
+                        if (myShapes[s].showLabel) {
+                            this.shapeLabels.push(
+                                this.viewer.addLabel(label, {
+                                    position: { x: atom.x, y: atom.y, z: atom.z },
+                                    fontColor: myShapes[s].color,
+                                    backgroundColor: getContrastingColor(myShapes[s].color),
+                                    backgroundOpacity: 0.8,
+                                })
+                            );
+                        }
                     });
                 });
             }
@@ -2272,11 +2276,11 @@ class ThreedmolContainer extends React.Component {
     };
 
     handleMyShapeLabelChange = (e) => {
-        this.setState({ myShapeLabel: e.target.value.trim() });
+        this.setState({ myShapeLabel: e.target.value });
     };
 
     handleMyShapeRegionChange = (e) => {
-        this.setState({ myShapeRegion: e.target.value.trim() });
+        this.setState({ myShapeRegion: e.target.value });
     };
 
     handleEnvelopOpacityChange = (e) => {
@@ -2301,6 +2305,7 @@ class ThreedmolContainer extends React.Component {
                         loci: null,
                         size: 2,
                         wireframe: false,
+                        showLabel: true,
                         color,
                     };
                 } else {
@@ -2348,6 +2353,7 @@ class ThreedmolContainer extends React.Component {
                         loci: null,
                         size: 2,
                         wireframe: false,
+                        showLabel: true,
                     };
                     this.setState({ myShapeRegion: "", myShapeLabel: "", myShapes: newShapes });
                 } else {
@@ -2405,6 +2411,7 @@ class ThreedmolContainer extends React.Component {
                     loci: null,
                     size: 2,
                     wireframe: false,
+                    showLabel: true,
                 };
                 this.setState({ myShapes: newShapes });
             } else {
@@ -2494,6 +2501,7 @@ class ThreedmolContainer extends React.Component {
                     locus: null,
                     size: 2,
                     wireframe: false,
+                    showLabel: true,
                 };
                 this.setState({ myShapes: newShapes });
             } else {

@@ -209,7 +209,7 @@ class CustomTrackAdder extends React.Component {
                         type="text"
                         className="form-control"
                         value={name}
-                        onChange={(event) => this.setState({ name: event.target.value.trim() })}
+                        onChange={(event) => this.setState({ name: event.target.value })}
                     />
                 </div>
                 <div

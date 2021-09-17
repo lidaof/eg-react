@@ -43,18 +43,21 @@ const ShapeMenu = (props) => {
     const [outline, setOutline] = useState(shape.outline);
     const [size, setSize] = useState(shape.size);
     const [wireframe, setWireframe] = useState(shape.wireframe);
+    const [showLabel, setshowLabel] = useState(shape.showLabel);
     const prevLabel = usePrevious(label);
     const prevColor = usePrevious(color);
     const prevOutline = usePrevious(outline);
     const prevSize = usePrevious(size);
     const prevWireframe = usePrevious(wireframe);
+    const prevshowLabel = usePrevious(showLabel);
     const updateShape = () => {
         if (
             label === prevLabel &&
             color === prevColor &&
             outline === prevOutline &&
             prevSize === size &&
-            prevWireframe === wireframe
+            prevWireframe === wireframe &&
+            prevshowLabel === showLabel
         ) {
             onSetMessage("no attribute changed, abort...");
             return;
@@ -67,6 +70,7 @@ const ShapeMenu = (props) => {
             loci: shape.loci,
             size,
             wireframe,
+            showLabel,
         };
         onUpdateMyShapes(id, newShape);
     };
@@ -105,6 +109,10 @@ const ShapeMenu = (props) => {
             <label>
                 frame:
                 <input type="checkbox" checked={wireframe} onChange={() => setWireframe(!wireframe)} />
+            </label>
+            <label>
+                label:
+                <input type="checkbox" checked={showLabel} onChange={() => setshowLabel(!showLabel)} />
             </label>
             <button title="Update" className="btn btn-primary btn-sm btn-dense" onClick={updateShape}>
                 <CheckCircleIcon size={16} />
