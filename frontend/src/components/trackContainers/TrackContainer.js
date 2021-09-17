@@ -549,7 +549,7 @@ class TrackContainer extends React.Component {
                             onSetEnteredRegion={onSetEnteredRegion}
                         />
                     )}
-                    <div className="tool-element">
+                    <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <ReorderMany
                             onOpenReorderManyModal={this.openReorderManyModal}
                             onCloseReorderManyModal={this.closeReorderManyModal}
@@ -560,10 +560,10 @@ class TrackContainer extends React.Component {
                     {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
                     <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
                     <ButtonGroup buttons={panRightButton} />
-                    <div className="tool-element">
+                    <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <UndoRedo />
                     </div>
-                    <div className="tool-element">
+                    <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <History />
                     </div>
                     <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
