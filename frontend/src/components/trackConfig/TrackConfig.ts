@@ -63,6 +63,10 @@ export class TrackConfig {
         return this.trackModel.type === "bigwig" || this.trackModel.type === "bedgraph";
     }
 
+    isImageTrack(): boolean {
+        return this.trackModel.type === "omero4dn" || this.trackModel.type === "omeroidr";
+    }
+
     /**
      *
      * @param oldRegion

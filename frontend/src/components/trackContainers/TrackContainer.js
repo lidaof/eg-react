@@ -34,6 +34,7 @@ import { niceBpCount } from "../../util";
 
 import "./TrackContainer.css";
 import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManager";
+import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 
 // import { DEFAULT_OPTIONS as DYNAMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack";
 
@@ -108,6 +109,7 @@ class TrackContainer extends React.Component {
             circletColor: "#ff5722",
             panningAnimation: "none",
             zoomAnimation: 0,
+            groupScale: undefined,
         };
         this.leftBeam = React.createRef();
         this.rightBeam = React.createRef();
@@ -125,57 +127,14 @@ class TrackContainer extends React.Component {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.panLeftOrRight = this.panLeftOrRight.bind(this);
         this.zoomOut = this.zoomOut.bind(this);
+        this.groupManager = new GroupedTrackManager();
     }
 
-    // componentDidMount() {
-    //     this.findGroups();
-    // }
-
-    // componentDidUpdate(prevProps) {
-    //     if (prevProps.tracks !== this.props.tracks) {
-    //         this.findGroups();
-    //     }
-    // }
-
-    // findGroups = () => {
-    //     const { tracks, trackData } = this.props;
-    //     // console.log(tracks);
-    //     const grouping = {}; // key: group id, value: {scale: 'auto'/'fixed', min: {trackid: xx,,,}, max: {trackid: xx,,,,}}
-    //     for (let i = 0; i < tracks.length; i++) {
-    //         if (tracks[i].options && tracks[i].options.group) {
-    //             const g = tracks[i].options.group;
-    //             const tid = tracks[i].getId();
-    //             const data = trackData[tid].data;
-    //             // console.log(data);
-    //             const values = data.map((f) => f.value).filter((x) => x);
-    //             if (!grouping.hasOwnProperty(g)) {
-    //                 grouping[g] = {
-    //                     scale: ScaleChoices.AUTO,
-    //                     min: { [tid]: _.min(values) },
-    //                     max: { [tid]: _.max(values) },
-    //                 };
-    //             } else {
-    //                 grouping[g].min[tid] = _.min(values);
-    //                 grouping[g].max[tid] = _.max(values);
-    //             }
-    //         }
-    //     }
-    //     console.log(grouping);
-    //     return grouping;
-    // };
-
-    // updateGroupScale = (groupId, scale) => {
-    //     const newScale = { ...this.state.groupScale, [groupId]: scale };
-    //     this.setState({ groupScale: newScale });
-    // };
-
-    // resetGroupScale = () => {
-    //     const scale = {};
-    //     Object.keys(this.state.groupScale).forEach((g) => {
-    //         scale[g] = { ...this.state.groupScale[g], min: 0, max: 0 };
-    //     });
-    //     this.setState({ groupScale: scale });
-    // };
+    componentDidUpdate(prevProps) {
+        if (prevProps.tracks !== this.props.tracks || prevProps.primaryView !== this.props.primaryView) {
+            this.getGroupScale();
+        }
+    }
 
     getBeamRefs = () => {
         return [this.leftBeam.current, this.rightBeam.current];
@@ -583,6 +542,17 @@ class TrackContainer extends React.Component {
         );
     }
 
+    getGroupScale = () => {
+        const { tracks, trackData, primaryView } = this.props;
+        const groupScale = this.groupManager.getGroupScale(
+            tracks,
+            trackData,
+            primaryView.visWidth,
+            primaryView.viewWindow
+        );
+        this.setState({ groupScale });
+    };
+
     /**
      * @return {JSX.Element[]} track elements to render
      */
@@ -601,15 +571,11 @@ class TrackContainer extends React.Component {
             isThereG3dTrack,
             onSetImageInfo,
         } = this.props;
-        const groupScale = new GroupedTrackManager().getGroupScale(
-            tracks,
-            trackData,
-            primaryView.visWidth,
-            primaryView.viewWindow
-        );
+
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
+            const layoutProps = getTrackConfig(trackModel).isImageTrack() ? { layoutModel } : {};
             return (
                 <TrackHandle
                     key={trackModel.getId()}
@@ -627,7 +593,7 @@ class TrackContainer extends React.Component {
                     onClick={this.handleTrackClicked}
                     onMetadataClick={this.handleMetadataClicked}
                     selectedRegion={viewRegion}
-                    layoutModel={layoutModel}
+                    // layoutModel={layoutModel}
                     getBeamRefs={this.getBeamRefs}
                     onSetAnchors3d={onSetAnchors3d}
                     onSetGeneFor3d={onSetGeneFor3d}
@@ -635,7 +601,8 @@ class TrackContainer extends React.Component {
                     basesPerPixel={basesPerPixel}
                     isThereG3dTrack={isThereG3dTrack}
                     onSetImageInfo={onSetImageInfo}
-                    groupScale={groupScale}
+                    groupScale={this.state.groupScale}
+                    {...layoutProps}
                 />
             );
         });

@@ -9,9 +9,11 @@ export const BinSize = {
     "25K": 25000,
     "10K": 10000,
     "5K": 5000,
+    "1K": 1000,
+    "500": 500,
 };
 
-export const SORTED_BIN_SIZES = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000];
+export const SORTED_BIN_SIZES = [2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 1000, 500];
 
 export enum NormalizationMode {
     NONE = "NONE",

@@ -1,5 +1,10 @@
 # Version History
 
+## 53.5.0
+
+-   removed unnecessary re-render of numerical track
+-   adding push notification
+
 ## 53.4.1
 
 -   added `bigchain` format support
