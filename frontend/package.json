@@ -89,7 +89,7 @@
         "fuse.js": "^3.6.1",
         "g3djs": "^2.0.1",
         "generic-filehandle": "^2.0.3",
-        "hic-straw": "^2.0.2",
+        "hic-straw": "^2.0.3",
         "install": "^0.13.0",
         "iwanthue": "^1.4.0",
         "jest-image-snapshot": "^1.0.1",

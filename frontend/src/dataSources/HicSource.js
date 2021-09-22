@@ -64,6 +64,7 @@ export class HicSource extends DataSource {
         // this.normVectorsPromise = null;
         this.metadata = null;
         this.normOptions = null;
+        this.currentBinSize = 0;
     }
 
     /**
@@ -162,7 +163,9 @@ export class HicSource extends DataSource {
         await this.straw.hicFile.init();
         this.metadata = await this.straw.getMetaData();
         this.normOptions = await this.straw.getNormalizationOptions();
+        // console.log(this.metadata, this.normOptions);
         const binSize = this.getBinSize(options, region);
+        this.currentBinSize = binSize;
         const promises = [];
         const loci = region.getGenomeIntervals();
         for (let i = 0; i < loci.length; i++) {
@@ -184,12 +187,18 @@ export class HicSource extends DataSource {
      * @return {} a meta object
      */
     getCurrentMeta(region, basesPerPixel, options) {
-        const binSize = this.getBinSize(options, region);
         return {
-            resolution: binSize,
+            resolution: this.currentBinSize,
             normalization: options.normalization,
         };
     }
+
+    getFileInfo = () => {
+        return {
+            resolutions: this.metadata.resolutions,
+            normOptions: this.normOptions,
+        };
+    };
 
     /**
      * Gets the genome-wide interaction map from the HiC file.

@@ -679,11 +679,19 @@ class TrackContainer extends React.Component {
             viewRegion,
             highlightColor,
             basesPerPixel,
+            trackData,
         } = this.props;
         if (!primaryView) {
             return null;
         }
         const { selectedTool } = this.state;
+        const fileInfos = {}; // key, track id, value: fileInfo obj
+        tracks.forEach((tk) => {
+            const tkId = tk.getId();
+            if (!_.isEmpty(trackData[tkId].fileInfo)) {
+                fileInfos[tkId] = trackData[tkId].fileInfo;
+            }
+        });
         const contextMenu = (
             <TrackContextMenu
                 tracks={tracks}
@@ -696,6 +704,7 @@ class TrackContainer extends React.Component {
                 onApplyDynamicLongrange={this.applyDynamicLongrange}
                 onApplyDynamicBed={this.applyDynamicBed}
                 basesPerPixel={basesPerPixel}
+                fileInfos={fileInfos}
             />
         );
         const trackDivStyle = {

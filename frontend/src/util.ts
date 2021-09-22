@@ -119,7 +119,7 @@ export function niceBpCount(bases: number, useMinus = false) {
     if (rounded >= 750000) {
         return `${(rounded / 1000000).toFixed(1)} Mb`;
     } else if (rounded >= 10000) {
-        return `${(rounded / 1000).toFixed(1)} kb`;
+        return `${(rounded / 1000).toFixed(1)} Kb`;
     } else if (rounded > 0) {
         return `${rounded} bp`;
     } else {
@@ -129,6 +129,16 @@ export function niceBpCount(bases: number, useMinus = false) {
             return "0 bp";
         }
     }
+}
+
+export function niceCount(bases: number) {
+    const rounded = bases >= 1000 ? Math.floor(bases) : Math.round(bases);
+    if (rounded >= 750000) {
+        return `${rounded / 1000000}M`;
+    } else if (rounded >= 1000) {
+        return `${rounded / 1000}K`;
+    }
+    return `${bases}bp`;
 }
 
 export function ceil(value: number, precision: number) {

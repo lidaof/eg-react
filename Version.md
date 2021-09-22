@@ -4,6 +4,7 @@
 
 -   removed unnecessary re-render of numerical track
 -   adding push notification
+-   allow HiC track bin size and normalization options linked to the hic file itself
 
 ## 53.4.1
 

@@ -59,6 +59,10 @@ export class TrackConfig {
         return this.trackModel.type === "bigwig";
     }
 
+    isHicTrack(): boolean {
+        return this.trackModel.type === "hic";
+    }
+
     isNumericalTrack(): boolean {
         return this.trackModel.type === "bigwig" || this.trackModel.type === "bedgraph";
     }
