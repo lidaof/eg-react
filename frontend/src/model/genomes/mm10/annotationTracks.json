@@ -215,43 +215,43 @@
     ],
     "Genome Comparison": [
         {
-            "name": "danRer7tomm10",
-            "label": "Zebrafish danRer7 to mm10 blastz",
+            "name": "mm10todanRer7",
+            "label": "Query zebrafish danRer7 to mm10 blastz",
             "querygenome": "danRer7",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_danRer7_axt.gz"
         },
         {
-            "name": "hg19tomm10",
-            "label": "Human hg19 to mm10 blastz",
+            "name": "mm10tohg19",
+            "label": "Query human hg19 to mm10 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_hg19_axt.gz"
         },
         {
-            "name": "hg38tomm10",
-            "label": "Human hg38 to mm10 blastz",
+            "name": "mm10tohg38",
+            "label": "Query human hg38 to mm10 blastz",
             "querygenome": "hg38",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_hg38_axt.gz"
         },
         {
-            "name": "rheMac3tomm10",
-            "label": "Rhesus macaque rheMac3 to mm10 blastz",
+            "name": "mm10torheMac3",
+            "label": "Query rhesus macaque rheMac3 to mm10 blastz",
             "querygenome": "rheMac3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rheMac3_axt.gz"
         },
         {
-            "name": "rn6tomm10",
-            "label": "Rat rn6 to mm10 blastz",
+            "name": "mm10torn6",
+            "label": "Query rat rn6 to mm10 blastz",
             "querygenome": "rn6",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10.rn6.gz"
         },
         {
-            "name": "bosTau8",
-            "label": "Cow bosTau8 to mm10 blastz",
+            "name": "mm10tobosTau8",
+            "label": "Query cow bosTau8 to mm10 blastz",
             "querygenome": "bosTau8",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-bosTau8.gz",
@@ -261,8 +261,8 @@
             }
         },
         {
-            "name": "calJac3",
-            "label": "Marmoset calJac3 to mm10 blastz",
+            "name": "mm10tocalJac3",
+            "label": "Query marmoset calJac3 to mm10 blastz",
             "querygenome": "calJac3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-calJac3.gz",
@@ -272,8 +272,8 @@
             }
         },
         {
-            "name": "danRer10",
-            "label": "Zebrafish danRer10 to mm10 blastz",
+            "name": "mm10todanRer10",
+            "label": "Query zebrafish danRer10 to mm10 blastz",
             "querygenome": "danRer10",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-danRer10.gz",
@@ -283,8 +283,8 @@
             }
         },
         {
-            "name": "danRer11",
-            "label": "Zebrafish danRer11 to mm10 blastz",
+            "name": "mm10todanRer11",
+            "label": "Query zebrafish danRer11 to mm10 blastz",
             "querygenome": "danRer11",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-danRer11.gz",
@@ -294,8 +294,8 @@
             }
         },
         {
-            "name": "galGal5",
-            "label": "Chicken galGal5 to mm10 blastz",
+            "name": "mm10togalGal5",
+            "label": "Query chicken galGal5 to mm10 blastz",
             "querygenome": "galGal5",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-galGal5.gz",
@@ -305,8 +305,8 @@
             }
         },
         {
-            "name": "galGal6",
-            "label": "Chicken galGal6 to mm10 blastz",
+            "name": "mm10togalGal6",
+            "label": "Query chicken galGal6 to mm10 blastz",
             "querygenome": "galGal6",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-galGal6.gz",
@@ -316,8 +316,8 @@
             }
         },
         {
-            "name": "gorGor3",
-            "label": "Gorilla gorGor3 to mm10 blastz",
+            "name": "mm10togorGor3",
+            "label": "Query gorilla gorGor3 to mm10 blastz",
             "querygenome": "gorGor3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-gorGor3.gz",
@@ -327,8 +327,8 @@
             }
         },
         {
-            "name": "panTro4",
-            "label": "Chimp panTro4 to mm10 blastz",
+            "name": "mm10topanTro4",
+            "label": "Query chimp panTro4 to mm10 blastz",
             "querygenome": "panTro4",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-panTro4.gz",
@@ -338,8 +338,8 @@
             }
         },
         {
-            "name": "panTro5",
-            "label": "Chimp panTro5 to mm10 blastz",
+            "name": "mm10topanTro5",
+            "label": "Query chimp panTro5 to mm10 blastz",
             "querygenome": "panTro5",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-panTro5.gz",
@@ -349,8 +349,8 @@
             }
         },
         {
-            "name": "panTro6",
-            "label": "Chimp panTro6 to mm10 blastz",
+            "name": "mm10topanTro6",
+            "label": "Query chimp panTro6 to mm10 blastz",
             "querygenome": "panTro6",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-panTro6.gz",
@@ -360,8 +360,8 @@
             }
         },
         {
-            "name": "rheMac8",
-            "label": "Rhesus rheMac8 to mm10 blastz",
+            "name": "mm10torheMac8",
+            "label": "Query rhesus rheMac8 to mm10 blastz",
             "querygenome": "rheMac8",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-rheMac8.gz",

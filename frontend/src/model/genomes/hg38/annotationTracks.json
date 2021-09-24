@@ -159,15 +159,15 @@
     ],
     "Genome Comparison": [
         {
-            "name": "mm10tohg38",
-            "label": "Mouse mm10 to hg38 blastz",
+            "name": "hg38tomm10",
+            "label": "Query mouse mm10 to hg38 blastz",
             "querygenome": "mm10",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_mm10_axt.gz"
         },
         {
-            "name": "panTro5tohg38",
-            "label": "Chimpanzee panTro5 to hg38 blastz",
+            "name": "hg38topanTro5",
+            "label": "Query chimpanzee panTro5 to hg38 blastz",
             "querygenome": "panTro5",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_panTro5_axt.gz",
@@ -177,8 +177,8 @@
             }
         },
         {
-            "name": "panTro6tohg38",
-            "label": "Chimpanzee panTro6 to hg38 blastz",
+            "name": "hg38topanTro6",
+            "label": "Query chimpanzee panTro6 to hg38 blastz",
             "querygenome": "panTro6",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38TopanTro6.gz",
@@ -188,15 +188,15 @@
             }
         },
         {
-            "name": "rheMac3tohg38",
-            "label": "Rhesus Macaque rheMac3 to hg38 blastz",
+            "name": "hg38torheMac3",
+            "label": "Query rhesus Macaque rheMac3 to hg38 blastz",
             "querygenome": "rheMac3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rheMac3_axt.gz"
         },
         {
-            "name": "papAnu2tohg38",
-            "label": "Baboon papAnu2 to hg38 blastz",
+            "name": "hg38topapAnu2",
+            "label": "Query baboon papAnu2 to hg38 blastz",
             "querygenome": "papAnu2",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38.papAnu2.net.gz",
@@ -206,8 +206,8 @@
             }
         },
         {
-            "name": "bosTau8tohg38",
-            "label": "Cow bosTau8 to hg38 blastz",
+            "name": "hg38tobosTau8",
+            "label": "Query cow bosTau8 to hg38 blastz",
             "querygenome": "bosTau8",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-bosTau8.gz",
@@ -217,8 +217,8 @@
             }
         },
         {
-            "name": "calJac3tohg38",
-            "label": "Marmoset calJac3 to hg38 blastz",
+            "name": "hg38tocalJac3",
+            "label": "Query marmoset calJac3 to hg38 blastz",
             "querygenome": "calJac3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-calJac3.gz",
@@ -228,8 +228,8 @@
             }
         },
         {
-            "name": "galGal6tohg38",
-            "label": "Chicken galGal6 to hg38 blastz",
+            "name": "hg38togalGal6",
+            "label": "Query chicken galGal6 to hg38 blastz",
             "querygenome": "galGal6",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-galGal6.gz",
@@ -239,8 +239,8 @@
             }
         },
         {
-            "name": "gorGor4tohg38",
-            "label": "Gorilla gorGor4 to hg38 blastz",
+            "name": "hg38togorGor4",
+            "label": "Query gorilla gorGor4 to hg38 blastz",
             "querygenome": "gorGor4",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-gorGor4.gz",
@@ -250,8 +250,8 @@
             }
         },
         {
-            "name": "mm39tohg38",
-            "label": "Mouse mm39 to hg38 blastz",
+            "name": "hg38tomm39",
+            "label": "Query mouse mm39 to hg38 blastz",
             "querygenome": "mm39",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-mm39.gz",
@@ -261,8 +261,8 @@
             }
         },
         {
-            "name": "panTro4tohg38",
-            "label": "Chimp panTro4 to hg38 blastz",
+            "name": "hg38topanTro4",
+            "label": "Query chimp panTro4 to hg38 blastz",
             "querygenome": "panTro4",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-panTro4.gz",
@@ -272,8 +272,8 @@
             }
         },
         {
-            "name": "rheMac8tohg38",
-            "label": "Rhesus rheMac8 to hg38 blastz",
+            "name": "hg38torheMac8",
+            "label": "Query rhesus rheMac8 to hg38 blastz",
             "querygenome": "rheMac8",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-rheMac8.gz",
@@ -283,8 +283,8 @@
             }
         },
         {
-            "name": "rn6tohg38",
-            "label": "Rat rn6 to hg38 blastz",
+            "name": "hg38torn6",
+            "label": "Query rat rn6 to hg38 blastz",
             "querygenome": "rn6",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38.rn6.gz",

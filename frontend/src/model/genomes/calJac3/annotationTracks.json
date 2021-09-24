@@ -31,8 +31,8 @@
     },
     "Genome Comparison": [
         {
-            "name": "hg19tocalJac3",
-            "label": "Human hg19 to calJac3 blastz",
+            "name": "calJac3tohg19",
+            "label": "Blastz using calJac3 as reference and human hg19 as query",
             "querygenome": "hg19",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/calJac3/calJac3_hg19.gz"
