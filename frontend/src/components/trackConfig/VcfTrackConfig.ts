@@ -1,3 +1,4 @@
+import { TrackOptions } from "./../../model/TrackModel";
 import { TrackConfig } from "./TrackConfig";
 import { VcfTrack, DEFAULT_OPTIONS } from "../trackVis/vcfTrack/VcfTrack";
 import VcfSource from "../../dataSources/VcfSource";
@@ -13,6 +14,7 @@ import RowHeightConfig from "components/trackContextMenu/RowHeightConfig";
 import AlwaysDrawLabelConfig from "components/trackContextMenu/AlwaysDrawLabelConfig";
 import TrackModel from "model/TrackModel";
 import { VcfColorScaleKeyConfig, VcfDisplayModeConfig } from "components/trackContextMenu/DisplayModeConfig";
+import EnsemblStyleConfig from "components/trackContextMenu/EnsemblStyleConfig";
 
 export class VcfTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -38,6 +40,13 @@ export class VcfTrackConfig extends TrackConfig {
         return data.map((record) => new Vcf(record));
     }
 
+    /**
+     * @override
+     */
+    shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
+        return oldOptions.ensemblStyle !== newOptions.ensemblStyle;
+    }
+
     getComponent() {
         return VcfTrack;
     }
@@ -47,6 +56,7 @@ export class VcfTrackConfig extends TrackConfig {
             LabelConfig,
             VcfDisplayModeConfig,
             VcfColorScaleKeyConfig,
+            EnsemblStyleConfig,
             highValueColorConfig,
             lowValueColorConfig,
             BackgroundColorConfig,

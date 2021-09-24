@@ -1,6 +1,6 @@
 {
     "name": "epgg",
-    "version": "53.3.2",
+    "version": "53.5.0",
     "author": "Ting Wang Lab @WUSTL",
     "repository": {
         "type": "git",
@@ -89,7 +89,7 @@
         "fuse.js": "^3.6.1",
         "g3djs": "^2.0.1",
         "generic-filehandle": "^2.0.3",
-        "hic-straw": "^2.0.2",
+        "hic-straw": "^2.0.3",
         "install": "^0.13.0",
         "iwanthue": "^1.4.0",
         "jest-image-snapshot": "^1.0.1",
@@ -184,5 +184,11 @@
             "last 1 safari version"
         ]
     },
-    "proxy": "http://localhost:3001/"
+    "proxy": "http://localhost:3001/",
+    "dependencies": {
+        "@material-ui/core": "^4.12.3",
+        "@material-ui/icons": "^4.11.2",
+        "@types/react-hammerjs": "^1.0.2",
+        "react-hammerjs": "^1.0.1"
+    }
 }

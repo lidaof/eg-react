@@ -1,6 +1,6 @@
 import React from 'react';
-import Hammer from 'react-hammerjs';
-import { CoordinateDiff } from './DragAcrossDiv';
+
+import { DragAcrossDiv, CoordinateDiff } from './DragAcrossDiv';
 import DisplayedRegionModel from '../model/DisplayedRegionModel';
 import { MouseButton } from '../util';
 import OpenInterval from '../model/interval/OpenInterval';
@@ -42,7 +42,6 @@ interface RegionPanTrackProps {
  * Same as {@link DragAcrossDiv}, but also calculates changes in view region as the result of the drag.
  * 
  * @author Silas Hsu
- * @author Shane Liu
  */
 export class RegionPanTracker extends React.Component<RegionPanTrackProps> {
     private dragOriginRegion: DisplayedRegionModel;
@@ -120,19 +119,24 @@ export class RegionPanTracker extends React.Component<RegionPanTrackProps> {
 
     render(): JSX.Element {
         const {
+            panRegion,
+            onViewDragStart,
+            onViewDrag,
+            onViewDragEnd,
+            basesPerPixel,
             children,
+            ...remainingProps
         } = this.props;
 
         return (
-            <Hammer
-                onPanStart={() => this.dragStart(null)}
-                onPan={e => this.drag(null, { dx: e.deltaX, dy: e.deltaY })}
-                onPanEnd={e => this.dragEnd(null, { dx: e.deltaX, dy: e.deltaY })}
+            <DragAcrossDiv
+                onDragStart={this.dragStart}
+                onDrag={this.drag}
+                onDragEnd={this.dragEnd}
+                {...remainingProps}
             >
-                <div>
-                    {children}
-                </div>
-            </Hammer>
+                {children}
+            </DragAcrossDiv>
         );
     }
 }

@@ -35,7 +35,7 @@ class GenomicCoordinates extends React.Component {
             const locus = segment.getLocus();
             const start = Math.floor(locus.start);
             const end = Math.ceil(start + drawModel.xWidthToBases(1));
-            return `${locus.chr}:${start}-${end}`;
+            return `${locus.chr}:${start + 1}-${end}`; // web to 1 based
             // return `${locus.chr}:${Math.floor(locus.start)}`;
         }
     }

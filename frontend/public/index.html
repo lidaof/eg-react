@@ -95,6 +95,7 @@
         <script src="%PUBLIC_URL%/js/create-plotly-component.min.js"></script>
         <script src="https://3Dmol.csb.pitt.edu/build/3Dmol.js"></script>
         <script src="https://unpkg.com/h264-mp4-encoder/embuild/dist/h264-mp4-encoder.web.js"></script>
+        <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js"></script>
     </head>
     <body>
         <noscript> You need to enable JavaScript to run this app. </noscript>
@@ -120,7 +121,6 @@
             gtag("js", new Date());
             gtag("config", "UA-129313073-1");
         </script>
-
         <!-- Global site tag (gtag.js) - Google Analytics  for GA4 tag -->
         <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-KSVNDZFZSM"></script>
         <script>
@@ -130,5 +130,14 @@
 
         gtag('config', 'G-KSVNDZFZSM');
         </script> -->
+
+        <script>
+            window.OneSignal = window.OneSignal || [];
+            OneSignal.push(function () {
+                OneSignal.init({
+                    appId: "04a54284-3052-42cb-886c-19a36f54b45d",
+                });
+            });
+        </script>
     </body>
 </html>

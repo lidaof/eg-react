@@ -1,3 +1,4 @@
+import { GenomeConfig } from "./GenomeConfig";
 import HG19 from "./hg19/hg19";
 import HG38 from "./hg38/hg38";
 import MM10 from "./mm10/mm10";
@@ -41,7 +42,7 @@ import Pfal3D7 from "./pfal3d7/pfal3d7";
 import TbruceiTREU927 from "./trypanosome/TbruceiTREU927";
 import TbruceiLister427 from "./trypanosome/TbruceiLister427";
 import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
-import { GenomeConfig } from "./GenomeConfig";
+import CHM13v1_1 from "./t2t-chm13-v1.1/chm13";
 
 /**
  * All available genomes.
@@ -92,6 +93,7 @@ export const allGenomes = [
     Creinhardtii506,
     TbruceiTREU927,
     TbruceiLister427,
+    CHM13v1_1,
 ];
 
 const genomeNameToConfig = {};
@@ -113,7 +115,7 @@ interface SpeciesConfig {
 export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     human: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
-        assemblies: [HG19.genome.getName(), HG38.genome.getName()],
+        assemblies: [HG19.genome.getName(), HG38.genome.getName(), CHM13v1_1.genome.getName()],
         color: "white",
     },
     chimp: {

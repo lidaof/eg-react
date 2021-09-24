@@ -1,5 +1,24 @@
 # Version History
 
+## 53.5.0
+
+-   removed unnecessary re-render of numerical track
+-   adding push notification
+-   allow HiC track bin size and normalization options linked to the hic file itself
+
+## 53.4.1
+
+-   added `bigchain` format support
+-   `bigchain` and `genomealign` can be added from remote track UI with specify a query genome
+-   layout header height bug fix
+-   region jumping following UCSC Browser: position coordinates `chr6:130129863-130129899` (1 based, 37bp), bed coordinate `chr6 130129863 130129899` (0 based, 36bp)
+
+## 53.4.0
+
+-   new T2T genome assembly `t2t-chm13-v1.1` added
+-   improved 3D module
+-   support Repeatmasker V2 format bigbed, track type `rmskv2`
+
 ## 53.3.2
 
 -   for `bigwig` track, specify `ensemblStyle` option to `true` can enable data with chromosome names as 1, 2, 3...work in the browser

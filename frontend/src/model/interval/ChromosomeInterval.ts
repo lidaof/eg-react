@@ -1,5 +1,5 @@
-import OpenInterval from './OpenInterval';
-import _ from 'lodash';
+import OpenInterval from "./OpenInterval";
+import _ from "lodash";
 
 /**
  * The plain-object version of ChromosomeInterval, without any methods.
@@ -12,7 +12,7 @@ export interface IChromosomeInterval {
 
 /**
  * Return result from ChromsomeInterval.mergeAdvanced().
- * 
+ *
  * @template T - an object that can be converted into a ChromosomeInterval
  */
 interface MergedLocus<T> {
@@ -22,7 +22,7 @@ interface MergedLocus<T> {
 
 /**
  * Basically an OpenInterval with a chromosome's name.  Expresses genomic coordinates.
- * 
+ *
  * @implements {Serializable}
  * @author Silas Hsu
  */
@@ -30,16 +30,17 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
     /**
      * Parses a string representing a ChromosomeInterval, such as those produced by the toString() method.  Throws an
      * error if parsing fails.
-     * 
+     *
      * @param {string} str - interval to parse
      * @return {ChromosomeInterval} parsed instance
      * @throws {RangeError} if parsing fails
      */
     static parse(str: string): ChromosomeInterval {
-        const regexMatch = str.replace(/,/g, '').match(/([\w:.]+)\W+(\d+)\W+(\d+)/);
+        const regexMatch = str.replace(/,/g, "").match(/([\w:.]+)\W+(\d+)\W+(\d+)/);
+        const positionAdjust = str.includes(":") ? 1 : 0; // position format
         if (regexMatch) {
             const chr = regexMatch[1];
-            const start = Number.parseInt(regexMatch[2], 10);
+            const start = Math.max(Number.parseInt(regexMatch[2], 10) - positionAdjust, 0);
             const end = Number.parseInt(regexMatch[3], 10);
             return new ChromosomeInterval(chr, start, end);
         } else {
@@ -49,20 +50,22 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
 
     /**
      * Merges chromosome intervals based on proximity and chromosome name.  Does not mutate any inputs.
-     * 
+     *
      * This function accepts a list of objects of arbitrary type, as long a ChromosomeInterval can be extracted through
      * the `iteratee` callback.  The `mergeDistance` parameter expresses a distance in bases at which two loci are close
      * enough to warrant merging.
-     * 
+     *
      * @param {T[]} objects - objects from which ChromosomeIntervals can be extracted
      * @param {number} mergeDistance - distance in bases at which two intervals are close enough to merge
      * @param {(object: T) => ChromosomeInterval} iteratee - callback that accepts an object and returns a locus
      * @return {object[]}
      */
-    static mergeAdvanced<T>(objects: T[], mergeDistance: number,
-        iteratee: (object: T) => ChromosomeInterval): Array<MergedLocus<T>>
-    {
-        const groupedByChromosome = _.groupBy(objects, obj => iteratee(obj).chr);
+    static mergeAdvanced<T>(
+        objects: T[],
+        mergeDistance: number,
+        iteratee: (object: T) => ChromosomeInterval
+    ): Array<MergedLocus<T>> {
+        const groupedByChromosome = _.groupBy(objects, (obj) => iteratee(obj).chr);
         const merged = [];
         for (const chrName in groupedByChromosome) {
             const objectsForChromosome = groupedByChromosome[chrName];
@@ -83,8 +86,9 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
                     // Found the end: this locus is far enough from the current merged locus
                     if (start - mergedEnd > mergeDistance) {
                         break;
-                    // else this record should be merged into the current locus
-                    } else if (end > mergedEnd) { // Update the end of the merged locus if necessary
+                        // else this record should be merged into the current locus
+                    } else if (end > mergedEnd) {
+                        // Update the end of the merged locus if necessary
                         mergedEnd = end;
                     }
                     mergeEndIndex++;
@@ -93,7 +97,7 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
                 // Push a new merged locus
                 merged.push({
                     locus: new ChromosomeInterval(chrName, mergedStart, mergedEnd),
-                    sources: objectsForChromosome.slice(mergeStartIndex, mergeEndIndex)
+                    sources: objectsForChromosome.slice(mergeStartIndex, mergeEndIndex),
                 });
                 mergeStartIndex = mergeEndIndex;
             }
@@ -104,19 +108,19 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
 
     /**
      * Merges chromosome intervals based on proximity, by default 2000 bp.  Does not mutate any inputs.
-     * 
+     *
      * @param {ChromosomeInterval[]} intervals - interval list to inspect for overlaps
      * @param {number} [mergeDistance] - distance in bases at which two intervals are close enough to merge
      * @return {ChromosomeInterval[]} - version of input list with intervals merged
      */
-    static mergeOverlaps(intervals: ChromosomeInterval[], mergeDistance=2000): ChromosomeInterval[] {
+    static mergeOverlaps(intervals: ChromosomeInterval[], mergeDistance = 2000): ChromosomeInterval[] {
         const mergeInfos = ChromosomeInterval.mergeAdvanced(intervals, mergeDistance, _.identity);
-        return mergeInfos.map(info => info.locus);
+        return mergeInfos.map((info) => info.locus);
     }
 
     /**
      * Makes a new instance.  The input interval should be a 0-indexed open one.
-     * 
+     *
      * @param {string} chr - name of the chromosome
      * @param {number} start - start of the interval, inclusive
      * @param {number} end - end of the interval, exclusive
@@ -136,7 +140,7 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
     /**
      * Enables the spread operator for ChromosomeIntervals.
      */
-    *[Symbol.iterator] () {
+    *[Symbol.iterator]() {
         yield this.start;
         yield this.end;
     }
@@ -151,13 +155,13 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
     /**
      * Intersects this and another ChromosomeInterval, and returns the result in as a new ChromosomeInterval.  Returns
      * null if there is no intersection at all.
-     * 
+     *
      * @param {ChromosomeInterval} other - other ChromosomeInterval to intersect
      * @return {ChromosomeInterval} intersection of this and the other interval, or null if none exists
      */
     getOverlap(other: ChromosomeInterval): ChromosomeInterval {
         if (this.chr !== other.chr) {
-            return null
+            return null;
         } else {
             const overlap = this.toOpenInterval().getOverlap(other);
             return overlap ? new ChromosomeInterval(this.chr, overlap.start, overlap.end) : null;
@@ -171,7 +175,6 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
         return `${this.chr}:${this.start}-${this.end}`;
     }
 
-
     /**
      * @return {OpenInterval} an OpenInterval version of this instance.
      */
@@ -182,7 +185,7 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
     /**
      * Interprets this and another interval as a multi-chromosome interval, with this being the start and the other
      * being the end.  Returns a human-readable representation of that interpretation.
-     * 
+     *
      * @param {ChromosomeInterval} other - the "end" of the multi-chromosome interval
      * @return {string} a human-readable representation of a multi-chromosome interval
      */

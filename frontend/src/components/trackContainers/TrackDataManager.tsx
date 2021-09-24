@@ -30,7 +30,8 @@ export interface TrackData {
     alignment: Alignment;
     visRegion: DisplayedRegionModel;
     data: any[];
-    meta?: any; // track file meta information
+    meta?: any; // track file current meta information
+    fileInfo?: any; // track file original information in header etc.
     isLoading: boolean;
     error?: any;
 }
@@ -146,6 +147,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
                         visRegion,
                         data: trackConfig.formatData(rawData),
                         meta: dataSource.getCurrentMeta(dataRegion, this.props.basesPerPixel, options),
+                        fileInfo: dataSource.getFileInfo(),
                         isLoading: false,
                         error: null,
                     });

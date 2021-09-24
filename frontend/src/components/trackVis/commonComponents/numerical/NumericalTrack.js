@@ -14,6 +14,7 @@ import { NumericalDisplayModes } from "../../../../model/DisplayModes";
 import { DefaultAggregators } from "../../../../model/FeatureAggregator";
 import { ScaleChoices } from "../../../../model/ScaleChoices";
 import { NumericalAggregator } from "./NumericalAggregator";
+// import { withLogPropChanges } from "components/withLogPropChanges";
 
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN,
@@ -74,6 +75,23 @@ class NumericalTrack extends React.PureComponent {
         this.renderTooltip = this.renderTooltip.bind(this);
         this.aggregator = new NumericalAggregator();
     }
+
+    // componentDidUpdate(prevProps, prevState) {
+    //     if (prevProps.layoutModel !== this.props.layoutModel) {
+    //         console.log("layout changed");
+    //         console.log(prevProps.layoutModel);
+    //         console.log(this.props.layoutModel);
+    //         const a = prevProps.layoutModel.toJson();
+    //         const b = this.props.layoutModel.toJson();
+    //         console.log(a, b);
+    //         console.log(_.isEqual(a, b));
+    //     }
+    //     if (prevProps.groupScale !== this.props.groupScale) {
+    //         console.log("groupScale changed");
+    //         console.log(prevProps.groupScale);
+    //         console.log(this.props.groupScale);
+    //     }
+    // }
 
     // aggregateFeatures(data, viewRegion, width, aggregatorId) {
     //     // const aggregator = new FeatureAggregator();
@@ -334,6 +352,7 @@ export class ValuePlot extends React.PureComponent {
     }
 
     render() {
+        // console.log("render in valueplot");
         const { xToValue, height, forceSvg } = this.props;
         return (
             <DesignRenderer
@@ -348,3 +367,4 @@ export class ValuePlot extends React.PureComponent {
 }
 
 export default withDefaultOptions(NumericalTrack);
+// export default withLogPropChanges(withDefaultOptions(NumericalTrack));

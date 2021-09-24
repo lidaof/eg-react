@@ -9,6 +9,7 @@ import CustomHubAdder from "./CustomHubAdder";
 import FacetTable from "./FacetTable";
 import { HELP_LINKS } from "../../util";
 import { TrackOptionsUI } from "./TrackOptionsUI";
+import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 
 // Just add a new entry here to support adding a new track type.
 // const TRACK_TYPES = ['bigWig', 'bedGraph', 'methylC', 'categorical', 'bed', 'bigBed', 'repeatmasker','refBed', 'hic', 'longrange', 'bigInteract', 'cool', 'bam'];
@@ -23,8 +24,8 @@ export const TRACK_TYPES = {
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange"],
     Stats: ["boxplot"],
-    Repeats: ["repeatmasker"],
-    Alignment: ["bam", "pairwise", "snv", "snv2"],
+    Repeats: ["rmskv2", "repeatmasker"],
+    Alignment: ["bam", "pairwise", "snv", "snv2", "bigchain", "genomealign"],
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
     Image: ["omero4dn", "omeroidr"],
@@ -58,6 +59,9 @@ export const TYPES_DESC = {
     rgbpeak: "peak in bigbed format with RGB value",
     vcf: "Variant Call Format",
     boxplot: "show numerical data as boxplots",
+    rmskv2: "RepeatMasker V2 structure with color",
+    bigchain: "bigChain pairwise alignment",
+    genomealign: "genome pairwise alignment",
 };
 
 /**
@@ -87,6 +91,7 @@ class CustomTrackAdder extends React.Component {
             metadata: { genome: this.props.genomeConfig.genome.getName() },
             trackAdded: false,
             selectedTabIndex: 0,
+            querygenome: "",
             options: null, // custom track options
         };
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
@@ -103,6 +108,12 @@ class CustomTrackAdder extends React.Component {
             return;
         } else {
             const newTrack = new TrackModel({ ...this.state, datahub: "Custom track" });
+            if (getTrackConfig(newTrack).isGenomeAlignTrack()) {
+                if (!this.state.querygenome) {
+                    this.setState({ urlError: "Please enter query genome for genomealign/bigchain track" });
+                    return;
+                }
+            }
             this.props.onTracksAdded([newTrack]);
             this.props.onAddTracksToPool([newTrack], false);
             this.setState({ urlError: "", trackAdded: true });
@@ -161,7 +172,7 @@ class CustomTrackAdder extends React.Component {
     };
 
     renderCustomTrackAdder() {
-        const { type, url, name, metadata, urlError } = this.state;
+        const { type, url, name, metadata, urlError, querygenome } = this.state;
         const primaryGenome = this.props.genomeConfig.genome.getName();
         var allGenomes = getSecondaryGenomes(primaryGenome, this.props.addedTracks);
         allGenomes.unshift(primaryGenome);
@@ -189,9 +200,8 @@ class CustomTrackAdder extends React.Component {
                         type="text"
                         className="form-control"
                         value={url}
-                        onChange={(event) => this.setState({ url: event.target.value })}
+                        onChange={(event) => this.setState({ url: event.target.value.trim() })}
                     />
-                    <span style={{ color: "red" }}>{urlError}</span>
                 </div>
                 <div className="form-group">
                     <label>Track label</label>
@@ -202,8 +212,20 @@ class CustomTrackAdder extends React.Component {
                         onChange={(event) => this.setState({ name: event.target.value })}
                     />
                 </div>
+                <div
+                    className="form-group"
+                    style={{ display: type === "bigchain" || type === "genomealign" ? "block" : "none" }}
+                >
+                    <label>Query genome</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={querygenome}
+                        onChange={(event) => this.setState({ querygenome: event.target.value.trim() })}
+                    />
+                </div>
                 <div className="form-group">
-                    <label>genome</label>
+                    <label>Genome</label>
                     <select
                         className="form-control"
                         value={metadata.genome}
@@ -212,6 +234,7 @@ class CustomTrackAdder extends React.Component {
                         {this.renderGenomeOptions(allGenomes)}
                     </select>
                 </div>
+                <span style={{ color: "red" }}>{urlError}</span>
                 <TrackOptionsUI onGetOptions={(value) => this.getOptions(value)} />
                 {this.renderButtons()}
             </form>

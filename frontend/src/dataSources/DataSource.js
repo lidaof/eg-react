@@ -21,6 +21,14 @@ class DataSource {
     }
 
     /**
+     *
+     * @returns file's header or metadata information, used for build dynamically context menu
+     */
+    getFileInfo() {
+        return {};
+    }
+
+    /**
      * Functions as this object's destructor; deallocates anything that needs manual deallocation.
      */
     cleanUp() {}

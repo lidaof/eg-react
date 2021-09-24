@@ -8,7 +8,7 @@ import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import { ViewExpansion, RegionExpander } from "../../model/RegionExpander";
 import { MultiAlignmentViewCalculator, MultiAlignment } from "../../model/alignment/MultiAlignmentViewCalculator";
 import { GenomeConfig } from "../../model/genomes/GenomeConfig";
-import {getTrackConfig} from "../trackConfig/getTrackConfig";
+import { getTrackConfig } from "../trackConfig/getTrackConfig";
 
 interface ViewManagerProps {
     genome: string; // The primary genome
@@ -42,7 +42,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
             super(props);
             this._getAlignmentCalculator = memoizeOne(this._getAlignmentCalculator);
             this.fetchPrimaryView = memoizeOne(this.fetchPrimaryView);
-            this.state = {primaryView: null};
+            this.state = { primaryView: null };
             this._mostRecentAlignmentCalculator = new MultiAlignmentViewCalculator(props.genomeConfig, []);
         }
 
@@ -88,7 +88,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
                 console.error("Falling back to nonaligned primary view");
             }
             if (viewRegion === this.props.viewRegion) {
-                this.setState({primaryView: returnValue.primaryView});
+                this.setState({ primaryView: returnValue.primaryView });
             }
             return returnValue;
         }
@@ -102,7 +102,7 @@ export function withTrackView(WrappedComponent: React.ComponentType<WrappedCompo
              * rely on a change in alignment data to fetch track data; we have to use region changes.  And that is why
              * we effectively need to pass a way of fetching alignments in a Promise to the track data fetcher.
              */
-            const {viewRegion, tracks} = this.props;
+            const { viewRegion, tracks } = this.props;
             const visWidth = this.getVisualizationWidth();
             return <WrappedComponent
                 basesPerPixel={this.props.viewRegion.getWidth() / visWidth}

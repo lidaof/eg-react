@@ -1,7 +1,7 @@
 import React from "react";
 
 export const OpacityThickness = (props) => {
-    const { onUpdate, opacity, thickness } = props;
+    const { onUpdate, opacity, thickness, highlightStyle } = props;
     return (
         <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
             <label>
@@ -16,7 +16,7 @@ export const OpacityThickness = (props) => {
                 />
             </label>
             <label>
-                tube thickness:{" "}
+                thickness/radius:{" "}
                 <input
                     type="number"
                     min={0}
@@ -25,6 +25,15 @@ export const OpacityThickness = (props) => {
                     value={thickness}
                     onChange={(e) => onUpdate("cartoonThickness", Number.parseFloat(e.target.value || 0))}
                 />
+            </label>
+            <label>
+                paint style:{" "}
+                <select value={highlightStyle} onChange={(e) => onUpdate("highlightStyle", e.target.value)}>
+                    <option value="cartoon">cartoon</option>
+                    <option value="sphere">sphere</option>
+                    {/* <option value="cross">cross</option> */}
+                    {/* <option value="line">line</option> */}
+                </select>
             </label>
         </div>
     );

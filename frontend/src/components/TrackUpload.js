@@ -184,6 +184,7 @@ export class TrackUpload extends React.Component {
                             <option value="methylC">methylC - {TYPES_DESC.methylC}</option>
                             <option value="categorical">categorical - {TYPES_DESC.categorical}</option>
                             <option value="bed">bed - {TYPES_DESC.bed}</option>
+                            <option value="vcf">vcf - {TYPES_DESC.vcf}</option>
                             <option value="refBed">refBed - {TYPES_DESC.refBed}</option>
                             <option value="longrange">longrange - {TYPES_DESC.longrange}</option>
                             <option value="qbed">qBED - {TYPES_DESC.qBED}</option>

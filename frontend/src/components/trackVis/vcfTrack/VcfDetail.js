@@ -20,7 +20,7 @@ class VcfDetail extends React.PureComponent {
 
     render() {
         const { vcf } = this.props;
-        const vcfId = vcf.getName() || "";
+        const vcfId = vcf.variant.ID;
         let linkOut,
             trimmed = {};
         if (vcfId) {
@@ -56,7 +56,7 @@ class VcfDetail extends React.PureComponent {
             <div>
                 {vcfId ? (
                     <div className="Tooltip-major-text">
-                        {linkOut} <CopyToClip value={vcfId} />
+                        {linkOut} <CopyToClip value={vcfId.join(", ")} />
                     </div>
                 ) : null}
                 <div>
@@ -138,7 +138,14 @@ const infoAsTable = (info) => {
     const trs = (
         <tr>
             {cols.map((col, idx) => (
-                <td key={idx}>{Array.isArray(info[col]) ? info[col].join(",") : info[col]}</td>
+                <td key={idx}>
+                    {Array.isArray(info[col])
+                        ? _.truncate(info[col].join(","), {
+                              length: 75,
+                              separator: /[,; ]/,
+                          })
+                        : info[col]}
+                </td>
             ))}
         </tr>
     );

@@ -77,8 +77,11 @@ export function tabIdExistInLayout(layout, tabId) {
 }
 
 export function ensureLayoutHeader(json) {
+    // console.log(json);
     if (json.layout.children.length > 1) {
         return json; // always keep the layout
+    } else if (json.layout.children[0].children.length > 1) {
+        return json;
     } else {
         return { ...json, global: global0 };
     }
