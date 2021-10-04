@@ -41,4 +41,4 @@ function UnconnectedHighlightableTrackContainer(props: HighlightableTrackContain
     );
 }
 
-export const ZoomableTrackContainer = withTrackLegendWidth(UnconnectedHighlightableTrackContainer);
+export const HighlightableTrackContainer = withTrackLegendWidth(UnconnectedHighlightableTrackContainer);
