@@ -21,6 +21,12 @@ export const Tools = {
 (Alt+M)`,
         cursor: "zoom-in",
     },
+    HIGHLIGHT: {
+        buttonContent: "❕",
+        title: `Highlight tool
+(Alt+N)`,
+        cursor: "pointer",
+    },
 };
 
 ToolButtons.propTypes = {

@@ -11,6 +11,8 @@ import TrackHandle from "./TrackHandle";
 import { PannableTrackContainer } from "./PannableTrackContainer";
 import ReorderableTrackContainer from "./ReorderableTrackContainer";
 import { ZoomableTrackContainer } from "./ZoomableTrackContainer";
+import { HighlightableTrackContainer } from "./HighlightableTrackContainer";
+import HighlightNewRegion from "./HighlightNewRegion";
 import MetadataHeader from "./MetadataHeader";
 import { Tools, ToolButtons } from "./Tools";
 import ZoomButtons from "./ZoomButtons";
@@ -128,6 +130,11 @@ class TrackContainer extends React.Component {
         this.panLeftOrRight = this.panLeftOrRight.bind(this);
         this.zoomOut = this.zoomOut.bind(this);
         this.groupManager = new GroupedTrackManager();
+
+        this.onClick = (evt) => {
+            console.log(evt);
+            this.initializeHighlight(evt);
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -451,6 +458,14 @@ class TrackContainer extends React.Component {
         this.props.onTracksChanged(newTracks);
     };
 
+    /**
+     * starts highlight
+     * @param {MouseEvent} evt
+     */
+    initializeHighlight(evt) {
+        console.log(evt)
+    }
+
     // End callback methods
     ////////////////////
     // Render methods //
@@ -469,6 +484,7 @@ class TrackContainer extends React.Component {
             onSetEnteredRegion,
             primaryView,
         } = this.props;
+        // console.log(this.props, viewRegion);
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
         const panLeftButton = (
             <button
@@ -644,6 +660,14 @@ class TrackContainer extends React.Component {
                         onXOffsetChanged={this.changeXOffset}
                     />
                 );
+            case Tools.HIGHLIGHT:
+                return (
+                    <HighlightableTrackContainer
+                        trackElements={trackElements}
+                        visData={primaryView}
+                        onNewHighlight={HighlightNewRegion}
+                    />
+                )
             default:
                 return trackElements;
         }
@@ -712,6 +736,7 @@ class TrackContainer extends React.Component {
             paddingBottom: "3px",
             cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR,
         };
+        console.log(enteredRegion, highlightColor, highlightEnteredRegion, primaryView, this.state.xOffset);
         return (
             <React.Fragment>
                 <OutsideClickDetector onOutsideClick={this.deselectAllTracks}>
