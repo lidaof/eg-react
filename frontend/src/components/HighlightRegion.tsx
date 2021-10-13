@@ -35,6 +35,14 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         highlightColor: 'rgba(255, 255, 0, 0.3)',
     };
 
+    constructor(props: HighlightRegionProps | Readonly<HighlightRegionProps>) {
+        super(props);
+        
+        this.state = {
+            highlightItems: []
+        }
+    }
+
     /**
      * Initializes state, binds event listeners, and attaches a keyboard listener to the window, which will listen for
      * requests to cancel a selection.

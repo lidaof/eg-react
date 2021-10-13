@@ -112,6 +112,7 @@ class TrackContainer extends React.Component {
             panningAnimation: "none",
             zoomAnimation: 0,
             groupScale: undefined,
+            highlightItems: [],
         };
         this.leftBeam = React.createRef();
         this.rightBeam = React.createRef();
@@ -131,10 +132,10 @@ class TrackContainer extends React.Component {
         this.zoomOut = this.zoomOut.bind(this);
         this.groupManager = new GroupedTrackManager();
 
-        this.onClick = (evt) => {
-            console.log(evt);
-            this.initializeHighlight(evt);
-        }
+        // this.onClick = (evt) => {
+        //     console.log(evt);
+        //     this.initializeHighlight(evt);
+        // }
     }
 
     componentDidUpdate(prevProps) {
@@ -462,9 +463,9 @@ class TrackContainer extends React.Component {
      * starts highlight
      * @param {MouseEvent} evt
      */
-    initializeHighlight(evt) {
-        console.log(evt)
-    }
+    // initializeHighlight(evt) {
+    //     console.log(evt)
+    // }
 
     // End callback methods
     ////////////////////
@@ -540,6 +541,11 @@ class TrackContainer extends React.Component {
                     </div>
                     <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <History />
+                    </div>
+                    <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
+                        <HighlightMenu
+                            highlightItems={this.state.highlightItems}
+                        />
                     </div>
                     <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
                         <PixelInfo
@@ -736,7 +742,7 @@ class TrackContainer extends React.Component {
             paddingBottom: "3px",
             cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR,
         };
-        console.log(enteredRegion, highlightColor, highlightEnteredRegion, primaryView, this.state.xOffset);
+        // console.log(enteredRegion, highlightColor, highlightEnteredRegion, primaryView, this.state.xOffset);
         return (
             <React.Fragment>
                 <OutsideClickDetector onOutsideClick={this.deselectAllTracks}>
