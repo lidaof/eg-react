@@ -23,6 +23,7 @@ import DataHubParser from "./model/DataHubParser";
 import OpenInterval from "./model/interval/OpenInterval";
 import { Genome } from "./model/genomes/Genome";
 import Chromosome from "./model/genomes/Chromosome";
+import { HighlightItem } from "../node_modules/@types/react/index";
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
@@ -70,6 +71,7 @@ export interface AppState {
     virusBrowserMode?: boolean;
     layout?: object;
     // g3dtracks?: TrackModel[];
+    highlightItems?: HighlightItem[];
 }
 
 const bundleId = uuid.v1();
@@ -89,6 +91,7 @@ const initialState: AppState = {
     customTracksPool: [],
     layout: {},
     // g3dtracks: [],
+    highlightItems: [],
 };
 
 enum ActionType {

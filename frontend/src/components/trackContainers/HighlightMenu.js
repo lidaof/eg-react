@@ -39,12 +39,45 @@ import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManage
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 
 /**
- * Menu for managing multiple highlights created on TrackContainer
+ * Gets props to pass to RegionSetSelector.
+ * 
+ * FIXME
+ * 
+ * @param {Object} state - redux state
+ * @return {Object} props to pass to RegionSetSelector
  */
-export default class HighlightMenu extends React.Component {
+ function mapStateToProps(state) {
+    return {
+        sets: state.browser.present.regionSets,
+        selectedSet: state.browser.present.regionSetView
+    };
+}
+
+/**
+ * Callbacks to pass to RegionSetSelector.
+ * 
+ * FIXME
+ */
+const callbacks = {
+    onSetsChanged: ActionCreators.setRegionSetList,
+    onSetSelected: ActionCreators.setRegionSetView,
+};
+
+/**
+ * Menu for managing multiple highlights created on TrackContainer
+ * 
+ * Read up on Redux;
+ * For Redux storage of highlightItems data:
+ *      Create switch case for UPDATE_HIGHLIGHT_ITEMS in NextState method in AppState.ts;
+ *      Set items in Redux storage with ActionCreator.METHOD();
+ *      Create withAppState = connect(mapStateToProps, callbacks);
+ *          Find out how this works, this is how you store and access data in Redux;
+ *          Connect is the most important part;
+ */
+class HighlightMenu extends React.Component {
 
     constructor() {
-        this.state ={
+        this.state = {
             showMenu: false,
         }
     }
@@ -78,6 +111,8 @@ export default class HighlightMenu extends React.Component {
         );
     }
 }
+
+export default connect(mapStateToProps, callbacks)(HighlightMenu);
 
 class HighlightItem extends React.Component {
 
