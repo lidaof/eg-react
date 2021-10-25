@@ -48,19 +48,15 @@ import { getTrackConfig } from "components/trackConfig/getTrackConfig";
  */
  function mapStateToProps(state) {
     return {
-        sets: state.browser.present.regionSets,
-        selectedSet: state.browser.present.regionSetView
+        highlightItems: state.browser.present.highlightItems
     };
 }
 
 /**
- * Callbacks to pass to RegionSetSelector.
- * 
- * FIXME
+ * Callbacks to pass to HighlightMenu
  */
 const callbacks = {
-    onSetsChanged: ActionCreators.setRegionSetList,
-    onSetSelected: ActionCreators.setRegionSetView,
+    onSetsChanged: ActionCreators.setHighlights
 };
 
 /**
@@ -75,23 +71,20 @@ const callbacks = {
  *          Connect is the most important part;
  */
 class HighlightMenu extends React.Component {
+    static propTypes = {
+        highlightItems: PropTypes.arrayOf(PropType.object).isRequired,
+        menuOpen: PropTypes.bool
+    };
 
     constructor() {
+        super(props);
         this.state = {
-            showMenu: false,
-        }
-    }
 
-    openMenu() {
-        this.setState({ showMenu: true });
-    }
-
-    closeMenu() {
-        this.setState({ showMenu: false });
+        };
     }
 
     render() {
-        const { highlightItems } = this.props;
+        const { highlightItems, menuOpen } = this.props;
         const highlightElements = highlightItems.map(item => {
             if (item.active && item.inViewRegion) {
                 return (
@@ -104,16 +97,21 @@ class HighlightMenu extends React.Component {
             }
         });
 
-        return (
-            <div className="highlightMenu-body">
-                {highlightElements}
-            </div>
-        );
+        if (menuOpen) {
+            return (
+                <div className="highlightMenu-body">
+                    {highlightElements}
+                </div>
+            );
+        }
     }
 }
 
 export default connect(mapStateToProps, callbacks)(HighlightMenu);
 
 class HighlightItem extends React.Component {
-
+    static propTypes = {
+        color: PropTypes.string,
+        opacity: PropTypes.number
+    }
 }

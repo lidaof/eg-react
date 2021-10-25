@@ -27,6 +27,7 @@ import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import UndoRedo from "./UndoRedo";
 import History from "./History";
 import HighlightRegion from "../HighlightRegion";
+import HighlightMenu from "./HighlightMenu";
 import { VerticalDivider } from "./VerticalDivider";
 import { CircletView } from "./CircletView";
 import ButtonGroup from "./ButtonGroup";

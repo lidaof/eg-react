@@ -114,6 +114,7 @@ enum ActionType {
     SET_HUB_SESSION_STORAGE = "SET_HUB_SESSION_STORAGE",
     SET_LAYOUT = "SET_LAYOUT",
     // SET_G3D_TRACKS = "SET_G3D_TRACKS",
+    SET_HIGHLIGHTS = "SET_HIGHLIGHTS",
 }
 
 interface AppAction {
@@ -236,6 +237,15 @@ export const ActionCreators = {
     // setThreedTracks: (newTracks: TrackModel[]) => {
     //     return { type: ActionType.SET_G3D_TRACKS, threedTracks: newTracks };
     // },
+
+    /**
+     * Action for updating state for highlight items
+     * @param highlights array of HighlightItems that are created in HighlightMenu.js
+     * @returns 
+     */
+    setHighlights: (highlights: HighlightItem[]) => {
+        return { type: ActionType.SET_HIGHLIGHTS, highlights };
+    }
 };
 
 function getInitialState(): AppState {
@@ -424,6 +434,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, layout: action.layout };
         // case ActionType.SET_G3D_TRACKS:
         //     return { ...prevState, threedTracks: action.tracks };
+        case ActionType.SET_HIGHLIGHTS:
+            return { ...prevState, highlightItems: action.highlights };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);
