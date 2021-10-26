@@ -5,6 +5,8 @@ import { SelectableGenomeArea } from '../SelectableGenomeArea';
 
 import { ViewExpansion } from '../../model/RegionExpander';
 import OpenInterval from '../../model/interval/OpenInterval';
+import { connect } from 'react-redux';
+import { AppState, ActionCreators } from 'AppState';
 
 interface HighlightableTrackContainerProps {
     trackElements: JSX.Element[]; // Track elements to render
@@ -19,6 +21,25 @@ interface HighlightableTrackContainerProps {
      */
     onNewHighlight?(start: number, end: number): void;
 }
+
+/**
+ * Gets props to pass to HighlightableTrackContainer.
+ * 
+ * @param {Object} state - redux state
+ * @return {Object} props to pass to RegionSetSelector
+ */
+ function mapStateToProps(state: AppState) {
+    return {
+        highlightItems: state.highlightItems
+    };
+}
+
+/**
+ * Callbacks to pass to HighlightMenu
+ */
+const callbacks = {
+    onSetsChanged: ActionCreators.setHighlights
+};
 
 /**
  * A track container that allows selecting and zooming into a region
@@ -41,4 +62,6 @@ function UnconnectedHighlightableTrackContainer(props: HighlightableTrackContain
     );
 }
 
-export const HighlightableTrackContainer = withTrackLegendWidth(UnconnectedHighlightableTrackContainer);
+const HighlightableTrackContainer = withTrackLegendWidth(UnconnectedHighlightableTrackContainer);
+
+export default connect(mapStateToProps, callbacks)(HighlightableTrackContainer);

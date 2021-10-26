@@ -39,9 +39,7 @@ import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManage
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 
 /**
- * Gets props to pass to RegionSetSelector.
- * 
- * FIXME
+ * Gets props to pass to HighlightMenu.js
  * 
  * @param {Object} state - redux state
  * @return {Object} props to pass to RegionSetSelector
@@ -72,12 +70,12 @@ const callbacks = {
  */
 class HighlightMenu extends React.Component {
     static propTypes = {
-        highlightItems: PropTypes.arrayOf(PropType.object).isRequired,
+        highlightItems: PropTypes.arrayOf(PropTypes.object).isRequired,
         menuOpen: PropTypes.bool
     };
 
     constructor() {
-        super(props);
+        super();
         this.state = {
 
         };
@@ -103,6 +101,8 @@ class HighlightMenu extends React.Component {
                     {highlightElements}
                 </div>
             );
+        } else {
+            return null;
         }
     }
 }

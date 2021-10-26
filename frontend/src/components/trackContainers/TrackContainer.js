@@ -113,7 +113,7 @@ class TrackContainer extends React.Component {
             panningAnimation: "none",
             zoomAnimation: 0,
             groupScale: undefined,
-            highlightItems: [],
+            showHighlightMenu: false,
         };
         this.leftBeam = React.createRef();
         this.rightBeam = React.createRef();
@@ -253,6 +253,20 @@ class TrackContainer extends React.Component {
     toggleReorderManyModal = () => {
         this.setState((prevState) => {
             return { showReorderManyModal: !prevState.showReorderManyModal };
+        });
+    };
+
+    openHighlightMenu = () => {
+        this.setState({ showHighlightMenu: true });
+    };
+
+    closeHighlightMenu = () => {
+        this.setState({ showHighlightMenu: false });
+    };
+
+    toggleHighlightMenu = () => {
+        this.setState((prevState) => {
+            return { showHighlightMenu: !prevState.showHighlightMenu };
         });
     };
 
@@ -545,7 +559,7 @@ class TrackContainer extends React.Component {
                     </div>
                     <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <HighlightMenu
-                            highlightItems={this.state.highlightItems}
+                            menuOpen={this.state.showHighlightMenu}
                         />
                     </div>
                     <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
