@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@types/react-hammerjs": "^1.0.2",
-    "react-hammerjs": "^1.0.1"
-  }
-}

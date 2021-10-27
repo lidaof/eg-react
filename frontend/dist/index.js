@@ -1,5 +1,7 @@
 "use strict";
 
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var React = _interopRequireWildcard(require("react"));
 
 var ReactDOM = _interopRequireWildcard(require("react-dom"));
@@ -10,7 +12,7 @@ var _AppRouter = _interopRequireDefault(require("./AppRouter"));
 
 var _AppState = _interopRequireDefault(require("./AppState"));
 
-var _registerServiceWorker = _interopRequireDefault(require("./registerServiceWorker"));
+var serviceWorker = _interopRequireWildcard(require("./serviceWorker"));
 
 var _hg = _interopRequireDefault(require("./model/genomes/hg19/hg19"));
 
@@ -28,15 +30,21 @@ require("./index.css");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
-var root = document.getElementById('root');
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+var root = document.getElementById("root");
 
 if (root) {
-  ReactDOM.render(React.createElement(_reactRedux.Provider, {
+  ReactDOM.render( /*#__PURE__*/React.createElement(_reactRedux.Provider, {
     store: _AppState.default
-  }, React.createElement(_AppRouter.default, null)), root);
-  (0, _registerServiceWorker.default)();
+  }, /*#__PURE__*/React.createElement(_AppRouter.default, null)), root);
+  serviceWorker.register({
+    onUpdate: function onUpdate() {
+      return ReactDOM.render( /*#__PURE__*/React.createElement(ReloadNotification, null), document.getElementById("newVersionNotification"));
+    }
+  });
 } else {
   window.React = React;
   window.ReactDOM = ReactDOM;
@@ -48,9 +56,16 @@ if (root) {
 }
 
 window.renderBrowserInElement = function (contents, container) {
-  return ReactDOM.render(React.createElement(_reactRedux.Provider, {
+  return ReactDOM.render( /*#__PURE__*/React.createElement(_reactRedux.Provider, {
     store: _AppState.default
-  }, React.createElement(_EmbeddedContainer.default, {
+  }, /*#__PURE__*/React.createElement(_EmbeddedContainer.default, {
     contents: contents
   })), container);
 };
+
+function ReloadNotification() {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "alert alert-info lead",
+    role: "alert"
+  }, "A new version of the browser is available. Please reload the page.");
+}

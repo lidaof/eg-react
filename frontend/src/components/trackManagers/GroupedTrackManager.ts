@@ -43,7 +43,7 @@ export class GroupedTrackManager {
                 // console.log(data);
                 const xvalues = this.aggregator.xToValueMaker(data, trackData[tid].visRegion, width, tracks[i].options);
                 const max =
-                    xvalues[0] && xvalues[0].length ? _.max(xvalues[0].slice(viewWindow.start, viewWindow.end)) : 0;
+                    xvalues[0] && xvalues[0].length ? _.max(xvalues[0].slice(viewWindow.start, viewWindow.end)) : 1;
                 const min =
                     xvalues[1] && xvalues[1].length ? _.min(xvalues[1].slice(viewWindow.start, viewWindow.end)) : 0;
                 if (!grouping.hasOwnProperty(g)) {

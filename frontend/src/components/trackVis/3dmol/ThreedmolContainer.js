@@ -441,7 +441,22 @@ class ThreedmolContainer extends React.Component {
             }
         }
         if (width !== prevProps.width || height !== prevProps.height) {
-            this.setState({ mainBoxHeight: height, mainBoxWidth: width });
+            // this.setState({ mainBoxHeight: height, mainBoxWidth: width });
+            if (layout === "side" && thumbStyle !== "hide") {
+                this.setState({
+                    mainBoxHeight: height,
+                    mainBoxWidth: halftWidth,
+                    thumbBoxHeight: height,
+                    thumbBoxWidth: halftWidth,
+                });
+            } else {
+                this.setState({
+                    mainBoxHeight: height,
+                    mainBoxWidth: width,
+                    thumbBoxHeight: 240,
+                    thumbBoxWidth: 300,
+                });
+            }
         }
         if (mainBoxHeight !== prevState.mainBoxHeight || mainBoxWidth !== prevState.mainBoxWidth) {
             this.viewer.render();
@@ -469,7 +484,7 @@ class ThreedmolContainer extends React.Component {
             this.setState({ paintAnnotationRegion: "none" });
         }
         if (annoFormat !== prevState.annoFormat) {
-            this.setState({ paintAnnotationRegion: "none", annotationFileObject: null });
+            this.setState({ paintAnnotationRegion: "none", annotationFileObject: null, annoUsePromoter: false });
         }
         if (numFormat !== prevState.numFormat) {
             this.setState({ paintRegion: "none", numFileObject: null });

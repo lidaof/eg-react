@@ -31,10 +31,10 @@ import ButtonGroup from "./ButtonGroup";
 import TrackRegionController from "../genomeNavigator/TrackRegionController";
 import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
-
-import "./TrackContainer.css";
 import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManager";
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
+
+import "./TrackContainer.css";
 
 // import { DEFAULT_OPTIONS as DYNAMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack";
 
