@@ -30,6 +30,7 @@ import packageJson from "../../package.json";
 import ScatterPlot from "./Geneplot/ScatterPlot";
 import ColorPicker from "./ColorPicker";
 import { TextTrack } from "./TextTrack";
+import { AppIcon, GenomePicker } from "./GenomePicker";
 
 import "./Nav.css";
 
@@ -195,13 +196,15 @@ class Nav extends React.Component {
             <div className="Nav-container">
                 <div className="panel">
                     {!virusBrowserMode && (
-                        <div className="element" id="logoDiv">
-                            <img
+                        // <div className="element" id="logoDiv">
+                        <div style={{ marginTop: "10px", marginRight: "20px" }}>
+                            {/* <img
                                 src="https://epigenomegateway.wustl.edu/images/eglogo.jpg"
                                 width="180px"
                                 height="30px"
                                 alt="browser logo"
-                            />
+                            /> */}
+                            <AppIcon />
                             {/* <span id="theNew" >The New</span> */}
                             <span id="theVersion">v{packageJson.version}</span>
                         </div>

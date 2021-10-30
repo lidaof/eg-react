@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Card from "@material-ui/core/Card";
@@ -47,7 +47,14 @@ const LinkWithMargin = withStyles({
     },
 })(Link);
 
-function TabPanel(props) {
+interface TabPanelProps {
+    children: React.ReactNode;
+    index: number;
+    value: any;
+    [key: string]: any;
+}
+
+function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
 
     return (
@@ -70,25 +77,24 @@ TabPanel.propTypes = {
     value: PropTypes.any.isRequired,
 };
 
-function a11yProps(index) {
+function a11yProps(index: number) {
     return {
         id: `full-width-tab-${index}`,
         "aria-controls": `full-width-tabpanel-${index}`,
     };
 }
 
-function GenomePicker(props) {
-    const theme = useTheme();
-    const [value, setValue] = React.useState(0);
+interface GenomePickerContainerProps {
+    onGenomeSelected: (name: string) => void;
+    bundleId: string;
+}
+
+interface GenomePickerProps {
+    onGenomeSelected: (name: string) => void;
+}
+
+export function GenomePicker(props: GenomePickerProps) {
     const [searchText, setSearchText] = useState("");
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
-
-    const handleChangeIndex = (index) => {
-        setValue(index);
-    };
 
     // Map the genomes to a list of cards. Genome search engine filters by both the species and the different assemblies.
     // It is not case sensitive.
@@ -97,7 +103,7 @@ function GenomePicker(props) {
             .filter(([species2, details]) => {
                 return (
                     species2.toLowerCase().includes(searchText.toLowerCase()) ||
-                    details.assemblies.join("").toLowerCase().includes(searchText)
+                    details.assemblies.join("").toLowerCase().includes(searchText.toLowerCase())
                 );
             })
             .map(([species2, details], idx) => {
@@ -108,15 +114,62 @@ function GenomePicker(props) {
                     );
                 }
                 return (
+                    // @ts-ignore
                     <Grid item xs={12} md={4} align="center" key={idx}>
                         <GenomePickerCard
                             species={species2}
                             details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
-                            onChoose={(genomeName) => props.onGenomeSelected(genomeName)}
+                            onChoose={(genomeName: string) => props.onGenomeSelected(genomeName)}
                         />
                     </Grid>
                 );
             });
+    };
+
+    return (
+        <Container maxWidth="md">
+            <Grid container spacing={4}>
+                <Grid item xs={12} md={6}>
+                    <Typography variant="h4" style={{ margin: "25px", marginLeft: 0 }}>
+                        Please select a genome
+                    </Typography>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                    <TextField
+                        id="outlined-margin-normal"
+                        placeholder="Search for a genome..."
+                        margin="normal"
+                        variant="outlined"
+                        style={{ width: "100%", paddingRight: "16px" }}
+                        className="searchFieldRounded"
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            ),
+                        }}
+                        onChange={(e) => setSearchText(e.target.value)}
+                    />
+                </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+                {renderTreeCards()}
+            </Grid>
+        </Container>
+    )
+}
+
+function GenomePickerContainer(props: GenomePickerProps) {
+    const theme = useTheme();
+    const [value, setValue] = React.useState(0);
+
+    const handleChange = (event: ChangeEvent<{}>, newValue: any) => {
+        setValue(newValue);
+    };
+
+    const handleChangeIndex = (index: number) => {
+        setValue(index);
     };
 
     return (
@@ -141,39 +194,11 @@ function GenomePicker(props) {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <Container maxWidth="md">
-                        <Grid container spacing={4}>
-                            <Grid item xs={12} md={6}>
-                                <Typography variant="h4" style={{ margin: "25px", marginLeft: 0 }}>
-                                    Please select a genome
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    id="outlined-margin-normal"
-                                    placeholder="Search for a genome..."
-                                    margin="normal"
-                                    variant="outlined"
-                                    style={{ width: "100%", paddingRight: "16px" }}
-                                    className="searchFieldRounded"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <SearchIcon />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                    onChange={(e) => setSearchText(e.target.value)}
-                                />
-                            </Grid>
-                        </Grid>
-                        <Grid container spacing={2}>
-                            {renderTreeCards()}
-                        </Grid>
-                    </Container>
+                    <GenomePicker onGenomeSelected={props.onGenomeSelected} />
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
                     {!process.env.REACT_APP_NO_FIREBASE ? (
+                        // @ts-ignore
                         <SessionUI bundleId={props.bundleId} withGenomePicker={true} />
                     ) : (
                         <p>Session function is only working with Firebase configuration.</p>
@@ -184,20 +209,28 @@ function GenomePicker(props) {
     );
 }
 
+export function AppIcon() {
+    return (
+        <>
+            <Typography variant="h5" noWrap>
+            <img
+                src="https://epigenomegateway.wustl.edu/browser/favicon-144.png"
+                alt="Browser Icon"
+                style={{ height: 50, width: "auto", marginLeft: 20, marginRight: 20 }}
+            />
+                WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span>
+            </Typography>
+        </>
+    );
+}
+
 function AppHeader() {
     const styles = useStyles();
     return (
         <div>
             <AppBar color="transparent" position="static">
                 <Toolbar disableGutters>
-                    <img
-                        src="https://epigenomegateway.wustl.edu/browser/favicon-144.png"
-                        alt="Browser Icon"
-                        style={{ height: 50, width: "auto", marginLeft: 20, marginRight: 20 }}
-                    />
-                    <Typography variant="h5" noWrap>
-                        WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span>
-                    </Typography>
+                    <AppIcon />
                     <div className={styles.alignRight}>
                         <LinkWithMargin
                             href="https://epigenomegateway.readthedocs.io/en/latest/"
@@ -220,7 +253,13 @@ function AppHeader() {
     );
 }
 
-function GenomePickerCard(props) {
+interface GenomePickerCardProps {
+    species: string;
+    details: { logoUrl: string; assemblies: string[] };
+    onChoose: (genomeName: string) => void;
+}
+
+function GenomePickerCard(props: GenomePickerCardProps) {
     const styles = useStyles();
     const { species, details, onChoose } = props;
     const { logoUrl, assemblies } = details;
@@ -272,11 +311,16 @@ const useStyles = makeStyles({
         marginRight: 15,
         marginLeft: "auto",
     },
+    vertScroll: {
+        maxHeight: "200px",
+        overflowY: "scroll",
+    },
 });
 
-GenomePicker.propTypes = {
+GenomePickerContainer.propTypes = {
     onGenomeSelected: PropTypes.func, // Called on genome selection.  Sigature: (genomeName: string): void
     bundleId: PropTypes.string,
 };
 
-export default connect(null, callbacks)(GenomePicker);
+// @ts-ignore
+export default connect(null, callbacks)(GenomePickerContainer);

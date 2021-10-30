@@ -2,8 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import _ from "lodash";
+// import AppState, { ActionCreators } from "./AppState";
 import { ActionCreators } from "./AppState";
-import GenomePicker from "./components/GenomePicker";
+import GenomePickerContainer from "./components/GenomePicker";
 import Nav from "./components/Nav";
 import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
 import TrackContainer from "./components/trackContainers/TrackContainer";
@@ -22,7 +23,22 @@ import "./App.css";
 
 const REGION_EXPANDER = new RegionExpander(1);
 
-function mapStateToProps(state) {
+interface MapStateToPropsProps {
+    browser: {
+        present: {
+            viewRegion: DisplayedRegionModel;
+            tracks: TrackModel[];
+            bundleId: string;
+            sessionFromUrl: string;
+            trackLegendWidth: number;
+            isShowingNavigator: boolean;
+            customTracksPool: TrackModel[];
+            virusBrowserMode: boolean;
+        }
+    }
+}
+
+function mapStateToProps(state: MapStateToPropsProps) {
     return {
         viewRegion: state.browser.present.viewRegion,
         tracks: state.browser.present.tracks,
@@ -44,7 +60,50 @@ const callbacks = {
 const withAppState = connect(mapStateToProps, callbacks);
 const withEnhancements = _.flowRight(withAppState, withCurrentGenome);
 
-class App extends React.PureComponent {
+interface AppProps {
+    viewRegion: DisplayedRegionModel;
+    tracks: TrackModel[];
+    bundleId: string;
+    sessionFromUrl: string;
+    onNewViewRegion: (region: DisplayedRegionModel) => void;
+    onTracksChanged: (tracks: TrackModel[]) => void;
+    embeddingMode: any;
+    genomeConfig: any;
+    publicTracksPool: any[];
+    customTracksPool: any[];
+    trackLegendWidth: any;
+    onLegendWidthChange: any;
+    isShowingNavigator: any;
+    virusBrowserMode: any;
+    layoutModel: any;
+    onSetAnchors3d: any;
+    onSetGeneFor3d: any;
+    viewer3dNumFrames: any;
+    isThereG3dTrack: any;
+    onSetImageInfo: any;
+}
+
+interface AppStateProps {
+    highlightEnteredRegion: boolean;
+    enteredRegion: any;
+    highlightColor: string;
+    publicHubs: any[];
+    publicTracksPool: any[];
+    customTracksPool: any[];
+    availableTrackSets: Set<string>;
+    suggestedMetaSets: Set<string>;
+}
+
+interface RGBAColor {
+    rgb: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }
+}
+
+class App extends React.PureComponent<AppProps, AppStateProps> {
     static propTypes = {
         genomeConfig: PropTypes.object,
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel),
@@ -54,7 +113,7 @@ class App extends React.PureComponent {
         embeddingMode: PropTypes.bool,
     };
 
-    constructor(props) {
+    constructor(props: AppProps) {
         super(props);
         this.state = {
             // isShowing3D: false,
@@ -86,11 +145,11 @@ class App extends React.PureComponent {
         this.initializeMetaSets(this.props.tracks);
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps: AppProps) {
         if (nextProps.genomeConfig && nextProps.genomeConfig !== this.props.genomeConfig) {
             if (nextProps.genomeConfig.publicHubList) {
                 const publicHubs = nextProps.genomeConfig.publicHubList.slice();
-                publicHubs.map((x) => (x.genome = nextProps.genomeConfig.genome.getName()));
+                publicHubs.map((x: { genome: any }) => (x.genome = nextProps.genomeConfig.genome.getName()));
                 this.setState({
                     publicHubs: publicHubs,
                 });
@@ -119,26 +178,26 @@ class App extends React.PureComponent {
         this.initializeMetaSets(nextProps.tracks);
     }
 
-    initializeMetaSets = (tracks) => {
+    initializeMetaSets = (tracks: any[]) => {
         const allKeys = tracks.map((track) => Object.keys(track.metadata));
         const metaKeys = _.union(...allKeys);
         this.addTermToMetaSets(metaKeys);
     };
 
-    addTermToMetaSets(term) {
+    addTermToMetaSets(term: any[]) {
         const toBeAdded = Array.isArray(term) ? term : [term];
         this.setState({
             suggestedMetaSets: new Set([...this.state.suggestedMetaSets, ...toBeAdded]),
         });
     }
 
-    addTracktoAvailable(trackModel) {
+    addTracktoAvailable(trackModel: any) {
         this.setState({
             availableTrackSets: new Set([...this.state.availableTrackSets, trackModel]),
         });
     }
 
-    removeTrackFromAvailable(trackModel) {
+    removeTrackFromAvailable(trackModel: any) {
         const newTrackSets = new Set(Array.from(this.state.availableTrackSets));
         newTrackSets.delete(trackModel);
         this.setState({
@@ -152,7 +211,7 @@ class App extends React.PureComponent {
      * @param {TrackModel[]} newTracks - additions to the list of all tracks available from a hub
      * @param {boolean} toPublic - whether to also add the tracks to public or custom pool
      */
-    addTracksToPool(newTracks, toPublic = true) {
+    addTracksToPool(newTracks: TrackModel[], toPublic = true) {
         if (toPublic) {
             // const urlSets = new Set([...this.state.publicTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
@@ -168,17 +227,17 @@ class App extends React.PureComponent {
         }
     }
 
-    updatePublicHubs(publicHubs) {
+    updatePublicHubs(publicHubs: any) {
         this.setState({ publicHubs });
     }
 
-    addTracks(tracks) {
+    addTracks(tracks: any) {
         const newTracks = this.props.tracks.concat(tracks);
         this.props.onTracksChanged(newTracks);
         this.updateOtherPublicHubs(newTracks);
     }
 
-    removeTrack(indexToRemove) {
+    removeTrack(indexToRemove: number) {
         const newTracks = this.props.tracks.filter((track, index) => index !== indexToRemove);
         this.props.onTracksChanged(newTracks);
         this.updateOtherPublicHubs(newTracks);
@@ -200,11 +259,11 @@ class App extends React.PureComponent {
         });
     };
 
-    setEnteredRegion = (chrInterval) => {
+    setEnteredRegion = (chrInterval: any) => {
         this.setState({ enteredRegion: chrInterval });
     };
 
-    setHighlightColor = (color) => {
+    setHighlightColor = (color: RGBAColor) => {
         const rgb = color.rgb;
         this.setState({
             highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`,
@@ -226,7 +285,7 @@ class App extends React.PureComponent {
         return grouped;
     };
 
-    updateOtherPublicHubs = (tracks) => {
+    updateOtherPublicHubs = (tracks: any[]) => {
         const { genomeConfig } = this.props;
         const secondaryGenomes = getSecondaryGenomes(genomeConfig.genome.getName(), tracks);
         const secondConfigs = secondaryGenomes.map((g) => getGenomeConfig(g));
@@ -238,7 +297,7 @@ class App extends React.PureComponent {
             .reduce((secondHubList, x) => secondHubList.concat(x.publicHubList), []);
         if (genomeConfig.publicHubList) {
             const publicHubs = genomeConfig.publicHubList.slice();
-            publicHubs.map((x) => (x.genome = genomeConfig.genome.getName()));
+            publicHubs.map((x: { genome: any }) => (x.genome = genomeConfig.genome.getName()));
             secondHubList = publicHubs.concat(secondHubList);
         }
         this.setState({
@@ -276,7 +335,7 @@ class App extends React.PureComponent {
         if (!genomeConfig) {
             return (
                 <div>
-                    <GenomePicker bundleId={bundleId} />
+                    <GenomePickerContainer bundleId={bundleId} />
                     <hr />
                     <Footer />
                     <Notifications />
@@ -360,4 +419,5 @@ class App extends React.PureComponent {
 
 export default withEnhancements(App);
 
+// @ts-ignore
 export const AppWithoutGenome = withAppState(App);

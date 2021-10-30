@@ -606,6 +606,7 @@ class TrackContainer extends React.Component {
                 />
             );
         });
+        console.log(trackElements);
         return trackElements;
     }
 
