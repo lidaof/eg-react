@@ -11,6 +11,7 @@ import DisplayedRegionModel from "./model/DisplayedRegionModel";
 import { AppStateSaver, AppStateLoader } from "./model/AppSaveLoad";
 import TrackModel from "./model/TrackModel";
 import RegionSet from "./model/RegionSet";
+import { HighlightItem } from "../src/components/trackContainers/HighlightMenu";
 import uuid from "uuid";
 import * as firebase from "firebase/app";
 import "firebase/database";
@@ -23,7 +24,6 @@ import DataHubParser from "./model/DataHubParser";
 import OpenInterval from "./model/interval/OpenInterval";
 import { Genome } from "./model/genomes/Genome";
 import Chromosome from "./model/genomes/Chromosome";
-import { HighlightItem } from "../node_modules/@types/react/index";
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
@@ -73,6 +73,8 @@ export interface AppState {
     // g3dtracks?: TrackModel[];
     highlightItems?: HighlightItem[];
 }
+
+
 
 const bundleId = uuid.v1();
 

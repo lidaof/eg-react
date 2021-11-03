@@ -1,17 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
-import connect from "react-redux/lib/connect/connect";
-import ReactModal from "react-modal";
-import Hotkeys from "react-hot-keys";
-import { ActionCreators } from "../../AppState";
+import { connect } from "react-redux";
+import AppState, { ActionCreators } from "../../AppState";
 import { withTrackData } from "./TrackDataManager";
 import { withTrackView } from "./TrackViewManager";
 import TrackHandle from "./TrackHandle";
 import { PannableTrackContainer } from "./PannableTrackContainer";
 import ReorderableTrackContainer from "./ReorderableTrackContainer";
 import { ZoomableTrackContainer } from "./ZoomableTrackContainer";
-import { HighlightableTrackContainer } from "./HighlightableTrackContainer";
 import HighlightNewRegion from "./HighlightNewRegion";
 import MetadataHeader from "./MetadataHeader";
 import { Tools, ToolButtons } from "./Tools";
@@ -35,8 +32,6 @@ import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
 
 import "./HighlightMenu.css";
-import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManager";
-import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 
 /**
  * Gets props to pass to HighlightMenu.js
@@ -44,9 +39,9 @@ import { getTrackConfig } from "components/trackConfig/getTrackConfig";
  * @param {Object} state - redux state
  * @return {Object} props to pass to RegionSetSelector
  */
- function mapStateToProps(state) {
+ function mapStateToProps(state: AppState) {
     return {
-        highlightItems: state.browser.present.highlightItems
+        highlightItems: state.highlightItems
     };
 }
 
@@ -55,6 +50,12 @@ import { getTrackConfig } from "components/trackConfig/getTrackConfig";
  */
 const callbacks = {
     onSetsChanged: ActionCreators.setHighlights
+};
+
+interface HighlightMenuProps {
+    highlightItems: HighlightItem[];
+    menuOpen: boolean;
+
 };
 
 /**
@@ -68,14 +69,9 @@ const callbacks = {
  *          Find out how this works, this is how you store and access data in Redux;
  *          Connect is the most important part;
  */
-class HighlightMenu extends React.Component {
-    static propTypes = {
-        highlightItems: PropTypes.arrayOf(PropTypes.object).isRequired,
-        menuOpen: PropTypes.bool
-    };
-
-    constructor() {
-        super();
+export class HighlightMenu extends React.Component<HighlightMenuProps> {
+    constructor(props: HighlightMenuProps) {
+        super(props);
         this.state = {
 
         };
@@ -83,13 +79,12 @@ class HighlightMenu extends React.Component {
 
     render() {
         const { highlightItems, menuOpen } = this.props;
-        const highlightElements = highlightItems.map(item => {
-            if (item.active && item.inViewRegion) {
+        const highlightElements = highlightItems.map((item) => {
+            if (item.props.active && item.props.inViewRegion) {
                 return (
                     <HighlightItem
-                        color={item.color}
-                        opacity={item.opacity}
-
+                        color={item.props.color}
+                        opacity={item.props.opacity}
                     />
                 );
             }
@@ -109,9 +104,39 @@ class HighlightMenu extends React.Component {
 
 export default connect(mapStateToProps, callbacks)(HighlightMenu);
 
-class HighlightItem extends React.Component {
-    static propTypes = {
-        color: PropTypes.string,
-        opacity: PropTypes.number
+export interface HighlightItemProps {
+    active?: boolean;
+    color?: string;
+    inViewRegion?: boolean;
+    opacity?: number;
+    highlightNumber?: number;
+    handleDelete?: Function;
+    handleViewRegionJump?: Function;
+}
+
+export class HighlightItem extends React.Component<HighlightItemProps> {
+
+    constructor(props: HighlightItemProps) {
+        super(props);
+
+        this.state = {
+            color: null,
+            name: `Highlight ${this.props.highlightNumber}`,
+        }
+    }
+
+    updateName(name: string): void {
+        this.setState({ name: name });
+    }
+
+    render(): JSX.Element {
+        return (
+            <div className="highlight-item-body">
+                {/* name input */}
+                {/* "is in view region" indicator */}
+                {/* left: color picker; right: hide+show, delete buttons */}
+                {/* jump to this view region */}
+            </div>
+        );
     }
 }

@@ -7,11 +7,13 @@ import { ViewExpansion } from '../../model/RegionExpander';
 import OpenInterval from '../../model/interval/OpenInterval';
 import { connect } from 'react-redux';
 import { AppState, ActionCreators } from 'AppState';
+import { StateWithHistory } from 'redux-undo';
 
 interface HighlightableTrackContainerProps {
     trackElements: JSX.Element[]; // Track elements to render
     visData: ViewExpansion; // Track visualization config
     legendWidth: number;
+    highligthItems: any[],
 
     /**
      * Callback for when a region is selected.
@@ -28,9 +30,9 @@ interface HighlightableTrackContainerProps {
  * @param {Object} state - redux state
  * @return {Object} props to pass to RegionSetSelector
  */
- function mapStateToProps(state: AppState) {
+ function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
     return {
-        highlightItems: state.highlightItems
+        highlightItems: state.browser.present.highlightItems
     };
 }
 
@@ -52,13 +54,13 @@ function UnconnectedHighlightableTrackContainer(props: HighlightableTrackContain
     const {trackElements, visData, legendWidth, onNewHighlight} = props;
     const {viewWindowRegion, viewWindow} = visData;
     return (
-    <SelectableGenomeArea
-        selectableRegion={viewWindowRegion}
-        dragLimits={new OpenInterval(legendWidth, legendWidth + viewWindow.getLength())}
-        onRegionSelected={onNewHighlight}
-    >
-        {trackElements}
-    </SelectableGenomeArea>
+        <SelectableGenomeArea
+            selectableRegion={viewWindowRegion}
+            dragLimits={new OpenInterval(legendWidth, legendWidth + viewWindow.getLength())}
+            onRegionSelected={onNewHighlight}
+        >
+            {trackElements}
+        </SelectableGenomeArea>
     );
 }
 

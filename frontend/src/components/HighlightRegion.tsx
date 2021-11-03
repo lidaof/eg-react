@@ -4,8 +4,11 @@ import LinearDrawingModel from '../model/LinearDrawingModel';
 import { withTrackLegendWidth } from './withTrackLegendWidth';
 import { ViewExpansion } from '../model/RegionExpander';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
+import { HighlightItem } from '../components/trackContainers/HighlightMenu';
 
 import './HighlightRegion.css';
+import AppState, { ActionCreators } from 'AppState';
+import { connect } from 'react-redux';
 
 interface HighlightRegionProps {
     y?: number | string; // Relative Y of the top of the selection box; how far from the top of this container
@@ -16,7 +19,28 @@ interface HighlightRegionProps {
     legendWidth: number;
     xOffset: number;
     highlightColor: string;
+    highlightItems: HighlightItem[];
 }
+
+/**
+ * Gets props to pass to HighlightableTrackContainer.
+ * 
+ * @param {Object} state - redux state
+ * @return {Object} props to pass to RegionSetSelector
+ */
+ function mapStateToProps(state: AppState) {
+    return {
+        highlightItems: state.highlightItems
+    };
+}
+
+/**
+ * Callbacks to pass to HighlightMenu
+ */
+const callbacks = {
+    onSetsChanged: ActionCreators.setHighlights
+};
+
 
 /**
  * Creates a box that highlight user's entered region, from gene or region locator
@@ -33,14 +57,11 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         legendWidth: 120,
         xOffset: 0,
         highlightColor: 'rgba(255, 255, 0, 0.3)',
+        highlightItems: [],
     };
 
     constructor(props: HighlightRegionProps | Readonly<HighlightRegionProps>) {
         super(props);
-        
-        this.state = {
-            highlightItems: []
-        }
     }
 
     /**
@@ -93,4 +114,4 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     }
 }
 
-export default withTrackLegendWidth(HighlightRegion);
+export default connect(mapStateToProps, callbacks)(withTrackLegendWidth(HighlightRegion));
