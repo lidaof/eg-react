@@ -5,6 +5,7 @@ import { withTrackLegendWidth } from './withTrackLegendWidth';
 import { ViewExpansion } from '../model/RegionExpander';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import { HighlightItem } from '../components/trackContainers/HighlightMenu';
+import { StateWithHistory } from 'redux-undo';
 
 import './HighlightRegion.css';
 import AppState, { ActionCreators } from 'AppState';
@@ -28,9 +29,9 @@ interface HighlightRegionProps {
  * @param {Object} state - redux state
  * @return {Object} props to pass to RegionSetSelector
  */
- function mapStateToProps(state: AppState) {
+ function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
     return {
-        highlightItems: state.highlightItems
+        highlightItems: state.browser.present.highlightItems
     };
 }
 

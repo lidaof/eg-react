@@ -31,7 +31,14 @@ import TrackRegionController from "../genomeNavigator/TrackRegionController";
 import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
 
+import { StateWithHistory } from 'redux-undo';
+
 import "./HighlightMenu.css";
+
+/**
+ * HighlightMenu and HighlightItem
+ * @author Vincent Xu
+ */
 
 /**
  * Gets props to pass to HighlightMenu.js
@@ -39,9 +46,9 @@ import "./HighlightMenu.css";
  * @param {Object} state - redux state
  * @return {Object} props to pass to RegionSetSelector
  */
- function mapStateToProps(state: AppState) {
+ function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
     return {
-        highlightItems: state.highlightItems
+        highlightItems: state.browser.present.highlightItems
     };
 }
 
@@ -79,7 +86,10 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
 
     render() {
         const { highlightItems, menuOpen } = this.props;
+        console.log(this.props);
         const highlightElements = highlightItems.map((item) => {
+            console.log(item);
+
             if (item.props.active && item.props.inViewRegion) {
                 return (
                     <HighlightItem
@@ -87,6 +97,8 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                         opacity={item.props.opacity}
                     />
                 );
+            } else {
+                return null;
             }
         });
 
@@ -130,10 +142,26 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
     }
 
     render(): JSX.Element {
+        console.log(this.props);
+        const { active, color, inViewRegion, opacity, highlightNumber, handleDelete, handleViewRegionJump } = this.props;
+        const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
+        const isInRegionColor = (inViewRegion ? 'green' : 'red');
         return (
             <div className="highlight-item-body">
                 {/* name input */}
                 {/* "is in view region" indicator */}
+                <span
+                    style={{
+                        cursor: "pointer",
+                        color: `${isInRegionColor}`,
+                        fontSize: "2em",
+                        position: "absolute",
+                        top: "-5px",
+                        right: "15px",
+                        zIndex: 2,
+                }}>
+                    {isInRegionText}
+                </span>
                 {/* left: color picker; right: hide+show, delete buttons */}
                 {/* jump to this view region */}
             </div>
