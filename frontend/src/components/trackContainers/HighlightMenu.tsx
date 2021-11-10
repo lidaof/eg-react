@@ -103,9 +103,11 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         });
 
         if (menuOpen) {
+            let emptyFiller = (highlightItems.length === 0 ? 'No Existing Highlights' : null);
             return (
                 <div className="highlightMenu-body">
                     {highlightElements}
+                    {emptyFiller}
                 </div>
             );
         } else {
@@ -146,9 +148,15 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
         const { active, color, inViewRegion, opacity, highlightNumber, handleDelete, handleViewRegionJump } = this.props;
         const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
+
+        const highlightName = `Highlight ${highlightNumber}`;
+        function updateName(): void {
+            
+        }
         return (
             <div className="highlight-item-body">
                 {/* name input */}
+                <input type="text" placeholder="Highlight Name" value={highlightName} onChange={updateName} />
                 {/* "is in view region" indicator */}
                 <span
                     style={{
