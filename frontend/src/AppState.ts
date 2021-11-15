@@ -11,7 +11,7 @@ import DisplayedRegionModel from "./model/DisplayedRegionModel";
 import { AppStateSaver, AppStateLoader } from "./model/AppSaveLoad";
 import TrackModel from "./model/TrackModel";
 import RegionSet from "./model/RegionSet";
-import { HighlightItem } from "../src/components/trackContainers/HighlightMenu";
+import { HighlightItemProps } from "../src/components/trackContainers/HighlightMenu";
 import uuid from "uuid";
 import * as firebase from "firebase/app";
 import "firebase/database";
@@ -71,7 +71,7 @@ export interface AppState {
     virusBrowserMode?: boolean;
     layout?: object;
     // g3dtracks?: TrackModel[];
-    highlightItems?: HighlightItem[];
+    highlightItems?: HighlightItemProps[];
 }
 
 
@@ -245,7 +245,7 @@ export const ActionCreators = {
      * @param highlights array of HighlightItems that are created in HighlightMenu.js
      * @returns 
      */
-    setHighlights: (highlights: HighlightItem[]) => {
+    setHighlights: (highlights: HighlightItemProps[]) => {
         return { type: ActionType.SET_HIGHLIGHTS, highlights };
     }
 };

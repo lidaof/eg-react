@@ -34,6 +34,7 @@ import { niceBpCount } from "../../util";
 import { StateWithHistory } from 'redux-undo';
 
 import "./HighlightMenu.css";
+import OpenInterval from "model/interval/OpenInterval";
 
 /**
  * HighlightMenu and HighlightItem
@@ -60,7 +61,7 @@ const callbacks = {
 };
 
 interface HighlightMenuProps {
-    highlightItems: HighlightItem[];
+    highlightItems: HighlightItemProps[];
     menuOpen: boolean;
 
 };
@@ -82,19 +83,32 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         this.state = {
 
         };
+
+        this.handleDelete = this.handleDelete.bind(this);
+        this.handleViewRegionJump = this.handleViewRegionJump.bind(this);
+    }
+
+    handleDelete(): void {
+
+    }
+
+    handleViewRegionJump(): void {
+
     }
 
     render() {
         const { highlightItems, menuOpen } = this.props;
         console.log(this.props);
-        const highlightElements = highlightItems.map((item) => {
+        const highlightElements = highlightItems.map((item, counter) => {
             console.log(item);
 
-            if (item.props.active && item.props.inViewRegion) {
+            if (item.active && item.inViewRegion) {
                 return (
                     <HighlightItem
-                        color={item.props.color}
-                        opacity={item.props.opacity}
+                        color={item.color}
+                        highlightNumber={counter}
+                        handleDelete={this.handleDelete}
+                        handleViewRegionJump={this.handleViewRegionJump}
                     />
                 );
             } else {
@@ -122,8 +136,8 @@ export interface HighlightItemProps {
     active?: boolean;
     color?: string;
     inViewRegion?: boolean;
-    opacity?: number;
     highlightNumber?: number;
+    viewRegion?: OpenInterval;
     handleDelete?: Function;
     handleViewRegionJump?: Function;
 }
@@ -134,29 +148,49 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
         super(props);
 
         this.state = {
-            color: null,
             name: `Highlight ${this.props.highlightNumber}`,
+            active: true,
         }
+
+        this.updateName = this.updateName.bind(this);
+        this.showItem = this.showItem.bind(this);
+        this.hideItem = this.hideItem.bind(this);
     }
 
-    updateName(name: string): void {
-        this.setState({ name: name });
+    /**
+     * Updates name of highlightItem, stores value in state of HighlightItem
+     * @param evt value of name input
+     */
+    updateName(evt: any): void {
+        console.log(evt);
+        this.setState({ name: evt });
+    }
+
+    /**
+     * Makes highlight visible
+     */
+    showItem(): void {
+        this.setState({ active: true });
+    }
+
+    /**
+     * Makes highlight invisible
+     */
+    hideItem(): void {
+        this.setState({ active: false });
     }
 
     render(): JSX.Element {
         console.log(this.props);
-        const { active, color, inViewRegion, opacity, highlightNumber, handleDelete, handleViewRegionJump } = this.props;
+        const { active, color, inViewRegion, highlightNumber, handleDelete, handleViewRegionJump } = this.props;
         const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
 
         const highlightName = `Highlight ${highlightNumber}`;
-        function updateName(): void {
-            
-        }
         return (
             <div className="highlight-item-body">
                 {/* name input */}
-                <input type="text" placeholder="Highlight Name" value={highlightName} onChange={updateName} />
+                <input type="text" placeholder="Highlight Name" value={highlightName} onChange={this.updateName} />
                 {/* "is in view region" indicator */}
                 <span
                     style={{

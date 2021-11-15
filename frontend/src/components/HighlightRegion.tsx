@@ -4,7 +4,7 @@ import LinearDrawingModel from '../model/LinearDrawingModel';
 import { withTrackLegendWidth } from './withTrackLegendWidth';
 import { ViewExpansion } from '../model/RegionExpander';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
-import { HighlightItem } from '../components/trackContainers/HighlightMenu';
+import { HighlightItem, HighlightItemProps } from '../components/trackContainers/HighlightMenu';
 import { StateWithHistory } from 'redux-undo';
 
 import './HighlightRegion.css';
@@ -20,7 +20,7 @@ interface HighlightRegionProps {
     legendWidth: number;
     xOffset: number;
     highlightColor: string;
-    highlightItems: HighlightItem[];
+    highlightItems: HighlightItemProps[];
 }
 
 /**
@@ -93,7 +93,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @inheritdoc
      */
     render(): JSX.Element {
-        const {height, y, children, enteredRegion, highlightEnteredRegion, xOffset, highlightColor } = this.props;
+        const {height, y, children, enteredRegion, highlightEnteredRegion, xOffset, highlightColor, highlightItems } = this.props;
         const highlight = enteredRegion ? this.getHiglightedXs(enteredRegion) : null;
         const style = highlight ? {
             left: highlight.start + xOffset + "px",
@@ -104,6 +104,14 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         } : null;
         const className = highlightEnteredRegion ? "HighlightRegion-box" : "HighlightRegion-none";
         const theBox = <div className={className} style={style} />;
+
+        // pushes new HighlightItem to Redux
+        const newHighlightItem: HighlightItemProps = {
+            color: highlightColor,
+            inViewRegion: highlightEnteredRegion,
+            viewRegion: highlight,
+        }
+        highlightItems.push(newHighlightItem);
         return (
         <div
             style={{position: "relative", overflow: "hidden"}}
