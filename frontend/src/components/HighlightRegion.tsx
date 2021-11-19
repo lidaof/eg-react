@@ -105,6 +105,8 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         const className = highlightEnteredRegion ? "HighlightRegion-box" : "HighlightRegion-none";
         const theBox = <div className={className} style={style} />;
 
+        console.log(highlightItems);
+
         // pushes new HighlightItem to Redux
         const newHighlightItem: HighlightItemProps = {
             color: highlightColor,
@@ -112,6 +114,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
             viewRegion: highlight,
         }
         highlightItems.push(newHighlightItem);
+        console.log(highlightItems);
         return (
         <div
             style={{position: "relative", overflow: "hidden"}}

@@ -88,8 +88,10 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         this.handleViewRegionJump = this.handleViewRegionJump.bind(this);
     }
 
-    handleDelete(): void {
-
+    handleDelete(highlightNumber: number): void {
+        const { highlightItems } = this.props;
+        // const sourceItem = highlightItems.find(item => item.highlightNumber === highlightNumber);
+        highlightItems.splice(highlightNumber, 1);
     }
 
     handleViewRegionJump(): void {
@@ -106,7 +108,9 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                 return (
                     <HighlightItem
                         color={item.color}
+                        inViewRegion={item.inViewRegion}
                         highlightNumber={counter}
+                        viewRegion={item.viewRegion}
                         handleDelete={this.handleDelete}
                         handleViewRegionJump={this.handleViewRegionJump}
                     />
@@ -143,6 +147,8 @@ export interface HighlightItemProps {
 }
 
 export class HighlightItem extends React.Component<HighlightItemProps> {
+
+
 
     constructor(props: HighlightItemProps) {
         super(props);
@@ -205,6 +211,9 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
                     {isInRegionText}
                 </span>
                 {/* left: color picker; right: hide+show, delete buttons */}
+                <div className="highlightitem-buttons-group">
+                    <button id="highlightitem-delete" onClick={() => { handleDelete(highlightNumber) }}>Delete</button>
+                </div>
                 {/* jump to this view region */}
             </div>
         );
