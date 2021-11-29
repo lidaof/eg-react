@@ -108,13 +108,16 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         console.log(highlightItems);
 
         // pushes new HighlightItem to Redux
-        const newHighlightItem: HighlightItemProps = {
-            color: highlightColor,
-            inViewRegion: highlightEnteredRegion,
-            viewRegion: highlight,
+        if (highlight) {
+            const newHighlightItem: HighlightItemProps = {
+                color: highlightColor,
+                inViewRegion: highlightEnteredRegion,
+                viewRegion: highlight,
+            }
+            highlightItems.push(newHighlightItem);
+            console.log(highlightItems);
         }
-        highlightItems.push(newHighlightItem);
-        console.log(highlightItems);
+
         return (
         <div
             style={{position: "relative", overflow: "hidden"}}

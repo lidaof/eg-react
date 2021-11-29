@@ -35,6 +35,7 @@ import { StateWithHistory } from 'redux-undo';
 
 import "./HighlightMenu.css";
 import OpenInterval from "model/interval/OpenInterval";
+import ColorPicker from "components/ColorPicker";
 
 /**
  * HighlightMenu and HighlightItem
@@ -104,7 +105,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         const highlightElements = highlightItems.map((item, counter) => {
             console.log(item);
 
-            if (item.active && item.inViewRegion) {
+            if (item.inViewRegion) {
                 return (
                     <HighlightItem
                         color={item.color}
@@ -123,7 +124,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         if (menuOpen) {
             let emptyFiller = (highlightItems.length === 0 ? 'No Existing Highlights' : null);
             return (
-                <div className="highlightMenu-body">
+                <div className="highlight-menu-body">
                     {highlightElements}
                     {emptyFiller}
                 </div>
@@ -159,6 +160,7 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
         }
 
         this.updateName = this.updateName.bind(this);
+        this.updateColor = this.updateColor.bind(this);
         this.showItem = this.showItem.bind(this);
         this.hideItem = this.hideItem.bind(this);
     }
@@ -170,6 +172,14 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
     updateName(evt: any): void {
         console.log(evt);
         this.setState({ name: evt });
+    }
+
+    /**
+     * updates the color of the highlight
+     * @param evt new color input
+     */
+    updateColor(evt: any): void {
+
     }
 
     /**
@@ -192,27 +202,29 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
         const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
 
-        const highlightName = `Highlight ${highlightNumber}`;
+        var highlightName = `Highlight ${highlightNumber}`;
         return (
             <div className="highlight-item-body">
                 {/* name input */}
-                <input type="text" placeholder="Highlight Name" value={highlightName} onChange={this.updateName} />
+                <input type="text" className="highlight-item-name" value={highlightName} onChange={this.updateName} />
                 {/* "is in view region" indicator */}
                 <span
                     style={{
                         cursor: "pointer",
                         color: `${isInRegionColor}`,
-                        fontSize: "2em",
-                        position: "absolute",
-                        top: "-5px",
-                        right: "15px",
-                        zIndex: 2,
+                        fontSize: "1em",
+                        position: "relative",
+                        zIndex: "inherit",
                 }}>
                     {isInRegionText}
                 </span>
                 {/* left: color picker; right: hide+show, delete buttons */}
-                <div className="highlightitem-buttons-group">
-                    <button id="highlightitem-delete" onClick={() => { handleDelete(highlightNumber) }}>Delete</button>
+                <div className="highlight-item-buttons-group">
+                    <button className="highlight-item-delete" onClick={() => { handleDelete(highlightNumber) }}>Delete</button>
+                    <ColorPicker
+                        color={color}
+                        onChange={this.updateColor}
+                    />
                 </div>
                 {/* jump to this view region */}
             </div>

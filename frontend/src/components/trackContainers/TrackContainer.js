@@ -557,7 +557,7 @@ class TrackContainer extends React.Component {
                     <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <History />
                     </div>
-                    <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
+                    <div className="tool-element" style={{ display: "flex", height: "10vh"}}>
                         <HighlightMenu
                             menuOpen={this.state.selectedTool === Tools.HIGHLIGHT}
                         />

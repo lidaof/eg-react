@@ -1,7 +1,41 @@
 /* style sheet for HighlightMenu and HighlightItem classes */
 
-.highlightMenu-body {
-    height: 500%;
-    width: 20%;
-    padding: 5px;
+.highlight-menu-body {
+    height: 100%;
+    display: block;
+    position: inherit;
+    overflow: auto;
+}
+
+.highlight-item-body {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    display: block;
+    z-index: inherit;
+    background-color: lightgray;
+}
+
+.highlight-item-name {
+    width: 100%;
+    position: relative;
+    display: block;
+    font-size: 1em;
+}
+
+.highlight-item-buttons-group {
+    height: 50%;
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.highlight-item-delete {
+    height: 50%;
+    width: 50%;
+    position: relative;
+    top: 0%;
+    left: 0%;
+    display: block;
 }
