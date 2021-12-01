@@ -114,8 +114,26 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 inViewRegion: highlightEnteredRegion,
                 viewRegion: highlight,
             }
-            highlightItems.push(newHighlightItem);
-            console.log(highlightItems);
+            if (highlightItems.length !== 0) {
+                var noMatches = true;
+                for (var i = 0; i < highlightItems.length; i++) {
+                    console.log(newHighlightItem, highlightItems[i]);
+                    if (newHighlightItem.color === highlightItems[i].color &&
+                        newHighlightItem.viewRegion.start === highlightItems[i].viewRegion.start &&
+                        newHighlightItem.viewRegion.end === highlightItems[i].viewRegion.end) {
+                            noMatches = false;
+                            break;
+                        }
+                };
+                if (noMatches) {
+                        highlightItems.push(newHighlightItem);
+                        console.log('pushing new highlightItem', highlightItems);
+                }
+            } else {
+                highlightItems.push(newHighlightItem);
+                console.log('pushing new highlightItem', highlightItems);
+            }
+
         }
 
         return (

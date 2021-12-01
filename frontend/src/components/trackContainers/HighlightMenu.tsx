@@ -198,8 +198,8 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
 
     render(): JSX.Element {
         console.log(this.props);
-        const { active, color, inViewRegion, highlightNumber, handleDelete, handleViewRegionJump } = this.props;
-        const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
+        const { active, color, inViewRegion, highlightNumber, viewRegion, handleDelete, handleViewRegionJump } = this.props;
+        // const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
 
         var highlightName = `Highlight ${highlightNumber}`;
@@ -216,7 +216,7 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
                         position: "relative",
                         zIndex: "inherit",
                 }}>
-                    {isInRegionText}
+                    {`${viewRegion.start}-${viewRegion.end}`}
                 </span>
                 {/* left: color picker; right: hide+show, delete buttons */}
                 <div className="highlight-item-buttons-group">
