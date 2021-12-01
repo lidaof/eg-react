@@ -15,6 +15,7 @@
         "storybook": "start-storybook -p 9009 -s public",
         "test": "react-app-rewired test --env=jsdom",
         "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
+        "postdeploy": "aws cloudfront create-invalidation --distribution-id E3E258KR33918Y --paths \"/*\"",
         "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules"
     },
     "peerDependencies": {
@@ -123,7 +124,7 @@
         "react-color": "^2.19.3",
         "react-compound-slider": "^0.20.1",
         "react-copy-to-clipboard": "^5.0.2",
-        "react-detect-offline": "^2.4.0",
+        "react-detect-offline": "^2.4.5",
         "react-dom": "^16.13.1",
         "react-hammerjs": "^1.0.1",
         "react-hot-keys": "^1.2.2",

@@ -313,6 +313,19 @@ const TbruceiLister427 = [
     },
 ];
 
+const xenTro10 = [
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const genomeConfig = {
     hg19,
     mm10,
@@ -343,6 +356,7 @@ const genomeConfig = {
     hpv16,
     TbruceiTREU927,
     TbruceiLister427,
+    xenTro10,
 };
 
 module.exports = genomeConfig;

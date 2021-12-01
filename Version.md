@@ -5,6 +5,8 @@
 -   removed unnecessary re-render of numerical track
 -   adding push notification
 -   allow HiC track bin size and normalization options linked to the hic file itself
+-   add an option `italicizeText` to allow _italic_ text/label on gene tracks
+-   new genome `xenTro10` added
 
 ## 53.4.1
 

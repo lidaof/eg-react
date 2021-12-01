@@ -11,6 +11,7 @@ separate aggregate function out
 export class NumericalAggregator {
     constructor() {
         this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
+        this.xToValueMaker = memoizeOne(this.xToValueMaker);
     }
 
     aggregateFeatures(data, viewRegion, width, aggregatorId) {
@@ -26,7 +27,7 @@ export class NumericalAggregator {
             xToValue,
             xToValue2,
             hasReverse = false;
-        if(data){
+        if (data) {
             const dataForward = data.filter((feature) => feature.value === undefined || feature.value >= 0); // bed track to density mode
             const dataReverse = data.filter((feature) => feature.value < 0);
             if (dataReverse.length) {
@@ -41,7 +42,7 @@ export class NumericalAggregator {
                 hasReverse = true;
             }
             const xToValueBeforeSmooth =
-            dataForward.length > 0 ? this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod) : [];
+                dataForward.length > 0 ? this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod) : [];
             xToValue = smoothNumber === 0 ? xToValueBeforeSmooth : Smooth(xToValueBeforeSmooth, smoothNumber);
         }
         return [xToValue, xToValue2, hasReverse];

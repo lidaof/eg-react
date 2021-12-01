@@ -43,6 +43,7 @@ import TbruceiTREU927 from "./trypanosome/TbruceiTREU927";
 import TbruceiLister427 from "./trypanosome/TbruceiLister427";
 import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
 import CHM13v1_1 from "./t2t-chm13-v1.1/chm13";
+import xenTro10 from "./xenTro10/xenTro10";
 
 /**
  * All available genomes.
@@ -94,6 +95,7 @@ export const allGenomes = [
     TbruceiTREU927,
     TbruceiLister427,
     CHM13v1_1,
+    xenTro10,
 ];
 
 const genomeNameToConfig = {};
@@ -182,6 +184,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chicken.png",
         assemblies: [GalGal6.genome.getName(), GalGal5.genome.getName()],
         color: "yellow",
+    },
+    frog: {
+        logoUrl: "https://vizhub.wustl.edu/public/xenTro10/frog.png",
+        assemblies: [xenTro10.genome.getName()],
+        color: "white",
     },
     zebrafish: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",

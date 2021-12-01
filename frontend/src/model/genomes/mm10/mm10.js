@@ -94,8 +94,7 @@ const publicHubData = {
         "cells and circumstances in which a gene is active.",
     "Toxicant Exposures and Responses by Genomic and Epigenomic Regulators of Transcription (TaRGET)":
         "The TaRGET(Toxicant Exposures and Responses by Genomic and Epigenomic Regulators of Transcription) program is a research consortium funded by the National Institute of Environmental Health Sciences (NIEHS). The goal of the collaboration is to address the role of environmental exposures in disease pathogenesis as a function of epigenome perturbation, including understanding the environmental control of epigenetic mechanisms and assessing the utility of surrogate tissue analysis in mouse models of disease-relevant environmental exposures.",
-    "3D structures":
-        "3D stucure data collected from: Tan L, Xing D, Chang CH, Li H et al. Three-dimensional genome structures of single diploid human cells. Science 2018 Aug 31;361(6405):924-928. The 3dg data were used and converted to g3d format using g3dtools.",
+    "3D structures": "3D stucure data collection",
 };
 
 const publicHubList = [
@@ -121,13 +120,6 @@ const publicHubList = [
         },
     },
     {
-        collection: "3D structures",
-        name: "3D structures from Science 2018 Aug 31;361(6405):924-928",
-        numTracks: 10,
-        oldHubFormat: false,
-        url: "https://vizhub.wustl.edu/public/g3d/mm10/hub",
-    },
-    {
         collection: "Toxicant Exposures and Responses by Genomic and Epigenomic Regulators of Transcription (TaRGET)",
         name: "Mouse TaRGET",
         numTracks: 965,
@@ -137,6 +129,27 @@ const publicHubList = [
             "hub built by": "Wanqing Shao (wanqingshao@wustl.edu)",
             "hub built date": "Jan 30 2019",
         },
+    },
+    {
+        collection: "3D structures",
+        name: "3D structures from Science 2018 Aug 31;361(6405):924-928",
+        numTracks: 10,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/g3d/mm10/hub",
+    },
+    {
+        collection: "3D structures",
+        name: "3D structures from Nat Struct Mol Biol 2019 Apr;26(4):297-307",
+        numTracks: 1227,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/g3d/mm10/GSE121791/hub",
+    },
+    {
+        collection: "3D structures",
+        name: "3D structures from Cell 2021 Feb 4;184(3):741-758.e17",
+        numTracks: 9770,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/g3d/mm10/GSE162511/hub",
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",

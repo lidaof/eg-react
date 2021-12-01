@@ -29,14 +29,14 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
 }
 
 .Nav-genome {
-    opacity: 0.3;
+    opacity: 0.6;
     text-align: center;
     cursor: pointer;
     width: 180px;
 }
 
 .Nav-genome:hover {
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .Nav-center {

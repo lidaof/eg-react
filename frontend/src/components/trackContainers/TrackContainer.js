@@ -131,7 +131,7 @@ class TrackContainer extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.tracks !== this.props.tracks || prevProps.primaryView !== this.props.primaryView) {
+        if (this.props.tracks !== prevProps.tracks || prevProps.primaryView !== this.props.primaryView) {
             this.getGroupScale();
         }
     }
@@ -545,7 +545,7 @@ class TrackContainer extends React.Component {
     getGroupScale = () => {
         const { tracks, trackData, primaryView } = this.props;
         const groupScale = this.groupManager.getGroupScale(
-            tracks,
+            tracks.map((tk) => tk.options.hasOwnProperty("group") && tk.options.group),
             trackData,
             primaryView.visWidth,
             primaryView.viewWindow

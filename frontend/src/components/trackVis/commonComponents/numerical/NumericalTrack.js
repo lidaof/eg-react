@@ -227,6 +227,7 @@ class NumericalTrack extends React.PureComponent {
     }
 
     render() {
+        // console.log("render");
         const { data, viewRegion, width, trackModel, unit, options, forceSvg } = this.props;
         const { height, color, color2, colorAboveMax, color2BelowMin } = options;
         const xvalues = this.aggregator.xToValueMaker(data, viewRegion, width, options);

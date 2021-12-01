@@ -2273,11 +2273,11 @@ class ThreedmolContainer extends React.Component {
 
     setUseLegendMax = (e) => {
         // console.log(e.target.value, Number.parseFloat(e.target.value));
-        this.setState({ useLegengMax: Number.parseFloat(e.target.value) });
+        this.setState({ useLegengMax: Number.parseFloat(e.target.value) || 0 });
     };
 
     setUseLegendMin = (e) => {
-        this.setState({ useLegengMin: Number.parseFloat(e.target.value) });
+        this.setState({ useLegengMin: Number.parseFloat(e.target.value) || 0 });
     };
 
     handleAutoLegendScaleChange = () => {
