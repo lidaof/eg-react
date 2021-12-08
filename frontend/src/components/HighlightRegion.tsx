@@ -90,37 +90,28 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     }
 
     /**
-     * @inheritdoc
+     * Input pathway: original HighlightRegion.tsx functionality, code cut/copied from render();
+     * @returns new HighlightItem data object
      */
-    render(): JSX.Element {
-        const {height, y, children, enteredRegion, highlightEnteredRegion, xOffset, highlightColor, highlightItems } = this.props;
+    createNewHighlightItem(): void {
+        const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems } = this.props;
         const highlight = enteredRegion ? this.getHiglightedXs(enteredRegion) : null;
-        const style = highlight ? {
-            left: highlight.start + xOffset + "px",
-            top: y,
-            width: highlight.getLength() + "px",
-            height,
-            backgroundColor: highlightColor,
-        } : null;
-        const className = highlightEnteredRegion ? "HighlightRegion-box" : "HighlightRegion-none";
-        const theBox = <div className={className} style={style} />;
-
-        console.log(highlightItems);
 
         // pushes new HighlightItem to Redux
         if (highlight) {
             const newHighlightItem: HighlightItemProps = {
                 color: highlightColor,
                 inViewRegion: highlightEnteredRegion,
-                viewRegion: highlight,
+                highlightInterval: highlight,
+                viewRegion: new ChromosomeInterval(enteredRegion.chr, enteredRegion.start, enteredRegion.end),
             }
             if (highlightItems.length !== 0) {
                 var noMatches = true;
                 for (var i = 0; i < highlightItems.length; i++) {
                     console.log(newHighlightItem, highlightItems[i]);
                     if (newHighlightItem.color === highlightItems[i].color &&
-                        newHighlightItem.viewRegion.start === highlightItems[i].viewRegion.start &&
-                        newHighlightItem.viewRegion.end === highlightItems[i].viewRegion.end) {
+                        newHighlightItem.highlightInterval.start === highlightItems[i].highlightInterval.start &&
+                        newHighlightItem.highlightInterval.end === highlightItems[i].highlightInterval.end) {
                             noMatches = false;
                             break;
                         }
@@ -133,16 +124,44 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 highlightItems.push(newHighlightItem);
                 console.log('pushing new highlightItem', highlightItems);
             }
-
         }
+    }
+
+    /**
+     * checks every HighlightItem in the highlightItems prop and renders those in the view region;
+     * @returns container that has highlight elements in it
+     * @inheritdoc
+     */
+    render(): JSX.Element {
+        const { height, y, children, enteredRegion, highlightEnteredRegion, xOffset, highlightColor, highlightItems } = this.props;
+
+        console.log(highlightItems);
+
+        const theBoxes = highlightItems.map((item) => {
+            if (true /** logic to check within view region */) {
+                const style = item.highlightInterval ? {
+                    left: item.highlightInterval.start + xOffset + "px",
+                    top: y,
+                    width: item.highlightInterval.getLength() + "px",
+                    height,
+                    backgroundColor: highlightColor,
+                } : null;
+                const className = highlightEnteredRegion ? "HighlightRegion-box" : "HighlightRegion-none";
+                return (
+                    <div className={className} style={style} />
+                );
+            } else {
+                return null;
+            }
+        });
 
         return (
-        <div
-            style={{position: "relative", overflow: "hidden"}}
-        >
-            {theBox}
-            {children}
-        </div>
+            <div
+                style={{position: "relative", overflow: "hidden"}}
+            >
+                {theBoxes}
+                {children}
+            </div>
         );
     }
 }

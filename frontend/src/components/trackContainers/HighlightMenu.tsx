@@ -36,6 +36,7 @@ import { StateWithHistory } from 'redux-undo';
 import "./HighlightMenu.css";
 import OpenInterval from "model/interval/OpenInterval";
 import ColorPicker from "components/ColorPicker";
+import ChromosomeInterval from "model/interval/ChromosomeInterval";
 
 /**
  * HighlightMenu and HighlightItem
@@ -140,9 +141,10 @@ export default connect(mapStateToProps, callbacks)(HighlightMenu);
 export interface HighlightItemProps {
     active?: boolean;
     color?: string;
-    inViewRegion?: boolean;
     highlightNumber?: number;
-    viewRegion?: OpenInterval;
+    highlightInterval?: OpenInterval;
+    inViewRegion?: boolean;
+    viewRegion?: ChromosomeInterval;
     handleDelete?: Function;
     handleViewRegionJump?: Function;
 }
@@ -198,11 +200,11 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
 
     render(): JSX.Element {
         console.log(this.props);
-        const { active, color, inViewRegion, highlightNumber, viewRegion, handleDelete, handleViewRegionJump } = this.props;
+        const { active, color, inViewRegion, highlightNumber, viewRegion, highlightInterval, handleDelete, handleViewRegionJump } = this.props;
         // const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
 
-        var highlightName = `Highlight ${highlightNumber}`;
+        let highlightName = `Highlight ${highlightNumber}`;
         return (
             <div className="highlight-item-body">
                 {/* name input */}
@@ -216,15 +218,15 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
                         position: "relative",
                         zIndex: "inherit",
                 }}>
-                    {`${viewRegion.start}-${viewRegion.end}`}
+                    {`${highlightInterval.start}-${highlightInterval.end}`}
                 </span>
                 {/* left: color picker; right: hide+show, delete buttons */}
                 <div className="highlight-item-buttons-group">
-                    <button className="highlight-item-delete" onClick={() => { handleDelete(highlightNumber) }}>Delete</button>
                     <ColorPicker
                         color={color}
                         onChange={this.updateColor}
                     />
+                    <button className="highlight-item-delete" onClick={() => { handleDelete(highlightNumber) }}>Delete</button>
                 </div>
                 {/* jump to this view region */}
             </div>
