@@ -757,7 +757,6 @@ class TrackContainer extends React.Component {
             paddingBottom: "3px",
             cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR,
         };
-        // console.log(enteredRegion, highlightColor, highlightEnteredRegion, primaryView, this.state.xOffset);
         return (
             <React.Fragment>
                 <OutsideClickDetector onOutsideClick={this.deselectAllTracks}>
