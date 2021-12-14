@@ -9,7 +9,6 @@ import TrackHandle from "./TrackHandle";
 import { PannableTrackContainer } from "./PannableTrackContainer";
 import ReorderableTrackContainer from "./ReorderableTrackContainer";
 import { ZoomableTrackContainer } from "./ZoomableTrackContainer";
-import HighlightNewRegion from "./HighlightNewRegion";
 import MetadataHeader from "./MetadataHeader";
 import { Tools, ToolButtons } from "./Tools";
 import ZoomButtons from "./ZoomButtons";

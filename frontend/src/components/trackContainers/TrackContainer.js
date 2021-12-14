@@ -12,7 +12,6 @@ import { PannableTrackContainer } from "./PannableTrackContainer";
 import ReorderableTrackContainer from "./ReorderableTrackContainer";
 import { ZoomableTrackContainer } from "./ZoomableTrackContainer";
 import HighlightableTrackContainer from "./HighlightableTrackContainer";
-import HighlightNewRegion from "./HighlightNewRegion";
 import MetadataHeader from "./MetadataHeader";
 import { Tools, ToolButtons } from "./Tools";
 import ZoomButtons from "./ZoomButtons";
@@ -93,6 +92,7 @@ class TrackContainer extends React.Component {
          */
         onMetadataTermsChanged: PropTypes.func,
         suggestedMetaSets: PropTypes.instanceOf(Set),
+        setNewEnteredRegion: PropTypes.func,
     };
 
     static defaultProps = {
@@ -132,11 +132,7 @@ class TrackContainer extends React.Component {
         this.panLeftOrRight = this.panLeftOrRight.bind(this);
         this.zoomOut = this.zoomOut.bind(this);
         this.groupManager = new GroupedTrackManager();
-
-        // this.onClick = (evt) => {
-        //     console.log(evt);
-        //     this.initializeHighlight(evt);
-        // }
+        this.handleNewHighlight = this.handleNewHighlight.bind(this);
     }
 
     componentDidUpdate(prevProps) {
@@ -179,6 +175,16 @@ class TrackContainer extends React.Component {
             }, 1000);
         });
         // onNewRegion(...newRegion.getContextCoordinates());
+    }
+
+    /**
+     * updates primaryView and enteredRegion from HighlightableTrackContainer.tsx
+     * these updates trigger rerender in HighlightRegion.tsx
+     */
+    handleNewHighlight(newPrimaryView, newEnteredRegion) {
+        let { primaryView, enteredRegion } = this.props;
+        primaryView = newPrimaryView;
+        enteredRegion = newEnteredRegion;
     }
 
     onKeyDown(keyName, e, handle) {
@@ -652,7 +658,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element} - subcontainer that renders tracks
      */
     renderSubContainer() {
-        const { tracks, primaryView, onNewRegion, onTracksChanged } = this.props;
+        const { tracks, primaryView, viewRegion, onNewRegion, onTracksChanged, setNewEnteredRegion } = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
@@ -686,7 +692,8 @@ class TrackContainer extends React.Component {
                     <HighlightableTrackContainer
                         trackElements={trackElements}
                         visData={primaryView}
-                        onNewHighlight={HighlightNewRegion}
+                        viewRegion={}
+                        onNewHighlight={setNewEnteredRegion}
                     />
                 )
             default:

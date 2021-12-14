@@ -14,10 +14,10 @@ import { connect } from 'react-redux';
 interface HighlightRegionProps {
     y?: number | string; // Relative Y of the top of the selection box; how far from the top of this container
     height?: number | string; // Height of the selection box
-    enteredRegion: ChromosomeInterval;
+    enteredRegion: ChromosomeInterval; // region that is highlighted in chromosome coordinates;
     highlightEnteredRegion: boolean;
-    visData: ViewExpansion;
-    legendWidth: number;
+    visData: ViewExpansion; // contains data on chromosome start/stop, and window start/stop;
+    legendWidth: number; // used in calculation for highlight;
     xOffset: number;
     highlightColor: string;
     highlightItems: HighlightItemProps[];
@@ -94,7 +94,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @returns new HighlightItem data object
      */
     createNewHighlightItem(): void {
-        const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems } = this.props;
+        const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems, visData } = this.props;
         const highlight = enteredRegion ? this.getHiglightedXs(enteredRegion) : null;
 
         // pushes new HighlightItem to Redux

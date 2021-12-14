@@ -9,10 +9,13 @@ import OpenInterval from '../../model/interval/OpenInterval';
 import { connect } from 'react-redux';
 import { AppState, ActionCreators } from 'AppState';
 import { StateWithHistory } from 'redux-undo';
+import ChromosomeInterval from 'model/interval/ChromosomeInterval';
+import DisplayedRegionModel from 'model/DisplayedRegionModel';
 
 interface HighlightableTrackContainerProps {
     trackElements: JSX.Element[]; // Track elements to render
     visData: ViewExpansion; // Track visualization config
+    viewRegion: DisplayedRegionModel;
     legendWidth: number;
     highligthItems: HighlightItemProps[],
 
@@ -52,7 +55,7 @@ const callbacks = {
  * @author Silas Hsu
  */
 function UnconnectedHighlightableTrackContainer(props: HighlightableTrackContainerProps): JSX.Element {
-    const {trackElements, visData, legendWidth, onNewHighlight} = props;
+    const {trackElements, visData, legendWidth, viewRegion, onNewHighlight} = props;
     const {viewWindowRegion, viewWindow} = visData;
     return (
         <SelectableGenomeArea

@@ -19,6 +19,7 @@ import { HELP_LINKS, getSecondaryGenomes } from "./util";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
 
 import "./App.css";
+import ChromosomeInterval from "model/interval/ChromosomeInterval";
 
 const REGION_EXPANDER = new RegionExpander(1);
 
@@ -77,6 +78,8 @@ class App extends React.PureComponent {
         this.addTracktoAvailable = this.addTracktoAvailable.bind(this);
         this.removeTrackFromAvailable = this.removeTrackFromAvailable.bind(this);
         this.addTermToMetaSets = this.addTermToMetaSets.bind(this);
+        this.setEnteredRegion = this.setEnteredRegion.bind(this);
+        this.convertEnteredRegionToChromosomeInterval = this.convertEnteredRegionToChromosomeInterval.bind(this);
     }
 
     componentDidMount() {
@@ -203,6 +206,21 @@ class App extends React.PureComponent {
     setEnteredRegion = (chrInterval) => {
         this.setState({ enteredRegion: chrInterval });
     };
+
+    /**
+     * Converts OpenInterval start/stop into ChromosomeInterval based on _navContext
+     * @param {number} start absolute start of enteredRegion
+     * @param {number} stop absolute end of enteredRegion
+     * 
+     * FIXME
+     */
+    convertEnteredRegionToChromosomeInterval = (start, end) => {
+        viewRegion
+        const chr = `${7}`;
+        const chrStart = 0;
+        const chrEnd = 1;
+        this.setEnteredRegion(new ChromosomeInterval(chr, chrStart, chrEnd));
+    }
 
     setHighlightColor = (color) => {
         const rgb = color.rgb;
@@ -351,6 +369,7 @@ class App extends React.PureComponent {
                     viewer3dNumFrames={viewer3dNumFrames}
                     isThereG3dTrack={isThereG3dTrack}
                     onSetImageInfo={onSetImageInfo}
+                    setNewEnteredRegion={this.convertEnteredRegionToChromosomeInterval}
                 />
                 {!embeddingMode && <Footer />}
             </div>
