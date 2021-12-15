@@ -105,6 +105,11 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         const highlightElements = highlightItems.map((item, counter) => {
             console.log(item);
 
+            function updateName(newName: string) {
+                console.log(newName);
+                item.highlightName = newName;
+            }
+
             if (item.inViewRegion) {
                 return (
                     <HighlightItem
@@ -112,6 +117,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                         inViewRegion={item.inViewRegion}
                         highlightNumber={counter}
                         viewRegion={item.viewRegion}
+                        handleNewName={updateName}
                         handleDelete={this.handleDelete}
                         handleViewRegionJump={this.handleViewRegionJump}
                     />
@@ -145,13 +151,12 @@ export interface IHighlightItem {
     highlightInterval?: OpenInterval;
     inViewRegion?: boolean;
     viewRegion?: ChromosomeInterval;
+    handleNewName?: Function;
     handleDelete?: Function;
     handleViewRegionJump?: Function;
 }
 
 export class HighlightItem extends React.Component<IHighlightItem, any> {
-
-
 
     constructor(props: IHighlightItem) {
         super(props);
@@ -161,7 +166,7 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
             active: true,
         }
 
-        this.updateName = this.updateName.bind(this);
+        // this.updateName = this.updateName.bind(this);
         this.updateColor = this.updateColor.bind(this);
         this.showItem = this.showItem.bind(this);
         this.hideItem = this.hideItem.bind(this);
@@ -171,10 +176,10 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
      * Updates name of highlightItem, stores value in state of HighlightItem
      * @param evt value of name input
      */
-    updateName(evt: any): void {
-        console.log(evt);
-        this.setState({ name: evt });
-    }
+    // updateName(evt: any): void {
+    //     console.log(evt);
+    //     this.setState({ name: evt });
+    // }
 
     /**
      * updates the color of the highlight
@@ -200,14 +205,15 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
 
     render(): JSX.Element {
         console.log(this.props);
-        const { active, color, inViewRegion, viewRegion, handleDelete, handleViewRegionJump } = this.props;
+        const { active, color, inViewRegion, viewRegion, handleNewName, handleDelete, handleViewRegionJump } = this.props;
         // const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
 
+        let name: string;
         return (
             <div className="highlight-item-body">
                 {/* name input */}
-                <input type="text" className="highlight-item-name" value={this.state.name} onChange={this.updateName} />
+                <input type="text" className="highlight-item-name" value={name} onChange={() => { handleNewName(name) }} />
                 {/* "is in view region" indicator */}
                 <span
                     style={{
