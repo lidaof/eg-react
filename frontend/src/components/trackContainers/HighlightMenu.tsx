@@ -62,7 +62,7 @@ const callbacks = {
 };
 
 interface HighlightMenuProps {
-    highlightItems: HighlightItemProps[];
+    highlightItems: IHighlightItem[];
     menuOpen: boolean;
 
 };
@@ -137,7 +137,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
 
 export default connect(mapStateToProps, callbacks)(HighlightMenu);
 
-export interface HighlightItemProps {
+export interface IHighlightItem {
     active?: boolean;
     color?: string;
     highlightNumber?: number;
@@ -149,11 +149,11 @@ export interface HighlightItemProps {
     handleViewRegionJump?: Function;
 }
 
-export class HighlightItem extends React.Component<HighlightItemProps, any> {
+export class HighlightItem extends React.Component<IHighlightItem, any> {
 
 
 
-    constructor(props: HighlightItemProps) {
+    constructor(props: IHighlightItem) {
         super(props);
 
         this.state = {

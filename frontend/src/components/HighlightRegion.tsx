@@ -4,14 +4,14 @@ import LinearDrawingModel from '../model/LinearDrawingModel';
 import { withTrackLegendWidth } from './withTrackLegendWidth';
 import { ViewExpansion } from '../model/RegionExpander';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
-import { HighlightItem, HighlightItemProps } from '../components/trackContainers/HighlightMenu';
+import { HighlightItem, IHighlightItem } from '../components/trackContainers/HighlightMenu';
 import { StateWithHistory } from 'redux-undo';
 
 import './HighlightRegion.css';
 import AppState, { ActionCreators } from 'AppState';
 import { connect } from 'react-redux';
 
-interface IHighlightRegion {
+interface HighlightRegionProps {
     y?: number | string; // Relative Y of the top of the selection box; how far from the top of this container
     height?: number | string; // Height of the selection box
     enteredRegion: ChromosomeInterval; // region that is highlighted in chromosome coordinates;
@@ -20,7 +20,7 @@ interface IHighlightRegion {
     legendWidth: number; // used in calculation for highlight;
     xOffset: number;
     highlightColor: string;
-    highlightItems: HighlightItemProps[];
+    highlightItems: IHighlightItem[];
 }
 
 /**
@@ -48,8 +48,8 @@ const callbacks = {
  * 
  * @author Daofeng Li, modified from Silas Hsu
  */
-class HighlightRegion extends React.PureComponent<IHighlightRegion> {
-    static defaultProps: IHighlightRegion = {
+class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
+    static defaultProps: HighlightRegionProps = {
         y: "0px",
         height: "100%",
         enteredRegion: null,
@@ -61,7 +61,7 @@ class HighlightRegion extends React.PureComponent<IHighlightRegion> {
         highlightItems: [],
     };
 
-    constructor(props: IHighlightRegion | Readonly<IHighlightRegion>) {
+    constructor(props: HighlightRegionProps | Readonly<HighlightRegionProps>) {
         super(props);
     }
 
@@ -100,7 +100,7 @@ class HighlightRegion extends React.PureComponent<IHighlightRegion> {
 
         // pushes new HighlightItem to Redux
         if (highlight) {
-            const newHighlightItem: HighlightItemProps = {
+            const newHighlightItem: IHighlightItem = {
                 color: highlightColor,
                 inViewRegion: highlightEnteredRegion,
                 highlightInterval: highlight,

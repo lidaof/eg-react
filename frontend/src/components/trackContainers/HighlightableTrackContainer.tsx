@@ -2,7 +2,7 @@ import React from 'react';
 
 import { withTrackLegendWidth } from '../withTrackLegendWidth';
 import { SelectableGenomeArea } from '../SelectableGenomeArea';
-import { HighlightItemProps } from './HighlightMenu';
+import { IHighlightItem } from './HighlightMenu';
 
 import { ViewExpansion } from '../../model/RegionExpander';
 import OpenInterval from '../../model/interval/OpenInterval';
@@ -17,7 +17,7 @@ interface HighlightableTrackContainerProps {
     visData: ViewExpansion; // Track visualization config
     viewRegion: DisplayedRegionModel;
     legendWidth: number;
-    highligthItems: HighlightItemProps[],
+    highligthItems: IHighlightItem[],
 
     /**
      * Callback for when a region is selected.
