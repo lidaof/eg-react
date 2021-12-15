@@ -141,6 +141,7 @@ export interface HighlightItemProps {
     active?: boolean;
     color?: string;
     highlightNumber?: number;
+    highlightName?: string;
     highlightInterval?: OpenInterval;
     inViewRegion?: boolean;
     viewRegion?: ChromosomeInterval;
@@ -203,11 +204,10 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
         // const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
 
-        let highlightName = `Highlight ${this.props.highlightNumber}`;
         return (
             <div className="highlight-item-body">
                 {/* name input */}
-                <input type="text" className="highlight-item-name" value={highlightName} onChange={this.updateName} />
+                <input type="text" className="highlight-item-name" value={this.props.highlightName} onChange={this.updateName} />
                 {/* "is in view region" indicator */}
                 <span
                     style={{

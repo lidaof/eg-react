@@ -143,7 +143,7 @@ class HighlightRegion extends React.PureComponent<IHighlightRegion> {
         }
 
         const theBoxes = highlightItems.map((item) => {
-            if (item.viewRegion.chr === enteredRegion.chr /** logic to check if in view region */) {
+            if (item.viewRegion.chr === enteredRegion.chr /** logic to check if in view region, use features */) {
                 const style = item.highlightInterval ? {
                     left: item.highlightInterval.start + xOffset + "px",
                     top: y,
