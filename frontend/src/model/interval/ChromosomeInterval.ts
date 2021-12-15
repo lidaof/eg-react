@@ -169,6 +169,16 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
     }
 
     /**
+     * Checks if the current interval is within the larger interval
+     * @param other larger interval
+     * @returns true if within
+     */
+    isWithin(other: ChromosomeInterval): boolean {
+        
+        return ;
+    }
+
+    /**
      * @return {string} human-readable representation of this interval
      */
     toString(): string {
