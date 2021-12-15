@@ -149,7 +149,7 @@ export interface HighlightItemProps {
     handleViewRegionJump?: Function;
 }
 
-export class HighlightItem extends React.Component<HighlightItemProps> {
+export class HighlightItem extends React.Component<HighlightItemProps, any> {
 
 
 
@@ -207,7 +207,7 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
         return (
             <div className="highlight-item-body">
                 {/* name input */}
-                <input type="text" className="highlight-item-name" value={this.props.highlightName} onChange={this.updateName} />
+                <input type="text" className="highlight-item-name" value={this.state.name} onChange={this.updateName} />
                 {/* "is in view region" indicator */}
                 <span
                     style={{
