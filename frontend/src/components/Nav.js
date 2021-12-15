@@ -31,6 +31,7 @@ import ScatterPlot from "./Geneplot/ScatterPlot";
 import ColorPicker from "./ColorPicker";
 import { TextTrack } from "./TextTrack";
 import { AppIcon, GenomePicker } from "./GenomePicker";
+import Button from '@material-ui/core/Button';
 
 import "./Nav.css";
 
@@ -151,6 +152,11 @@ class Nav extends React.Component {
         this.setState({ otherGenome: null, genomeModal: false });
     };
 
+    onGenomeSelected = (name) => {
+        this.props.onGenomeSelected(name);
+        this.handleGenomeCloseModal();
+    }
+
     render() {
         const {
             tracks,
@@ -216,6 +222,9 @@ class Nav extends React.Component {
                                 backgroundImage: `url(${logo})`,
                                 color: color,
                                 backgroundSize: "cover",
+                                marginTop: 10,
+                                marginBottom: 10,
+                                borderRadius: "0.25rem"
                             }}
                         >
                             <div onClick={this.handleGenomeOpenModal}>
@@ -241,11 +250,13 @@ class Nav extends React.Component {
                                     },
                                 }}
                             >
-                                {this.renderOtherGenomes()}
+                                <GenomePicker 
+                                    onGenomeSelected={this.onGenomeSelected}
+                                />
                                 <button className="btn btn-sm btn-danger" onClick={this.handleGenomeCloseModal}>
                                     Close
                                 </button>{" "}
-                                {otherGenome && (
+                                {otherGenome && ( 
                                     <button className="btn btn-sm btn-primary" onClick={this.changeGenome}>
                                         Go
                                     </button>
@@ -594,16 +605,20 @@ function HighlightColorChange(props) {
 
 function DropdownOpener(props) {
     const { extraClassName, label } = props;
+    const color = extraClassName.split('-')[1];
+    console.log(color);
     return (
-        <button
+        <Button
             type="button"
-            className={`btn dropdown-toggle ${extraClassName}`}
+            // className={`btn dropdown-toggle ${extraClassName}`}
+            color={color}
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
+            variant="contained"
         >
             {label}
-        </button>
+        </Button>
     );
 }
 
