@@ -202,6 +202,22 @@ class DisplayedRegionModel {
             return first.toStringWithOther(last);
         }
     }
+
+    /**
+     * @return {string} the displayed region according to custom start/end
+     * @param start the custom start of the region
+     * @param end the custom end of the region
+     */
+    customRegionAsString(start: number, end: number): string {
+        const segments = this._navContext.getFeaturesInInterval(start, end, true);
+        if (segments.length === 1) {
+            return segments[0].toString();
+        } else {
+            const first = segments[0];
+            const last = segments[segments.length - 1];
+            return first.toStringWithOther(last);
+        }
+    }
 }
 
 export default DisplayedRegionModel;

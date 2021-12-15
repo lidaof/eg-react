@@ -11,7 +11,7 @@ import './HighlightRegion.css';
 import AppState, { ActionCreators } from 'AppState';
 import { connect } from 'react-redux';
 
-interface HighlightRegionProps {
+interface IHighlightRegion {
     y?: number | string; // Relative Y of the top of the selection box; how far from the top of this container
     height?: number | string; // Height of the selection box
     enteredRegion: ChromosomeInterval; // region that is highlighted in chromosome coordinates;
@@ -48,8 +48,8 @@ const callbacks = {
  * 
  * @author Daofeng Li, modified from Silas Hsu
  */
-class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
-    static defaultProps: HighlightRegionProps = {
+class HighlightRegion extends React.PureComponent<IHighlightRegion> {
+    static defaultProps: IHighlightRegion = {
         y: "0px",
         height: "100%",
         enteredRegion: null,
@@ -61,7 +61,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         highlightItems: [],
     };
 
-    constructor(props: HighlightRegionProps | Readonly<HighlightRegionProps>) {
+    constructor(props: IHighlightRegion | Readonly<IHighlightRegion>) {
         super(props);
     }
 
@@ -75,6 +75,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     getHiglightedXs(chrInterval: ChromosomeInterval): OpenInterval {
         const {legendWidth, visData} = this.props;
         const {viewWindowRegion, viewWindow} = visData;
+        console.log(chrInterval);
         const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
         // there will be many interval when there are gaps
         const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
@@ -136,6 +137,10 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         const { height, y, children, enteredRegion, highlightEnteredRegion, xOffset, highlightColor, highlightItems } = this.props;
 
         console.log(highlightItems);
+
+        if (highlightEnteredRegion) {
+            this.createNewHighlightItem();
+        }
 
         const theBoxes = highlightItems.map((item) => {
             if (item.viewRegion.chr === enteredRegion.chr /** logic to check if in view region */) {

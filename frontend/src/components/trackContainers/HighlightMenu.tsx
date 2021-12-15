@@ -199,11 +199,11 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
 
     render(): JSX.Element {
         console.log(this.props);
-        const { active, color, inViewRegion, highlightNumber, viewRegion, highlightInterval, handleDelete, handleViewRegionJump } = this.props;
+        const { active, color, inViewRegion, viewRegion, handleDelete, handleViewRegionJump } = this.props;
         // const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
 
-        let highlightName = `Highlight ${highlightNumber}`;
+        let highlightName = `Highlight ${this.props.highlightNumber}`;
         return (
             <div className="highlight-item-body">
                 {/* name input */}
@@ -217,7 +217,7 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
                         position: "relative",
                         zIndex: "inherit",
                 }}>
-                    {`${highlightInterval.start}-${highlightInterval.end}`}
+                    {`${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`}
                 </span>
                 {/* left: color picker; right: hide+show, delete buttons */}
                 <div className="highlight-item-buttons-group">
@@ -225,7 +225,7 @@ export class HighlightItem extends React.Component<HighlightItemProps> {
                         color={color}
                         onChange={this.updateColor}
                     />
-                    <button className="highlight-item-delete" onClick={() => { handleDelete(highlightNumber) }}>Delete</button>
+                    <button className="highlight-item-delete" onClick={() => { handleDelete(this.props.highlightNumber) }}>Delete</button>
                 </div>
                 {/* jump to this view region */}
             </div>

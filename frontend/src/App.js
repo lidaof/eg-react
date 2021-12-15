@@ -205,6 +205,7 @@ class App extends React.PureComponent {
 
     setEnteredRegion = (chrInterval) => {
         this.setState({ enteredRegion: chrInterval });
+        console.log(chrInterval);
     };
 
     /**
@@ -212,14 +213,25 @@ class App extends React.PureComponent {
      * @param {number} start absolute start of enteredRegion
      * @param {number} stop absolute end of enteredRegion
      * 
-     * FIXME
+     * FIXME strategy 1: gets viewRegion as string, then splits string to get chrNumber, start, and end
+     * FIXME strategy 2: modify the DisplayRegionModel.currentRegionAsString() to take custom start/end
+     *  that are within the viewRegion
      */
     convertEnteredRegionToChromosomeInterval = (start, end) => {
-        viewRegion
-        const chr = `${7}`;
-        const chrStart = 0;
-        const chrEnd = 1;
-        this.setEnteredRegion(new ChromosomeInterval(chr, chrStart, chrEnd));
+        // Method 1:
+        // const coords = this.props.viewRegion.currentRegionAsString();
+        // const chr = coords.split(':')[0];
+        // const chrStart = coords.split(':')[1].split('-')[0];
+        // const chrEnd = coords.split(':')[1].split('-')[1];
+        // this.setEnteredRegion(new ChromosomeInterval(chr, Number(chrStart), Number(chrEnd)));
+
+        // Method 2:
+        // const segments = viewRegion.getFeatureSegments();
+        const coords = this.props.viewRegion.customRegionAsString(start, end);
+        const chr = coords.split(':')[0];
+        const chrStart = coords.split(':')[1].split('-')[0];
+        const chrEnd = coords.split(':')[1].split('-')[1];
+        this.setEnteredRegion(new ChromosomeInterval(chr, Number(chrStart), Number(chrEnd)));
     }
 
     setHighlightColor = (color) => {

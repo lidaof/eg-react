@@ -692,7 +692,7 @@ class TrackContainer extends React.Component {
                     <HighlightableTrackContainer
                         trackElements={trackElements}
                         visData={primaryView}
-                        viewRegion={}
+                        viewRegion={viewRegion}
                         onNewHighlight={setNewEnteredRegion}
                     />
                 )
