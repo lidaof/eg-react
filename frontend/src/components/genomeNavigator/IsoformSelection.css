@@ -33,3 +33,12 @@
     font-size: x-small;
     min-width: 200px;
 }
+
+.IsoformSelection-item-simple {
+    border: 1px solid lightgrey;
+}
+
+.IsoformSelection-item-simple:hover {
+    background-color: #fdbb84;
+    cursor: pointer;
+}

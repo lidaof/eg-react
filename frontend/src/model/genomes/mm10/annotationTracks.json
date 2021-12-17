@@ -215,13 +215,6 @@
     ],
     "Genome Comparison": [
         {
-            "name": "cavPor3tomm10",
-            "label": "Guinea Pig cavPor3 to mm10 blastz",
-            "querygenome": "cavPor3",
-            "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_cavPor3_axt.gz"
-        },
-        {
             "name": "danRer7tomm10",
             "label": "Zebrafish danRer7 to mm10 blastz",
             "querygenome": "danRer7",
@@ -250,18 +243,132 @@
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rheMac3_axt.gz"
         },
         {
-            "name": "rn5tomm10",
-            "label": "Rat rn5 to mm10 blastz",
-            "querygenome": "rn5",
-            "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rn5_axt.gz"
-        },
-        {
             "name": "rn6tomm10",
             "label": "Rat rn6 to mm10 blastz",
             "querygenome": "rn6",
             "filetype": "genomealign",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/mm10.rn6.gz"
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10.rn6.gz"
+        },
+        {
+            "name": "bosTau8",
+            "label": "Cow bosTau8 to mm10 blastz",
+            "querygenome": "bosTau8",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-bosTau8.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsBosTau8/axtNet/"
+            }
+        },
+        {
+            "name": "calJac3",
+            "label": "Marmoset calJac3 to mm10 blastz",
+            "querygenome": "calJac3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-calJac3.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsCalJac3/axtNet/"
+            }
+        },
+        {
+            "name": "danRer10",
+            "label": "Zebrafish danRer10 to mm10 blastz",
+            "querygenome": "danRer10",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-danRer10.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsDanRer10/axtNet/"
+            }
+        },
+        {
+            "name": "danRer11",
+            "label": "Zebrafish danRer11 to mm10 blastz",
+            "querygenome": "danRer11",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-danRer11.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsDanRer11/axtNet/"
+            }
+        },
+        {
+            "name": "galGal5",
+            "label": "Chicken galGal5 to mm10 blastz",
+            "querygenome": "galGal5",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-galGal5.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsGalGal5/axtNet/"
+            }
+        },
+        {
+            "name": "galGal6",
+            "label": "Chicken galGal6 to mm10 blastz",
+            "querygenome": "galGal6",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-galGal6.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsGalGal6/axtNet/"
+            }
+        },
+        {
+            "name": "gorGor3",
+            "label": "Gorilla gorGor3 to mm10 blastz",
+            "querygenome": "gorGor3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-gorGor3.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsGorGor3/axtNet/"
+            }
+        },
+        {
+            "name": "panTro4",
+            "label": "Chimp panTro4 to mm10 blastz",
+            "querygenome": "panTro4",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-panTro4.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsPanTro4/axtNet/"
+            }
+        },
+        {
+            "name": "panTro5",
+            "label": "Chimp panTro5 to mm10 blastz",
+            "querygenome": "panTro5",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-panTro5.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsPanTro5/axtNet/"
+            }
+        },
+        {
+            "name": "panTro6",
+            "label": "Chimp panTro6 to mm10 blastz",
+            "querygenome": "panTro6",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-panTro6.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsPanTro6/axtNet/"
+            }
+        },
+        {
+            "name": "rheMac8",
+            "label": "Rhesus rheMac8 to mm10 blastz",
+            "querygenome": "rheMac8",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-rheMac8.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/mm10/vsRheMac8/axtNet/"
+            }
         }
     ],
     "Mappability": [

@@ -3,7 +3,7 @@
 }
 
 .dense-button {
-    padding: 2px;
+    padding: 2px 4px;
     line-height: 1;
 }
 
@@ -31,4 +31,9 @@
 .nav-tabs .nav-link.active:hover {
     color: red;
     background-color: whitesmoke;
+}
+
+.btn-dense {
+    margin-right: 2px !important;
+    margin-bottom: 0 !important;
 }

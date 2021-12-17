@@ -4,7 +4,9 @@
 
 import sys, gzip
 
-#from https://github.com/ucscGenomeBrowser/kent/blob/022eb4f62a0af16526ca1bebcd9e68bd456265dc/src/hg/lib/gtexGeneBed.c
+#from https://github.com/ucscGenomeBrowser/kent/blob/master/src/hg/lib/gtexGeneBed.c#L248
+
+
 typeMap = {
     'IG_C_gene':'coding',
     'IG_D_gene':'coding',
@@ -39,6 +41,7 @@ typeMap = {
     'Mt_tRNA':'nonCoding',
     'antisense':'nonCoding',
     'lincRNA':'nonCoding',
+    'lncRNA':'nonCoding',
     'miRNA':'nonCoding',
     'misc_RNA':'nonCoding',
     'processed_transcript':'nonCoding',

@@ -162,6 +162,12 @@ class ReorderMany extends React.Component {
                     ariaHideApp={false}
                     onRequestClose={this.props.onCloseReorderManyModal}
                     shouldCloseOnOverlayClick={true}
+                    style={{
+                        overlay: {
+                            backgroundColor: "rgba(111,107,101, 0.7)",
+                            zIndex: 4,
+                        },
+                    }}
                 >
                     <div className="ReorderMany">
                         <h5>

@@ -101,6 +101,7 @@ export class BamRecord extends Feature {
     */
     static makeBamRecords(rawObjects: IBamRecord[]) {
         const results = [];
+        console.log(rawObjects)
         for (const rawObject of rawObjects) {
             if (rawObject.flag & BamFlags.SEGMENT_UNMAPPED || rawObject.flag & BamFlags.SUPPLEMENTARY) {
                 continue;

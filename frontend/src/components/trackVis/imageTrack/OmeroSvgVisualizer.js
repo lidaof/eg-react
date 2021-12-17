@@ -7,7 +7,7 @@ import { MAX_NUMBER_THUMBNAILS, THUMBNAIL_PADDING } from "./OmeroTrack";
 import { ensureMaxListLength } from "../../../util";
 import TrackModel from "model/TrackModel";
 
-const CORS_PROXY = "https://epigenome.wustl.edu/cors";
+export const CORS_PROXY = "https://epigenome.wustl.edu/cors";
 
 export class OmeroSvgVisualizer extends React.PureComponent {
     static propTypes = {

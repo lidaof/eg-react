@@ -1,4 +1,4 @@
-import BedSourceWorker from './BedSourceWorker';
-import registerWorkerRunnableSource from '../worker/registerWorkerRunnableSource';
+import BedSourceWorker from "./TabixSource";
+import registerWorkerRunnableSource from "../worker/registerWorkerRunnableSource";
 
 registerWorkerRunnableSource(BedSourceWorker);

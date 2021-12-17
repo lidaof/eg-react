@@ -4,17 +4,17 @@ import _ from "lodash";
 import { scaleLinear } from "d3-scale";
 import memoizeOne from "memoize-one";
 import { notify } from "react-notify-toast";
-import Smooth from "array-smooth";
 import Track from "../Track";
 import TrackLegend from "../TrackLegend";
 import GenomicCoordinates from "../GenomicCoordinates";
 import HoverTooltipContext from "../tooltip/HoverTooltipContext";
 import configOptionMerging from "../configOptionMerging";
-
 import { RenderTypes, DesignRenderer } from "../../../../art/DesignRenderer";
 import { NumericalDisplayModes } from "../../../../model/DisplayModes";
-import { FeatureAggregator, DefaultAggregators } from "../../../../model/FeatureAggregator";
+import { DefaultAggregators } from "../../../../model/FeatureAggregator";
 import { ScaleChoices } from "../../../../model/ScaleChoices";
+import { NumericalAggregator } from "./NumericalAggregator";
+// import { withLogPropChanges } from "components/withLogPropChanges";
 
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN,
@@ -28,6 +28,7 @@ export const DEFAULT_OPTIONS = {
     yMax: 10,
     yMin: 0,
     smooth: 0,
+    ensemblStyle: false,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
@@ -69,54 +70,93 @@ class NumericalTrack extends React.PureComponent {
         this.scales = null;
         this.hasReverse = false;
 
-        this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
+        // this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
         this.computeScales = memoizeOne(this.computeScales);
         this.renderTooltip = this.renderTooltip.bind(this);
+        this.aggregator = new NumericalAggregator();
     }
 
-    aggregateFeatures(data, viewRegion, width, aggregatorId) {
-        const aggregator = new FeatureAggregator();
-        const xToFeatures = aggregator.makeXMap(data, viewRegion, width);
-        return xToFeatures.map(DefaultAggregators.fromId(aggregatorId));
-    }
+    // componentDidUpdate(prevProps, prevState) {
+    //     if (prevProps.layoutModel !== this.props.layoutModel) {
+    //         console.log("layout changed");
+    //         console.log(prevProps.layoutModel);
+    //         console.log(this.props.layoutModel);
+    //         const a = prevProps.layoutModel.toJson();
+    //         const b = this.props.layoutModel.toJson();
+    //         console.log(a, b);
+    //         console.log(_.isEqual(a, b));
+    //     }
+    //     if (prevProps.groupScale !== this.props.groupScale) {
+    //         console.log("groupScale changed");
+    //         console.log(prevProps.groupScale);
+    //         console.log(this.props.groupScale);
+    //     }
+    // }
+
+    // aggregateFeatures(data, viewRegion, width, aggregatorId) {
+    //     // const aggregator = new FeatureAggregator();
+    //     // const xToFeatures = aggregator.makeXMap(data, viewRegion, width);
+    //     // return xToFeatures.map(DefaultAggregators.fromId(aggregatorId));
+    // }
 
     computeScales(xToValue, xToValue2, height) {
-        const { yScale, yMin, yMax } = this.props.options;
-        if (yMin >= yMax) {
-            notify.show("Y-axis min must less than max", "error", 2000);
-        }
         /*
         All tracks get `PropsFromTrackContainer` (see `Track.ts`).
 
         `props.viewWindow` contains the range of x that is visible when no dragging.  
             It comes directly from the `ViewExpansion` object from `RegionExpander.ts`
         */
-        const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
-        let max = _.max(visibleValues) || 0; // in case undefined returned here, cause maxboth be undefined too
-        const xValues2 = this.xToValue2.filter((x) => x);
-        let min =
-            (xValues2.length ? _.min(xToValue2.slice(this.props.viewWindow.start, this.props.viewWindow.end)) : 0) || 0;
-        const maxBoth = Math.max(Math.abs(max), Math.abs(min));
-        max = maxBoth;
-        min = xValues2.length ? -maxBoth : 0;
-        if (yScale === ScaleChoices.FIXED) {
-            max = yMax ? yMax : max;
-            min = yMin !== undefined ? yMin : min;
-            // if (xValues2.length && yMin > 0) {
-            //     notify.show("Please set Y-axis min <=0 when there are negative values", "warning", 5000);
-            //     min = 0;
-            // }
+        const { yScale, yMin, yMax } = this.props.options;
+        if (yMin >= yMax) {
+            notify.show("Y-axis min must less than max", "error", 2000);
+        }
+        const { trackModel, groupScale } = this.props;
+        let gscale = {},
+            min,
+            max,
+            xValues2 = [];
+        if (groupScale) {
+            if (trackModel.options.hasOwnProperty("group")) {
+                gscale = groupScale[trackModel.options.group];
+            }
+        }
+        if (!_.isEmpty(gscale)) {
+            max = _.max(Object.values(gscale.max));
+            min = _.min(Object.values(gscale.min));
+        } else {
+            const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
+            max = _.max(visibleValues) || 1; // in case undefined returned here, cause maxboth be undefined too
+            xValues2 = xToValue2.filter((x) => x);
+            min =
+                (xValues2.length
+                    ? _.min(xToValue2.slice(this.props.viewWindow.start, this.props.viewWindow.end))
+                    : 0) || 0;
+            const maxBoth = Math.max(Math.abs(max), Math.abs(min));
+            max = maxBoth;
+            min = xValues2.length ? -maxBoth : 0;
+            if (yScale === ScaleChoices.FIXED) {
+                max = yMax ? yMax : max;
+                min = yMin !== undefined ? yMin : min;
+                // if (xValues2.length && yMin > 0) {
+                //     notify.show("Please set Y-axis min <=0 when there are negative values", "warning", 5000);
+                //     min = 0;
+                // }
+            }
         }
         if (min > max) {
             notify.show("Y-axis min should less than Y-axis max", "warning", 5000);
             min = 0;
         }
-        // determines the distance of y=0 from the top
-        const zeroLine = min < 0 ? TOP_PADDING + ((height - TOP_PADDING) * max) / (max + Math.abs(min)) : height;
+
+        // determines the distance of y=0 from the top, also the height of positive part
+        const zeroLine = min < 0 ? TOP_PADDING + ((height - 2 * TOP_PADDING) * max) / (max - min) : height;
 
         if (xValues2.length && (yScale === ScaleChoices.AUTO || (yScale === ScaleChoices.FIXED && yMin < 0))) {
             return {
-                axisScale: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
+                axisScale: scaleLinear()
+                    .domain([max, min])
+                    .range([TOP_PADDING, height - TOP_PADDING])
+                    .clamp(true),
                 valueToY: scaleLinear().domain([max, 0]).range([TOP_PADDING, zeroLine]).clamp(true),
                 valueToYReverse: scaleLinear()
                     .domain([0, min])
@@ -187,28 +227,15 @@ class NumericalTrack extends React.PureComponent {
     }
 
     render() {
+        // console.log("render");
         const { data, viewRegion, width, trackModel, unit, options, forceSvg } = this.props;
-        const { height, color, color2, aggregateMethod, colorAboveMax, color2BelowMin, smooth, yScale, yMin } = options;
-        const dataForward = data.filter((feature) => feature.value === undefined || feature.value >= 0); // bed track to density mode
-        const dataReverse = data.filter((feature) => feature.value < 0);
-        let xToValue2BeforeSmooth;
-        if (dataReverse.length) {
-            xToValue2BeforeSmooth = this.aggregateFeatures(dataReverse, viewRegion, width, aggregateMethod);
-        } else {
-            xToValue2BeforeSmooth = [];
-        }
-        const smoothNumber = Number.parseInt(smooth) || 0;
-        this.xToValue2 = smoothNumber === 0 ? xToValue2BeforeSmooth : Smooth(xToValue2BeforeSmooth, smoothNumber);
-        const xValues2 = this.xToValue2.filter((x) => x);
-        this.hasReverse = false;
-        if (xValues2.length && (yScale === ScaleChoices.AUTO || (yScale === ScaleChoices.FIXED && yMin < 0))) {
-            this.hasReverse = true;
-        }
-        const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
-        const xToValueBeforeSmooth =
-            dataForward.length > 0 ? this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod) : [];
-        this.xToValue = smoothNumber === 0 ? xToValueBeforeSmooth : Smooth(xToValueBeforeSmooth, smoothNumber);
+        const { height, color, color2, colorAboveMax, color2BelowMin } = options;
+        const xvalues = this.aggregator.xToValueMaker(data, viewRegion, width, options);
+        this.xToValue = xvalues[0];
+        this.xToValue2 = xvalues[1];
+        this.hasReverse = xvalues[2];
         this.scales = this.computeScales(this.xToValue, this.xToValue2, height);
+        const isDrawingBars = this.getEffectiveDisplayMode() === NumericalDisplayModes.BAR; // As opposed to heatmap
         const legend = (
             <TrackLegend
                 trackModel={trackModel}
@@ -328,6 +355,7 @@ export class ValuePlot extends React.PureComponent {
     }
 
     render() {
+        // console.log("render in valueplot");
         const { xToValue, height, forceSvg } = this.props;
         return (
             <DesignRenderer
@@ -342,3 +370,4 @@ export class ValuePlot extends React.PureComponent {
 }
 
 export default withDefaultOptions(NumericalTrack);
+// export default withLogPropChanges(withDefaultOptions(NumericalTrack));

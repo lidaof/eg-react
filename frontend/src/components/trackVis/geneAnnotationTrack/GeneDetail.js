@@ -15,6 +15,7 @@ class GeneDetail extends React.PureComponent {
     static propTypes = {
         gene: PropTypes.instanceOf(Gene).isRequired, // The Gene object for which to display info
         collectionName: PropTypes.string.isRequired,
+        queryEndpoint: PropTypes.object,
     };
 
     render() {
@@ -22,7 +23,7 @@ class GeneDetail extends React.PureComponent {
         const colors = GeneAnnotation.getDrawColors(gene);
         return (
             <div style={{ maxWidth: 400 }}>
-                <FeatureDetail feature={gene} />
+                <FeatureDetail feature={gene} queryEndpoint={this.props.queryEndpoint} />
                 <i style={{ wordBreak: "break-word" }}>{gene.description}</i>
                 <div>
                     {gene.transcriptionClass && (

@@ -1,8 +1,75 @@
 # Version History
 
+## 53.5.0
+
+-   removed unnecessary re-render of numerical track
+-   adding push notification
+-   allow HiC track bin size and normalization options linked to the hic file itself
+-   add an option `italicizeText` to allow _italic_ text/label on gene tracks
+-   new genome `xenTro10` added
+
+## 53.4.1
+
+-   added `bigchain` format support
+-   `bigchain` and `genomealign` can be added from remote track UI with specify a query genome
+-   layout header height bug fix
+-   region jumping following UCSC Browser: position coordinates `chr6:130129863-130129899` (1 based, 37bp), bed coordinate `chr6 130129863 130129899` (0 based, 36bp)
+
+## 53.4.0
+
+-   new T2T genome assembly `t2t-chm13-v1.1` added
+-   improved 3D module
+-   support Repeatmasker V2 format bigbed, track type `rmskv2`
+
+## 53.3.2
+
+-   for `bigwig` track, specify `ensemblStyle` option to `true` can enable data with chromosome names as 1, 2, 3...work in the browser
+-   `bedcolor` track type
+-   Roadmap (hg38) hub update
+-   more genome alignment tracks
+-   pdf output label alignment improvement
+
+## 53.3.1
+
+-   switched to `@gmod/bbi` library for bigwig data fetching
+-   removed zoom level configuration for bigWig track
+
+## 53.3.0
+
+-   updated 4DN data hubs
+-   fixed a screenshot bug while tracks are grouped
+
+## 53.2.0
+
+-   introduce `boxplot` track type show numerical data in small window as boxplots
+
+## 53.1.0
+
+-   `vcf` track bug fix for certain tooltip clicking
+-   updated SARS-CoV-2 data hubs by Changxu Fan
+
+## 53.0.0
+
+-   3D structure view module added, for more please check [the 3D documentation](https://eg.readthedocs.io/en/latest/3d.html)
+-   basic support for `vcf` format
+
+## 52.5.2
+
+-   add an option `queryEndpoint` to `TrackModel` allow customization of gene/feature annotaion query
+-   added 2 new Trypanosome genomes `TbruceiTREU927` and `TbruceiLister427` per user's request
+
+## 52.5.1
+
+-   fixed a bug that `dynseq` track doesn't work correctly in Safari
+-   fixed a bug that screenshot error on `hic` heatmap mode
+-   fixed a bug that `longrange` track cannot change name/label
+-   added a feature that sessions are sorted by date by dafault, can change to sorting by label
+-   add a new track type `rgbpeak` to show the peaks in `bigbed` format supporting `itemRgb` attribute
+-   added a new virus genome `hpv16`, ref sequence from https://www.ncbi.nlm.nih.gov/nuccore/NC_001526.4, gene annotation from https://www.ncbi.nlm.nih.gov/assembly/GCF_000863945.3/
+
 ## 52.5.0
 
--   Dynamic sequence track type `dynseq` added, the track type is proposed and initially developped by Surag Nai from Anshul Kundaje's lab at Stanford University
+-   Dynamic sequence track type `dynseq` added, the track type is proposed and initially developped by Surag Nair from Anshul Kundaje's lab at Stanford University
 
 ## 52.4.1
 
@@ -11,7 +78,7 @@
 
 ## 52.4.0
 
--   added percentile scale for interaction tracks (`hic`, `longrange` etc.)
+-   added percentile scale for interaction tracks (`hic`, `longrange`) etc.
 -   improved fixed scale config for numerical tracks
 -   video output for dynamic track
 -   added the highlight beams for interaction track at `heatmap` mode

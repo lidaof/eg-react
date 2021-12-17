@@ -1,3 +1,4 @@
+import LabelConfig from "components/trackContextMenu/LabelConfig";
 import { TrackOptions } from "model/TrackModel";
 import { InteractionDisplayMode } from "./../../model/DisplayModes";
 import { TrackConfig } from "./TrackConfig";
@@ -91,6 +92,7 @@ export class LongRangeTrackConfig extends TrackConfig {
 
     getMenuComponents() {
         const items = [
+            LabelConfig,
             InteractionDisplayModeConfig,
             HeightConfig,
             ScoreConfig,

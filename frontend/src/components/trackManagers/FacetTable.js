@@ -24,7 +24,7 @@ class FacetTable extends Component {
         onTracksAdded: PropTypes.func,
         addTermToMetaSets: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
-        publicTrackSets: PropTypes.instanceOf(Set),
+        publicTrackSets: PropTypes.instanceOf(Set)
     };
 
     static defaultProps = {
@@ -43,7 +43,7 @@ class FacetTable extends Component {
             rowHeader: "",
             columnHeader: "",
             showModalId: null,
-            metaKeys: [],
+            metaKeys: []
         };
 
         this.toggleHeader = this.toggleHeader.bind(this);

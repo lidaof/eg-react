@@ -14,9 +14,9 @@ import Notifications from "react-notify-toast";
 import LoadSession from "./components/LoadSession";
 import { RegionExpander } from "./model/RegionExpander";
 import { Footer } from "./components/Footer";
-import { SessionUI } from "./components/SessionUI";
 import { Offline } from "react-detect-offline";
-import { HELP_LINKS } from "./util";
+import { HELP_LINKS, getSecondaryGenomes } from "./util";
+import { getGenomeConfig } from "./model/genomes/allGenomes";
 
 import "./App.css";
 
@@ -80,10 +80,8 @@ class App extends React.PureComponent {
     }
 
     componentDidMount() {
-        if (this.props.genomeConfig && this.props.genomeConfig.publicHubList) {
-            this.setState({
-                publicHubs: this.props.genomeConfig.publicHubList.slice(),
-            });
+        if (this.props.genomeConfig) {
+            this.updateOtherPublicHubs(this.props.tracks);
         }
         this.initializeMetaSets(this.props.tracks);
     }
@@ -91,8 +89,10 @@ class App extends React.PureComponent {
     UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.genomeConfig && nextProps.genomeConfig !== this.props.genomeConfig) {
             if (nextProps.genomeConfig.publicHubList) {
+                const publicHubs = nextProps.genomeConfig.publicHubList.slice();
+                publicHubs.map((x) => (x.genome = nextProps.genomeConfig.genome.getName()));
                 this.setState({
-                    publicHubs: nextProps.genomeConfig.publicHubList.slice(),
+                    publicHubs: publicHubs,
                 });
             } else {
                 // when switch genome, need reset hub as well
@@ -175,11 +175,13 @@ class App extends React.PureComponent {
     addTracks(tracks) {
         const newTracks = this.props.tracks.concat(tracks);
         this.props.onTracksChanged(newTracks);
+        this.updateOtherPublicHubs(newTracks);
     }
 
     removeTrack(indexToRemove) {
-        let newTracks = this.props.tracks.filter((track, index) => index !== indexToRemove);
+        const newTracks = this.props.tracks.filter((track, index) => index !== indexToRemove);
         this.props.onTracksChanged(newTracks);
+        this.updateOtherPublicHubs(newTracks);
     }
 
     // toggleNavigator = () => {
@@ -224,6 +226,26 @@ class App extends React.PureComponent {
         return grouped;
     };
 
+    updateOtherPublicHubs = (tracks) => {
+        const { genomeConfig } = this.props;
+        const secondaryGenomes = getSecondaryGenomes(genomeConfig.genome.getName(), tracks);
+        const secondConfigs = secondaryGenomes.map((g) => getGenomeConfig(g));
+        secondConfigs
+            .filter((x) => x.publicHubList)
+            .map((x) => x.publicHubList.map((y) => (y.genome = x.genome.getName())));
+        let secondHubList = secondConfigs
+            .filter((x) => x.publicHubList)
+            .reduce((secondHubList, x) => secondHubList.concat(x.publicHubList), []);
+        if (genomeConfig.publicHubList) {
+            const publicHubs = genomeConfig.publicHubList.slice();
+            publicHubs.map((x) => (x.genome = genomeConfig.genome.getName()));
+            secondHubList = publicHubs.concat(secondHubList);
+        }
+        this.setState({
+            publicHubs: secondHubList,
+        });
+    };
+
     render() {
         const {
             genomeConfig,
@@ -238,6 +260,11 @@ class App extends React.PureComponent {
             embeddingMode,
             virusBrowserMode,
             layoutModel,
+            onSetAnchors3d,
+            onSetGeneFor3d,
+            viewer3dNumFrames,
+            isThereG3dTrack,
+            onSetImageInfo,
         } = this.props;
         if (sessionFromUrl) {
             return (
@@ -248,9 +275,8 @@ class App extends React.PureComponent {
         }
         if (!genomeConfig) {
             return (
-                <div className="container-fluid">
-                    <GenomePicker />
-                    {!process.env.REACT_APP_NO_FIREBASE && <SessionUI bundleId={bundleId} withGenomePicker={true} />}
+                <div>
+                    <GenomePicker bundleId={bundleId} />
                     <hr />
                     <Footer />
                     <Notifications />
@@ -320,6 +346,11 @@ class App extends React.PureComponent {
                     genomeConfig={genomeConfig}
                     tracks={tracks.filter((tk) => tk.type !== "g3d")}
                     layoutModel={layoutModel}
+                    onSetAnchors3d={onSetAnchors3d}
+                    onSetGeneFor3d={onSetGeneFor3d}
+                    viewer3dNumFrames={viewer3dNumFrames}
+                    isThereG3dTrack={isThereG3dTrack}
+                    onSetImageInfo={onSetImageInfo}
                 />
                 {!embeddingMode && <Footer />}
             </div>

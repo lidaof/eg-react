@@ -1,8 +1,10 @@
 .MetadataHeader-container {
-    margin-left: auto;
-    margin-right: 0;
+    /* margin-left: auto;
+    margin-right: 0; */
     padding-bottom: 5px;
-    position: relative;
+    flex-grow: 2;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .MetadataHeader-terms {
@@ -15,6 +17,14 @@
     vertical-align: middle;
 }
 
-.MetadataHeader-terms li:first-child {
+/* .MetadataHeader-terms li:first-child {
     writing-mode: horizontal-tb;
+} */
+
+.MetadataHeader-button {
+    margin-top: auto;
+    margin-left: 1ch;
+    margin-bottom: auto;
+    padding-bottom: 5px;
+    position: relative;
 }

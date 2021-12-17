@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import axios from "axios";
 import _ from "lodash";
 import { notify } from "react-notify-toast";
 import ReactTable from "react-table";
@@ -10,7 +9,7 @@ import Feature from "../model/Feature";
 import FlankingStrategy from "../model/FlankingStrategy";
 import RegionSet from "../model/RegionSet";
 import ChromosomeInterval from "../model/interval/ChromosomeInterval";
-import { AWS_API } from "../dataSources/GeneSource";
+import { getSymbolRegions } from "../util";
 
 import "react-table/react-table.css";
 
@@ -88,6 +87,7 @@ class RegionSetConfig extends React.Component {
 
     async handleAddList(event) {
         event.preventDefault();
+        const genomeName = this.props.genome.getName();
         this.setState({ loadingMsg: "loading" });
         const inputListRaw = this.state.regionList.trim().split("\n");
         const inputListRaw2 = inputListRaw.map((item) => item.trim());
@@ -104,7 +104,7 @@ class RegionSetConfig extends React.Component {
                     return new Feature(symbol, locus, "+"); // coordinates default have + as strand
                 }
             } catch (error) {}
-            return this.getSymbolRegions(symbol);
+            return getSymbolRegions(genomeName, symbol);
         });
         const parsed = await Promise.all(promise);
         const parsed2 = parsed.map((item, index) => {
@@ -147,16 +147,6 @@ class RegionSetConfig extends React.Component {
             new FlankingStrategy()
         );
         this.setState({ set });
-    }
-
-    async getSymbolRegions(symbol) {
-        const genomeName = this.props.genome.getName();
-        const params = {
-            q: symbol,
-            getOnlyNames: false,
-        };
-        const response = await axios.get(`${AWS_API}/${genomeName}/genes/queryName`, { params: params });
-        return response.data;
     }
 
     getRegionSetFromProps(props) {

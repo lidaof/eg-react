@@ -69,23 +69,18 @@
     display: block;
 }
 
-#hoverbox {
-    position: absolute;
-    left: 5px;
-    bottom: 5px;
-    z-index: 3;
-    background: lightcyan;
-    text-align: left;
-}
-
 .toggle-model-container {
     display: flex;
     justify-content: space-between;
-    background-color: aquamarine;
     margin-bottom: 2px;
 }
 
-.toggle-model {
+.toggle-model-container:hover {
+    border-bottom: 1px solid orange;
+}
+
+.toggle-model:hover {
+    background-color: orange;
     cursor: pointer;
 }
 
@@ -101,18 +96,18 @@
     position: absolute;
     left: 2px;
     top: 2px;
-    z-index: 2;
+    z-index: 1;
 }
 
 .placement-container span {
     display: inline-block;
 }
 
-.drawer {
+/* .drawer {
     z-index: 3;
-}
+} */
 
-.drawer-handle {
+/* .drawer-handle {
     background: hotpink;
 }
 
@@ -123,7 +118,11 @@
 }
 .drawer-left .drawer-handle {
     top: 17%;
-}
+} */
+
+/* .drawer.drawer-open .drawer-mask {
+    opacity: 0.1;
+} */
 
 .card-header button {
     margin-bottom: 0 !important;
@@ -131,4 +130,40 @@
 
 .card-header {
     padding: 0;
+}
+
+.FrameListMenu label {
+    margin-bottom: 0;
+}
+
+.FrameListMenu ol {
+    list-style-type: circle;
+}
+
+.hoverButtons button {
+    margin: 2px 0;
+    display: block;
+}
+
+.closeMenu-3d {
+    font-size: 36px;
+    cursor: pointer;
+    color: red;
+    position: absolute;
+    right: 10px;
+    top: -8px;
+    z-index: 5;
+}
+
+.arrow-list input[type="number"] {
+    margin-bottom: 0 !important;
+    margin-right: 2px !important;
+    width: 8ch;
+}
+
+#static-legend {
+    position: absolute;
+    z-index: 4;
+    left: 10px;
+    bottom: 50px;
 }

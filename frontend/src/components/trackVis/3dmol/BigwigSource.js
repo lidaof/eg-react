@@ -1,12 +1,19 @@
-import { BigWig } from '@gmod/bbi';
+import { BigWig } from "@gmod/bbi";
+import { RemoteFile } from "generic-filehandle";
+import { fetch } from "node-fetch";
 
 export class BigwigSource {
-    constructor(url){
+    constructor(url) {
         this.url = url;
+        // const headers = this.url.includes("4dnucleome")
+        //     ? {
+        //           Authorization: process.env.REACT_APP_4DN_KEY,
+        //       }
+        //     : {};
         this.bw = new BigWig({
-            url,
+            // filehandle: new RemoteFile(url, { fetch, overrides: { headers } }),
+            filehandle: new RemoteFile(url, { fetch }),
         });
-        this.header = null;
     }
 
     async getData(chrom, start, end, opts) {

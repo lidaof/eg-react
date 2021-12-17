@@ -152,6 +152,12 @@ class HubTrackTable extends React.PureComponent {
     const { rowHeader, columnHeader } = this.props;
     let columns = [];
     columns.push({
+      Header: "Genome",
+      id: "genome",
+      accessor: data => data.getMetadata("genome"),
+      width: 100
+    });
+    columns.push({
       Header: "Name",
       accessor: "name"
     });
@@ -159,7 +165,7 @@ class HubTrackTable extends React.PureComponent {
       Header: "Data hub",
       accessor: "datahub"
     });
-    if (rowHeader !== UNUSED_META_KEY) {
+    if (rowHeader !== UNUSED_META_KEY && rowHeader !== "genome") {
       columns.push({
         Header: rowHeader,
         id: rowHeader.toLowerCase(),
@@ -174,7 +180,7 @@ class HubTrackTable extends React.PureComponent {
         headerStyle: { flex: "100 0 auto", overflow: "visible" }
       });
     }
-    if (columnHeader !== UNUSED_META_KEY) {
+    if (columnHeader !== UNUSED_META_KEY && rowHeader !== "genome") {
       columns.push({
         Header: columnHeader,
         id: columnHeader.toLowerCase(),

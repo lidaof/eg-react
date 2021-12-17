@@ -91,8 +91,7 @@ chr1    791044  793910  chr8:248210-251154,2`,
     },
     qbed: {
         label: "qBED",
-        desc:
-            "Text file in qBED format, comprising 4-6 columns: chrom, start, end, value; and, optionally, strand and annotation",
+        desc: "Text file in qBED format, comprising 4-6 columns: chrom, start, end, value; and, optionally, strand and annotation",
         example: `chr1    51441754        51441758        1       -       CTAGAGACTGGC
 chr1    51441754        51441758        21      -       CTTTCCTCCCCA
 chr1    51982564        51982568        3       +       CGCGATCGCGAC
@@ -103,6 +102,18 @@ chr1    59951043        59951047        1       +       ACAAGAGAGACT
 chr1    61106283        61106287        1       -       ATGCACTACTTC
 chr1    61106283        61106287        7       -       CGTTTTTCACCT
 chr1    61542006        61542010        1       -       CTGAGAGACTGG`,
+    },
+    bedcolor: {
+        label: "bed regions with colors",
+        desc: "standard bed 3 column format + 4th column as color string, hex or rgb or color name",
+        example: `chr7	128535000	128855000	#0a4be5
+chr7	128855000	128960000	#26080f
+chr7	128855000	129140000	#b9abed
+chr7	128965000	129690000	#550184
+chr7	128975000	129125000	#1a417a
+chr7	129140000	129245000	#875f72
+chr7	129305000	129465000	#855c63
+chr7	129475000	129670000	#34caec`,
     },
 };
 

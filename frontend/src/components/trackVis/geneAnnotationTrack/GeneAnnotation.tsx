@@ -1,11 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
-
+import shortid from 'shortid';
 import AnnotationArrows from '../commonComponents/annotation/AnnotationArrows';
-
 import Gene from '../../../model/Gene';
 import { FeaturePlacer, PlacedFeature, PlacedSegment } from '../../../model/FeaturePlacer';
-import shortid from 'shortid';
 
 const FEATURE_PLACER = new FeaturePlacer();
 const HEIGHT = 9;
@@ -23,6 +21,7 @@ export const DEFAULT_OPTIONS = {
         other: 'rgb(128,128,128)'
     },
     hiddenPixels: 0.5,
+    italicizeText: false,
 }
 
 interface GeneDisplayOptions {
@@ -52,7 +51,8 @@ export class GeneAnnotation extends React.Component<GeneAnnotationProps> {
 
         return {
             color: mergedOptions.categoryColors[gene.transcriptionClass] || mergedOptions.color,
-            backgroundColor: mergedOptions.backgroundColor
+            backgroundColor: mergedOptions.backgroundColor,
+            italicizeText: mergedOptions.italicizeText
         };
     }
 

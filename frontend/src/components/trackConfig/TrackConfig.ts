@@ -3,6 +3,7 @@ import LabelConfig from "../trackContextMenu/LabelConfig";
 import { TrackModel, TrackOptions } from "../../model/TrackModel";
 import DataSource from "../../dataSources/DataSource";
 import { DYNAMIC_TYPES } from "./getTrackConfig";
+import { TrackGroupingBehavior } from "model/TrackGroupingBehavior";
 
 export class TrackConfig {
     public defaultOptions: TrackOptions;
@@ -47,16 +48,27 @@ export class TrackConfig {
     }
 
     isGenomeAlignTrack(): boolean {
-        return this.trackModel.type === "genomealign" || this.trackModel.filetype === "genomealign";
+        return this.trackModel.type === "genomealign" || this.trackModel.type === "bigchain";
     }
 
     isDynamicTrack(): boolean {
-        const trackType = this.trackModel.type || this.trackModel.filetype;
-        return DYNAMIC_TYPES.includes(trackType);
+        return DYNAMIC_TYPES.includes(this.trackModel.type);
     }
 
     isBigwigTrack(): boolean {
         return this.trackModel.type === "bigwig";
+    }
+
+    isHicTrack(): boolean {
+        return this.trackModel.type === "hic";
+    }
+
+    isNumericalTrack(): boolean {
+        return this.trackModel.type === "bigwig" || this.trackModel.type === "bedgraph";
+    }
+
+    isImageTrack(): boolean {
+        return this.trackModel.type === "omero4dn" || this.trackModel.type === "omeroidr";
     }
 
     /**
@@ -73,7 +85,11 @@ export class TrackConfig {
         return UnknownTrack;
     }
 
-    getMenuComponents(): React.ComponentType[] {
+    getMenuComponents(basesPerPixel?: number): React.ComponentType[] {
         return [LabelConfig];
+    }
+
+    getGroupingBehavior(): TrackGroupingBehavior<unknown> | null {
+        return null;
     }
 }

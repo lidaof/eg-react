@@ -112,8 +112,8 @@ export class RegionPanTracker extends React.Component<RegionPanTrackProps> {
         const navContext = region.getNavigationContext();
         const [start, end] = region.getContextCoordinates();
 
-        const newStart = navContext.toGaplessCoordinate( Math.max(0, start + baseDiff) );
-        const newEnd = navContext.toGaplessCoordinate( Math.min(end + baseDiff, navContext.getTotalBases() - 1) );
+        const newStart = navContext.toGaplessCoordinate(Math.max(0, start + baseDiff));
+        const newEnd = navContext.toGaplessCoordinate(Math.min(end + baseDiff, navContext.getTotalBases() - 1));
         return new OpenInterval(newStart, newEnd);
     }
 
@@ -129,14 +129,14 @@ export class RegionPanTracker extends React.Component<RegionPanTrackProps> {
         } = this.props;
 
         return (
-        <DragAcrossDiv
-            onDragStart={this.dragStart}
-            onDrag={this.drag}
-            onDragEnd={this.dragEnd}
-            {...remainingProps}
-        >
-            {children}
-        </DragAcrossDiv>
+            <DragAcrossDiv
+                onDragStart={this.dragStart}
+                onDrag={this.drag}
+                onDragEnd={this.dragEnd}
+                {...remainingProps}
+            >
+                {children}
+            </DragAcrossDiv>
         );
     }
 }

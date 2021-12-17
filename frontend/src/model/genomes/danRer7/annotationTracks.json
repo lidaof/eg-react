@@ -15,7 +15,7 @@
                 "name": "rmsk_all",
                 "label": "RepeatMasker",
                 "filetype": "repeatmasker",
-                "url": "https://wangftp.wustl.edu/~xzhuo/browser/danRer7/danRer7.bb",
+                "url": "https://vizhub.wustl.edu/public/danRer7/danRer7.bb",
                 "height": 30
             }
         ]
@@ -24,7 +24,7 @@
         {
             "type": "categorical",
             "name": "CpG Islands (unmasked)",
-            "url": "https://wangftp.wustl.edu/~xzhuo/browser/danRer7/danRer7.CGI.txt.gz",
+            "url": "https://vizhub.wustl.edu/public/danRer7/danRer7.CGI.txt.gz",
             "height": 30,
             "options": {
               "label": "CpG Context (unmasked)",

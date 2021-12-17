@@ -1,4 +1,4 @@
-import { TrackModel } from 'model/TrackModel';
+import { TrackModel } from "model/TrackModel";
 import { GenomeConfig } from "./../genomes/GenomeConfig";
 import _ from "lodash";
 import memoizeOne from "memoize-one";
@@ -20,7 +20,6 @@ import { ViewExpansion } from "../RegionExpander";
 import { FeaturePlacer } from "../FeaturePlacer";
 import DisplayedRegionModel from "../DisplayedRegionModel";
 import { niceBpCount } from "../../util";
-// import { object } from 'prop-types';
 
 export interface PlacedAlignment {
     record: AlignmentRecord;
@@ -79,6 +78,7 @@ export interface MultiAlignment {
 interface RecordsObj {
     query: string;
     records: AlignmentRecord[];
+    isBigChain?: boolean;
 }
 
 interface RefinedObj {
@@ -99,9 +99,7 @@ export class MultiAlignmentViewCalculator {
     private _alignmentFetchers: AlignmentFetcher[];
 
     constructor(primaryGenomeConfig: GenomeConfig, queryTracks: TrackModel[]) {
-        this._alignmentFetchers = queryTracks.map(
-            (track) => new AlignmentFetcher(primaryGenomeConfig, track)
-        );
+        this._alignmentFetchers = queryTracks.map((track) => new AlignmentFetcher(primaryGenomeConfig, track));
         this.primaryGenome = primaryGenomeConfig.genome.getName();
         this.multiAlign = memoizeOne(this.multiAlign);
     }
@@ -114,12 +112,12 @@ export class MultiAlignmentViewCalculator {
         const { visRegion, visWidth, viewWindowRegion } = visData;
 
         const drawModel = new LinearDrawingModel(visRegion, visWidth);
-        const isFineMode = drawModel.xWidthToBases(1) < MAX_FINE_MODE_BASES_PER_PIXEL;
+        const viewReregionReachFineMode = drawModel.xWidthToBases(1) < MAX_FINE_MODE_BASES_PER_PIXEL;
         let recordsArray: RecordsObj[];
-        if (isFineMode) {
+        if (viewReregionReachFineMode) {
             const recordsPromise = this._alignmentFetchers.map(async (fetcher) => {
                 const records = await fetcher.fetchAlignment(visRegion, visData, false);
-                return { query: fetcher.queryGenome, records: records };
+                return { query: fetcher.queryGenome, records: records, isBigChain: fetcher.isBigChain };
             });
             const oldRecordsArray = await Promise.all(recordsPromise);
             const { newRecordsArray, allGaps } = this.refineRecordsArray(oldRecordsArray, visData);
@@ -129,7 +127,9 @@ export class MultiAlignmentViewCalculator {
             return recordsArray.reduce(
                 (multiAlign, records) => ({
                     ...multiAlign,
-                    [records.query]: this.alignFine(records.query, records.records, visData, primaryVisData),
+                    [records.query]: records.isBigChain
+                        ? this.alignRough(records.query, records.records, visData)
+                        : this.alignFine(records.query, records.records, visData, primaryVisData, allGaps),
                 }),
                 {}
             );
@@ -283,7 +283,13 @@ export class MultiAlignmentViewCalculator {
             return index;
         }
     }
-    alignFine(query: string, records: AlignmentRecord[], oldVisData: ViewExpansion, visData: ViewExpansion): Alignment {
+    alignFine(
+        query: string,
+        records: AlignmentRecord[],
+        oldVisData: ViewExpansion,
+        visData: ViewExpansion,
+        allGaps: Gap[]
+    ): Alignment {
         // There's a lot of steps, so bear with me...
         const { visRegion, visWidth } = visData;
         // drawModel is derived from visData:
@@ -295,9 +301,9 @@ export class MultiAlignmentViewCalculator {
         // calculate navContext and placements using oldVisData so small gaps won't seperate different features:
         const navContext = oldVisData.visRegion.getNavigationContext();
         const placements = this._computeContextLocations(records, oldVisData);
-        const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
+        // const primaryGaps = this._getPrimaryGenomeGaps(placements, minGapLength);
         const navContextBuilder = new NavContextBuilder(navContext);
-        navContextBuilder.setGaps(primaryGaps);
+        navContextBuilder.setGaps(allGaps); // Use allGaps instead of primaryGaps here so gaps between placements were also included here.
         // With the draw model, we can set x spans for each placed alignment
         // Adjust contextSpan and xSpan in placements using visData:
         for (const placement of placements) {

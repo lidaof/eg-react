@@ -6,10 +6,12 @@
 
 import parseColor from "parse-color";
 import _ from "lodash";
-import iwanthue from "iwanthue";
-import * as THREE from "three";
+// import iwanthue from "iwanthue";
+// import * as THREE from "three";
 import rgba from "color-rgba";
 import ChromosomeInterval from "model/interval/ChromosomeInterval";
+import { AWS_API } from "dataSources/GeneSource";
+import axios from "axios";
 
 interface Coordinate {
     x: number;
@@ -117,7 +119,7 @@ export function niceBpCount(bases: number, useMinus = false) {
     if (rounded >= 750000) {
         return `${(rounded / 1000000).toFixed(1)} Mb`;
     } else if (rounded >= 10000) {
-        return `${(rounded / 1000).toFixed(1)} kb`;
+        return `${(rounded / 1000).toFixed(1)} Kb`;
     } else if (rounded > 0) {
         return `${rounded} bp`;
     } else {
@@ -127,6 +129,16 @@ export function niceBpCount(bases: number, useMinus = false) {
             return "0 bp";
         }
     }
+}
+
+export function niceCount(bases: number) {
+    const rounded = bases >= 1000 ? Math.floor(bases) : Math.round(bases);
+    if (rounded >= 750000) {
+        return `${rounded / 1000000}M`;
+    } else if (rounded >= 1000) {
+        return `${rounded / 1000}K`;
+    }
+    return `${bases}bp`;
 }
 
 export function ceil(value: number, precision: number) {
@@ -142,6 +154,19 @@ export function readFileAsText(file: Blob) {
     });
     reader.readAsText(file);
     return promise;
+}
+
+export function readFileAsBuffer(file: Blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const arrayBuffer = reader.result;
+            const bytes = new Uint8Array(arrayBuffer as ArrayBuffer);
+            resolve(bytes);
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+    });
 }
 
 /**
@@ -164,6 +189,7 @@ export const HELP_LINKS = {
     trackOptions: "https://eg.readthedocs.io/en/latest/datahub.html#track-properties",
     textTrack: "https://eg.readthedocs.io/en/latest/text.html",
     publish: "https://eg.readthedocs.io/en/latest/faq.html#publish-with-the-browser",
+    threed: "https://eg.readthedocs.io/en/latest/3d.html#supported-file-formats-for-3d-annotation-painting",
 };
 
 // /**
@@ -236,45 +262,45 @@ export function variableIsObject(obj: any) {
     return obj !== null && obj !== undefined && obj.constructor.name === "Object";
 }
 
-function reformatData(data: any) {
-    const grouped = _.groupBy(data, (x) => x[6]);
-    const sorted = {};
-    Object.keys(grouped).forEach((key) => {
-        const sort = grouped[key].sort((a, b) => a[0].localeCompare(b[0]) || a[1] - b[1]);
-        sorted[key] = sort;
-    });
-    return sorted;
-}
+// function reformatData(data: any) {
+//     const grouped = _.groupBy(data, (x) => x[6]);
+//     const sorted = {};
+//     Object.keys(grouped).forEach((key) => {
+//         const sort = grouped[key].sort((a, b) => a[0].localeCompare(b[0]) || a[1] - b[1]);
+//         sorted[key] = sort;
+//     });
+//     return sorted;
+// }
 
-export function getSplines(data: any) {
-    if (!data.length) {
-        console.error("error: data for splines is empty");
-        return null;
-    }
-    const splines = {};
-    const palette = iwanthue(data.length * 2);
-    data.forEach((dat: any, datIndex: number) => {
-        if (!dat) return;
-        const formatted = reformatData(dat.data);
-        Object.keys(formatted).forEach((key, keyIndex) => {
-            const tubeData = formatted[key];
+// export function getSplines(data: any) {
+//     if (!data.length) {
+//         console.error("error: data for splines is empty");
+//         return null;
+//     }
+//     const splines = {};
+//     const palette = iwanthue(data.length * 2);
+//     data.forEach((dat: any, datIndex: number) => {
+//         if (!dat) return;
+//         const formatted = reformatData(dat.data);
+//         Object.keys(formatted).forEach((key, keyIndex) => {
+//             const tubeData = formatted[key];
 
-            const points = tubeData.map((item: any) => new THREE.Vector3(item[3], item[4], item[5]));
-            // console.log(points.length);
-            const spline = new THREE.CatmullRomCurve3(points);
-            const color = palette[datIndex + keyIndex];
-            splines[`${dat.region}_${key}`] = { spline, color };
-        });
-    });
-    return splines;
-}
+//             const points = tubeData.map((item: any) => new THREE.Vector3(item[3], item[4], item[5]));
+//             // console.log(points.length);
+//             const spline = new THREE.CatmullRomCurve3(points);
+//             const color = palette[datIndex + keyIndex];
+//             splines[`${dat.region}_${key}`] = { spline, color };
+//         });
+//     });
+//     return splines;
+// }
 
-export function getTubeMesh(spline: any, color: any) {
-    const geometry = new THREE.TubeBufferGeometry(spline, 2000, 0.5, 8, false);
-    const material = new THREE.MeshBasicMaterial({ color });
-    const mesh = new THREE.Mesh(geometry, material);
-    return mesh;
-}
+// export function getTubeMesh(spline: any, color: any) {
+//     const geometry = new THREE.TubeBufferGeometry(spline, 2000, 0.5, 8, false);
+//     const material = new THREE.MeshBasicMaterial({ color });
+//     const mesh = new THREE.Mesh(geometry, material);
+//     return mesh;
+// }
 
 export function colorString2number(color: string): number {
     const [r, g, b] = rgba(color); //alpha not spreaded
@@ -298,14 +324,23 @@ export function arraysEqual(a: any[], b: any[]) {
     if (a === b) return true;
     if (a === null || b === null) return false;
     if (a.length !== b.length) return false;
-  
+
     // If you don't care about the order of the elements inside
     // the array, you should sort both arrays here.
     // Please note that calling sort on an array will modify that array.
     // you might want to clone your array first.
-  
+
     for (let i = 0; i < a.length; ++i) {
-      if (a[i] !== b[i]) return false;
+        if (a[i] !== b[i]) return false;
     }
     return true;
-  }
+}
+
+export const getSymbolRegions = async (genomeName: string, symbol: string) => {
+    const params = {
+        q: symbol,
+        getOnlyNames: false,
+    };
+    const response = await axios.get(`${AWS_API}/${genomeName}/genes/queryName`, { params: params });
+    return response.data;
+};

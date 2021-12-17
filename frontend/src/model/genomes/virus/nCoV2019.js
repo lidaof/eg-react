@@ -38,8 +38,7 @@ const defaultTracks = [
                     color: "#FFC300",
                 },
                 "S1,S2 cleavage site": {
-                    name:
-                        "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
+                    name: "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
                     color: "#18872F",
                 },
                 "heptad repeat 1 (HR1)": {
@@ -74,7 +73,7 @@ const defaultTracks = [
     new TrackModel({
         name: "Viral RNA expression (nanopore)",
         type: "bigwig",
-        url: "https://wangftp.wustl.edu/~xzhuo/bat_genomes/VeroInf24h.bw",
+        url: "https://vizhub.wustl.edu/public/virus/VeroInf24h.bw",
         options: {
             zoomLevel: "0",
         },
@@ -166,8 +165,7 @@ const annotationTracks = {
                         color: "#FFC300",
                     },
                     "S1,S2 cleavage site": {
-                        name:
-                            "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
+                        name: "Cleavage at this site generates the S1 and S2 subunits of the S protein (PMID: 32155444, 32532959)",
                         color: "#18872F",
                     },
                     "heptad repeat 1 (HR1)": {
@@ -252,226 +250,39 @@ const publicHubData = {
     "Putative SARS-CoV-2 Immune Epitopes":
         "Datahubs with tracks providing predicted epitope sequences across the SARS-CoV-2 reference genome",
     "Image data from IDR": "Images from IDR (https://idr.openmicroscopy.org/)",
+    "SARS-CoV-2 CRISPR Screen Database":
+        "A database containing tracks displaying the log2 fold changes and p-values in SARS-CoV-2 infected populations vs uninfected control.",
+    "Variants of Interest and Variants of Concern":
+        "A database containing all 8 SARS-CoV-2 Variants of Interest and all 5 Variants of Concern, as defined by the CDC as of May 25, 2021: https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-info.html#Interest",
 };
 
 const publicHubList = [
     {
-        collection: "NCBI database",
-        name: "All NCBI SARS-CoV-2 isolates",
-        numTracks: 40421,
+        collection: "SARS-CoV-2 CRISPR Screen Database",
+        name: "SARS-CoV-2 CRISPR Screen Database",
+        numTracks: 12,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/ncbi/12-5/browser_strains.json",
+        url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/crispr_screen/crispr_screen.json",
         description: {
-          "hub built by": "Changxu Fan (fanc@wustl.edu)",
-          "hub info": "All SARS-CoV-2 strains available on NCBI. Aligned to reference genome (NC_045512.2) using EMBL 'stretcher'.",
-          "data source": "https://www.ncbi.nlm.nih.gov/nuccore",
-          "white space": "Matching the reference",
-          "colored bars": "Variation from the reference. Details are color coded. Zoom in to click on the bar to see detail",
-          "long stretches of rosy brown": "Unsequenced regions"
-        }
-      },
-      {
-        collection: "NCBI database",
-        name: "All NCBI SARS-CoV-2 isolates, in SNV2 format",
-        numTracks: 40421,
+            "hub built by": "Jennifer Karlow (Flynn) (jaflynn@wustl.edu)",
+            "data source":
+                "Baggen, J., Persoons, L., Vanstreels, E. et al. Genome-wide CRISPR screening identifies TMEM106B as a proviral host factor for SARS-CoV-2. Nat Genet 53, 435–444 (2021). https://doi.org/10.1038/s41588-021-00805-2",
+            "hub info":
+                "This datahub contains 12 tracks - 4 for each stringency/adjustment levels: one showing log2 fold change values and the other 3 showing p-values for SARS-CoV-2 infected populations vs uninfected controls (14 days after exposure). The data displayed are from Supplementary Table 11: Supplementary Table 11. SARS-CoV-2 low stringency screen - gene-level analysis SARS-CoV-2 versus control - adjusted, Supplementary Table 7: Supplementary Table 7. SARS-CoV-2 high stringency screen - gene-level analysis, and Supplementary Table 10. SARS-CoV-2 low stringency screen - gene-level analysis SARS-CoV-2 versus control.",
+        },
+    },
+    {
+        collection: "Variants of Interest and Variants of Concern",
+        name: "Variants of Interest and Variants of Concern",
+        numTracks: 13,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~cfan/ncbi/12-5/browser_strains_snv2.json",
+        url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/variants_of_concern/voi_and_voc.json",
         description: {
-          "hub built by": "Changxu Fan (fanc@wustl.edu)",
-          "hub info": "All SARS-CoV-2 strains available on NCBI. Aligned to reference genome (NC_045512.2) using EMBL 'stretcher'.",
-          "format": "SNV2: suggests putative amino acid level mutations",
-          "data source": "https://www.ncbi.nlm.nih.gov/nuccore"
-        }
-         
-      },
-      {
-        collection:
-          "Nextstrain database",
-        name: "All Nextstrain SARS-CoV-2 isolates",
-        numTracks: 3434,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/nextstrain/12-5/browser_strains.json",
-        description: {
-          "hub built by": "Changxu Fan (fanc@wustl.edu)",
-          "track type": "SNV tracks of all SARS-CoV-2 strains from Nextstrain, displaying their sequence variation from the reference",
-          "data source": "http://data.Nextstrain.org/ncov.json"
-        }
-      },
-      {
-        collection:
-          "Nextstrain database",
-        name: "All Nextstrain SARS-CoV-2 isolates, in SNV2 format",
-        numTracks: 3434,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/nextstrain/12-5/browser_strains_snv2.json",
-        description: {
-          "hub built by": "Changxu Fan (fanc@wustl.edu)",
-          "track type": "SNV tracks of all SARS-CoV-2 strains from Nextstrain, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
-          "data source": "http://data.Nextstrain.org/ncov.json"
-        }
-      },
-      {
-        collection: "GISAID database",
-        name: "GISAID database (-5/22/2020)",
-        numTracks: 30612,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/5-22/browser_strains.json",
-        description: {
-          "track type": "SNV tracks of all SARS-CoV-2 strains available on GISAID as of 5/22/2020, displaying their sequence variation from the reference",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
-      {
-        collection: "GISAID database",
-        name: "GISAID database SNV2 format (-5/22/2020)",
-        numTracks: 30612,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/5-22/browser_strains_snv2.json",
-        description: {
-          "track type": "SNV2 tracks of all SARS-CoV-2 strains available on GISAID as of 5/22/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
-      {
-        collection: "GISAID database",
-        name: "GISAID database (5/22/2020-7/28/2020)",
-        numTracks: 42199,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/7-28/browser_strains_new.json",
-        description: {
-          "track type": "SNV tracks of all SARS-CoV-2 strains that became available on GISAID between 5/22/2020 and 7/28/2020 , displaying their sequence variation from the reference",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
-      {
-        collection: "GISAID database",
-        name: "GISAID database SNV2 format (5/22/2020-7/28/2020)",
-        numTracks: 42199,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/7-28/browser_strains_new_snv2.json",
-        description: {
-          "track type": "SNV2 tracks of all SARS-CoV-2 strains that became available on GISAID between 5/22/2020 and 7/28/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
-        {
-        collection: "GISAID database",
-        name: "GISAID database (7/28/2020 - 9/21/2020)",
-        numTracks: "33785",
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/9-21/browser_strains_new.json",
-        description: {
-          "track type": "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 7/28/2020 to 9/21/2020, displaying their sequence variation from the reference",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
-      {
-        collection: "GISAID database",
-        name: "GISAID database SNV2 format (7/28/2020 - 9/21/2020)",
-        numTracks: 33785,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/9-21/browser_strains_new_snv2.json",
-        description: {
-          "track type": "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 7/28/2020 to 9/21/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
-        {
-        collection: "GISAID database",
-        name: "GISAID database (9/21/2020 - 10/28/2020)",
-        numTracks: 59667,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/10-28/browser_strains_new.json",
-        description: {
-          "track type": "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 9/21/2020 to 10/28/2020, displaying their sequence variation from the reference",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
-      {
-        collection: "GISAID database",
-        name: "GISAID database SNV2 format (9/21/2020 - 10/28/2020)",
-        numTracks: 59667,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/10-28/browser_strains_new_snv2.json",
-        description: {
-          "track type": "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 9/21/2020 to 10/28/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
-      {
-        collection: "GISAID database",
-        name: "GISAID database (10/28/2020 - now)",
-        numTracks: 74375,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/12-5/browser_strains_new.json",
-        description: {
-          "track type": "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID since 10/28/2020, displaying their sequence variation from the reference",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
-      {
-        collection: "GISAID database",
-        name: "GISAID database SNV2 format (10/28/2020 - now)",
-        numTracks: 74375,
-        oldHubFormat: false,
-        url:
-          "https://wangftp.wustl.edu/~cfan/gisaid/12-5/browser_strains_new_snv2.json",
-        description: {
-          "track type": "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID since 10/28/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
-          "data source": (
-                        <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
-                            <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
-                        </a>
-                    )
-        }
-      },
+            "hub built by": "Jennifer Karlow (Flynn) (jaflynn@wustl.edu)",
+            "hub info":
+                "A database containing all 8 SARS-CoV-2 Variants of Interest and all 5 Variants of Concern, as defined by the CDC as of May 25, 2021: https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-info.html#Interest",
+        },
+    },
     {
         collection: "Diagnostics",
         name: "Primers",
@@ -509,8 +320,7 @@ const publicHubList = [
         description: {
             "hub built by": "Jennifer Flynn (jaflynn@wustl.edu)",
             "hub info": "Predicted SARS-CoV-2 epitopes that bind to class 1 HLA proteins",
-            values:
-                "Values represent number of strains with the predicted epitope. Only epitope predictions with 100% sequence identity in SARS-CoV-2 are displayed.",
+            values: "Values represent number of strains with the predicted epitope. Only epitope predictions with 100% sequence identity in SARS-CoV-2 are displayed.",
             "data source": "Campbell, et al. (2020) pre-print (DOI: 10.1101/2020.03.30.016931)",
         },
     },
@@ -547,8 +357,7 @@ const publicHubList = [
             "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
             "hub info":
                 "Coordinates of transcription regulatory sequences (TRSs) were retrieved from (Wu et al., 2020; DOI: 10.1038/s41586-020-2008-3). Recombination events were detected by junction-spanning RNA-seq reads that were generated by (Kim et al., 2020; DOI: 10.1016/j.cell.2020.04.011). The color intensity of the arc corresponds to the number of reads supporting the recombination event.",
-            TRS:
-                "Transcription regulatory sequences (TRSs). The leader TRS (TRS-L) is colored black and body TRSs (TRS-B) are colored red.",
+            TRS: "Transcription regulatory sequences (TRSs). The leader TRS (TRS-L) is colored black and body TRSs (TRS-B) are colored red.",
             "TRS-L-dependent recombination track": "Recombination events mediated by TRS-L. Scale 0-7000000 reads.",
             "TRS-L-independent recombination track": "Recombination events not mediated by TRS-L. Scale 0-1000 reads.",
         },
@@ -571,7 +380,7 @@ const publicHubList = [
         name: "Viral RNA expression (Kim et al., 2020)",
         numTracks: 1,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~xzhuo/viralBrowser/nanoporeBW.json",
+        url: "https://vizhub.wustl.edu/public/virus/nanoporeBW.json",
         description: {
             "hub built by": "Xiaoyu Zhuo (xzhuo@wustl.edu)",
             "hub info":
@@ -613,6 +422,664 @@ const publicHubList = [
             "hub built by": "Daofeng Li (dli23@wustl.edu)",
             "hub info": "Images are displayed through API provided by IDR.",
             "data source": "https://idr.openmicroscopy.org/",
+        },
+    },
+    {
+        collection: "NCBI database",
+        name: "All NCBI SARS-CoV-2 isolates",
+        numTracks: "53248",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/ncbi/2021-02-16/browser_strains.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "hub info":
+                "All SARS-CoV-2 strains available on NCBI. Aligned to reference genome (NC_045512.2) using EMBL 'stretcher'.",
+            "data source": "https://www.ncbi.nlm.nih.gov/nuccore",
+            "white space": "Matching the reference",
+            "colored bars":
+                "Variation from the reference. Details are color coded. Zoom in to click on the bar to see detail",
+            "long stretches of rosy brown": "Unsequenced regions",
+        },
+    },
+    {
+        collection: "NCBI database",
+        name: "All NCBI SARS-CoV-2 isolates, in SNV2 format",
+        numTracks: "53248",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/ncbi/2021-02-16/browser_strains_snv2.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "hub info":
+                "All SARS-CoV-2 strains available on NCBI. Aligned to reference genome (NC_045512.2) using EMBL 'stretcher'.",
+            format: "SNV2: suggests putative amino acid level mutations",
+            "data source": "https://www.ncbi.nlm.nih.gov/nuccore",
+        },
+    },
+    {
+        collection: "Nextstrain database",
+        name: "All Nextstrain SARS-CoV-2 isolates",
+        numTracks: 3890,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/nextstrain/2021-04-27/browser_strains.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "track type":
+                "SNV tracks of all SARS-CoV-2 strains from Nextstrain, displaying their sequence variation from the reference",
+            "data source": "http://data.Nextstrain.org/ncov.json",
+        },
+    },
+    {
+        collection: "Nextstrain database",
+        name: "All Nextstrain SARS-CoV-2 isolates, in SNV2 format",
+        numTracks: 3890,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/nextstrain/2021-04-27/browser_strains_snv2.json",
+        description: {
+            "hub built by": "Changxu Fan (fanc@wustl.edu)",
+            "track type":
+                "SNV tracks of all SARS-CoV-2 strains from Nextstrain, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": "http://data.Nextstrain.org/ncov.json",
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (-5/22/2020)",
+        numTracks: 30612,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/5-22/browser_strains.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 strains available on GISAID as of 5/22/2020, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (-5/22/2020)",
+        numTracks: 30612,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/5-22/browser_strains_snv2.json",
+        description: {
+            "track type":
+                "SNV2 tracks of all SARS-CoV-2 strains available on GISAID as of 5/22/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (5/22/2020-7/28/2020)",
+        numTracks: 42199,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/7-28/browser_strains_new.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 strains that became available on GISAID between 5/22/2020 and 7/28/2020 , displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (5/22/2020-7/28/2020)",
+        numTracks: 42199,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/7-28/browser_strains_new_snv2.json",
+        description: {
+            "track type":
+                "SNV2 tracks of all SARS-CoV-2 strains that became available on GISAID between 5/22/2020 and 7/28/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (7/28/2020 - 9/21/2020)",
+        numTracks: "33785",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/9-21/browser_strains_new.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 7/28/2020 to 9/21/2020, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (7/28/2020 - 9/21/2020)",
+        numTracks: "33785",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/9-21/browser_strains_new_snv2.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 7/28/2020 to 9/21/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (9/21/2020 - 10/28/2020)",
+        numTracks: "59667",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/10-28/browser_strains_new.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 9/21/2020 to 10/28/2020, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (9/21/2020 - 10/28/2020)",
+        numTracks: "59667",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/10-28/browser_strains_new_snv2.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 9/21/2020 to 10/28/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (10/28/2020 - 12/5/2020)",
+        numTracks: "74375",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/12-5/browser_strains_new.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 10/28/2020 to 12/5/2020, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (10/28/2020 - 12/5/2020)",
+        numTracks: "74375",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/12-5/browser_strains_new_snv2.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 10/28/2020 to 12/5/2020, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (12/5/2020 - 2/16/2021) part1",
+        numTracks: "55198",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part1.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part1",
+        numTracks: "55198",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part1.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (12/5/2020 - 2/16/2021) part2",
+        numTracks: "55198",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part2.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part2",
+        numTracks: "55198",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part2.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (12/5/2020 - 2/16/2021) part3",
+        numTracks: "55198",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part3.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part3",
+        numTracks: "55198",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part3.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (12/5/2020 - 2/16/2021) part4",
+        numTracks: "55198",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part4.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part4",
+        numTracks: "55198",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part4.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (12/5/2020 - 2/16/2021) part5",
+        numTracks: "55195",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part5.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part5",
+        numTracks: "55195",
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part5.json",
+        description: {
+            "track type":
+                "SNV tracks of all SARS-CoV-2 isolates that became available on GISAID from 12/5/2020 to 2/16/2021, displaying their sequence variation from the reference and suggesting putative amino acid level mutations",
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 1",
+        numTracks: 74745,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part1.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 2",
+        numTracks: 74747,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part2.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 3",
+        numTracks: 74785,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part3.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 4",
+        numTracks: 74749,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part4.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 5",
+        numTracks: 74781,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part5.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 6",
+        numTracks: 74781,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part6.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 7",
+        numTracks: 74755,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part7.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 8",
+        numTracks: 74759,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part8.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 9",
+        numTracks: 74747,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part9.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 10",
+        numTracks: 74736,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_part10.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 1, in SNV2 format ",
+        numTracks: 74745,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part1.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 2, in SNV2 format ",
+        numTracks: 74747,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part2.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 3, in SNV2 format ",
+        numTracks: 74785,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part3.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 4, in SNV2 format ",
+        numTracks: 74749,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part4.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 5, in SNV2 format ",
+        numTracks: 74781,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part5.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 6, in SNV2 format ",
+        numTracks: 74781,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part6.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 7, in SNV2 format ",
+        numTracks: 74755,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part7.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 8, in SNV2 format ",
+        numTracks: 74759,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part8.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 9, in SNV2 format ",
+        numTracks: 74747,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part9.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
+        },
+    },
+    {
+        collection: "GISAID database",
+        name: "GISAID database (2021-04-27 update) part 10, in SNV2 format ",
+        numTracks: 74736,
+        oldHubFormat: false,
+        url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-04-27/browser_strains_new_snv2_part10.json",
+        description: {
+            "data source": (
+                <a href="https://www.gisaid.org/" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.gisaid.org/fileadmin/gisaid/img/schild.png" alt="GISAID logo" />
+                </a>
+            ),
         },
     },
 ];

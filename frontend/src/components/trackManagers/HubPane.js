@@ -57,7 +57,7 @@ class HubPane extends React.PureComponent {
              <HubTable 
                 onHubLoaded={this.props.onAddTracksToPool}
                 onTracksAdded={this.props.onTracksAdded}
-                publicHubs={this.props.publicHubs} 
+                publicHubs={this.props.publicHubs}
                 onHubUpdated={this.props.onHubUpdated}
              />
             {

@@ -4,9 +4,7 @@ import _ from "lodash";
 import connect from "react-redux/lib/connect/connect";
 import ReactModal from "react-modal";
 import Hotkeys from "react-hot-keys";
-
 import { ActionCreators } from "../../AppState";
-
 import { withTrackData } from "./TrackDataManager";
 import { withTrackView } from "./TrackViewManager";
 import TrackHandle from "./TrackHandle";
@@ -21,21 +19,20 @@ import ContextMenuManager from "../ContextMenuManager";
 import DivWithBullseye from "../DivWithBullseye";
 import withAutoDimensions from "../withAutoDimensions";
 import TrackContextMenu from "../trackContextMenu/TrackContextMenu";
-
 import TrackModel from "../../model/TrackModel";
 import TrackSelectionBehavior from "../../model/TrackSelectionBehavior";
 import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import UndoRedo from "./UndoRedo";
 import History from "./History";
-
 import HighlightRegion from "../HighlightRegion";
 import { VerticalDivider } from "./VerticalDivider";
 import { CircletView } from "./CircletView";
 import ButtonGroup from "./ButtonGroup";
 import TrackRegionController from "../genomeNavigator/TrackRegionController";
-
 import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
+import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManager";
+import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 
 import "./TrackContainer.css";
 
@@ -112,6 +109,7 @@ class TrackContainer extends React.Component {
             circletColor: "#ff5722",
             panningAnimation: "none",
             zoomAnimation: 0,
+            groupScale: undefined,
         };
         this.leftBeam = React.createRef();
         this.rightBeam = React.createRef();
@@ -129,11 +127,18 @@ class TrackContainer extends React.Component {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.panLeftOrRight = this.panLeftOrRight.bind(this);
         this.zoomOut = this.zoomOut.bind(this);
+        this.groupManager = new GroupedTrackManager();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.tracks !== prevProps.tracks || prevProps.primaryView !== this.props.primaryView) {
+            this.getGroupScale();
+        }
     }
 
     getBeamRefs = () => {
         return [this.leftBeam.current, this.rightBeam.current];
-    }
+    };
 
     panLeftOrRight(left = true) {
         const { primaryView, onNewRegion } = this.props;
@@ -503,7 +508,7 @@ class TrackContainer extends React.Component {
                             onSetEnteredRegion={onSetEnteredRegion}
                         />
                     )}
-                    <div className="tool-element">
+                    <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <ReorderMany
                             onOpenReorderManyModal={this.openReorderManyModal}
                             onCloseReorderManyModal={this.closeReorderManyModal}
@@ -514,10 +519,10 @@ class TrackContainer extends React.Component {
                     {/* <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} /> */}
                     <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={this.zoomOut} />
                     <ButtonGroup buttons={panRightButton} />
-                    <div className="tool-element">
+                    <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <UndoRedo />
                     </div>
-                    <div className="tool-element">
+                    <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <History />
                     </div>
                     <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
@@ -537,14 +542,40 @@ class TrackContainer extends React.Component {
         );
     }
 
+    getGroupScale = () => {
+        const { tracks, trackData, primaryView } = this.props;
+        const groupScale = this.groupManager.getGroupScale(
+            tracks.map((tk) => tk.options.hasOwnProperty("group") && tk.options.group),
+            trackData,
+            primaryView.visWidth,
+            primaryView.viewWindow
+        );
+        this.setState({ groupScale });
+    };
+
     /**
      * @return {JSX.Element[]} track elements to render
      */
     makeTrackElements() {
-        const { tracks, trackData, primaryView, metadataTerms, viewRegion, layoutModel } = this.props;
+        const {
+            tracks,
+            trackData,
+            primaryView,
+            metadataTerms,
+            viewRegion,
+            layoutModel,
+            onSetAnchors3d,
+            onSetGeneFor3d,
+            viewer3dNumFrames,
+            basesPerPixel,
+            isThereG3dTrack,
+            onSetImageInfo,
+        } = this.props;
+
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
+            const layoutProps = getTrackConfig(trackModel).isImageTrack() ? { layoutModel } : {};
             return (
                 <TrackHandle
                     key={trackModel.getId()}
@@ -562,8 +593,16 @@ class TrackContainer extends React.Component {
                     onClick={this.handleTrackClicked}
                     onMetadataClick={this.handleMetadataClicked}
                     selectedRegion={viewRegion}
-                    layoutModel={layoutModel}
+                    // layoutModel={layoutModel}
                     getBeamRefs={this.getBeamRefs}
+                    onSetAnchors3d={onSetAnchors3d}
+                    onSetGeneFor3d={onSetGeneFor3d}
+                    viewer3dNumFrames={viewer3dNumFrames}
+                    basesPerPixel={basesPerPixel}
+                    isThereG3dTrack={isThereG3dTrack}
+                    onSetImageInfo={onSetImageInfo}
+                    groupScale={this.state.groupScale}
+                    {...layoutProps}
                 />
             );
         });
@@ -639,11 +678,20 @@ class TrackContainer extends React.Component {
             primaryView,
             viewRegion,
             highlightColor,
+            basesPerPixel,
+            trackData,
         } = this.props;
         if (!primaryView) {
             return null;
         }
         const { selectedTool } = this.state;
+        const fileInfos = {}; // key, track id, value: fileInfo obj
+        tracks.forEach((tk) => {
+            const tkId = tk.getId();
+            if (!_.isEmpty(trackData[tkId].fileInfo)) {
+                fileInfos[tkId] = trackData[tkId].fileInfo;
+            }
+        });
         const contextMenu = (
             <TrackContextMenu
                 tracks={tracks}
@@ -655,6 +703,8 @@ class TrackContainer extends React.Component {
                 onApplyDynamicHic={this.applyDynamicHic}
                 onApplyDynamicLongrange={this.applyDynamicLongrange}
                 onApplyDynamicBed={this.applyDynamicBed}
+                basesPerPixel={basesPerPixel}
+                fileInfos={fileInfos}
             />
         );
         const trackDivStyle = {
@@ -671,8 +721,14 @@ class TrackContainer extends React.Component {
                         shouldMenuClose={(event) => !SELECTION_BEHAVIOR.isToggleEvent(event)}
                     >
                         <DivWithBullseye style={trackDivStyle} id="trackContainer">
-                            <div id="beamLeft" ref={this.leftBeam}> <div id="beamLeftInner"></div> </div>
-                            <div id="beamRight" ref={this.rightBeam}> <div id="beamRightInner"></div> </div>
+                            <div id="beamLeft" ref={this.leftBeam}>
+                                {" "}
+                                <div id="beamLeftInner"></div>{" "}
+                            </div>
+                            <div id="beamRight" ref={this.rightBeam}>
+                                {" "}
+                                <div id="beamRightInner"></div>{" "}
+                            </div>
                             <VerticalDivider
                                 visData={primaryView}
                                 genomeRegion={viewRegion}

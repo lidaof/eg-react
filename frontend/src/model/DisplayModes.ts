@@ -34,3 +34,14 @@ export const BigWigZoomLevels = {
     3: 3,
     4: 4,
 };
+
+export const VcfColorScaleKeys = {
+    QUAL: "QUAL",
+    AF: "AF",
+};
+
+export const VcfDisplayModes = {
+    AUTO: "auto",
+    DENSITY: "density",
+    FULL: "full",
+};

@@ -19,9 +19,9 @@ class BigSourceWorker extends WorkerRunnableSource {
     constructor(url) {
         super();
         this.url = url;
-        const opts = {credentials: this.url.includes('4dnucleome') ? process.env.REACT_APP_4DN_KEY : undefined}
+        // const opts = {credentials: this.url.includes('4dnucleome') ? process.env.REACT_APP_4DN_KEY : undefined}
         this.bigWigPromise = new Promise((resolve, reject) => {
-            bigwig.makeBwg(new bin.URLFetchable(url, opts), (bigWigObj, error) => {
+            bigwig.makeBwg(new bin.URLFetchable(url), (bigWigObj, error) => {
                 if (error) {
                     reject(error);
                 }
@@ -51,6 +51,7 @@ class BigSourceWorker extends WorkerRunnableSource {
         for (let dasFeature of combinedData) {
             dasFeature.min -= 1; // bbi-js returns 1-indexed features; -1 to compensate.
         }
+        // console.log(combinedData);
         return combinedData;
     }
 

@@ -29,14 +29,14 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
 }
 
 .Nav-genome {
-    opacity: 0.3;
+    opacity: 0.6;
     text-align: center;
     cursor: pointer;
     width: 180px;
 }
 
 .Nav-genome:hover {
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .Nav-center {
@@ -145,4 +145,15 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
 
 .italic {
     font-style: italic;
+}
+
+.otherGenome-container {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(6, auto);
+}
+
+.otherGenome-label:hover {
+    cursor: pointer;
+    border-bottom: 1px solid blue;
 }

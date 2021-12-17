@@ -4,7 +4,6 @@ import _ from "lodash";
 import { scaleLinear } from "d3-scale";
 import memoizeOne from "memoize-one";
 import { notify } from "react-notify-toast";
-import LinearDrawingModel from "model/LinearDrawingModel";
 import HoverTooltipContext from "../commonComponents/tooltip/HoverTooltipContext";
 import Chromosomes from "components/genomeNavigator/Chromosomes";
 import withCurrentGenome from "components/withCurrentGenome";
@@ -15,10 +14,11 @@ import configOptionMerging from "../commonComponents/configOptionMerging";
 import { ScaleChoices } from "model/ScaleChoices";
 import { getGenomeConfig } from "model/genomes/allGenomes";
 import TrackLegend from "../commonComponents/TrackLegend";
-import { ValuePlot } from "../commonComponents/numerical/NumericalTrack";
+import NumericalTrack from "../commonComponents/numerical/NumericalTrack";
 
 const CHROMOSOMES_Y = 60;
 const TOP_PADDING = 2;
+export const MAX_PIXELS_PER_BASE_NUMERIC = 0.5;
 
 export const DEFAULT_OPTIONS = {
     aggregateMethod: DefaultAggregators.types.MEAN,
@@ -50,6 +50,7 @@ class DynseqTrack extends PureComponent {
         this.xToValue = null;
         this.xToValue2 = null;
         this.allValues = [];
+        this.drawHeights = [];
         this.scales = null;
         this.hasReverse = false;
         this.aggregateFeatures = memoizeOne(this.aggregateFeatures);
@@ -93,19 +94,23 @@ class DynseqTrack extends PureComponent {
             min = yMin ? yMin : min;
         }
         if (min > max) {
-            min = max;
+            notify.show("Y-axis min should less than Y-axis max", "warning", 5000);
+            min = 0;
         }
 
         // determines the distance of y=0 from the top
-        let zeroLine = min < 0 ? TOP_PADDING + ((height - TOP_PADDING) * max) / (max + Math.abs(min)) : height;
+        const zeroLine = min < 0 ? TOP_PADDING + ((height - 2 * TOP_PADDING) * max) / (max - min) : height;
 
         if (xToValue2.length > 0) {
             return {
                 valueToHeight: scaleLinear()
                     .domain([min, max])
-                    .range([zeroLine - height, zeroLine - TOP_PADDING]),
+                    .range([zeroLine - height + TOP_PADDING, zeroLine - TOP_PADDING]),
                 valueToY: scaleLinear().domain([max, 0]).range([TOP_PADDING, zeroLine]).clamp(true),
-                axisScale: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
+                axisScale: scaleLinear()
+                    .domain([max, min])
+                    .range([TOP_PADDING, height - TOP_PADDING])
+                    .clamp(true),
                 valueToYReverse: scaleLinear()
                     .domain([0, min])
                     .range([0, zeroLine - TOP_PADDING])
@@ -120,7 +125,7 @@ class DynseqTrack extends PureComponent {
             return {
                 valueToHeight: scaleLinear()
                     .domain([min, max])
-                    .range([zeroLine - height, zeroLine - TOP_PADDING]),
+                    .range([0, height - TOP_PADDING]),
                 valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
                 axisScale: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
                 valueToOpacity: scaleLinear().domain([min, max]).range([0, 1]).clamp(true),
@@ -140,20 +145,26 @@ class DynseqTrack extends PureComponent {
      */
     renderTooltip = (relativeX) => {
         const { trackModel, viewRegion, width, unit } = this.props;
-        const idx = Math.round(relativeX);
-        const value = this.allValues.length > idx ? this.allValues[idx] : undefined;
-        if (!value) {
-            return null;
-        }
+        const value = this.xToValue[Math.round(relativeX)];
+        const value2 = this.hasReverse ? this.xToValue2[Math.round(relativeX)] : null;
         const stringValue = typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : "(no data)";
+        const stringValue2 = typeof value2 === "number" && !Number.isNaN(value2) ? value2.toFixed(2) : "(no data)";
         return (
             <div>
                 <div>
                     <span className="Tooltip-major-text" style={{ marginRight: 3 }}>
-                        {stringValue}
+                        {this.hasReverse && "Forward: "} {stringValue}
                     </span>
                     {unit && <span className="Tooltip-minor-text">{unit}</span>}
                 </div>
+                {this.hasReverse && (
+                    <div>
+                        <span className="Tooltip-major-text" style={{ marginRight: 3 }}>
+                            Reverse: {stringValue2}
+                        </span>
+                        {unit && <span className="Tooltip-minor-text">{unit}</span>}
+                    </div>
+                )}
                 <div className="Tooltip-minor-text">
                     <GenomicCoordinates viewRegion={viewRegion} width={width} x={relativeX} />
                 </div>
@@ -163,8 +174,8 @@ class DynseqTrack extends PureComponent {
     };
 
     render() {
-        const { data, viewRegion, width, trackModel, options, forceSvg, unit } = this.props;
-        const { height, aggregateMethod, color } = options;
+        const { data, viewRegion, width, trackModel, options, unit, basesPerPixel } = this.props;
+        const { height, aggregateMethod } = options;
         const dataForward = data.filter((feature) => feature.value === undefined || feature.value >= 0); // bed track to density mode
         const dataReverse = data.filter((feature) => feature.value < 0);
         if (dataReverse.length > 0) {
@@ -176,60 +187,47 @@ class DynseqTrack extends PureComponent {
         this.xToValue =
             dataForward.length > 0 ? this.aggregateFeatures(dataForward, viewRegion, width, aggregateMethod) : [];
         this.scales = this.computeScales(this.xToValue, this.xToValue2, height);
-        let drawHeights = this.xToValue.map(this.scales.valueToHeight);
-        this.allValues = this.xToValue;
+        this.drawHeights = this.xToValue.map((x) => this.scales.valueToHeight(x) || 0);
+        this.allValues = this.xToValue.map((x) => x || 0);
         if (this.xToValue2.length > 0) {
-            const negHeights = this.xToValue2.map(this.scales.valueToHeight);
-            drawHeights = drawHeights.map((num, idx) => (num || 0) + (negHeights[idx] || 0));
-            this.allValues = this.allValues.map((num, idx) => (num || 0) + (this.xToValue2[idx] || 0));
+            const negHeights = this.xToValue2.map((x) => this.scales.valueToHeight(x) || 0);
+            this.drawHeights = this.drawHeights.map((num, idx) => num + negHeights[idx]);
+            this.allValues = this.allValues.map((num, idx) => num + (this.xToValue2[idx] || 0));
         }
-        const drawModel = new LinearDrawingModel(viewRegion, width);
-        const seqmode = drawModel.basesToXWidth(1) > 2;
-        const legend = (
-            <TrackLegend
-                trackModel={trackModel}
-                height={height}
-                axisScale={seqmode ? this.scales.axisScale : undefined}
-                axisLegend={unit}
-            />
-        );
+        // const drawModel = new LinearDrawingModel(viewRegion, width);
+        // const seqmode = drawModel.basesToXWidth(1) > 2;
         const genomeConfig = getGenomeConfig(trackModel.getMetadata("genome")) || this.props.genomeConfig;
-        let renderer;
-        if (seqmode) {
-            renderer = (
-                <svg width={width} height={height} style={{ display: "block" }}>
-                    <Chromosomes
-                        genomeConfig={genomeConfig}
-                        viewRegion={viewRegion}
-                        width={width}
-                        labelOffset={CHROMOSOMES_Y}
-                        hideChromName={true}
-                        drawHeights={drawHeights}
-                        zeroLine={this.scales.zeroLine}
-                        height={height}
-                        hideCytoband={true}
-                        minXwidthPerBase={2}
-                    />
-                </svg>
-            );
-        } else {
-            renderer = (
-                <ValuePlot
-                    xToValue={this.allValues}
-                    scales={this.scales}
+        if (basesPerPixel <= MAX_PIXELS_PER_BASE_NUMERIC) {
+            const legend = (
+                <TrackLegend
+                    trackModel={trackModel}
                     height={height}
-                    color={color}
-                    forceSvg={forceSvg}
-                    isDrawingBars={false}
+                    axisScale={this.scales.axisScale}
+                    axisLegend={unit}
                 />
             );
+            const visualizer = (
+                <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip}>
+                    <svg width={width} height={height} style={{ display: "block" }}>
+                        <Chromosomes
+                            genomeConfig={genomeConfig}
+                            viewRegion={viewRegion}
+                            width={width}
+                            labelOffset={CHROMOSOMES_Y}
+                            hideChromName={true}
+                            drawHeights={this.drawHeights}
+                            zeroLine={this.scales.zeroLine}
+                            height={height}
+                            hideCytoband={true}
+                            minXwidthPerBase={2}
+                        />
+                    </svg>
+                </HoverTooltipContext>
+            );
+            return <Track {...this.props} legend={legend} visualizer={visualizer} />;
+        } else {
+            return <NumericalTrack {...this.props} />;
         }
-        const visualizer = (
-            <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltip}>
-                {renderer}
-            </HoverTooltipContext>
-        );
-        return <Track {...this.props} legend={legend} visualizer={visualizer} />;
     }
 }
 

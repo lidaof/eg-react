@@ -29,6 +29,7 @@ const defaultTracks = [
         name: "PlasmoDBGene",
         genome: "Pfal3D7",
         label: "PlasmoDB 9.0 genes",
+        queryEndpoint: { name: "PlasmoDB", endpoint: "https://plasmodb.org/plasmo/app/record/gene/" },
     }),
     new TrackModel({
         type: "ruler",
@@ -38,6 +39,7 @@ const defaultTracks = [
 
 const publicHubData = {
     "Noble lab": "Published data from Noble lab (https://noble.gs.washington.edu/)",
+    "3D structures": "3D stucure data collection",
 };
 
 const publicHubList = [
@@ -49,6 +51,13 @@ const publicHubList = [
         url: "https://vizhub.wustl.edu/public/Pfalciparum3D7/long",
         description:
             "A collection of long-range chromatin interaction data sets from https://noble.gs.washington.edu/proj/plasmo3d/",
+    },
+    {
+        collection: "3D structures",
+        name: "3D structures from Genome Res. 2014 Jun; 24(6): 974–988.",
+        numTracks: 3,
+        oldHubFormat: false,
+        url: "https://target.wustl.edu/dli/tmp/pfal3d7_3d.json",
     },
 ];
 

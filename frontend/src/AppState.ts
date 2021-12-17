@@ -69,7 +69,7 @@ export interface AppState {
     genomeConfig?: object;
     virusBrowserMode?: boolean;
     layout?: object;
-    // threedTracks?: TrackModel[];
+    // g3dtracks?: TrackModel[];
 }
 
 const bundleId = uuid.v1();
@@ -88,7 +88,7 @@ const initialState: AppState = {
     isShowingVR: false,
     customTracksPool: [],
     layout: {},
-    // threedTracks: [],
+    // g3dtracks: [],
 };
 
 enum ActionType {
@@ -110,7 +110,7 @@ enum ActionType {
     SET_VIRUS_BROWSER_MODE = "SET_VIRUS_BROWSER_MODE",
     SET_HUB_SESSION_STORAGE = "SET_HUB_SESSION_STORAGE",
     SET_LAYOUT = "SET_LAYOUT",
-    // SET_THREED_TRACKS = "SET_THREED_TRACKS",
+    // SET_G3D_TRACKS = "SET_G3D_TRACKS",
 }
 
 interface AppAction {
@@ -194,7 +194,11 @@ export const ActionCreators = {
         return { type: ActionType.SET_CUSTOM_TRACKS_POOL, customTracksPool };
     },
 
-    setTracksCustomTracksPool: (tracks: TrackModel[], customTracksPool: TrackModel[], withDefaultTracks: boolean = true) => {
+    setTracksCustomTracksPool: (
+        tracks: TrackModel[],
+        customTracksPool: TrackModel[],
+        withDefaultTracks: boolean = true
+    ) => {
         return {
             type: ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL,
             tracks,
@@ -227,19 +231,16 @@ export const ActionCreators = {
     },
 
     // setThreedTracks: (newTracks: TrackModel[]) => {
-    //     return { type: ActionType.SET_THREED_TRACKS, threedTracks: newTracks };
+    //     return { type: ActionType.SET_G3D_TRACKS, threedTracks: newTracks };
     // },
 };
 
 function getInitialState(): AppState {
     let state = initialState;
-
     const { query } = querySting.parseUrl(window.location.href);
     let newState;
     if (!_.isEmpty(query)) {
-        if (query.bundle) {
-            newState = { ...state, bundleId: query.bundle, sessionFromUrl: true };
-        }
+        // console.log(query);
         if (query.session) {
             window.location.href = `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&session=${query.session}&statusId=${query.statusId}`;
         }
@@ -260,6 +261,13 @@ function getInitialState(): AppState {
                 type: ActionType.SET_GENOME,
                 genomeName: query.genome,
             });
+        }
+        if (query.bundle) {
+            if (query.genome) {
+                newState = { ...newState, bundleId: query.bundle, sessionFromUrl: true };
+            } else {
+                newState = { ...state, bundleId: query.bundle, sessionFromUrl: true };
+            }
         }
         if (query.hicUrl) {
             const tmpState = getNextState(state, {
@@ -290,6 +298,7 @@ function getInitialState(): AppState {
                 type: ActionType.SET_VIRUS_BROWSER_MODE,
             });
         }
+        // console.log(newState);
         return (newState as AppState) || (state as AppState);
     }
     const blob = STORAGE.getItem(SESSION_KEY);
@@ -390,7 +399,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 isShowingVR: !prevState.isShowingVR,
             };
         case ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL:
-            const tracks = action.withDefaultTracks ? [...prevState.tracks, ...action.tracks]: [...action.tracks];
+            const tracks = action.withDefaultTracks ? [...prevState.tracks, ...action.tracks] : [...action.tracks];
             return {
                 ...prevState,
                 tracks,
@@ -410,7 +419,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             };
         case ActionType.SET_LAYOUT:
             return { ...prevState, layout: action.layout };
-        // case ActionType.SET_THREED_TRACKS:
+        // case ActionType.SET_G3D_TRACKS:
         //     return { ...prevState, threedTracks: action.tracks };
         default:
             // console.warn("Unknown change state action; ignoring.");
@@ -422,7 +431,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
 async function getTracksFromHubURL(url: string): Promise<any> {
     const json = await new Json5Fetcher().get(url);
     const hubParser = new DataHubParser();
-    return await hubParser.getTracksInHub(json, "URL hub", false, 0);
+    return await hubParser.getTracksInHub(json, "URL hub", "", false, 0);
 }
 
 /**
@@ -493,12 +502,14 @@ async function asyncInitState() {
     const { query } = querySting.parseUrl(window.location.href);
     if (!_.isEmpty(query)) {
         if (query.hub) {
-            const withDefaultTracks = !query.noDefaultTracks || (query.noDefaultTracks ? false: true);
+            const withDefaultTracks = !query.noDefaultTracks || (query.noDefaultTracks ? false : true);
             const customTracksPool = await getTracksFromHubURL(query.hub as string);
             if (customTracksPool) {
                 const tracks = customTracksPool.filter((track: any) => track.showOnHubLoad);
                 if (tracks.length > 0) {
-                    AppState.dispatch(ActionCreators.setTracksCustomTracksPool(tracks, customTracksPool, withDefaultTracks));
+                    AppState.dispatch(
+                        ActionCreators.setTracksCustomTracksPool(tracks, customTracksPool, withDefaultTracks)
+                    );
                 } else {
                     AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
                 }

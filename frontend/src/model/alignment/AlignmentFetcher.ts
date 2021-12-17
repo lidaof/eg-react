@@ -1,6 +1,7 @@
-import { TrackModel } from 'model/TrackModel';
+import { TrackModel } from "model/TrackModel";
 import { GenomeConfig } from "./../genomes/GenomeConfig";
 import { AlignmentRecord } from "./AlignmentRecord";
+import { BigChainAlignmentRecord } from "./BigChainAlignmentRecord";
 import DisplayedRegionModel from "../DisplayedRegionModel";
 import { ViewExpansion } from "../RegionExpander";
 // import { getGenomeConfig } from "../genomes/allGenomes";
@@ -8,17 +9,20 @@ import { ViewExpansion } from "../RegionExpander";
 import DataSource from "../../dataSources/DataSource";
 import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { GenomeAlignWorker } from "../../dataSources/WorkerTSHook";
+import { BigGmodWorker } from "../../dataSources/WorkerTSHook";
 
 export class AlignmentFetcher {
     public primaryGenome: string;
     private _dataSource: DataSource;
     public queryGenome: string;
+    public isBigChain: boolean;
 
     constructor(public primaryGenomeConfig: GenomeConfig, public queryTrack: TrackModel) {
         this.primaryGenome = primaryGenomeConfig.genome.getName();
         this.primaryGenomeConfig = primaryGenomeConfig;
         this.queryTrack = queryTrack;
-        this.queryGenome = queryTrack.querygenome || queryTrack.getMetadata('genome');
+        this.queryGenome = queryTrack.querygenome || queryTrack.getMetadata("genome");
+        this.isBigChain = queryTrack.type === "bigchain";
         this._dataSource = this.initDataSource();
     }
 
@@ -34,7 +38,7 @@ export class AlignmentFetcher {
             return this.makeErrorSource();
         }
         let url = this.queryTrack.url;
-        if(!url) {
+        if (!url) {
             const annotationTracks = this.primaryGenomeConfig.annotationTracks || {};
             const comparisonTracks = annotationTracks["Genome Comparison"] || [];
             const theTrack = comparisonTracks.find((track: any) => track.querygenome === this.queryGenome) || {};
@@ -43,7 +47,11 @@ export class AlignmentFetcher {
         if (!url) {
             return this.makeErrorSource();
         }
-        return new WorkerSource(GenomeAlignWorker, url);
+        if (this.isBigChain) {
+            return new WorkerSource(BigGmodWorker, url);
+        } else {
+            return new WorkerSource(GenomeAlignWorker, url);
+        }
     }
 
     makeErrorSource(): DataSource {
@@ -65,8 +73,13 @@ export class AlignmentFetcher {
     ): Promise<AlignmentRecord[]> {
         const { visRegion, visWidth } = visData;
         const basesPerPixel = visRegion.getWidth() / visWidth;
-        const rawRecords: any[] = await this._dataSource.getData(fetchRegion, basesPerPixel, { isRoughMode });
-        return rawRecords.map(record => new AlignmentRecord(record));
+        if (this.isBigChain) {
+            const rawRecords: any[] = await this._dataSource.getData(fetchRegion, basesPerPixel, {});
+            return rawRecords.map((record) => new BigChainAlignmentRecord(record));
+        } else {
+            const rawRecords: any[] = await this._dataSource.getData(fetchRegion, basesPerPixel, { isRoughMode });
+            return rawRecords.map((record) => new AlignmentRecord(record));
+        }
     }
 }
 

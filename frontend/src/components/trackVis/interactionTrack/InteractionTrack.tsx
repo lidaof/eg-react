@@ -47,6 +47,8 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
     };
     forceSvg?: boolean;
     getBeamRefs?: any;
+    onSetAnchors3d?: any;
+    isThereG3dTrack?: boolean;
 }
 
 export const DEFAULT_OPTIONS = {
@@ -63,6 +65,7 @@ export const DEFAULT_OPTIONS = {
     greedyTooltip: false,
     fetchViewWindowOnly: false,
     bothAnchorsInView: false,
+    isThereG3dTrack: false,
 
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
@@ -160,7 +163,7 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
     }
 
     render(): JSX.Element {
-        const { data, trackModel, visRegion, width, viewWindow, options, forceSvg, getBeamRefs } = this.props;
+        const { data, trackModel, visRegion, width, viewWindow, options, forceSvg, getBeamRefs, onShowTooltip, onHideTooltip, onSetAnchors3d, isThereG3dTrack } = this.props;
         const filteredData = this.filterData(data);
         this.scales = this.computeScale();
         const visualizerProps = {
@@ -176,9 +179,13 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             binSize: options.binSize,
             onInteractionHovered: this.showTooltip,
             onMouseOut: this.hideTooltip,
+            onShowTooltip,
+            onHideTooltip,
+            onSetAnchors3d,
             forceSvg,
             greedyTooltip: options.greedyTooltip,
             bothAnchorsInView: options.bothAnchorsInView,
+            isThereG3dTrack,
         };
         let visualizer; // , height;
         // if (options.displayMode === InteractionDisplayMode.HEATMAP) {

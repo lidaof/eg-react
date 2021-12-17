@@ -56,6 +56,7 @@ export class NavContextBuilder {
                 resultFeatures.pop();
             }
 
+            prevSplitBase = prevSplitBase > splitBase ? 0: prevSplitBase;
             const leftLocus = new FeatureSegment(featureToSplit, prevSplitBase, splitBase).getLocus();
             const rightLocus = new FeatureSegment(featureToSplit, splitBase).getLocus();
             if (leftLocus.getLength() > 0) {

@@ -59,12 +59,12 @@ export function deleteTabByIdFromLayout(layout, tabId) {
     }
     const model = FlexLayout.Model.fromJson(layout);
     model.doAction(FlexLayout.Actions.deleteTab(tabId));
-    const json = model.toJson();
-    if (json.layout.children.length > 1) {
-        return json; // always keep the layout
-    } else {
-        return { ...json, global: global0 };
-    }
+    return model.toJson();
+}
+
+export function deleteTabByIdFromModel(model, tabId) {
+    model.doAction(FlexLayout.Actions.deleteTab(tabId));
+    return model.toJson();
 }
 
 export function tabIdExistInLayout(layout, tabId) {
@@ -74,4 +74,15 @@ export function tabIdExistInLayout(layout, tabId) {
     const model = FlexLayout.Model.fromJson(layout);
     const tab = model.getNodeById(tabId);
     return tab === undefined ? false : true;
+}
+
+export function ensureLayoutHeader(json) {
+    // console.log(json);
+    if (json.layout.children.length > 1) {
+        return json; // always keep the layout
+    } else if (json.layout.children[0].children.length > 1) {
+        return json;
+    } else {
+        return { ...json, global: global0 };
+    }
 }

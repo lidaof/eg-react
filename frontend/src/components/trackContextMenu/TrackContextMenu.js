@@ -5,10 +5,11 @@ import Collapsible from "react-collapsible";
 import TrackModel from "../../model/TrackModel";
 import { getTrackConfig, INTERACTION_TYPES } from "../trackConfig/getTrackConfig";
 import { CopyToClip } from "../CopyToClipboard";
+import { NUMERRICAL_TRACK_TYPES } from "../trackManagers/CustomTrackAdder";
+import { niceCount, variableIsObject } from "../../util";
+import SelectConfig from "./SelectConfig";
 
 import "./TrackContextMenu.css";
-import { NUMERRICAL_TRACK_TYPES } from "../trackManagers/CustomTrackAdder";
-import { variableIsObject } from "../../util";
 
 /**
  * Props that menu items will recieve.
@@ -67,13 +68,14 @@ class TrackContextMenu extends React.PureComponent {
      *
      * @return {JSX.Element[]} menu elements to render
      */
-    renderTrackSpecificItems() {
-        const selectedTracks = this.props.tracks.filter((track) => track.isSelected);
+    renderTrackSpecificItems(selectedTracks) {
+        const { basesPerPixel } = this.props;
+        // const selectedTracks = this.props.tracks.filter((track) => track.isSelected);
         const trackConfigs = selectedTracks.map(getTrackConfig);
         let menuComponents = []; // Array of arrays, one for each track
         let optionsObjects = [];
         for (const config of trackConfigs) {
-            const menuItems = config.getMenuComponents();
+            const menuItems = config.getMenuComponents(basesPerPixel);
             if (!menuItems) {
                 // Intersecting anything with the empty set is the empty set, so we can stop right here.
                 return [];
@@ -124,6 +126,11 @@ class TrackContextMenu extends React.PureComponent {
         return (
             <div className="TrackContextMenu-body">
                 <MenuTitle tracks={selectedTracks} />
+                <HicBinSizeNormOptionConfig
+                    tracks={selectedTracks}
+                    fileInfos={this.props.fileInfos}
+                    onOptionSet={this.changeSelectedTracks}
+                />
                 {this.renderTrackSpecificItems(selectedTracks)}
                 <CircletViewConfig tracks={selectedTracks} onCircletRequested={this.props.onCircletRequested} />
                 <DeselectOption numTracks={selectedTracks.length} onClick={this.props.deselectAllTracks} />
@@ -161,6 +168,54 @@ function CircletViewConfig(props) {
                 Circlet view
             </button>
         </div>
+    );
+}
+
+/**
+ *
+ * @param {*} props: contains selected tracks and fileInfos obj
+ * a menu item controls hic binsize and norm options
+ * the binsize and norm options are from the file's metadata/header info
+ */
+function HicBinSizeNormOptionConfig(props) {
+    const { tracks, fileInfos, onOptionSet } = props;
+    const trackConfigs = tracks.map(getTrackConfig);
+    const optionsObjects = trackConfigs.map((config) => config.getOptions());
+    const isHicTracks = trackConfigs.map((config) => config.isHicTrack());
+    if (!_.every(isHicTracks, Boolean)) {
+        return null;
+    }
+    const allResolutions = [],
+        allNormOptions = [];
+    Object.keys(fileInfos).forEach((trackId) => {
+        allResolutions.push(fileInfos[trackId].resolutions);
+        allNormOptions.push(fileInfos[trackId].normOptions);
+    });
+    const commonResolutions = _.intersection(...allResolutions);
+    const commonNormOptions = _.intersection(...allNormOptions);
+    const commonResolutionsObj = { AUTO: 0 },
+        commonNormOptionsObj = {};
+    commonResolutions.forEach((r) => (commonResolutionsObj[niceCount(r)] = r));
+    commonNormOptions.forEach((r) => (commonNormOptionsObj[r] = r));
+    return (
+        <>
+            <SelectConfig
+                optionName="binSize"
+                label="Bin size:"
+                defaultValue={commonResolutionsObj.AUTO}
+                choices={commonResolutionsObj}
+                optionsObjects={optionsObjects}
+                onOptionSet={onOptionSet}
+            />
+            <SelectConfig
+                optionName="normalization"
+                label="Normalization"
+                defaultValue={commonNormOptionsObj.NONE}
+                choices={commonNormOptionsObj}
+                optionsObjects={optionsObjects}
+                onOptionSet={onOptionSet}
+            />
+        </>
     );
 }
 
