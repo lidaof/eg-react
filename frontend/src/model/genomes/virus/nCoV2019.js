@@ -22,7 +22,7 @@ const defaultTracks = [
     new TrackModel({
         type: "categorical",
         name: "S protein annotations",
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_Sprot_annot_sorted.bed.gz",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/sars-cov-2_Sprot_annot_sorted.bed.gz",
         options: {
             height: 20,
             alwaysDrawLabel: true,
@@ -61,15 +61,15 @@ const defaultTracks = [
             height: 50,
         },
     }),
-    new TrackModel({
-        type: "qbed",
-        name: "Mutation Alert",
-        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_alert.bed.sort.gz",
-        options: {
-            height: 60,
-            color: "darkgreen",
-        },
-    }),
+    // new TrackModel({
+    //     type: "qbed",
+    //     name: "Mutation Alert",
+    //     url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_alert.bed.sort.gz",
+    //     options: {
+    //         height: 60,
+    //         color: "darkgreen",
+    //     },
+    // }),
     new TrackModel({
         name: "Viral RNA expression (nanopore)",
         type: "bigwig",
@@ -78,20 +78,20 @@ const defaultTracks = [
             zoomLevel: "0",
         },
     }),
-    new TrackModel({
-        type: "bed",
-        name: "Putative SARS Immune Epitopes",
-        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/IEDB_NC_045512.2_SARS-tblastn-nCoV_3H3V6ZBF01R.bed.gz",
-        options: {
-            color: "#9013fe",
-            displayMode: "density",
-            height: 60,
-        },
-    }),
+    // new TrackModel({
+    //     type: "bed",
+    //     name: "Putative SARS Immune Epitopes",
+    //     url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/IEDB_NC_045512.2_SARS-tblastn-nCoV_3H3V6ZBF01R.bed.gz",
+    //     options: {
+    //         color: "#9013fe",
+    //         displayMode: "density",
+    //         height: 60,
+    //     },
+    // }),
     new TrackModel({
         type: "categorical",
         name: "Transcription regulatory sequences (TRSs)",
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_trs_sorted.bed.gz",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/sars-cov-2_trs_sorted.bed.gz",
         options: {
             height: 15,
             alwaysDrawLabel: true,
@@ -103,30 +103,30 @@ const defaultTracks = [
             },
         },
     }),
-    new TrackModel({
-        type: "longrange",
-        name: "TRS-L-dependent recombination",
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/TRS-L-dependent_recombinationEvents_sorted.bed.gz",
-        options: {
-            yScale: "fixed",
-            yMax: 7000000,
-            yMin: 0,
-            displayMode: "arc",
-            lineWidth: 3,
-            height: 205,
-            greedyTooltip: true,
-        },
-    }),
-    new TrackModel({
-        type: "dbedgraph",
-        name: "Viral RNA Modifications",
-        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/studies/kim-2020/Table_S5_frac.dbg.gz",
-        options: {
-            dynamicLabels: ["gRNA", "S", "3a", "E", "M", "6", "7a", "7b", "8", "N"],
-            speed: [3],
-        },
-        showOnHubLoad: true,
-    }),
+    // new TrackModel({
+    //     type: "longrange",
+    //     name: "TRS-L-dependent recombination",
+    //     url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/TRS-L-dependent_recombinationEvents_sorted.bed.gz",
+    //     options: {
+    //         yScale: "fixed",
+    //         yMax: 7000000,
+    //         yMin: 0,
+    //         displayMode: "arc",
+    //         lineWidth: 3,
+    //         height: 205,
+    //         greedyTooltip: true,
+    //     },
+    // }),
+    // new TrackModel({
+    //     type: "dbedgraph",
+    //     name: "Viral RNA Modifications",
+    //     url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/studies/kim-2020/Table_S5_frac.dbg.gz",
+    //     options: {
+    //         dynamicLabels: ["gRNA", "S", "3a", "E", "M", "6", "7a", "7b", "8", "N"],
+    //         speed: [3],
+    //     },
+    //     showOnHubLoad: true,
+    // }),
 ];
 
 const annotationTracks = {
@@ -149,7 +149,7 @@ const annotationTracks = {
         {
             type: "categorical",
             name: "S protein annotations",
-            url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_Sprot_annot_sorted.bed.gz",
+            url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/sars-cov-2_Sprot_annot_sorted.bed.gz",
             options: {
                 height: 20,
                 alwaysDrawLabel: true,
@@ -286,7 +286,7 @@ const publicHubList = [
     {
         collection: "Diagnostics",
         name: "Primers",
-        numTracks: "Updating",
+        numTracks: 9,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/viralBrowser/primers/primers.json",
         description: {
@@ -301,7 +301,7 @@ const publicHubList = [
         name: "CRISPR-based diagnostic tests",
         numTracks: 2,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/crispr_diagnostic_tests.json",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/crispr_diagnostic_tests.json",
         description: {
             "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
             "hub info": "CRISPR-based assays for detecting SARS-CoV-2.",
@@ -352,7 +352,7 @@ const publicHubList = [
         name: "Recombination events (Kim et al., 2020)",
         numTracks: 3,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/recombinationEvents.json",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/recombinationEvents.json",
         description: {
             "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
             "hub info":
@@ -404,7 +404,7 @@ const publicHubList = [
         name: "Non-canonical ORFs",
         numTracks: 1,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_finkel2020_novelORFs.json",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/sars-cov-2_finkel2020_novelORFs.json",
         description: {
             "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
             "hub info":
