@@ -1,5 +1,10 @@
 # Version History
 
+## 53.5.1
+
+-   add spin utility for 3d model viewer
+-   add `clampHeight` option to chromatin interaction track for `arc` and `heatmap` style
+
 ## 53.5.0
 
 -   removed unnecessary re-render of numerical track
