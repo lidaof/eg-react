@@ -78,16 +78,16 @@ const defaultTracks = [
             zoomLevel: "0",
         },
     }),
-    // new TrackModel({
-    //     type: "bed",
-    //     name: "Putative SARS Immune Epitopes",
-    //     url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/IEDB_NC_045512.2_SARS-tblastn-nCoV_3H3V6ZBF01R.bed.gz",
-    //     options: {
-    //         color: "#9013fe",
-    //         displayMode: "density",
-    //         height: 60,
-    //     },
-    // }),
+    new TrackModel({
+        type: "bed",
+        name: "Putative SARS Immune Epitopes",
+        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/IEDB_NC_045512.2_SARS-tblastn-nCoV_3H3V6ZBF01R.bed.gz",
+        options: {
+            color: "#9013fe",
+            displayMode: "density",
+            height: 60,
+        },
+    }),
     new TrackModel({
         type: "categorical",
         name: "Omicron: B.1.1.529 and BA lineages",
