@@ -11,7 +11,7 @@
         "build-dist": "rm -f umd/* && cd build && cat static/js/*.js > ../umd/epgg.js && cat static/css/*.css > ../umd/epgg.css && cp *worker.js ../umd/ && cd ../umd && sed -i ''  's#/browser#.#g' *.js",
         "build-storybook": "build-storybook -s public",
         "eject": "react-scripts eject",
-        "start": "PORT=3001 react-app-rewired start",
+        "start": "react-app-rewired start",
         "storybook": "start-storybook -p 9009 -s public",
         "test": "react-app-rewired test --env=jsdom",
         "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
