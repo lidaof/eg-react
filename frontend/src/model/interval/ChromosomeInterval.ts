@@ -173,10 +173,10 @@ class ChromosomeInterval extends OpenInterval implements IChromosomeInterval {
      * @param other larger interval
      * @returns true if within
      */
-    isWithin(other: ChromosomeInterval): boolean {
+    // isWithin(other: ChromosomeInterval): boolean {
         
-        return ;
-    }
+    //     return ;
+    // }
 
     /**
      * @return {string} human-readable representation of this interval
