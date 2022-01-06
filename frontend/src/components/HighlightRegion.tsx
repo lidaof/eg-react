@@ -19,6 +19,7 @@ interface HighlightRegionProps {
     visData: ViewExpansion; // contains data on chromosome start/stop, and window start/stop;
     legendWidth: number; // used in calculation for highlight;
     xOffset: number;
+    viewRegion: ChromosomeInterval;
     highlightColor: string;
     highlightItems: IHighlightItem[];
 }
@@ -57,6 +58,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         visData: null,
         legendWidth: 120,
         xOffset: 0,
+        viewRegion: null,
         highlightColor: 'rgba(255, 255, 0, 0.3)',
         highlightItems: [],
     };
@@ -94,7 +96,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * Input pathway: original HighlightRegion.tsx functionality, code cut/copied from render();
      * @returns new HighlightItem data object
      */
-    createNewHighlightItem(): void {
+    createNewHighlightItem(targetItem?: HighlightItem): void {
         const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems, visData } = this.props;
         const highlight = enteredRegion ? this.getHiglightedXs(enteredRegion) : null;
 
@@ -134,7 +136,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @inheritdoc
      */
     render(): JSX.Element {
-        const { height, y, children, enteredRegion, highlightEnteredRegion, xOffset, highlightColor, highlightItems } = this.props;
+        const { height, y, children, enteredRegion, viewRegion, highlightEnteredRegion, xOffset, highlightColor, highlightItems, visData } = this.props;
 
         console.log(highlightItems);
 
@@ -143,7 +145,18 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         }
 
         const theBoxes = highlightItems.map((item) => {
-            if (item.viewRegion.chr === enteredRegion.chr /** logic to check if in view region, use features */) {
+            console.log(item.viewRegion, viewRegion, visData);
+            const itemIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion);
+            const itemOpenInterval = new OpenInterval(itemIntervals[0].start, itemIntervals[itemIntervals.length - 1].end);
+            // const viewRegionIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(viewRegion);
+            // const viewRegionOpenInterval = new OpenInterval(viewRegionIntervals[0].start, viewRegionIntervals[viewRegionIntervals.length - 1].end);
+            console.log(itemIntervals, itemOpenInterval, /** viewRegionIntervals, viewRegionOpenInterval */);
+            console.log(itemOpenInterval.start >= visData.viewWindowRegion.getContextCoordinates().start &&
+                itemOpenInterval.end <= visData.viewWindowRegion.getContextCoordinates().end);
+            if (/** logic to check if in view region, use features */
+                    itemOpenInterval.start >= visData.viewWindowRegion.getContextCoordinates().start &&
+                    itemOpenInterval.end <= visData.viewWindowRegion.getContextCoordinates().end
+                ) {
                 const style = item.highlightInterval ? {
                     left: item.highlightInterval.start + xOffset + "px",
                     top: y,

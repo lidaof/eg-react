@@ -788,6 +788,7 @@ class TrackContainer extends React.Component {
                             >
                                 <HighlightRegion
                                     enteredRegion={enteredRegion}
+                                    viewRegion={viewRegion}
                                     highlightColor={highlightColor}
                                     highlightEnteredRegion={highlightEnteredRegion}
                                     visData={primaryView}
