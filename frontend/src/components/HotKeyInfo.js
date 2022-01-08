@@ -13,6 +13,7 @@ export class HotKeyInfo extends React.Component {
                     <li><kbd>Alt</kbd> + <kbd>Z</kbd> and <kbd>Alt</kbd> + <kbd>X</kbd>: Pan one full panel left or right.</li>
                     <li><kbd>Alt</kbd> + <kbd>I</kbd> and <kbd>Alt</kbd> + <kbd>O</kbd>: Zoom In and Out 1 fold.</li>
                     <li><kbd>Alt</kbd> + <kbd>G</kbd>: Toogle the re-order many tracks interface.</li>
+                    <li><kbd>Alt</kbd> + <kbd>U</kbd>: Open Highlight Menu.</li>
                 </ul>
             </div>
         );

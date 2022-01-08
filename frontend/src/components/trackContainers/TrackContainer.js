@@ -113,7 +113,7 @@ class TrackContainer extends React.Component {
             panningAnimation: "none",
             zoomAnimation: 0,
             groupScale: undefined,
-            showHighlightMenu: false,
+            showHighlightMenuModal: false,
         };
         this.leftBeam = React.createRef();
         this.rightBeam = React.createRef();
@@ -215,6 +215,9 @@ class TrackContainer extends React.Component {
             case "alt+g":
                 this.toggleReorderManyModal();
                 break;
+            case "alt+u":
+                this.toggleHighlightMenuModal();
+                break;
             default:
                 break;
         }
@@ -262,15 +265,15 @@ class TrackContainer extends React.Component {
         });
     };
 
-    openHighlightMenu = () => {
+    openHighlightMenuModal = () => {
         this.setState({ showHighlightMenu: true });
     };
 
-    closeHighlightMenu = () => {
+    closeHighlightMenuModal = () => {
         this.setState({ showHighlightMenu: false });
     };
 
-    toggleHighlightMenu = () => {
+    toggleHighlightMenuModal = () => {
         this.setState((prevState) => {
             return { showHighlightMenu: !prevState.showHighlightMenu };
         });
@@ -563,9 +566,11 @@ class TrackContainer extends React.Component {
                     <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <History />
                     </div>
-                    <div className="tool-element" style={{ display: "flex", height: "10vh"}}>
+                    <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <HighlightMenu
-                            menuOpen={this.state.selectedTool === Tools.HIGHLIGHT}
+                            onOpenHighlightMenuModal={this.openHighlightMenuModal}
+                            onCloseHighlightMenuModal={this.closeHighlightMenuModal}
+                            showHighlightMenuModal={this.state.showHighlightMenuModal}
                         />
                     </div>
                     <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
@@ -802,7 +807,7 @@ class TrackContainer extends React.Component {
                 </OutsideClickDetector>
                 {this.renderModal()}
                 <Hotkeys
-                    keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o,alt+g"
+                    keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o,alt+g,alt+u"
                     onKeyDown={this.onKeyDown.bind(this)}
                 ></Hotkeys>
             </React.Fragment>

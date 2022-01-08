@@ -36,6 +36,7 @@ import "./HighlightMenu.css";
 import OpenInterval from "model/interval/OpenInterval";
 import ColorPicker from "components/ColorPicker";
 import ChromosomeInterval from "model/interval/ChromosomeInterval";
+import ReactModal from "react-modal";
 
 /**
  * HighlightMenu and HighlightItem
@@ -63,8 +64,9 @@ const callbacks = {
 
 interface HighlightMenuProps {
     highlightItems: IHighlightItem[];
-    menuOpen: boolean;
-
+    showHighlightMenuModal: boolean;
+    onOpenHighlightMenuModal: any;
+    onCloseHighlightMenuModal: any;
 };
 
 /**
@@ -100,9 +102,20 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
     }
 
     render() {
-        const { highlightItems, menuOpen } = this.props;
+        // if (menuOpen) {
+        //     return (
+        //         <div className="highlight-menu-body">
+        //             {highlightElements}
+        //             {emptyFiller}
+        //         </div>
+        //     );
+        // } else {
+        //     return null;
+        // }
+
+        const { highlightItems } = this.props;
         console.log(this.props);
-        const highlightElements = highlightItems.map((item, counter) => {
+        const highlightElements = (highlightItems.length !== 0 ? highlightItems.map((item, counter) => {
             console.log(item);
 
             function updateName(newName: string) {
@@ -125,19 +138,56 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
             } else {
                 return null;
             }
-        });
+        }) : 'No Existing Highlights');
 
-        if (menuOpen) {
-            let emptyFiller = (highlightItems.length === 0 ? 'No Existing Highlights' : null);
-            return (
-                <div className="highlight-menu-body">
-                    {highlightElements}
-                    {emptyFiller}
-                </div>
-            );
-        } else {
-            return null;
-        }
+        return (
+            <React.Fragment>
+                <button
+                    onClick={this.props.onOpenHighlightMenuModal}
+                    title="Highlight Menu {Alt+U)"
+                    className="btn btn-light"
+                >
+                    <span role="img" aria-label="reorder">
+                        🗒️
+                    </span>
+                </button>
+                <ReactModal
+                    isOpen={this.props.showHighlightMenuModal}
+                    contentLabel="HighlightMenu"
+                    ariaHideApp={false}
+                    onRequestClose={this.props.onCloseHighlightMenuModal}
+                    shouldCloseOnOverlayClick={true}
+                    style={{
+                        overlay: {
+                            backgroundColor: "rgba(111,107,101,0.3",
+                            zIndex: 4,
+                        },
+                    }}
+                >
+                    <div className="HighlightMenu">
+                        <h5>
+                            All highlights are listed here:
+                        </h5>
+                        {highlightElements}
+                        <span
+                            className="text-right"
+                            style={{
+                                cursor: "pointer",
+                                color: "red",
+                                fontSize: "2em",
+                                position: "absolute",
+                                top: "-5px",
+                                right: "15px",
+                                zIndex: 2,
+                            }}
+                            onClick={this.props.onCloseHighlightMenuModal}
+                        >
+                            ×
+                        </span>
+                    </div>
+                </ReactModal>
+            </React.Fragment>
+        )
     }
 }
 
