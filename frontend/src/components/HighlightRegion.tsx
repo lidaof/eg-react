@@ -74,7 +74,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @param {Object} props - props as specified by React
      */
 
-    getHiglightedXs(chrInterval: ChromosomeInterval): OpenInterval {
+    getHighlightedXs(chrInterval: ChromosomeInterval): OpenInterval {
         const {legendWidth, visData} = this.props;
         const {viewWindowRegion, viewWindow} = visData;
         console.log(chrInterval);
@@ -96,9 +96,9 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * Input pathway: original HighlightRegion.tsx functionality, code cut/copied from render();
      * @returns new HighlightItem data object
      */
-    createNewHighlightItem(targetItem?: HighlightItem): void {
+    createNewHighlightItem(): void {
         const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems, visData } = this.props;
-        const highlight = enteredRegion ? this.getHiglightedXs(enteredRegion) : null;
+        const highlight = enteredRegion ? this.getHighlightedXs(enteredRegion) : null;
 
         // pushes new HighlightItem to Redux
         if (highlight) {
@@ -113,8 +113,8 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 for (var i = 0; i < highlightItems.length; i++) {
                     console.log(newHighlightItem, highlightItems[i]);
                     if (newHighlightItem.color === highlightItems[i].color &&
-                        newHighlightItem.highlightInterval.start === highlightItems[i].highlightInterval.start &&
-                        newHighlightItem.highlightInterval.end === highlightItems[i].highlightInterval.end) {
+                        newHighlightItem.viewRegion.start === highlightItems[i].viewRegion.start &&
+                        newHighlightItem.viewRegion.end === highlightItems[i].viewRegion.end) {
                             noMatches = false;
                             break;
                         }
@@ -128,6 +128,18 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 console.log('pushing new highlightItem', highlightItems);
             }
         }
+    }
+
+    recalculateHighlightItem(item: IHighlightItem): IHighlightItem {
+        const highlight = this.getHighlightedXs(item.viewRegion);
+        const newIHighlight = {
+            color: item.color,
+            inViewRegion: item.inViewRegion,
+            highlightInterval: highlight,
+            viewRegion: item.viewRegion
+        }
+
+        return newIHighlight;
     }
 
     /**
@@ -157,6 +169,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                     itemOpenInterval.start >= visData.viewWindowRegion.getContextCoordinates().start &&
                     itemOpenInterval.end <= visData.viewWindowRegion.getContextCoordinates().end
                 ) {
+                item = this.recalculateHighlightItem(item);
                 const style = item.highlightInterval ? {
                     left: item.highlightInterval.start + xOffset + "px",
                     top: y,
