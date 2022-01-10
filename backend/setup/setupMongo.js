@@ -52,7 +52,8 @@ async function main() {
     // }
 
     // const genomes = ["hpv16"]; // if just want to load one genome
-    const genomes = ["TbruceiTREU927", "TbruceiLister427"]; // if just want to load one genome
+    // const genomes = ["TbruceiTREU927", "TbruceiLister427"]; // if just want to load one genome
+    const genomes = ["xenTro10"]; // if just want to load one genome
 
     // Get mongo connection
     let mongoClient;

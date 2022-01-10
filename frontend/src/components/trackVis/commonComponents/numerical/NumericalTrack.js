@@ -115,15 +115,17 @@ class NumericalTrack extends React.PureComponent {
             min,
             max,
             xValues2 = [];
-        if (trackModel.options.hasOwnProperty("group")) {
-            gscale = groupScale[trackModel.options.group];
+        if (groupScale) {
+            if (trackModel.options.hasOwnProperty("group")) {
+                gscale = groupScale[trackModel.options.group];
+            }
         }
         if (!_.isEmpty(gscale)) {
             max = _.max(Object.values(gscale.max));
             min = _.min(Object.values(gscale.min));
         } else {
             const visibleValues = xToValue.slice(this.props.viewWindow.start, this.props.viewWindow.end);
-            max = _.max(visibleValues) || 0; // in case undefined returned here, cause maxboth be undefined too
+            max = _.max(visibleValues) || 1; // in case undefined returned here, cause maxboth be undefined too
             xValues2 = xToValue2.filter((x) => x);
             min =
                 (xValues2.length
@@ -225,6 +227,7 @@ class NumericalTrack extends React.PureComponent {
     }
 
     render() {
+        // console.log("render");
         const { data, viewRegion, width, trackModel, unit, options, forceSvg } = this.props;
         const { height, color, color2, colorAboveMax, color2BelowMin } = options;
         const xvalues = this.aggregator.xToValueMaker(data, viewRegion, width, options);

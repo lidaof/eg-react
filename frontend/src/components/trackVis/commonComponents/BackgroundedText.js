@@ -1,11 +1,11 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
 /**
- * SVG <text> element with background color.  For performance reasons, this component guesses the text dimensions 
+ * SVG <text> element with background color.  For performance reasons, this component guesses the text dimensions
  * rather than measuring the text's bounding box.  It is reasonably good at this estimation; nonetheless, we are dealing
  * with a guess, so the background box may not be completely accurate.
- * 
+ *
  * @author Silas Hsu
  */
 class BackgroundedText extends React.Component {
@@ -41,35 +41,45 @@ class BackgroundedText extends React.Component {
     }
 
     getRectX() {
-        const {x, horizontalPadding, textAnchor} = this.props;
+        const { x, horizontalPadding, textAnchor } = this.props;
         const estimatedTextWidth = this.estimateTextWidth();
         let textStartX;
         if (textAnchor === "end") {
             textStartX = x - estimatedTextWidth;
         } else if (textAnchor === "middle") {
             textStartX = x - 0.5 * estimatedTextWidth;
-        } else { // textAnchor === "start"
+        } else {
+            // textAnchor === "start"
             textStartX = x;
         }
         return textStartX - horizontalPadding;
     }
 
     getRectY() {
-        const {y, height, dominantBaseline} = this.props;
+        const { y, height, dominantBaseline } = this.props;
         let textTopY;
         if (dominantBaseline === "hanging") {
             textTopY = y;
         } else if (dominantBaseline === "middle") {
             textTopY = y - 0.5 * height;
-        } else { // dominantBaseline === "baseline"
+        } else {
+            // dominantBaseline === "baseline"
             textTopY = y - height;
         }
         return textTopY;
     }
 
     render() {
-        const {height, horizontalPadding, backgroundColor, backgroundOpacity, fontSize, children,
-            ...textProps} = this.props;
+        const {
+            height,
+            horizontalPadding,
+            backgroundColor,
+            backgroundOpacity,
+            fontSize,
+            children,
+            italicizeText,
+            ...textProps
+        } = this.props;
         if (fontSize) {
             console.warn("The `fontSize` prop is invalid.  Use the `height` prop to set font size.");
         }
@@ -79,21 +89,25 @@ class BackgroundedText extends React.Component {
 
         let background = null;
         if (backgroundColor && backgroundOpacity > 0) {
-            background = <rect
-                x={this.getRectX()}
-                y={this.getRectY()}
-                width={this.estimateTextWidth() + 2 * horizontalPadding}
-                height={height}
-                fill={backgroundColor}
-                opacity={backgroundOpacity}
-            />;
+            background = (
+                <rect
+                    x={this.getRectX()}
+                    y={this.getRectY()}
+                    width={this.estimateTextWidth() + 2 * horizontalPadding}
+                    height={height}
+                    fill={backgroundColor}
+                    opacity={backgroundOpacity}
+                />
+            );
         }
 
         return (
-        <React.Fragment>
-            {background}
-            <text {...textProps} fontSize={1.5 * height}>{children}</text>
-        </React.Fragment>
+            <React.Fragment>
+                {background}
+                <text {...textProps} fontStyle={italicizeText ? "italic" : "normal"} fontSize={1.5 * height}>
+                    {children}
+                </text>
+            </React.Fragment>
         );
     }
 }

@@ -32,18 +32,23 @@ class MetadataHeader extends React.PureComponent {
             : "btn btn-sm btn-success dense-button";
         return (
             <>
-                <div
-                    className="MetadataHeader-button"
-                    onClick={() => this.setState({ isShowingEditMenu: !this.state.isShowingEditMenu })}
-                >
-                    <button className={buttonStyle}>Metadata {suffix}</button>
+                <div className="MetadataHeader-button">
+                    <button
+                        onClick={() => this.setState({ isShowingEditMenu: !this.state.isShowingEditMenu })}
+                        className={buttonStyle}
+                    >
+                        Metadata {suffix}
+                    </button>
+                    <div>
+                        <MetadataSelectionMenu
+                            terms={this.props.terms}
+                            style={editMenuStyle}
+                            onNewTerms={this.props.onNewTerms}
+                            suggestedMetaSets={this.props.suggestedMetaSets}
+                        />
+                    </div>
                 </div>
-                <MetadataSelectionMenu
-                    terms={this.props.terms}
-                    style={editMenuStyle}
-                    onNewTerms={this.props.onNewTerms}
-                    suggestedMetaSets={this.props.suggestedMetaSets}
-                />
+
                 <div className="MetadataHeader-container">
                     <ul className="MetadataHeader-terms">
                         {this.props.terms.map((term) => (

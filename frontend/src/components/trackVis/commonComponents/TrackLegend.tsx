@@ -3,14 +3,14 @@ import { connect } from "react-redux";
 import { ScaleLinear } from "d3-scale";
 import { select } from "d3-selection";
 import { axisLeft } from "d3-axis";
+import { format } from "d3-format";
+import { StateWithHistory } from "redux-undo";
 import { AppState } from "../../../AppState";
 import { TranslatableG } from "../../TranslatableG";
 import TrackModel from "../../../model/TrackModel";
-import { StateWithHistory } from "redux-undo";
 import { BASE_COLORS, Sequence } from "../../Sequence";
 import LinearDrawingModel from "../../../model/LinearDrawingModel";
 import DisplayedRegionModel from "../../../model/DisplayedRegionModel";
-import { format } from "d3-format";
 
 import "./TrackLegend.css";
 
@@ -205,9 +205,9 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             const segmentsAll = selectedRegion.getFeatureSegments();
             // not showing Gap
             const segments = segmentsAll.filter((s) => s.feature.getName() !== "Gap");
-            if (segments.length === 1) {
-                chromLabel = segments[0].feature.getName();
-            }
+            // if (segments.length === 1) {
+            chromLabel = segments[0].feature.getName();
+            // }
             if (segments.length > 1) {
                 chromLabel += `-${segments[segments.length - 1].feature.getName()}`;
             }
@@ -237,18 +237,20 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
         }
         return (
             <div style={divStyle} title={label}>
-                <p className="TrackLegend-label" style={pStyle}>
-                    {label}
-                </p>
-                <div style={{ display: "flex", alignItems: "center", fontSize: "12px" }}>
-                    {plotLegend && this.plotATCGLegend()}
-                </div>
-                {labelList}
-                <div
-                    style={{ fontSize: "11px", alignSelf: "flex-end", backgroundColor: "white" }}
-                    className="TrackLegend-chrLabel"
-                >
-                    {chromLabel}
+                <div className="TrackLegend-wrap">
+                    <p className="TrackLegend-label" style={pStyle}>
+                        {label}
+                    </p>
+                    <div style={{ display: "flex", alignItems: "center", fontSize: "12px" }}>
+                        {plotLegend && this.plotATCGLegend()}
+                    </div>
+                    {labelList}
+                    <div
+                        style={{ fontSize: "11px", alignSelf: "flex-end" }}
+                        className="TrackLegend-chrLabel"
+                    >
+                        {chromLabel}
+                    </div>
                 </div>
                 {axis}
             </div>

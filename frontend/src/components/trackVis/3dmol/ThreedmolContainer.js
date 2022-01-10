@@ -180,6 +180,10 @@ class ThreedmolContainer extends React.Component {
             showEnvelop: false,
             envelopColor: "grey",
             envelopOpacity: "0.3",
+            spinning: true,
+            spinDirection: "y",
+            spinSpeed: 1,
+            spinReverse: false,
         };
         this.paintWithBigwig = _.debounce(this.paintWithBigwig, 150);
         // this.paintWithComparment = _.debounce(this.paintWithComparment, 150);
@@ -217,6 +221,7 @@ class ThreedmolContainer extends React.Component {
         await this.g3dFile.readHeader();
         const reso = Math.max(...this.g3dFile.meta.resolutions);
         this.setState({ resolutions: this.g3dFile.meta.resolutions, resolution: reso });
+        this.viewer.spin(this.state.spinDirection, this.state.spinSpeed);
     }
 
     async componentDidUpdate(prevProps, prevState) {
@@ -263,6 +268,10 @@ class ThreedmolContainer extends React.Component {
             showEnvelop,
             envelopColor,
             envelopOpacity,
+            spinning,
+            spinDirection,
+            spinSpeed,
+            spinReverse,
         } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
@@ -441,7 +450,22 @@ class ThreedmolContainer extends React.Component {
             }
         }
         if (width !== prevProps.width || height !== prevProps.height) {
-            this.setState({ mainBoxHeight: height, mainBoxWidth: width });
+            // this.setState({ mainBoxHeight: height, mainBoxWidth: width });
+            if (layout === "side" && thumbStyle !== "hide") {
+                this.setState({
+                    mainBoxHeight: height,
+                    mainBoxWidth: halftWidth,
+                    thumbBoxHeight: height,
+                    thumbBoxWidth: halftWidth,
+                });
+            } else {
+                this.setState({
+                    mainBoxHeight: height,
+                    mainBoxWidth: width,
+                    thumbBoxHeight: 240,
+                    thumbBoxWidth: 300,
+                });
+            }
         }
         if (mainBoxHeight !== prevState.mainBoxHeight || mainBoxWidth !== prevState.mainBoxWidth) {
             this.viewer.render();
@@ -469,10 +493,23 @@ class ThreedmolContainer extends React.Component {
             this.setState({ paintAnnotationRegion: "none" });
         }
         if (annoFormat !== prevState.annoFormat) {
-            this.setState({ paintAnnotationRegion: "none", annotationFileObject: null });
+            this.setState({ paintAnnotationRegion: "none", annotationFileObject: null, annoUsePromoter: false });
         }
         if (numFormat !== prevState.numFormat) {
             this.setState({ paintRegion: "none", numFileObject: null });
+        }
+        if (
+            spinning !== prevState.spinning ||
+            spinReverse !== prevState.spinReverse ||
+            spinSpeed !== prevState.spinSpeed ||
+            spinDirection !== prevState.spinDirection
+        ) {
+            if (spinning) {
+                const speed = spinReverse ? -spinSpeed : spinSpeed;
+                this.viewer.spin(spinDirection, speed);
+            } else {
+                this.viewer.spin(false);
+            }
         }
     }
 
@@ -1003,6 +1040,14 @@ class ThreedmolContainer extends React.Component {
         this.setState({ numFileObject: e.target.files[0] });
     };
 
+    setSpinDirection = (e) => {
+        this.setState({ spinDirection: e.target.value });
+    };
+
+    setSpinSpeed = (e) => {
+        this.setState({ spinSpeed: Number.parseInt(e.target.value) });
+    };
+
     initEnvelop = () => {
         const { envelopRadius, envelopCenter, envelopOpacity, envelopColor } = this.state;
         // using shape generating not perfect sphere
@@ -1040,6 +1085,18 @@ class ThreedmolContainer extends React.Component {
     toggleDisplayEnvelop = () => {
         this.setState((prevState) => {
             return { showEnvelop: !prevState.showEnvelop };
+        });
+    };
+
+    toggleSpin = () => {
+        this.setState((prevState) => {
+            return { spinning: !prevState.spinning };
+        });
+    };
+
+    toggleSpinReverse = () => {
+        this.setState((prevState) => {
+            return { spinReverse: !prevState.spinReverse };
         });
     };
 
@@ -2258,11 +2315,11 @@ class ThreedmolContainer extends React.Component {
 
     setUseLegendMax = (e) => {
         // console.log(e.target.value, Number.parseFloat(e.target.value));
-        this.setState({ useLegengMax: Number.parseFloat(e.target.value) });
+        this.setState({ useLegengMax: Number.parseFloat(e.target.value) || 0 });
     };
 
     setUseLegendMin = (e) => {
-        this.setState({ useLegengMin: Number.parseFloat(e.target.value) });
+        this.setState({ useLegengMin: Number.parseFloat(e.target.value) || 0 });
     };
 
     handleAutoLegendScaleChange = () => {
@@ -2666,6 +2723,10 @@ class ThreedmolContainer extends React.Component {
             showEnvelop,
             envelopColor,
             envelopOpacity,
+            spinning,
+            spinDirection,
+            spinSpeed,
+            spinReverse,
         } = this.state;
         const { tracks, x, y, onNewViewRegion, viewRegion, sync3d } = this.props;
         const bwTracks = tracks.filter((track) => getTrackConfig(track).isBigwigTrack());
@@ -2745,6 +2806,44 @@ class ThreedmolContainer extends React.Component {
                                                     onChange={this.handleEnvelopOpacityChange}
                                                 />
                                             </label>
+                                        </div>
+                                        <div>
+                                            <label htmlFor="spin">
+                                                Spin:{" "}
+                                                <input
+                                                    type="checkbox"
+                                                    name="spin"
+                                                    checked={spinning}
+                                                    onChange={this.toggleSpin}
+                                                />
+                                            </label>
+                                            <span style={{ display: spinning ? "inline" : "none" }}>
+                                                <label>
+                                                    Direction:{" "}
+                                                    <select value={spinDirection} onChange={this.setSpinDirection}>
+                                                        <option value="x">x</option>
+                                                        <option value="y">y</option>
+                                                        <option value="z">z</option>
+                                                    </select>
+                                                </label>
+                                                <label>
+                                                    Speed:{" "}
+                                                    <select value={spinSpeed} onChange={this.setSpinSpeed}>
+                                                        <option value="1">normal</option>
+                                                        <option value="2">fast</option>
+                                                        <option value="3">faster</option>
+                                                    </select>
+                                                </label>
+                                                <label htmlFor="spinReverse">
+                                                    Reverse:{" "}
+                                                    <input
+                                                        type="checkbox"
+                                                        name="spinReverse"
+                                                        checked={spinReverse}
+                                                        onChange={this.toggleSpinReverse}
+                                                    />
+                                                </label>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
