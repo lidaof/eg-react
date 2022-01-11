@@ -159,7 +159,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                     shouldCloseOnOverlayClick={true}
                     style={{
                         overlay: {
-                            backgroundColor: "rgba(111,107,101,0.3",
+                            backgroundColor: "rgba(111,107,101,0.3)",
                             zIndex: 4,
                         },
                     }}
