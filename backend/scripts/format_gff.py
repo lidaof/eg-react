@@ -26,13 +26,14 @@ def main():
             with open(fout,'w') as outfile:
                 for line in infile:
                     if line.startswith('#'): continue
-                    if line.startswith('unitig'): continue #
+                    if line.startswith('unitig'): continue
+                    if line.startswith('Scaffold'): continue
                     line = line.strip()
                     if not line: continue
                     t = line.split('\t')
                     details = {}
                     #print t
-                    items = t[8].split(';')
+                    items = t[8].rstrip(';').split(';')
                     for item in items:
                         i = item.split('=')
                         details[i[0]] = i[1]

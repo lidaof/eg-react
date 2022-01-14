@@ -1,5 +1,9 @@
 # Version History
 
+## 53.5.2
+
+-   new genomes `susScr11`, `oviAri4` and Brapa ([#228](https://github.com/lidaof/eg-react/issues/228)) added.
+
 ## 53.5.1
 
 -   add spin utility for 3d model viewer
