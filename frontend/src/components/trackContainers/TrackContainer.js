@@ -266,16 +266,17 @@ class TrackContainer extends React.Component {
     };
 
     openHighlightMenuModal = () => {
-        this.setState({ showHighlightMenu: true });
+        this.setState({ showHighlightMenuModal: true });
+        console.log(this.state.showHighlightMenuModal);
     };
 
     closeHighlightMenuModal = () => {
-        this.setState({ showHighlightMenu: false });
+        this.setState({ showHighlightMenuModal: false });
     };
 
     toggleHighlightMenuModal = () => {
         this.setState((prevState) => {
-            return { showHighlightMenu: !prevState.showHighlightMenu };
+            return { showHighlightMenuModal: !prevState.showHighlightMenuModal };
         });
     };
 
