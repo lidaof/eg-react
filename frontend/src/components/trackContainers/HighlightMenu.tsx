@@ -281,7 +281,7 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
                         color={color}
                         onChange={this.updateColor}
                     />
-                    <button className="highlight-item-delete" onClick={() => { handleDelete(this.props.highlightNumber) }}>Delete</button>
+                    <button className="highlight-item-delete" onClick={() => { handleDelete(this.props.highlightNumber) }}>Delete Please</button>
                 </div>
                 {/* jump to this view region */}
             </div>
