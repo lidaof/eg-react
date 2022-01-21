@@ -101,6 +101,10 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
 
     }
 
+    updateHighlightItems(): void {
+
+    }
+
     render() {
         // if (menuOpen) {
         //     return (
@@ -118,26 +122,21 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         const highlightElements = (highlightItems.length !== 0 ? highlightItems.map((item, counter) => {
             console.log(item);
 
-            function updateName(newName: string) {
-                console.log(newName);
-                item.highlightName = newName;
+            function updateName(evt: any) {
+                item.highlightName = evt.target.value;
             }
 
-            if (item.inViewRegion) {
-                return (
-                    <HighlightItem
-                        color={item.color}
-                        inViewRegion={item.inViewRegion}
-                        highlightNumber={counter}
-                        viewRegion={item.viewRegion}
-                        handleNewName={updateName}
-                        handleDelete={this.handleDelete}
-                        handleViewRegionJump={this.handleViewRegionJump}
-                    />
-                );
-            } else {
-                return null;
-            }
+            return (
+                <HighlightItem
+                    color={item.color}
+                    inViewRegion={item.inViewRegion}
+                    highlightNumber={counter}
+                    viewRegion={item.viewRegion}
+                    handleNewName={updateName}
+                    handleDelete={this.handleDelete}
+                    handleViewRegionJump={this.handleViewRegionJump}
+                />
+            );
         }) : 'No Existing Highlights');
 
         return (
@@ -155,7 +154,10 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                     isOpen={this.props.showHighlightMenuModal}
                     contentLabel="HighlightMenu"
                     ariaHideApp={false}
-                    onRequestClose={this.props.onCloseHighlightMenuModal}
+                    onRequestClose={() => {
+                        this.props.onCloseHighlightMenuModal();
+
+                    }}
                     shouldCloseOnOverlayClick={true}
                     style={{
                         overlay: {
@@ -214,7 +216,10 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
         this.state = {
             name: `Highlight ${this.props.highlightNumber}`,
             active: true,
+            color: this.props.color,
         }
+
+        this.updateColor(this.props.color);
 
         // this.updateName = this.updateName.bind(this);
         this.updateColor = this.updateColor.bind(this);
@@ -236,7 +241,14 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
      * @param evt new color input
      */
     updateColor(evt: any): void {
+        this.setState({ color: evt });
 
+        // callback to update the highlight element color
+    }
+
+    updateName(evt: any): void {
+        const val = evt.target.value;
+        this.setState({ name: val });
     }
 
     /**
@@ -259,16 +271,16 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
         // const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
 
-        let name: string;
         return (
             <div className="highlight-item-body">
                 {/* name input */}
-                <input type="text" className="highlight-item-name" value={name} onChange={() => { handleNewName(name) }} />
+                <input type="text" className="highlight-item-name" value={this.state.name} onChange={evt => handleNewName(evt)} />
                 {/* "is in view region" indicator */}
                 <span
                     style={{
                         cursor: "pointer",
-                        color: `${isInRegionColor}`,
+                        color: 'black',
+                        background: `${isInRegionColor}`,
                         fontSize: "1em",
                         position: "relative",
                         zIndex: "inherit",
@@ -288,3 +300,18 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
         );
     }
 }
+
+// const Grid = SortableContainer(({ items, colNum }) => {
+//     const gridStyles = {
+//         display: "grid",
+//         gridTemplateColumns: `repeat(${colNum}, 1fr)`,
+//         gridGap: "5px",
+//     };
+//     return (
+//         <div style={gridStyles}>
+//             {items.map((value, index) => (
+//                 <GridItem key={`item-${index}`} index={index} value={value} />
+//             ))}
+//         </div>
+//     );
+// });
