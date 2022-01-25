@@ -103,9 +103,11 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         // pushes new HighlightItem to Redux
         if (highlight) {
             const newHighlightItem: IHighlightItem = {
+                active: true,
                 color: highlightColor,
-                inViewRegion: highlightEnteredRegion,
+                highlightName: 'New Highlight',
                 highlightInterval: highlight,
+                inViewRegion: highlightEnteredRegion,
                 viewRegion: new ChromosomeInterval(enteredRegion.chr, enteredRegion.start, enteredRegion.end),
             }
             if (highlightItems.length !== 0) {
@@ -175,7 +177,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                     top: y,
                     width: item.highlightInterval.getLength() + "px",
                     height,
-                    backgroundColor: highlightColor,
+                    backgroundColor: item.color,
                 } : null;
                 const className = highlightEnteredRegion ? "HighlightRegion-box" : "HighlightRegion-none";
                 return (

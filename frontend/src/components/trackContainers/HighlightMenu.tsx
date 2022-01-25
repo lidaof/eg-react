@@ -87,52 +87,57 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
 
         };
 
+        this.updateActive = this.updateActive.bind(this);
+        this.updateName = this.updateName.bind(this);
+        this.updateColor = this.updateColor.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
         this.handleViewRegionJump = this.handleViewRegionJump.bind(this);
     }
 
+    updateActive(highlightNumber: number): void {
+        this.props.highlightItems[highlightNumber].active = !this.props.highlightItems[highlightNumber].active;
+        console.log(this.props.highlightItems[highlightNumber]);
+        this.forceUpdate();
+    }
+
+    updateName(highlightNumber: number, evt: any): void {
+        this.props.highlightItems[highlightNumber].highlightName = evt.target.value;
+        this.forceUpdate();
+    }
+
+    updateColor(highlightNumber: number, color: string): void {
+        console.log(highlightNumber, color);
+        this.props.highlightItems[highlightNumber].color = color;
+        this.forceUpdate();
+    }
+
     handleDelete(highlightNumber: number): void {
-        const { highlightItems } = this.props;
-        // const sourceItem = highlightItems.find(item => item.highlightNumber === highlightNumber);
-        highlightItems.splice(highlightNumber, 1);
+        this.props.highlightItems.splice(highlightNumber, 1);
+        console.log(highlightNumber, this.props.highlightItems);
+        this.forceUpdate();
     }
 
     handleViewRegionJump(): void {
 
     }
 
-    updateHighlightItems(): void {
-
-    }
-
     render() {
-        // if (menuOpen) {
-        //     return (
-        //         <div className="highlight-menu-body">
-        //             {highlightElements}
-        //             {emptyFiller}
-        //         </div>
-        //     );
-        // } else {
-        //     return null;
-        // }
-
         const { highlightItems } = this.props;
         console.log(this.props);
         const highlightElements = (highlightItems.length !== 0 ? highlightItems.map((item, counter) => {
             console.log(item);
 
-            function updateName(evt: any) {
-                item.highlightName = evt.target.value;
-            }
-
             return (
                 <HighlightItem
+                    active={item.active}
                     color={item.color}
                     inViewRegion={item.inViewRegion}
                     highlightNumber={counter}
                     viewRegion={item.viewRegion}
-                    handleNewName={updateName}
+                    highlightName={item.highlightName}
+                    updateActive={this.updateActive}
+                    handleNewName={this.updateName}
+                    handleNewColor={this.updateColor}
                     handleDelete={this.handleDelete}
                     handleViewRegionJump={this.handleViewRegionJump}
                 />
@@ -154,10 +159,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                     isOpen={this.props.showHighlightMenuModal}
                     contentLabel="HighlightMenu"
                     ariaHideApp={false}
-                    onRequestClose={() => {
-                        this.props.onCloseHighlightMenuModal();
-
-                    }}
+                    onRequestClose={this.props.onCloseHighlightMenuModal}
                     shouldCloseOnOverlayClick={true}
                     style={{
                         overlay: {
@@ -203,7 +205,9 @@ export interface IHighlightItem {
     highlightInterval?: OpenInterval;
     inViewRegion?: boolean;
     viewRegion?: ChromosomeInterval;
+    updateActive?: Function;
     handleNewName?: Function;
+    handleNewColor?: Function;
     handleDelete?: Function;
     handleViewRegionJump?: Function;
 }
@@ -213,87 +217,55 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
     constructor(props: IHighlightItem) {
         super(props);
 
-        this.state = {
-            name: `Highlight ${this.props.highlightNumber}`,
-            active: true,
-            color: this.props.color,
-        }
-
-        this.updateColor(this.props.color);
-
-        // this.updateName = this.updateName.bind(this);
-        this.updateColor = this.updateColor.bind(this);
-        this.showItem = this.showItem.bind(this);
-        this.hideItem = this.hideItem.bind(this);
-    }
-
-    /**
-     * Updates name of highlightItem, stores value in state of HighlightItem
-     * @param evt value of name input
-     */
-    // updateName(evt: any): void {
-    //     console.log(evt);
-    //     this.setState({ name: evt });
-    // }
-
-    /**
-     * updates the color of the highlight
-     * @param evt new color input
-     */
-    updateColor(evt: any): void {
-        this.setState({ color: evt });
-
-        // callback to update the highlight element color
-    }
-
-    updateName(evt: any): void {
-        const val = evt.target.value;
-        this.setState({ name: val });
-    }
-
-    /**
-     * Makes highlight visible
-     */
-    showItem(): void {
-        this.setState({ active: true });
-    }
-
-    /**
-     * Makes highlight invisible
-     */
-    hideItem(): void {
-        this.setState({ active: false });
     }
 
     render(): JSX.Element {
         console.log(this.props);
-        const { active, color, inViewRegion, viewRegion, handleNewName, handleDelete, handleViewRegionJump } = this.props;
+        const { active, color, inViewRegion, viewRegion, highlightName, highlightNumber, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
         // const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
         const isInRegionColor = (inViewRegion ? 'green' : 'red');
+        const isHighlightActive = (active ? 'Active' : 'Inactive');
+        const isHighlightActiveColor = (active ? 'green' : 'red');
 
         return (
             <div className="highlight-item-body">
                 {/* name input */}
-                <input type="text" className="highlight-item-name" value={this.state.name} onChange={evt => handleNewName(evt)} />
+                <input type="text" className="highlight-item-name" value={highlightName} onChange={evt => handleNewName(highlightNumber, evt)} />
                 {/* "is in view region" indicator */}
                 <span
                     style={{
                         cursor: "pointer",
                         color: 'black',
-                        background: `${isInRegionColor}`,
+                        background: isInRegionColor,
                         fontSize: "1em",
                         position: "relative",
                         zIndex: "inherit",
                 }}>
                     {`${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`}
                 </span>
+                {/* "is highlight active" */}
+                <span
+                    style={{
+                        color: 'black',
+                        background: isHighlightActiveColor,
+                        fontSize: "1em",
+                        position: "relative",
+                        zIndex: "inherit",
+                    }}
+                >
+                    {isHighlightActive}
+                </span>
                 {/* left: color picker; right: hide+show, delete buttons */}
                 <div className="highlight-item-buttons-group">
                     <ColorPicker
                         color={color}
-                        onChange={this.updateColor}
+                        onChange={(evt: any) => handleNewColor(highlightNumber, evt)}
                     />
                     <button className="highlight-item-delete" onClick={() => { handleDelete(this.props.highlightNumber) }}>Delete Please</button>
+                    <button className="highlight-item-active" style={{ background: isHighlightActiveColor }} onClick={() => {
+                        updateActive(highlightNumber);
+                        // this.forceUpdate();
+                    }}>{isHighlightActive}</button>
                 </div>
                 {/* jump to this view region */}
             </div>
