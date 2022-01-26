@@ -10,8 +10,10 @@ import SnpDetail from './SnpDetail';
 import Snp from '../../../model/Snp';
 
 export const DEFAULT_OPTIONS = {
-    options: {maxRows: 20},
+    options: { maxRows: 20 },
     height: 40,
+    hiddenPixels: 0.5,
+    alwaysDrawLabel: false,
 }
 
 const ROW_VERTICAL_PADDING = 2;
@@ -22,6 +24,8 @@ interface SnpTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
     options: {
         color?: string;
         color2?: string;
+        alwaysDrawLabel?: boolean;
+        hiddenPixels?: number;
     }
 }
 
@@ -75,12 +79,14 @@ class SnpTrackNoTooltip extends React.Component<SnpTrackProps> {
                 reverseStrandColor={this.props.options.color2}
                 isInvertArrowDirection={placement.isReverse}
                 onClick={this.renderTooltip}
+                alwaysDrawLabel={this.props.options.alwaysDrawLabel}
+                hiddenPixels={this.props.options.hiddenPixels}
             />
         );
     }
 
     render() {
-        const message = this.props.data.length > 0 ? null : 
+        const message = this.props.data.length > 0 ? null :
             <div className="Track-message">Please zoom in to see track contents</div>;
         return <AnnotationTrack
             {...this.props}

@@ -11,6 +11,7 @@ import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 import LocalBedSource from "../../dataSources/LocalBedSource";
 import BedTextSource from "../../dataSources/BedTextSource";
 import HiddenPixelsConfig from "../trackContextMenu/HiddenPixelsConfig";
+import AlwaysDrawLabelConfig from "components/trackContextMenu/AlwaysDrawLabelConfig";
 
 enum BedColumnIndex {
     NAME = 3,
@@ -58,7 +59,7 @@ export class BedTrackConfig extends AnnotationTrackConfig {
     }
 
     getMenuComponents() {
-        const items = [...super.getMenuComponents(), HiddenPixelsConfig];
+        const items = [...super.getMenuComponents(), HiddenPixelsConfig, AlwaysDrawLabelConfig];
         if (this.getOptions().displayMode === AnnotationDisplayModes.DENSITY) {
             items.push(YscaleConfig);
         }

@@ -1,10 +1,10 @@
-import axios from 'axios';
-import _ from 'lodash';
-import DataSource from './DataSource';
+import axios from "axios";
+import _ from "lodash";
+import DataSource from "./DataSource";
 
 const SNP_REGION_API = {
-    'hg19': 'https://grch37.rest.ensembl.org/overlap/region/human',
-    'hg38': 'https://rest.ensembl.org/overlap/region/human',
+    hg19: "https://grch37.rest.ensembl.org/overlap/region/human",
+    hg38: "https://rest.ensembl.org/overlap/region/human",
 };
 
 /**
@@ -21,7 +21,7 @@ class SnpSource extends DataSource {
     constructor(trackModel) {
         super();
         if (!trackModel) {
-            console.warn('No track model specified.  This data source will fetch no data!');
+            console.warn("No track model specified.  This data source will fetch no data!");
         }
         this.trackModel = trackModel;
     }
@@ -33,29 +33,29 @@ class SnpSource extends DataSource {
         if (!this.trackModel) {
             return [];
         }
-        const genome = this.trackModel.getMetadata('genome') || this.trackModel.genome;
+        const genome = this.trackModel.getMetadata("genome") || this.trackModel.genome;
         const api = SNP_REGION_API[genome] || null;
         if (!api) {
             return [];
         }
         const params = {
-            'content-type': 'application/json',
-            'feature': 'variation',
+            "content-type": "application/json",
+            feature: "variation",
         };
-        let promises = region.getGenomeIntervals().map(locus => {
-            if (locus.getLength() <= 10000) {
+        let promises = region.getGenomeIntervals().map((locus) => {
+            if (locus.getLength() <= 30000) {
                 /**
                  * Gets an object that looks like {data: []}
                  */
-                return axios.get(`${api}/${locus.chr.substr(3)}:${locus.start+1}-${locus.end}`, {
-                    params: params
+                return axios.get(`${api}/${locus.chr.substr(3)}:${locus.start + 1}-${locus.end}`, {
+                    params: params,
                 });
             } else {
-                return {data: []};
+                return { data: [] };
             }
         });
         const dataForEachSegment = await Promise.all(promises);
-        return _.flatMap(dataForEachSegment, 'data');
+        return _.flatMap(dataForEachSegment, "data");
     }
 }
 

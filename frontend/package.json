@@ -123,6 +123,7 @@
         "react-collapsible": "^2.8.0",
         "react-color": "^2.19.3",
         "react-compound-slider": "^0.20.1",
+        "react-cookie-consent": "^7.2.1",
         "react-copy-to-clipboard": "^5.0.2",
         "react-detect-offline": "^2.4.5",
         "react-dom": "^16.13.1",

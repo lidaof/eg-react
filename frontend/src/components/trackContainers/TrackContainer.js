@@ -547,8 +547,8 @@ class TrackContainer extends React.Component {
         const groupScale = this.groupManager.getGroupScale(
             tracks.filter((tk) => tk.options.hasOwnProperty("group") && tk.options.group),
             trackData,
-            primaryView.visWidth,
-            primaryView.viewWindow
+            primaryView ? primaryView.visWidth : 0,
+            primaryView ? primaryView.viewWindow : 0
         );
         this.setState({ groupScale });
     };
