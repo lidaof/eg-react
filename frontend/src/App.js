@@ -381,6 +381,7 @@ class App extends React.PureComponent {
                     viewer3dNumFrames={viewer3dNumFrames}
                     isThereG3dTrack={isThereG3dTrack}
                     onSetImageInfo={onSetImageInfo}
+                    setEnteredRegion={this.setEnteredRegion}
                     setNewEnteredRegion={this.convertEnteredRegionToChromosomeInterval}
                 />
                 {!embeddingMode && <Footer />}

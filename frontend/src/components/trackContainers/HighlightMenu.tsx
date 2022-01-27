@@ -67,6 +67,7 @@ interface HighlightMenuProps {
     showHighlightMenuModal: boolean;
     onOpenHighlightMenuModal: any;
     onCloseHighlightMenuModal: any;
+    setEnteredRegion: Function;
 };
 
 /**
@@ -95,6 +96,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
     }
 
     updateActive(highlightNumber: number): void {
+        this.props.setEnteredRegion(null);
         this.props.highlightItems[highlightNumber].active = !this.props.highlightItems[highlightNumber].active;
         console.log(this.props.highlightItems[highlightNumber]);
         this.forceUpdate();
@@ -106,18 +108,21 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
     }
 
     updateColor(highlightNumber: number, color: string): void {
+        this.props.setEnteredRegion(null);
         console.log(highlightNumber, color);
         this.props.highlightItems[highlightNumber].color = color;
         this.forceUpdate();
     }
 
     handleDelete(highlightNumber: number): void {
+        this.props.setEnteredRegion(null);
         this.props.highlightItems.splice(highlightNumber, 1);
         console.log(highlightNumber, this.props.highlightItems);
         this.forceUpdate();
     }
 
     handleViewRegionJump(): void {
+        this.props.setEnteredRegion(null);
 
     }
 

@@ -144,6 +144,8 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         return newIHighlight;
     }
 
+    
+
     /**
      * checks every HighlightItem in the highlightItems prop and renders those in the view region;
      * @returns container that has highlight elements in it
@@ -154,9 +156,9 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
 
         console.log(highlightItems);
 
-        if (highlightEnteredRegion) {
-            this.createNewHighlightItem();
-        }
+        // logical check for whether to create new highlightItem is through value of enteredRegion prop
+        // enteredRegion === null => no new highlight
+        this.createNewHighlightItem();
 
         const theBoxes = highlightItems.map((item) => {
             console.log(item.viewRegion, viewRegion, visData);
@@ -169,7 +171,8 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 itemOpenInterval.end <= visData.viewWindowRegion.getContextCoordinates().end);
             if (/** logic to check if in view region, use features */
                     itemOpenInterval.start >= visData.viewWindowRegion.getContextCoordinates().start &&
-                    itemOpenInterval.end <= visData.viewWindowRegion.getContextCoordinates().end
+                    itemOpenInterval.end <= visData.viewWindowRegion.getContextCoordinates().end &&
+                    item.active
                 ) {
                 item = this.recalculateHighlightItem(item);
                 const style = item.highlightInterval ? {

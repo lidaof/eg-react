@@ -92,6 +92,7 @@ class TrackContainer extends React.Component {
          */
         onMetadataTermsChanged: PropTypes.func,
         suggestedMetaSets: PropTypes.instanceOf(Set),
+        setEnteredRegion: PropTypes.func,
         setNewEnteredRegion: PropTypes.func,
     };
 
@@ -505,6 +506,7 @@ class TrackContainer extends React.Component {
             onMetadataTermsChanged,
             suggestedMetaSets,
             viewRegion,
+            setEnteredRegion,
             onNewRegion,
             onToggleHighlight,
             onSetEnteredRegion,
@@ -569,6 +571,7 @@ class TrackContainer extends React.Component {
                     </div>
                     <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <HighlightMenu
+                            setEnteredRegion={setEnteredRegion}
                             onOpenHighlightMenuModal={this.openHighlightMenuModal}
                             onCloseHighlightMenuModal={this.closeHighlightMenuModal}
                             showHighlightMenuModal={this.state.showHighlightMenuModal}
