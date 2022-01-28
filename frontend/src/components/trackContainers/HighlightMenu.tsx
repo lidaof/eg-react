@@ -144,6 +144,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                     highlightNumber={counter}
                     viewRegion={item.viewRegion}
                     highlightName={item.highlightName}
+                    inViewRegion={item.inViewRegion}
                     updateActive={this.updateActive}
                     handleNewName={this.updateName}
                     handleNewColor={this.updateColor}
@@ -213,6 +214,7 @@ export interface IHighlightItem {
     highlightName?: string;
     highlightInterval?: OpenInterval;
     viewRegion?: ChromosomeInterval;
+    inViewRegion?: boolean;
     absoluteInterval?: OpenInterval;
     updateActive?: Function;
     handleNewName?: Function;
@@ -226,14 +228,23 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
     constructor(props: IHighlightItem) {
         super(props);
 
+        this.state = {
+            color: this.props.color,
+        }
+
+        this.handleStateColor = this.handleStateColor.bind(this);
+    }
+
+    handleStateColor(color: string) {
+        this.setState({ color: color });
     }
 
     render(): JSX.Element {
         console.log(this.props);
-        const { active, color, viewRegion, highlightName, highlightNumber, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
+        const { active, viewRegion, highlightName, highlightNumber, inViewRegion, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
         
         // update this color
-        const isInRegionColor = (true ? 'green' : 'red');
+        const isInRegionColor = (inViewRegion ? 'green' : 'red');
         const isHighlightActive = (active ? 'Active' : 'Inactive');
         const isHighlightActiveColor = (active ? 'green' : 'red');
 
@@ -253,48 +264,21 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
                 }}>
                     {`${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`}
                 </span>
-                {/* "is highlight active" */}
-                <span
-                    style={{
-                        color: 'black',
-                        background: isHighlightActiveColor,
-                        fontSize: "1em",
-                        position: "relative",
-                        zIndex: "inherit",
-                    }}
-                >
-                    {isHighlightActive}
-                </span>
-                {/* left: color picker; right: hide+show, delete buttons */}
+                {/* left to right: color picker, delete, hide+show, jump-to-view-region */}
                 <div className="highlight-item-buttons-group">
                     <ColorPicker
-                        color={color}
-                        onChange={(evt: any) => handleNewColor(highlightNumber, evt)}
+                        color={this.state.color}
+                        onChange={(evt: any) => {
+                            handleNewColor(highlightNumber, `rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
+                            this.handleStateColor(`rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
+                        }}
                     />
-                    <button className="highlight-item-delete" onClick={() => { handleDelete(this.props.highlightNumber) }}>Delete Please</button>
-                    <button className="highlight-item-active" style={{ background: isHighlightActiveColor }} onClick={() => {
-                        updateActive(highlightNumber);
-                        // this.forceUpdate();
-                    }}>{isHighlightActive}</button>
-                    <button className="highlight-item-jump" onClick={() => { handleViewRegionJump(this.props.highlightNumber) }}>Jump To This Highlight</button>
+                    <button className="highlight-item-button" onClick={() => { handleDelete(this.props.highlightNumber) }}>Delete Please</button>
+                    <button className="highlight-item-button" style={{ background: isHighlightActiveColor }} onClick={() => { updateActive(highlightNumber) }}>{isHighlightActive}</button>
+                    {/* jump to this view region */}
+                    <button className="highlight-item-button" onClick={() => { handleViewRegionJump(this.props.highlightNumber) }}>Jump To This Highlight</button>
                 </div>
-                {/* jump to this view region */}
             </div>
         );
     }
 }
-
-// const Grid = SortableContainer(({ items, colNum }) => {
-//     const gridStyles = {
-//         display: "grid",
-//         gridTemplateColumns: `repeat(${colNum}, 1fr)`,
-//         gridGap: "5px",
-//     };
-//     return (
-//         <div style={gridStyles}>
-//             {items.map((value, index) => (
-//                 <GridItem key={`item-${index}`} index={index} value={value} />
-//             ))}
-//         </div>
-//     );
-// });

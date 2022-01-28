@@ -113,6 +113,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 highlightName: 'New Highlight',
                 highlightInterval: highlight,
                 viewRegion: new ChromosomeInterval(enteredRegion.chr, enteredRegion.start, enteredRegion.end),
+                inViewRegion: true,
                 absoluteInterval: middleInterval
             }
             if (highlightItems.length !== 0) {
@@ -138,7 +139,6 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     }
 
     recalculateHighlightItem(item: IHighlightItem): IHighlightItem {
-        const { visData } = this.props;
         const highlight = this.getHighlightedXs(item.viewRegion);
         const newIHighlight = {
             active: true,
@@ -146,6 +146,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
             highlightName: item.highlightName,
             highlightInterval: highlight,
             viewRegion: item.viewRegion,
+            inViewRegion: true,
             absoluteInterval: item.absoluteInterval
         }
 
@@ -162,6 +163,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     render(): JSX.Element {
         const { height, y, children, enteredRegion, viewRegion, highlightEnteredRegion, xOffset, highlightColor, highlightItems, visData } = this.props;
 
+        // highlightItems.forEach(item => item.inViewRegion = false);
         console.log(highlightItems);
 
         // logical check for whether to create new highlightItem is through value of enteredRegion prop
@@ -198,6 +200,8 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 return null;
             }
         });
+
+        console.log(highlightItems);
 
         return (
             <div
