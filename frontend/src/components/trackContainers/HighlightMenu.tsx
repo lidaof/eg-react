@@ -51,7 +51,8 @@ import ReactModal from "react-modal";
  */
  function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
     return {
-        highlightItems: state.browser.present.highlightItems
+        highlightItems: state.browser.present.highlightItems,
+        viewRegion: state.browser.present.viewRegion
     };
 }
 
@@ -59,7 +60,8 @@ import ReactModal from "react-modal";
  * Callbacks to pass to HighlightMenu
  */
 const callbacks = {
-    onSetsChanged: ActionCreators.setHighlights
+    onSetsChanged: ActionCreators.setHighlights,
+    onNewRegion: ActionCreators.setViewRegion
 };
 
 interface HighlightMenuProps {
@@ -68,6 +70,7 @@ interface HighlightMenuProps {
     onOpenHighlightMenuModal: any;
     onCloseHighlightMenuModal: any;
     setEnteredRegion: Function;
+    onNewRegion: Function;
 };
 
 /**
@@ -121,22 +124,23 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         this.forceUpdate();
     }
 
-    handleViewRegionJump(): void {
+    handleViewRegionJump(highlightNumber: number): void {
         this.props.setEnteredRegion(null);
-
+        console.log(this.props.highlightItems[highlightNumber].absoluteInterval);
+        const interval = this.props.highlightItems[highlightNumber].absoluteInterval;
+        this.props.onNewRegion(interval.start, interval.end);
     }
 
     render() {
         const { highlightItems } = this.props;
         console.log(this.props);
-        const highlightElements = (highlightItems.length !== 0 ? highlightItems.map((item, counter) => {
+        const highlightElements = (highlightItems && highlightItems.length !== 0 ? highlightItems.map((item, counter) => {
             console.log(item);
 
             return (
                 <HighlightItem
                     active={item.active}
                     color={item.color}
-                    inViewRegion={item.inViewRegion}
                     highlightNumber={counter}
                     viewRegion={item.viewRegion}
                     highlightName={item.highlightName}
@@ -208,8 +212,8 @@ export interface IHighlightItem {
     highlightNumber?: number;
     highlightName?: string;
     highlightInterval?: OpenInterval;
-    inViewRegion?: boolean;
     viewRegion?: ChromosomeInterval;
+    absoluteInterval?: OpenInterval;
     updateActive?: Function;
     handleNewName?: Function;
     handleNewColor?: Function;
@@ -226,9 +230,10 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
 
     render(): JSX.Element {
         console.log(this.props);
-        const { active, color, inViewRegion, viewRegion, highlightName, highlightNumber, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
-        // const isInRegionText = (inViewRegion ? 'Within current view region' : 'Not within current view region');
-        const isInRegionColor = (inViewRegion ? 'green' : 'red');
+        const { active, color, viewRegion, highlightName, highlightNumber, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
+        
+        // update this color
+        const isInRegionColor = (true ? 'green' : 'red');
         const isHighlightActive = (active ? 'Active' : 'Inactive');
         const isHighlightActiveColor = (active ? 'green' : 'red');
 
@@ -271,6 +276,7 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
                         updateActive(highlightNumber);
                         // this.forceUpdate();
                     }}>{isHighlightActive}</button>
+                    <button className="highlight-item-jump" onClick={() => { handleViewRegionJump(this.props.highlightNumber) }}>Jump To This Highlight</button>
                 </div>
                 {/* jump to this view region */}
             </div>

@@ -102,13 +102,18 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
 
         // pushes new HighlightItem to Redux
         if (highlight) {
+            const wholeInterval = visData.visRegion.getContextCoordinates();
+            const middleInterval = new OpenInterval(
+                wholeInterval.start + Math.round(wholeInterval.getLength() / 3),
+                wholeInterval.end - Math.round(wholeInterval.getLength() / 3)
+            );
             const newHighlightItem: IHighlightItem = {
                 active: true,
                 color: highlightColor,
                 highlightName: 'New Highlight',
                 highlightInterval: highlight,
-                inViewRegion: highlightEnteredRegion,
                 viewRegion: new ChromosomeInterval(enteredRegion.chr, enteredRegion.start, enteredRegion.end),
+                absoluteInterval: middleInterval
             }
             if (highlightItems.length !== 0) {
                 var noMatches = true;
@@ -133,12 +138,15 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     }
 
     recalculateHighlightItem(item: IHighlightItem): IHighlightItem {
+        const { visData } = this.props;
         const highlight = this.getHighlightedXs(item.viewRegion);
         const newIHighlight = {
+            active: true,
             color: item.color,
-            inViewRegion: item.inViewRegion,
+            highlightName: item.highlightName,
             highlightInterval: highlight,
-            viewRegion: item.viewRegion
+            viewRegion: item.viewRegion,
+            absoluteInterval: item.absoluteInterval
         }
 
         return newIHighlight;
