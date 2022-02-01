@@ -6,6 +6,7 @@ import { firebaseConnect, getVal } from "react-redux-firebase";
 import { AppState } from "../AppState";
 import { StateWithHistory } from "redux-undo";
 import { notify } from "react-notify-toast";
+import JSZip from 'jszip';
 import { AppStateSaver } from "../model/AppSaveLoad";
 import { ActionCreators } from "../AppState";
 import LoadSession from "./LoadSession";
@@ -129,6 +130,27 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
     downloadAsHub = () => {
         this.downloadSession(true);
     };
+
+    downloadWholeBundle = () => {
+        const bundle = this.getBundle();
+        const { sessionsInBundle, bundleId } = bundle;
+        const zip = new JSZip();
+        const zipName = `${bundleId}.zip`;
+        Object.keys(sessionsInBundle).forEach(k => {
+            const session = sessionsInBundle[k];
+            zip.file(`${session.label}.json`, JSON.stringify(session.state) + "\n");
+
+        })
+        zip.generateAsync({ type: "base64" })
+            .then(function (content) {
+                const dl = document.createElement("a");
+                document.body.appendChild(dl); // This line makes it work in Firefox.
+                dl.setAttribute("href", "data:application/zip;base64," + content);
+                dl.setAttribute("download", zipName);
+                dl.click();
+                notify.show("Whole bundle downloaded!", "success", 2000);
+            });
+    }
 
     setSessionLabel = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ newSessionLabel: event.target.value.trim() });
@@ -336,6 +358,8 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                         </button>{" "}
                         <button className="SessionUI btn btn-info" onClick={this.downloadAsHub}>
                             Download as datahub
+                        </button> <button className="SessionUI btn btn-warning" onClick={this.downloadWholeBundle}>
+                            Download whole bundle
                         </button>
                     </React.Fragment>
                 )}
