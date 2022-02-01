@@ -151,7 +151,7 @@
         "shortid": "^2.2.15",
         "tcp-port-used": "^0.1.2",
         "text-encoding": "^0.7.0",
-        "three": "^0.125.0",
+        "three": "^0.137.0",
         "typescript": "^3.4.5",
         "underscore": "^1.10.2",
         "util": "^0.12.3",
