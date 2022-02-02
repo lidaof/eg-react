@@ -246,8 +246,22 @@ class NavigationContext {
             return new OpenInterval(center - 3, center + 3);
         }
 
-        const locus = ChromosomeInterval.parse(str);
-        const contextCoords = this.convertGenomeIntervalToBases(locus)[0];
+        /**
+         * Support for multi-chr viewRegion str inputs, assuming form: "chra:b-c;chrd:e-f"
+         */
+        const segments = str.split(';');
+        const intervals = [];
+        for(var i = 0; i < segments.length; i++) {
+            // parses str segments into ChromosomeIntervals
+            const locus = ChromosomeInterval.parse(str);
+            intervals.push(this.convertGenomeIntervalToBases(locus)[0]);
+        }
+
+        // const locus = ChromosomeInterval.parse(str);
+        // const contextCoords = this.convertGenomeIntervalToBases(locus)[0];
+
+        // creates open interval based on the start of the first chr segment and the end of the last chr segment
+        const contextCoords = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
         if (!contextCoords) {
             throw new RangeError('Location unavailable in this context');
         } else {
