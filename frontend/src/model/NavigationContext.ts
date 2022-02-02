@@ -261,6 +261,7 @@ class NavigationContext {
         // const contextCoords = this.convertGenomeIntervalToBases(locus)[0];
 
         // creates open interval based on the start of the first chr segment and the end of the last chr segment
+        // can assume no gaps
         const contextCoords = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
         if (!contextCoords) {
             throw new RangeError('Location unavailable in this context');
