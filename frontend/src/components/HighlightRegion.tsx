@@ -14,7 +14,7 @@ import { connect } from 'react-redux';
 interface HighlightRegionProps {
     y?: number | string; // Relative Y of the top of the selection box; how far from the top of this container
     height?: number | string; // Height of the selection box
-    enteredRegion: ChromosomeInterval; // region that is highlighted in chromosome coordinates;
+    enteredRegion: ChromosomeInterval | ChromosomeInterval[]; // region that is highlighted in chromosome coordinates;
     highlightEnteredRegion: boolean;
     visData: ViewExpansion; // contains data on chromosome start/stop, and window start/stop;
     legendWidth: number; // used in calculation for highlight;
@@ -74,17 +74,39 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @param {Object} props - props as specified by React
      */
 
-    getHighlightedXs(chrInterval: ChromosomeInterval): OpenInterval {
+    getHighlightedXs(chrInterval: ChromosomeInterval | ChromosomeInterval[]): OpenInterval {
         const {legendWidth, visData} = this.props;
         const {viewWindowRegion, viewWindow} = visData;
         console.log(chrInterval);
-        const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
-        // there will be many interval when there are gaps
-        const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
-        const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
-        const xRegion = drawModel.baseSpanToXSpan(interval);
-        let start = Math.max(legendWidth, xRegion.start + legendWidth);
-        let end = xRegion.end + legendWidth;
+
+        let start, end;
+
+        if (Array.isArray(chrInterval)) {
+            const ints = [];
+            for (var i = 0; i < chrInterval.length; i++) {
+                const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
+                // there will be many interval when there are gaps
+                const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
+                const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
+                const xRegion = drawModel.baseSpanToXSpan(interval);
+                const intStart = Math.max(legendWidth, xRegion.start + legendWidth);
+                const intEnd = xRegion.end + legendWidth;
+                ints.push(intStart, intEnd);
+            }
+            start = ints[0];
+            end = ints[ints.length - 1];
+        } else {
+            const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
+            // there will be many interval when there are gaps
+            const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
+            const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
+            const xRegion = drawModel.baseSpanToXSpan(interval);
+            start = Math.max(legendWidth, xRegion.start + legendWidth);
+            end = xRegion.end + legendWidth;
+        }
+
+        console.log(end, start);
+
         if (end <= start) {
             start = -1;
             end = 0;
