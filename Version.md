@@ -4,6 +4,7 @@
 
 -   new genomes `susScr11`, `oviAri4` and Brapa ([#228](https://github.com/lidaof/eg-react/issues/228)) added.
 -   image tracks/hubs update
+-   add new feature to allow long range tracks with colors for each arc/heatmap diamond
 
 ## 53.5.1
 

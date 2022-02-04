@@ -59,7 +59,12 @@ class HeatmapNoLegendWidth extends React.PureComponent<HeatmapProps, {}> {
     }
 
     renderRect = (placedInteraction: PlacedInteraction, index: number) => {
-        const { opacityScale, color, color2, viewWindow, height, bothAnchorsInView, clampHeight } = this.props;
+        const { opacityScale, viewWindow, height, bothAnchorsInView, clampHeight } = this.props;
+        let { color, color2 } = this.props;
+        if (placedInteraction.interaction.color) {
+            color = placedInteraction.interaction.color;
+            color2 = placedInteraction.interaction.color;
+        }
         const score = placedInteraction.interaction.score;
         if (!score) {
             return null;
@@ -154,6 +159,7 @@ class HeatmapNoLegendWidth extends React.PureComponent<HeatmapProps, {}> {
                 }
             }
             return <div>
+                {interaction.name && <div>{interaction.name}</div>}
                 <div>Locus1: {interaction.locus1.toString()}</div>
                 <div>Locus2: {interaction.locus2.toString()}</div>
                 <div>Score: {interaction.score}</div>

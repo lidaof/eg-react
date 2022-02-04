@@ -46,7 +46,12 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     clampScale: ScaleLinear<number, number>;
 
     renderArc = (placedInteraction: PlacedInteraction, index: number) => {
-        const { opacityScale, color, color2, lineWidth, bothAnchorsInView, viewWindow, height, clampHeight } = this.props;
+        const { opacityScale, lineWidth, bothAnchorsInView, viewWindow, height, clampHeight } = this.props;
+        let { color, color2 } = this.props;
+        if (placedInteraction.interaction.color) {
+            color = placedInteraction.interaction.color;
+            color2 = placedInteraction.interaction.color;
+        }
         // const arcs = [], arcHeights = [];
         // const curveYScale = scaleLinear().domain([0, viewWindow.getLength()]).range([0, HEIGHT]).clamp(true);
         const score = placedInteraction.interaction.score;
@@ -135,6 +140,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 const divs = tops.map((arc: any, i: number) => {
                     return (
                         <div key={i}>
+                            {arc[4].name && <div>{arc[4].name}</div>}
                             <div>Locus1: {arc[4].locus1.toString()}</div>
                             <div>Locus2: {arc[4].locus2.toString()}</div>
                             <div>Score: {arc[4].score}</div>
@@ -155,6 +161,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
             if (arc) {
                 return (
                     <div>
+                        {arc[4].name && <div>{arc[4].name}</div>}
                         <div>Locus1: {arc[4].locus1.toString()}</div>
                         <div>Locus2: {arc[4].locus2.toString()}</div>
                         <div>Score: {arc[4].score}</div>

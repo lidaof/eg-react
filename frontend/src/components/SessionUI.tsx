@@ -7,6 +7,7 @@ import { AppState } from "../AppState";
 import { StateWithHistory } from "redux-undo";
 import { notify } from "react-notify-toast";
 import JSZip from 'jszip';
+import _ from 'lodash'
 import { AppStateSaver } from "../model/AppSaveLoad";
 import { ActionCreators } from "../AppState";
 import LoadSession from "./LoadSession";
@@ -134,11 +135,15 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
     downloadWholeBundle = () => {
         const bundle = this.getBundle();
         const { sessionsInBundle, bundleId } = bundle;
+        if (_.isEmpty(sessionsInBundle)) {
+            notify.show("Session bundle is empty, skipping...", "error", 2000);
+            return;
+        }
         const zip = new JSZip();
         const zipName = `${bundleId}.zip`;
         Object.keys(sessionsInBundle).forEach(k => {
             const session = sessionsInBundle[k];
-            zip.file(`${session.label}.json`, JSON.stringify(session.state) + "\n");
+            zip.file(`${session.label}-${k}.json`, JSON.stringify(session.state) + "\n");
 
         })
         zip.generateAsync({ type: "base64" })
@@ -364,7 +369,7 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                     </React.Fragment>
                 )}
                 {this.renderSavedSessions()}
-                <div className="font-italic" style={{ maxWidth: "480px" }}>
+                <div className="font-italic" style={{ maxWidth: "600px" }}>
                     Disclaimer: please use <span className="font-weight-bold">sessionFile</span> or{" "}
                     <span className="font-weight-bold">hub</span> URL for publishing using the Browser. Session id is
                     supposed to be shared with trusted people only. Please check our docs for{" "}
