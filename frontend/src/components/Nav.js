@@ -32,8 +32,10 @@ import ColorPicker from "./ColorPicker";
 import { TextTrack } from "./TextTrack";
 import { AppIcon, GenomePicker } from "./GenomePicker";
 import Button from '@material-ui/core/Button';
+import { ArrowBack } from '@material-ui/icons'
 
 import "./Nav.css";
+import { IconButton } from "@material-ui/core";
 
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
@@ -201,6 +203,9 @@ class Nav extends React.Component {
         return (
             <div className="Nav-container">
                 <div className="panel">
+                    <IconButton onClick={() => this.onGenomeSelected('')} style={{ marginTop: "5px" }}>
+                        <ArrowBack />
+                    </IconButton>
                     {!virusBrowserMode && (
                         // <div className="element" id="logoDiv">
                         <div style={{ marginTop: "10px", marginRight: "20px" }}>
@@ -250,13 +255,17 @@ class Nav extends React.Component {
                                     },
                                 }}
                             >
-                                <GenomePicker 
+                                <IconButton onClick={this.handleGenomeCloseModal}>
+                                    <ArrowBack />
+                                </IconButton>
+                                <GenomePicker
                                     onGenomeSelected={this.onGenomeSelected}
+                                    title="Choose a new genome"
                                 />
-                                <button className="btn btn-sm btn-danger" onClick={this.handleGenomeCloseModal}>
+                                <Button variant="contained" color="primary" onClick={this.handleGenomeCloseModal}>
                                     Close
-                                </button>{" "}
-                                {otherGenome && ( 
+                                </Button>{" "}
+                                {otherGenome && (
                                     <button className="btn btn-sm btn-primary" onClick={this.changeGenome}>
                                         Go
                                     </button>

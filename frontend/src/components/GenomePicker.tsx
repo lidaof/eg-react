@@ -91,6 +91,7 @@ interface GenomePickerContainerProps {
 
 interface GenomePickerProps {
     onGenomeSelected: (name: string) => void;
+    title?: string;
 }
 
 export function GenomePicker(props: GenomePickerProps) {
@@ -131,7 +132,7 @@ export function GenomePicker(props: GenomePickerProps) {
             <Grid container spacing={4}>
                 <Grid item xs={12} md={6}>
                     <Typography variant="h4" style={{ margin: "25px", marginLeft: 0 }}>
-                        Please select a genome
+                        {props.title || "Please select a genome"}
                     </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
