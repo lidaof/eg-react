@@ -213,7 +213,7 @@ export interface IHighlightItem {
     highlightNumber?: number;
     highlightName?: string;
     highlightInterval?: OpenInterval;
-    viewRegion?: ChromosomeInterval;
+    viewRegion?: ChromosomeInterval | ChromosomeInterval[];
     inViewRegion?: boolean;
     absoluteInterval?: OpenInterval;
     updateActive?: Function;
@@ -248,6 +248,14 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
         const isHighlightActive = (active ? 'Active' : 'Inactive');
         const isHighlightActiveColor = (active ? 'green' : 'red');
 
+        let viewRegionString;
+        if (Array.isArray(viewRegion)) {
+            viewRegionString = `${viewRegion[0].chr}:${viewRegion[0].start}-${viewRegion[0].end};
+            ${viewRegion[viewRegion.length - 1].chr}:${viewRegion[viewRegion.length - 1].start}-${viewRegion[viewRegion.length - 1].end}`;
+        } else {
+            viewRegionString = `${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`;
+        }
+
         return (
             <div className="highlight-item-body">
                 {/* name input */}
@@ -262,7 +270,7 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
                         position: "relative",
                         zIndex: "inherit",
                 }}>
-                    {`${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`}
+                    {viewRegionString}
                 </span>
                 {/* left to right: color picker, delete, hide+show, jump-to-view-region */}
                 <div className="highlight-item-buttons-group">

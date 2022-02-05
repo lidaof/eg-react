@@ -246,23 +246,35 @@ class NavigationContext {
             return new OpenInterval(center - 3, center + 3);
         }
 
-        /**
-         * Support for multi-chr viewRegion str inputs, assuming form: "chra:b-c;chrd:e-f"
-         */
-        const segments = str.split(';');
-        const intervals = [];
-        for(var i = 0; i < segments.length; i++) {
-            // parses str segments into ChromosomeIntervals
+        let start, end;
+        if (str.split(`:`).length === 3) {
+            /**
+             * Support for multi-chr viewRegion str inputs, assuming form: "chra:b-chrc:d"
+             */
+            const segments = str.split('-');
+            const start1 = Number(segments[0].split(`:`)[1]);
+            const end1 = Number(segments[1].split(`:`)[1]);
+            const endChr = Number(segments[1].split(`:`)[0].split(`r`)[1]);
+            const miniIntStart = `${segments[0]}-${start1 + 4}`;
+            const miniIntEnd = `chr${endChr}:${end1 - 4}-${end1}`;
+            const startInt = ChromosomeInterval.parse(miniIntStart);
+            const endInt = ChromosomeInterval.parse(miniIntEnd);
+            const contextCoordsStart = this.convertGenomeIntervalToBases(startInt)[0];
+            const contextCoordsEnd = this.convertGenomeIntervalToBases(endInt)[0];
+            start = contextCoordsStart.start;
+            end = contextCoordsEnd.end;
+        } else if (str.split(`:`).length === 2) {
             const locus = ChromosomeInterval.parse(str);
-            intervals.push(this.convertGenomeIntervalToBases(locus)[0]);
+            const contextCoords = this.convertGenomeIntervalToBases(locus)[0];
+            start = contextCoords.start;
+            end = contextCoords.end;
+        } else {
+            throw new RangeError('Interval of incorrect formatting');
         }
-
-        // const locus = ChromosomeInterval.parse(str);
-        // const contextCoords = this.convertGenomeIntervalToBases(locus)[0];
 
         // creates open interval based on the start of the first chr segment and the end of the last chr segment
         // can assume no gaps
-        const contextCoords = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
+        const contextCoords = new OpenInterval(start, end);
         if (!contextCoords) {
             throw new RangeError('Location unavailable in this context');
         } else {
