@@ -154,6 +154,176 @@ const defaultTracks = [
             },
         },
     }),
+    new TrackModel({
+        "type": "categorical",
+        "name": "Protein_domains",
+        "url": "https://epigenome.wustl.edu/SARS-CoV-2/uniprot//Protein_domains.cat.gz",
+        "options": {
+            "height": 20,
+            "alwaysDrawLabel": true,
+            "maxRows": 100,
+            "hiddenPixels": 0,
+            "source": "uniprot, compiled by ucsc (https://genome.ucsc.edu/cgi-bin/hgTables?hgsid=1276980573_aa3KBxjbtSRpAuTf9vi5WxRKX9b8&clade=virus&org=SARS-CoV-2&db=wuhCor1&hgta_group=uniprot&hgta_track=ncbiGeneBGP&hgta_table=0&hgta_regionType=range&position=NC_045512v2%3A1-29%2C903&hgta_outputType=primaryTable&hgta_outFileName=)",
+            "category": {
+                "Ubiquitin-like 1": {
+                    "name": "Ubiquitin-like 1",
+                    "color": "#F8766D"
+                },
+                "DPUP": {
+                    "name": "DPUP",
+                    "color": "#F27D52"
+                },
+                "ExoN/MTase coa...": {
+                    "name": "ExoN/MTase coa...",
+                    "color": "#EA842F"
+                },
+                "Ubiquitin-like 2": {
+                    "name": "Ubiquitin-like 2",
+                    "color": "#E18A00"
+                },
+                "Macro 2": {
+                    "name": "Macro 2",
+                    "color": "#D79000"
+                },
+                "CV ZBD": {
+                    "name": "CV ZBD",
+                    "color": "#CB9600"
+                },
+                "Nsp15 N-termin...": {
+                    "name": "Nsp15 N-termin...",
+                    "color": "#BE9C00"
+                },
+                "+)RNA virus he...": {
+                    "name": "+)RNA virus he...",
+                    "color": "#B0A100"
+                },
+                "zinc finger": {
+                    "name": "zinc finger",
+                    "color": "#9FA600"
+                },
+                "RdRp Nsp8 cofa...": {
+                    "name": "RdRp Nsp8 cofa...",
+                    "color": "#8CAB00"
+                },
+                "CoV 3a-like vi...": {
+                    "name": "CoV 3a-like vi...",
+                    "color": "#75AF00"
+                },
+                "AV-Nsp11N/CoV-...": {
+                    "name": "AV-Nsp11N/CoV-...",
+                    "color": "#58B300"
+                },
+                "Nidovirus-type...": {
+                    "name": "Nidovirus-type...",
+                    "color": "#24B700"
+                },
+                "Nsp9 ssRNA-bin...": {
+                    "name": "Nsp9 ssRNA-bin...",
+                    "color": "#00BA38"
+                },
+                "N7-MTase": {
+                    "name": "N7-MTase",
+                    "color": "#00BC58"
+                },
+                "ExoN": {
+                    "name": "ExoN",
+                    "color": "#00BE70"
+                },
+                "SARS ORF8 Ig-like": {
+                    "name": "SARS ORF8 Ig-like",
+                    "color": "#00C086"
+                },
+                "NendoU": {
+                    "name": "NendoU",
+                    "color": "#00C199"
+                },
+                "BetaCoV Nsp1 C...": {
+                    "name": "BetaCoV Nsp1 C...",
+                    "color": "#00C1AB"
+                },
+                "BetaCoV S1-NTD": {
+                    "name": "BetaCoV S1-NTD",
+                    "color": "#00C0BC"
+                },
+                "RdRp Nsp7 cofa...": {
+                    "name": "RdRp Nsp7 cofa...",
+                    "color": "#00BECC"
+                },
+                "Peptidase C30": {
+                    "name": "Peptidase C30",
+                    "color": "#00BBDA"
+                },
+                "X4e": {
+                    "name": "X4e",
+                    "color": "#00B7E7"
+                },
+                "Nsp12 RNA-depe...": {
+                    "name": "Nsp12 RNA-depe...",
+                    "color": "#00B2F3"
+                },
+                "CoV N NTD": {
+                    "name": "CoV N NTD",
+                    "color": "#00ACFC"
+                },
+                "CoV N CTD": {
+                    "name": "CoV N CTD",
+                    "color": "#00A5FF"
+                },
+                "Macro 1": {
+                    "name": "Macro 1",
+                    "color": "#619CFF"
+                },
+                "9b": {
+                    "name": "9b",
+                    "color": "#8B93FF"
+                },
+                "Macro 3": {
+                    "name": "Macro 3",
+                    "color": "#A989FF"
+                },
+                "NiRAN": {
+                    "name": "NiRAN",
+                    "color": "#C27FFF"
+                },
+                "RdRp catalytic": {
+                    "name": "RdRp catalytic",
+                    "color": "#D575FE"
+                },
+                "Nucleic acid-b...": {
+                    "name": "Nucleic acid-b...",
+                    "color": "#E56DF5"
+                },
+                "Virion surface": {
+                    "name": "Virion surface",
+                    "color": "#F066EA"
+                },
+                "BetaCoV S1-CTD": {
+                    "name": "BetaCoV S1-CTD",
+                    "color": "#F962DD"
+                },
+                "Peptidase C16": {
+                    "name": "Peptidase C16",
+                    "color": "#FE61CE"
+                },
+                "Lumenal": {
+                    "name": "Lumenal",
+                    "color": "#FF62BD"
+                },
+                "CoV Nsp1 globular": {
+                    "name": "CoV Nsp1 globular",
+                    "color": "#FF65AC"
+                },
+                "Intravirion": {
+                    "name": "Intravirion",
+                    "color": "#FF6A99"
+                },
+                "Nsp4C": {
+                    "name": "Nsp4C",
+                    "color": "#FD7084"
+                }
+            }
+        }
+    })
     // new TrackModel({
     //     type: "longrange",
     //     name: "TRS-L-dependent recombination",
@@ -286,6 +456,7 @@ const annotationTracks = {
 };
 
 const publicHubData = {
+    "UniProt protein annotation": "compiled by ucsc, assessed through https://genome.ucsc.edu/cgi-bin/hgTables?hgsid=1276980573_aa3KBxjbtSRpAuTf9vi5WxRKX9b8&clade=virus&org=SARS-CoV-2&db=wuhCor1&hgta_group=uniprot&hgta_track=ncbiGeneBGP&hgta_table=0&hgta_regionType=range&position=NC_045512v2%3A1-29%2C903&hgta_outputType=primaryTable&hgta_outFileName=",
     "NCBI database":
         "SNV tracks of all SARS-CoV-2 strains on NCBI Genbank displaying their sequence variation from reference",
     "Nextstrain database":
@@ -308,6 +479,16 @@ const publicHubData = {
 };
 
 const publicHubList = [
+    {
+        collection: "UniProt protein annotation",
+        name: "UniProt protein annotation",
+        numTracks: 13,
+        oldHubFormat: false,
+        url: "https://epigenome.wustl.edu/SARS-CoV-2/uniprot/tracks.json",
+        description: {
+            "data source": "compiled by ucsc, assessed through https://genome.ucsc.edu/cgi-bin/hgTables?hgsid=1276980573_aa3KBxjbtSRpAuTf9vi5WxRKX9b8&clade=virus&org=SARS-CoV-2&db=wuhCor1&hgta_group=uniprot&hgta_track=ncbiGeneBGP&hgta_table=0&hgta_regionType=range&position=NC_045512v2%3A1-29%2C903&hgta_outputType=primaryTable&hgta_outFileName="
+        },
+    },
     {
         collection: "SARS-CoV-2 CRISPR Screen Database",
         name: "SARS-CoV-2 CRISPR Screen Database",
