@@ -30,6 +30,7 @@ import SwipeableViews from "react-swipeable-views";
 import { ActionCreators } from "../AppState";
 import { treeOfLife } from "../model/genomes/allGenomes";
 import { SessionUI } from "./SessionUI";
+import Logo from '../images/logo.png'
 
 import "./GenomePicker.css";
 
@@ -214,12 +215,12 @@ export function AppIcon() {
     return (
         <>
             <Typography variant="h5" noWrap>
-            <img
-                src="https://epigenomegateway.wustl.edu/browser/favicon-144.png"
-                alt="Browser Icon"
-                style={{ height: 50, width: "auto", marginLeft: 20, marginRight: 20 }}
-            />
-                WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span>
+                <img
+                    src={Logo}
+                    alt="Browser Icon"
+                    style={{ height: 40, width: "auto", marginRight: 10 }}
+                />
+                {/* WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span> */}
             </Typography>
         </>
     );

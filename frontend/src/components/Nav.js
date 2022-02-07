@@ -31,11 +31,11 @@ import ScatterPlot from "./Geneplot/ScatterPlot";
 import ColorPicker from "./ColorPicker";
 import { TextTrack } from "./TextTrack";
 import { AppIcon, GenomePicker } from "./GenomePicker";
-import Button from '@material-ui/core/Button';
-import { ArrowBack } from '@material-ui/icons'
+import Button from "@material-ui/core/Button";
+import { ArrowBack } from "@material-ui/icons";
+import { IconButton } from "@material-ui/core";
 
 import "./Nav.css";
-import { IconButton } from "@material-ui/core";
 
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
@@ -157,7 +157,7 @@ class Nav extends React.Component {
     onGenomeSelected = (name) => {
         this.props.onGenomeSelected(name);
         this.handleGenomeCloseModal();
-    }
+    };
 
     render() {
         const {
@@ -203,12 +203,12 @@ class Nav extends React.Component {
         return (
             <div className="Nav-container">
                 <div className="panel">
-                    <IconButton onClick={() => this.onGenomeSelected('')} style={{ marginTop: "5px" }}>
+                    <IconButton onClick={() => this.onGenomeSelected("")} style={{ marginTop: "5px" }}>
                         <ArrowBack />
                     </IconButton>
                     {!virusBrowserMode && (
                         // <div className="element" id="logoDiv">
-                        <div style={{ marginTop: "10px", marginRight: "20px" }}>
+                        <div style={{ marginTop: "10px" }}>
                             {/* <img
                                 src="https://epigenomegateway.wustl.edu/images/eglogo.jpg"
                                 width="180px"
@@ -229,7 +229,7 @@ class Nav extends React.Component {
                                 backgroundSize: "cover",
                                 marginTop: 10,
                                 marginBottom: 10,
-                                borderRadius: "0.25rem"
+                                borderRadius: "0.25rem",
                             }}
                         >
                             <div onClick={this.handleGenomeOpenModal}>
@@ -258,10 +258,7 @@ class Nav extends React.Component {
                                 <IconButton onClick={this.handleGenomeCloseModal}>
                                     <ArrowBack />
                                 </IconButton>
-                                <GenomePicker
-                                    onGenomeSelected={this.onGenomeSelected}
-                                    title="Choose a new genome"
-                                />
+                                <GenomePicker onGenomeSelected={this.onGenomeSelected} title="Choose a new genome" />
                                 <Button variant="contained" color="primary" onClick={this.handleGenomeCloseModal}>
                                     Close
                                 </Button>{" "}
@@ -614,20 +611,31 @@ function HighlightColorChange(props) {
 
 function DropdownOpener(props) {
     const { extraClassName, label } = props;
-    const color = extraClassName.split('-')[1];
-    console.log(color);
+    // const color = extraClassName.split("-")[1];
+    // console.log(color);
+    // return (
+    //     <Button
+    //         type="button"
+    //         // className={`btn dropdown-toggle ${extraClassName}`}
+    //         color={color}
+    //         data-toggle="dropdown"
+    //         aria-haspopup="true"
+    //         aria-expanded="false"
+    //         variant="contained"
+    //     >
+    //         {label}
+    //     </Button>
+    // );
     return (
-        <Button
+        <button
             type="button"
-            // className={`btn dropdown-toggle ${extraClassName}`}
-            color={color}
+            className={`btn ${extraClassName}`}
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
-            variant="contained"
         >
             {label}
-        </Button>
+        </button>
     );
 }
 
