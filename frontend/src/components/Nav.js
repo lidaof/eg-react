@@ -215,7 +215,7 @@ class Nav extends React.Component {
                                 height="30px"
                                 alt="browser logo"
                             /> */}
-                            <AppIcon />
+                            <AppIcon withText={false} />
                             {/* <span id="theNew" >The New</span> */}
                             <span id="theVersion">v{packageJson.version}</span>
                         </div>

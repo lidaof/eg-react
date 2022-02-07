@@ -211,7 +211,7 @@ function GenomePickerContainer(props: GenomePickerProps) {
     );
 }
 
-export function AppIcon() {
+export function AppIcon({ withText = true }) {
     return (
         <>
             <Typography variant="h5" noWrap>
@@ -220,7 +220,7 @@ export function AppIcon() {
                     alt="Browser Icon"
                     style={{ height: 40, width: "auto", marginRight: 10 }}
                 />
-                {/* WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span> */}
+                {withText && <>WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span></>}
             </Typography>
         </>
     );
