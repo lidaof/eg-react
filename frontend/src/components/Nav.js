@@ -30,8 +30,12 @@ import packageJson from "../../package.json";
 import ScatterPlot from "./Geneplot/ScatterPlot";
 import ColorPicker from "./ColorPicker";
 import { TextTrack } from "./TextTrack";
+import { AppIcon, GenomePicker } from "./GenomePicker";
+import Button from '@material-ui/core/Button';
+import { ArrowBack } from '@material-ui/icons'
 
 import "./Nav.css";
+import { IconButton } from "@material-ui/core";
 
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
@@ -150,6 +154,11 @@ class Nav extends React.Component {
         this.setState({ otherGenome: null, genomeModal: false });
     };
 
+    onGenomeSelected = (name) => {
+        this.props.onGenomeSelected(name);
+        this.handleGenomeCloseModal();
+    }
+
     render() {
         const {
             tracks,
@@ -194,14 +203,19 @@ class Nav extends React.Component {
         return (
             <div className="Nav-container">
                 <div className="panel">
+                    <IconButton onClick={() => this.onGenomeSelected('')} style={{ marginTop: "5px" }}>
+                        <ArrowBack />
+                    </IconButton>
                     {!virusBrowserMode && (
-                        <div className="element" id="logoDiv">
-                            <img
+                        // <div className="element" id="logoDiv">
+                        <div style={{ marginTop: "10px", marginRight: "20px" }}>
+                            {/* <img
                                 src="https://epigenomegateway.wustl.edu/images/eglogo.jpg"
                                 width="180px"
                                 height="30px"
                                 alt="browser logo"
-                            />
+                            /> */}
+                            <AppIcon />
                             {/* <span id="theNew" >The New</span> */}
                             <span id="theVersion">v{packageJson.version}</span>
                         </div>
@@ -213,6 +227,9 @@ class Nav extends React.Component {
                                 backgroundImage: `url(${logo})`,
                                 color: color,
                                 backgroundSize: "cover",
+                                marginTop: 10,
+                                marginBottom: 10,
+                                borderRadius: "0.25rem"
                             }}
                         >
                             <div onClick={this.handleGenomeOpenModal}>
@@ -238,10 +255,16 @@ class Nav extends React.Component {
                                     },
                                 }}
                             >
-                                {this.renderOtherGenomes()}
-                                <button className="btn btn-sm btn-danger" onClick={this.handleGenomeCloseModal}>
+                                <IconButton onClick={this.handleGenomeCloseModal}>
+                                    <ArrowBack />
+                                </IconButton>
+                                <GenomePicker
+                                    onGenomeSelected={this.onGenomeSelected}
+                                    title="Choose a new genome"
+                                />
+                                <Button variant="contained" color="primary" onClick={this.handleGenomeCloseModal}>
                                     Close
-                                </button>{" "}
+                                </Button>{" "}
                                 {otherGenome && (
                                     <button className="btn btn-sm btn-primary" onClick={this.changeGenome}>
                                         Go
@@ -591,16 +614,20 @@ function HighlightColorChange(props) {
 
 function DropdownOpener(props) {
     const { extraClassName, label } = props;
+    const color = extraClassName.split('-')[1];
+    console.log(color);
     return (
-        <button
+        <Button
             type="button"
-            className={`btn dropdown-toggle ${extraClassName}`}
+            // className={`btn dropdown-toggle ${extraClassName}`}
+            color={color}
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
+            variant="contained"
         >
             {label}
-        </button>
+        </Button>
     );
 }
 
