@@ -6,6 +6,8 @@ import { firebaseConnect, getVal } from "react-redux-firebase";
 import { AppState } from "../AppState";
 import { StateWithHistory } from "redux-undo";
 import { notify } from "react-notify-toast";
+import JSZip from 'jszip';
+import _ from 'lodash'
 import { AppStateSaver } from "../model/AppSaveLoad";
 import { ActionCreators } from "../AppState";
 import LoadSession from "./LoadSession";
@@ -129,6 +131,31 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
     downloadAsHub = () => {
         this.downloadSession(true);
     };
+
+    downloadWholeBundle = () => {
+        const bundle = this.getBundle();
+        const { sessionsInBundle, bundleId } = bundle;
+        if (_.isEmpty(sessionsInBundle)) {
+            notify.show("Session bundle is empty, skipping...", "error", 2000);
+            return;
+        }
+        const zip = new JSZip();
+        const zipName = `${bundleId}.zip`;
+        Object.keys(sessionsInBundle).forEach(k => {
+            const session = sessionsInBundle[k];
+            zip.file(`${session.label}-${k}.json`, JSON.stringify(session.state) + "\n");
+
+        })
+        zip.generateAsync({ type: "base64" })
+            .then(function (content) {
+                const dl = document.createElement("a");
+                document.body.appendChild(dl); // This line makes it work in Firefox.
+                dl.setAttribute("href", "data:application/zip;base64," + content);
+                dl.setAttribute("download", zipName);
+                dl.click();
+                notify.show("Whole bundle downloaded!", "success", 2000);
+            });
+    }
 
     setSessionLabel = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ newSessionLabel: event.target.value.trim() });
@@ -336,11 +363,13 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
                         </button>{" "}
                         <button className="SessionUI btn btn-info" onClick={this.downloadAsHub}>
                             Download as datahub
+                        </button> <button className="SessionUI btn btn-warning" onClick={this.downloadWholeBundle}>
+                            Download whole bundle
                         </button>
                     </React.Fragment>
                 )}
                 {this.renderSavedSessions()}
-                <div className="font-italic" style={{ maxWidth: "480px" }}>
+                <div className="font-italic" style={{ maxWidth: "600px" }}>
                     Disclaimer: please use <span className="font-weight-bold">sessionFile</span> or{" "}
                     <span className="font-weight-bold">hub</span> URL for publishing using the Browser. Session id is
                     supposed to be shared with trusted people only. Please check our docs for{" "}

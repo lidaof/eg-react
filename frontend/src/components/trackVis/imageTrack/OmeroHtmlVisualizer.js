@@ -76,16 +76,16 @@ class OmeroHtmlVisualizer extends React.PureComponent {
                 See details in 4DN data portal
             </a>
         ) : null;
-        const button3d = this.props.isThereG3dTrack ? (
-            <button className="btn btn-sm btn-warning" onClick={() => this.props.onSetImageInfo(dataTable)}>
-                Show in 3D
-            </button>
-        ) : null;
-        const button3dClear = this.props.isThereG3dTrack ? (
-            <button className="btn btn-sm btn-secondary" onClick={() => this.props.onSetImageInfo(null)}>
-                Remove from 3D
-            </button>
-        ) : null;
+        // const button3d = this.props.isThereG3dTrack ? (
+        //     <button className="btn btn-sm btn-warning" onClick={() => this.props.onSetImageInfo(dataTable)}>
+        //         Show in 3D
+        //     </button>
+        // ) : null;
+        // const button3dClear = this.props.isThereG3dTrack ? (
+        //     <button className="btn btn-sm btn-secondary" onClick={() => this.props.onSetImageInfo(null)}>
+        //         Remove from 3D
+        //     </button>
+        // ) : null;
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} onClose={this.props.onHideTooltip} hideArrow={true}>
                 <div>
@@ -96,7 +96,8 @@ class OmeroHtmlVisualizer extends React.PureComponent {
                     >
                         View larger image
                     </button>{" "}
-                    {detailButton} {button3d} {button3dClear}
+                    {/* {detailButton} {button3d} {button3dClear} */}
+                    {detailButton}
                 </div>
                 <ObjectAsTable content={dataTable.details} />
             </Tooltip>

@@ -21,7 +21,7 @@ const genome = new Genome("sacCer3", [
     new Chromosome("chrXIV", 784333),
     new Chromosome("chrXV", 1091291),
     new Chromosome("chrXVI", 948066),
-    new Chromosome("chrM", 85779)
+    new Chromosome("chrM", 85779),
 ]);
 
 const navContext = genome.makeNavContext();
@@ -30,12 +30,26 @@ const defaultTracks = [
     new TrackModel({
         type: "geneAnnotation",
         name: "sgdGene",
-        genome: "sacCer3"
+        genome: "sacCer3",
     }),
     new TrackModel({
         type: "ruler",
-        name: "Ruler"
-    })
+        name: "Ruler",
+    }),
+];
+
+const publicHubData = {
+    "3D structures": "3D stucure data collection",
+};
+
+const publicHubList = [
+    {
+        collection: "3D structures",
+        name: "3D structures from Nature 465, 363–367 (2010)",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://target.wustl.edu/dli/tmp/2010_nature_yeast_3d.json",
+    },
 ];
 
 const sacCer3 = {
@@ -45,7 +59,9 @@ const sacCer3 = {
     defaultRegion: defaultRegion,
     defaultTracks: defaultTracks,
     twoBitURL: "https://vizhub.wustl.edu/public/sacCer3/sacCer3.2bit",
-    annotationTracks
+    publicHubData,
+    publicHubList,
+    annotationTracks,
 };
 
 export default sacCer3;

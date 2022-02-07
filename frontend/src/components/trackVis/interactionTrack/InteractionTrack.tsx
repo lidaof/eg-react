@@ -43,7 +43,7 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
         maxValueFilter?: number,
         minValueFilter?: number,
         bothAnchorsInView?: boolean,
-
+        clampHeight?: boolean;
     };
     forceSvg?: boolean;
     getBeamRefs?: any;
@@ -66,6 +66,7 @@ export const DEFAULT_OPTIONS = {
     fetchViewWindowOnly: false,
     bothAnchorsInView: false,
     isThereG3dTrack: false,
+    clampHeight: false,
 
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
@@ -185,7 +186,9 @@ class InteractionTrack extends React.PureComponent<InteractionTrackProps, {}> {
             forceSvg,
             greedyTooltip: options.greedyTooltip,
             bothAnchorsInView: options.bothAnchorsInView,
+            fetchViewWindowOnly: options.fetchViewWindowOnly,
             isThereG3dTrack,
+            clampHeight: options.clampHeight,
         };
         let visualizer; // , height;
         // if (options.displayMode === InteractionDisplayMode.HEATMAP) {

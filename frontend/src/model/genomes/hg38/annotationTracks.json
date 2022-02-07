@@ -166,6 +166,13 @@
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_mm10_axt.gz"
         },
         {
+            "name": "t2t-chm13tohg38",
+            "label": "chm13v1.1 to hg38 minimap2",
+            "querygenome": "t2t-chm13-v1.1",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/querychm13tohg38.align.gz"
+        },
+        {
             "name": "panTro5tohg38",
             "label": "Chimpanzee panTro5 to hg38 blastz",
             "querygenome": "panTro5",

@@ -1,10 +1,23 @@
 # Version History
 
+## 53.5.2
+
+-   new genomes `susScr11`, `oviAri4` and Brapa ([#228](https://github.com/lidaof/eg-react/issues/228)) added.
+-   image tracks/hubs update
+-   add new feature to allow long range tracks with colors for each arc/heatmap diamond
+
+## 53.5.1
+
+-   add spin utility for 3d model viewer
+-   add `clampHeight` option to chromatin interaction track for `arc` and `heatmap` style
+
 ## 53.5.0
 
 -   removed unnecessary re-render of numerical track
 -   adding push notification
 -   allow HiC track bin size and normalization options linked to the hic file itself
+-   add an option `italicizeText` to allow _italic_ text/label on gene tracks
+-   new genome `xenTro10` added
 
 ## 53.4.1
 

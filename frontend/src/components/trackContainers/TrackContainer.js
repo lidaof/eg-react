@@ -31,10 +31,10 @@ import ButtonGroup from "./ButtonGroup";
 import TrackRegionController from "../genomeNavigator/TrackRegionController";
 import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
-
-import "./TrackContainer.css";
 import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManager";
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
+
+import "./TrackContainer.css";
 
 // import { DEFAULT_OPTIONS as DYNAMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack";
 
@@ -131,7 +131,7 @@ class TrackContainer extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.tracks !== this.props.tracks || prevProps.primaryView !== this.props.primaryView) {
+        if (this.props.tracks !== prevProps.tracks || prevProps.primaryView !== this.props.primaryView) {
             this.getGroupScale();
         }
     }
@@ -545,10 +545,10 @@ class TrackContainer extends React.Component {
     getGroupScale = () => {
         const { tracks, trackData, primaryView } = this.props;
         const groupScale = this.groupManager.getGroupScale(
-            tracks,
+            tracks.filter((tk) => tk.options.hasOwnProperty("group") && tk.options.group),
             trackData,
-            primaryView.visWidth,
-            primaryView.viewWindow
+            primaryView ? primaryView.visWidth : 0,
+            primaryView ? primaryView.viewWindow : 0
         );
         this.setState({ groupScale });
     };

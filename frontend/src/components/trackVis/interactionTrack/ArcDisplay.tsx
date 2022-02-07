@@ -1,5 +1,5 @@
 import React from "react";
-import { ScaleLinear } from "d3-scale";
+import { scaleLinear, ScaleLinear } from "d3-scale";
 import _ from "lodash";
 import { PlacedInteraction } from "../../../model/FeaturePlacer";
 import OpenInterval from "../../../model/interval/OpenInterval";
@@ -26,10 +26,12 @@ interface ArcDisplayProps {
     forceSvg?: boolean;
     greedyTooltip?: boolean;
     bothAnchorsInView?: boolean;
+    fetchViewWindowOnly?: boolean;
     onSetAnchors3d?: any;
     onShowTooltip?: any;
     onHideTooltip?: any;
     isThereG3dTrack?: boolean;
+    clampHeight?: boolean;
 }
 
 // const ITEM_LIMIT = 1000;
@@ -41,9 +43,15 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
     // }
 
     arcData: any[];
+    clampScale: ScaleLinear<number, number>;
 
     renderArc = (placedInteraction: PlacedInteraction, index: number) => {
-        const { opacityScale, color, color2, lineWidth, bothAnchorsInView, viewWindow } = this.props;
+        const { opacityScale, lineWidth, bothAnchorsInView, viewWindow, height, clampHeight } = this.props;
+        let { color, color2 } = this.props;
+        if (placedInteraction.interaction.color) {
+            color = placedInteraction.interaction.color;
+            color2 = placedInteraction.interaction.color;
+        }
         // const arcs = [], arcHeights = [];
         // const curveYScale = scaleLinear().domain([0, viewWindow.getLength()]).range([0, HEIGHT]).clamp(true);
         const score = placedInteraction.interaction.score;
@@ -72,8 +80,24 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
         if (spanLength < 1) {
             return null;
         }
-        const radius = Math.max(0, Math.SQRT2 * halfLength - lineWidth * 0.5);
-        this.arcData.push([spanCenter, -halfLength, radius, lineWidth, placedInteraction.interaction]);
+        let preRadius, centerY;
+        if (clampHeight) {
+            // angles for all arcs will be same
+            // const angle = this.clampScale(height)
+            // preRadius = halfLength / Math.cos(angle)
+            const scaledHeight = this.clampScale(halfLength) * height;
+            if (scaledHeight === 0) {
+                preRadius = 0
+            } else {
+                preRadius = (Math.pow(scaledHeight, 2) + Math.pow(halfLength, 2)) / (2 * scaledHeight);
+                centerY = scaledHeight - preRadius;
+            }
+        } else {
+            preRadius = Math.SQRT2 * halfLength; // ignore height
+            centerY = -halfLength;
+        }
+        const radius = Math.max(0, preRadius - lineWidth * 0.5);
+        this.arcData.push([spanCenter, centerY, radius, lineWidth, placedInteraction.interaction]);
         return (
             <path
                 key={placedInteraction.generateKey() + index}
@@ -116,6 +140,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
                 const divs = tops.map((arc: any, i: number) => {
                     return (
                         <div key={i}>
+                            {arc[4].name && <div>{arc[4].name}</div>}
                             <div>Locus1: {arc[4].locus1.toString()}</div>
                             <div>Locus2: {arc[4].locus2.toString()}</div>
                             <div>Score: {arc[4].score}</div>
@@ -136,6 +161,7 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
             if (arc) {
                 return (
                     <div>
+                        {arc[4].name && <div>{arc[4].name}</div>}
                         <div>Locus1: {arc[4].locus1.toString()}</div>
                         <div>Locus2: {arc[4].locus2.toString()}</div>
                         <div>Score: {arc[4].score}</div>
@@ -198,7 +224,9 @@ export class ArcDisplay extends React.PureComponent<ArcDisplayProps, {}> {
 
     render() {
         this.arcData = [];
-        const { placedInteractions, width, forceSvg, height } = this.props;
+        const { placedInteractions, width, forceSvg, height, viewWindow, fetchViewWindowOnly, bothAnchorsInView } = this.props;
+        const heightStandard = fetchViewWindowOnly || bothAnchorsInView ? 0.5 * viewWindow.getLength() : 0.5 * width;
+        this.clampScale = scaleLinear().domain([0, heightStandard]).range([0, 1]).clamp(false);
         // const sortedInteractions = placedInteractions.slice().sort((a, b)
         //        => b.interaction.score - a.interaction.score);
         // const slicedInteractions = sortedInteractions.slice(0, ITEM_LIMIT); // Only render ITEM_LIMIT highest scores

@@ -28,8 +28,8 @@ class EmbeddedContainer extends React.PureComponent<EmbeddedProps, EmbeddedState
     }
 
     componentDidMount() {
-        const { genomeName, displayRegion, trackLegendWidth, isShowingNavigator, tracks, 
-            metadataTerms, regionSets, regionSetViewIndex } = this.props.contents;        
+        const { genomeName, displayRegion, trackLegendWidth, isShowingNavigator, tracks,
+            metadataTerms, regionSets, regionSetViewIndex } = this.props.contents;
         const state = {
             genomeName,
             displayRegion,
@@ -44,26 +44,27 @@ class EmbeddedContainer extends React.PureComponent<EmbeddedProps, EmbeddedState
     }
 
     toggleHighlight = () => {
-        this.setState(prevState =>  ({highlightEnteredRegion: !prevState.highlightEnteredRegion}));
+        this.setState(prevState => ({ highlightEnteredRegion: !prevState.highlightEnteredRegion }));
     };
 
     setEnteredRegion = (interval: any) => {
-        this.setState({enteredRegion: interval});
+        this.setState({ enteredRegion: interval });
     }
 
     render(): JSX.Element {
+        console.log(this.props)
         // somehow react complain `Property 'embeddingMode' does not exist on type 'IntrinsicAttributes'
         // if I give the prop directly
-        const otherProps = {embeddingMode: true};
+        const otherProps = { embeddingMode: true };
         // return <App {...otherProps}/>;
-        return <TrackContainer 
-                    expansionAmount={REGION_EXPANDER} 
-                    suggestedMetaSets={new Set(["Track type"])}
-                    onToggleHighlight={this.toggleHighlight}
-                    onSetEnteredRegion={this.setEnteredRegion}
-                    {...otherProps}
-                />;
-    }   
+        return <TrackContainer
+            expansionAmount={REGION_EXPANDER}
+            suggestedMetaSets={new Set(["Track type"])}
+            onToggleHighlight={this.toggleHighlight}
+            onSetEnteredRegion={this.setEnteredRegion}
+            {...otherProps}
+        />;
+    }
 };
 
 // const mapStateToProps = (state: any) => {

@@ -43,6 +43,10 @@ import TbruceiTREU927 from "./trypanosome/TbruceiTREU927";
 import TbruceiLister427 from "./trypanosome/TbruceiLister427";
 import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
 import CHM13v1_1 from "./t2t-chm13-v1.1/chm13";
+import xenTro10 from "./xenTro10/xenTro10";
+import b_chiifu_v3 from "./brapa/brara_chiifu_v3.0";
+import susScr11 from "./susScr11/susScr11";
+import oviAri4 from "./oviAri4/oviAri4";
 
 /**
  * All available genomes.
@@ -94,6 +98,10 @@ export const allGenomes = [
     TbruceiTREU927,
     TbruceiLister427,
     CHM13v1_1,
+    xenTro10,
+    b_chiifu_v3,
+    susScr11,
+    oviAri4,
 ];
 
 const genomeNameToConfig = {};
@@ -153,6 +161,16 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         assemblies: [BosTau8.genome.getName()],
         color: "yellow",
     },
+    sheep: {
+        logoUrl: "https://vizhub.wustl.edu/public/oviAri4/sheep.png",
+        assemblies: [oviAri4.genome.getName()],
+        color: "white",
+    },
+    pig: {
+        logoUrl: "https://vizhub.wustl.edu/public/susScr11/pig.png",
+        assemblies: [susScr11.genome.getName()],
+        color: "white",
+    },
     rabbit: {
         logoUrl: "https://vizhub.wustl.edu/public/oryCun2/rabbit.png",
         assemblies: [oryCun2.genome.getName()],
@@ -183,6 +201,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         assemblies: [GalGal6.genome.getName(), GalGal5.genome.getName()],
         color: "yellow",
     },
+    frog: {
+        logoUrl: "https://vizhub.wustl.edu/public/xenTro10/frog.png",
+        assemblies: [xenTro10.genome.getName()],
+        color: "white",
+    },
     zebrafish: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
         assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName(), DAN_RER7.genome.getName()],
@@ -207,6 +230,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png",
         assemblies: [AraTha1.genome.getName()],
         color: "yellow",
+    },
+    brapa: {
+        logoUrl: "https://vizhub.wustl.edu/public/b_chiifu_v3/brapa.png",
+        assemblies: [b_chiifu_v3.genome.getName()],
+        color: "white",
     },
     seahare: {
         logoUrl: "https://vizhub.wustl.edu/public/aplCal3/seaHare.png",

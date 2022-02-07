@@ -22,7 +22,7 @@ const defaultTracks = [
     new TrackModel({
         type: "categorical",
         name: "S protein annotations",
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_Sprot_annot_sorted.bed.gz",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/sars-cov-2_Sprot_annot_sorted.bed.gz",
         options: {
             height: 20,
             alwaysDrawLabel: true,
@@ -61,15 +61,15 @@ const defaultTracks = [
             height: 50,
         },
     }),
-    new TrackModel({
-        type: "qbed",
-        name: "Mutation Alert",
-        url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_alert.bed.sort.gz",
-        options: {
-            height: 60,
-            color: "darkgreen",
-        },
-    }),
+    // new TrackModel({
+    //     type: "qbed",
+    //     name: "Mutation Alert",
+    //     url: "https://wangftp.wustl.edu/~cfan/gisaid/latest/diversity/ncov_alert.bed.sort.gz",
+    //     options: {
+    //         height: 60,
+    //         color: "darkgreen",
+    //     },
+    // }),
     new TrackModel({
         name: "Viral RNA expression (nanopore)",
         type: "bigwig",
@@ -90,8 +90,59 @@ const defaultTracks = [
     }),
     new TrackModel({
         type: "categorical",
+        name: "Omicron: B.1.1.529 and BA lineages",
+        url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/variants_of_concern/Omicron_B.1.1.529_and_BA_lineages.bed.gz",
+        options: {
+            height: 20,
+            alwaysDrawLabel: true,
+            maxRows: 100,
+            hiddenPixels: 0,
+            category: {
+                A67V: { name: "A67V", color: "#F00A0A" },
+                "del69-70": { name: "del69-70", color: "#F00A0A" },
+                T95I: { name: "T95I", color: "#F00A0A" },
+                "del142-144": { name: "del142-144", color: "#F00A0A" },
+                Y145D: { name: "Y145D", color: "#F00A0A" },
+                del211: { name: "del211", color: "#F00A0A" },
+                L212I: { name: "L212I", color: "#F00A0A" },
+                ins214EPE: { name: "ins214EPE", color: "#F00A0A" },
+                G339D: { name: "G339D", color: "#F00A0A" },
+                S371L: { name: "S371L", color: "#F00A0A" },
+                S373P: { name: "S373P", color: "#F00A0A" },
+                K417N: { name: "K417N", color: "#F00A0A" },
+                N440K: { name: "N440K", color: "#F00A0A" },
+                G446S: { name: "G446S", color: "#F00A0A" },
+                S477N: { name: "S477N", color: "#F00A0A" },
+                T478K: { name: "T478K", color: "#F00A0A" },
+                E484A: { name: "E484A", color: "#F00A0A" },
+                Q493R: { name: "Q493R", color: "#F00A0A" },
+                G496S: { name: "G496S", color: "#F00A0A" },
+                Q498R: { name: "Q498R", color: "#F00A0A" },
+                N501Y: { name: "N501Y", color: "#F00A0A" },
+                Y505H: { name: "Y505H", color: "#F00A0A" },
+                T547K: { name: "T547K", color: "#F00A0A" },
+                D614G: { name: "D614G", color: "#F00A0A" },
+                H655Y: { name: "H655Y", color: "#F00A0A" },
+                N679K: { name: "N679K", color: "#F00A0A" },
+                P681H: { name: "P681H", color: "#F00A0A" },
+                N764K: { name: "N764K", color: "#F00A0A" },
+                D796Y: { name: "D796Y", color: "#F00A0A" },
+                N856K: { name: "N856K", color: "#F00A0A" },
+                Q954H: { name: "Q954H", color: "#F00A0A" },
+                N969K: { name: "N969K", color: "#F00A0A" },
+                L981F: { name: "L981F", color: "#F00A0A" },
+            },
+        },
+        details: {
+            "data source": "CDC: https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-classifications.html",
+            description:
+                "Omicron: B.1.1.529 and BA lineages are classified as a Variant of Concern by the CDC as of Dec 23, 2021. This track displays all associated Spike portein substitutions.",
+        },
+    }),
+    new TrackModel({
+        type: "categorical",
         name: "Transcription regulatory sequences (TRSs)",
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_trs_sorted.bed.gz",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/sars-cov-2_trs_sorted.bed.gz",
         options: {
             height: 15,
             alwaysDrawLabel: true,
@@ -103,30 +154,30 @@ const defaultTracks = [
             },
         },
     }),
-    new TrackModel({
-        type: "longrange",
-        name: "TRS-L-dependent recombination",
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/TRS-L-dependent_recombinationEvents_sorted.bed.gz",
-        options: {
-            yScale: "fixed",
-            yMax: 7000000,
-            yMin: 0,
-            displayMode: "arc",
-            lineWidth: 3,
-            height: 205,
-            greedyTooltip: true,
-        },
-    }),
-    new TrackModel({
-        type: "dbedgraph",
-        name: "Viral RNA Modifications",
-        url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/studies/kim-2020/Table_S5_frac.dbg.gz",
-        options: {
-            dynamicLabels: ["gRNA", "S", "3a", "E", "M", "6", "7a", "7b", "8", "N"],
-            speed: [3],
-        },
-        showOnHubLoad: true,
-    }),
+    // new TrackModel({
+    //     type: "longrange",
+    //     name: "TRS-L-dependent recombination",
+    //     url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/TRS-L-dependent_recombinationEvents_sorted.bed.gz",
+    //     options: {
+    //         yScale: "fixed",
+    //         yMax: 7000000,
+    //         yMin: 0,
+    //         displayMode: "arc",
+    //         lineWidth: 3,
+    //         height: 205,
+    //         greedyTooltip: true,
+    //     },
+    // }),
+    // new TrackModel({
+    //     type: "dbedgraph",
+    //     name: "Viral RNA Modifications",
+    //     url: "https://wangftp.wustl.edu/~mchoudhary/viralBrowser/studies/kim-2020/Table_S5_frac.dbg.gz",
+    //     options: {
+    //         dynamicLabels: ["gRNA", "S", "3a", "E", "M", "6", "7a", "7b", "8", "N"],
+    //         speed: [3],
+    //     },
+    //     showOnHubLoad: true,
+    // }),
 ];
 
 const annotationTracks = {
@@ -149,7 +200,7 @@ const annotationTracks = {
         {
             type: "categorical",
             name: "S protein annotations",
-            url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_Sprot_annot_sorted.bed.gz",
+            url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/sars-cov-2_Sprot_annot_sorted.bed.gz",
             options: {
                 height: 20,
                 alwaysDrawLabel: true,
@@ -286,7 +337,7 @@ const publicHubList = [
     {
         collection: "Diagnostics",
         name: "Primers",
-        numTracks: "Updating",
+        numTracks: 9,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/viralBrowser/primers/primers.json",
         description: {
@@ -301,7 +352,7 @@ const publicHubList = [
         name: "CRISPR-based diagnostic tests",
         numTracks: 2,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/crispr_diagnostic_tests.json",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/crispr_diagnostic_tests.json",
         description: {
             "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
             "hub info": "CRISPR-based assays for detecting SARS-CoV-2.",
@@ -314,7 +365,7 @@ const publicHubList = [
     {
         collection: "Putative SARS-CoV-2 Immune Epitopes",
         name: "SARS-CoV-2 Epitopes Predicted to Bind HLA Class 1 Proteins Database",
-        numTracks: "1",
+        numTracks: 1,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~jflynn/virus_genome_browser/Campbell_et_al/campbell_et_al.json",
         description: {
@@ -352,7 +403,7 @@ const publicHubList = [
         name: "Recombination events (Kim et al., 2020)",
         numTracks: 3,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/recombinationEvents.json",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/recombinationEvents.json",
         description: {
             "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
             "hub info":
@@ -404,7 +455,7 @@ const publicHubList = [
         name: "Non-canonical ORFs",
         numTracks: 1,
         oldHubFormat: false,
-        url: "https://wangftp.wustl.edu/~gmatt/viralBrowser/sars-cov-2_finkel2020_novelORFs.json",
+        url: "https://wangftp.wustl.edu/~cfan/viralBrowser/v2/others/hubs/gmatt/sars-cov-2_finkel2020_novelORFs.json",
         description: {
             "hub built by": "Gavriel Matt (gavrielmatt@wustl.edu)",
             "hub info":
@@ -427,7 +478,7 @@ const publicHubList = [
     {
         collection: "NCBI database",
         name: "All NCBI SARS-CoV-2 isolates",
-        numTracks: "53248",
+        numTracks: 53248,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/ncbi/2021-02-16/browser_strains.json",
         description: {
@@ -444,7 +495,7 @@ const publicHubList = [
     {
         collection: "NCBI database",
         name: "All NCBI SARS-CoV-2 isolates, in SNV2 format",
-        numTracks: "53248",
+        numTracks: 53248,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/ncbi/2021-02-16/browser_strains_snv2.json",
         description: {
@@ -549,7 +600,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database (7/28/2020 - 9/21/2020)",
-        numTracks: "33785",
+        numTracks: 33785,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/9-21/browser_strains_new.json",
         description: {
@@ -565,7 +616,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database SNV2 format (7/28/2020 - 9/21/2020)",
-        numTracks: "33785",
+        numTracks: 33785,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/9-21/browser_strains_new_snv2.json",
         description: {
@@ -581,7 +632,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database (9/21/2020 - 10/28/2020)",
-        numTracks: "59667",
+        numTracks: 59667,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/10-28/browser_strains_new.json",
         description: {
@@ -597,7 +648,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database SNV2 format (9/21/2020 - 10/28/2020)",
-        numTracks: "59667",
+        numTracks: 59667,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/10-28/browser_strains_new_snv2.json",
         description: {
@@ -613,7 +664,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database (10/28/2020 - 12/5/2020)",
-        numTracks: "74375",
+        numTracks: 74375,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/12-5/browser_strains_new.json",
         description: {
@@ -629,7 +680,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database SNV2 format (10/28/2020 - 12/5/2020)",
-        numTracks: "74375",
+        numTracks: 74375,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/12-5/browser_strains_new_snv2.json",
         description: {
@@ -645,7 +696,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database (12/5/2020 - 2/16/2021) part1",
-        numTracks: "55198",
+        numTracks: 55198,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part1.json",
         description: {
@@ -661,7 +712,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part1",
-        numTracks: "55198",
+        numTracks: 55198,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part1.json",
         description: {
@@ -677,7 +728,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database (12/5/2020 - 2/16/2021) part2",
-        numTracks: "55198",
+        numTracks: 55198,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part2.json",
         description: {
@@ -693,7 +744,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part2",
-        numTracks: "55198",
+        numTracks: 55198,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part2.json",
         description: {
@@ -709,7 +760,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database (12/5/2020 - 2/16/2021) part3",
-        numTracks: "55198",
+        numTracks: 55198,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part3.json",
         description: {
@@ -725,7 +776,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part3",
-        numTracks: "55198",
+        numTracks: 55198,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part3.json",
         description: {
@@ -741,7 +792,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database (12/5/2020 - 2/16/2021) part4",
-        numTracks: "55198",
+        numTracks: 55198,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part4.json",
         description: {
@@ -757,7 +808,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part4",
-        numTracks: "55198",
+        numTracks: 55198,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part4.json",
         description: {
@@ -773,7 +824,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database (12/5/2020 - 2/16/2021) part5",
-        numTracks: "55195",
+        numTracks: 55195,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_part5.json",
         description: {
@@ -789,7 +840,7 @@ const publicHubList = [
     {
         collection: "GISAID database",
         name: "GISAID database SNV2 format (12/5/2020 - 2/16/2021) part5",
-        numTracks: "55195",
+        numTracks: 55195,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~cfan/gisaid/2021-02-16/browser_strains_new_snv2_part5.json",
         description: {

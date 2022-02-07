@@ -158,6 +158,8 @@ const publicHubData = {
         "The NIH Roadmap Epigenomics Mapping Consortium was launched with the goal of producing a public resource of human epigenomic data to catalyze basic biology and disease-oriented research. The Consortium leverages experimental pipelines built around next-generation sequencing technologies to map DNA methylation, histone modifications, chromatin accessibility and small RNA transcripts in stem cells and primary ex vivo tissues selected to represent the normal counterparts of tissues and organ systems frequently involved in human disease (quoted from Roadmap website).",
     "3D structures":
         "3D stucure data collected from: Tan L, Xing D, Chang CH, Li H et al. Three-dimensional genome structures of single diploid human cells. Science 2018 Aug 31;361(6405):924-928. The 3dg data were used and converted to g3d format using g3dtools.",
+    "Image collection":
+        "Image data from the Image Data Resource (IDR) or 4DN. Images are mapped to genomic coordinates with annotation gene id or symbol.",
 };
 
 const publicHubList = [
@@ -174,6 +176,18 @@ const publicHubList = [
         numTracks: 34,
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/g3d/hg19/hub",
+    },
+    {
+        collection: "Image collection",
+        name: "IDR image data",
+        numTracks: 28,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/imagetrack/hg19/hg19.json",
+        description: {
+            "hub built by": "Daofeng Li (dli23@wustl.edu)",
+            "total number of images": "544,814",
+            "hub built notes": "covered 28 human datasets from IDR",
+        },
     },
     {
         collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
