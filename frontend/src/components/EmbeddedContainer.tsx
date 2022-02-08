@@ -4,6 +4,7 @@ import { ActionCreators } from '../AppState';
 // import App from '../App';
 import TrackContainer from "./trackContainers/TrackContainer";
 import { RegionExpander } from '../model/RegionExpander';
+import { getGenomeConfig } from '../model/genomes/allGenomes';
 
 const REGION_EXPANDER = new RegionExpander(1);
 
@@ -52,10 +53,9 @@ class EmbeddedContainer extends React.PureComponent<EmbeddedProps, EmbeddedState
     }
 
     render(): JSX.Element {
-        console.log(this.props)
         // somehow react complain `Property 'embeddingMode' does not exist on type 'IntrinsicAttributes'
         // if I give the prop directly
-        const otherProps = { embeddingMode: true };
+        const otherProps = { ...this.props, embeddingMode: true };
         // return <App {...otherProps}/>;
         return <TrackContainer
             expansionAmount={REGION_EXPANDER}
@@ -78,7 +78,8 @@ const mapStateToProps = (state: any) => {
         genome: state.browser.present.genomeName,
         viewRegion: state.browser.present.viewRegion,
         tracks: state.browser.present.tracks,
-        metadataTerms: state.browser.present.metadataTerms
+        metadataTerms: state.browser.present.metadataTerms,
+        genomeConfig: getGenomeConfig(state.browser.present.genomeName)
     };
 }
 
