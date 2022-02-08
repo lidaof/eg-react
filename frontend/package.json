@@ -9,6 +9,7 @@
     "scripts": {
         "build": "react-app-rewired build",
         "build-dist": "rm -f umd/* && cd build && cat static/js/*.js > ../umd/epgg.js && cat static/css/*.css > ../umd/epgg.css && cp *worker.js ../umd/ && cd ../umd && sed -i ''  's#/browser#.#g' *.js",
+        "build-emb": "react-app-rewired --config-overrides make-embed.config.js build",
         "build-storybook": "build-storybook -s public",
         "eject": "react-scripts eject",
         "start": "react-app-rewired start",
@@ -105,7 +106,7 @@
         "memoize-one": "^3.1.1",
         "nightmare": "^2.10.0",
         "node-fetch": "^2.6.1",
-        "node-sass": "^4.14.1",
+        "node-sass": "^6.0.1",
         "npm": "^7.20.5",
         "papaparse": "^5.2.0",
         "parse-color": "^1.0.0",
