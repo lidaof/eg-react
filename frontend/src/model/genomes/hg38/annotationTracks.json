@@ -202,6 +202,24 @@
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_rheMac3_axt.gz"
         },
         {
+            "name": "hg38torheMac8",
+            "label": "Query rhesus rheMac8 to hg38 blastz",
+            "querygenome": "rheMac8",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-rheMac8.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsRheMac8/"
+            }
+        },
+        {
+            "name": "hg38torheMac10",
+            "label": "Query rhesus Macaque rheMac10 to hg38 blastz",
+            "querygenome": "rheMac10",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-rheMac10.gz"
+        },
+        {
             "name": "hg38topapAnu2",
             "label": "Query baboon papAnu2 to hg38 blastz",
             "querygenome": "papAnu2",
@@ -232,6 +250,17 @@
             "details": {
                 "source": "UCSC Genome Browser",
                 "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsCalJac3/"
+            }
+        },
+        {
+            "name": "hg38tocalJac4",
+            "label": "Query marmoset calJac4 to hg38 blastz",
+            "querygenome": "calJac4",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-calJac4.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsCalJac4/"
             }
         },
         {
@@ -279,17 +308,6 @@
             }
         },
         {
-            "name": "hg38torheMac8",
-            "label": "Query rhesus rheMac8 to hg38 blastz",
-            "querygenome": "rheMac8",
-            "filetype": "genomealign",
-            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-rheMac8.gz",
-            "details": {
-                "source": "UCSC Genome Browser",
-                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsRheMac8/"
-            }
-        },
-        {
             "name": "hg38torn6",
             "label": "Query rat rn6 to hg38 blastz",
             "querygenome": "rn6",
@@ -298,6 +316,17 @@
             "details": {
                 "source": "UCSC Genome Browser",
                 "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsRn6/"
+            }
+        },
+        {
+            "name": "hg38tosusScr3",
+            "label": "Query pig susScr3 to hg38 blastz",
+            "querygenome": "susScr3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-susScr3.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsSusScr3/"
             }
         }
     ],
