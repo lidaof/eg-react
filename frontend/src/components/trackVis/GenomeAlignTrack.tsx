@@ -318,27 +318,25 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
     const curvePaths = segments.map((segment, i) => {
       const x0 = Math.floor(segment.targetXSpan.start);
       const y0 = RECT_HEIGHT;
-      let x1 = Math.floor(segment.queryXSpan.start);
-      let y1 = queryRectTopY;
-      let x2 = Math.ceil(segment.queryXSpan.end);
-      // let y2 = queryRectTopY;
-      if (
-        (!plotReverse && segment.record.queryStrand === "-") ||
-        (plotReverse && segment.record.queryStrand === "+")
-      ) {
-        x2 = Math.floor(segment.queryXSpan.start);
-        // y2 = queryRectTopY;
-        x1 = Math.ceil(segment.queryXSpan.end);
-        y1 = queryRectTopY;;
-      }
+      const x1 = (!plotReverse && segment.record.queryStrand === "-") ||
+                 (plotReverse && segment.record.queryStrand === "+") ? 
+                 Math.ceil(segment.queryXSpan.end) :
+                 Math.floor(segment.queryXSpan.start);
+      const y1 = queryRectTopY;
+      const x2 = (!plotReverse && segment.record.queryStrand === "-") ||
+                 (plotReverse && segment.record.queryStrand === "+") ? 
+                 Math.floor(segment.queryXSpan.start) :
+                 Math.ceil(segment.queryXSpan.end);
+      // const y2 = queryRectTopY;
+
       const x3 = segment.targetXSpan.end;
       const y3 = RECT_HEIGHT;
       const yhalf = (RECT_HEIGHT + queryRectTopY)/2;
       const d_string = `M ${x0} ${y0} 
-      C ${x0} ${yhalf}, ${x1} ${yhalf},${x1},${y1} 
-      H ${x2} 
-      C ${x2} ${yhalf}, ${x3} ${yhalf}, ${x3},${y3}
-      Z`; 
+        C ${x0} ${yhalf}, ${x1} ${yhalf},${x1},${y1} 
+        H ${x2} 
+        C ${x2} ${yhalf}, ${x3} ${yhalf}, ${x3},${y3}
+        Z`; 
 
       return (
         <path
