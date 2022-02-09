@@ -10,6 +10,7 @@ import { BigWigTrackConfig } from "./BigWigTrackConfig";
 import { GeneAnnotationTrackConfig } from "./GeneAnnotationTrackConfig";
 import { HicTrackConfig } from "./HicTrackConfig";
 import { LongRangeTrackConfig } from "./LongRangeTrackConfig";
+import { LongRangeColorTrackConfig } from "./LongRangeColorTrackConfig";
 import { BigInteractTrackConfig } from "./BigInteractTrackConfig";
 import { CoolTrackConfig } from "./CoolTrackConfig";
 import { MethylCTrackConfig } from "./MethylCTrackConfig";
@@ -52,6 +53,7 @@ const TYPE_NAME_TO_CONFIG = {
     bigwig: BigWigTrackConfig,
     hic: HicTrackConfig,
     longrange: LongRangeTrackConfig,
+    longrangecolor: LongRangeColorTrackConfig,
     biginteract: BigInteractTrackConfig,
     cool: CoolTrackConfig,
     geneannotation: GeneAnnotationTrackConfig,

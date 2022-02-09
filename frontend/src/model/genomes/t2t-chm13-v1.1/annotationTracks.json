@@ -37,5 +37,14 @@
                 "height": 40
             }
         ]
-    }
+    },
+    "Genome Comparison": [
+        {
+            "name": "hg38tochm13",
+            "label": "chm13v1.1 to hg38 minimap2",
+            "querygenome": "hg38",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/t2t-chm13-v1.1/weaver/queryhg38tochm13.align.gz"
+        }
+    ]
 }

@@ -1,6 +1,6 @@
 {
     "name": "epgg",
-    "version": "53.5.1",
+    "version": "53.5.2",
     "author": "Ting Wang Lab @WUSTL",
     "repository": {
         "type": "git",
@@ -9,6 +9,7 @@
     "scripts": {
         "build": "react-app-rewired build",
         "build-dist": "rm -f umd/* && cd build && cat static/js/*.js > ../umd/epgg.js && cat static/css/*.css > ../umd/epgg.css && cp *worker.js ../umd/ && cd ../umd && sed -i ''  's#/browser#.#g' *.js",
+        "build-emb": "react-app-rewired --config-overrides make-embed.config.js build",
         "build-storybook": "build-storybook -s public",
         "eject": "react-scripts eject",
         "start": "react-app-rewired start",
@@ -59,10 +60,12 @@
         "@types/node": "^10.17.26",
         "@types/query-string": "^6.1.0",
         "@types/react": "^16.9.38",
+        "@types/react-detect-offline": "^2.4.1",
         "@types/react-dom": "^16.9.8",
         "@types/react-hammerjs": "^1.0.2",
         "@types/react-notify-toast": "^0.5.1",
         "@types/react-redux": "^6.0.2",
+        "@types/react-swipeable-views": "^0.13.1",
         "@types/shortid": "0.0.29",
         "@types/text-encoding": "0.0.35",
         "@types/uuid": "^3.4.9",
@@ -98,11 +101,12 @@
         "jquery.kinetic": "^2.2.4",
         "json5": "^1.0.1",
         "jsonschema": "^1.2.6",
+        "jszip": "^3.7.1",
         "lodash": "^4.17.19",
         "memoize-one": "^3.1.1",
         "nightmare": "^2.10.0",
         "node-fetch": "^2.6.1",
-        "node-sass": "^4.14.1",
+        "node-sass": "^6.0.1",
         "npm": "^7.20.5",
         "papaparse": "^5.2.0",
         "parse-color": "^1.0.0",
@@ -123,6 +127,7 @@
         "react-collapsible": "^2.8.0",
         "react-color": "^2.19.3",
         "react-compound-slider": "^0.20.1",
+        "react-cookie-consent": "^7.2.1",
         "react-copy-to-clipboard": "^5.0.2",
         "react-detect-offline": "^2.4.5",
         "react-dom": "^16.13.1",
@@ -149,7 +154,7 @@
         "shortid": "^2.2.15",
         "tcp-port-used": "^0.1.2",
         "text-encoding": "^0.7.0",
-        "three": "^0.125.0",
+        "three": "^0.137.0",
         "typescript": "^3.4.5",
         "underscore": "^1.10.2",
         "util": "^0.12.3",
@@ -188,7 +193,6 @@
     "proxy": "http://localhost:3001/",
     "dependencies": {
         "@material-ui/core": "^4.12.3",
-        "@material-ui/icons": "^4.11.2",
         "@types/react-hammerjs": "^1.0.2",
         "react-hammerjs": "^1.0.1"
     }

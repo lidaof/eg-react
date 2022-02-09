@@ -95,6 +95,8 @@ const publicHubData = {
     "Toxicant Exposures and Responses by Genomic and Epigenomic Regulators of Transcription (TaRGET)":
         "The TaRGET(Toxicant Exposures and Responses by Genomic and Epigenomic Regulators of Transcription) program is a research consortium funded by the National Institute of Environmental Health Sciences (NIEHS). The goal of the collaboration is to address the role of environmental exposures in disease pathogenesis as a function of epigenome perturbation, including understanding the environmental control of epigenetic mechanisms and assessing the utility of surrogate tissue analysis in mouse models of disease-relevant environmental exposures.",
     "3D structures": "3D stucure data collection",
+    "Image collection":
+        "Image data from the Image Data Resource (IDR) or 4DN. Images are mapped to genomic coordinates with annotation gene id or symbol.",
 };
 
 const publicHubList = [
@@ -150,6 +152,18 @@ const publicHubList = [
         numTracks: 9770,
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/g3d/mm10/GSE162511/hub",
+    },
+    {
+        collection: "Image collection",
+        name: "4dn image data",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/imagetrack/mm10/4dn/mm10.json",
+        description: {
+            "hub built by": "Daofeng Li (dli23@wustl.edu)",
+            "total number of images": 124,
+            "hub built notes": "mixed image datasets for mm10 in 4dn",
+        },
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",

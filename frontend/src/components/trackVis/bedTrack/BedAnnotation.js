@@ -53,13 +53,14 @@ class BedAnnotation extends React.Component {
             isInvertArrowDirection,
             onClick,
             alwaysDrawLabel,
+            hiddenPixels,
         } = this.props;
         const colorToUse = feature.getIsReverseStrand() ? reverseStrandColor : color;
         const contrastColor = getContrastingColor(colorToUse);
         const [startX, endX] = xSpan;
         const width2 = endX - startX;
-        const width = alwaysDrawLabel ? Math.max(2, width2) : width2;
-        if (width <= 0) {
+        const width = alwaysDrawLabel ? Math.max(3, width2) : width2;
+        if (width < hiddenPixels) {
             return null;
         }
 

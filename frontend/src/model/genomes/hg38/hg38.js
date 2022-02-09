@@ -74,6 +74,8 @@ const publicHubData = {
         "A database consisting of host (human) transcriptional changes resulting from SARS-CoV-2 and other respiratory infections in in vitro, ex vivo, and in vivo systems.",
     "Reference human epigenomes from Roadmap Epigenomics Consortium":
         "The NIH Roadmap Epigenomics Mapping Consortium was launched with the goal of producing a public resource of human epigenomic data to catalyze basic biology and disease-oriented research. The Consortium leverages experimental pipelines built around next-generation sequencing technologies to map DNA methylation, histone modifications, chromatin accessibility and small RNA transcripts in stem cells and primary ex vivo tissues selected to represent the normal counterparts of tissues and organ systems frequently involved in human disease (quoted from Roadmap website).",
+    "Image collection":
+        "Image data from the Image Data Resource (IDR) or 4DN. Images are mapped to genomic coordinates with annotation gene id or symbol.",
 };
 
 const publicHubList = [
@@ -101,6 +103,30 @@ const publicHubList = [
         oldHubFormat: false,
         url: "https://vizhub.wustl.edu/public/hg38/Roadmap_hg38_others_June2021.json",
         description: "Roadmap RNA-seq, WGBS etc. Data are hosted by ENCODE data portal.",
+    },
+    {
+        collection: "Image collection",
+        name: "IDR image data",
+        numTracks: 28,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/imagetrack/hg38/hg38.json",
+        description: {
+            "hub built by": "Daofeng Li (dli23@wustl.edu)",
+            "total number of images": 539977,
+            "hub built notes": "covered 28 human datasets from IDR",
+        },
+    },
+    {
+        collection: "Image collection",
+        name: "4dn image data",
+        numTracks: 1,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/imagetrack/hg38/4dn/hg38.json",
+        description: {
+            "hub built by": "Daofeng Li (dli23@wustl.edu)",
+            "total number of images": 601,
+            "hub built notes": "mixed image datasets for hg38 in 4dn",
+        },
     },
     {
         collection: "Encyclopedia of DNA Elements (ENCODE)",

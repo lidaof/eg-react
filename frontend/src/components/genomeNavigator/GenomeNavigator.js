@@ -1,14 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { MIN_VIEW_REGION_SIZE } from '../../AppState';
-import MainPane from './MainPane';
-import DisplayedRegionModel from '../../model/DisplayedRegionModel';
+import React from "react";
+import PropTypes from "prop-types";
+import { MIN_VIEW_REGION_SIZE } from "../../AppState";
+import MainPane from "./MainPane";
+import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 
 //import './GenomeNavigator.css';
 
 /**
  * A navigator that allows users to scroll around the genome and select what region for tracks to display.
- * 
+ *
  * @author Silas Hsu
  */
 class GenomeNavigator extends React.Component {
@@ -24,11 +24,11 @@ class GenomeNavigator extends React.Component {
          *         `newStart`: the nav context coordinate of the start of the selected interval
          *         `newEnd`: the nav context coordinate of the end of the selected interval
          */
-        onRegionSelected: PropTypes.func
+        onRegionSelected: PropTypes.func,
     };
 
     static defaultProps = {
-        onRegionSelected: () => undefined
+        onRegionSelected: () => undefined,
     };
 
     /**
@@ -47,13 +47,13 @@ class GenomeNavigator extends React.Component {
 
     /**
      * Sets the default region for MainPane to cover whole chromosomes/features that are in `selectedRegion`
-     * 
+     *
      * @param {DisplayedRegionModel} selectedRegion - the currently selected region
      * @return {DisplayedRegionModel} the default view region for the genome navigator
      */
     _setInitialView(selectedRegion) {
         const navContext = selectedRegion.getNavigationContext();
-        const features = selectedRegion.getFeatureSegments().map(segment => segment.feature);
+        const features = selectedRegion.getFeatureSegments().map((segment) => segment.feature);
 
         const firstFeature = features[0];
         const lastFeature = features[features.length - 1];
@@ -65,7 +65,7 @@ class GenomeNavigator extends React.Component {
 
     /**
      * Resets the view region if a new one is received.
-     * 
+     *
      * @param {any} nextProps - new props that this component will receive
      * @override
      */
@@ -73,19 +73,21 @@ class GenomeNavigator extends React.Component {
         const thisNavContext = this.state.viewRegion.getNavigationContext();
         const nextNavContext = nextProps.selectedRegion.getNavigationContext();
         if (thisNavContext !== nextNavContext) {
-            this.setState({viewRegion: new DisplayedRegionModel(nextNavContext)});
+            this.setState({ viewRegion: new DisplayedRegionModel(nextNavContext) });
         }
-        if (this.props.selectedRegion.getGenomeIntervals()[0].chr !== 
-                nextProps.selectedRegion.getGenomeIntervals()[0].chr) {
-            this.setState( {
-                viewRegion: this._setInitialView(nextProps.selectedRegion)
+        if (
+            this.props.selectedRegion.getGenomeIntervals()[0].chr !==
+            nextProps.selectedRegion.getGenomeIntervals()[0].chr
+        ) {
+            this.setState({
+                viewRegion: this._setInitialView(nextProps.selectedRegion),
             });
         }
     }
 
     /**
      * Copies this.state.viewRegion, mutates it by calling `methodName` with `args`, and then calls this.setState().
-     * 
+     *
      * @param {string} methodName - the method to call on the model
      * @param {any[]} args - arguments to provide to the method
      */
@@ -95,12 +97,12 @@ class GenomeNavigator extends React.Component {
         if (regionCopy.getWidth() < MIN_VIEW_REGION_SIZE) {
             return;
         }
-        this.setState({viewRegion: regionCopy});
+        this.setState({ viewRegion: regionCopy });
     }
 
     /**
      * Wrapper for calling zoom() on the view model.
-     * 
+     *
      * @param {number} amount - amount to zoom
      * @param {number} [focusPoint] - focal point of the zoom
      * @see DisplayedRegionModel#zoom
@@ -111,7 +113,7 @@ class GenomeNavigator extends React.Component {
 
     /**
      * Wrapper for calling setRegion() on the view model
-     * 
+     *
      * @param {number} newStart - start nav context coordinate
      * @param {number} newEnd - end nav context coordinate
      * @see DisplayedRegionModel#setRegion
@@ -122,7 +124,7 @@ class GenomeNavigator extends React.Component {
 
     /**
      * Zooms the view to the right level when the zoom slider is dragged.
-     * 
+     *
      * @param {React.SyntheticEvent} event - the event that react fired when the zoom slider was changed
      */
     zoomSliderDragged(event) {
@@ -136,7 +138,7 @@ class GenomeNavigator extends React.Component {
      */
     render() {
         return (
-            <div style={{margin: "5px"}}>
+            <div>
                 <MainPane
                     viewRegion={this.state.viewRegion}
                     selectedRegion={this.props.selectedRegion}

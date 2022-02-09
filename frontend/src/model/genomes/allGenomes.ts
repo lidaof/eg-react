@@ -44,6 +44,9 @@ import TbruceiLister427 from "./trypanosome/TbruceiLister427";
 import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
 import CHM13v1_1 from "./t2t-chm13-v1.1/chm13";
 import xenTro10 from "./xenTro10/xenTro10";
+import b_chiifu_v3 from "./brapa/brara_chiifu_v3.0";
+import susScr11 from "./susScr11/susScr11";
+import oviAri4 from "./oviAri4/oviAri4";
 
 /**
  * All available genomes.
@@ -96,6 +99,9 @@ export const allGenomes = [
     TbruceiLister427,
     CHM13v1_1,
     xenTro10,
+    b_chiifu_v3,
+    susScr11,
+    oviAri4,
 ];
 
 const genomeNameToConfig = {};
@@ -154,6 +160,16 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         logoUrl: "https://vizhub.wustl.edu/public/bosTau8/Cow.png",
         assemblies: [BosTau8.genome.getName()],
         color: "yellow",
+    },
+    sheep: {
+        logoUrl: "https://vizhub.wustl.edu/public/oviAri4/sheep.png",
+        assemblies: [oviAri4.genome.getName()],
+        color: "white",
+    },
+    pig: {
+        logoUrl: "https://vizhub.wustl.edu/public/susScr11/pig.png",
+        assemblies: [susScr11.genome.getName()],
+        color: "white",
     },
     rabbit: {
         logoUrl: "https://vizhub.wustl.edu/public/oryCun2/rabbit.png",
@@ -214,6 +230,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png",
         assemblies: [AraTha1.genome.getName()],
         color: "yellow",
+    },
+    brapa: {
+        logoUrl: "https://vizhub.wustl.edu/public/b_chiifu_v3/brapa.png",
+        assemblies: [b_chiifu_v3.genome.getName()],
+        color: "white",
     },
     seahare: {
         logoUrl: "https://vizhub.wustl.edu/public/aplCal3/seaHare.png",

@@ -9,6 +9,7 @@ import { withTooltip, TooltipCallbacks } from "../commonComponents/tooltip/withT
 import { Feature } from "../../../model/Feature";
 import { PlacedFeatureGroup } from "../../../model/FeatureArranger";
 import OpenInterval from "model/interval/OpenInterval";
+import configOptionMerging from "../commonComponents/configOptionMerging";
 
 const ROW_VERTICAL_PADDING = 2;
 const ROW_HEIGHT = BedAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
@@ -19,8 +20,15 @@ interface BedTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
         color?: string;
         color2?: string;
         alwaysDrawLabel?: boolean;
+        hiddenPixels?: number;
     };
 }
+
+export const DEFAULT_OPTIONS = {
+    hiddenPixels: 0.5,
+}
+
+const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
 /**
  * Track component for BED annotations.
@@ -83,6 +91,7 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
                 isInvertArrowDirection={placement.isReverse}
                 onClick={this.renderTooltip}
                 alwaysDrawLabel={this.props.options.alwaysDrawLabel}
+                hiddenPixels={this.props.options.hiddenPixels}
             />
         ));
     }
@@ -99,4 +108,4 @@ class BedTrackNoTooltip extends React.Component<BedTrackProps> {
     }
 }
 
-export const BedTrack = withTooltip(BedTrackNoTooltip as any);
+export const BedTrack = withDefaultOptions(withTooltip(BedTrackNoTooltip as any));

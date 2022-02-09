@@ -204,10 +204,10 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
             }
             const segmentsAll = selectedRegion.getFeatureSegments();
             // not showing Gap
-            const segments = segmentsAll.filter((s) => s.feature.getName() !== "Gap");
-            // if (segments.length === 1) {
-            chromLabel = segments[0].feature.getName();
-            // }
+            const segments = segmentsAll.filter((s) => s && s.feature.getName() !== "Gap");
+            if (segments.length === 1) {
+                chromLabel = segments[0].feature.getName();
+            }
             if (segments.length > 1) {
                 chromLabel += `-${segments[segments.length - 1].feature.getName()}`;
             }

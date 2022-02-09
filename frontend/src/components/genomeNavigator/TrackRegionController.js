@@ -8,8 +8,8 @@ import { CopyToClip } from "../CopyToClipboard";
 
 const MODAL_STYLE = {
     content: {
-        top: "40px",
-        left: "300px",
+        top: "50px",
+        left: "295px",
         right: "unset",
         bottom: "unset",
         overflow: "visible",
