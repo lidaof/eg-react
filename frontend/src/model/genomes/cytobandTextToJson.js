@@ -1,23 +1,23 @@
 /**
  * !!! This is a node.js script that the client doesn't run !!!
- * 
+ *
  * Parses UCSC-style tab-separated cytoband data into JSON.  We only run it once to generate the JSON and git commit the
  * result.  See also: {@link CytobandTypes.ts}
- * 
+ *
  * @author Silas Hsu
  */
-'use strict';
+"use strict";
 
-const path = require('path');
-const fs = require('fs');
-const _ = require('lodash');
+const path = require("path");
+const fs = require("fs");
+const _ = require("lodash");
 
-const RECORD_DELIMITER = '\n';
-const FIELD_DELIMITER = '\t';
+const RECORD_DELIMITER = "\n";
+const FIELD_DELIMITER = "\t";
 
 /**
  * Reads the contents of a file asynchronously.  Promisfied version of fs.readFile.
- * 
+ *
  * @param {string} readPath - path to read
  * @param {string} [encoding] - encoding to read
  * @return {Promise<string | Buffer>} - Promise for contents of the file
@@ -38,7 +38,7 @@ function promiseReadFile(readPath, encoding) {
 /**
  * Writes to a file asynchronously, creating the file if it doesn't exist, and completely replacing the contents if it
  * already exists.  Promisfied version of fs.writeFile.
- * 
+ *
  * @param {string} writePath - path to write
  * @param {string} contents - what to write
  * @return {Promise<void>} - Promise the resolves when writing is done
@@ -46,7 +46,7 @@ function promiseReadFile(readPath, encoding) {
  */
 function promiseWriteFile(writePath, contents) {
     return new Promise((resolve, reject) => {
-        fs.writeFile(writePath, contents, error => {
+        fs.writeFile(writePath, contents, (error) => {
             if (error) {
                 reject(error);
             } else {
@@ -59,7 +59,7 @@ function promiseWriteFile(writePath, contents) {
 const CYTOBAND_PROPS = ["chrom", "chromStart", "chromEnd", "name", "gieStain"];
 /**
  * Constructs a Cytoband object from a string that contains the proper data.
- * 
+ *
  * @param {string[]} rawRecord - array of strings containing cytoband data
  * @return {Cytoband | null} - cytoband object, or null if there was a problem
  */
@@ -69,7 +69,9 @@ function makeCytobandObject(rawRecord) {
         return null;
     }
     const object = _.zipObject(CYTOBAND_PROPS, rawStringValues);
-    if (object.gieStain === 'n/a') { return null };
+    if (object.gieStain === "n/a") {
+        return null;
+    }
     object.chromStart = Number.parseInt(object.chromStart);
     object.chromEnd = Number.parseInt(object.chromEnd);
     if (!Number.isSafeInteger(object.chromStart) || !Number.isSafeInteger(object.chromEnd)) {
@@ -80,7 +82,7 @@ function makeCytobandObject(rawRecord) {
 
 /**
  * Parses raw text data into a mapping from chromosome name to a list of all cytobands in that chromosome.
- * 
+ *
  * @param {string} text - raw UCSC cytoband file contents
  * @return {CytobandMap} - cytoband data map
  */
@@ -96,7 +98,10 @@ function convertTextToCytobandMap(text) {
         const cytobandObject = makeCytobandObject(rawRecord);
         if (cytobandObject) {
             const chrom = cytobandObject.chrom;
-            if (chrom.includes('_')) {
+            if (chrom.includes("_")) {
+                continue; // skip super contigs to reduce file size
+            }
+            if (chrom.includes("-")) {
                 continue; // skip super contigs to reduce file size
             }
             if (!result[chrom]) {
@@ -112,7 +117,7 @@ function convertTextToCytobandMap(text) {
 
 /**
  * Main entry point.
- * 
+ *
  * @param {string[]} argv - arguments
  * @return {Promise<number>} exit code
  */
@@ -123,11 +128,11 @@ async function main(argv) {
     }
 
     const inPath = argv[2];
-    const inFileName = path.basename(inPath, '.txt');
+    const inFileName = path.basename(inPath, ".txt");
     const inFilePath = path.dirname(inPath);
     const outPath = `${inFilePath}/${inFileName}.json`;
     try {
-        const input = await promiseReadFile(inPath, 'utf8');
+        const input = await promiseReadFile(inPath, "utf8");
         const output = JSON.stringify(convertTextToCytobandMap(input));
         await promiseWriteFile(outPath, output);
         console.log(`${inPath} --> ${outPath}`);
@@ -138,6 +143,7 @@ async function main(argv) {
     return 0;
 }
 
-if (require.main === module) { // Called directly
-    main(process.argv).then(process.exit)
+if (require.main === module) {
+    // Called directly
+    main(process.argv).then(process.exit);
 } // else required as a module

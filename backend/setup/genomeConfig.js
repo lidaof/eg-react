@@ -249,6 +249,19 @@ const calJac3 = [
     },
 ];
 
+const calJac4 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const nomLeu3 = [
     {
         name: "ensGene",
@@ -347,7 +360,33 @@ const susScr11 = [
     },
 ];
 
+const susScr3 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const oviAri4 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const rheMac10 = [
     {
         name: "refGene",
         file: "refGene_load",
@@ -394,6 +433,9 @@ const genomeConfig = {
     b_chiifu_v3,
     susScr11,
     oviAri4,
+    susScr3,
+    rheMac10,
+    calJac4,
 };
 
 module.exports = genomeConfig;
