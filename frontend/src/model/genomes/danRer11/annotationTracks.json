@@ -26,8 +26,8 @@
     },
     "Genome Comparison": [
         {
-            "name": "querylepOcu1 to danRer11",
-            "label": "spotted gar to zebrafish lastz ensembl",
+            "name": "danRer11tolepOcu1",
+            "label": "Ensembl lastz using zebrafish danRer11 as reference and lepOcu1 as query",
             "querygenome": "lepOcu1",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/danRer11/weaver/danRer11.lepocu1.gz"

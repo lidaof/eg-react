@@ -26,8 +26,8 @@
     },
     "Genome Comparison": [
         {
-            "name": "hg19torheMac3",
-            "label": "Human hg19 to rheMac3 blastz",
+            "name": "rheMac3tohg19",
+            "label": "Query human hg19 to rheMac3 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/rheMac3/rheMac3_hg19.gz"

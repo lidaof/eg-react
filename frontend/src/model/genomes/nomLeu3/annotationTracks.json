@@ -26,8 +26,8 @@
     },
     "Genome Comparison": [
         {
-            "name": "hg19tonomLeu3",
-            "label": "Human hg19 to nomLeu3 blastz",
+            "name": "nomLeu3tohg19",
+            "label": "Query human hg19 to nomLeu3 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/nomLeu3/nomLeu3_hg19.gz"
