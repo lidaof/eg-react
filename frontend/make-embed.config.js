@@ -38,15 +38,6 @@ module.exports = {
                 presets: ["@babel/preset-typescript", "@babel/preset-env", "@babel/preset-react"],
                 plugins: ["@babel/proposal-class-properties", "@babel/proposal-object-rest-spread"],
             },
-            // use: [
-            //     {
-            //         loader: "babel-loader",
-            //         options: {
-            //             presets: ["@babel/preset-typescript", "@babel/preset-env", "@babel/preset-react"],
-            //             plugins: ["@babel/proposal-class-properties", "@babel/proposal-object-rest-spread"],
-            //         },
-            //     },
-            // ],
             test: /\.(js|jsx)$/,
         });
 
@@ -61,7 +52,13 @@ module.exports = {
         config.output = {
             ...config.output,
             globalObject: "this",
+            filename: "epgg.js",
+            chunkFilename: "epgg.chunk.js",
         };
+
+        // Renames main.b100e6da.css to main.css
+        config.plugins[5].options.filename = "epgg.css";
+        config.plugins[5].options.moduleFilename = () => "epgg.css";
 
         config.plugins = config.plugins.map((plugin) => {
             if (plugin.constructor.name === "GenerateSW") {
