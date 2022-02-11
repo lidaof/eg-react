@@ -9,7 +9,7 @@
     "scripts": {
         "build": "react-app-rewired build",
         "build-dist": "rm -f umd/* && cd build && cat static/js/*.js > ../umd/epgg.js && cat static/css/*.css > ../umd/epgg.css && cp *worker.js ../umd/ && cd ../umd && sed -i ''  's#/browser#.#g' *.js",
-        "build-emb": "react-app-rewired --config-overrides make-embed.config.js build",
+        "build-emb": "react-app-rewired build --config-overrides ./make-embed.config.js",
         "build-storybook": "build-storybook -s public",
         "eject": "react-scripts eject",
         "start": "react-app-rewired start",
