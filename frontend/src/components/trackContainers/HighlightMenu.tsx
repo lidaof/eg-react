@@ -253,7 +253,7 @@ export interface IHighlightItem {
     highlightNumber?: number;
     highlightName?: string;
     highlightInterval?: OpenInterval;
-    viewRegion?: ChromosomeInterval;
+    viewRegion?: ChromosomeInterval | ChromosomeInterval[];
     inViewRegion?: boolean;
     absoluteInterval?: OpenInterval;
     updateActive?: Function;
@@ -288,7 +288,16 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
         const isInRegionColor = (inViewRegion ? '#009F6B' : '#C40233');
         // const isHighlightActive = (active ? 'Active' : 'Inactive');
         // const isHighlightActiveColor = (active ? 'green' : 'red');
+        // @ts-ignore
         const titleStr = `${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`;
+
+        let viewRegionString;
+        if (Array.isArray(viewRegion)) {
+            viewRegionString = `${viewRegion[0].chr}:${viewRegion[0].start}-${viewRegion[0].end};
+            ${viewRegion[viewRegion.length - 1].chr}:${viewRegion[viewRegion.length - 1].start}-${viewRegion[viewRegion.length - 1].end}`;
+        } else {
+            viewRegionString = `${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`;
+        }
 
         return (
             <Card style={{ borderRadius: 30, overflow: 'visible' }}>

@@ -135,8 +135,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 color: highlightColor,
                 highlightName: 'New Highlight',
                 highlightInterval: highlight,
-                // @ts-ignore
-                viewRegion: new ChromosomeInterval(enteredRegion.chr, enteredRegion.start, enteredRegion.end),
+                viewRegion: enteredRegion,
                 inViewRegion: true,
                 absoluteInterval: middleInterval
             }
@@ -145,8 +144,8 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 for (var i = 0; i < highlightItems.length; i++) {
                     console.log(newHighlightItem, highlightItems[i]);
                     if (newHighlightItem.color === highlightItems[i].color &&
-                        newHighlightItem.viewRegion.start === highlightItems[i].viewRegion.start &&
-                        newHighlightItem.viewRegion.end === highlightItems[i].viewRegion.end) {
+                        newHighlightItem.viewRegion === highlightItems[i].viewRegion &&
+                        newHighlightItem.viewRegion === highlightItems[i].viewRegion) {
                             noMatches = false;
                             break;
                         }
@@ -196,16 +195,25 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
 
         const theBoxes = highlightItems.map((item) => {
             console.log(item.viewRegion, viewRegion, visData);
-            const itemIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion);
-            const itemOpenInterval = new OpenInterval(itemIntervals[0].start, itemIntervals[itemIntervals.length - 1].end);
-            // const viewRegionIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(viewRegion);
-            // const viewRegionOpenInterval = new OpenInterval(viewRegionIntervals[0].start, viewRegionIntervals[viewRegionIntervals.length - 1].end);
-            console.log(itemIntervals, itemOpenInterval, /** viewRegionIntervals, viewRegionOpenInterval */);
-            console.log(itemOpenInterval.start >= visData.viewWindowRegion.getContextCoordinates().start &&
-                itemOpenInterval.end <= visData.viewWindowRegion.getContextCoordinates().end);
+
+            let start, end;
+            if (Array.isArray(item.viewRegion)) {
+                const ints = [];
+                for (var i = 0; i < item.viewRegion.length; i++) {
+                    const intervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion[i]);
+                    ints.push(intervals[0].start, intervals[intervals.length - 1].end);
+                }
+                start = ints[0];
+                end = ints[ints.length - 1];
+            } else {
+                const itemIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion);
+                start = itemIntervals[0].start;
+                end = itemIntervals[itemIntervals.length - 1].end;
+            }
+
             if (/** logic to check if in view region, use features */
-                    itemOpenInterval.start >= visData.viewWindowRegion.getContextCoordinates().start &&
-                    itemOpenInterval.end <= visData.viewWindowRegion.getContextCoordinates().end &&
+                    start >= visData.viewWindowRegion.getContextCoordinates().start &&
+                    end <= visData.viewWindowRegion.getContextCoordinates().end &&
                     item.active
                 ) {
                 item = this.recalculateHighlightItem(item);
