@@ -37,6 +37,25 @@ import OpenInterval from "model/interval/OpenInterval";
 import ColorPicker from "components/ColorPicker";
 import ChromosomeInterval from "model/interval/ChromosomeInterval";
 import ReactModal from "react-modal";
+import Typography from "@material-ui/core/Typography";
+import Card from "@material-ui/core/Card";
+import {
+    Button,
+    CardHeader,
+    Grid,
+    TextField,
+    CardActions,
+    Tooltip,
+    IconButton,
+    CardContent,
+} from "@material-ui/core";
+import {
+    Delete as DeleteIcon,
+    Visibility as ActiveIcon,
+    VisibilityOff as InactiveIcon,
+    ChevronRight as JumpIcon,
+    Edit as EditIcon
+} from '@material-ui/icons'
 
 /**
  * HighlightMenu and HighlightItem
@@ -49,9 +68,10 @@ import ReactModal from "react-modal";
  * @param {Object} state - redux state
  * @return {Object} props to pass to RegionSetSelector
  */
- function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
+function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
     return {
         highlightItems: state.browser.present.highlightItems,
+
         viewRegion: state.browser.present.viewRegion
     };
 }
@@ -105,8 +125,8 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         this.forceUpdate();
     }
 
-    updateName(highlightNumber: number, evt: any): void {
-        this.props.highlightItems[highlightNumber].highlightName = evt.target.value;
+    updateName(highlightNumber: number, newName: string): void {
+        this.props.highlightItems[highlightNumber].highlightName = newName;
         this.forceUpdate();
     }
 
@@ -129,30 +149,48 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         console.log(this.props.highlightItems[highlightNumber].absoluteInterval);
         const interval = this.props.highlightItems[highlightNumber].absoluteInterval;
         this.props.onNewRegion(interval.start, interval.end);
+        this.props.onCloseHighlightMenuModal();
     }
 
     render() {
         const { highlightItems } = this.props;
+        // const highlightItems = new Array(6).fill(JSON.parse(`{"active":true,"color":"rgba(255, 255, 0, 0.3)","highlightName":"Unnamed","highlightInterval":{"start":246.00137653768002,"end":500.0001092490223},"viewRegion":{"start":27108317,"end":27219029,"chr":"chr7"},"inViewRegion":true,"absoluteInterval":{"start":1259057699,"end":1259378068}}`));
         console.log(this.props);
-        const highlightElements = (highlightItems && highlightItems.length !== 0 ? highlightItems.map((item, counter) => {
+        const highlightElements = (highlightItems && highlightItems.length !== 0 ? highlightItems.map((item: any, counter: any) => {
             console.log(item);
 
             return (
-                <HighlightItem
-                    active={item.active}
-                    color={item.color}
-                    highlightNumber={counter}
-                    viewRegion={item.viewRegion}
-                    highlightName={item.highlightName}
-                    inViewRegion={item.inViewRegion}
-                    updateActive={this.updateActive}
-                    handleNewName={this.updateName}
-                    handleNewColor={this.updateColor}
-                    handleDelete={this.handleDelete}
-                    handleViewRegionJump={this.handleViewRegionJump}
-                />
+                <Grid item xs={4}>
+                    <HighlightItem
+                        active={item.active}
+                        color={item.color}
+                        highlightNumber={counter}
+                        viewRegion={item.viewRegion}
+                        highlightName={item.highlightName}
+                        inViewRegion={item.inViewRegion}
+                        updateActive={this.updateActive}
+                        handleNewName={this.updateName}
+                        handleNewColor={this.updateColor}
+                        handleDelete={this.handleDelete}
+                        handleViewRegionJump={this.handleViewRegionJump}
+                    />
+                </Grid>
             );
-        }) : 'No Existing Highlights');
+        }) : (
+            <div style={{ display: 'grid', placeItems: 'center', height: "32vh", marginTop: 100, color: '#3c4043' }}>
+                <img
+                    src="https://epigenomegateway.wustl.edu/browser/favicon-144.png"
+                    alt="Browser Icon"
+                    style={{ height: 125, width: "auto", marginLeft: 20, marginRight: 20 }}
+                />
+                <Typography variant="h4">
+                    No highlights
+                </Typography>
+                <Typography variant="h5" style={{ width: '50vh', textAlign: 'center' }}>
+                    Select a region with the highlight tool and it will show up here.
+                </Typography>
+            </div>
+        ));
 
         return (
             <React.Fragment>
@@ -179,10 +217,12 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                     }}
                 >
                     <div className="HighlightMenu">
-                        <h5>
-                            All highlights are listed here:
-                        </h5>
-                        {highlightElements}
+                        <Typography variant="h5" style={{ margin: 15 }}>
+                            Highlights
+                        </Typography>
+                        <Grid container spacing={2} justifyContent="center">
+                            {highlightElements}
+                        </Grid>
                         <span
                             className="text-right"
                             style={{
@@ -230,6 +270,7 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
 
         this.state = {
             color: this.props.color,
+            editing: false
         }
 
         this.handleStateColor = this.handleStateColor.bind(this);
@@ -242,43 +283,73 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
     render(): JSX.Element {
         console.log(this.props);
         const { active, viewRegion, highlightName, highlightNumber, inViewRegion, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
-        
+
         // update this color
-        const isInRegionColor = (inViewRegion ? 'green' : 'red');
-        const isHighlightActive = (active ? 'Active' : 'Inactive');
-        const isHighlightActiveColor = (active ? 'green' : 'red');
+        const isInRegionColor = (inViewRegion ? '#009F6B' : '#C40233');
+        // const isHighlightActive = (active ? 'Active' : 'Inactive');
+        // const isHighlightActiveColor = (active ? 'green' : 'red');
+        const titleStr = `${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`;
 
         return (
-            <div className="highlight-item-body">
-                {/* name input */}
-                <input type="text" className="highlight-item-name" value={highlightName} onChange={evt => handleNewName(highlightNumber, evt)} />
-                {/* "is in view region" indicator */}
-                <span
+            <Card style={{ borderRadius: 30, overflow: 'visible' }}>
+                <CardHeader
+                    action={
+                        <Tooltip title="Edit Name">
+                            <IconButton
+                                onClick={() => {
+                                    let input = prompt("Please enter a new name");
+                                    input && handleNewName(highlightNumber, input);
+                                }}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                        </Tooltip>
+
+                    }
+                    title={highlightName}
                     style={{
-                        cursor: "pointer",
-                        color: 'black',
-                        background: isInRegionColor,
-                        fontSize: "1em",
-                        position: "relative",
-                        zIndex: "inherit",
-                }}>
-                    {`${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`}
-                </span>
-                {/* left to right: color picker, delete, hide+show, jump-to-view-region */}
-                <div className="highlight-item-buttons-group">
-                    <ColorPicker
-                        color={this.state.color}
-                        onChange={(evt: any) => {
-                            handleNewColor(highlightNumber, `rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
-                            this.handleStateColor(`rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
-                        }}
-                    />
-                    <button className="highlight-item-button" onClick={() => { handleDelete(this.props.highlightNumber) }}>Delete Please</button>
-                    <button className="highlight-item-button" style={{ background: isHighlightActiveColor }} onClick={() => { updateActive(highlightNumber) }}>{isHighlightActive}</button>
-                    {/* jump to this view region */}
-                    <button className="highlight-item-button" onClick={() => { handleViewRegionJump(this.props.highlightNumber) }}>Jump To This Highlight</button>
-                </div>
-            </div>
-        );
+                        backgroundColor: isInRegionColor,
+                        paddingLeft: 25,
+                        borderTopLeftRadius: 30,
+                        borderTopRightRadius: 30,
+                    }}
+                />
+                <CardContent>
+                    {/* "is in view region" indicator */}
+                    <Typography
+                        variant="h5"
+                    >
+                        {titleStr}
+                    </Typography>
+                    {/* left to right: color picker, delete, hide+show, jump-to-view-region */}
+                    <div className="highlight-item-buttons-group">
+                        <ColorPicker
+                            color={this.state.color}
+                            onChange={(evt: any) => {
+                                handleNewColor(highlightNumber, `rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
+                                this.handleStateColor(`rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
+                            }}
+                        />
+                    </div>
+                </CardContent>
+                <CardActions>
+                    <Tooltip title="Delete">
+                        <IconButton onClick={() => { handleDelete(this.props.highlightNumber) }}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Toggle Active">
+                        <IconButton onClick={() => { updateActive(highlightNumber) }}>
+                            {active ? <ActiveIcon /> : <InactiveIcon />}
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Jump to Highlight">
+                        <IconButton onClick={() => { handleViewRegionJump(this.props.highlightNumber) }}>
+                            <JumpIcon />
+                        </IconButton>
+                    </Tooltip>
+                </CardActions>
+            </Card>
+        )
     }
 }

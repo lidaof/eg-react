@@ -84,6 +84,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         if (Array.isArray(chrInterval)) {
             const ints = [];
             for (var i = 0; i < chrInterval.length; i++) {
+                // @ts-ignore
                 const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
                 // there will be many interval when there are gaps
                 const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
@@ -134,6 +135,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 color: highlightColor,
                 highlightName: 'New Highlight',
                 highlightInterval: highlight,
+                // @ts-ignore
                 viewRegion: new ChromosomeInterval(enteredRegion.chr, enteredRegion.start, enteredRegion.end),
                 inViewRegion: true,
                 absoluteInterval: middleInterval
