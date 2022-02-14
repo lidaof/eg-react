@@ -154,7 +154,6 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
 
     render() {
         const { highlightItems } = this.props;
-        // const highlightItems = new Array(6).fill(JSON.parse(`{"active":true,"color":"rgba(255, 255, 0, 0.3)","highlightName":"Unnamed","highlightInterval":{"start":246.00137653768002,"end":500.0001092490223},"viewRegion":{"start":27108317,"end":27219029,"chr":"chr7"},"inViewRegion":true,"absoluteInterval":{"start":1259057699,"end":1259378068}}`));
         console.log(this.props);
         const highlightElements = (highlightItems && highlightItems.length !== 0 ? highlightItems.map((item: any, counter: any) => {
             console.log(item);
