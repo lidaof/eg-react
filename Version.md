@@ -1,5 +1,11 @@
 # Version History
 
+## 53.6.0
+
+-   new genomes `susScr3`, `calJac4`, `rheMac10` added.
+-   UI, button styles changes from Shane Liu
+-   added cookie consent notice
+
 ## 53.5.2
 
 -   new genomes `susScr11`, `oviAri4` and Brapa ([#228](https://github.com/lidaof/eg-react/issues/228)) added.
