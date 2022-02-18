@@ -40,11 +40,11 @@ const MAX_POLYGONS = 500;
  * @param {number} i - first index to swap
  * @param {number} j - second index to swap
  */
-function swap(array: any[], i: number, j: number) {
-  const temp = array[j];
-  array[j] = array[i];
-  array[i] = temp;
-}
+// function swap(array: any[], i: number, j: number) {
+//   const temp = array[j];
+//   array[j] = array[i];
+//   array[i] = temp;
+// }
 
 /**
  *
@@ -289,32 +289,6 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
       );
     }
 
-    // const segmentPolygons = segments.map((segment, i) => {
-    //   const points = [
-    //     [Math.floor(segment.targetXSpan.start), RECT_HEIGHT],
-    //     [Math.floor(segment.queryXSpan.start), queryRectTopY],
-    //     [Math.ceil(segment.queryXSpan.end), queryRectTopY],
-    //     [Math.ceil(segment.targetXSpan.end), RECT_HEIGHT],
-    //   ];
-    //   if (
-    //     (!plotReverse && segment.record.queryStrand === "-") ||
-    //     (plotReverse && segment.record.queryStrand === "+")
-    //   ) {
-    //     swap(points, 1, 2);
-    //   }
-
-    //   return (
-    //     <polygon
-    //       key={i}
-    //       points={points as any} // Contrary to what Typescript thinks, you CAN pass a number[][].
-    //       fill={this.props.options.queryColor}
-    //       fillOpacity={0.5}
-    //       // tslint:disable-next-line:jsx-no-lambda
-    //       onClick={() => console.log("You clicked on " + segment.record.getLocus())}
-    //     />
-    //   );
-    // });
-
     const curvePaths = segments.map((segment, i) => {
       const x0 = Math.floor(segment.targetXSpan.start);
       const y0 = RECT_HEIGHT;
@@ -345,7 +319,7 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
           fill={this.props.options.queryColor}
           fillOpacity={0.5}
           // tslint:disable-next-line:jsx-no-lambda
-          onClick={() => console.log("You clicked on " + segment.record.getLocus())}
+          // onClick={() => console.log("You clicked on " + segment.record.getLocus())}
         />
       );
     });
