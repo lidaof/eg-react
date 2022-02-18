@@ -74,37 +74,42 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @param {Object} props - props as specified by React
      */
 
-    getHighlightedXs(chrInterval: ChromosomeInterval | ChromosomeInterval[]): OpenInterval {
+    getHighlightedXs(interval: OpenInterval): OpenInterval {
         const {legendWidth, visData} = this.props;
         const {viewWindowRegion, viewWindow} = visData;
-        console.log(chrInterval);
+        console.log(interval);
 
         let start, end;
 
-        if (Array.isArray(chrInterval)) {
-            const ints = [];
-            for (var i = 0; i < chrInterval.length; i++) {
-                // @ts-ignore
-                const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
-                // there will be many interval when there are gaps
-                const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
-                const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
-                const xRegion = drawModel.baseSpanToXSpan(interval);
-                const intStart = Math.max(legendWidth, xRegion.start + legendWidth);
-                const intEnd = xRegion.end + legendWidth;
-                ints.push(intStart, intEnd);
-            }
-            start = ints[0];
-            end = ints[ints.length - 1];
-        } else {
-            const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
-            // there will be many interval when there are gaps
-            const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
-            const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
-            const xRegion = drawModel.baseSpanToXSpan(interval);
-            start = Math.max(legendWidth, xRegion.start + legendWidth);
-            end = xRegion.end + legendWidth;
-        }
+        // if (Array.isArray(chrInterval)) {
+        //     const ints = [];
+        //     for (var i = 0; i < chrInterval.length; i++) {
+        //         // @ts-ignore
+        //         const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
+        //         // there will be many interval when there are gaps
+        //         const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
+        //         const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
+        //         const xRegion = drawModel.baseSpanToXSpan(interval);
+        //         const intStart = Math.max(legendWidth, xRegion.start + legendWidth);
+        //         const intEnd = xRegion.end + legendWidth;
+        //         ints.push(intStart, intEnd);
+        //     }
+        //     start = ints[0];
+        //     end = ints[ints.length - 1];
+        // } else {
+        //     const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
+        //     // there will be many interval when there are gaps
+        //     const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
+        //     const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
+        //     const xRegion = drawModel.baseSpanToXSpan(interval);
+        //     start = Math.max(legendWidth, xRegion.start + legendWidth);
+        //     end = xRegion.end + legendWidth;
+        // }
+
+        const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
+        const xRegion = drawModel.baseSpanToXSpan(interval);
+        start = Math.max(legendWidth, xRegion.start + legendWidth);
+        end = xRegion.end + legendWidth;
 
         console.log(end, start);
 

@@ -20,6 +20,7 @@ import { getGenomeConfig } from "./model/genomes/allGenomes";
 
 import "./App.css";
 import ChromosomeInterval from "model/interval/ChromosomeInterval";
+import OpenInterval from "model/interval/OpenInterval";
 
 const REGION_EXPANDER = new RegionExpander(1);
 
@@ -219,19 +220,15 @@ class App extends React.PureComponent {
      */
     convertEnteredRegionToChromosomeInterval = (start, end) => {
         // Method 1:
-        // const coords = this.props.viewRegion.currentRegionAsString();
+        this.setEnteredRegion(new OpenInterval(start, end));
+
+        // Method 2:
+        // const segments = viewRegion.getFeatureSegments();
+        // const coords = this.props.viewRegion.customRegionAsString(start, end);
         // const chr = coords.split(':')[0];
         // const chrStart = coords.split(':')[1].split('-')[0];
         // const chrEnd = coords.split(':')[1].split('-')[1];
         // this.setEnteredRegion(new ChromosomeInterval(chr, Number(chrStart), Number(chrEnd)));
-
-        // Method 2:
-        // const segments = viewRegion.getFeatureSegments();
-        const coords = this.props.viewRegion.customRegionAsString(start, end);
-        const chr = coords.split(':')[0];
-        const chrStart = coords.split(':')[1].split('-')[0];
-        const chrEnd = coords.split(':')[1].split('-')[1];
-        this.setEnteredRegion(new ChromosomeInterval(chr, Number(chrStart), Number(chrEnd)));
     }
 
     setHighlightColor = (color) => {
