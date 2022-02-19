@@ -14,7 +14,7 @@ import { connect } from 'react-redux';
 interface HighlightRegionProps {
     y?: number | string; // Relative Y of the top of the selection box; how far from the top of this container
     height?: number | string; // Height of the selection box
-    enteredRegion: ChromosomeInterval | ChromosomeInterval[]; // region that is highlighted in chromosome coordinates;
+    enteredRegion: OpenInterval; // region that is highlighted in absolute genome coordinates;
     highlightEnteredRegion: boolean;
     visData: ViewExpansion; // contains data on chromosome start/stop, and window start/stop;
     legendWidth: number; // used in calculation for highlight;
@@ -125,7 +125,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @returns new HighlightItem data object
      */
     createNewHighlightItem(): void {
-        const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems, visData } = this.props;
+        const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems, viewRegion, visData } = this.props;
         const highlight = enteredRegion ? this.getHighlightedXs(enteredRegion) : null;
 
         // pushes new HighlightItem to Redux
@@ -135,12 +135,14 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 wholeInterval.start + Math.round(wholeInterval.getLength() / 3),
                 wholeInterval.end - Math.round(wholeInterval.getLength() / 3)
             );
+            const coords = visData.visRegion.customRegionAsString(middleInterval.start, middleInterval.end);
+            console.log(coords);
             const newHighlightItem: IHighlightItem = {
                 active: true,
                 color: highlightColor,
                 highlightName: 'New Highlight',
                 highlightInterval: highlight,
-                viewRegion: enteredRegion,
+                viewRegion: coords,
                 inViewRegion: true,
                 absoluteInterval: middleInterval
             }
@@ -149,8 +151,8 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 for (var i = 0; i < highlightItems.length; i++) {
                     console.log(newHighlightItem, highlightItems[i]);
                     if (newHighlightItem.color === highlightItems[i].color &&
-                        newHighlightItem.viewRegion === highlightItems[i].viewRegion &&
-                        newHighlightItem.viewRegion === highlightItems[i].viewRegion) {
+                        newHighlightItem.absoluteInterval.start === highlightItems[i].absoluteInterval.start &&
+                        newHighlightItem.absoluteInterval.end === highlightItems[i].absoluteInterval.end) {
                             noMatches = false;
                             break;
                         }
@@ -167,7 +169,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     }
 
     recalculateHighlightItem(item: IHighlightItem): IHighlightItem {
-        const highlight = this.getHighlightedXs(item.viewRegion);
+        const highlight = this.getHighlightedXs(item.absoluteInterval);
         const newIHighlight = {
             active: true,
             color: item.color,
@@ -211,9 +213,9 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 start = ints[0];
                 end = ints[ints.length - 1];
             } else {
-                const itemIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion);
-                start = itemIntervals[0].start;
-                end = itemIntervals[itemIntervals.length - 1].end;
+                // const itemIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion);
+                // start = itemIntervals[0].start;
+                // end = itemIntervals[itemIntervals.length - 1].end;
             }
 
             if (/** logic to check if in view region, use features */
