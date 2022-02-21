@@ -667,7 +667,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element} - subcontainer that renders tracks
      */
     renderSubContainer() {
-        const { tracks, primaryView, viewRegion, onNewRegion, onTracksChanged, setNewEnteredRegion } = this.props;
+        const { tracks, primaryView, viewRegion, onNewRegion, onTracksChanged, setEnteredRegion } = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
@@ -702,7 +702,7 @@ class TrackContainer extends React.Component {
                         trackElements={trackElements}
                         visData={primaryView}
                         viewRegion={viewRegion}
-                        onNewHighlight={setNewEnteredRegion}
+                        onNewHighlight={setEnteredRegion}
                     />
                 )
             default:

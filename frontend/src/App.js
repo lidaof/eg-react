@@ -80,7 +80,7 @@ class App extends React.PureComponent {
         this.removeTrackFromAvailable = this.removeTrackFromAvailable.bind(this);
         this.addTermToMetaSets = this.addTermToMetaSets.bind(this);
         this.setEnteredRegion = this.setEnteredRegion.bind(this);
-        this.convertEnteredRegionToChromosomeInterval = this.convertEnteredRegionToChromosomeInterval.bind(this);
+        // this.convertEnteredRegionToChromosomeInterval = this.convertEnteredRegionToChromosomeInterval.bind(this);
     }
 
     componentDidMount() {
@@ -204,9 +204,9 @@ class App extends React.PureComponent {
         });
     };
 
-    setEnteredRegion = (chrInterval) => {
-        this.setState({ enteredRegion: chrInterval });
-        console.log(chrInterval);
+    setEnteredRegion = (openInterval) => {
+        this.setState({ enteredRegion: openInterval });
+        console.log(openInterval);
     };
 
     /**
@@ -218,9 +218,9 @@ class App extends React.PureComponent {
      * FIXME strategy 2: modify the DisplayRegionModel.currentRegionAsString() to take custom start/end
      *  that are within the viewRegion
      */
-    convertEnteredRegionToChromosomeInterval = (start, end) => {
+    // convertEnteredRegionToChromosomeInterval = (start, end) => {
         // Method 1:
-        this.setEnteredRegion(new OpenInterval(start, end));
+        // this.setEnteredRegion(new OpenInterval(start, end));
 
         // Method 2:
         // const segments = viewRegion.getFeatureSegments();
@@ -229,7 +229,7 @@ class App extends React.PureComponent {
         // const chrStart = coords.split(':')[1].split('-')[0];
         // const chrEnd = coords.split(':')[1].split('-')[1];
         // this.setEnteredRegion(new ChromosomeInterval(chr, Number(chrStart), Number(chrEnd)));
-    }
+    // }
 
     setHighlightColor = (color) => {
         const rgb = color.rgb;
@@ -379,7 +379,7 @@ class App extends React.PureComponent {
                     isThereG3dTrack={isThereG3dTrack}
                     onSetImageInfo={onSetImageInfo}
                     setEnteredRegion={this.setEnteredRegion}
-                    setNewEnteredRegion={this.convertEnteredRegionToChromosomeInterval}
+                    // setNewEnteredRegion={this.convertEnteredRegionToChromosomeInterval}
                 />
                 {!embeddingMode && <Footer />}
             </div>

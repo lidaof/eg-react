@@ -5,6 +5,7 @@ import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import GeneSearchBox from "./GeneSearchBox";
 import SnpSearchBox from "./SnpSearchBox";
 import { CopyToClip } from "../CopyToClipboard";
+import OpenInterval from "model/interval/OpenInterval";
 
 const MODAL_STYLE = {
     content: {
@@ -99,7 +100,8 @@ class TrackRegionController extends React.Component {
             this.setState({ badInputMessage: "" });
         }
         this.props.onRegionSelected(parsedRegion.start, parsedRegion.end);
-        this.props.onSetEnteredRegion(navContext.getLociInInterval(parsedRegion.start, parsedRegion.end)[0]);
+        // this.props.onSetEnteredRegion(navContext.getLociInInterval(parsedRegion.start, parsedRegion.end)[0]);
+        this.props.onSetEnteredRegion(new OpenInterval(parsedRegion.start, parsedRegion.end));
         this.handleCloseModal();
     }
 

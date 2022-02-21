@@ -127,9 +127,10 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     createNewHighlightItem(): void {
         const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems, viewRegion, visData } = this.props;
         const highlight = enteredRegion ? this.getHighlightedXs(enteredRegion) : null;
-
+        console.log(enteredRegion);
+        
         // pushes new HighlightItem to Redux
-        if (highlight) {
+        if (highlight && highlightEnteredRegion) {
             const wholeInterval = visData.visRegion.getContextCoordinates();
             const middleInterval = new OpenInterval(
                 wholeInterval.start + Math.round(wholeInterval.getLength() / 3),
@@ -203,24 +204,26 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         const theBoxes = highlightItems.map((item) => {
             console.log(item.viewRegion, viewRegion, visData);
 
-            let start, end;
-            if (Array.isArray(item.viewRegion)) {
-                const ints = [];
-                for (var i = 0; i < item.viewRegion.length; i++) {
-                    const intervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion[i]);
-                    ints.push(intervals[0].start, intervals[intervals.length - 1].end);
-                }
-                start = ints[0];
-                end = ints[ints.length - 1];
-            } else {
-                // const itemIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion);
-                // start = itemIntervals[0].start;
-                // end = itemIntervals[itemIntervals.length - 1].end;
-            }
+            // let start, end;
+            // if (Array.isArray(item.viewRegion)) {
+            //     const ints = [];
+            //     for (var i = 0; i < item.viewRegion.length; i++) {
+            //         const intervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion[i]);
+            //         ints.push(intervals[0].start, intervals[intervals.length - 1].end);
+            //     }
+            //     start = ints[0];
+            //     end = ints[ints.length - 1];
+            // } else {
+            //     const itemIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion);
+            //     start = itemIntervals[0].start;
+            //     end = itemIntervals[itemIntervals.length - 1].end;
+            // }
+
+            console.log(item, visData.visRegion.getContextCoordinates());
 
             if (/** logic to check if in view region, use features */
-                    start >= visData.viewWindowRegion.getContextCoordinates().start &&
-                    end <= visData.viewWindowRegion.getContextCoordinates().end &&
+                    item.absoluteInterval.start >= visData.visRegion.getContextCoordinates().start &&
+                    item.absoluteInterval.end <= visData.visRegion.getContextCoordinates().end &&
                     item.active
                 ) {
                 item = this.recalculateHighlightItem(item);
