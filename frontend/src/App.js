@@ -204,9 +204,13 @@ class App extends React.PureComponent {
         });
     };
 
-    setEnteredRegion = (openInterval) => {
-        this.setState({ enteredRegion: openInterval });
+    setEnteredRegion = (openInterval, end) => {
         console.log(openInterval);
+        if (isNaN(openInterval) || openInterval === null) {
+            this.setState({ enteredRegion: openInterval });
+        } else {
+            this.setState({ enteredRegion: new OpenInterval(openInterval, end) });
+        }
     };
 
     /**

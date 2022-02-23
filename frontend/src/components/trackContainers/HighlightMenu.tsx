@@ -71,7 +71,6 @@ import {
 function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
     return {
         highlightItems: state.browser.present.highlightItems,
-
         viewRegion: state.browser.present.viewRegion
     };
 }
@@ -288,15 +287,15 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
         // const isHighlightActive = (active ? 'Active' : 'Inactive');
         // const isHighlightActiveColor = (active ? 'green' : 'red');
         // @ts-ignore
-        const titleStr = `${viewRegion.chr}:${viewRegion.start}-${viewRegion.end}`;
+        const titleStr = viewRegion;
 
-        let viewRegionString;
-        if (Array.isArray(viewRegion)) {
-            viewRegionString = `${viewRegion[0].chr}:${viewRegion[0].start}-${viewRegion[0].end};
-            ${viewRegion[viewRegion.length - 1].chr}:${viewRegion[viewRegion.length - 1].start}-${viewRegion[viewRegion.length - 1].end}`;
-        } else {
-            viewRegionString = viewRegion;
-        }
+        // let viewRegionString;
+        // if (Array.isArray(viewRegion)) {
+        //     viewRegionString = `${viewRegion[0].chr}:${viewRegion[0].start}-${viewRegion[0].end};
+        //     ${viewRegion[viewRegion.length - 1].chr}:${viewRegion[viewRegion.length - 1].start}-${viewRegion[viewRegion.length - 1].end}`;
+        // } else {
+        //     viewRegionString = viewRegion;
+        // }
 
         return (
             <Card style={{ borderRadius: 30, overflow: 'visible' }}>

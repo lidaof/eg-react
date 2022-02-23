@@ -97,7 +97,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         //     start = ints[0];
         //     end = ints[ints.length - 1];
         // } else {
-        //     const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
+            // const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
         //     // there will be many interval when there are gaps
         //     const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
         //     const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
@@ -127,16 +127,11 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     createNewHighlightItem(): void {
         const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems, viewRegion, visData } = this.props;
         const highlight = enteredRegion ? this.getHighlightedXs(enteredRegion) : null;
-        console.log(enteredRegion);
+        console.log(enteredRegion, highlight);
         
         // pushes new HighlightItem to Redux
-        if (highlight && highlightEnteredRegion) {
-            const wholeInterval = visData.visRegion.getContextCoordinates();
-            const middleInterval = new OpenInterval(
-                wholeInterval.start + Math.round(wholeInterval.getLength() / 3),
-                wholeInterval.end - Math.round(wholeInterval.getLength() / 3)
-            );
-            const coords = visData.visRegion.customRegionAsString(middleInterval.start, middleInterval.end);
+        if (highlight) {
+            const coords = visData.visRegion.customRegionAsString(enteredRegion.start, enteredRegion.end);
             console.log(coords);
             const newHighlightItem: IHighlightItem = {
                 active: true,
@@ -145,7 +140,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 highlightInterval: highlight,
                 viewRegion: coords,
                 inViewRegion: true,
-                absoluteInterval: middleInterval
+                absoluteInterval: enteredRegion
             }
             if (highlightItems.length !== 0) {
                 var noMatches = true;
