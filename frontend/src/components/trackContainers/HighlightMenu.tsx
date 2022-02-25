@@ -85,6 +85,7 @@ const callbacks = {
 
 interface HighlightMenuProps {
     highlightItems: IHighlightItem[];
+    viewRegion: DisplayedRegionModel;
     showHighlightMenuModal: boolean;
     onOpenHighlightMenuModal: any;
     onCloseHighlightMenuModal: any;
@@ -94,14 +95,6 @@ interface HighlightMenuProps {
 
 /**
  * Menu for managing multiple highlights created on TrackContainer
- * 
- * Read up on Redux;
- * For Redux storage of highlightItems data:
- *      Create switch case for UPDATE_HIGHLIGHT_ITEMS in NextState method in AppState.ts;
- *      Set items in Redux storage with ActionCreator.METHOD();
- *      Create withAppState = connect(mapStateToProps, callbacks);
- *          Find out how this works, this is how you store and access data in Redux;
- *          Connect is the most important part;
  */
 export class HighlightMenu extends React.Component<HighlightMenuProps> {
     constructor(props: HighlightMenuProps) {
@@ -120,7 +113,6 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
     updateActive(highlightNumber: number): void {
         this.props.setEnteredRegion(null);
         this.props.highlightItems[highlightNumber].active = !this.props.highlightItems[highlightNumber].active;
-        console.log(this.props.highlightItems[highlightNumber]);
         this.forceUpdate();
     }
 
@@ -131,7 +123,6 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
 
     updateColor(highlightNumber: number, color: string): void {
         this.props.setEnteredRegion(null);
-        console.log(highlightNumber, color);
         this.props.highlightItems[highlightNumber].color = color;
         this.forceUpdate();
     }
@@ -139,24 +130,19 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
     handleDelete(highlightNumber: number): void {
         this.props.setEnteredRegion(null);
         this.props.highlightItems.splice(highlightNumber, 1);
-        console.log(highlightNumber, this.props.highlightItems);
         this.forceUpdate();
     }
 
     handleViewRegionJump(highlightNumber: number): void {
         this.props.setEnteredRegion(null);
-        console.log(this.props.highlightItems[highlightNumber].absoluteInterval);
         const interval = this.props.highlightItems[highlightNumber].absoluteInterval;
         this.props.onNewRegion(interval.start, interval.end);
         this.props.onCloseHighlightMenuModal();
     }
 
     render() {
-        const { highlightItems } = this.props;
-        console.log(this.props);
+        const { highlightItems, viewRegion } = this.props;
         const highlightElements = (highlightItems && highlightItems.length !== 0 ? highlightItems.map((item: any, counter: any) => {
-            console.log(item);
-
             return (
                 <Grid item xs={4}>
                     <HighlightItem
@@ -165,7 +151,8 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                         highlightNumber={counter}
                         viewRegion={item.viewRegion}
                         highlightName={item.highlightName}
-                        inViewRegion={item.inViewRegion}
+                        absoluteInterval={item.absoluteInterval}
+                        windowViewRegion={viewRegion}
                         updateActive={this.updateActive}
                         handleNewName={this.updateName}
                         handleNewColor={this.updateColor}
@@ -252,7 +239,7 @@ export interface IHighlightItem {
     highlightName?: string;
     highlightInterval?: OpenInterval;
     viewRegion?: string;
-    inViewRegion?: boolean;
+    windowViewRegion?: DisplayedRegionModel;
     absoluteInterval?: OpenInterval;
     updateActive?: Function;
     handleNewName?: Function;
@@ -279,23 +266,15 @@ export class HighlightItem extends React.Component<IHighlightItem, any> {
     }
 
     render(): JSX.Element {
-        console.log(this.props);
-        const { active, viewRegion, highlightName, highlightNumber, inViewRegion, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
+        const { active, viewRegion, highlightName, highlightNumber, windowViewRegion, absoluteInterval, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
 
         // update this color
+        const windowAbsInterval = windowViewRegion.getContextCoordinates();
+        // logic gives 5px of slack
+        const inViewRegion = (absoluteInterval.start + 5 > windowAbsInterval.start && absoluteInterval.end - 5 < windowAbsInterval.end);
         const isInRegionColor = (inViewRegion ? '#009F6B' : '#C40233');
-        // const isHighlightActive = (active ? 'Active' : 'Inactive');
-        // const isHighlightActiveColor = (active ? 'green' : 'red');
         // @ts-ignore
         const titleStr = viewRegion;
-
-        // let viewRegionString;
-        // if (Array.isArray(viewRegion)) {
-        //     viewRegionString = `${viewRegion[0].chr}:${viewRegion[0].start}-${viewRegion[0].end};
-        //     ${viewRegion[viewRegion.length - 1].chr}:${viewRegion[viewRegion.length - 1].start}-${viewRegion[viewRegion.length - 1].end}`;
-        // } else {
-        //     viewRegionString = viewRegion;
-        // }
 
         return (
             <Card style={{ borderRadius: 30, overflow: 'visible' }}>

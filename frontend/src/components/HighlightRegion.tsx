@@ -77,41 +77,12 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     getHighlightedXs(interval: OpenInterval): OpenInterval {
         const {legendWidth, visData} = this.props;
         const {viewWindowRegion, viewWindow} = visData;
-        console.log(interval);
 
         let start, end;
-
-        // if (Array.isArray(chrInterval)) {
-        //     const ints = [];
-        //     for (var i = 0; i < chrInterval.length; i++) {
-        //         // @ts-ignore
-        //         const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
-        //         // there will be many interval when there are gaps
-        //         const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
-        //         const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
-        //         const xRegion = drawModel.baseSpanToXSpan(interval);
-        //         const intStart = Math.max(legendWidth, xRegion.start + legendWidth);
-        //         const intEnd = xRegion.end + legendWidth;
-        //         ints.push(intStart, intEnd);
-        //     }
-        //     start = ints[0];
-        //     end = ints[ints.length - 1];
-        // } else {
-            // const intervals = viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(chrInterval);
-        //     // there will be many interval when there are gaps
-        //     const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
-        //     const interval = new OpenInterval(intervals[0].start, intervals[intervals.length - 1].end);
-        //     const xRegion = drawModel.baseSpanToXSpan(interval);
-        //     start = Math.max(legendWidth, xRegion.start + legendWidth);
-        //     end = xRegion.end + legendWidth;
-        // }
-
         const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
         const xRegion = drawModel.baseSpanToXSpan(interval);
         start = Math.max(legendWidth, xRegion.start + legendWidth);
         end = xRegion.end + legendWidth;
-
-        console.log(end, start);
 
         if (end <= start) {
             start = -1;
@@ -127,25 +98,21 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     createNewHighlightItem(): void {
         const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems, viewRegion, visData } = this.props;
         const highlight = enteredRegion ? this.getHighlightedXs(enteredRegion) : null;
-        console.log(enteredRegion, highlight);
         
         // pushes new HighlightItem to Redux
         if (highlight) {
             const coords = visData.visRegion.customRegionAsString(enteredRegion.start, enteredRegion.end);
-            console.log(coords);
             const newHighlightItem: IHighlightItem = {
                 active: true,
                 color: highlightColor,
                 highlightName: 'New Highlight',
                 highlightInterval: highlight,
                 viewRegion: coords,
-                inViewRegion: true,
                 absoluteInterval: enteredRegion
             }
             if (highlightItems.length !== 0) {
                 var noMatches = true;
                 for (var i = 0; i < highlightItems.length; i++) {
-                    console.log(newHighlightItem, highlightItems[i]);
                     if (newHighlightItem.color === highlightItems[i].color &&
                         newHighlightItem.absoluteInterval.start === highlightItems[i].absoluteInterval.start &&
                         newHighlightItem.absoluteInterval.end === highlightItems[i].absoluteInterval.end) {
@@ -155,11 +122,9 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 };
                 if (noMatches) {
                         highlightItems.push(newHighlightItem);
-                        console.log('pushing new highlightItem', highlightItems);
                 }
             } else {
                 highlightItems.push(newHighlightItem);
-                console.log('pushing new highlightItem', highlightItems);
             }
         }
     }
@@ -172,7 +137,6 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
             highlightName: item.highlightName,
             highlightInterval: highlight,
             viewRegion: item.viewRegion,
-            inViewRegion: true,
             absoluteInterval: item.absoluteInterval
         }
 
@@ -189,33 +153,11 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
     render(): JSX.Element {
         const { height, y, children, enteredRegion, viewRegion, highlightEnteredRegion, xOffset, highlightColor, highlightItems, visData } = this.props;
 
-        // highlightItems.forEach(item => item.inViewRegion = false);
-        console.log(highlightItems);
-
         // logical check for whether to create new highlightItem is through value of enteredRegion prop
         // enteredRegion === null => no new highlight
         this.createNewHighlightItem();
 
         const theBoxes = highlightItems.map((item) => {
-            console.log(item.viewRegion, viewRegion, visData);
-
-            // let start, end;
-            // if (Array.isArray(item.viewRegion)) {
-            //     const ints = [];
-            //     for (var i = 0; i < item.viewRegion.length; i++) {
-            //         const intervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion[i]);
-            //         ints.push(intervals[0].start, intervals[intervals.length - 1].end);
-            //     }
-            //     start = ints[0];
-            //     end = ints[ints.length - 1];
-            // } else {
-            //     const itemIntervals = visData.viewWindowRegion.getNavigationContext().convertGenomeIntervalToBases(item.viewRegion);
-            //     start = itemIntervals[0].start;
-            //     end = itemIntervals[itemIntervals.length - 1].end;
-            // }
-
-            console.log(item, visData.visRegion.getContextCoordinates());
-
             if (/** logic to check if in view region, use features */
                     item.absoluteInterval.start >= visData.visRegion.getContextCoordinates().start &&
                     item.absoluteInterval.end <= visData.visRegion.getContextCoordinates().end &&
@@ -237,8 +179,6 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 return null;
             }
         });
-
-        console.log(highlightItems);
 
         return (
             <div

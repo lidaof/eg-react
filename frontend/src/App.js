@@ -205,7 +205,6 @@ class App extends React.PureComponent {
     };
 
     setEnteredRegion = (openInterval, end) => {
-        console.log(openInterval);
         if (isNaN(openInterval) || openInterval === null) {
             this.setState({ enteredRegion: openInterval });
         } else {
