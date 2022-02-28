@@ -21,8 +21,9 @@ export const TRACK_TYPES = {
     Annotation: ["bed", "bigBed", "refBed"],
     Peak: ["rgbpeak"],
     Categorical: ["categorical"],
+    // "Transcription Factor": ["jaspar"],
     Methylation: ["methylC"],
-    Interaction: ["hic", "cool", "bigInteract", "longrange"],
+    Interaction: ["hic", "cool", "bigInteract", "longrange", "longrangecolor"],
     Stats: ["boxplot"],
     Repeats: ["rmskv2", "repeatmasker"],
     Alignment: ["bam", "pairwise", "snv", "snv2", "bigchain", "genomealign"],
@@ -44,6 +45,7 @@ export const TYPES_DESC = {
     refBed: "gene annotationd data, processed by tabix in .gz format",
     hic: "long range interaction data in hic format",
     longrange: "long range interaction data in longrange format",
+    longrangecolor: "long range interaction data in longrange format with feature and color",
     bigInteract: "long range interaction data in bigInteract format",
     cool: "long range interaction data in cool format, use data uuid instead of URL",
     bam: "reads alignment data",
@@ -62,6 +64,7 @@ export const TYPES_DESC = {
     rmskv2: "RepeatMasker V2 structure with color",
     bigchain: "bigChain pairwise alignment",
     genomealign: "genome pairwise alignment",
+    // jaspar: "transcription factor binding data from Jaspar",
 };
 
 /**

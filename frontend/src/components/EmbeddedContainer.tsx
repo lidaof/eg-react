@@ -4,6 +4,7 @@ import { ActionCreators } from '../AppState';
 // import App from '../App';
 import TrackContainer from "./trackContainers/TrackContainer";
 import { RegionExpander } from '../model/RegionExpander';
+import { getGenomeConfig } from '../model/genomes/allGenomes';
 
 const REGION_EXPANDER = new RegionExpander(1);
 
@@ -28,8 +29,8 @@ class EmbeddedContainer extends React.PureComponent<EmbeddedProps, EmbeddedState
     }
 
     componentDidMount() {
-        const { genomeName, displayRegion, trackLegendWidth, isShowingNavigator, tracks, 
-            metadataTerms, regionSets, regionSetViewIndex } = this.props.contents;        
+        const { genomeName, displayRegion, trackLegendWidth, isShowingNavigator, tracks,
+            metadataTerms, regionSets, regionSetViewIndex } = this.props.contents;
         const state = {
             genomeName,
             displayRegion,
@@ -44,26 +45,26 @@ class EmbeddedContainer extends React.PureComponent<EmbeddedProps, EmbeddedState
     }
 
     toggleHighlight = () => {
-        this.setState(prevState =>  ({highlightEnteredRegion: !prevState.highlightEnteredRegion}));
+        this.setState(prevState => ({ highlightEnteredRegion: !prevState.highlightEnteredRegion }));
     };
 
     setEnteredRegion = (interval: any) => {
-        this.setState({enteredRegion: interval});
+        this.setState({ enteredRegion: interval });
     }
 
     render(): JSX.Element {
         // somehow react complain `Property 'embeddingMode' does not exist on type 'IntrinsicAttributes'
         // if I give the prop directly
-        const otherProps = {embeddingMode: true};
+        const otherProps = { ...this.props, embeddingMode: true };
         // return <App {...otherProps}/>;
-        return <TrackContainer 
-                    expansionAmount={REGION_EXPANDER} 
-                    suggestedMetaSets={new Set(["Track type"])}
-                    onToggleHighlight={this.toggleHighlight}
-                    onSetEnteredRegion={this.setEnteredRegion}
-                    {...otherProps}
-                />;
-    }   
+        return <TrackContainer
+            expansionAmount={REGION_EXPANDER}
+            suggestedMetaSets={new Set(["Track type"])}
+            onToggleHighlight={this.toggleHighlight}
+            onSetEnteredRegion={this.setEnteredRegion}
+            {...otherProps}
+        />;
+    }
 };
 
 // const mapStateToProps = (state: any) => {
@@ -77,7 +78,8 @@ const mapStateToProps = (state: any) => {
         genome: state.browser.present.genomeName,
         viewRegion: state.browser.present.viewRegion,
         tracks: state.browser.present.tracks,
-        metadataTerms: state.browser.present.metadataTerms
+        metadataTerms: state.browser.present.metadataTerms,
+        genomeConfig: getGenomeConfig(state.browser.present.genomeName)
     };
 }
 

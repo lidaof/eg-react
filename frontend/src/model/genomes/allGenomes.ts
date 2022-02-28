@@ -14,6 +14,7 @@ import MM9 from "./mm9/mm9";
 import BosTau8 from "./bosTau8/bosTau8";
 import rheMac2 from "./rheMac2/rheMac2";
 import rheMac3 from "./rheMac3/rheMac3";
+import rheMac10 from "./rheMac10/rheMac10";
 import RheMac8 from "./rheMac8/rheMac8";
 import GalGal6 from "./galGal6/galGal6";
 import GalGal5 from "./galGal5/galGal5";
@@ -38,11 +39,17 @@ import canFam2 from "./canFam2/canFam2";
 import canFam3 from "./canFam3/canFam3";
 import monDom5 from "./monDom5/monDom5";
 import calJac3 from "./calJac3/calJac3";
+import calJac4 from "./calJac4/calJac4";
 import Pfal3D7 from "./pfal3d7/pfal3d7";
 import TbruceiTREU927 from "./trypanosome/TbruceiTREU927";
 import TbruceiLister427 from "./trypanosome/TbruceiLister427";
 import Creinhardtii506 from "./Creinhardtii506/Creinhardtii506";
 import CHM13v1_1 from "./t2t-chm13-v1.1/chm13";
+import xenTro10 from "./xenTro10/xenTro10";
+import b_chiifu_v3 from "./brapa/brara_chiifu_v3.0";
+import susScr11 from "./susScr11/susScr11";
+import susScr3 from "./susScr3/susScr3";
+import oviAri4 from "./oviAri4/oviAri4";
 
 /**
  * All available genomes.
@@ -94,6 +101,13 @@ export const allGenomes = [
     TbruceiTREU927,
     TbruceiLister427,
     CHM13v1_1,
+    xenTro10,
+    b_chiifu_v3,
+    susScr11,
+    susScr3,
+    oviAri4,
+    calJac4,
+    rheMac10,
 ];
 
 const genomeNameToConfig = {};
@@ -140,18 +154,33 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     rhesus: {
         logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
-        assemblies: [RheMac8.genome.getName(), rheMac3.genome.getName(), rheMac2.genome.getName()],
+        assemblies: [
+            rheMac10.genome.getName(),
+            RheMac8.genome.getName(),
+            rheMac3.genome.getName(),
+            rheMac2.genome.getName(),
+        ],
         color: "yellow",
     },
     marmoset: {
         logoUrl: "https://vizhub.wustl.edu/public/calJac3/Marmoset.png",
-        assemblies: [calJac3.genome.getName()],
+        assemblies: [calJac4.genome.getName(), calJac3.genome.getName()],
         color: "yellow",
     },
     cow: {
         logoUrl: "https://vizhub.wustl.edu/public/bosTau8/Cow.png",
         assemblies: [BosTau8.genome.getName()],
         color: "yellow",
+    },
+    sheep: {
+        logoUrl: "https://vizhub.wustl.edu/public/oviAri4/sheep.png",
+        assemblies: [oviAri4.genome.getName()],
+        color: "white",
+    },
+    pig: {
+        logoUrl: "https://vizhub.wustl.edu/public/susScr11/pig.png",
+        assemblies: [susScr11.genome.getName(), susScr3.genome.getName()],
+        color: "white",
     },
     rabbit: {
         logoUrl: "https://vizhub.wustl.edu/public/oryCun2/rabbit.png",
@@ -183,6 +212,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         assemblies: [GalGal6.genome.getName(), GalGal5.genome.getName()],
         color: "yellow",
     },
+    frog: {
+        logoUrl: "https://vizhub.wustl.edu/public/xenTro10/frog.png",
+        assemblies: [xenTro10.genome.getName()],
+        color: "white",
+    },
     zebrafish: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
         assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName(), DAN_RER7.genome.getName()],
@@ -207,6 +241,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png",
         assemblies: [AraTha1.genome.getName()],
         color: "yellow",
+    },
+    brapa: {
+        logoUrl: "https://vizhub.wustl.edu/public/b_chiifu_v3/brapa.png",
+        assemblies: [b_chiifu_v3.genome.getName()],
+        color: "white",
     },
     seahare: {
         logoUrl: "https://vizhub.wustl.edu/public/aplCal3/seaHare.png",

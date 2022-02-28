@@ -21,6 +21,7 @@ import FetchViewWindowConfig from "components/trackContextMenu/FetchViewWindowCo
 import MaxValueFilterConfig from "components/trackContextMenu/MaxValueFilterConfig";
 import MinValueFilterConfig from "components/trackContextMenu/MinValueFilterConfig";
 import BothAnchorsInViewConfig from "components/trackContextMenu/BothAnchorsInViewConfig";
+import ClampHeightConfig from "components/trackContextMenu/ClampHeightConfig";
 
 export class LongRangeTrackConfig extends TrackConfig {
     constructor(props: any) {
@@ -106,6 +107,12 @@ export class LongRangeTrackConfig extends TrackConfig {
         ];
         if (this.getOptions().displayMode === InteractionDisplayMode.ARC) {
             items.splice(1, 0, LineWidthConfig);
+        }
+        if (
+            this.getOptions().displayMode === InteractionDisplayMode.HEATMAP ||
+            this.getOptions().displayMode === InteractionDisplayMode.ARC
+        ) {
+            items.push(ClampHeightConfig);
         }
         return items;
     }

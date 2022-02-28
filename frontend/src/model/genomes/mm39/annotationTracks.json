@@ -13,6 +13,13 @@
             "filetype": "geneAnnotation"
         }
     ],
+    "Transcription Factor": [
+        {
+            "name": "JASPAR Transcription Factors 2022",
+            "type": "jaspar",
+            "url": "https://hgdownload.soe.ucsc.edu/gbdb/mm39/jaspar/JASPAR2022.bb"
+        }
+    ],
     "RepeatMasker": {
         "All Repeats": [
             {

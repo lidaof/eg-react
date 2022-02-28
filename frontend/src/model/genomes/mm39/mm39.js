@@ -33,31 +33,29 @@ const navContext = genome.makeNavContext();
 const defaultRegion = navContext.parse("chr6:52181837-52185652");
 const defaultTracks = [
     new TrackModel({
-    type: "ruler",
-    name: "Ruler"
-  }),
-  new TrackModel({
-    type: "geneAnnotation",
-    name: "refGene",
-    genome: "mm39"
-  }),
-  new TrackModel({
-    type: "repeatmasker",
-    name: "RepeatMasker",
-    url: "https://vizhub.wustl.edu/public/mm39/rmsk16.bb"
-  })
+        type: "ruler",
+        name: "Ruler",
+    }),
+    new TrackModel({
+        type: "geneAnnotation",
+        name: "refGene",
+        genome: "mm39",
+    }),
+    new TrackModel({
+        type: "repeatmasker",
+        name: "RepeatMasker",
+        url: "https://vizhub.wustl.edu/public/mm39/rmsk16.bb",
+    }),
 ];
 
-
-
 const MM39 = {
-  genome: genome,
-  navContext: navContext,
-  cytobands: cytobands,
-  defaultRegion: defaultRegion,
-  defaultTracks: defaultTracks,
-  twoBitURL: "https://vizhub.wustl.edu/public/mm10/mm10.2bit",
-  annotationTracks
+    genome: genome,
+    navContext: navContext,
+    cytobands: cytobands,
+    defaultRegion: defaultRegion,
+    defaultTracks: defaultTracks,
+    twoBitURL: "https://vizhub.wustl.edu/public/mm39/mm39.2bit",
+    annotationTracks,
 };
 
 export default MM39;

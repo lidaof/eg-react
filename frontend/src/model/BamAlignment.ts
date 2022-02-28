@@ -177,6 +177,10 @@ export class BamAlignment extends Feature {
         for (const cigarOp of this.cigar) {
             const count = cigarOp.count;
             switch (cigarOp.opName) {
+                case 'S': // Ignore soft and Hard clipped sequences
+                case 'H':
+                seqIndex += count;
+                break;
                 case 'M': // Alignment (but not necessarily sequence) matches
                 case '=':
                 case 'X':

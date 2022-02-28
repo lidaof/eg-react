@@ -249,6 +249,19 @@ const calJac3 = [
     },
 ];
 
+const calJac4 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const nomLeu3 = [
     {
         name: "ensGene",
@@ -313,6 +326,79 @@ const TbruceiLister427 = [
     },
 ];
 
+const xenTro10 = [
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const b_chiifu_v3 = [
+    {
+        name: "gene",
+        file: "Brapa_genome_v3.0_genes.gff3.refbed",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const susScr11 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const susScr3 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const oviAri4 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
+const rheMac10 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const genomeConfig = {
     hg19,
     mm10,
@@ -343,6 +429,13 @@ const genomeConfig = {
     hpv16,
     TbruceiTREU927,
     TbruceiLister427,
+    xenTro10,
+    b_chiifu_v3,
+    susScr11,
+    oviAri4,
+    susScr3,
+    rheMac10,
+    calJac4,
 };
 
 module.exports = genomeConfig;

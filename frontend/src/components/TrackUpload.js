@@ -178,6 +178,7 @@ export class TrackUpload extends React.Component {
                             <option value="bigInteract">bigInteract - {TYPES_DESC.bigInteract}</option>
                             <option value="dynseq">dynseq - {TYPES_DESC.dynseq}</option>
                             <option value="g3d">G3D - {TYPES_DESC.g3d}</option>
+                            {/* <option value="jaspar">Jaspar - {TYPES_DESC.jaspar}</option> */}
                         </optgroup>
                         <optgroup label="select both the track file and index file (only select 1 pair)">
                             <option value="bedGraph">bedGraph - {TYPES_DESC.bedGraph}</option>
@@ -187,6 +188,7 @@ export class TrackUpload extends React.Component {
                             <option value="vcf">vcf - {TYPES_DESC.vcf}</option>
                             <option value="refBed">refBed - {TYPES_DESC.refBed}</option>
                             <option value="longrange">longrange - {TYPES_DESC.longrange}</option>
+                            <option value="longrangecolor">longrange - {TYPES_DESC.longrangecolor}</option>
                             <option value="qbed">qBED - {TYPES_DESC.qBED}</option>
                             <option value="bam">BAM - {TYPES_DESC.bam}</option>
                         </optgroup>

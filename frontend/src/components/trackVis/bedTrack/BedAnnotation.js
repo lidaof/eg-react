@@ -33,12 +33,14 @@ class BedAnnotation extends React.Component {
          *     `feature`: the same Feature as the one passed via props
          */
         onClick: PropTypes.func,
+        opacity: PropTypes.number,
     };
 
     static defaultProps = {
         color: "blue",
         reverseStrandColor: "red",
         isInvertArrowDirection: false,
+        opacity: 1,
         onClick: (event, feature) => undefined,
     };
 
@@ -53,17 +55,19 @@ class BedAnnotation extends React.Component {
             isInvertArrowDirection,
             onClick,
             alwaysDrawLabel,
+            hiddenPixels,
+            opacity,
         } = this.props;
         const colorToUse = feature.getIsReverseStrand() ? reverseStrandColor : color;
         const contrastColor = getContrastingColor(colorToUse);
         const [startX, endX] = xSpan;
         const width2 = endX - startX;
-        const width = alwaysDrawLabel ? Math.max(2, width2) : width2;
-        if (width <= 0) {
+        const width = alwaysDrawLabel ? Math.max(3, width2) : width2;
+        if (width < hiddenPixels) {
             return null;
         }
 
-        const mainBody = <rect x={startX} y={0} width={width} height={HEIGHT} fill={colorToUse} />;
+        const mainBody = <rect x={startX} y={0} width={width} height={HEIGHT} fill={colorToUse} opacity={opacity} />;
         if (isMinimal) {
             return (
                 <TranslatableG y={y} onClick={(event) => onClick(event, feature)}>
@@ -82,6 +86,7 @@ class BedAnnotation extends React.Component {
                     // If this boolean expression confuses you, construct a truth table.  I needed one ;)
                     isToRight={feature.getIsReverseStrand() === isInvertArrowDirection}
                     color={contrastColor}
+                    opacity={opacity}
                 />
             );
         }

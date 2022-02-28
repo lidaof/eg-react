@@ -1,6 +1,6 @@
 {
     "name": "epgg",
-    "version": "53.5.0",
+    "version": "53.6.1",
     "author": "Ting Wang Lab @WUSTL",
     "repository": {
         "type": "git",
@@ -8,13 +8,14 @@
     },
     "scripts": {
         "build": "react-app-rewired build",
-        "build-dist": "rm -f umd/* && cd build && cp static/js/*.js ../umd/epgg.js && cp static/css/*.css ../umd/epgg.css && cp *worker.js ../umd/ && cd ../umd && sed -i ''  's//browser/./g' *.js",
+        "build-emb": "react-app-rewired build --config-overrides ./make-embed.config.js",
         "build-storybook": "build-storybook -s public",
         "eject": "react-scripts eject",
         "start": "react-app-rewired start",
         "storybook": "start-storybook -p 9009 -s public",
         "test": "react-app-rewired test --env=jsdom",
         "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
+        "postdeploy": "aws cloudfront create-invalidation --distribution-id E3E258KR33918Y --paths \"/*\"",
         "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules"
     },
     "peerDependencies": {
@@ -40,6 +41,9 @@
         "@juggle/resize-observer": "^3.2.0",
         "@material-ui/core": "^4.12.3",
         "@material-ui/icons": "^4.11.2",
+        "@nivo/chord": "^0.70.0",
+        "@nivo/colors": "^0.70.0",
+        "@nivo/core": "^0.70.0",
         "@primer/octicons-react": "^11.3.0",
         "@storybook/addon-actions": "^3.3.15",
         "@storybook/addon-links": "^3.3.15",
@@ -58,11 +62,13 @@
         "@types/node": "^10.17.26",
         "@types/query-string": "^6.1.0",
         "@types/react": "^16.9.38",
+        "@types/react-detect-offline": "^2.4.1",
         "@types/react-dom": "^16.9.8",
         "@types/react-hammerjs": "^1.0.2",
         "@types/react-modal": "^3.13.1",
         "@types/react-notify-toast": "^0.5.1",
         "@types/react-redux": "^6.0.2",
+        "@types/react-swipeable-views": "^0.13.1",
         "@types/shortid": "0.0.29",
         "@types/text-encoding": "0.0.35",
         "@types/uuid": "^3.4.9",
@@ -89,7 +95,7 @@
         "fsevents": "^2.1.3",
         "fuse.js": "^3.6.1",
         "g3djs": "^2.0.1",
-        "generic-filehandle": "^2.0.3",
+        "generic-filehandle": "^2.2.1",
         "hic-straw": "^2.0.3",
         "install": "^0.13.0",
         "iwanthue": "^1.4.0",
@@ -98,11 +104,12 @@
         "jquery.kinetic": "^2.2.4",
         "json5": "^1.0.1",
         "jsonschema": "^1.2.6",
+        "jszip": "^3.7.1",
         "lodash": "^4.17.19",
         "memoize-one": "^3.1.1",
         "nightmare": "^2.10.0",
         "node-fetch": "^2.6.1",
-        "node-sass": "^4.14.1",
+        "node-sass": "^7.0.0",
         "npm": "^7.20.5",
         "papaparse": "^5.2.0",
         "parse-color": "^1.0.0",
@@ -115,7 +122,7 @@
         "query-string": "^6.13.1",
         "rc-drawer": "^4.2.2",
         "react": "^16.13.1",
-        "react-app-rewired": "^2.1.6",
+        "react-app-rewired": "^2.1.9",
         "react-autosuggest": "^10.0.2",
         "react-beautiful-dnd": "^3.0.0",
         "react-bootstrap-tabs": "^2.0.0",
@@ -123,21 +130,22 @@
         "react-collapsible": "^2.8.0",
         "react-color": "^2.19.3",
         "react-compound-slider": "^0.20.1",
+        "react-cookie-consent": "^7.2.1",
         "react-copy-to-clipboard": "^5.0.2",
-        "react-detect-offline": "^2.4.0",
+        "react-detect-offline": "^2.4.5",
         "react-dom": "^16.13.1",
         "react-hammerjs": "^1.0.1",
         "react-hot-keys": "^1.2.2",
         "react-modal": "^3.11.2",
         "react-notify-toast": "^0.5.1",
         "react-popper": "^0.8.2",
-        "react-radio-buttons": "^1.2.2",
         "react-radio-group": "^3.0.3",
         "react-redux": "^5.1.2",
         "react-redux-firebase": "^2.5.1",
         "react-router": "^5.2.0",
         "react-router-dom": "^5.2.0",
         "react-scripts": "^3.4.1",
+        "react-select": "^4.3.1",
         "react-sortable-hoc": "^1.11.0",
         "react-speech-recognition": "^2.0.4",
         "react-swipeable-views": "^0.14.0",
@@ -147,9 +155,10 @@
         "redux-undo": "^1.0.1",
         "script-loader": "^0.7.2",
         "shortid": "^2.2.15",
+        "styled-components": "^5.3.3",
         "tcp-port-used": "^0.1.2",
         "text-encoding": "^0.7.0",
-        "three": "^0.125.0",
+        "three": "^0.137.0",
         "typescript": "^3.4.5",
         "underscore": "^1.10.2",
         "util": "^0.12.3",
@@ -166,13 +175,11 @@
         "genomics",
         "data visualization"
     ],
-    "module": "dist/lib.js",
     "files": [
-        "umd",
-        "dist"
+        "umd"
     ],
     "description": "WashU Epigenome Browser",
-    "homepage": "http://epigenomegateway.wustl.edu/browser",
+    "homepage": "https://epigenomegateway.wustl.edu/browser",
     "browserslist": {
         "production": [
             ">0.2%",
@@ -185,11 +192,5 @@
             "last 1 safari version"
         ]
     },
-    "proxy": "http://localhost:3001/",
-    "dependencies": {
-        "@material-ui/core": "^4.12.3",
-        "@material-ui/icons": "^4.11.2",
-        "@types/react-hammerjs": "^1.0.2",
-        "react-hammerjs": "^1.0.1"
-    }
+    "proxy": "http://localhost:3001/"
 }

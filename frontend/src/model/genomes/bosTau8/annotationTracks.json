@@ -34,8 +34,8 @@
     ],
     "Genome Comparison": [
         {
-            "name": "mm10tobosTau8",
-            "label": "Mouse mm10 to bosTau8 blastz",
+            "name": "bosTau8tomm10",
+            "label": "Blastz using bosTau8 as reference and mm10 as query",
             "querygenome": "mm10",
             "metadata": {"genome": "mm10"},
             "filetype": "genomealign",

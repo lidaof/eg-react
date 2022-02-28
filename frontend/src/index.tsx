@@ -56,3 +56,25 @@ function ReloadNotification(): JSX.Element {
     </div>
   );
 }
+
+// will have the track modals/objects
+interface HubJson {
+  trackModal: any[];
+
+}
+
+export function renderHub(hubJson: HubJson, divElement: HTMLElement) {
+  ReactDOM.render(
+    <Provider store={AppState}>
+      <AppRouter />
+    </Provider>,
+    root
+  );
+  serviceWorker.register({
+    onUpdate: () =>
+      ReactDOM.render(
+        <ReloadNotification />,
+        document.getElementById("newVersionNotification")
+      )
+  });
+}

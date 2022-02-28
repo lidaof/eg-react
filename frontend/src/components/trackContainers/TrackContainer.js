@@ -29,14 +29,15 @@ import HighlightRegion from "../HighlightRegion";
 import HighlightMenu from "./HighlightMenu";
 import { VerticalDivider } from "./VerticalDivider";
 import { CircletView } from "./CircletView";
+import { ChordView } from "./ChordView";
 import ButtonGroup from "./ButtonGroup";
 import TrackRegionController from "../genomeNavigator/TrackRegionController";
 import ReorderMany from "./ReorderMany";
 import { niceBpCount } from "../../util";
-
-import "./TrackContainer.css";
 import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManager";
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
+
+import "./TrackContainer.css";
 
 // import { DEFAULT_OPTIONS as DYNAMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack";
 
@@ -108,8 +109,10 @@ class TrackContainer extends React.Component {
             selectedTool: Tools.DRAG,
             xOffset: 0,
             showModal: false,
+            showChordModal: false,
             showReorderManyModal: false,
             trackForCircletView: null, // the trackmodel for circlet view
+            trackForChordView: null,
             circletColor: "#ff5722",
             panningAnimation: "none",
             zoomAnimation: 0,
@@ -137,7 +140,7 @@ class TrackContainer extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.tracks !== this.props.tracks || prevProps.primaryView !== this.props.primaryView) {
+        if (this.props.tracks !== prevProps.tracks || prevProps.primaryView !== this.props.primaryView) {
             this.getGroupScale();
         }
     }
@@ -247,6 +250,14 @@ class TrackContainer extends React.Component {
     handleCloseModal() {
         this.setState({ showModal: false, trackForCircletView: null });
     }
+
+    handleOpenChordModal = (track) => {
+        this.setState({ showChordModal: true, trackForChordView: track });
+    };
+
+    handleCloseChordModal = () => {
+        this.setState({ showChordModal: false });
+    };
 
     setCircletColor(color) {
         this.setState({ circletColor: color });
@@ -596,10 +607,10 @@ class TrackContainer extends React.Component {
     getGroupScale = () => {
         const { tracks, trackData, primaryView } = this.props;
         const groupScale = this.groupManager.getGroupScale(
-            tracks,
+            tracks.filter((tk) => tk.options.hasOwnProperty("group") && tk.options.group),
             trackData,
-            primaryView.visWidth,
-            primaryView.viewWindow
+            primaryView ? primaryView.visWidth : 0,
+            primaryView ? primaryView.viewWindow : 0
         );
         this.setState({ groupScale });
     };
@@ -726,6 +737,17 @@ class TrackContainer extends React.Component {
         );
     }
 
+    renderChordModal() {
+        const { trackData } = this.props;
+        const { trackForChordView } = this.state;
+        return (
+            <ReactModal isOpen={this.state.showChordModal} contentLabel="chord-opener" ariaHideApp={false}>
+                <button onClick={this.handleCloseChordModal}>Close</button>
+                <ChordView trackData={trackData} track={trackForChordView} />
+            </ReactModal>
+        );
+    }
+
     /**
      * @inheritdoc
      */
@@ -758,6 +780,7 @@ class TrackContainer extends React.Component {
                 onTracksChanged={onTracksChanged}
                 deselectAllTracks={this.deselectAllTracks}
                 onCircletRequested={this.handleOpenModal}
+                onChordRequested={this.handleOpenChordModal}
                 onApplyMatplot={this.applyMatPlot}
                 onApplyDynamicplot={this.applyDynamicPlot}
                 onApplyDynamicHic={this.applyDynamicHic}
@@ -809,6 +832,7 @@ class TrackContainer extends React.Component {
                     </ContextMenuManager>
                 </OutsideClickDetector>
                 {this.renderModal()}
+                {this.renderChordModal()}
                 <Hotkeys
                     keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o,alt+g,alt+u"
                     onKeyDown={this.onKeyDown.bind(this)}

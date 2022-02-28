@@ -11,7 +11,7 @@
             "name": "refGene",
             "label": "RefSeq genes",
             "filetype": "geneAnnotation"
-        }, 
+        },
         {
             "name": "gencodeM19",
             "label": "GENCODE M19 genes",
@@ -41,6 +41,13 @@
             "filetype": "geneAnnotation"
         }
     ],
+    "Transcription Factor": [
+        {
+            "name": "JASPAR Transcription Factors 2022",
+            "type": "jaspar",
+            "url": "https://hgdownload.soe.ucsc.edu/gbdb/mm10/jaspar/JASPAR2022.bb"
+        }
+    ],
     "RepeatMasker": {
         "All Repeats": [
             {
@@ -59,7 +66,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons.bigWig",
             "height": 30,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "EuarchontoGliresphastCons60way",
@@ -67,7 +74,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons60wayEuarchontoGlire.bigWig",
             "height": 30,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "GliresphastCons60way",
@@ -75,7 +82,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons60wayGlire.bigWig",
             "height": 30,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "PlacentalsphastCons60way",
@@ -83,7 +90,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons60wayPlacental.bigWig",
             "height": 30,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "VertebratephyloP60way",
@@ -91,7 +98,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phyloP60way.bigWig",
             "height": 30,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         },
         {
             "name": "EuarchontoGliresphyloP60way",
@@ -99,7 +106,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phyloP60wayEuarchontoglire.bigWig",
             "height": 30,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         },
         {
             "name": "GliresphyloP60way",
@@ -107,7 +114,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons60wayGlire.bigWig",
             "height": 30,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         },
         {
             "name": "PlacentalephyloP60way",
@@ -115,9 +122,8 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phyloP60wayPlacental.bigWigg",
             "height": 30,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         }
-        
     ],
     "Genome Annotation": [
         {
@@ -133,20 +139,20 @@
                 "source": "mod/mouse/humanENCODE Blacklists",
                 "download url": "http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/mm10-mouse/mm10.blacklist.bed.gz"
             }
-         },
+        },
         {
             "type": "categorical",
             "name": "CpG Context",
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context",
-              "category": {
-                "Island": {"name": "Island", "color": "#05B678"},
-                "Shore": { "name": "Shore", "color": "#F5DC69"},
-                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-              },
-              "backgroundColor":"#071CEC"
+                "label": "CpG Context",
+                "category": {
+                    "Island": { "name": "Island", "color": "#05B678" },
+                    "Shore": { "name": "Shore", "color": "#F5DC69" },
+                    "Shelf": { "name": "Shelf", "color": "#07C6EC" }
+                },
+                "backgroundColor": "#071CEC"
             }
         },
         {
@@ -155,13 +161,13 @@
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_unmasked_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context (unmasked)",
-              "category": {
-                "Island": {"name": "Island", "color": "#05B678"},
-                "Shore": { "name": "Shore", "color": "#F5DC69"},
-                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-              },
-              "backgroundColor":"#071CEC"
+                "label": "CpG Context (unmasked)",
+                "category": {
+                    "Island": { "name": "Island", "color": "#05B678" },
+                    "Shore": { "name": "Shore", "color": "#F5DC69" },
+                    "Shelf": { "name": "Shelf", "color": "#07C6EC" }
+                },
+                "backgroundColor": "#071CEC"
             }
         },
         {
@@ -170,10 +176,10 @@
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_category.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context",
-              "category": {
-                "CGI": {"name": "CGI", "color": "#FE8801"}
-              }
+                "label": "CpG Context",
+                "category": {
+                    "CGI": { "name": "CGI", "color": "#FE8801" }
+                }
             }
         },
         {
@@ -182,10 +188,10 @@
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_unmasked_category.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context (unmasked)",
-              "category": {
-                "CGI": {"name": "CGI", "color": "#FE8801"}
-              }
+                "label": "CpG Context (unmasked)",
+                "category": {
+                    "CGI": { "name": "CGI", "color": "#FE8801" }
+                }
             }
         },
         {
@@ -197,7 +203,7 @@
             "options": {
                 "color": "#cc00cc"
             }
-         },
+        },
         {
             "name": "gc5Base",
             "label": "GC percent",
@@ -215,43 +221,43 @@
     ],
     "Genome Comparison": [
         {
-            "name": "danRer7tomm10",
-            "label": "Zebrafish danRer7 to mm10 blastz",
+            "name": "mm10todanRer7",
+            "label": "Query zebrafish danRer7 to mm10 blastz",
             "querygenome": "danRer7",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_danRer7_axt.gz"
         },
         {
-            "name": "hg19tomm10",
-            "label": "Human hg19 to mm10 blastz",
+            "name": "mm10tohg19",
+            "label": "Query human hg19 to mm10 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_hg19_axt.gz"
         },
         {
-            "name": "hg38tomm10",
-            "label": "Human hg38 to mm10 blastz",
+            "name": "mm10tohg38",
+            "label": "Query human hg38 to mm10 blastz",
             "querygenome": "hg38",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_hg38_axt.gz"
         },
         {
-            "name": "rheMac3tomm10",
-            "label": "Rhesus macaque rheMac3 to mm10 blastz",
+            "name": "mm10torheMac3",
+            "label": "Query rhesus macaque rheMac3 to mm10 blastz",
             "querygenome": "rheMac3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10_rheMac3_axt.gz"
         },
         {
-            "name": "rn6tomm10",
-            "label": "Rat rn6 to mm10 blastz",
+            "name": "mm10torn6",
+            "label": "Query rat rn6 to mm10 blastz",
             "querygenome": "rn6",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10.rn6.gz"
         },
         {
-            "name": "bosTau8",
-            "label": "Cow bosTau8 to mm10 blastz",
+            "name": "mm10tobosTau8",
+            "label": "Query cow bosTau8 to mm10 blastz",
             "querygenome": "bosTau8",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-bosTau8.gz",
@@ -261,8 +267,8 @@
             }
         },
         {
-            "name": "calJac3",
-            "label": "Marmoset calJac3 to mm10 blastz",
+            "name": "mm10tocalJac3",
+            "label": "Query marmoset calJac3 to mm10 blastz",
             "querygenome": "calJac3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-calJac3.gz",
@@ -272,8 +278,8 @@
             }
         },
         {
-            "name": "danRer10",
-            "label": "Zebrafish danRer10 to mm10 blastz",
+            "name": "mm10todanRer10",
+            "label": "Query zebrafish danRer10 to mm10 blastz",
             "querygenome": "danRer10",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-danRer10.gz",
@@ -283,8 +289,8 @@
             }
         },
         {
-            "name": "danRer11",
-            "label": "Zebrafish danRer11 to mm10 blastz",
+            "name": "mm10todanRer11",
+            "label": "Query zebrafish danRer11 to mm10 blastz",
             "querygenome": "danRer11",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-danRer11.gz",
@@ -294,8 +300,8 @@
             }
         },
         {
-            "name": "galGal5",
-            "label": "Chicken galGal5 to mm10 blastz",
+            "name": "mm10togalGal5",
+            "label": "Query chicken galGal5 to mm10 blastz",
             "querygenome": "galGal5",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-galGal5.gz",
@@ -305,8 +311,8 @@
             }
         },
         {
-            "name": "galGal6",
-            "label": "Chicken galGal6 to mm10 blastz",
+            "name": "mm10togalGal6",
+            "label": "Query chicken galGal6 to mm10 blastz",
             "querygenome": "galGal6",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-galGal6.gz",
@@ -316,8 +322,8 @@
             }
         },
         {
-            "name": "gorGor3",
-            "label": "Gorilla gorGor3 to mm10 blastz",
+            "name": "mm10togorGor3",
+            "label": "Query gorilla gorGor3 to mm10 blastz",
             "querygenome": "gorGor3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-gorGor3.gz",
@@ -327,8 +333,8 @@
             }
         },
         {
-            "name": "panTro4",
-            "label": "Chimp panTro4 to mm10 blastz",
+            "name": "mm10topanTro4",
+            "label": "Query chimp panTro4 to mm10 blastz",
             "querygenome": "panTro4",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-panTro4.gz",
@@ -338,8 +344,8 @@
             }
         },
         {
-            "name": "panTro5",
-            "label": "Chimp panTro5 to mm10 blastz",
+            "name": "mm10topanTro5",
+            "label": "Query chimp panTro5 to mm10 blastz",
             "querygenome": "panTro5",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-panTro5.gz",
@@ -349,8 +355,8 @@
             }
         },
         {
-            "name": "panTro6",
-            "label": "Chimp panTro6 to mm10 blastz",
+            "name": "mm10topanTro6",
+            "label": "Query chimp panTro6 to mm10 blastz",
             "querygenome": "panTro6",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-panTro6.gz",
@@ -360,8 +366,8 @@
             }
         },
         {
-            "name": "rheMac8",
-            "label": "Rhesus rheMac8 to mm10 blastz",
+            "name": "mm10torheMac8",
+            "label": "Query rhesus rheMac8 to mm10 blastz",
             "querygenome": "rheMac8",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm10/weaver/mm10-rheMac8.gz",
@@ -372,7 +378,7 @@
         }
     ],
     "Mappability": [
-         {
+        {
             "name": "24mer Mapability",
             "label": "24mer alignability",
             "filetype": "bigwig",
@@ -447,7 +453,7 @@
                 "software": "GEM",
                 "runby": "R.Sears"
             }
-        },  
+        },
         {
             "name": "100mer Mapability",
             "label": "100mer alignability",

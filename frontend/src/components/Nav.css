@@ -29,14 +29,14 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
 }
 
 .Nav-genome {
-    opacity: 0.3;
+    opacity: 0.6;
     text-align: center;
     cursor: pointer;
     width: 180px;
 }
 
 .Nav-genome:hover {
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .Nav-center {
@@ -79,8 +79,8 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
     color: red;
     font-size: 0.7em;
     position: absolute;
-    top: 2px;
-    left: 130px;
+    top: -2px;
+    left: 75px;
 }
 
 #logoDiv {

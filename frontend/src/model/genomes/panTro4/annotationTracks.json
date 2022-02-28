@@ -31,8 +31,8 @@
     },
     "Genome Comparison": [
         {
-            "name": "hg19topanTro4",
-            "label": "Human hg19 to panTro4 blastz",
+            "name": "panTro4tohg19",
+            "label": "Query human hg19 to panTro4 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/panTro4/panTro4_hg19.gz"

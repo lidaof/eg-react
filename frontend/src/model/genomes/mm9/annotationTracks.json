@@ -28,15 +28,15 @@
     
     "Genome Comparison": [
         {
-            "name": "hg19tomm9",
-            "label": "Human hg19 to mm9 blastz",
+            "name": "mm9tohg19",
+            "label": "Query human hg19 to mm9 blastz",
             "querygenome": "hg19",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm9/weaver/mm9_hg19_axt.gz"
         },
         {
-            "name": "calJac3tomm9",
-            "label": "Marmoset calJac3 to mm9 blastz",
+            "name": "mm9tocalJac3",
+            "label": "Query marmoset calJac3 to mm9 blastz",
             "querygenome": "calJac3",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/mm9/weaver/mm9-calJac3.gz",

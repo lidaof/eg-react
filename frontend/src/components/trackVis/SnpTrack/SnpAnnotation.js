@@ -1,19 +1,19 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import { TranslatableG } from '../../TranslatableG';
-import AnnotationArrows from '../commonComponents/annotation/AnnotationArrows';
-import BackgroundedText from '../commonComponents/BackgroundedText';
+import { TranslatableG } from "../../TranslatableG";
+import AnnotationArrows from "../commonComponents/annotation/AnnotationArrows";
+import BackgroundedText from "../commonComponents/BackgroundedText";
 
-import Snp from '../../../model/Snp';
-import OpenInterval from '../../../model/interval/OpenInterval';
-import { getContrastingColor } from '../../../util';
+import Snp from "../../../model/Snp";
+import OpenInterval from "../../../model/interval/OpenInterval";
+import { getContrastingColor } from "../../../util";
 
 const HEIGHT = 9;
 
 /**
  * Visualizer for Snp objects.
- * 
+ *
  * @author Silas Hsu
  */
 class SnpAnnotation extends React.Component {
@@ -43,30 +43,48 @@ class SnpAnnotation extends React.Component {
     };
 
     render() {
-        const {snp, xSpan, y, color, reverseStrandColor, isMinimal, isInvertArrowDirection, onClick} = this.props;
+        const {
+            snp,
+            xSpan,
+            y,
+            color,
+            reverseStrandColor,
+            isMinimal,
+            isInvertArrowDirection,
+            onClick,
+            alwaysDrawLabel,
+            hiddenPixels,
+        } = this.props;
         const colorToUse = snp.getIsReverseStrand() ? reverseStrandColor : color;
         const contrastColor = getContrastingColor(colorToUse);
         const [startX, endX] = xSpan;
-        const width = endX - startX;
-        if (width <= 0) {
+        const width2 = endX - startX;
+        const width = alwaysDrawLabel ? Math.max(3, width2) : width2;
+        if (width <= hiddenPixels) {
             return null;
         }
 
         const mainBody = <rect x={startX} y={0} width={width} height={HEIGHT} fill={colorToUse} />;
         if (isMinimal) {
-            return <TranslatableG y={y} onClick={event => onClick(event, snp)} >{mainBody}</TranslatableG>;
+            return (
+                <TranslatableG y={y} onClick={(event) => onClick(event, snp)}>
+                    {mainBody}
+                </TranslatableG>
+            );
         }
 
         let arrows = null;
         if (snp.getHasStrand()) {
-            arrows = <AnnotationArrows
-                startX={startX}
-                endX={endX}
-                height={HEIGHT}
-                // If this boolean expression confuses you, construct a truth table.  I needed one ;)
-                isToRight={snp.getIsReverseStrand() === isInvertArrowDirection}
-                color={contrastColor}
-            />;
+            arrows = (
+                <AnnotationArrows
+                    startX={startX}
+                    endX={endX}
+                    height={HEIGHT}
+                    // If this boolean expression confuses you, construct a truth table.  I needed one ;)
+                    isToRight={snp.getIsReverseStrand() === isInvertArrowDirection}
+                    color={contrastColor}
+                />
+            );
         }
 
         let label = null;
@@ -87,14 +105,27 @@ class SnpAnnotation extends React.Component {
                     {snp.getName()}
                 </BackgroundedText>
             );
+        } else if (alwaysDrawLabel) {
+            label = (
+                <BackgroundedText
+                    x={endX + 4} // 4px space between rect and text label
+                    y={0}
+                    height={HEIGHT - 1}
+                    fill={colorToUse}
+                    dominantBaseline="hanging"
+                    textAnchor="start"
+                >
+                    {snp.getName()}
+                </BackgroundedText>
+            );
         }
 
         return (
-        <TranslatableG y={y} onClick={event => onClick(event, snp)} >
-            {mainBody}
-            {arrows}
-            {label}
-        </TranslatableG>
+            <TranslatableG y={y} onClick={(event) => onClick(event, snp)}>
+                {mainBody}
+                {arrows}
+                {label}
+            </TranslatableG>
         );
     }
 }
