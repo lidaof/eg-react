@@ -1,12 +1,12 @@
 {
-   "Ruler": [
+    "Ruler": [
         {
             "type": "ruler",
             "label": "Ruler",
             "name": "Ruler"
         }
     ],
-   "Genes": [
+    "Genes": [
         {
             "name": "refGene",
             "label": "RefSeq genes",
@@ -55,6 +55,13 @@
             "filetype": "geneAnnotation"
         }
     ],
+    "Transcription Factor": [
+        {
+            "name": "JASPAR Transcription Factors 2022",
+            "type": "jaspar",
+            "url": "https://hgdownload.soe.ucsc.edu/gbdb/hg38/jaspar/JASPAR2022.bb"
+        }
+    ],
     "Variation": [
         {
             "name": "Snp",
@@ -87,20 +94,20 @@
                 "source": "mod/mouse/humanENCODE Blacklists",
                 "download url": "http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/hg38-human/hg38.blacklist.bed.gz"
             }
-         },
+        },
         {
             "type": "categorical",
             "name": "CpG Context",
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context",
-              "category": {
-                "Island": {"name": "Island", "color": "#05B678"},
-                "Shore": { "name": "Shore", "color": "#F5DC69"},
-                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-              },
-              "backgroundColor":"#071CEC"
+                "label": "CpG Context",
+                "category": {
+                    "Island": { "name": "Island", "color": "#05B678" },
+                    "Shore": { "name": "Shore", "color": "#F5DC69" },
+                    "Shelf": { "name": "Shelf", "color": "#07C6EC" }
+                },
+                "backgroundColor": "#071CEC"
             }
         },
         {
@@ -109,13 +116,13 @@
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_unmasked_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context (unmasked)",
-              "category": {
-                "Island": {"name": "Island", "color": "#05B678"},
-                "Shore": { "name": "Shore", "color": "#F5DC69"},
-                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-              },
-              "backgroundColor":"#071CEC"
+                "label": "CpG Context (unmasked)",
+                "category": {
+                    "Island": { "name": "Island", "color": "#05B678" },
+                    "Shore": { "name": "Shore", "color": "#F5DC69" },
+                    "Shelf": { "name": "Shelf", "color": "#07C6EC" }
+                },
+                "backgroundColor": "#071CEC"
             }
         },
         {
@@ -124,10 +131,10 @@
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_category.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context",
-              "category": {
-                "CGI": {"name": "CGI", "color": "#FE8801"}
-              }
+                "label": "CpG Context",
+                "category": {
+                    "CGI": { "name": "CGI", "color": "#FE8801" }
+                }
             }
         },
         {
@@ -136,10 +143,10 @@
             "url": "https://epgg-test.wustl.edu/d/hg38/hg38_cpgIslands_unmasked_category.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context (unmasked)",
-              "category": {
-                "CGI": {"name": "CGI", "color": "#FE8801"}
-              }
+                "label": "CpG Context (unmasked)",
+                "category": {
+                    "CGI": { "name": "CGI", "color": "#FE8801" }
+                }
             }
         },
         {
@@ -155,7 +162,7 @@
                 "yMin": 0,
                 "yMax": 100
             }
-        }   
+        }
     ],
     "Genome Comparison": [
         {
@@ -331,7 +338,7 @@
         }
     ],
     "Mappability": [
-         {
+        {
             "name": "24mer Mapability",
             "label": "24mer alignability",
             "filetype": "bigwig",
@@ -349,7 +356,7 @@
                 "runby": "X.Zhuo"
             }
         },
-         {
+        {
             "name": "36mer Mapability",
             "label": "36mer alignability",
             "filetype": "bigwig",
@@ -367,7 +374,7 @@
                 "runby": "X.Zhuo"
             }
         },
-         {
+        {
             "name": "50mer Mapability",
             "label": "50mer alignability",
             "filetype": "bigwig",
@@ -385,7 +392,7 @@
                 "runby": "X.Zhuo"
             }
         },
-         {
+        {
             "name": "75mer Mapability",
             "label": "75mer alignability",
             "filetype": "bigwig",
@@ -403,7 +410,7 @@
                 "runby": "X.Zhuo"
             }
         },
-         {
+        {
             "name": "100mer Mapability",
             "label": "100mer alignability",
             "filetype": "bigwig",

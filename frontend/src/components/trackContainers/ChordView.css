@@ -1,0 +1,12 @@
+.ChordView-Control ul {
+    list-style-type: none;
+    display: flex;
+}
+
+.ChordView-Control li {
+    margin-right: 2ch;
+}
+
+.ChordView-Control input {
+    margin-right: 1ch;
+}

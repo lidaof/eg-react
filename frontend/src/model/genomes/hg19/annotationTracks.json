@@ -1,5 +1,5 @@
 {
-  "Ruler": [
+    "Ruler": [
         {
             "type": "ruler",
             "label": "Ruler",
@@ -12,7 +12,6 @@
             "label": "RefSeq genes",
             "filetype": "geneAnnotation"
         },
-        
         {
             "name": "gencodeV29",
             "label": "GENCODE V29 genes",
@@ -57,6 +56,13 @@
             "filetype": "refbed"
         }
     ],
+    "Transcription Factor": [
+        {
+            "name": "JASPAR Transcription Factors 2022",
+            "type": "jaspar",
+            "url": "https://hgdownload.soe.ucsc.edu/gbdb/hg19/jaspar/JASPAR2022.bb"
+        }
+    ],
     "Variation": [
         {
             "name": "Snp",
@@ -82,7 +88,7 @@
             "filetype": "bedgraph",
             "url": "https://egg.wustl.edu/d/hg19/vertebratephastCons46way.gz",
             "height": 50,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "primatephastCons46way",
@@ -90,7 +96,7 @@
             "filetype": "bedgraph",
             "url": "https://egg.wustl.edu/d/hg19/primatephastCons46way.gz",
             "height": 50,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "placentalphastCons46way",
@@ -98,7 +104,7 @@
             "filetype": "bedgraph",
             "url": "https://egg.wustl.edu/d/hg19/placentalphastCons46way.gz",
             "height": 50,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "vertebratephyloP46way",
@@ -106,7 +112,7 @@
             "filetype": "bedgraph",
             "url": "https://egg.wustl.edu/d/hg19/vertebratephyloP46way.gz",
             "height": 50,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         },
         {
             "name": "primatephyloP46way",
@@ -114,7 +120,7 @@
             "filetype": "bedgraph",
             "url": "https://egg.wustl.edu/d/hg19/primatephyloP46way.gz",
             "height": 50,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         },
         {
             "name": "placentalphyloP46way",
@@ -122,7 +128,7 @@
             "filetype": "bedgraph",
             "url": "https://egg.wustl.edu/d/hg19/placentalphyloP46way.gz",
             "height": 50,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         }
     ],
     "Genome Annotation": [
@@ -139,20 +145,20 @@
                 "source": "mod/mouse/humanENCODE Blacklists",
                 "download url": "http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/hg19-human/wgEncodeHg19ConsensusSignalArtifactRegions.bed.gz"
             }
-         },
+        },
         {
             "type": "categorical",
             "name": "CpG Context",
             "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context",
-              "category": {
-                "Island": {"name": "Island", "color": "#05B678"},
-                "Shore": { "name": "Shore", "color": "#F5DC69"},
-                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-              },
-              "backgroundColor":"#071CEC"
+                "label": "CpG Context",
+                "category": {
+                    "Island": { "name": "Island", "color": "#05B678" },
+                    "Shore": { "name": "Shore", "color": "#F5DC69" },
+                    "Shelf": { "name": "Shelf", "color": "#07C6EC" }
+                },
+                "backgroundColor": "#071CEC"
             }
         },
         {
@@ -161,13 +167,13 @@
             "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context (unmasked)",
-              "category": {
-                "Island": {"name": "Island", "color": "#05B678"},
-                "Shore": { "name": "Shore", "color": "#F5DC69"},
-                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-              },
-              "backgroundColor":"#071CEC"
+                "label": "CpG Context (unmasked)",
+                "category": {
+                    "Island": { "name": "Island", "color": "#05B678" },
+                    "Shore": { "name": "Shore", "color": "#F5DC69" },
+                    "Shelf": { "name": "Shelf", "color": "#07C6EC" }
+                },
+                "backgroundColor": "#071CEC"
             }
         },
         {
@@ -176,10 +182,10 @@
             "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_category.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context",
-              "category": {
-                "CGI": {"name": "CGI", "color": "#FE8801"}
-              }
+                "label": "CpG Context",
+                "category": {
+                    "CGI": { "name": "CGI", "color": "#FE8801" }
+                }
             }
         },
         {
@@ -188,10 +194,10 @@
             "url": "https://epgg-test.wustl.edu/d/hg19/hg19_cpgIslands_unmasked_category.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context (unmasked)",
-              "category": {
-                "CGI": {"name": "CGI", "color": "#FE8801"}
-              }
+                "label": "CpG Context (unmasked)",
+                "category": {
+                    "CGI": { "name": "CGI", "color": "#FE8801" }
+                }
             }
         },
         {

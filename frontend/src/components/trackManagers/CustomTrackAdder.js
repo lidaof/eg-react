@@ -21,6 +21,7 @@ export const TRACK_TYPES = {
     Annotation: ["bed", "bigBed", "refBed"],
     Peak: ["rgbpeak"],
     Categorical: ["categorical"],
+    // "Transcription Factor": ["jaspar"],
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange", "longrangecolor"],
     Stats: ["boxplot"],
@@ -63,6 +64,7 @@ export const TYPES_DESC = {
     rmskv2: "RepeatMasker V2 structure with color",
     bigchain: "bigChain pairwise alignment",
     genomealign: "genome pairwise alignment",
+    // jaspar: "transcription factor binding data from Jaspar",
 };
 
 /**

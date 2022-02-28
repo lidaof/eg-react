@@ -1,5 +1,11 @@
 # Version History
 
+## 53.6.1
+
+-   changed circlet view UI slightly
+-   added chord view
+-   added Jaspar 2022 TF tracks to Annotation track sets
+
 ## 53.6.0
 
 -   new genomes `susScr3`, `calJac4`, `rheMac10` added.

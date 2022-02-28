@@ -11,7 +11,7 @@
             "name": "refGene",
             "label": "RefSeq genes",
             "filetype": "geneAnnotation"
-        }, 
+        },
         {
             "name": "gencodeM19",
             "label": "GENCODE M19 genes",
@@ -41,6 +41,13 @@
             "filetype": "geneAnnotation"
         }
     ],
+    "Transcription Factor": [
+        {
+            "name": "JASPAR Transcription Factors 2022",
+            "type": "jaspar",
+            "url": "https://hgdownload.soe.ucsc.edu/gbdb/mm10/jaspar/JASPAR2022.bb"
+        }
+    ],
     "RepeatMasker": {
         "All Repeats": [
             {
@@ -59,7 +66,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons.bigWig",
             "height": 30,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "EuarchontoGliresphastCons60way",
@@ -67,7 +74,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons60wayEuarchontoGlire.bigWig",
             "height": 30,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "GliresphastCons60way",
@@ -75,7 +82,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons60wayGlire.bigWig",
             "height": 30,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "PlacentalsphastCons60way",
@@ -83,7 +90,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons60wayPlacental.bigWig",
             "height": 30,
-            "options": { "color": "#006385"}
+            "options": { "color": "#006385" }
         },
         {
             "name": "VertebratephyloP60way",
@@ -91,7 +98,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phyloP60way.bigWig",
             "height": 30,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         },
         {
             "name": "EuarchontoGliresphyloP60way",
@@ -99,7 +106,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phyloP60wayEuarchontoglire.bigWig",
             "height": 30,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         },
         {
             "name": "GliresphyloP60way",
@@ -107,7 +114,7 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phastCons60wayGlire.bigWig",
             "height": 30,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         },
         {
             "name": "PlacentalephyloP60way",
@@ -115,9 +122,8 @@
             "filetype": "bigwig",
             "url": "https://egg.wustl.edu/d/mm10/phyloP60wayPlacental.bigWigg",
             "height": 30,
-            "options": { "color": "#006385", "color2": "#852100"}
+            "options": { "color": "#006385", "color2": "#852100" }
         }
-        
     ],
     "Genome Annotation": [
         {
@@ -133,20 +139,20 @@
                 "source": "mod/mouse/humanENCODE Blacklists",
                 "download url": "http://mitra.stanford.edu/kundaje/akundaje/release/blacklists/mm10-mouse/mm10.blacklist.bed.gz"
             }
-         },
+        },
         {
             "type": "categorical",
             "name": "CpG Context",
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context",
-              "category": {
-                "Island": {"name": "Island", "color": "#05B678"},
-                "Shore": { "name": "Shore", "color": "#F5DC69"},
-                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-              },
-              "backgroundColor":"#071CEC"
+                "label": "CpG Context",
+                "category": {
+                    "Island": { "name": "Island", "color": "#05B678" },
+                    "Shore": { "name": "Shore", "color": "#F5DC69" },
+                    "Shelf": { "name": "Shelf", "color": "#07C6EC" }
+                },
+                "backgroundColor": "#071CEC"
             }
         },
         {
@@ -155,13 +161,13 @@
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_unmasked_Shores_Shelves.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context (unmasked)",
-              "category": {
-                "Island": {"name": "Island", "color": "#05B678"},
-                "Shore": { "name": "Shore", "color": "#F5DC69"},
-                "Shelf": { "name": "Shelf", "color": "#07C6EC"}
-              },
-              "backgroundColor":"#071CEC"
+                "label": "CpG Context (unmasked)",
+                "category": {
+                    "Island": { "name": "Island", "color": "#05B678" },
+                    "Shore": { "name": "Shore", "color": "#F5DC69" },
+                    "Shelf": { "name": "Shelf", "color": "#07C6EC" }
+                },
+                "backgroundColor": "#071CEC"
             }
         },
         {
@@ -170,10 +176,10 @@
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_category.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context",
-              "category": {
-                "CGI": {"name": "CGI", "color": "#FE8801"}
-              }
+                "label": "CpG Context",
+                "category": {
+                    "CGI": { "name": "CGI", "color": "#FE8801" }
+                }
             }
         },
         {
@@ -182,10 +188,10 @@
             "url": "https://epgg-test.wustl.edu/d/mm10/mm10_cpgIslands_unmasked_category.bed.gz",
             "height": 30,
             "options": {
-              "label": "CpG Context (unmasked)",
-              "category": {
-                "CGI": {"name": "CGI", "color": "#FE8801"}
-              }
+                "label": "CpG Context (unmasked)",
+                "category": {
+                    "CGI": { "name": "CGI", "color": "#FE8801" }
+                }
             }
         },
         {
@@ -197,7 +203,7 @@
             "options": {
                 "color": "#cc00cc"
             }
-         },
+        },
         {
             "name": "gc5Base",
             "label": "GC percent",
@@ -372,7 +378,7 @@
         }
     ],
     "Mappability": [
-         {
+        {
             "name": "24mer Mapability",
             "label": "24mer alignability",
             "filetype": "bigwig",
@@ -447,7 +453,7 @@
                 "software": "GEM",
                 "runby": "R.Sears"
             }
-        },  
+        },
         {
             "name": "100mer Mapability",
             "label": "100mer alignability",

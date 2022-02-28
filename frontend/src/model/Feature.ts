@@ -151,6 +151,29 @@ export class ColoredFeature extends Feature {
 }
 
 /**
+ * a JasparFeature.
+ *
+ * @author Daofeng Li
+ */
+export class JasparFeature extends Feature {
+    score: number;
+    matrixId: string;
+
+    /**
+     * Sets jaspar tf name and score and returns this.
+     *
+     * @param {number} score - jaspar score.
+     * @param {string} matrixId - jaspar matrixId.
+     * @return {this}
+     */
+    withJaspar(score: number, matrixId: string): this {
+        this.score = score;
+        this.matrixId = matrixId;
+        return this;
+    }
+}
+
+/**
  * Everything a Feature is, plus a `values` prop.
  *
  * @author Daofeng Li

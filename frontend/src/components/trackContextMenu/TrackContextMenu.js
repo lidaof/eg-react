@@ -132,7 +132,11 @@ class TrackContextMenu extends React.PureComponent {
                     onOptionSet={this.changeSelectedTracks}
                 />
                 {this.renderTrackSpecificItems(selectedTracks)}
-                <CircletViewConfig tracks={selectedTracks} onCircletRequested={this.props.onCircletRequested} />
+                <CircletViewConfig
+                    tracks={selectedTracks}
+                    onCircletRequested={this.props.onCircletRequested}
+                    onChordRequested={this.props.onChordRequested}
+                />
                 <DeselectOption numTracks={selectedTracks.length} onClick={this.props.deselectAllTracks} />
                 <RemoveOption numTracks={selectedTracks.length} onClick={this.removeSelectedTracks} />
                 <TrackMoreInfo tracks={selectedTracks} />
@@ -166,6 +170,9 @@ function CircletViewConfig(props) {
         <div className="TrackContextMenu-item">
             <button className="btn btn-info btn-sm btn-tight" onClick={() => props.onCircletRequested(track)}>
                 Circlet view
+            </button>{" "}
+            <button className="btn btn-warning btn-sm btn-tight" onClick={() => props.onChordRequested(track)}>
+                Chord view
             </button>
         </div>
     );

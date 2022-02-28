@@ -38,6 +38,7 @@ import { VcfTrackConfig } from "./VcfTrackConfig";
 import { BoxplotTrackConfig } from "./BoxplotTrackConfig";
 import { BedcolorTrackConfig } from "./BedcolorTrackConfig";
 import { Rmskv2TrackConfig } from "./Rmskv2TrackConfig";
+import { JasparTrackConfig } from "./JasparTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 export const DYNAMIC_TYPES = ["dynamic", "dbedgraph", "dynamichic", "dynamiclongrange"];
@@ -83,6 +84,7 @@ const TYPE_NAME_TO_CONFIG = {
     bedcolor: BedcolorTrackConfig,
     rmskv2: Rmskv2TrackConfig,
     bigchain: GenomeAlignTrackConfig,
+    jaspar: JasparTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

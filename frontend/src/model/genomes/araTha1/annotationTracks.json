@@ -12,5 +12,12 @@
             "label": "TAIR10 genes",
             "filetype": "geneAnnotation"
         }
+    ],
+    "Transcription Factor": [
+        {
+            "name": "JASPAR Transcription Factors 2022",
+            "type": "jaspar",
+            "url": "https://vizhub.wustl.edu/public/JASPAR/2022/JASPAR2022_araTha1.bb"
+        }
     ]
 }

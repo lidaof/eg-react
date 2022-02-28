@@ -283,11 +283,13 @@ function getInitialState(): AppState {
             newState = { ...tmpState, tracks: [track] };
         }
         if (query.position) {
-            const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
-            newState = getNextState(newState as AppState, {
-                type: ActionType.SET_VIEW_REGION,
-                ...interval,
-            });
+            if (newState) {
+                const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
+                newState = getNextState(newState as AppState, {
+                    type: ActionType.SET_VIEW_REGION,
+                    ...interval,
+                });
+            }
         }
         if (query.virusBrowserMode) {
             const tmpState = getNextState(state, {
@@ -519,6 +521,12 @@ async function asyncInitState() {
             const json = await new Json5Fetcher().get(query.sessionFile as string);
             if (json) {
                 AppState.dispatch(ActionCreators.restoreSession(json));
+                // when position in URL with sessionFile, see issue #245
+                if (query.position) {
+                    const state = new AppStateLoader().fromObject(json);
+                    const interval = state.viewRegion.getNavigationContext().parse(query.position as string);
+                    AppState.dispatch(ActionCreators.setViewRegion(interval.start, interval.end));
+                }
             }
         }
         if (query.hubSessionStorage) {

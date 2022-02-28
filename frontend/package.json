@@ -1,6 +1,6 @@
 {
     "name": "epgg",
-    "version": "53.6.0",
+    "version": "53.6.1",
     "author": "Ting Wang Lab @WUSTL",
     "repository": {
         "type": "git",
@@ -41,6 +41,9 @@
         "@juggle/resize-observer": "^3.2.0",
         "@material-ui/core": "^4.12.3",
         "@material-ui/icons": "^4.11.2",
+        "@nivo/chord": "^0.70.0",
+        "@nivo/colors": "^0.70.0",
+        "@nivo/core": "^0.70.0",
         "@primer/octicons-react": "^11.3.0",
         "@storybook/addon-actions": "^3.3.15",
         "@storybook/addon-links": "^3.3.15",
@@ -135,13 +138,13 @@
         "react-modal": "^3.11.2",
         "react-notify-toast": "^0.5.1",
         "react-popper": "^0.8.2",
-        "react-radio-buttons": "^1.2.2",
         "react-radio-group": "^3.0.3",
         "react-redux": "^5.1.2",
         "react-redux-firebase": "^2.5.1",
         "react-router": "^5.2.0",
         "react-router-dom": "^5.2.0",
         "react-scripts": "^3.4.1",
+        "react-select": "^4.3.1",
         "react-sortable-hoc": "^1.11.0",
         "react-speech-recognition": "^2.0.4",
         "react-swipeable-views": "^0.14.0",
@@ -151,6 +154,7 @@
         "redux-undo": "^1.0.1",
         "script-loader": "^0.7.2",
         "shortid": "^2.2.15",
+        "styled-components": "^5.3.3",
         "tcp-port-used": "^0.1.2",
         "text-encoding": "^0.7.0",
         "three": "^0.137.0",
@@ -174,7 +178,7 @@
         "umd"
     ],
     "description": "WashU Epigenome Browser",
-    "homepage": "http://epigenomegateway.wustl.edu/browser",
+    "homepage": "https://epigenomegateway.wustl.edu/browser",
     "browserslist": {
         "production": [
             ">0.2%",
@@ -187,10 +191,5 @@
             "last 1 safari version"
         ]
     },
-    "proxy": "http://localhost:3001/",
-    "dependencies": {
-        "@material-ui/core": "^4.12.3",
-        "@types/react-hammerjs": "^1.0.2",
-        "react-hammerjs": "^1.0.1"
-    }
+    "proxy": "http://localhost:3001/"
 }

@@ -12,8 +12,15 @@
             "label": "RefSeq genes",
             "filetype": "geneAnnotation"
         }
-     ],
-     "RepeatMasker": {
+    ],
+    "Transcription Factor": [
+        {
+            "name": "JASPAR Transcription Factors 2022",
+            "type": "jaspar",
+            "url": "https://vizhub.wustl.edu/public/JASPAR/2022/JASPAR2022_danRer11.bb"
+        }
+    ],
+    "RepeatMasker": {
         "All Repeats": [
             {
                 "name": "rmsk_all",
@@ -34,4 +41,3 @@
         }
     ]
 }
-        
