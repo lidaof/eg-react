@@ -4,7 +4,7 @@ import LinearDrawingModel from '../model/LinearDrawingModel';
 import { withTrackLegendWidth } from './withTrackLegendWidth';
 import { ViewExpansion } from '../model/RegionExpander';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
-import { HighlightItem, IHighlightItem } from '../components/trackContainers/HighlightMenu';
+import { IHighlightItem } from '../components/trackContainers/HighlightMenu';
 import { StateWithHistory } from 'redux-undo';
 
 import './HighlightRegion.css';
@@ -30,7 +30,7 @@ interface HighlightRegionProps {
  * @param {Object} state - redux state
  * @return {Object} props to pass to RegionSetSelector
  */
- function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
+function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
     return {
         highlightItems: state.browser.present.highlightItems
     };
@@ -63,9 +63,6 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         highlightItems: [],
     };
 
-    constructor(props: HighlightRegionProps | Readonly<HighlightRegionProps>) {
-        super(props);
-    }
 
     /**
      * Initializes state, binds event listeners, and attaches a keyboard listener to the window, which will listen for
@@ -75,8 +72,8 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      */
 
     getHighlightedXs(interval: OpenInterval): OpenInterval {
-        const {legendWidth, visData} = this.props;
-        const {viewWindowRegion, viewWindow} = visData;
+        const { legendWidth, visData } = this.props;
+        const { viewWindowRegion, viewWindow } = visData;
 
         let start, end;
         const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
@@ -96,9 +93,9 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @returns new HighlightItem data object
      */
     createNewHighlightItem(): void {
-        const { enteredRegion, highlightEnteredRegion, highlightColor, highlightItems, viewRegion, visData } = this.props;
+        const { enteredRegion, highlightColor, highlightItems, visData } = this.props;
         const highlight = enteredRegion ? this.getHighlightedXs(enteredRegion) : null;
-        
+
         // pushes new HighlightItem to Redux
         if (highlight) {
             const coords = visData.visRegion.customRegionAsString(enteredRegion.start, enteredRegion.end);
@@ -116,12 +113,12 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                     if (newHighlightItem.color === highlightItems[i].color &&
                         newHighlightItem.absoluteInterval.start === highlightItems[i].absoluteInterval.start &&
                         newHighlightItem.absoluteInterval.end === highlightItems[i].absoluteInterval.end) {
-                            noMatches = false;
-                            break;
-                        }
+                        noMatches = false;
+                        break;
+                    }
                 };
                 if (noMatches) {
-                        highlightItems.push(newHighlightItem);
+                    highlightItems.push(newHighlightItem);
                 }
             } else {
                 highlightItems.push(newHighlightItem);
@@ -143,7 +140,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         return newIHighlight;
     }
 
-    
+
 
     /**
      * checks every HighlightItem in the highlightItems prop and renders those in the view region;
@@ -151,18 +148,18 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @inheritdoc
      */
     render(): JSX.Element {
-        const { height, y, children, enteredRegion, viewRegion, highlightEnteredRegion, xOffset, highlightColor, highlightItems, visData } = this.props;
+        const { height, y, children, highlightEnteredRegion, xOffset, highlightItems, visData } = this.props;
 
         // logical check for whether to create new highlightItem is through value of enteredRegion prop
         // enteredRegion === null => no new highlight
         this.createNewHighlightItem();
 
-        const theBoxes = highlightItems.map((item) => {
+        const theBoxes = highlightItems.map((item, idx) => {
             if (/** logic to check if in view region, use features */
-                    item.absoluteInterval.start >= visData.visRegion.getContextCoordinates().start &&
-                    item.absoluteInterval.end <= visData.visRegion.getContextCoordinates().end &&
-                    item.active
-                ) {
+                item.absoluteInterval.start >= visData.visRegion.getContextCoordinates().start &&
+                item.absoluteInterval.end <= visData.visRegion.getContextCoordinates().end &&
+                item.active
+            ) {
                 item = this.recalculateHighlightItem(item);
                 const style = item.highlightInterval ? {
                     left: item.highlightInterval.start + xOffset + "px",
@@ -173,7 +170,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 } : null;
                 const className = highlightEnteredRegion ? "HighlightRegion-box" : "HighlightRegion-none";
                 return (
-                    <div className={className} style={style} />
+                    <div key={idx} className={className} style={style} />
                 );
             } else {
                 return null;
@@ -182,7 +179,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
 
         return (
             <div
-                style={{position: "relative", overflow: "hidden"}}
+                style={{ position: "relative", overflow: "hidden" }}
             >
                 {theBoxes}
                 {children}

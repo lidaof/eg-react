@@ -6,12 +6,6 @@
  *
  */
 import { createStore, combineReducers, compose } from "redux";
-import { getGenomeConfig } from "./model/genomes/allGenomes";
-import DisplayedRegionModel from "./model/DisplayedRegionModel";
-import { AppStateSaver, AppStateLoader } from "./model/AppSaveLoad";
-import TrackModel from "./model/TrackModel";
-import RegionSet from "./model/RegionSet";
-import { IHighlightItem } from "../src/components/trackContainers/HighlightMenu";
 import uuid from "uuid";
 import * as firebase from "firebase/app";
 import "firebase/database";
@@ -19,6 +13,12 @@ import { firebaseReducer, reactReduxFirebase } from "react-redux-firebase";
 import undoable from "redux-undo";
 import querySting from "query-string";
 import _ from "lodash";
+import { getGenomeConfig } from "./model/genomes/allGenomes";
+import DisplayedRegionModel from "./model/DisplayedRegionModel";
+import { AppStateSaver, AppStateLoader } from "./model/AppSaveLoad";
+import TrackModel from "./model/TrackModel";
+import RegionSet from "./model/RegionSet";
+import { IHighlightItem } from "./components/trackContainers/HighlightMenu";
 import Json5Fetcher from "./model/Json5Fetcher";
 import DataHubParser from "./model/DataHubParser";
 import OpenInterval from "./model/interval/OpenInterval";
@@ -73,8 +73,6 @@ export interface AppState {
     // g3dtracks?: TrackModel[];
     highlightItems?: IHighlightItem[];
 }
-
-
 
 const bundleId = uuid.v1();
 
@@ -243,11 +241,12 @@ export const ActionCreators = {
     /**
      * Action for updating state for highlight items
      * @param highlights array of HighlightItems that are created in HighlightMenu.js
-     * @returns 
+     * @returns
      */
     setHighlights: (highlights: IHighlightItem[]) => {
+        console.log(highlights);
         return { type: ActionType.SET_HIGHLIGHTS, highlights };
-    }
+    },
 };
 
 function getInitialState(): AppState {

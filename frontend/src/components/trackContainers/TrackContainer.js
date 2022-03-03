@@ -11,7 +11,6 @@ import TrackHandle from "./TrackHandle";
 import { PannableTrackContainer } from "./PannableTrackContainer";
 import ReorderableTrackContainer from "./ReorderableTrackContainer";
 import { ZoomableTrackContainer } from "./ZoomableTrackContainer";
-import HighlightableTrackContainer from "./HighlightableTrackContainer";
 import MetadataHeader from "./MetadataHeader";
 import { Tools, ToolButtons } from "./Tools";
 import ZoomButtons from "./ZoomButtons";
@@ -60,6 +59,7 @@ const callbacks = {
     onNewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
     onMetadataTermsChanged: ActionCreators.setMetadataTerms,
+    onSetHighlights: ActionCreators.setHighlights,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -93,8 +93,7 @@ class TrackContainer extends React.Component {
          */
         onMetadataTermsChanged: PropTypes.func,
         suggestedMetaSets: PropTypes.instanceOf(Set),
-        setEnteredRegion: PropTypes.func,
-        setNewEnteredRegion: PropTypes.func,
+        onSetEnteredRegion: PropTypes.func,
     };
 
     static defaultProps = {
@@ -136,7 +135,6 @@ class TrackContainer extends React.Component {
         this.panLeftOrRight = this.panLeftOrRight.bind(this);
         this.zoomOut = this.zoomOut.bind(this);
         this.groupManager = new GroupedTrackManager();
-        this.handleNewHighlight = this.handleNewHighlight.bind(this);
     }
 
     componentDidUpdate(prevProps) {
@@ -179,16 +177,6 @@ class TrackContainer extends React.Component {
             }, 1000);
         });
         // onNewRegion(...newRegion.getContextCoordinates());
-    }
-
-    /**
-     * updates primaryView and enteredRegion from HighlightableTrackContainer.tsx
-     * these updates trigger rerender in HighlightRegion.tsx
-     */
-    handleNewHighlight(newPrimaryView, newEnteredRegion) {
-        let { primaryView, enteredRegion } = this.props;
-        primaryView = newPrimaryView;
-        enteredRegion = newEnteredRegion;
     }
 
     onKeyDown(keyName, e, handle) {
@@ -516,7 +504,6 @@ class TrackContainer extends React.Component {
             onMetadataTermsChanged,
             suggestedMetaSets,
             viewRegion,
-            setEnteredRegion,
             onNewRegion,
             onToggleHighlight,
             onSetEnteredRegion,
@@ -581,7 +568,7 @@ class TrackContainer extends React.Component {
                     </div>
                     <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <HighlightMenu
-                            setEnteredRegion={setEnteredRegion}
+                            setEnteredRegion={onSetEnteredRegion}
                             onOpenHighlightMenuModal={this.openHighlightMenuModal}
                             onCloseHighlightMenuModal={this.closeHighlightMenuModal}
                             showHighlightMenuModal={this.state.showHighlightMenuModal}
@@ -677,7 +664,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element} - subcontainer that renders tracks
      */
     renderSubContainer() {
-        const { tracks, primaryView, viewRegion, onNewRegion, onTracksChanged, setEnteredRegion } = this.props;
+        const { tracks, primaryView, onNewRegion, onTracksChanged, onSetHighlights } = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
@@ -708,13 +695,12 @@ class TrackContainer extends React.Component {
                 );
             case Tools.HIGHLIGHT:
                 return (
-                    <HighlightableTrackContainer
+                    <ZoomableTrackContainer
                         trackElements={trackElements}
                         visData={primaryView}
-                        viewRegion={viewRegion}
-                        onNewHighlight={setEnteredRegion}
+                        onNewRegion={onSetHighlights}
                     />
-                )
+                );
             default:
                 return trackElements;
         }

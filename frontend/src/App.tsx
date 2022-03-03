@@ -18,10 +18,9 @@ import { Footer } from "./components/Footer";
 import { Offline } from "react-detect-offline";
 import { HELP_LINKS, getSecondaryGenomes } from "./util";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
+import OpenInterval from "model/interval/OpenInterval";
 
 import "./App.css";
-import ChromosomeInterval from "model/interval/ChromosomeInterval";
-import OpenInterval from "model/interval/OpenInterval";
 
 const REGION_EXPANDER = new RegionExpander(1);
 
@@ -138,7 +137,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         this.addTracktoAvailable = this.addTracktoAvailable.bind(this);
         this.removeTrackFromAvailable = this.removeTrackFromAvailable.bind(this);
         this.addTermToMetaSets = this.addTermToMetaSets.bind(this);
-        this.setEnteredRegion = this.setEnteredRegion.bind(this);
         // this.convertEnteredRegionToChromosomeInterval = this.convertEnteredRegionToChromosomeInterval.bind(this);
     }
 
@@ -215,7 +213,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
      * @param {TrackModel[]} newTracks - additions to the list of all tracks available from a hub
      * @param {boolean} toPublic - whether to also add the tracks to public or custom pool
      */
-    addTracksToPool(newTracks: TrackModel[], toPublic = true) {
+    addTracksToPool(newTracks: TrackModel[], toPublic: boolean = true) {
         if (toPublic) {
             // const urlSets = new Set([...this.state.publicTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
@@ -270,33 +268,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             this.setState({ enteredRegion: new OpenInterval(openInterval, end) });
         }
     };
-
-    /**
-     * Converts OpenInterval start/stop into ChromosomeInterval based on _navContext
-     * @param {number} start absolute start of enteredRegion
-     * @param {number} stop absolute end of enteredRegion
-     * 
-     * FIXME strategy 1: gets viewRegion as string, then splits string to get chrNumber, start, and end
-     * FIXME strategy 2: modify the DisplayRegionModel.currentRegionAsString() to take custom start/end
-     *  that are within the viewRegion
-     */
-    // convertEnteredRegionToChromosomeInterval = (start, end) => {
-    // Method 1:
-    // this.setEnteredRegion(new OpenInterval(start, end));
-
-    // Method 2:
-    // const segments = viewRegion.getFeatureSegments();
-    // const coords = this.props.viewRegion.customRegionAsString(start, end);
-    // const chr = coords.split(':')[0];
-    // const chrStart = coords.split(':')[1].split('-')[0];
-    // const chrEnd = coords.split(':')[1].split('-')[1];
-    // this.setEnteredRegion(new ChromosomeInterval(chr, Number(chrStart), Number(chrEnd)));
-    // }
-
-    // setHighlightColor = (color) => {
-    // setEnteredRegion = (chrInterval: any) => {
-    //     this.setState({ enteredRegion: chrInterval });
-    // };
 
     setHighlightColor = (color: RGBAColor) => {
         const rgb = color.rgb;
@@ -445,8 +416,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     viewer3dNumFrames={viewer3dNumFrames}
                     isThereG3dTrack={isThereG3dTrack}
                     onSetImageInfo={onSetImageInfo}
-                    setEnteredRegion={this.setEnteredRegion}
-                // setNewEnteredRegion={this.convertEnteredRegionToChromosomeInterval}
+                    onSetEnteredRegion={this.setEnteredRegion}
                 />
                 {!embeddingMode && <Footer />}
             </div>

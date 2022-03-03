@@ -5,7 +5,7 @@ import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import GeneSearchBox from "./GeneSearchBox";
 import SnpSearchBox from "./SnpSearchBox";
 import { CopyToClip } from "../CopyToClipboard";
-import OpenInterval from "model/interval/OpenInterval";
+import OpenInterval from "../../model/interval/OpenInterval";
 
 const MODAL_STYLE = {
     content: {

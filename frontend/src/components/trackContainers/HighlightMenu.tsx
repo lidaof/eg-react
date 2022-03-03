@@ -1,49 +1,16 @@
 import React from "react";
-import PropTypes from "prop-types";
-import _ from "lodash";
 import { connect } from "react-redux";
 import AppState, { ActionCreators } from "../../AppState";
-import { withTrackData } from "./TrackDataManager";
-import { withTrackView } from "./TrackViewManager";
-import TrackHandle from "./TrackHandle";
-import { PannableTrackContainer } from "./PannableTrackContainer";
-import ReorderableTrackContainer from "./ReorderableTrackContainer";
-import { ZoomableTrackContainer } from "./ZoomableTrackContainer";
-import MetadataHeader from "./MetadataHeader";
-import { Tools, ToolButtons } from "./Tools";
-import ZoomButtons from "./ZoomButtons";
-import OutsideClickDetector from "../OutsideClickDetector";
-import ContextMenuManager from "../ContextMenuManager";
-import DivWithBullseye from "../DivWithBullseye";
-import withAutoDimensions from "../withAutoDimensions";
-import TrackContextMenu from "../trackContextMenu/TrackContextMenu";
-import TrackModel from "../../model/TrackModel";
-import TrackSelectionBehavior from "../../model/TrackSelectionBehavior";
 import DisplayedRegionModel from "../../model/DisplayedRegionModel";
-import UndoRedo from "./UndoRedo";
-import History from "./History";
-import HighlightRegion from "../HighlightRegion";
-import { VerticalDivider } from "./VerticalDivider";
-import { CircletView } from "./CircletView";
-import ButtonGroup from "./ButtonGroup";
-import TrackRegionController from "../genomeNavigator/TrackRegionController";
-import ReorderMany from "./ReorderMany";
-import { niceBpCount } from "../../util";
-
 import { StateWithHistory } from 'redux-undo';
-
-import "./HighlightMenu.css";
 import OpenInterval from "model/interval/OpenInterval";
 import ColorPicker from "components/ColorPicker";
-import ChromosomeInterval from "model/interval/ChromosomeInterval";
 import ReactModal from "react-modal";
 import Typography from "@material-ui/core/Typography";
 import Card from "@material-ui/core/Card";
 import {
-    Button,
     CardHeader,
     Grid,
-    TextField,
     CardActions,
     Tooltip,
     IconButton,
@@ -56,6 +23,8 @@ import {
     ChevronRight as JumpIcon,
     Edit as EditIcon
 } from '@material-ui/icons'
+
+import "./HighlightMenu.css";
 
 /**
  * HighlightMenu and HighlightItem
@@ -142,7 +111,8 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
 
     render() {
         const { highlightItems, viewRegion } = this.props;
-        const highlightElements = (highlightItems && highlightItems.length !== 0 ? highlightItems.map((item: any, counter: any) => {
+        // console.log(highlightItems)
+        const highlightElements = (highlightItems && highlightItems.length > 0 ? highlightItems.map((item: any, counter: any) => {
             return (
                 <Grid item xs={4}>
                     <HighlightItem
@@ -184,8 +154,8 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                     title="Highlight Menu {Alt+U)"
                     className="btn btn-light"
                 >
-                    <span role="img" aria-label="reorder">
-                        🗒️
+                    <span role="img" aria-label="highlights">
+                        ⚡
                     </span>
                 </button>
                 <ReactModal
