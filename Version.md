@@ -1,5 +1,9 @@
 # Version History
 
+## 53.6.2
+
+-   `rn7` added
+
 ## 53.6.1
 
 -   changed circlet view UI slightly

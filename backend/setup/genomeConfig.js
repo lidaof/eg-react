@@ -399,6 +399,19 @@ const rheMac10 = [
     },
 ];
 
+const rn7 = [
+    {
+        name: "refGene",
+        file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "ncbiGene",
+        file: "ncbiRefSeq_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+];
+
 const genomeConfig = {
     hg19,
     mm10,
@@ -436,6 +449,7 @@ const genomeConfig = {
     susScr3,
     rheMac10,
     calJac4,
+    rn7,
 };
 
 module.exports = genomeConfig;
