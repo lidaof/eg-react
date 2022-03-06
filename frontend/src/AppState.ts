@@ -18,7 +18,7 @@ import DisplayedRegionModel from "./model/DisplayedRegionModel";
 import { AppStateSaver, AppStateLoader } from "./model/AppSaveLoad";
 import TrackModel from "./model/TrackModel";
 import RegionSet from "./model/RegionSet";
-import { IHighlightItem } from "./components/trackContainers/HighlightMenu";
+import { HighlightInterval } from "./components/trackContainers/HighlightMenu";
 import Json5Fetcher from "./model/Json5Fetcher";
 import DataHubParser from "./model/DataHubParser";
 import OpenInterval from "./model/interval/OpenInterval";
@@ -71,7 +71,7 @@ export interface AppState {
     virusBrowserMode?: boolean;
     layout?: object;
     // g3dtracks?: TrackModel[];
-    highlightItems?: IHighlightItem[];
+    highlights?: HighlightInterval[];
 }
 
 const bundleId = uuid.v1();
@@ -91,7 +91,7 @@ const initialState: AppState = {
     customTracksPool: [],
     layout: {},
     // g3dtracks: [],
-    highlightItems: [],
+    highlights: [],
 };
 
 enum ActionType {
@@ -243,7 +243,7 @@ export const ActionCreators = {
      * @param highlights array of HighlightItems that are created in HighlightMenu.js
      * @returns
      */
-    setHighlights: (highlights: IHighlightItem[]) => {
+    setHighlights: (highlights: HighlightInterval[]) => {
         console.log(highlights);
         return { type: ActionType.SET_HIGHLIGHTS, highlights };
     },
@@ -438,7 +438,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         // case ActionType.SET_G3D_TRACKS:
         //     return { ...prevState, threedTracks: action.tracks };
         case ActionType.SET_HIGHLIGHTS:
-            return { ...prevState, highlightItems: action.highlights };
+            return { ...prevState, highlights: action.highlights };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);

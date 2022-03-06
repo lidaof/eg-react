@@ -29,36 +29,17 @@ import "./HighlightMenu.css";
 /**
  * HighlightMenu and HighlightItem
  * @author Vincent Xu
+ * @author Daofeng Li
  */
 
-/**
- * Gets props to pass to HighlightMenu.js
- * 
- * @param {Object} state - redux state
- * @return {Object} props to pass to RegionSetSelector
- */
-function mapStateToProps(state: { browser: StateWithHistory<AppState> }) {
-    return {
-        highlightItems: state.browser.present.highlightItems,
-        viewRegion: state.browser.present.viewRegion
-    };
-}
-
-/**
- * Callbacks to pass to HighlightMenu
- */
-const callbacks = {
-    onSetsChanged: ActionCreators.setHighlights,
-    onNewRegion: ActionCreators.setViewRegion
-};
 
 interface HighlightMenuProps {
-    highlightItems: IHighlightItem[];
+    highlights: HighlightInterval[];
     viewRegion: DisplayedRegionModel;
     showHighlightMenuModal: boolean;
     onOpenHighlightMenuModal: any;
     onCloseHighlightMenuModal: any;
-    setEnteredRegion: Function;
+    onSetHighlights: Function;
     onNewRegion: Function;
 };
 
@@ -66,68 +47,23 @@ interface HighlightMenuProps {
  * Menu for managing multiple highlights created on TrackContainer
  */
 export class HighlightMenu extends React.Component<HighlightMenuProps> {
-    constructor(props: HighlightMenuProps) {
-        super(props);
-        this.state = {
+   
 
-        };
 
-        this.updateActive = this.updateActive.bind(this);
-        this.updateName = this.updateName.bind(this);
-        this.updateColor = this.updateColor.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
-        this.handleViewRegionJump = this.handleViewRegionJump.bind(this);
-    }
-
-    updateActive(highlightNumber: number): void {
-        this.props.setEnteredRegion(null);
-        this.props.highlightItems[highlightNumber].active = !this.props.highlightItems[highlightNumber].active;
-        this.forceUpdate();
-    }
-
-    updateName(highlightNumber: number, newName: string): void {
-        this.props.highlightItems[highlightNumber].highlightName = newName;
-        this.forceUpdate();
-    }
-
-    updateColor(highlightNumber: number, color: string): void {
-        this.props.setEnteredRegion(null);
-        this.props.highlightItems[highlightNumber].color = color;
-        this.forceUpdate();
-    }
-
-    handleDelete(highlightNumber: number): void {
-        this.props.setEnteredRegion(null);
-        this.props.highlightItems.splice(highlightNumber, 1);
-        this.forceUpdate();
-    }
-
-    handleViewRegionJump(highlightNumber: number): void {
-        this.props.setEnteredRegion(null);
-        const interval = this.props.highlightItems[highlightNumber].absoluteInterval;
-        this.props.onNewRegion(interval.start, interval.end);
+    handleViewRegionJump(highlightInterval: HighlightInterval): void {
+        const {start, end} = highlightInterval;
+        this.props.onNewRegion(start, end);
         this.props.onCloseHighlightMenuModal();
     }
 
     render() {
-        const { highlightItems, viewRegion } = this.props;
-        // console.log(highlightItems)
-        const highlightElements = (highlightItems && highlightItems.length > 0 ? highlightItems.map((item: any, counter: any) => {
+        const { highlights, viewRegion } = this.props;
+        console.log(highlights)
+        const highlightElements = highlights.length? highlights.map((item: HighlightInterval, index: number) => {
             return (
                 <Grid item xs={4}>
                     <HighlightItem
-                        active={item.active}
-                        color={item.color}
-                        highlightNumber={counter}
-                        viewRegion={item.viewRegion}
-                        highlightName={item.highlightName}
-                        absoluteInterval={item.absoluteInterval}
-                        windowViewRegion={viewRegion}
-                        updateActive={this.updateActive}
-                        handleNewName={this.updateName}
-                        handleNewColor={this.updateColor}
-                        handleDelete={this.handleDelete}
-                        handleViewRegionJump={this.handleViewRegionJump}
+                        
                     />
                 </Grid>
             );
@@ -145,7 +81,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                     Select a region with the highlight tool and it will show up here.
                 </Typography>
             </div>
-        ));
+        );
 
         return (
             <React.Fragment>
@@ -200,112 +136,99 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
     }
 }
 
-export default connect(mapStateToProps, callbacks)(HighlightMenu);
-
-export interface IHighlightItem {
-    active?: boolean;
-    color?: string;
-    highlightNumber?: number;
-    highlightName?: string;
-    highlightInterval?: OpenInterval;
-    viewRegion?: string;
-    windowViewRegion?: DisplayedRegionModel;
-    absoluteInterval?: OpenInterval;
-    updateActive?: Function;
-    handleNewName?: Function;
-    handleNewColor?: Function;
-    handleDelete?: Function;
-    handleViewRegionJump?: Function;
+export class HighlightInterval {
+    start: number;
+    end: number;
+    display: boolean;
+    color: string;
+    tag: string;
+    constructor(start: number, end: number, tag: string='', color: string='rgba(255,255,0, 0.3)') {
+        this.start = start;
+        this.end = end;
+        this.tag = tag;
+        this.color = color;
+        this.display = true;
+    }
 }
 
-export class HighlightItem extends React.Component<IHighlightItem, any> {
-
-    constructor(props: IHighlightItem) {
-        super(props);
-
-        this.state = {
-            color: this.props.color,
-            editing: false
-        }
-
-        this.handleStateColor = this.handleStateColor.bind(this);
-    }
+export class HighlightItem extends React.Component {
 
     handleStateColor(color: string) {
         this.setState({ color: color });
     }
 
     render(): JSX.Element {
-        const { active, viewRegion, highlightName, highlightNumber, windowViewRegion, absoluteInterval, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
+        return <p>a</p>;
+        // const { active, viewRegion, highlightName, highlightNumber, windowViewRegion, absoluteInterval, updateActive, handleNewName, handleNewColor, handleDelete, handleViewRegionJump } = this.props;
 
-        // update this color
-        const windowAbsInterval = windowViewRegion.getContextCoordinates();
-        // logic gives 5px of slack
-        const inViewRegion = (absoluteInterval.start + 5 > windowAbsInterval.start && absoluteInterval.end - 5 < windowAbsInterval.end);
-        const isInRegionColor = (inViewRegion ? '#009F6B' : '#C40233');
-        // @ts-ignore
-        const titleStr = viewRegion;
+        // // update this color
+        // const windowAbsInterval = windowViewRegion.getContextCoordinates();
+        // // logic gives 5px of slack
+        // const inViewRegion = (absoluteInterval.start + 5 > windowAbsInterval.start && absoluteInterval.end - 5 < windowAbsInterval.end);
+        // const isInRegionColor = (inViewRegion ? '#009F6B' : '#C40233');
+        // // @ts-ignore
+        // const titleStr = viewRegion;
 
-        return (
-            <Card style={{ borderRadius: 30, overflow: 'visible' }}>
-                <CardHeader
-                    action={
-                        <Tooltip title="Edit Name">
-                            <IconButton
-                                onClick={() => {
-                                    let input = prompt("Please enter a new name");
-                                    input && handleNewName(highlightNumber, input);
-                                }}
-                            >
-                                <EditIcon />
-                            </IconButton>
-                        </Tooltip>
+        // return (
+        //     <Card style={{ borderRadius: 30, overflow: 'visible' }}>
+        //         <CardHeader
+        //             action={
+        //                 <Tooltip title="Edit Name">
+        //                     <IconButton
+        //                         onClick={() => {
+        //                             let input = prompt("Please enter a new name");
+        //                             input && handleNewName(highlightNumber, input);
+        //                         }}
+        //                     >
+        //                         <EditIcon />
+        //                     </IconButton>
+        //                 </Tooltip>
 
-                    }
-                    title={highlightName}
-                    style={{
-                        backgroundColor: isInRegionColor,
-                        paddingLeft: 25,
-                        borderTopLeftRadius: 30,
-                        borderTopRightRadius: 30,
-                    }}
-                />
-                <CardContent>
-                    {/* "is in view region" indicator */}
-                    <Typography
-                        variant="h5"
-                    >
-                        {titleStr}
-                    </Typography>
-                    {/* left to right: color picker, delete, hide+show, jump-to-view-region */}
-                    <div className="highlight-item-buttons-group">
-                        <ColorPicker
-                            color={this.state.color}
-                            onChange={(evt: any) => {
-                                handleNewColor(highlightNumber, `rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
-                                this.handleStateColor(`rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
-                            }}
-                        />
-                    </div>
-                </CardContent>
-                <CardActions>
-                    <Tooltip title="Delete">
-                        <IconButton onClick={() => { handleDelete(this.props.highlightNumber) }}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Toggle Active">
-                        <IconButton onClick={() => { updateActive(highlightNumber) }}>
-                            {active ? <ActiveIcon /> : <InactiveIcon />}
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Jump to Highlight">
-                        <IconButton onClick={() => { handleViewRegionJump(this.props.highlightNumber) }}>
-                            <JumpIcon />
-                        </IconButton>
-                    </Tooltip>
-                </CardActions>
-            </Card>
-        )
+        //             }
+        //             title={highlightName}
+        //             style={{
+        //                 backgroundColor: isInRegionColor,
+        //                 paddingLeft: 25,
+        //                 borderTopLeftRadius: 30,
+        //                 borderTopRightRadius: 30,
+        //             }}
+        //         />
+        //         <CardContent>
+        //             {/* "is in view region" indicator */}
+        //             <Typography
+        //                 variant="h5"
+        //             >
+        //                 {titleStr}
+        //             </Typography>
+        //             {/* left to right: color picker, delete, hide+show, jump-to-view-region */}
+        //             <div className="highlight-item-buttons-group">
+        //                 <ColorPicker
+        //                     color={this.state.color}
+        //                     onChange={(evt: any) => {
+        //                         handleNewColor(highlightNumber, `rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
+        //                         this.handleStateColor(`rgba(${evt.rgb.r}, ${evt.rgb.g}, ${evt.rgb.b}, 0.3)`);
+        //                     }}
+        //                 />
+        //             </div>
+        //         </CardContent>
+        //         <CardActions>
+        //             <Tooltip title="Delete">
+        //                 <IconButton onClick={() => { handleDelete(this.props.highlightNumber) }}>
+        //                     <DeleteIcon />
+        //                 </IconButton>
+        //             </Tooltip>
+        //             <Tooltip title="Toggle Active">
+        //                 <IconButton onClick={() => { updateActive(highlightNumber) }}>
+        //                     {active ? <ActiveIcon /> : <InactiveIcon />}
+        //                 </IconButton>
+        //             </Tooltip>
+        //             <Tooltip title="Jump to Highlight">
+        //                 <IconButton onClick={() => { handleViewRegionJump(this.props.highlightNumber) }}>
+        //                     <JumpIcon />
+        //                 </IconButton>
+        //             </Tooltip>
+        //         </CardActions>
+        //     </Card>
+        // )
     }
 }

@@ -25,7 +25,7 @@ import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import UndoRedo from "./UndoRedo";
 import History from "./History";
 import HighlightRegion from "../HighlightRegion";
-import HighlightMenu from "./HighlightMenu";
+import { HighlightMenu } from "./HighlightMenu";
 import { VerticalDivider } from "./VerticalDivider";
 import { CircletView } from "./CircletView";
 import { ChordView } from "./ChordView";
@@ -59,7 +59,6 @@ const callbacks = {
     onNewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
     onMetadataTermsChanged: ActionCreators.setMetadataTerms,
-    onSetHighlights: ActionCreators.setHighlights,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -93,7 +92,7 @@ class TrackContainer extends React.Component {
          */
         onMetadataTermsChanged: PropTypes.func,
         suggestedMetaSets: PropTypes.instanceOf(Set),
-        onSetEnteredRegion: PropTypes.func,
+        onNewHighlight: PropTypes.func,
     };
 
     static defaultProps = {
@@ -506,8 +505,10 @@ class TrackContainer extends React.Component {
             viewRegion,
             onNewRegion,
             onToggleHighlight,
-            onSetEnteredRegion,
+            onNewHighlight,
+            highlights,
             primaryView,
+            onSetHighlights,
         } = this.props;
         // console.log(this.props, viewRegion);
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
@@ -546,7 +547,7 @@ class TrackContainer extends React.Component {
                             selectedRegion={viewRegion}
                             onRegionSelected={onNewRegion}
                             onToggleHighlight={onToggleHighlight}
-                            onSetEnteredRegion={onSetEnteredRegion}
+                            onNewHighlight={onNewHighlight}
                         />
                     )}
                     <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
@@ -568,10 +569,11 @@ class TrackContainer extends React.Component {
                     </div>
                     <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                         <HighlightMenu
-                            setEnteredRegion={onSetEnteredRegion}
+                            onSetHighlights={onSetHighlights}
                             onOpenHighlightMenuModal={this.openHighlightMenuModal}
                             onCloseHighlightMenuModal={this.closeHighlightMenuModal}
                             showHighlightMenuModal={this.state.showHighlightMenuModal}
+                            highlights={highlights}
                         />
                     </div>
                     <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
@@ -664,7 +666,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element} - subcontainer that renders tracks
      */
     renderSubContainer() {
-        const { tracks, primaryView, onNewRegion, onTracksChanged, onSetHighlights } = this.props;
+        const { tracks, primaryView, onNewRegion, onTracksChanged, onNewHighlight } = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
@@ -698,7 +700,7 @@ class TrackContainer extends React.Component {
                     <ZoomableTrackContainer
                         trackElements={trackElements}
                         visData={primaryView}
-                        onNewRegion={onSetHighlights}
+                        onNewRegion={onNewHighlight}
                     />
                 );
             default:
@@ -741,13 +743,11 @@ class TrackContainer extends React.Component {
         const {
             tracks,
             onTracksChanged,
-            enteredRegion,
-            highlightEnteredRegion,
             primaryView,
             viewRegion,
-            highlightColor,
             basesPerPixel,
             trackData,
+            highlights,
         } = this.props;
         if (!primaryView) {
             return null;
@@ -804,12 +804,10 @@ class TrackContainer extends React.Component {
                                 xOffset={this.state.xOffset}
                             >
                                 <HighlightRegion
-                                    enteredRegion={enteredRegion}
                                     viewRegion={viewRegion}
-                                    highlightColor={highlightColor}
-                                    highlightEnteredRegion={highlightEnteredRegion}
                                     visData={primaryView}
                                     xOffset={this.state.xOffset}
+                                    highlights={highlights}
                                 >
                                     {this.renderSubContainer()}
                                 </HighlightRegion>
@@ -822,7 +820,7 @@ class TrackContainer extends React.Component {
                 <Hotkeys
                     keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o,alt+g,alt+u"
                     onKeyDown={this.onKeyDown.bind(this)}
-                ></Hotkeys>
+                />
             </React.Fragment>
         );
     }

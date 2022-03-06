@@ -18,7 +18,7 @@ import { Footer } from "./components/Footer";
 import { Offline } from "react-detect-offline";
 import { HELP_LINKS, getSecondaryGenomes } from "./util";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
-import OpenInterval from "model/interval/OpenInterval";
+import { HighlightInterval } from './components/trackContainers/HighlightMenu';
 
 import "./App.css";
 
@@ -35,6 +35,7 @@ interface MapStateToPropsProps {
             isShowingNavigator: boolean;
             customTracksPool: TrackModel[];
             virusBrowserMode: boolean;
+            highlights: HighlightInterval[];
         }
     }
 }
@@ -49,6 +50,7 @@ function mapStateToProps(state: MapStateToPropsProps) {
         isShowingNavigator: state.browser.present.isShowingNavigator,
         customTracksPool: state.browser.present.customTracksPool,
         virusBrowserMode: state.browser.present.virusBrowserMode,
+        highlights: state.browser.present.highlights,
     };
 }
 
@@ -56,6 +58,7 @@ const callbacks = {
     onNewViewRegion: ActionCreators.setViewRegion,
     onTracksChanged: ActionCreators.setTracks,
     onLegendWidthChange: ActionCreators.setTrackLegendWidth,
+    onSetHighlights: ActionCreators.setHighlights,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -82,6 +85,8 @@ interface AppProps {
     viewer3dNumFrames: any;
     isThereG3dTrack: any;
     onSetImageInfo: any;
+    highlights: HighlightInterval[];
+    onSetHighlights: (highlights: HighlightInterval[]) => void;
 }
 
 interface AppStateProps {
@@ -125,8 +130,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             publicHubs: [],
             publicTracksPool: [],
             customTracksPool: [],
-            // publicTrackSets: new Set(),
-            // customTrackSets: new Set(),
             availableTrackSets: new Set(),
             suggestedMetaSets: new Set(["Track type"]),
         };
@@ -137,7 +140,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         this.addTracktoAvailable = this.addTracktoAvailable.bind(this);
         this.removeTrackFromAvailable = this.removeTrackFromAvailable.bind(this);
         this.addTermToMetaSets = this.addTermToMetaSets.bind(this);
-        // this.convertEnteredRegionToChromosomeInterval = this.convertEnteredRegionToChromosomeInterval.bind(this);
     }
 
     componentDidMount() {
@@ -261,13 +263,10 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         });
     };
 
-    setEnteredRegion = (openInterval: number, end: number) => {
-        if (isNaN(openInterval) || openInterval === null) {
-            this.setState({ enteredRegion: openInterval });
-        } else {
-            this.setState({ enteredRegion: new OpenInterval(openInterval, end) });
-        }
-    };
+    newHighlight = (start: number, end: number) => {
+        const interval = new HighlightInterval(start, end);
+        this.props.onSetHighlights([...this.props.highlights, interval])
+    }
 
     setHighlightColor = (color: RGBAColor) => {
         const rgb = color.rgb;
@@ -330,6 +329,8 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             viewer3dNumFrames,
             isThereG3dTrack,
             onSetImageInfo,
+            highlights,
+            onSetHighlights,
         } = this.props;
         if (sessionFromUrl) {
             return (
@@ -363,7 +364,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     // onToggleNavigator={onToggleNavigator}
                     // onToggle3DScene={this.toggle3DScene}
                     onToggleHighlight={this.toggleHighlight}
-                    onSetEnteredRegion={this.setEnteredRegion}
+                    onNewHighlight={this.newHighlight}
                     onSetHighlightColor={this.setHighlightColor}
                     selectedRegion={viewRegion}
                     onRegionSelected={onNewViewRegion}
@@ -416,7 +417,9 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     viewer3dNumFrames={viewer3dNumFrames}
                     isThereG3dTrack={isThereG3dTrack}
                     onSetImageInfo={onSetImageInfo}
-                    onSetEnteredRegion={this.setEnteredRegion}
+                    onNewHighlight={this.newHighlight}                    
+                    highlights={highlights}
+                    onSetHighlights={onSetHighlights}
                 />
                 {!embeddingMode && <Footer />}
             </div>
