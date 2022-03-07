@@ -253,6 +253,7 @@ export const ActionCreators = {
 function getInitialState(): AppState {
     let state = initialState;
     const { query } = querySting.parseUrl(window.location.href);
+    console.log(query);
     let newState;
     if (!_.isEmpty(query)) {
         // console.log(query);
@@ -272,9 +273,10 @@ function getInitialState(): AppState {
             window.location.href = `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&publichub=${query.publichub}`;
         }
         if (query.genome) {
+            console.log(query);
             newState = getNextState(state, {
                 type: ActionType.SET_GENOME,
-                genomeName: query.genome,
+                genomeName: query,
             });
         }
         if (query.bundle) {
@@ -315,6 +317,14 @@ function getInitialState(): AppState {
                 type: ActionType.SET_VIRUS_BROWSER_MODE,
             });
         }
+        if (query) {
+            if (newState) {
+                newState = getNextState(newState as AppState, {
+                    type: ActionType.SET_HIGHLIGHTS,
+                    ...query,
+                });
+            }
+        }
         // console.log(newState);
         return (newState as AppState) || (state as AppState);
     }
@@ -334,6 +344,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
     if (!prevState) {
         return getInitialState();
     }
+
+    console.log(prevState, action);
 
     switch (action.type) {
         case ActionType.SET_GENOME: // Setting genome resets state.

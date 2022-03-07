@@ -173,7 +173,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 } : null;
                 const className = highlightEnteredRegion ? "HighlightRegion-box" : "HighlightRegion-none";
                 return (
-                    <div className={className} style={style} />
+                    <div className={className} key={item.absoluteInterval.toString()} style={style} />
                 );
             } else {
                 return null;
