@@ -10,6 +10,7 @@ import PANTRO5 from "./panTro5/panTro5";
 import PANTRO6 from "./panTro6/panTro6";
 import rn4 from "./rn4/rn4";
 import RN6 from "./rn6/rn6";
+import RN7 from "./rn7/rn7";
 import MM9 from "./mm9/mm9";
 import BosTau8 from "./bosTau8/bosTau8";
 import rheMac2 from "./rheMac2/rheMac2";
@@ -56,7 +57,6 @@ import oviAri4 from "./oviAri4/oviAri4";
  */
 
 export const allGenomes = [
-    // order matters, shows same order in genome list after click genome logo
     HG38,
     HG19,
     MM39,
@@ -108,6 +108,7 @@ export const allGenomes = [
     oviAri4,
     calJac4,
     rheMac10,
+    RN7,
 ];
 
 const genomeNameToConfig = {};
@@ -199,7 +200,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     rat: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Rat.png",
-        assemblies: [RN6.genome.getName(), rn4.genome.getName()],
+        assemblies: [RN7.genome.getName(), RN6.genome.getName(), rn4.genome.getName()],
         color: "white",
     },
     opossum: {
