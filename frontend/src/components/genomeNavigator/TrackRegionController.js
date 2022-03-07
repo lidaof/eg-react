@@ -5,7 +5,6 @@ import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import GeneSearchBox from "./GeneSearchBox";
 import SnpSearchBox from "./SnpSearchBox";
 import { CopyToClip } from "../CopyToClipboard";
-import OpenInterval from "../../model/interval/OpenInterval";
 
 const MODAL_STYLE = {
     content: {
@@ -49,6 +48,7 @@ class TrackRegionController extends React.Component {
          *         `newEnd`: the nav context coordinate of the end of the interval
          */
         onRegionSelected: PropTypes.func.isRequired,
+        onNewHighlight: PropTypes.func,
     };
 
     constructor(props) {
@@ -100,14 +100,9 @@ class TrackRegionController extends React.Component {
             this.setState({ badInputMessage: "" });
         }
         this.props.onRegionSelected(parsedRegion.start, parsedRegion.end);
-        // this.props.onSetEnteredRegion(navContext.getLociInInterval(parsedRegion.start, parsedRegion.end)[0]);
-        this.props.onSetEnteredRegion(new OpenInterval(parsedRegion.start, parsedRegion.end));
+        this.props.onNewHighlight(parsedRegion.start, parsedRegion.end);
         this.handleCloseModal();
     }
-
-    // handleClick(event) {
-    //     event.currentTarget.select();
-    // }
 
     /**
      * @inheritdoc
@@ -135,8 +130,7 @@ class TrackRegionController extends React.Component {
                         navContext={this.props.selectedRegion.getNavigationContext()}
                         onRegionSelected={this.props.onRegionSelected}
                         handleCloseModal={this.handleCloseModal}
-                        onToggleHighlight={this.props.onToggleHighlight}
-                        onSetEnteredRegion={this.props.onSetEnteredRegion}
+                        onNewHighlight={this.props.onNewHighlight}
                     />
                     {!this.props.virusBrowserMode && (
                         <>
@@ -145,8 +139,7 @@ class TrackRegionController extends React.Component {
                                 navContext={this.props.selectedRegion.getNavigationContext()}
                                 onRegionSelected={this.props.onRegionSelected}
                                 handleCloseModal={this.handleCloseModal}
-                                onToggleHighlight={this.props.onToggleHighlight}
-                                onSetEnteredRegion={this.props.onSetEnteredRegion}
+                                onNewHighlight={this.props.onNewHighlight}
                             />
                         </>
                     )}

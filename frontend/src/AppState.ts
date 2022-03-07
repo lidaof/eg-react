@@ -244,7 +244,7 @@ export const ActionCreators = {
      * @returns
      */
     setHighlights: (highlights: HighlightInterval[]) => {
-        console.log(highlights);
+        // console.log(highlights);
         return { type: ActionType.SET_HIGHLIGHTS, highlights };
     },
 };

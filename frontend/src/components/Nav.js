@@ -4,6 +4,9 @@ import ReactModal from "react-modal";
 import _ from "lodash";
 import { connect } from "react-redux";
 import { RadioGroup, Radio } from "react-radio-group";
+import Button from "@material-ui/core/Button";
+import { ArrowBack } from "@material-ui/icons";
+import { IconButton } from "@material-ui/core";
 import { ActionCreators } from "../AppState";
 import DisplayedRegionModel from "../model/DisplayedRegionModel";
 import { getSpeciesInfo, allGenomes } from "../model/genomes/allGenomes";
@@ -28,12 +31,8 @@ import { TrackUpload } from "./TrackUpload";
 import { FetchSequence } from "./FetchSequence";
 import packageJson from "../../package.json";
 import ScatterPlot from "./Geneplot/ScatterPlot";
-import ColorPicker from "./ColorPicker";
 import { TextTrack } from "./TextTrack";
 import { AppIcon, GenomePicker } from "./GenomePicker";
-import Button from "@material-ui/core/Button";
-import { ArrowBack } from "@material-ui/icons";
-import { IconButton } from "@material-ui/core";
 
 import "./Nav.css";
 
@@ -174,9 +173,6 @@ class Nav extends React.Component {
             // isShowing3D,
             // onToggle3DScene,
             bundleId,
-            onToggleHighlight,
-            onSetEnteredRegion,
-            highlightEnteredRegion,
             trackLegendWidth,
             onAddTracksToPool,
             publicTracksPool,
@@ -190,8 +186,7 @@ class Nav extends React.Component {
             removeTrackFromAvailable,
             availableTrackSets,
             addTermToMetaSets,
-            onSetHighlightColor,
-            highlightColor,
+            onNewHighlight,
             groupedTrackSets,
             virusBrowserMode,
         } = this.props;
@@ -274,8 +269,7 @@ class Nav extends React.Component {
                         <TrackRegionController
                             selectedRegion={selectedRegion}
                             onRegionSelected={onRegionSelected}
-                            onToggleHighlight={onToggleHighlight}
-                            onSetEnteredRegion={onSetEnteredRegion}
+                            onNewHighlight={onNewHighlight}
                             virusBrowserMode={virusBrowserMode}
                         />
                     </div>
@@ -453,7 +447,7 @@ class Nav extends React.Component {
                                     </div>
                                 </span>
                             </label>
-                            <label className="dropdown-item" htmlFor="isHighlightRegion">
+                            {/* <label className="dropdown-item" htmlFor="isHighlightRegion">
                                 <input
                                     id="isHighlightRegion"
                                     type="checkbox"
@@ -480,7 +474,7 @@ class Nav extends React.Component {
                                 >
                                     <HighlightColorChange color={highlightColor} onChange={onSetHighlightColor} />
                                 </ModalMenuItem>
-                            </label>
+                            </label> */}
                             {!virusBrowserMode && (
                                 <label className="dropdown-item" htmlFor="switchVR">
                                     <input id="switchVR" type="checkbox" checked={isShowingVR} onChange={onToggleVR} />
@@ -595,19 +589,19 @@ class Nav extends React.Component {
 
 export default connect(mapStateToProps, callbacks)(Nav);
 
-function HighlightColorChange(props) {
-    const { color, onChange } = props;
-    return (
-        <React.Fragment>
-            <p style={{ marginRight: "40px" }}>
-                Click the button below to change
-                <br />
-                the highlight color:
-            </p>
-            <ColorPicker color={color} onChange={onChange} label="current highlight box color" disableAlpha={false} />
-        </React.Fragment>
-    );
-}
+// function HighlightColorChange(props) {
+//     const { color, onChange } = props;
+//     return (
+//         <React.Fragment>
+//             <p style={{ marginRight: "40px" }}>
+//                 Click the button below to change
+//                 <br />
+//                 the highlight color:
+//             </p>
+//             <ColorPicker color={color} onChange={onChange} label="current highlight box color" disableAlpha={false} />
+//         </React.Fragment>
+//     );
+// }
 
 function DropdownOpener(props) {
     const { extraClassName, label } = props;

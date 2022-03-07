@@ -257,23 +257,23 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
     //     });
     // };
 
-    toggleHighlight = () => {
-        this.setState((prevState) => {
-            return { highlightEnteredRegion: !prevState.highlightEnteredRegion };
-        });
-    };
+    // toggleHighlight = () => {
+    //     this.setState((prevState) => {
+    //         return { highlightEnteredRegion: !prevState.highlightEnteredRegion };
+    //     });
+    // };
 
-    newHighlight = (start: number, end: number) => {
-        const interval = new HighlightInterval(start, end);
+    newHighlight = (start: number, end: number, tag: string = '') => {
+        const interval = new HighlightInterval(start, end, tag);
         this.props.onSetHighlights([...this.props.highlights, interval])
     }
 
-    setHighlightColor = (color: RGBAColor) => {
-        const rgb = color.rgb;
-        this.setState({
-            highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`,
-        });
-    };
+    // setHighlightColor = (color: RGBAColor) => {
+    //     const rgb = color.rgb;
+    //     this.setState({
+    //         highlightColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`,
+    //     });
+    // };
 
     groupTrackByGenome = () => {
         const { genomeConfig, tracks } = this.props;
@@ -363,9 +363,9 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     // isShowingNavigator={isShowingNavigator}
                     // onToggleNavigator={onToggleNavigator}
                     // onToggle3DScene={this.toggle3DScene}
-                    onToggleHighlight={this.toggleHighlight}
+                    // onToggleHighlight={this.toggleHighlight}
                     onNewHighlight={this.newHighlight}
-                    onSetHighlightColor={this.setHighlightColor}
+                    // onSetHighlightColor={this.setHighlightColor}
                     selectedRegion={viewRegion}
                     onRegionSelected={onNewViewRegion}
                     tracks={tracks}
@@ -417,7 +417,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     viewer3dNumFrames={viewer3dNumFrames}
                     isThereG3dTrack={isThereG3dTrack}
                     onSetImageInfo={onSetImageInfo}
-                    onNewHighlight={this.newHighlight}                    
+                    onNewHighlight={this.newHighlight}
                     highlights={highlights}
                     onSetHighlights={onSetHighlights}
                 />

@@ -20,6 +20,7 @@ class GeneSearchBox extends React.PureComponent {
          */
         onRegionSelected: PropTypes.func.isRequired,
         handleCloseModal: PropTypes.func.isRequired,
+        onToggleHighlight: PropTypes.func,
     };
 
     /**
@@ -30,7 +31,7 @@ class GeneSearchBox extends React.PureComponent {
         if (interval) {
             this.props.onRegionSelected(...interval);
             this.props.handleCloseModal();
-            this.props.onSetEnteredRegion(gene.getLocus());
+            this.props.onNewHighlight(interval.start, interval.end, gene.name);
         } else {
             notify.show("Gene not available in current region set view", "error", 2000);
         }

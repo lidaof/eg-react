@@ -16,7 +16,6 @@ interface HighlightRegionProps {
     xOffset: number;
     viewRegion: ChromosomeInterval;
     highlights: HighlightInterval[];
-
 }
 
 
@@ -68,16 +67,17 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         const { height, y, children, xOffset, highlights } = this.props;
         const xS = highlights.map(h => this.getHighlightedXs(new OpenInterval(h.start, h.end)));
         const theBoxes = highlights.map((item, idx) => {
-                const style =  {
-                    left: xS[idx].start + xOffset + "px",
-                    top: y,
-                    width: xS[idx].getLength() + "px",
-                    height,
-                    backgroundColor: item.color,
-                }
-                return (
-                    <div key={idx} className="HighlightRegion-box" style={style} />
-                );
+            const style = {
+                left: xS[idx].start + xOffset + "px",
+                top: y,
+                width: xS[idx].getLength() + "px",
+                height,
+                backgroundColor: item.color,
+                display: item.display ? 'unset' : 'none',
+            }
+            return (
+                <div key={idx} className="HighlightRegion-box" style={style} />
+            );
         });
         return (
             <div

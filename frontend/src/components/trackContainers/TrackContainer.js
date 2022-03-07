@@ -191,6 +191,9 @@ class TrackContainer extends React.Component {
             case "alt+m":
                 this.toggleTool(Tools.ZOOM_IN);
                 break;
+            case "alt+n":
+                this.toggleTool(Tools.HIGHLIGHT);
+                break;
             case "alt+z":
                 this.panLeftOrRight(true);
                 break;
@@ -574,6 +577,8 @@ class TrackContainer extends React.Component {
                             onCloseHighlightMenuModal={this.closeHighlightMenuModal}
                             showHighlightMenuModal={this.state.showHighlightMenuModal}
                             highlights={highlights}
+                            viewRegion={viewRegion}
+                            onNewRegion={onNewRegion}
                         />
                     </div>
                     <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
@@ -740,15 +745,7 @@ class TrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {
-            tracks,
-            onTracksChanged,
-            primaryView,
-            viewRegion,
-            basesPerPixel,
-            trackData,
-            highlights,
-        } = this.props;
+        const { tracks, onTracksChanged, primaryView, viewRegion, basesPerPixel, trackData, highlights } = this.props;
         if (!primaryView) {
             return null;
         }
@@ -818,7 +815,7 @@ class TrackContainer extends React.Component {
                 {this.renderModal()}
                 {this.renderChordModal()}
                 <Hotkeys
-                    keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+z,alt+x,alt+i,alt+o,alt+g,alt+u"
+                    keyName="alt+d,alt+h,alt+r,alt+s,alt+m,alt+n,alt+z,alt+x,alt+i,alt+o,alt+g,alt+u"
                     onKeyDown={this.onKeyDown.bind(this)}
                 />
             </React.Fragment>
