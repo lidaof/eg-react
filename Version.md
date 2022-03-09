@@ -3,6 +3,8 @@
 ## 53.6.2
 
 -   `rn7` added
+-   `qBed` add secondary color config and horizontal line option per Slack user request
+-   imporved highlighting functions
 
 ## 53.6.1
 

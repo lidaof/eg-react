@@ -17,6 +17,7 @@ import { FeatureAggregator } from "../../model/FeatureAggregator";
 export const DEFAULT_OPTIONS = {
     height: 40,
     color: "blue",
+    color2: "red",
     yScale: ScaleChoices.AUTO,
     logScale: LogChoices.AUTO,
     show: "all",
@@ -25,6 +26,8 @@ export const DEFAULT_OPTIONS = {
     yMax: 10,
     yMin: 0,
     markerSize: 3,
+    showHorizontalLine: false,
+    horizontalLineValue: 1,
 };
 
 const TOP_PADDING = 5;
@@ -223,8 +226,18 @@ class QBedTrack extends React.PureComponent {
     }
 
     render() {
-        const { data, viewRegion, width, trackModel, options, forceSvg } = this.props;
-        const { height, color, colorAboveMax, markerSize, opacity, show, sampleSize } = options;
+        const { data, viewRegion, width, trackModel, options, forceSvg, viewWindow } = this.props;
+        const {
+            height,
+            color,
+            color2,
+            markerSize,
+            opacity,
+            show,
+            sampleSize,
+            showHorizontalLine,
+            horizontalLineValue,
+        } = options;
         this.xToValue = data.length > 0 ? this.aggregateFeatures(data, viewRegion, width) : [];
         this.scales = this.computeScales(this.xToValue, height);
         // Set relative coordinates for each QBed (used for tooltip)
@@ -249,12 +262,15 @@ class QBedTrack extends React.PureComponent {
                     scales={this.scales}
                     height={height}
                     color={color}
-                    colorOut={colorAboveMax}
+                    color2={color2}
                     forceSvg={forceSvg}
                     markerSize={markerSize}
                     alpha={opacity[0] / 100}
                     show={show}
                     sampleSize={sampleSize}
+                    showHorizontalLine={showHorizontalLine}
+                    horizontalLineValue={horizontalLineValue}
+                    viewWindow={viewWindow}
                 />
             </HoverTooltipContext>
         );
@@ -268,10 +284,13 @@ class QBedPlot extends React.PureComponent {
         scales: PropTypes.object.isRequired,
         height: PropTypes.number.isRequired,
         color: PropTypes.string,
+        color2: PropTypes.string,
         markerSize: PropTypes.number,
         alpha: PropTypes.number,
         show: PropTypes.string,
         sampleSize: PropTypes.number,
+        showHorizontalLine: PropTypes.bool,
+        horizontalLineValue: PropTypes.number,
     };
 
     constructor(props) {
@@ -290,13 +309,25 @@ class QBedPlot extends React.PureComponent {
         if (value.length === 0) {
             return null;
         }
-        const { scales, color, markerSize, alpha } = this.props;
+        const { scales, color, color2, markerSize, alpha } = this.props;
         return value.map((quantum, idx) => {
             const y = scales.valueToY(quantum.value);
             const key = `${x}-${idx}`;
-            return <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={color} strokeOpacity={alpha} />;
+            const colorToUse = quantum.strand === "-" ? color2 : color;
+            return (
+                <circle key={key} cx={x} cy={y} r={markerSize} fill="none" stroke={colorToUse} strokeOpacity={alpha} />
+            );
         });
     }
+
+    renderHorizontalLine = () => {
+        const { showHorizontalLine, horizontalLineValue, scales, viewWindow } = this.props;
+        if (!showHorizontalLine) {
+            return null;
+        }
+        const y = scales.valueToY(horizontalLineValue);
+        return <line stroke="black" strokeWidth={1} x1={viewWindow.start} y1={y} x2={viewWindow.end} y2={y} />;
+    };
 
     render() {
         const { xToValue, height, forceSvg } = this.props;
@@ -307,6 +338,7 @@ class QBedPlot extends React.PureComponent {
                 height={height}
             >
                 {xToValue.map(this.renderPixel)}
+                {this.renderHorizontalLine()}
             </DesignRenderer>
         );
     }
