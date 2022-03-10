@@ -1,13 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import GenericDraggable from '../GenericDraggable';
-import GenericDroppable from '../GenericDroppable';
-import TrackModel from '../../model/TrackModel';
-import OpenInterval from '../../model/interval/OpenInterval';
+import React from "react";
+import PropTypes from "prop-types";
+import GenericDraggable from "../GenericDraggable";
+import GenericDroppable from "../GenericDroppable";
+import TrackModel from "../../model/TrackModel";
+import OpenInterval from "../../model/interval/OpenInterval";
 
 /**
  * Track container where the tracks can be dragged and dropped.
- * 
+ *
  * @author Silas Hsu
  */
 class ReorderableTrackContainer extends React.PureComponent {
@@ -25,7 +25,7 @@ class ReorderableTrackContainer extends React.PureComponent {
     };
 
     static defaultProps = {
-        onTracksChanged: () => undefined
+        onTracksChanged: () => undefined,
     };
 
     constructor(props) {
@@ -39,7 +39,7 @@ class ReorderableTrackContainer extends React.PureComponent {
      * Gets an array of intervals describing how adjacent tracks should group into draggables.  Non-selected tracks will
      * never drag with adjacent tracks.  Any adjacent selected tracks will group together.  This method guarantees that
      * returned intervals are sorted and will never overlap.
-     * 
+     *
      * @return {OpenInterval[]} - intervals describing how adjacent tracks should group into draggables
      */
     getTrackGroupings() {
@@ -64,30 +64,33 @@ class ReorderableTrackContainer extends React.PureComponent {
 
     /**
      * Takes an interval of `this.props.trackElements` and puts them in one GenericDraggable so they drag together.
-     * 
+     *
      * @param {OpenInterval} interval - indices, expressed as a range, of track elements to make draggable
      * @return {JSX.Element} - draggable track element(s)
      */
-    bundleTracksInInterval(interval) {
+    bundleTracksInInterval(interval, index) {
         if (interval.getLength() === 0) {
             return null;
         }
         const tracks = this.props.trackElements.slice(...interval);
         const key = tracks[0].key;
-        return <GenericDraggable key={key} draggableId={key} >{tracks}</GenericDraggable>;
+        return (
+            <GenericDraggable key={index} draggableId={key} index={index}>
+                {tracks}
+            </GenericDraggable>
+        );
     }
 
     /**
      * Callback for when a user has just finished a drag-and-drop.  Computes a new track order and requests the change.
-     * 
+     *
      * @param {DropResult} dropResult - object from react-beautiful-dnd
      */
     tracksDropped(dropResult) {
         if (!dropResult.destination) {
             return;
         }
-
-        const {trackModels, onTracksChanged} = this.props;
+        const { trackModels, onTracksChanged } = this.props;
         const fromIndex = dropResult.source.index;
         const toIndex = dropResult.destination.index;
         let newAdjacencies = this.adjacencies.slice();
@@ -108,8 +111,8 @@ class ReorderableTrackContainer extends React.PureComponent {
      */
     render() {
         this.adjacencies = this.getTrackGroupings();
-        const tracks = this.adjacencies.map(this.bundleTracksInInterval);
-        return <GenericDroppable onDrop={this.tracksDropped} >{tracks}</GenericDroppable>;
+        const tracks = this.adjacencies.map((interval, index) => this.bundleTracksInInterval(interval, index));
+        return <GenericDroppable onDrop={this.tracksDropped}>{tracks}</GenericDroppable>;
     }
 }
 

@@ -124,7 +124,7 @@
         "react": "^16.13.1",
         "react-app-rewired": "^2.1.9",
         "react-autosuggest": "^10.0.2",
-        "react-beautiful-dnd": "^3.0.0",
+        "react-beautiful-dnd": "^13.1.0",
         "react-bootstrap-tabs": "^2.0.0",
         "react-codemirror2": "^6.0.1",
         "react-collapsible": "^2.8.0",
