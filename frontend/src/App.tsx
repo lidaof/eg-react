@@ -100,14 +100,14 @@ interface AppStateProps {
     suggestedMetaSets: Set<string>;
 }
 
-interface RGBAColor {
-    rgb: {
-        r: number;
-        g: number;
-        b: number;
-        a: number;
-    }
-}
+// interface RGBAColor {
+//     rgb: {
+//         r: number;
+//         g: number;
+//         b: number;
+//         a: number;
+//     }
+// }
 
 class App extends React.PureComponent<AppProps, AppStateProps> {
     static propTypes = {
@@ -265,7 +265,10 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
 
     newHighlight = (start: number, end: number, tag: string = '') => {
         const interval = new HighlightInterval(start, end, tag);
-        this.props.onSetHighlights([...this.props.highlights, interval])
+        const existing = this.props.highlights.find(h => h.start === start && h.end === end)
+        if (!existing) {
+            this.props.onSetHighlights([...this.props.highlights, interval])
+        }
     }
 
     // setHighlightColor = (color: RGBAColor) => {

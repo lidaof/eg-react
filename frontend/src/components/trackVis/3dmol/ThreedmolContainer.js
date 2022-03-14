@@ -2728,7 +2728,8 @@ class ThreedmolContainer extends React.Component {
             spinSpeed,
             spinReverse,
         } = this.state;
-        const { tracks, x, y, onNewViewRegion, viewRegion, sync3d } = this.props;
+        const { tracks, x, y, onNewViewRegion, viewRegion, sync3d, onSetSelected, selectedSet, genomeConfig } =
+            this.props;
         const bwTracks = tracks.filter((track) => getTrackConfig(track).isBigwigTrack());
         return (
             <div id="threed-mol-container">
@@ -3595,6 +3596,9 @@ class ThreedmolContainer extends React.Component {
                             onNewViewRegion={onNewViewRegion}
                             removeHover={this.removeHover}
                             addToLabel={this.addAnchors3dToMyArrows}
+                            selectedSet={selectedSet}
+                            onSetSelected={onSetSelected}
+                            genomeConfig={genomeConfig}
                         />
                         <div
                             className="box1"

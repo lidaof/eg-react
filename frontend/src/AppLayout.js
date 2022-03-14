@@ -39,6 +39,7 @@ function mapStateToProps(state) {
         tracks: state.browser.present.tracks,
         isShowingVR: state.browser.present.isShowingVR,
         layout: state.browser.present.layout,
+        selectedSet: state.browser.present.regionSetView,
     };
 }
 
@@ -47,6 +48,7 @@ const callbacks = {
     onTracksChanged: ActionCreators.setTracks,
     onToggleVR: ActionCreators.toggleVR,
     onSetLayout: ActionCreators.setLayout,
+    onSetSelected: ActionCreators.setRegionSetView,
 };
 
 class AppLayout extends React.PureComponent {
@@ -280,7 +282,7 @@ class AppLayout extends React.PureComponent {
 
     render3dmolContainer = (node) => {
         const model = node.getModel();
-        const { viewRegion, genomeConfig, tracks, onNewViewRegion } = this.props;
+        const { viewRegion, genomeConfig, tracks, onNewViewRegion, onSetSelected, selectedSet } = this.props;
         const config = node.getConfig();
         const { x, y, width, height } = node.getRect();
         const g3dtrack = TrackModel.deserialize(config.trackModel);
@@ -317,6 +319,8 @@ class AppLayout extends React.PureComponent {
                 onToggleSync3d={this.toggleSync3d}
                 onGetViewer3dAndNumFrames={this.getViewer3dAndNumFrames}
                 imageInfo={this.state.imageInfo}
+                onSetSelected={onSetSelected}
+                selectedSet={selectedSet}
             />
         );
     };

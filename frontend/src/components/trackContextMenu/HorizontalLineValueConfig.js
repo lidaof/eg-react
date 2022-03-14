@@ -9,7 +9,13 @@ import NumberConfig from "./NumberConfig";
  */
 function HorizontalLineValueConfig(props) {
     return (
-        <NumberConfig {...props} optionName="horizontalLineValue" label="Horizontal line value:" hasSetButton={true} />
+        <NumberConfig
+            {...props}
+            optionName="horizontalLineValue"
+            label="Horizontal line value:"
+            hasSetButton={true}
+            isFloat={true}
+        />
     );
 }
 

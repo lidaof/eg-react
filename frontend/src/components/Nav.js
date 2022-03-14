@@ -3,13 +3,13 @@ import PropTypes from "prop-types";
 import ReactModal from "react-modal";
 import _ from "lodash";
 import { connect } from "react-redux";
-import { RadioGroup, Radio } from "react-radio-group";
+// import { RadioGroup, Radio } from "react-radio-group";
 import Button from "@material-ui/core/Button";
 import { ArrowBack } from "@material-ui/icons";
 import { IconButton } from "@material-ui/core";
 import { ActionCreators } from "../AppState";
 import DisplayedRegionModel from "../model/DisplayedRegionModel";
-import { getSpeciesInfo, allGenomes } from "../model/genomes/allGenomes";
+import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from "./genomeNavigator/TrackRegionController";
 import RegionSetSelector from "./RegionSetSelector";
 import Geneplot from "./Geneplot/Geneplot";
@@ -77,8 +77,8 @@ class Nav extends React.Component {
             otherGenome: null,
         };
         this.debounced = _.debounce(this.props.onLegendWidthChange, 250);
-        this.renderOtherGenomes = this.renderOtherGenomes.bind(this);
-        this.handleOtherGenomeChange = this.handleOtherGenomeChange.bind(this);
+        // this.renderOtherGenomes = this.renderOtherGenomes.bind(this);
+        // this.handleOtherGenomeChange = this.handleOtherGenomeChange.bind(this);
     }
 
     componentDidMount() {
@@ -121,32 +121,32 @@ class Nav extends React.Component {
         }
     };
 
-    handleOtherGenomeChange(value) {
-        this.setState({ otherGenome: value });
-    }
+    // handleOtherGenomeChange(value) {
+    //     this.setState({ otherGenome: value });
+    // }
 
-    renderOtherGenomes() {
-        const genomeName = this.props.genomeConfig.genome.getName();
-        const otherGenomes = allGenomes.map((g) => g.genome.getName()).filter((g) => g !== genomeName);
-        const radios = otherGenomes.map((g) => {
-            const { name } = getSpeciesInfo(g);
-            return (
-                <label key={g} className="otherGenome-label">
-                    <Radio value={g} /> <span className="capitalize">{name}</span> <span className="italic">{g}</span>
-                </label>
-            );
-        });
-        return (
-            <RadioGroup
-                name="otherGenome"
-                selectedValue={this.state.otherGenome}
-                onChange={this.handleOtherGenomeChange}
-                className="otherGenome-container"
-            >
-                {radios}
-            </RadioGroup>
-        );
-    }
+    // renderOtherGenomes() {
+    //     const genomeName = this.props.genomeConfig.genome.getName();
+    //     const otherGenomes = allGenomes.map((g) => g.genome.getName()).filter((g) => g !== genomeName);
+    //     const radios = otherGenomes.map((g) => {
+    //         const { name } = getSpeciesInfo(g);
+    //         return (
+    //             <label key={g} className="otherGenome-label">
+    //                 <Radio value={g} /> <span className="capitalize">{name}</span> <span className="italic">{g}</span>
+    //             </label>
+    //         );
+    //     });
+    //     return (
+    //         <RadioGroup
+    //             name="otherGenome"
+    //             selectedValue={this.state.otherGenome}
+    //             onChange={this.handleOtherGenomeChange}
+    //             className="otherGenome-container"
+    //         >
+    //             {radios}
+    //         </RadioGroup>
+    //     );
+    // }
 
     changeGenome = () => {
         this.props.onGenomeSelected(this.state.otherGenome);
