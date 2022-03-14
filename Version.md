@@ -1,5 +1,9 @@
 # Version History
 
+## 53.6.3
+
+-   3D viewer can enable region set view from segments
+
 ## 53.6.2
 
 -   `rn7` added
