@@ -3,6 +3,8 @@
 ## 53.6.3
 
 -   3D viewer can enable region set view from segments
+-   fixed a bug that MIN/MAX aggregator in numeric track crash
+-   added `t2t-chm13-v2.0`
 
 ## 53.6.2
 

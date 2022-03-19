@@ -51,6 +51,7 @@ import b_chiifu_v3 from "./brapa/brara_chiifu_v3.0";
 import susScr11 from "./susScr11/susScr11";
 import susScr3 from "./susScr3/susScr3";
 import oviAri4 from "./oviAri4/oviAri4";
+import CHMV2 from "./t2t-chm13-v2.0/chm13v2";
 
 /**
  * All available genomes.
@@ -109,6 +110,7 @@ export const allGenomes = [
     calJac4,
     rheMac10,
     RN7,
+    CHMV2,
 ];
 
 const genomeNameToConfig = {};
@@ -130,7 +132,7 @@ interface SpeciesConfig {
 export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     human: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
-        assemblies: [HG19.genome.getName(), HG38.genome.getName(), CHM13v1_1.genome.getName()],
+        assemblies: [HG19.genome.getName(), HG38.genome.getName(), CHM13v1_1.genome.getName(), CHMV2.genome.getName()],
         color: "white",
     },
     chimp: {

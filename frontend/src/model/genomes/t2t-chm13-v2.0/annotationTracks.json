@@ -1,0 +1,27 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "gencodeV35",
+            "label": "gencodeV35",
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmskv2",
+                "label": "RepeatMaskerV2",
+                "filetype": "rmskv2",
+                "url": "https://vizhub.wustl.edu/public/t2t-chm13-v2.0/rmsk.bigBed",
+                "height": 40
+            }
+        ]
+    }
+}
