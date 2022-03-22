@@ -40,7 +40,8 @@ import { BedcolorTrackConfig } from "./BedcolorTrackConfig";
 import { Rmskv2TrackConfig } from "./Rmskv2TrackConfig";
 import { JasparTrackConfig } from "./JasparTrackConfig";
 
-export const INTERACTION_TYPES = ["hic", "longrange", "biginteract", "genomealign"];
+export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
+export const ALIGNMENT_TYPES = ["genomealign"];
 export const DYNAMIC_TYPES = ["dynamic", "dbedgraph", "dynamichic", "dynamiclongrange"];
 
 const TYPE_NAME_TO_CONFIG = {
