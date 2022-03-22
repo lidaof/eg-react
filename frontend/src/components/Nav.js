@@ -193,7 +193,8 @@ class Nav extends React.Component {
         const genomeName = genomeConfig.genome.getName();
         const { name, logo, color } = getSpeciesInfo(genomeName);
         const hasInteractionTrack = tracks.some((model) => INTERACTION_TYPES.includes(model.type)) ? true : false;
-        const REGION_EXPANDER = hasInteractionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
+        const REGION_EXPANDER = REGION_EXPANDER1;
+        // const REGION_EXPANDER = hasInteractionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
         const { genomeModal, otherGenome } = this.state;
         return (
             <div className="Nav-container">
