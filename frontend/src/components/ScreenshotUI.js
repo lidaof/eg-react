@@ -53,8 +53,7 @@ class ScreenshotUINotConnected extends React.Component {
         svgElem.style.display = "block";
         const svgElemg = document.createElementNS(xmlns, "g"); // for labels, separate lines etc
         const svgElemg2 = document.createElementNS(xmlns, "g"); // for tracks contents
-        // const translateX = this.props.needClip ? -this.props.primaryView.viewWindow.start : 0;
-        const translateX = -this.props.primaryView.viewWindow.start;
+        const translateX = this.props.needClip ? -this.props.primaryView.viewWindow.start : 0;
         const clipDef = document.createElementNS(xmlns, "defs");
         const clipPath = document.createElementNS(xmlns, "clipPath");
         clipPath.setAttributeNS(null, "id", "cutoff-legend-space");
