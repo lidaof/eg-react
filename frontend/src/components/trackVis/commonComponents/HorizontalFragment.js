@@ -55,10 +55,14 @@ class HorizontalFragment extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {height, targetXSpanList, queryXSpanList, primaryColor, queryColor, 
+        const {height, segmentArray, primaryColor, queryColor, 
             onMouseMove, onMouseLeave, style, children, rectHeight, ...otherProps} = this.props;
         // calculate xSpanIndex by comparing relativeX with tangetXSpan.
         const relativeX = this.state.relativeX;
+        const targetXSpanList = segmentArray.map((segment) => segment.targetXSpan);
+        const queryXSpanList = segmentArray.map((segment) => segment.queryXSpan);
+        const targetLocusList = segmentArray.map((segment) => segment.visiblePart.getLocus().toString());
+        const queryLocusList = segmentArray.map((segment) => segment.visiblePart.getQueryLocus().toString());
         const xSpanIndex = targetXSpanList.reduce((iCusor, x, i) => x.start < relativeX && x.end >= relativeX  ? i : iCusor, NaN);
         // const mergedStyle = Object.assign({position: 'relative'}, style);
         var lines;
@@ -68,15 +72,17 @@ class HorizontalFragment extends React.Component {
         else {
             const targetXSpan = targetXSpanList[xSpanIndex];
             const queryXSpan = queryXSpanList[xSpanIndex];
+            const targetLocus = targetLocusList[xSpanIndex];
+            const queryLocus = queryLocusList[xSpanIndex];
             //1. The following is not accurate. Should use locus coordinates in alignment segment.
             //2. Need to reverse the triangle position for reverse aligned segment.
             const queryX = queryXSpan.start + queryXSpan.getLength() * (relativeX - targetXSpan.start) / targetXSpan.getLength();
             lines = (
                 <React.Fragment>
-                    {<HorizontalLine relativeY={LINE_MARGIN} xSpan={targetXSpan} color={primaryColor} />}
+                    {<HorizontalLine relativeY={LINE_MARGIN} xSpan={targetXSpan} color={primaryColor} locus={targetLocus} textHeight={10}/>}
                     {<Triangle relativeX={relativeX - TRIANGLE_SIZE} relativeY={LINE_MARGIN + LINE_WIDTH + rectHeight} color={primaryColor} direction={"down"}/>}
                     {<Triangle relativeX={queryX - TRIANGLE_SIZE} relativeY={height - rectHeight - LINE_MARGIN - LINE_WIDTH - TRIANGLE_SIZE} color={queryColor} direction={"up"}/>}
-                    {<HorizontalLine relativeY={height - LINE_MARGIN - LINE_WIDTH} xSpan={queryXSpan} color={queryColor} />}
+                    {<HorizontalLine relativeY={height - LINE_MARGIN - LINE_WIDTH} xSpan={queryXSpan} color={queryColor} locus={queryLocus} textHeight={-35}/>}
                 </React.Fragment>
             )
         }
@@ -101,17 +107,18 @@ class HorizontalFragment extends React.Component {
  * @return {JSX.Element} - element to render
  */
 function HorizontalLine(props) {
-    const {relativeY, xSpan, color} = props;
+    const {relativeY, xSpan, color,locus, textHeight} = props;
     const horizontalLineStyle = {
         top: relativeY,
         left: xSpan?xSpan.start:0,
         width: xSpan?xSpan.end - xSpan.start : 0,
         height: 2,
         color: color,
-        willChange: "top",
+        willChange: "top"
     };
+    const textStyle = {"marginTop":textHeight, "whiteSpace":"nowrap"};
 
-    return  xSpan ? <div className="Fragment-horizontal-line" style={horizontalLineStyle} /> : null;
+    return  xSpan ? <div className="Fragment-horizontal-line" style={horizontalLineStyle} > <p style={textStyle}>{locus}</p> </div>: null;
 }
 
 function Triangle(props) {
