@@ -130,12 +130,14 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
     const targetSequence = placement.visiblePart.getTargetSequence();
     const querySequence = placement.visiblePart.getQuerySequence();
     const baseWidth = targetXSpan.getLength() / targetSequence.length;
-
+    const targetLocus = placement.visiblePart.getLocus().toString();
+    const queryLocus = placement.visiblePart.getQueryLocus().toString();
     return (
       <React.Fragment key={i}>
-        {renderSequenceSegments(targetSequence, targetSegments, ALIGN_TRACK_MARGIN, primaryColor, false)}
+        {renderSequenceSegments(targetLocus, targetSequence, targetSegments, ALIGN_TRACK_MARGIN, primaryColor, false)}
         {renderAlignTicks()}
         {renderSequenceSegments(
+          queryLocus,
           querySequence,
           querySegments,
           height - RECT_HEIGHT - ALIGN_TRACK_MARGIN,
@@ -168,6 +170,7 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
     }
 
     function renderSequenceSegments(
+      locus: string,
       sequence: string,
       segments: PlacedSequenceSegment[],
       y: number,
@@ -183,6 +186,7 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
           width={segment.xSpan.getLength()}
           height={RECT_HEIGHT}
           fill={color}
+          onClick={() => console.log("You clicked on " + locus)}
         />
       ));
       const letters = nonGaps.map((segment, i) => (
@@ -254,10 +258,10 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
         width={targetXSpan.getLength()}
         height={RECT_HEIGHT}
         fill={this.props.options.primaryColor}
-      // tslint:disable-next-line:jsx-no-lambda
-      // onClick={() =>
-      //   console.log("You clicked on " + queryFeature.getLocus().toString())
-      // }
+        // tslint:disable-next-line:jsx-no-lambda
+        // onClick={() =>
+        //   console.log("You clicked on " + queryFeature.getLocus().toString())
+        // }
       />
     );
     const queryGenomeRect = (
@@ -268,7 +272,7 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
         height={RECT_HEIGHT}
         fill={this.props.options.queryColor}
         // tslint:disable-next-line:jsx-no-lambda
-        onClick={() => console.log("You clicked on " + queryFeature.getLocus().toString())}
+        // onClick={() => console.log("You clicked on " + queryFeature.getLocus().toString())}
       />
     );
 
@@ -304,6 +308,8 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
       // const y2 = queryRectTopY;
 
       const x3 = segment.targetXSpan.end;
+      const targetGenome = this.props.alignment.primaryGenome;
+      const queryGenome = this.props.alignment.queryGenome;
       const y3 = RECT_HEIGHT;
       const yhalf = (RECT_HEIGHT + queryRectTopY)/2;
       const d_string = `M ${x0} ${y0} 
@@ -319,7 +325,7 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
           fill={this.props.options.queryColor}
           fillOpacity={0.5}
           // tslint:disable-next-line:jsx-no-lambda
-          // onClick={() => console.log("You clicked on " + segment.record.getLocus())}
+          onClick={() => console.log(targetGenome + ":" + segment.record.getLocus() + " --- " + queryGenome + ":" + segment.record.queryLocus.toString())}
         />
       );
     });
