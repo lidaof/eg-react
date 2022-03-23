@@ -8,6 +8,8 @@ import { TrackHandle } from "./trackContainers/TrackHandle";
 import { withTrackLegendWidth } from "./withTrackLegendWidth";
 import { getTrackConfig } from "./trackConfig/getTrackConfig";
 import { GroupedTrackManager } from "./trackManagers/GroupedTrackManager";
+import HighlightRegion, { getHighlightedXs } from "./HighlightRegion";
+import OpenInterval from "../model/interval/OpenInterval";
 
 function mapStateToProps(state) {
     return {
@@ -41,6 +43,7 @@ class ScreenshotUINotConnected extends React.Component {
     };
 
     prepareSvg = () => {
+        const { highlights, needClip, legendWidth, primaryView } = this.props;
         const tracks = Array.from(document.querySelector("#screenshotContainer").querySelectorAll(".Track"));
         const boxHeight = tracks.reduce((acc, cur) => acc + cur.clientHeight, 11 * tracks.length);
         const boxWidth = tracks[0].clientWidth;
@@ -53,7 +56,7 @@ class ScreenshotUINotConnected extends React.Component {
         svgElem.style.display = "block";
         const svgElemg = document.createElementNS(xmlns, "g"); // for labels, separate lines etc
         const svgElemg2 = document.createElementNS(xmlns, "g"); // for tracks contents
-        const translateX = this.props.needClip ? -this.props.primaryView.viewWindow.start : 0;
+        const translateX = needClip ? -primaryView.viewWindow.start : 0;
         const clipDef = document.createElementNS(xmlns, "defs");
         const clipPath = document.createElementNS(xmlns, "clipPath");
         clipPath.setAttributeNS(null, "id", "cutoff-legend-space");
@@ -142,13 +145,27 @@ class ScreenshotUINotConnected extends React.Component {
         clipRect.setAttribute("height", clipHeight + "");
         clipPath.appendChild(clipRect);
         clipDef.appendChild(clipPath);
-        if (this.props.needClip) {
+        if (needClip) {
             svgElem.appendChild(clipDef);
             svgElemg2.setAttributeNS(null, "clip-path", "url(#cutoff-legend-space)");
         }
         svgElem.appendChild(svgElemg);
         svgElem.appendChild(svgElemg2);
         svgElem.setAttribute("xmlns", xmlns);
+        // highlights
+        const xS = highlights.map((h) => getHighlightedXs(new OpenInterval(h.start, h.end), primaryView, legendWidth));
+        highlights.forEach((item, idx) => {
+            if (item.display) {
+                const rect = document.createElementNS(xmlns, "rect");
+                rect.setAttribute("id", "highlightRect" + idx);
+                rect.setAttribute("x", xS[idx].start + "");
+                rect.setAttribute("y", "0");
+                rect.setAttribute("width", xS[idx].getLength() + "");
+                rect.setAttribute("height", boxHeight + "");
+                rect.setAttribute("fill", item.color);
+                svgElem.appendChild(rect);
+            }
+        });
         return new XMLSerializer().serializeToString(svgElem);
     };
 
@@ -231,6 +248,10 @@ class ScreenshotUINotConnected extends React.Component {
     }
 
     render() {
+        const { viewRegion, primaryView, highlights } = this.props;
+        if (!primaryView) {
+            return <div>Loading...</div>;
+        }
         const trackContents = this.makeSvgTrackElements();
         return (
             <div>
@@ -258,7 +279,9 @@ class ScreenshotUINotConnected extends React.Component {
                     ⬇ Download PDF
                 </button>
                 <div id="screenshotContainer" style={{ display: this.state.display }}>
-                    {trackContents}
+                    <HighlightRegion viewRegion={viewRegion} visData={primaryView} xOffset={0} highlights={highlights}>
+                        {trackContents}
+                    </HighlightRegion>
                 </div>
                 <div id="pdfContainer"></div>
             </div>

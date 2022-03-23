@@ -189,6 +189,7 @@ class Nav extends React.Component {
             onNewHighlight,
             groupedTrackSets,
             virusBrowserMode,
+            highlights,
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const { name, logo, color } = getSpeciesInfo(genomeName);
@@ -406,6 +407,8 @@ class Nav extends React.Component {
                                     expansionAmount={REGION_EXPANDER}
                                     needClip={hasExpansionTrack}
                                     genomeConfig={genomeConfig}
+                                    highlights={highlights}
+                                    viewRegion={selectedRegion}
                                 />
                             </ModalMenuItem>
                             <ModalMenuItem

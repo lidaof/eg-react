@@ -5,6 +5,8 @@
 -   3D viewer can enable region set view from segments
 -   fixed a bug that MIN/MAX aggregator in numeric track crash
 -   added `t2t-chm13-v2.0`
+-   fixed sceenshot issue with genome align track, reported by #252
+-   added highlights in screenshot by #251
 
 ## 53.6.2
 

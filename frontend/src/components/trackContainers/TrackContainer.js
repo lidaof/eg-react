@@ -747,7 +747,7 @@ class TrackContainer extends React.Component {
     render() {
         const { tracks, onTracksChanged, primaryView, viewRegion, basesPerPixel, trackData, highlights } = this.props;
         if (!primaryView) {
-            return null;
+            return <div>Loading...</div>;
         }
         const { selectedTool } = this.state;
         const fileInfos = {}; // key, track id, value: fileInfo obj

@@ -20,6 +20,28 @@ interface HighlightRegionProps {
 
 
 /**
+ * ScreenshotUI will also need use this function, make it exportable
+ * @param interval 
+ * @param visData 
+ * @param legendWidth 
+ * @returns 
+ */
+export const getHighlightedXs = (interval: OpenInterval, visData: ViewExpansion, legendWidth: number): OpenInterval => {
+    const { viewWindowRegion, viewWindow } = visData;
+    let start, end;
+    const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
+    const xRegion = drawModel.baseSpanToXSpan(interval);
+    start = Math.max(legendWidth, xRegion.start + legendWidth);
+    end = xRegion.end + legendWidth;
+    if (end <= start) {
+        start = -1;
+        end = 0;
+    }
+    return new OpenInterval(start, end);
+}
+
+
+/**
  * Creates a box that highlight user's entered region, from gene or region locator
  * 
  * @author Daofeng Li, modified from Silas Hsu
@@ -35,37 +57,14 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
         highlights: [],
     };
 
-
-    /**
-     * Initializes state, binds event listeners, and attaches a keyboard listener to the window, which will listen for
-     * requests to cancel a selection.
-     * 
-     * @param {Object} props - props as specified by React
-     */
-
-    getHighlightedXs(interval: OpenInterval): OpenInterval {
-        const { legendWidth, visData } = this.props;
-        const { viewWindowRegion, viewWindow } = visData;
-        let start, end;
-        const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
-        const xRegion = drawModel.baseSpanToXSpan(interval);
-        start = Math.max(legendWidth, xRegion.start + legendWidth);
-        end = xRegion.end + legendWidth;
-        if (end <= start) {
-            start = -1;
-            end = 0;
-        }
-        return new OpenInterval(start, end);
-    }
-
     /**
      * checks every HighlightItem in the highlightItems prop and renders those in the view region;
      * @returns container that has highlight elements in it
      * @inheritdoc
      */
     render(): JSX.Element {
-        const { height, y, children, xOffset, highlights } = this.props;
-        const xS = highlights.map(h => this.getHighlightedXs(new OpenInterval(h.start, h.end)));
+        const { height, y, children, xOffset, highlights, legendWidth, visData } = this.props;
+        const xS = highlights.map(h => getHighlightedXs(new OpenInterval(h.start, h.end), visData, legendWidth));
         const theBoxes = highlights.map((item, idx) => {
             const style = {
                 left: xS[idx].start + xOffset + "px",

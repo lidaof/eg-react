@@ -388,6 +388,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     embeddingMode={embeddingMode}
                     groupedTrackSets={groupedTrackSets}
                     virusBrowserMode={virusBrowserMode}
+                    highlights={highlights}
                 />
                 <Notifications />
                 {isShowingNavigator && (
