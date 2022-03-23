@@ -384,20 +384,22 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
       );
     } else {
       const drawData = alignment.drawData as PlacedMergedAlignment[];
+      const segmentArray = [].concat.apply([], drawData.map((placement) =>
+        placement.segments) as any)
       // const targetLocusArrayArray = drawData.map(
       //     placement => placement.segments.map(segment => segment.visiblePart.getLocus()));
       // const targetLocusArray = [].concat.apply([], targetLocusArrayArray);
       // const queryLocusArrayArray = drawData.map(
       //     placement => placement.segments.map(segment => segment.visiblePart.getQueryLocus()));
       // const queryLocusArray = [].concat.apply([], queryLocusArrayArray);
-      const targetXSpanArrayArray = drawData.map((placement) =>
-        placement.segments.map((segment) => segment.targetXSpan)
-      );
-      const targetXSpanArray = [].concat.apply([], targetXSpanArrayArray as any);
-      const queryXSpanArrayArray = drawData.map((placement) =>
-        placement.segments.map((segment) => segment.queryXSpan)
-      );
-      const queryXSpanArray = [].concat.apply([], queryXSpanArrayArray as any);
+      // const targetXSpanArrayArray = drawData.map((placement) =>
+      //   placement.segments.map((segment) => segment.targetXSpan)
+      // );
+      // const targetXSpanArray = [].concat.apply([], targetXSpanArrayArray as any);
+      // const queryXSpanArrayArray = drawData.map((placement) =>
+      //   placement.segments.map((segment) => segment.queryXSpan)
+      // );
+      // const queryXSpanArray = [].concat.apply([], queryXSpanArrayArray as any);
       const strand = alignment.plotStrand;
       svgElements = drawData.map((placement) => this.renderRoughAlignment(placement, strand === "-", height));
       const arrows = this.renderRoughStrand("+", 0, viewWindow, false);
@@ -411,8 +413,7 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
           rectHeight={RECT_HEIGHT}
           primaryColor={primaryColor}
           queryColor={queryColor}
-          targetXSpanList={targetXSpanArray}
-          queryXSpanList={queryXSpanArray}
+          segmentArray={segmentArray}
         >
           <svg width={width} height={height} style={{ display: "block" }}>
             {svgElements}
