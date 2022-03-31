@@ -420,6 +420,7 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
           primaryColor={primaryColor}
           queryColor={queryColor}
           segmentArray={segmentArray}
+          viewWindowStart={viewWindow.start}
         >
           <svg width={width} height={height} style={{ display: "block" }}>
             {svgElements}
