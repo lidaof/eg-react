@@ -56,10 +56,11 @@ class HorizontalFragment extends React.Component {
      * @inheritdoc
      */
     render() {
-        const {height, segmentArray, viewWindowStart, primaryColor, queryColor, 
+        const {height, segmentArray, strand, viewWindowStart, primaryColor, queryColor, 
             onMouseMove, onMouseLeave, style, children, rectHeight, ...otherProps} = this.props;
         // calculate xSpanIndex by comparing relativeX with tangetXSpan.
         const relativeX = this.state.relativeX;
+        const strandList = segmentArray.map((segment) => segment.record.queryStrand);
         const targetXSpanList = segmentArray.map((segment) => segment.targetXSpan);
         const queryXSpanList = segmentArray.map((segment) => segment.queryXSpan);
         const targetLocusList = segmentArray.map((segment) => segment.visiblePart.getLocus().toString());
@@ -78,8 +79,9 @@ class HorizontalFragment extends React.Component {
             const targetLocus = targetLocusList[xSpanIndex] + "(" + lengthList[xSpanIndex] + ")";
             const queryLocus = queryLocusList[xSpanIndex] + "(" + queryLengthList[xSpanIndex] + ")";
             //1. The following is not accurate. Should use locus coordinates in alignment segment.
-            //2. Need to reverse the triangle position for reverse aligned segment.
-            const queryX = queryXSpan.start + queryXSpan.getLength() * (relativeX - targetXSpan.start) / targetXSpan.getLength();
+            const queryX = strandList[xSpanIndex] === strand ? 
+                            queryXSpan.start + queryXSpan.getLength() * (relativeX - targetXSpan.start) / targetXSpan.getLength():
+                            queryXSpan.end - queryXSpan.getLength() * (relativeX - targetXSpan.start) / targetXSpan.getLength();
             lines = (
                 <React.Fragment>
                     {<HorizontalLine relativeY={LINE_MARGIN} xSpan={targetXSpan} viewWindowStart={viewWindowStart} color={primaryColor} locus={targetLocus} textHeight={10}/>}
