@@ -65,8 +65,8 @@
     ],
     "Variation": [
         {
-            "name": "Snp",
-            "label": "Snps from Ensembl",
+            "name": "SNVs from Ensembl",
+            "label": "SNVs from Ensembl",
             "type": "snp"
         }
     ],
