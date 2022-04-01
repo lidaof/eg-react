@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import Select from "react-select";
 import { ResponsiveChord } from "@nivo/chord";
+import _ from "lodash";
 import { ColorSchemeSelectOption, ColorSchemeSelectValue, useOrdinalColorSchemes } from "./nivo/colorSchemeSelect";
 import "./ChordView.css";
 /**
@@ -11,7 +12,7 @@ const MyResponsiveChord = ({ data, keys, count, scheme }) => (
     <ResponsiveChord
         matrix={data}
         keys={keys}
-        margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+        margin={{ top: 40, right: 100, bottom: 40, left: 40 }}
         valueFormat={count === "count" ? undefined : ".2f"}
         padAngle={0.02}
         innerRadiusRatio={0.96}
@@ -31,18 +32,47 @@ const MyResponsiveChord = ({ data, keys, count, scheme }) => (
         colors={{ scheme }}
         animate={false}
         motionConfig="stiff"
+        legends={[
+            {
+                anchor: "top-right",
+                direction: "column",
+                justify: false,
+                translateX: -30,
+                translateY: -40,
+                itemWidth: 80,
+                itemHeight: 14,
+                itemsSpacing: 0,
+                itemTextColor: "#999",
+                itemDirection: "left-to-right",
+                symbolSize: 12,
+                symbolShape: "circle",
+                effects: [
+                    {
+                        on: "hover",
+                        style: {
+                            itemTextColor: "#000",
+                        },
+                    },
+                ],
+            },
+        ]}
     />
 );
 
-const generateChordData = (data, count) => {
+const generateChordData = (data, count, nocontig) => {
     const keys = new Set(); // item: chr:start-end
     // Key: chr:start-end, value: {chr:start-end: score}
     const valueHash = {}; // why not use Map? https://stackoverflow.com/questions/44321324/javascript-map-much-slower-than-object-for-random-look-ups
     data.forEach((item) => {
         const { locus1, locus2, score } = item;
-        const valueToAdd = count === "count" ? 1 : score;
         const s1 = locus1.chr;
         const s2 = locus2.chr;
+        if (nocontig) {
+            if (s1.includes("_") || s2.includes("_")) {
+                return;
+            }
+        }
+        const valueToAdd = count === "count" ? 1 : score;
         keys.add(s1);
         if (s2 !== s1) {
             keys.add(s2);
@@ -65,7 +95,19 @@ const generateChordData = (data, count) => {
         }
     });
     const plot = [];
-    const keys2 = Array.from(keys);
+    const keys2 = Array.from(keys).sort((a, b) => {
+        if (a.length !== b.length) {
+            return a.length - b.length;
+        } else {
+            if (a < b) {
+                return -1;
+            }
+            if (a > b) {
+                return 1;
+            }
+        }
+        return 0;
+    });
     keys2.forEach((key) => {
         const sub = [];
         keys2.forEach((key2) => {
@@ -98,14 +140,20 @@ const styles = {
 
 export const ChordView = (props) => {
     const [count, setCount] = useState("count");
+    const [nocontig, setNocontig] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
     const options = useOrdinalColorSchemes();
     const { track, trackData } = props;
     const data = trackData[track.getId()].data;
-    const { keys, plotData } = useMemo(() => generateChordData(data, count), [data, count]);
+    const { keys, plotData } = useMemo(() => generateChordData(data, count, nocontig), [data, count, nocontig]);
     const onCountChange = (e) => {
         setCount(e.target.value);
     };
+    const toggleNocontig = () => {
+        setNocontig(!nocontig);
+    };
+
+    const debouncedToggleNocontig = _.debounce(toggleNocontig, 500);
     // console.log(keys, plotData);
     return (
         <div className="ChordView-Control">
@@ -141,6 +189,12 @@ export const ChordView = (props) => {
                         </label>
                     </li>
                 </ul>
+            </div>
+            <div style={{ display: "flex" }}>
+                <label htmlFor="nocontig">
+                    <strong>Remove contigs:</strong>{" "}
+                    <input type="checkbox" name="nocontig" checked={nocontig} onChange={debouncedToggleNocontig} />
+                </label>
             </div>
             <div style={{ display: "flex" }}>
                 <label style={{ margin: "auto 1ch auto 0" }}>

@@ -63,7 +63,9 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @inheritdoc
      */
     render(): JSX.Element {
+        console.log(this.props)
         const { height, y, children, xOffset, highlights, legendWidth, visData } = this.props;
+
         const xS = highlights.map(h => getHighlightedXs(new OpenInterval(h.start, h.end), visData, legendWidth));
         const theBoxes = highlights.map((item, idx) => {
             const style = {
@@ -73,7 +75,10 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
                 height,
                 backgroundColor: item.color,
                 display: item.display ? 'unset' : 'none',
+                willChange: 'left, width',
+                transition: 'left 1s, width 1s'
             }
+
             return (
                 <div key={idx} className="HighlightRegion-box" style={style} />
             );

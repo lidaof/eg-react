@@ -9,6 +9,7 @@ import {
     Tooltip,
     IconButton,
     CardContent,
+    Button
 } from "@material-ui/core";
 import {
     Delete as DeleteIcon,
@@ -78,7 +79,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
     }
 
     render() {
-        const { highlights, viewRegion } = this.props;
+        const { highlights, viewRegion, onSetHighlights } = this.props;
         // console.log(highlights)
         const highlightElements = highlights.length ? highlights.map((item: HighlightInterval, index: number) => {
             return (
@@ -136,6 +137,13 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
                         <Typography variant="h5" style={{ margin: 15 }}>
                             Highlights
                         </Typography>
+                        {
+                            highlights.length ?
+                                <div style={{ paddingBottom: '5px' }}>
+                                    <Button variant="contained" color="secondary" onClick={() => onSetHighlights([])}>Remove all</Button>
+                                </div>
+                                : null
+                        }
                         <Grid container spacing={2} justifyContent="center">
                             {highlightElements}
                         </Grid>
