@@ -13,6 +13,7 @@ export const DEFAULT_OPTIONS = {
     backgroundColor: 'white',
     categoryColors: {
         coding: 'rgb(101,1,168)',
+        protein_coding: 'rgb(101,1,168)',
         nonCoding: 'rgb(1,193,75)',
         pseudogene: 'rgb(230,0,172)',
         pseudo: 'rgb(230,0,172)',

@@ -1,8 +1,5 @@
 # this script takes the file output by add_transcriptClass.py and formats it so mongoimport can read it
 
-from tkinter import W
-
-
 desc = {}
 with open('kgXref.txt') as fin:
     # "kgID,mRNA,spID,spDisplayID,geneSymbol,refseq,protAcc,description,rfamAcc,tRnaName",

@@ -62,6 +62,11 @@ const hg38 = [
         fieldsConfig: geneFieldsAndIndex,
     },
     {
+        name: "MANE_select_1.0",
+        file: "mane_select_v1.0.hg38.refbed",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
         name: "Ensembl_GRCh38_94",
         file: "Homo_sapiens.GRCh38.94.chr_Gene.bed",
         fieldsConfig: geneFieldsAndIndex,

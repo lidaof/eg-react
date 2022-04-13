@@ -57,7 +57,8 @@ async function main() {
     // const genomes = ["b_chiifu_v3"]; // if just want to load one genome
     // const genomes = ["susScr11", "oviAri4"]; // if just want to load one genome
     // const genomes = ["susScr3"]; // if just want to load one genome
-    const genomes = ["rheMac10", "calJac4"]; // if just want to load one genome
+    // const genomes = ["rheMac10", "calJac4"]; // if just want to load one genome
+    const genomes = ["hg38"];
 
     // Get mongo connection
     let mongoClient;
