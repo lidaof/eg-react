@@ -63,7 +63,7 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      * @inheritdoc
      */
     render(): JSX.Element {
-        console.log(this.props)
+        // console.log(this.props)
         const { height, y, children, xOffset, highlights, legendWidth, visData } = this.props;
 
         const xS = highlights.map(h => getHighlightedXs(new OpenInterval(h.start, h.end), visData, legendWidth));

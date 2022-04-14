@@ -36,6 +36,10 @@ const navContext = genome.makeNavContext();
 const defaultRegion = navContext.parse("chr7:27053397-27373765");
 const defaultTracks = [
     new TrackModel({
+        type: "ruler",
+        name: "Ruler",
+    }),
+    new TrackModel({
         type: "geneAnnotation",
         name: "refGene",
         genome: "hg38",
@@ -46,13 +50,15 @@ const defaultTracks = [
         genome: "hg38",
     }),
     new TrackModel({
+        type: "geneAnnotation",
+        name: "MANE_select_1.0",
+        label: "MANE selection v1.0",
+        genome: "hg38",
+    }),
+    new TrackModel({
         type: "repeatmasker",
         name: "RepeatMasker",
         url: "https://vizhub.wustl.edu/public/hg38/rmsk16.bb",
-    }),
-    new TrackModel({
-        type: "ruler",
-        name: "Ruler",
     }),
 ];
 
