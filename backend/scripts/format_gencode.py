@@ -6,7 +6,7 @@ with open('kgXref.txt') as fin:
     for line in fin:
         t = line.strip().split('\t')
         desc[t[4]] = t[7]
-with open('wgEncodeGencodeCompV28.with_transcriptClass.txt')  as fin, open('gencodeV28_load','w') as fout:
+with open('wgEncodeGencodeCompV39.with_transcriptClass.txt')  as fin, open('gencodeV39_load','w') as fout:
     for line in fin:
         t = line.strip().split('\t')
         if t[12] in desc:

@@ -344,3 +344,11 @@ export const getSymbolRegions = async (genomeName: string, symbol: string) => {
     const response = await axios.get(`${AWS_API}/${genomeName}/genes/queryName`, { params: params });
     return response.data;
 };
+
+export const safeParseJsonString = (str: string) => {
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        return str;
+    }
+};

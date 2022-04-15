@@ -43,6 +43,11 @@ const hg19 = [
         file: "gencode.v29lift37.hg19.basic.annotation_Gene.bed",
         fieldsConfig: geneFieldsAndIndex,
     },
+    {
+        name: "gencodeV39",
+        file: "gencodeV39lift37_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
 ];
 
 const hg38 = [
@@ -69,6 +74,11 @@ const hg38 = [
     {
         name: "Ensembl_GRCh38_94",
         file: "Homo_sapiens.GRCh38.94.chr_Gene.bed",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "gencodeV39",
+        file: "gencodeV39_load",
         fieldsConfig: geneFieldsAndIndex,
     },
 ];
@@ -103,6 +113,11 @@ const mm10 = [
     {
         name: "gencodeM19Basic",
         file: "gencode.vM19.basic.annotation_Gene.bed",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "gencodeCompVM25",
+        file: "wgEncodeGencodeCompVM25_load",
         fieldsConfig: geneFieldsAndIndex,
     },
 ];
@@ -303,6 +318,11 @@ const mm39 = [
     {
         name: "refGene",
         file: "refGene_load",
+        fieldsConfig: geneFieldsAndIndex,
+    },
+    {
+        name: "gencodeCompVM28",
+        file: "wgEncodeGencodeCompVM28_load",
         fieldsConfig: geneFieldsAndIndex,
     },
 ];

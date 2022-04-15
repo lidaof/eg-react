@@ -11,6 +11,11 @@
             "name": "refGene",
             "label": "RefSeq genes",
             "filetype": "geneAnnotation"
+        },
+        {
+            "name": "gencodeCompVM28",
+            "label": "Gencode Comp VM28 genes",
+            "filetype": "geneAnnotation"
         }
     ],
     "Transcription Factor": [

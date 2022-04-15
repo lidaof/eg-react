@@ -1,5 +1,10 @@
 # Version History
 
+## 53.7.0
+
+-   added MANE select 1.0 for hg38
+-   updated gencode tracks for hg38, hg19, mm39 and mm10
+
 ## 53.6.3
 
 -   3D viewer can enable region set view from segments

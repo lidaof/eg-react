@@ -2,8 +2,8 @@ import axios from "axios";
 import _ from "lodash";
 import DataSource from "./DataSource";
 
-// export const AWS_API = "https://lambda.epigenomegateway.org/v2";
-export const AWS_API = ""; // local test
+export const AWS_API = "https://lambda.epigenomegateway.org/v2";
+// export const AWS_API = ""; // local test
 
 /**
  * A DataSource that calls our backend API for gene annotations.

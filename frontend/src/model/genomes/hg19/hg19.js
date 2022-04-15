@@ -35,6 +35,10 @@ const genome = new Genome("hg19", [
 const navContext = genome.makeNavContext();
 const defaultRegion = navContext.parse("chr7:27053397-27373765");
 const defaultTracks = [
+    new TrackModel({
+        type: "ruler",
+        name: "Ruler",
+    }),
     // new TrackModel({
     //     type: "bigwig",
     //     name: "test bigwig",
@@ -42,7 +46,15 @@ const defaultTracks = [
     // }),
     new TrackModel({
         type: "geneAnnotation",
-        name: "gencodeV29",
+        name: "refGene",
+        genome: "hg19",
+        options: {
+            maxRows: 10,
+        },
+    }),
+    new TrackModel({
+        type: "geneAnnotation",
+        name: "gencodeV39",
         genome: "hg19",
         options: {
             maxRows: 10,
@@ -100,10 +112,6 @@ const defaultTracks = [
     //         displayMode: 'arc'
     //     }
     // }),
-    new TrackModel({
-        type: "ruler",
-        name: "Ruler",
-    }),
     // new TrackModel({
     //     name: 'hg19 to mm10 alignment',
     //     type: "genomealign",
