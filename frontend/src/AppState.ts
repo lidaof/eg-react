@@ -398,7 +398,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         case ActionType.SET_TRACK_LEGEND_WIDTH:
             return { ...prevState, trackLegendWidth: action.width };
         case ActionType.RESTORE_SESSION:
-            return new AppStateLoader().fromObject(action.sessionState);
+            const sessionState = new AppStateLoader().fromObject(action.sessionState);
+            if (!sessionState.bundleId){
+                return {...sessionState, bundleId: uuid.v1()}
+            }
+            return sessionState;
         case ActionType.RETRIEVE_BUNDLE:
             return { ...prevState, bundleId: action.bundleId };
         case ActionType.SET_GENOME_RESTORE_SESSION:
