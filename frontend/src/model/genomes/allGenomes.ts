@@ -1,4 +1,4 @@
-import { GenomeConfig } from "./GenomeConfig";
+import { GenomeConfig, PhasedGenomeConfig } from "./GenomeConfig";
 import HG19 from "./hg19/hg19";
 import HG38 from "./hg38/hg38";
 import MM10 from "./mm10/mm10";
@@ -52,6 +52,7 @@ import susScr11 from "./susScr11/susScr11";
 import susScr3 from "./susScr3/susScr3";
 import oviAri4 from "./oviAri4/oviAri4";
 import CHMV2 from "./t2t-chm13-v2.0/chm13v2";
+import phasedHuman from "./phased/human-example/human";
 
 /**
  * All available genomes.
@@ -113,12 +114,22 @@ export const allGenomes = [
     CHMV2,
 ];
 
+export const phasedGenomes = [phasedHuman];
+
 const genomeNameToConfig = {};
 for (const config of allGenomes) {
     const genomeName = config.genome.getName();
     if (genomeNameToConfig[genomeName]) {
         // We need this, because when saving session, we save the genome name.
         throw new Error(`Two genomes have the same name ${genomeName}.  Refusing to continue!`);
+    }
+    genomeNameToConfig[genomeName] = config;
+}
+
+for (const config of phasedGenomes) {
+    const genomeName = config.name;
+    if (genomeNameToConfig[genomeName]) {
+        throw new Error(`Duplicated ${genomeName}.  Refusing to continue!`);
     }
     genomeNameToConfig[genomeName] = config;
 }
@@ -292,7 +303,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
  * @param {string} genomeName - name of a genome
  * @return {GenomeConfig} the genome's configuration object, or null if no such genome exists.
  */
-export function getGenomeConfig(genomeName: string): GenomeConfig {
+export function getGenomeConfig(genomeName: string): GenomeConfig & PhasedGenomeConfig {
     return genomeNameToConfig[genomeName] || null;
 }
 

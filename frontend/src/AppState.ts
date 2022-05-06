@@ -54,7 +54,7 @@ export const NO_SAVE_SESSION = "eg-no-session";
 export const MIN_VIEW_REGION_SIZE = 5;
 export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
-export interface AppState {
+export interface IAppState {
     genomeName: string;
     viewRegion: DisplayedRegionModel;
     tracks: TrackModel[];
@@ -62,21 +62,27 @@ export interface AppState {
     regionSets: RegionSet[];
     regionSetView: RegionSet;
     trackLegendWidth: number;
-    bundleId: string;
-    sessionFromUrl?: boolean;
+    // bundleId: string;
+    // sessionFromUrl?: boolean;
     isShowingNavigator: boolean;
     isShowingVR?: boolean;
     customTracksPool?: TrackModel[];
     genomeConfig?: object;
     virusBrowserMode?: boolean;
     layout?: object;
-    // g3dtracks?: TrackModel[];
     highlights?: HighlightInterval[];
+}
+
+interface IPhasedAppState {
+    bundleId: string;
+    sessionFromUrl?: boolean;
+    phased: boolean;
+    [phase: string]: any;
 }
 
 const bundleId = uuid.v1();
 
-const initialState: AppState = {
+const initialState: IAppState = {
     genomeName: "",
     viewRegion: null,
     tracks: [],
@@ -84,14 +90,23 @@ const initialState: AppState = {
     regionSets: [], // Available region sets, to be used for region set view
     regionSetView: null, // Region set backing current region set view, if applicable
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
-    bundleId,
-    sessionFromUrl: false,
+    // bundleId,
+    // sessionFromUrl: false,
     isShowingNavigator: true,
     isShowingVR: false,
     customTracksPool: [],
     layout: {},
     // g3dtracks: [],
     highlights: [],
+};
+
+const UN_PHASED_KEY = "unphased";
+
+const initialPhasedState: IPhasedAppState = {
+    bundleId,
+    phased: false,
+    sessionFromUrl: false,
+    [UN_PHASED_KEY]: initialState,
 };
 
 enum ActionType {
@@ -113,7 +128,6 @@ enum ActionType {
     SET_VIRUS_BROWSER_MODE = "SET_VIRUS_BROWSER_MODE",
     SET_HUB_SESSION_STORAGE = "SET_HUB_SESSION_STORAGE",
     SET_LAYOUT = "SET_LAYOUT",
-    // SET_G3D_TRACKS = "SET_G3D_TRACKS",
     SET_HIGHLIGHTS = "SET_HIGHLIGHTS",
 }
 
@@ -211,7 +225,7 @@ export const ActionCreators = {
         };
     },
 
-    setHubSessionStorage: (state: AppState, customTracksPool: TrackModel[]) => {
+    setHubSessionStorage: (state: IAppState, customTracksPool: TrackModel[]) => {
         return {
             type: ActionType.SET_HUB_SESSION_STORAGE,
             state,
@@ -249,8 +263,8 @@ export const ActionCreators = {
     },
 };
 
-function getInitialState(): AppState {
-    let state = initialState;
+function getInitialState(): IPhasedAppState {
+    let state = initialPhasedState;
     const { query } = querySting.parseUrl(window.location.href);
     let newState;
     if (!_.isEmpty(query)) {
@@ -299,7 +313,7 @@ function getInitialState(): AppState {
         if (query.position) {
             if (newState) {
                 const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
-                newState = getNextState(newState as AppState, {
+                newState = getNextState(newState as IAppState, {
                     type: ActionType.SET_VIEW_REGION,
                     ...interval,
                 });
@@ -315,7 +329,7 @@ function getInitialState(): AppState {
             });
         }
         // console.log(newState);
-        return (newState as AppState) || (state as AppState);
+        return (newState as IAppState) || (state as IAppState);
     }
     const blob = STORAGE.getItem(SESSION_KEY);
     if (blob) {
@@ -329,7 +343,7 @@ function getInitialState(): AppState {
     return state;
 }
 
-function getNextState(prevState: AppState, action: AppAction): AppState {
+function getNextState(prevState: IPhasedAppState, action: AppAction): IPhasedAppState {
     if (!prevState) {
         return getInitialState();
     }
@@ -340,15 +354,32 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             let nextTracks: TrackModel[] = [];
             const genomeConfig = getGenomeConfig(action.genomeName);
             if (genomeConfig) {
-                nextViewRegion = new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion);
-                nextTracks = genomeConfig.defaultTracks;
+                if (genomeConfig.phased) {
+                    const multiState = {};
+                    genomeConfig.phases.forEach((phase) => {
+                        nextViewRegion = new DisplayedRegionModel(phase.navContext, ...phase.defaultRegion);
+                        nextTracks = phase.defaultTracks;
+                        multiState[phase.genome.getName()] = {
+                            ...initialState,
+                            genomeName: action.genomeName,
+                            viewRegion: nextViewRegion,
+                            tracks: nextTracks,
+                        };
+                    });
+                    const { [UN_PHASED_KEY]: value, ...rest } = initialPhasedState;
+                    return { ...rest, ...multiState };
+                } else {
+                    nextViewRegion = new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion);
+                    nextTracks = genomeConfig.defaultTracks;
+                    const singleState = {
+                        ...initialState,
+                        genomeName: action.genomeName,
+                        viewRegion: nextViewRegion,
+                        tracks: nextTracks,
+                    };
+                    return { ...initialPhasedState, [UN_PHASED_KEY]: singleState };
+                }
             }
-            return {
-                ...initialState,
-                genomeName: action.genomeName,
-                viewRegion: nextViewRegion,
-                tracks: nextTracks,
-            };
         case ActionType.SET_CUSTOM_VIRUS_GENOME: // Setting virus genome.
             const virusTracks = action.tracks.map((data: any) => TrackModel.deserialize(data));
             const genome = new Genome(action.name, [new Chromosome(action.seqId, action.seq.length)]);
@@ -366,13 +397,14 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 fastaSeq: action.seq,
                 annotationTracks,
             };
-            return {
+            const singleState = {
                 ...initialState,
                 genomeName: action.name,
                 viewRegion: virusViewRegion,
                 tracks: virusTracks,
                 genomeConfig: virusGenomeConfig,
             };
+            return { ...initialPhasedState, [UN_PHASED_KEY]: singleState };
         case ActionType.SET_VIEW_REGION:
             if (!prevState.viewRegion) {
                 return prevState;
@@ -399,8 +431,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, trackLegendWidth: action.width };
         case ActionType.RESTORE_SESSION:
             const sessionState = new AppStateLoader().fromObject(action.sessionState);
-            if (!sessionState.bundleId){
-                return {...sessionState, bundleId: uuid.v1()}
+            if (!sessionState.bundleId) {
+                return { ...sessionState, bundleId: uuid.v1() };
             }
             return sessionState;
         case ActionType.RETRIEVE_BUNDLE:
@@ -463,7 +495,7 @@ async function getTracksFromHubURL(url: string): Promise<any> {
  * @param {RegionSet} [nextSet] - region set to back region set view in the next state
  * @return {Object} next redux store
  */
-function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
+function handleRegionSetViewChange(prevState: IAppState, nextSet: RegionSet) {
     if (nextSet) {
         return {
             ...prevState,

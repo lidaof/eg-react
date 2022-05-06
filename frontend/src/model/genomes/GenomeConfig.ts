@@ -1,8 +1,8 @@
-import Genome from './Genome';
-import NavigationContext from '../NavigationContext';
-import CytobandMap from './CytobandTypes';
-import OpenInterval from '../interval/OpenInterval';
-import TrackModel from '../TrackModel';
+import Genome from "./Genome";
+import NavigationContext from "../NavigationContext";
+import CytobandMap from "./CytobandTypes";
+import OpenInterval from "../interval/OpenInterval";
+import TrackModel from "../TrackModel";
 
 export interface GenomeConfig {
     genome: Genome;
@@ -14,4 +14,10 @@ export interface GenomeConfig {
     publicHubList: any[];
     annotationTracks: any;
     twoBitURL?: string;
+}
+
+export interface PhasedGenomeConfig {
+    name: string;
+    phased: boolean;
+    phases: GenomeConfig[];
 }
