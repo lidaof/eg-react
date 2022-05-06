@@ -1,3 +1,4 @@
+import { removeKeys } from './util';
 /**
  * The global Redux store for the Browser.  All state that needs to be saved and restored in sessions belongs here.
  *
@@ -76,7 +77,7 @@ export interface IAppState {
 interface IPhasedAppState {
     bundleId: string;
     sessionFromUrl?: boolean;
-    phased: boolean;
+    phasedKeys: string[]
     [phase: string]: any;
 }
 
@@ -104,7 +105,7 @@ const UN_PHASED_KEY = "unphased";
 
 const initialPhasedState: IPhasedAppState = {
     bundleId,
-    phased: false,
+    phasedKeys: null,
     sessionFromUrl: false,
     [UN_PHASED_KEY]: initialState,
 };
@@ -308,12 +309,17 @@ function getInitialState(): IPhasedAppState {
                 url: query.hicUrl,
                 name: urlComponets[urlComponets.length - 1].split(".")[0],
             });
-            newState = { ...tmpState, tracks: [track] };
+            const multiState = {}
+            const restState = removeKeys(tmpState.phasedKeys, tmpState);
+            tmpState.phasedKeys.forEach(phase => {
+                multiState[phase] = { ...tmpState[phase], tracks: [track] }
+            })
+            newState = { ...multiState, ...restState };
         }
         if (query.position) {
             if (newState) {
                 const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
-                newState = getNextState(newState as IAppState, {
+                newState = getNextState(newState as IPhasedAppState, {
                     type: ActionType.SET_VIEW_REGION,
                     ...interval,
                 });
@@ -329,7 +335,7 @@ function getInitialState(): IPhasedAppState {
             });
         }
         // console.log(newState);
-        return (newState as IAppState) || (state as IAppState);
+        return (newState as IPhasedAppState) || (state as IPhasedAppState);
     }
     const blob = STORAGE.getItem(SESSION_KEY);
     if (blob) {

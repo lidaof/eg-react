@@ -69,7 +69,7 @@ const maternal = {
 const phasedHuman = {
     name: genomeName,
     phases: [paternal, maternal],
-    phased: true,
+    phasedKeys: [paternal.genome.getName(), maternal.genome.getName()],
 };
 
 export default phasedHuman;

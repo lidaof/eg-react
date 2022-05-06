@@ -352,3 +352,8 @@ export const safeParseJsonString = (str: string) => {
         return str;
     }
 };
+
+// from https://stackoverflow.com/a/56156274/1098347
+export const removeKey = (k = "", { [k]:_, ...o } = {} as any) => o
+
+export const removeKeys = (keys:any[] = [], o = {}) => keys.reduce ((r, k) => removeKey (k, r), o)

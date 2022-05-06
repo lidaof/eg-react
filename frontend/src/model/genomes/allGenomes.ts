@@ -134,7 +134,7 @@ for (const config of phasedGenomes) {
     genomeNameToConfig[genomeName] = config;
 }
 
-interface SpeciesConfig {
+export interface SpeciesConfig {
     logoUrl: string;
     assemblies: string[];
     color: string;
@@ -298,6 +298,15 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         color: "blue",
     },
 };
+
+
+export const phasingTree: { [speciesName: string]: SpeciesConfig } = {
+    human: {
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
+        assemblies: [phasedHuman.name],
+        color: "white",
+    },
+}
 
 /**
  * @param {string} genomeName - name of a genome

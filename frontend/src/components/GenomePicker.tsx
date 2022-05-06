@@ -28,7 +28,7 @@ import Box from "@material-ui/core/Box";
 import Link from "@material-ui/core/Link";
 import SwipeableViews from "react-swipeable-views";
 import { ActionCreators } from "../AppState";
-import { treeOfLife } from "../model/genomes/allGenomes";
+import { phasingTree, SpeciesConfig, treeOfLife } from "../model/genomes/allGenomes";
 import { SessionUI } from "./SessionUI";
 import Logo from '../images/logo.png'
 
@@ -92,6 +92,7 @@ interface GenomePickerContainerProps {
 
 interface GenomePickerProps {
     onGenomeSelected: (name: string) => void;
+    treeOfLife: { [speciesName: string]: SpeciesConfig };
     title?: string;
 }
 
@@ -101,7 +102,7 @@ export function GenomePicker(props: GenomePickerProps) {
     // Map the genomes to a list of cards. Genome search engine filters by both the species and the different assemblies.
     // It is not case sensitive.
     const renderTreeCards = () => {
-        return Object.entries(treeOfLife)
+        return Object.entries(props.treeOfLife)
             .filter(([species2, details]) => {
                 return (
                     species2.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -187,7 +188,8 @@ function GenomePickerContainer(props: GenomePickerProps) {
                     aria-label="genome picker"
                 >
                     <Tab label="Choose a Genome" {...a11yProps(0)} />
-                    <Tab label="Load a session" {...a11yProps(1)} />
+                    <Tab label="Phased Genome" {...a11yProps(1)} />
+                    <Tab label="Load a session" {...a11yProps(2)} />
                 </Tabs>
             </AppBar>
             <SwipeableViews
@@ -196,9 +198,12 @@ function GenomePickerContainer(props: GenomePickerProps) {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <GenomePicker onGenomeSelected={props.onGenomeSelected} />
+                    <GenomePicker onGenomeSelected={props.onGenomeSelected} treeOfLife={treeOfLife} />
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
+                    <GenomePicker onGenomeSelected={props.onGenomeSelected} treeOfLife={phasingTree} title="Phased Genome" />
+                </TabPanel>
+                <TabPanel value={value} index={2} dir={theme.direction}>
                     {!process.env.REACT_APP_NO_FIREBASE ? (
                         // @ts-ignore
                         <SessionUI bundleId={props.bundleId} withGenomePicker={true} />
