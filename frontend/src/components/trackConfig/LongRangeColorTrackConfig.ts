@@ -38,7 +38,7 @@ export class LongRangeColorTrackConfig extends TrackConfig {
             if (this.trackModel.files.length > 0) {
                 return new LocalBedSource(this.trackModel.files);
             } else {
-                return new WorkerSource(BedWorker, this.trackModel.url);
+                return new WorkerSource(BedWorker, this.trackModel.url, this.trackModel.indexUrl);
             }
         }
     }

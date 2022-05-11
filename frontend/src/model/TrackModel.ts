@@ -39,6 +39,7 @@ interface ITrackModel {
     filetype?: string;
     options: TrackOptions;
     url: string;
+    indexUrl?: string;
     metadata: ITrackModelMetadata;
     fileObj?: Blob;
     queryEndpoint?: QueryEndpoint;
@@ -66,6 +67,7 @@ export class TrackModel {
     filetype?: string;
     options: TrackOptions;
     url: string;
+    indexUrl?: string;
     metadata: ITrackModelMetadata;
     id: number;
     isSelected: boolean;
@@ -88,7 +90,8 @@ export class TrackModel {
         this.type = this.type.toLowerCase();
         this.options = this.options || {}; // `options` stores dynamically-configurable options.
         this.options.label = this.label; // ...which is why we copy this.name.
-        this.url = this.url || "";
+        this.url = mapUrl(this.url) || "";
+        this.indexUrl = mapUrl(this.indexUrl) || undefined;
         this.metadata = variableIsObject(this.metadata) || Array.isArray(this.metadata) ? this.metadata : {}; // avoid number or string as metadata
         this.metadata["Track type"] = this.type;
         this.fileObj = this.fileObj || "";
@@ -226,3 +229,16 @@ export class TrackModel {
 }
 
 export default TrackModel;
+
+// modified from juicebox
+function mapUrl(url: string) {
+    if (!url) {
+        return undefined;
+    }
+    if (url.includes("//www.dropbox.com")) {
+        return url.replace("//www.dropbox.com", "//dl.dropboxusercontent.com");
+    } else if (url.startsWith("ftp://ftp.ncbi.nlm.nih.gov")) {
+        return url.replace("ftp://", "https://");
+    }
+    return url;
+}

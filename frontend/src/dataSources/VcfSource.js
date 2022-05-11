@@ -5,16 +5,16 @@ import VCF from "@gmod/vcf";
 import DataSource from "./DataSource";
 
 class VcfSource extends DataSource {
-    constructor(param) {
+    constructor(url, indexUrl) {
         // is param is string, it's a url, otherwise a File Obj array
         super();
         let filehandle, tbiFilehandle;
-        if (typeof param === "string") {
-            filehandle = new RemoteFile(param);
-            tbiFilehandle = new RemoteFile(param + ".tbi");
+        if (Array.isArray(url)) {
+            filehandle = new BlobFile(url.filter((f) => !f.name.endsWith(".tbi"))[0]);
+            tbiFilehandle = new BlobFile(url.filter((f) => f.name.endsWith(".tbi"))[0]);
         } else {
-            tbiFilehandle = new BlobFile(param.filter((f) => f.name.endsWith(".tbi"))[0]);
-            filehandle = new BlobFile(param.filter((f) => !f.name.endsWith(".tbi"))[0]);
+            filehandle = new RemoteFile(url);
+            tbiFilehandle = new RemoteFile(indexUrl ? indexUrl : url + ".tbi");
         }
         this.vcf = new TabixIndexedFile({ filehandle, tbiFilehandle });
         // console.log(this.vcf);

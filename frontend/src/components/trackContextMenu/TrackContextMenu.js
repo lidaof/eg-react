@@ -363,6 +363,16 @@ function TrackMoreInfo(props) {
             </div>
         );
     }
+    if (track.indexUrl) {
+        info.push(
+            <div key="indexUrl">
+                <h6>
+                    Index URL <CopyToClip value={track.indexUrl} />
+                </h6>
+                <p className="TrackContextMenu-URL">{track.indexUrl}</p>
+            </div>
+        );
+    }
     if (track.metadata) {
         info.push(
             <div key="metadata">

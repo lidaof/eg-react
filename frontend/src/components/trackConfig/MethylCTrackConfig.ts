@@ -1,19 +1,19 @@
-import { TrackConfig } from './TrackConfig';
+import { TrackConfig } from "./TrackConfig";
 
-import MethylCTrack, { DEFAULT_OPTIONS } from '../trackVis/MethylCTrack';
+import MethylCTrack, { DEFAULT_OPTIONS } from "../trackVis/MethylCTrack";
 
-import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
-import HeightConfig from '../trackContextMenu/HeightConfig';
-import MaxMethylAndDepthFilterConfig from '../trackContextMenu/MaxMethylAndDepthFilterConfig';
-import CombineStrandConfig from '../trackContextMenu/CombineStrandConfig';
-import { MethylColorConfig, ReadDepthColorConfig } from '../trackContextMenu/MethylColorConfig';
+import { BackgroundColorConfig } from "../trackContextMenu/ColorConfig";
+import HeightConfig from "../trackContextMenu/HeightConfig";
+import MaxMethylAndDepthFilterConfig from "../trackContextMenu/MaxMethylAndDepthFilterConfig";
+import CombineStrandConfig from "../trackContextMenu/CombineStrandConfig";
+import { MethylColorConfig, ReadDepthColorConfig } from "../trackContextMenu/MethylColorConfig";
 
-import WorkerSource from '../../dataSources/worker/WorkerSource';
-import { BedWorker } from '../../dataSources/WorkerTSHook';
-import BedRecord from '../../dataSources/bed/BedRecord';
-import LocalBedSource from '../../dataSources/LocalBedSource';
-import MethylCRecord from '../../model/MethylCRecord';
-import { TrackModel } from '../../model/TrackModel';
+import WorkerSource from "../../dataSources/worker/WorkerSource";
+import { BedWorker } from "../../dataSources/WorkerTSHook";
+import BedRecord from "../../dataSources/bed/BedRecord";
+import LocalBedSource from "../../dataSources/LocalBedSource";
+import MethylCRecord from "../../model/MethylCRecord";
+import { TrackModel } from "../../model/TrackModel";
 
 export class MethylCTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -25,23 +25,30 @@ export class MethylCTrackConfig extends TrackConfig {
         if (this.trackModel.files.length > 0) {
             return new LocalBedSource(this.trackModel.files);
         } else {
-            return new WorkerSource(BedWorker, this.trackModel.url);
+            return new WorkerSource(BedWorker, this.trackModel.url, this.trackModel.indexUrl);
         }
     }
 
     /**
      * Converts BedRecords to MethylCRecords.
-     * 
+     *
      * @param {BedRecord[]} data - BedRecords to convert
      * @return {MethylCRecord[]} MethylCRecords made from the input
      */
     formatData(data: BedRecord[]) {
-        return data.map(feature => new MethylCRecord(feature));
+        return data.map((feature) => new MethylCRecord(feature));
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), HeightConfig, CombineStrandConfig, MethylColorConfig, 
-            MaxMethylAndDepthFilterConfig, ReadDepthColorConfig, BackgroundColorConfig];
+        return [
+            ...super.getMenuComponents(),
+            HeightConfig,
+            CombineStrandConfig,
+            MethylColorConfig,
+            MaxMethylAndDepthFilterConfig,
+            ReadDepthColorConfig,
+            BackgroundColorConfig,
+        ];
     }
 
     getComponent() {

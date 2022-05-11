@@ -1,13 +1,13 @@
-import WorkerSource from '../../dataSources/worker/WorkerSource';
-import { BedWorker } from '../../dataSources/WorkerTSHook';
-import BedRecord from '../../dataSources/bed/BedRecord';
-import { AnnotationTrackConfig } from './AnnotationTrackConfig';
-import GeneAnnotationTrack from '../trackVis/geneAnnotationTrack/GeneAnnotationTrack';
-import { DEFAULT_OPTIONS } from '../trackVis/geneAnnotationTrack/GeneAnnotation';
-import Gene, { IdbRecord } from '../../model/Gene';
-import { TrackModel } from '../../model/TrackModel';
-import LocalBedSource from '../../dataSources/LocalBedSource';
-import BedTextSource from '../../dataSources/BedTextSource';
+import WorkerSource from "../../dataSources/worker/WorkerSource";
+import { BedWorker } from "../../dataSources/WorkerTSHook";
+import BedRecord from "../../dataSources/bed/BedRecord";
+import { AnnotationTrackConfig } from "./AnnotationTrackConfig";
+import GeneAnnotationTrack from "../trackVis/geneAnnotationTrack/GeneAnnotationTrack";
+import { DEFAULT_OPTIONS } from "../trackVis/geneAnnotationTrack/GeneAnnotation";
+import Gene, { IdbRecord } from "../../model/Gene";
+import { TrackModel } from "../../model/TrackModel";
+import LocalBedSource from "../../dataSources/LocalBedSource";
+import BedTextSource from "../../dataSources/BedTextSource";
 
 export class RefBedTrackConfig extends AnnotationTrackConfig {
     constructor(trackModel: TrackModel) {
@@ -20,13 +20,13 @@ export class RefBedTrackConfig extends AnnotationTrackConfig {
             return new BedTextSource({
                 url: this.trackModel.url,
                 blob: this.trackModel.fileObj,
-                textConfig: this.trackModel.textConfig
+                textConfig: this.trackModel.textConfig,
             });
         } else {
             if (this.trackModel.files.length > 0) {
                 return new LocalBedSource(this.trackModel.files);
             } else {
-                return new WorkerSource(BedWorker, this.trackModel.url);
+                return new WorkerSource(BedWorker, this.trackModel.url, this.trackModel.indexUrl);
             }
         }
     }
@@ -52,14 +52,14 @@ export class RefBedTrackConfig extends AnnotationTrackConfig {
      * @return {Gene[]} Genes
      */
     formatData(data: BedRecord[]) {
-        return data.map(record => {
+        return data.map((record) => {
             const refBedRecord = {} as IdbRecord;
             refBedRecord.chrom = record.chr;
             refBedRecord.txStart = record.start;
             refBedRecord.txEnd = record.end;
             refBedRecord.id = record[7];
             refBedRecord.name = record[6];
-            refBedRecord.description = record[11] ? record[11] : '';
+            refBedRecord.description = record[11] ? record[11] : "";
             refBedRecord.transcriptionClass = record[8];
             refBedRecord.exonStarts = record[9];
             refBedRecord.exonEnds = record[10];

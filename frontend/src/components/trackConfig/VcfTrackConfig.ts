@@ -26,7 +26,7 @@ export class VcfTrackConfig extends TrackConfig {
         if (this.trackModel.files.length > 0) {
             return new VcfSource(this.trackModel.files);
         } else {
-            return new VcfSource(this.trackModel.url);
+            return new VcfSource(this.trackModel.url, this.trackModel.indexUrl);
         }
     }
 
