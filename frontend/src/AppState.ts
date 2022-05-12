@@ -16,7 +16,7 @@ import _ from "lodash";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
 import DisplayedRegionModel from "./model/DisplayedRegionModel";
 import { AppStateSaver, AppStateLoader } from "./model/AppSaveLoad";
-import TrackModel from "./model/TrackModel";
+import TrackModel, { mapUrl } from "./model/TrackModel";
 import RegionSet from "./model/RegionSet";
 import { HighlightInterval } from "./components/trackContainers/HighlightMenu";
 import Json5Fetcher from "./model/Json5Fetcher";
@@ -399,8 +399,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, trackLegendWidth: action.width };
         case ActionType.RESTORE_SESSION:
             const sessionState = new AppStateLoader().fromObject(action.sessionState);
-            if (!sessionState.bundleId){
-                return {...sessionState, bundleId: uuid.v1()}
+            if (!sessionState.bundleId) {
+                return { ...sessionState, bundleId: uuid.v1() };
             }
             return sessionState;
         case ActionType.RETRIEVE_BUNDLE:
@@ -525,7 +525,7 @@ async function asyncInitState() {
     if (!_.isEmpty(query)) {
         if (query.hub) {
             const withDefaultTracks = !query.noDefaultTracks || (query.noDefaultTracks ? false : true);
-            const customTracksPool = await getTracksFromHubURL(query.hub as string);
+            const customTracksPool = await getTracksFromHubURL(mapUrl(query.hub as string));
             if (customTracksPool) {
                 const tracks = customTracksPool.filter((track: any) => track.showOnHubLoad);
                 if (tracks.length > 0) {
@@ -538,7 +538,7 @@ async function asyncInitState() {
             }
         }
         if (query.sessionFile) {
-            const json = await new Json5Fetcher().get(query.sessionFile as string);
+            const json = await new Json5Fetcher().get(mapUrl(query.sessionFile as string));
             if (json) {
                 AppState.dispatch(ActionCreators.restoreSession(json));
                 // when position in URL with sessionFile, see issue #245
@@ -550,7 +550,7 @@ async function asyncInitState() {
             }
         }
         if (query.hubSessionStorage) {
-            const customTracksPool = await getTracksFromHubURL(query.hubSessionStorage as string);
+            const customTracksPool = await getTracksFromHubURL(mapUrl(query.hubSessionStorage as string));
             if (customTracksPool) {
                 const tracksInHub = customTracksPool.filter((track: any) => track.showOnHubLoad);
                 const blob = STORAGE.getItem(SESSION_KEY);
