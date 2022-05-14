@@ -82,6 +82,9 @@ export class AppStateLoader {
             isShowingVR: object.isShowingVR,
             layout: object.layout || {},
             highlights: object.highlights || [],
+
+            genomeNames: object.genomeNames,
+            genomeStates: object.genomeStates
             // threedTracks: object.threedTracks.map((data: any) => TrackModel.deserialize(data)),
         };
     }

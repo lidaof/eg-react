@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import Button from "@material-ui/core/Button";
 import { ArrowBack } from "@material-ui/icons";
 import { IconButton } from "@material-ui/core";
-import { ActionCreators } from "../AppState";
+import { GlobalActionCreators } from "../AppState";
 import DisplayedRegionModel from "../model/DisplayedRegionModel";
 import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from "./genomeNavigator/TrackRegionController";
@@ -47,9 +47,9 @@ function mapStateToProps(state) {
 }
 
 const callbacks = {
-    onGenomeSelected: ActionCreators.setGenome,
-    onToggleNavigator: ActionCreators.toggleNavigator,
-    onToggleVR: ActionCreators.toggleVR,
+    onGenomeSelected: GlobalActionCreators.setGenome,
+    onToggleNavigator: GlobalActionCreators.toggleNavigator,
+    onToggleVR: GlobalActionCreators.toggleVR,
 };
 
 /**

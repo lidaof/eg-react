@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
-import { ActionCreators } from "../AppState";
+import { GlobalActionCreators } from "../AppState";
 import { Link } from "react-router-dom";
 
 class LoadSession extends React.PureComponent {
@@ -30,7 +30,7 @@ class LoadSession extends React.PureComponent {
 };
 
 const mapDispatchToProps = {
-    onSetRestore: ActionCreators.setGenomeRestoreSession,
+    onSetRestore: GlobalActionCreators.setGenomeRestoreSession,
 };
 
 export default compose(

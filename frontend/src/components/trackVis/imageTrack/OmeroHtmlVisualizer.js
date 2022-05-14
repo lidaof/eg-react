@@ -9,7 +9,7 @@ import { addTabSetToLayout, tabIdExistInLayout } from "../../../layoutUtils";
 import { withTooltip } from "../commonComponents/tooltip/withTooltip";
 import Tooltip from "../commonComponents/tooltip/Tooltip";
 import { ObjectAsTable } from "components/trackContextMenu/TrackContextMenu";
-import { ActionCreators } from "../../../AppState";
+import { GlobalActionCreators } from "../../../AppState";
 import TrackModel from "model/TrackModel";
 
 function mapStateToProps(state) {
@@ -20,7 +20,7 @@ function mapStateToProps(state) {
 }
 
 const callbacks = {
-    onSetLayout: ActionCreators.setLayout,
+    onSetLayout: GlobalActionCreators.setLayout,
 };
 
 class OmeroHtmlVisualizer extends React.PureComponent {

@@ -4,7 +4,7 @@ import _ from "lodash";
 import connect from "react-redux/lib/connect/connect";
 import ReactModal from "react-modal";
 import Hotkeys from "react-hot-keys";
-import { ActionCreators } from "../../AppState";
+import { GlobalActionCreators } from "../../AppState";
 import { withTrackData } from "./TrackDataManager";
 import { withTrackView } from "./TrackViewManager";
 import TrackHandle from "./TrackHandle";
@@ -56,9 +56,9 @@ function mapStateToProps(state) {
 }
 
 const callbacks = {
-    onNewRegion: ActionCreators.setViewRegion,
-    onTracksChanged: ActionCreators.setTracks,
-    onMetadataTermsChanged: ActionCreators.setMetadataTerms,
+    onNewRegion: GlobalActionCreators.setViewRegion,
+    onTracksChanged: GlobalActionCreators.setTracks,
+    onMetadataTermsChanged: GlobalActionCreators.setMetadataTerms,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -781,6 +781,7 @@ class TrackContainer extends React.Component {
         return (
             <React.Fragment>
                 <OutsideClickDetector onOutsideClick={this.deselectAllTracks}>
+                    {/* TODO: only render controls when !stateIdx or stateIdx === 0 */}
                     {this.renderControls()}
                     <ContextMenuManager
                         menuElement={contextMenu}

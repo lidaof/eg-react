@@ -3,10 +3,11 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import _ from "lodash";
 // import AppState, { ActionCreators } from "./AppState";
-import { ActionCreators } from "./AppState";
+import { GlobalActionCreators, GenomeState } from "./AppState";
 import GenomePickerContainer from "./components/GenomePicker";
 import Nav from "./components/Nav";
 import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
+import GenomeView from "./components/GenomeView";
 import TrackContainer from "./components/trackContainers/TrackContainer";
 import withCurrentGenome from "./components/withCurrentGenome";
 import DisplayedRegionModel from "./model/DisplayedRegionModel";
@@ -36,6 +37,9 @@ interface MapStateToPropsProps {
             customTracksPool: TrackModel[];
             virusBrowserMode: boolean;
             highlights: HighlightInterval[];
+
+            genomeNames: string[];
+            genomeStates: GenomeState[];        
         }
     }
 }
@@ -51,14 +55,17 @@ function mapStateToProps(state: MapStateToPropsProps) {
         customTracksPool: state.browser.present.customTracksPool,
         virusBrowserMode: state.browser.present.virusBrowserMode,
         highlights: state.browser.present.highlights,
+        
+        genomeNames: state.browser.present.genomeNames,
+        genomeStates: state.browser.present.genomeStates,
     };
 }
 
 const callbacks = {
-    onNewViewRegion: ActionCreators.setViewRegion,
-    onTracksChanged: ActionCreators.setTracks,
-    onLegendWidthChange: ActionCreators.setTrackLegendWidth,
-    onSetHighlights: ActionCreators.setHighlights,
+    onNewViewRegion: GlobalActionCreators.setViewRegion,
+    onTracksChanged: GlobalActionCreators.setTracks,
+    onLegendWidthChange: GlobalActionCreators.setTrackLegendWidth,
+    onSetHighlights: GlobalActionCreators.setHighlights,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
@@ -87,6 +94,9 @@ interface AppProps {
     onSetImageInfo: any;
     highlights: HighlightInterval[];
     onSetHighlights: (highlights: HighlightInterval[]) => void;
+
+    genomeNames: string[];
+    genomeStates: GenomeState[];
 }
 
 interface AppStateProps {
@@ -98,6 +108,8 @@ interface AppStateProps {
     customTracksPool: any[];
     availableTrackSets: Set<string>;
     suggestedMetaSets: Set<string>;
+
+    genomeStates: GenomeState[];
 }
 
 // interface RGBAColor {
@@ -124,6 +136,8 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         this.state = {
             // isShowing3D: false,
             // isShowingNavigator: true,
+            
+            // parent state
             highlightEnteredRegion: true,
             enteredRegion: null,
             highlightColor: "rgba(255, 255, 0, 0.3)", // light yellow
@@ -132,6 +146,9 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             customTracksPool: [],
             availableTrackSets: new Set(),
             suggestedMetaSets: new Set(["Track type"]),
+
+            // child state
+            genomeStates: new Array<GenomeState>(),
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
@@ -334,7 +351,14 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             onSetImageInfo,
             highlights,
             onSetHighlights,
+
+            genomeNames,
+            genomeStates,
         } = this.props;
+        console.log("🚀 ~ file: App.tsx ~ line 350 ~ App ~ render ~ this.props", this.props);
+        console.log("🚀 ~ file: App.tsx ~ line 350 ~ App ~ render ~ this.state", this.state);
+
+        
         if (sessionFromUrl) {
             return (
                 <div className="container-fluid">
@@ -407,24 +431,60 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                         functions.
                     </div>
                 </Offline>
-                <TrackContainer
-                    enteredRegion={this.state.enteredRegion}
-                    highlightColor={this.state.highlightColor}
-                    highlightEnteredRegion={this.state.highlightEnteredRegion}
-                    expansionAmount={REGION_EXPANDER}
-                    suggestedMetaSets={this.state.suggestedMetaSets}
-                    genomeConfig={genomeConfig}
-                    tracks={tracks.filter((tk) => tk.type !== "g3d")}
-                    layoutModel={layoutModel}
-                    onSetAnchors3d={onSetAnchors3d}
-                    onSetGeneFor3d={onSetGeneFor3d}
-                    viewer3dNumFrames={viewer3dNumFrames}
-                    isThereG3dTrack={isThereG3dTrack}
-                    onSetImageInfo={onSetImageInfo}
-                    onNewHighlight={this.newHighlight}
-                    highlights={highlights}
-                    onSetHighlights={onSetHighlights}
-                />
+                {genomeStates.map((data:GenomeState, idx:number) => {
+                    return (
+                        <GenomeView 
+                            stateIdx={idx}
+                            // navProps={{
+                            //     ...this.state,
+                            //      // isShowingNavigator: isShowingNavigator,
+                            //     // onToggleNavigator: onToggleNavigator,
+                            //     // onToggle3DScene: this.toggle3DScene,
+                            //     // onToggleHighlight: this.toggleHighlight,
+                            //     onNewHighlight: this.newHighlight,
+                            //     // onSetHighlightColor: this.setHighlightColor,
+                            //     selectedRegion: viewRegion,
+                            //     onRegionSelected: onNewViewRegion,
+                            //     tracks: data.tracks,
+                            //     genomeConfig: genomeConfig,
+                            //     onTracksAdded: this.addTracks,
+                            //     onTrackRemoved: this.removeTrack,
+                            //     bundleId: bundleId,
+                            //     trackLegendWidth: trackLegendWidth,
+                            //     onLegendWidthChange: onLegendWidthChange,
+                            //     onAddTracksToPool: this.addTracksToPool,
+                            //     onHubUpdated: this.updatePublicHubs,
+                            //     addedTrackSets: tracksUrlSets,
+                            //     // publicHubs: publicHubs,
+                            //     removeTrackFromAvailable: this.removeTrackFromAvailable,
+                            //     addTracktoAvailable: this.addTracktoAvailable,
+                            //     addTermToMetaSets: this.addTermToMetaSets,
+                            //     embeddingMode: embeddingMode,
+                            //     groupedTrackSets: groupedTrackSets,
+                            //     virusBrowserMode: virusBrowserMode,
+                            //     highlights: highlights,             
+                            // }}
+                            trackContainerProps={{
+                                enteredRegion: this.state.enteredRegion,
+                                highlightColor: this.state.highlightColor,
+                                highlightEnteredRegion: this.state.highlightEnteredRegion,
+                                expansionAmount: REGION_EXPANDER,
+                                suggestedMetaSets: this.state.suggestedMetaSets,
+                                genomeConfig: genomeConfig,
+                                tracks: data.tracks.filter((tk) => tk.type !== "g3d"),
+                                layoutModel: layoutModel,
+                                onSetAnchors3d: onSetAnchors3d,
+                                onSetGeneFor3d: onSetGeneFor3d,
+                                viewer3dNumFrames: viewer3dNumFrames,
+                                isThereG3dTrack: isThereG3dTrack,
+                                onSetImageInfo: onSetImageInfo,
+                                onNewHighlight: this.newHighlight,
+                                highlights: highlights,
+                                onSetHighlights: onSetHighlights,
+                            }}
+                        />
+                    )
+                })}
                 {!embeddingMode && <Footer />}
             </div>
         );

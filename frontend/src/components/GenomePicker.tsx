@@ -27,7 +27,7 @@ import Tab from "@material-ui/core/Tab";
 import Box from "@material-ui/core/Box";
 import Link from "@material-ui/core/Link";
 import SwipeableViews from "react-swipeable-views";
-import { ActionCreators } from "../AppState";
+import { GlobalActionCreators } from "../AppState";
 import { treeOfLife } from "../model/genomes/allGenomes";
 import { SessionUI } from "./SessionUI";
 import Logo from '../images/logo.png'
@@ -40,7 +40,7 @@ import "./GenomePicker.css";
  * @author Shane Liu
  */
 
-const callbacks = { onGenomeSelected: ActionCreators.setGenome };
+const callbacks = { onGenomeSelected: GlobalActionCreators.setGenome };
 
 const LinkWithMargin = withStyles({
     root: {

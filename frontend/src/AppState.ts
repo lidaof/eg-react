@@ -25,6 +25,12 @@ import OpenInterval from "./model/interval/OpenInterval";
 import { Genome } from "./model/genomes/Genome";
 import Chromosome from "./model/genomes/Chromosome";
 
+// TODO: remove this import
+// import mm39 and rn7 from "./model/genomes/allGenomes";
+import MM39 from "model/genomes/mm39/mm39";
+import RN7 from "model/genomes/rn7/rn7";
+console.log("🚀 ~ file: AppState.ts ~ line 31 ~ MM39", MM39)
+
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
     // jsdom doesn't support local storage.  Use a mock.
@@ -56,6 +62,10 @@ export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
 export interface AppState {
     genomeName: string;
+
+    genomeNames: string[];
+    genomeStates: GenomeState[];
+
     viewRegion: DisplayedRegionModel;
     tracks: TrackModel[];
     metadataTerms: string[];
@@ -74,10 +84,42 @@ export interface AppState {
     highlights?: HighlightInterval[];
 }
 
+export interface UnifiedState {
+    selectedGenomes: string[];
+    genomes: GenomeState[];
+
+    sessionFromUrl?: boolean;
+    isShowingNavigator: boolean;
+    isShowingVR?: boolean;
+    virusBrowserMode?: boolean;
+    layout?: object;
+}
+
+// state for a single genome.
+export interface GenomeState {
+    // genomeName: string;
+    // bundleId: string; // consider: is this the same for maternal / paternal?
+    tracks: TrackModel[];
+    customTracksPool?: TrackModel[];
+    genomeConfig?: object;
+
+    synced: boolean;
+    // if nullable, the data starts off as null and uses the global values. these values can be overridden locally.
+    viewRegion: DisplayedRegionModel | null;
+    metadataTerms: string[] | null;
+    regionSets: RegionSet[] | null;
+    regionSetView: RegionSet | null;
+    trackLegendWidth: number | null;
+    highlights: HighlightInterval[] | null;
+}
+
 const bundleId = uuid.v1();
 
 const initialState: AppState = {
     genomeName: "",
+    genomeNames: [],
+    genomeStates: [],
+
     viewRegion: null,
     tracks: [],
     metadataTerms: [],
@@ -126,7 +168,7 @@ interface AppAction {
  * All action creators.  Components don't need to know this, though.  They can think of them as callbacks that modify
  * the global store (or state).
  */
-export const ActionCreators = {
+export const GlobalActionCreators = {
     /**
      * Modifies the current genome.
      *
@@ -249,8 +291,136 @@ export const ActionCreators = {
     },
 };
 
+export const GenomeActionsCreatorsFactory = (idx: number) => {
+    return {
+        /**
+         * Modifies the current genome.
+         *
+         * @param {string} genomeName - name of the genome
+         */
+        setGenome: (genomeName: string) => {
+            return { idx: idx, type: ActionType.SET_GENOME, genomeName };
+        },
+
+        setViewRegion: (newStart: number, newEnd: number) => {
+            return { idx: idx, type: ActionType.SET_VIEW_REGION, start: newStart, end: newEnd };
+        },
+
+        setTracks: (newTracks: TrackModel[]) => {
+            return { idx: idx, type: ActionType.SET_TRACKS, tracks: newTracks };
+        },
+
+        setMetadataTerms: (newTerms: string[]) => {
+            return { idx: idx, type: ActionType.SET_METADATA_TERMS, terms: newTerms };
+        },
+
+        /**
+         * Replaces the list of available region sets with a new one.
+         *
+         * @param {RegionSet[]} list - new region set list
+         */
+        setRegionSetList: (list: RegionSet[]) => {
+            return { idx: idx, type: ActionType.SET_REGION_SET_LIST, list };
+        },
+
+        /**
+         * Enters or exit region set view with a particular region set.  If null/undefined, exits region set view.
+         *
+         * @param {RegionSet} [set] - set with which to enter region set view, or null to exit region set view
+         */
+        setRegionSetView: (set: RegionSet) => {
+            return { idx: idx, type: ActionType.SET_REGION_SET_VIEW, set };
+        },
+
+        setTrackLegendWidth: (width: number) => {
+            return { idx: idx, type: ActionType.SET_TRACK_LEGEND_WIDTH, width };
+        },
+
+        restoreSession: (sessionState: object) => {
+            return { type: ActionType.RESTORE_SESSION, sessionState };
+        },
+
+        retrieveBundle: (bundleId: string) => {
+            return { type: ActionType.RETRIEVE_BUNDLE, bundleId };
+        },
+
+        setGenomeRestoreSession: (genomeName: string, sessionState: object) => {
+            return {
+                type: ActionType.SET_GENOME_RESTORE_SESSION,
+                genomeName,
+                sessionState,
+            };
+        },
+
+        toggleNavigator: () => {
+            return { type: ActionType.TOGGLE_NAVIGATOR };
+        },
+
+        toggleVR: () => {
+            return { type: ActionType.TOGGLE_SHOWING_VR };
+        },
+
+        setCustomTracksPool: (customTracksPool: TrackModel[]) => {
+            return { type: ActionType.SET_CUSTOM_TRACKS_POOL, customTracksPool };
+        },
+
+        setTracksCustomTracksPool: (
+            tracks: TrackModel[],
+            customTracksPool: TrackModel[],
+            withDefaultTracks: boolean = true
+        ) => {
+            return {
+                idx: idx,
+                type: ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL,
+                tracks,
+                customTracksPool,
+                withDefaultTracks,
+            };
+        },
+
+        setHubSessionStorage: (state: AppState, customTracksPool: TrackModel[]) => {
+            return {
+                type: ActionType.SET_HUB_SESSION_STORAGE,
+                state,
+                customTracksPool,
+            };
+        },
+
+        setCustomVirusGenome: (name: string, seqId: string, seq: string, tracks: any[], annTracks: any) => {
+            return { type: ActionType.SET_CUSTOM_VIRUS_GENOME, name, seqId, seq, tracks, annTracks };
+        },
+
+        setVirusBrowserMode: () => {
+            return { type: ActionType.SET_VIRUS_BROWSER_MODE };
+        },
+
+        setLayout: (layout: object) => {
+            return {
+                idx: idx,
+                type: ActionType.SET_LAYOUT,
+                layout,
+            };
+        },
+
+        // setThreedTracks: (newTracks: TrackModel[]) => {
+        //     return { type: ActionType.SET_G3D_TRACKS, threedTracks: newTracks };
+        // },
+
+        /**
+         * Action for updating state for highlight items
+         * @param highlights array of HighlightItems that are created in HighlightMenu.js
+         * @returns
+         */
+        setHighlights: (highlights: HighlightInterval[]) => {
+            // console.log(highlights);
+            return { idx: idx, type: ActionType.SET_HIGHLIGHTS, highlights };
+        },
+    };
+};
+
 function getInitialState(): AppState {
     let state = initialState;
+    console.log("🚀 ~ file: AppState.ts ~ line 418 ~ getInitialState ~ initialState", state);
     const { query } = querySting.parseUrl(window.location.href);
     let newState;
     if (!_.isEmpty(query)) {
@@ -326,12 +496,40 @@ function getInitialState(): AppState {
             console.error(error);
         }
     }
+
+    console.log("temporary: creating artificial dual genomes.");
+    (state as AppState).genomeNames = ['mm39', 'rn7'];
+    (state as AppState).genomeStates = state.genomeNames.map((name:string, idx:number) => {
+        const {
+            genome,
+            navContext,
+            cytobands,
+            defaultRegion,
+            defaultTracks,
+            publicHubData,
+            publicHubList,
+            annotationTracks,
+            twoBitURL,
+        } = getGenomeConfig(name);
+        return {
+            tracks: defaultTracks,
+            synced: true,
+            viewRegion: null,
+            metadataTerms: null,
+            regionSets: null,
+            regionSetView: null,
+            trackLegendWidth: null,
+            highlights: null
+        }
+    });
+    
+
     return state;
 }
 
 function getNextState(prevState: AppState, action: AppAction): AppState {
     if (!prevState) {
-        return getInitialState();
+        return getInitialState(); 
     }
 
     switch (action.type) {
@@ -399,8 +597,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, trackLegendWidth: action.width };
         case ActionType.RESTORE_SESSION:
             const sessionState = new AppStateLoader().fromObject(action.sessionState);
-            if (!sessionState.bundleId){
-                return {...sessionState, bundleId: uuid.v1()}
+            if (!sessionState.bundleId) {
+                return { ...sessionState, bundleId: uuid.v1() }
             }
             return sessionState;
         case ActionType.RETRIEVE_BUNDLE:
@@ -485,12 +683,12 @@ function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
 
 const rootReducer = !process.env.REACT_APP_NO_FIREBASE
     ? combineReducers({
-          browser: undoable(getNextState, { limit: 20 }),
-          firebase: firebaseReducer,
-      })
+        browser: undoable(getNextState, { limit: 20 }),
+        firebase: firebaseReducer,
+    })
     : combineReducers({
-          browser: undoable(getNextState, { limit: 20 }),
-      });
+        browser: undoable(getNextState, { limit: 20 }),
+    });
 
 if (!process.env.REACT_APP_NO_FIREBASE) {
     // Firebase config
@@ -530,22 +728,22 @@ async function asyncInitState() {
                 const tracks = customTracksPool.filter((track: any) => track.showOnHubLoad);
                 if (tracks.length > 0) {
                     AppState.dispatch(
-                        ActionCreators.setTracksCustomTracksPool(tracks, customTracksPool, withDefaultTracks)
+                        GlobalActionCreators.setTracksCustomTracksPool(tracks, customTracksPool, withDefaultTracks)
                     );
                 } else {
-                    AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
+                    AppState.dispatch(GlobalActionCreators.setCustomTracksPool(customTracksPool));
                 }
             }
         }
         if (query.sessionFile) {
             const json = await new Json5Fetcher().get(query.sessionFile as string);
             if (json) {
-                AppState.dispatch(ActionCreators.restoreSession(json));
+                AppState.dispatch(GlobalActionCreators.restoreSession(json));
                 // when position in URL with sessionFile, see issue #245
                 if (query.position) {
                     const state = new AppStateLoader().fromObject(json);
                     const interval = state.viewRegion.getNavigationContext().parse(query.position as string);
-                    AppState.dispatch(ActionCreators.setViewRegion(interval.start, interval.end));
+                    AppState.dispatch(GlobalActionCreators.setViewRegion(interval.start, interval.end));
                 }
             }
         }
@@ -571,15 +769,15 @@ async function asyncInitState() {
                             });
                             const tracks = [...state.tracks, ...filteredTracks];
                             const finalState = { ...state, tracks };
-                            AppState.dispatch(ActionCreators.setHubSessionStorage(finalState, customTracksPool));
+                            AppState.dispatch(GlobalActionCreators.setHubSessionStorage(finalState, customTracksPool));
                         } else {
                             //if url changed genome
                             if (tracksInHub.length > 0) {
                                 AppState.dispatch(
-                                    ActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool)
+                                    GlobalActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool)
                                 );
                             } else {
-                                AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
+                                AppState.dispatch(GlobalActionCreators.setCustomTracksPool(customTracksPool));
                             }
                         }
                     } catch (error) {
@@ -588,15 +786,15 @@ async function asyncInitState() {
                     }
                 } else {
                     if (tracksInHub.length > 0) {
-                        AppState.dispatch(ActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool));
+                        AppState.dispatch(GlobalActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool));
                     } else {
-                        AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
+                        AppState.dispatch(GlobalActionCreators.setCustomTracksPool(customTracksPool));
                     }
                 }
             }
         }
         if (query.virusBrowserMode) {
-            AppState.dispatch(ActionCreators.setVirusBrowserMode());
+            AppState.dispatch(GlobalActionCreators.setVirusBrowserMode());
         }
     }
 }
