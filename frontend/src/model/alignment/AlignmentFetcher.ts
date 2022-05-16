@@ -50,7 +50,7 @@ export class AlignmentFetcher {
         if (this.isBigChain) {
             return new WorkerSource(BigGmodWorker, url);
         } else {
-            return new WorkerSource(GenomeAlignWorker, url);
+            return new WorkerSource(GenomeAlignWorker, url, this.queryTrack.indexUrl);
         }
     }
 
