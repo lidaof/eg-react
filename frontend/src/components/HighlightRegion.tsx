@@ -5,6 +5,7 @@ import { withTrackLegendWidth } from './withTrackLegendWidth';
 import { ViewExpansion } from '../model/RegionExpander';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import { HighlightInterval } from '../components/trackContainers/HighlightMenu';
+import { TrackData } from './trackContainers/TrackDataManager';
 
 import './HighlightRegion.css';
 
@@ -16,6 +17,7 @@ interface HighlightRegionProps {
     xOffset: number;
     viewRegion: ChromosomeInterval;
     highlights: HighlightInterval[];
+    trackData?: TrackData;
 }
 
 
@@ -26,11 +28,18 @@ interface HighlightRegionProps {
  * @param legendWidth 
  * @returns 
  */
-export const getHighlightedXs = (interval: OpenInterval, visData: ViewExpansion, legendWidth: number): OpenInterval => {
+export const getHighlightedXs = (interval: OpenInterval, visData: ViewExpansion, legendWidth: number, trackData: TrackData): OpenInterval => {
     const { viewWindowRegion, viewWindow } = visData;
+    const navBuilds = Object.keys(trackData).map(k => trackData[k].alignment).filter(x => x).map(x => x.navContextBuilder);
+    // console.log(navBuilds)
     let start, end;
+    let newIntervalStart = interval.start, newIntervalEnd = interval.end;
+    navBuilds.forEach(build => {
+        newIntervalStart = build.convertOldCoordinates(newIntervalStart);
+        newIntervalEnd = build.convertOldCoordinates(newIntervalEnd);
+    })
     const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
-    const xRegion = drawModel.baseSpanToXSpan(interval);
+    const xRegion = drawModel.baseSpanToXSpan(new OpenInterval(newIntervalStart, newIntervalEnd));
     start = Math.max(legendWidth, xRegion.start + legendWidth);
     end = xRegion.end + legendWidth;
     if (end <= start) {
@@ -64,9 +73,9 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      */
     render(): JSX.Element {
         // console.log(this.props)
-        const { height, y, children, xOffset, highlights, legendWidth, visData } = this.props;
+        const { height, y, children, xOffset, highlights, legendWidth, visData, trackData } = this.props;
 
-        const xS = highlights.map(h => getHighlightedXs(new OpenInterval(h.start, h.end), visData, legendWidth));
+        const xS = highlights.map(h => getHighlightedXs(new OpenInterval(h.start, h.end), visData, legendWidth, trackData));
         const theBoxes = highlights.map((item, idx) => {
             const style = {
                 left: xS[idx].start + xOffset + "px",

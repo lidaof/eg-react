@@ -69,6 +69,7 @@ export interface Alignment {
     primaryGenome: string;
     queryGenome: string;
     basesPerPixel: number;
+    navContextBuilder?: NavContextBuilder;
 }
 
 export interface MultiAlignment {
@@ -407,6 +408,7 @@ export class MultiAlignmentViewCalculator {
             primaryGenome: this.primaryGenome,
             queryGenome: query,
             basesPerPixel: drawModel.xWidthToBases(1),
+            navContextBuilder,
         };
     }
 
