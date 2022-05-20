@@ -806,6 +806,7 @@ class TrackContainer extends React.Component {
                                     xOffset={this.state.xOffset}
                                     highlights={highlights}
                                     trackData={trackData}
+                                    tracks={tracks}
                                 >
                                     {this.renderSubContainer()}
                                 </HighlightRegion>
