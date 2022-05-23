@@ -6,6 +6,8 @@
         "type": "git",
         "url": "https://github.com/lidaof/eg-react.git"
     },
+    "homepage": "./",
+    "main": "./public/electron.js",
     "scripts": {
         "build": "react-app-rewired build",
         "build-emb": "react-app-rewired build --config-overrides ./make-embed.config.js",
@@ -16,7 +18,8 @@
         "test": "react-app-rewired test --env=jsdom",
         "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
         "postdeploy": "aws cloudfront create-invalidation --distribution-id E3E258KR33918Y --paths \"/*\"",
-        "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules"
+        "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules",
+        "electron:start": "concurrently -k \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electronmon .\""
     },
     "peerDependencies": {
         "prop-types": "^15.6.0",
@@ -84,9 +87,13 @@
         "codemirror": "^5.55.0",
         "color-parse": "^1.4.2",
         "color-rgba": "^2.1.1",
+        "concurrently": "^7.2.1",
         "cross-env": "^5.2.1",
         "curved-menu": "^1.0.9",
         "d3": "^4.12.0",
+        "electron": "^18.2.4",
+        "electron-builder": "^23.0.3",
+        "electronmon": "^2.0.2",
         "enzyme": "^3.11.0",
         "enzyme-adapter-react-16": "^1.15.2",
         "eslint-plugin-prettier": "^3.1.4",
@@ -162,6 +169,7 @@
         "underscore": "^1.10.2",
         "util": "^0.12.3",
         "uuid": "^3.4.0",
+        "wait-on": "^6.0.1",
         "webpack": "^4.42.0",
         "webpack-cli": "^3.3.12",
         "workbox-webpack-plugin": "^4.3.1",
@@ -178,17 +186,12 @@
         "umd"
     ],
     "description": "WashU Epigenome Browser",
-    "homepage": "https://epigenomegateway.wustl.edu/browser",
     "browserslist": {
         "production": [
-            ">0.2%",
-            "not dead",
-            "not op_mini all"
+            "last 1 electron version"
         ],
         "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
+            "last 1 electron version"
         ]
     },
     "proxy": "http://localhost:3001/"
