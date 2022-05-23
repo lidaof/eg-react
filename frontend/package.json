@@ -8,6 +8,23 @@
     },
     "homepage": "./",
     "main": "./public/electron.js",
+    "build": {
+        "appId": "com.electron.myapp",
+        "productName": "WashU Epigenome Browser",
+        "files": ["build/**/*", "node_modules/**/*"],
+        "directories": {
+            "buildResources": "public"
+        },
+        "mac": {
+            "target": "dmg"
+        },
+        "win": {
+            "target": "nsis"
+        },
+        "linux": {
+            "target": "deb"
+        }
+    },
     "scripts": {
         "build": "react-app-rewired build",
         "build-emb": "react-app-rewired build --config-overrides ./make-embed.config.js",
@@ -19,7 +36,10 @@
         "deploy": "aws s3 sync ~/eg-react/frontend/build/ s3://epigenomegateway.org/browser/ --delete",
         "postdeploy": "aws cloudfront create-invalidation --distribution-id E3E258KR33918Y --paths \"/*\"",
         "build-pkg": "rm -rf dist && cross-env NODE_ENV=production babel src/ --out-dir dist --extensions \".ts,.tsx,.js,.jsx\" --copy-files --ignore __tests__,spec.js,test.js,__snapshots__,umd,build,public,node_modules",
-        "electron:start": "concurrently -k \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electronmon .\""
+        "electron:start": "concurrently -k \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electronmon .\"",
+        "electron:package:mac": "npm build && electron-builder -m -c.extraMetadata.main=build/electron.js",
+        "electron:package:win": "npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js",
+        "electron:package:linux": "npm run build && electron-builder -l -c.extraMetadata.main=build/electron.js"
     },
     "peerDependencies": {
         "prop-types": "^15.6.0",
