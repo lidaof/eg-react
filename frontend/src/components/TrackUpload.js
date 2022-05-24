@@ -7,6 +7,7 @@ import JSON5 from "json5";
 import { readFileAsText, HELP_LINKS } from "../util";
 import { TrackOptionsUI } from "./trackManagers/TrackOptionsUI";
 import { TYPES_DESC } from "./trackManagers/CustomTrackAdder";
+const fs = require('fs');
 
 const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract", "g3d", "dynseq", "rgbpeak"]; // all lower case
 
@@ -78,6 +79,10 @@ export class TrackUpload extends React.Component {
             ];
         }
         this.props.onTracksAdded(tracks);
+
+        // save track local file paths to Redux
+        console.log(this.props);
+
         this.setState({ msg: "Track added." });
     };
 

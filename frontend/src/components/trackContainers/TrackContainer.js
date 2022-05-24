@@ -628,6 +628,7 @@ class TrackContainer extends React.Component {
             onSetImageInfo,
         } = this.props;
 
+        console.log(tracks);
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];

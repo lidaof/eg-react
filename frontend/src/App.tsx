@@ -239,6 +239,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         const newTracks = this.props.tracks.concat(tracks);
         this.props.onTracksChanged(newTracks);
         this.updateOtherPublicHubs(newTracks);
+        console.log(this.props.tracks);
     }
 
     removeTrack(indexToRemove: number) {
