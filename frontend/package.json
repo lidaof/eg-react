@@ -2,6 +2,7 @@
     "name": "epgg",
     "version": "53.7.0",
     "author": "Ting Wang Lab @WUSTL",
+    "email": "twang@wustl.edu",
     "repository": {
         "type": "git",
         "url": "https://github.com/lidaof/eg-react.git"
@@ -9,7 +10,7 @@
     "homepage": "./",
     "main": "./public/electron.js",
     "build": {
-        "appId": "com.electron.myapp",
+        "appId": "washu.epigenome.browser",
         "productName": "WashU Epigenome Browser",
         "files": ["build/**/*", "node_modules/**/*"],
         "directories": {
