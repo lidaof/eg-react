@@ -193,7 +193,7 @@ const publicHubList = [
     {
         collection: "HiC interaction from HiGlass",
         name: "HiC interaction from HiGlass",
-        numTracks: 79,
+        numTracks: 78,
         oldHubFormat: false,
         url: "https://wangftp.wustl.edu/~dli/eg-hubs/higlass/2019/mm10_cool.json",
     },
