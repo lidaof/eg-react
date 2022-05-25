@@ -33,6 +33,8 @@ import { SessionUI } from "./SessionUI";
 import Logo from '../images/logo.png'
 
 import "./GenomePicker.css";
+import { Brightness2 } from "@material-ui/icons";
+import _ from "lodash";
 
 /**
  * loading page for choose genome
@@ -40,7 +42,7 @@ import "./GenomePicker.css";
  * @author Shane Liu
  */
 
-const callbacks = { onGenomeSelected: GlobalActionCreators.setGenome };
+const callbacks = { onGenomeSelected: GlobalActionCreators.setGenome, onMultipleGenomeSelected: GlobalActionCreators.setMultipleGenomes };
 
 const LinkWithMargin = withStyles({
     root: {
@@ -87,30 +89,33 @@ function a11yProps(index: number) {
 
 interface GenomePickerContainerProps {
     onGenomeSelected: (name: string) => void;
+    onMultipleGenomeSelected: (names: string[]) => void;
     bundleId: string;
 }
 
 interface GenomePickerProps {
     onGenomeSelected: (name: string) => void;
+    onMultipleGenomeSelected: (names: string[]) => void;
     title?: string;
 }
 
 export function GenomePicker(props: GenomePickerProps) {
     const [searchText, setSearchText] = useState<string>("");
-    const [metaText, setMetaText] = useState<string>("Hold shift to select multiple");
     const [shiftHeld, setShiftHeld] = useState<boolean>(false);
-    const [genomesSelected, setGenomesSelected] = useState<string[]>([]);
+    const [genomesSelected, setGenomesSelected] = useState<{[key: string]: boolean}>({});
 
     function downHandler({ key }: { key: string }) {
-        if (key === 'Shift') {
-            setShiftHeld(true);
+        if (key === 'Shift') { return setShiftHeld(true); }
+        if (key === 'Escape') {
+            setGenomesSelected({});
         }
     }
 
     function upHandler({ key }: { key: string }) {
         if (key === 'Shift') {
             if (genomesSelected.length) {
-                setGenomesSelected([]);
+                props.onMultipleGenomeSelected(Object.keys(genomesSelected));
+                setGenomesSelected({});
             }
             setShiftHeld(false);
         }
@@ -127,7 +132,7 @@ export function GenomePicker(props: GenomePickerProps) {
 
     const handleGenomePicked = (genomeName: string) => {
         if (shiftHeld) {
-            setGenomesSelected([...genomesSelected, genomeName]);
+            setGenomesSelected({...genomesSelected, [genomeName]: !genomesSelected[genomeName]});
         } else {
             props.onGenomeSelected(genomeName)
         }
@@ -156,6 +161,8 @@ export function GenomePicker(props: GenomePickerProps) {
                         <GenomePickerCard
                             species={species2}
                             details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
+                            // TODO: Optimize how selected genomes are shown.
+                            selected={genomesSelected}
                             onChoose={handleGenomePicked}
                         />
                     </Grid>
@@ -163,12 +170,27 @@ export function GenomePicker(props: GenomePickerProps) {
             });
     };
 
+    let metaText = "";
+    if (shiftHeld) {
+        const keyLength = Object.values(genomesSelected).filter(e => e).length;
+        if (keyLength) {
+            metaText = `Release to select ${keyLength} genomes, or esc to cancel`;
+        } else {
+            metaText = "Click on multiple genomes to select";
+        }
+    } else {
+        metaText = "Hold shift to select multiple";
+    }
+
     return (
         <Container maxWidth="md">
             <Grid container spacing={4}>
                 <Grid item xs={12} md={6}>
-                    <Typography variant="h4" style={{ margin: "25px", marginLeft: 0 }}>
+                    <Typography variant="h4" style={{ margin: "25px", marginLeft: 0, marginBottom: 0 }}>
                         {props.title || "Please select a genome"}
+                    </Typography>
+                    <Typography variant="body1" style={{ margin: 3 }}>
+                        {metaText}
                     </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -231,7 +253,7 @@ function GenomePickerContainer(props: GenomePickerProps) {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <GenomePicker onGenomeSelected={props.onGenomeSelected} />
+                    <GenomePicker onGenomeSelected={props.onGenomeSelected} onMultipleGenomeSelected={props.onMultipleGenomeSelected} />
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
                     {!process.env.REACT_APP_NO_FIREBASE ? (
@@ -293,18 +315,29 @@ function AppHeader() {
 interface GenomePickerCardProps {
     species: string;
     details: { logoUrl: string; assemblies: string[] };
+    selected: {[key:string]: boolean};
     onChoose: (genomeName: string) => void;
 }
 
 function GenomePickerCard(props: GenomePickerCardProps) {
     const styles = useStyles();
-    const { species, details, onChoose } = props;
+    const { species, selected, details, onChoose } = props;
     const { logoUrl, assemblies } = details;
 
     const renderAssemblies = () => {
         return assemblies.map((assembly, idx) => {
+            const isSelected = !!selected[assembly];
             return (
-                <ListItem key={idx} button onClick={() => onChoose(assembly)} style={{ height: 25 }}>
+                // TODO: improve the selected style, ideally to match the material ui style
+                <ListItem
+                    key={idx}
+                    button
+                    onClick={() => onChoose(assembly)}
+                    style={{
+                        height: 25,
+                        backgroundColor: isSelected ? 'lightgray' : 'white',
+                        borderRadius: 7
+                    }}>
                     <ListItemIcon>
                         <ChevronRightIcon />
                     </ListItemIcon>
