@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Card from "@material-ui/core/Card";
@@ -96,7 +96,42 @@ interface GenomePickerProps {
 }
 
 export function GenomePicker(props: GenomePickerProps) {
-    const [searchText, setSearchText] = useState("");
+    const [searchText, setSearchText] = useState<string>("");
+    const [metaText, setMetaText] = useState<string>("Hold shift to select multiple");
+    const [shiftHeld, setShiftHeld] = useState<boolean>(false);
+    const [genomesSelected, setGenomesSelected] = useState<string[]>([]);
+
+    function downHandler({ key }: { key: string }) {
+        if (key === 'Shift') {
+            setShiftHeld(true);
+        }
+    }
+
+    function upHandler({ key }: { key: string }) {
+        if (key === 'Shift') {
+            if (genomesSelected.length) {
+                setGenomesSelected([]);
+            }
+            setShiftHeld(false);
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener('keydown', downHandler);
+        window.addEventListener('keyup', upHandler);
+        return () => {
+            window.removeEventListener('keydown', downHandler);
+            window.removeEventListener('keyup', upHandler);
+        };
+    }, []);
+
+    const handleGenomePicked = (genomeName: string) => {
+        if (shiftHeld) {
+            setGenomesSelected([...genomesSelected, genomeName]);
+        } else {
+            props.onGenomeSelected(genomeName)
+        }
+    }
 
     // Map the genomes to a list of cards. Genome search engine filters by both the species and the different assemblies.
     // It is not case sensitive.
@@ -121,7 +156,7 @@ export function GenomePicker(props: GenomePickerProps) {
                         <GenomePickerCard
                             species={species2}
                             details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
-                            onChoose={(genomeName: string) => props.onGenomeSelected(genomeName)}
+                            onChoose={handleGenomePicked}
                         />
                     </Grid>
                 );

@@ -12,7 +12,7 @@ import "firebase/database";
 import { firebaseReducer, reactReduxFirebase } from "react-redux-firebase";
 import undoable from "redux-undo";
 import querySting from "query-string";
-import _ from "lodash";
+import _, { attempt } from "lodash";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
 import DisplayedRegionModel from "./model/DisplayedRegionModel";
 import { AppStateSaver, AppStateLoader } from "./model/AppSaveLoad";
@@ -29,6 +29,8 @@ import Chromosome from "./model/genomes/Chromosome";
 // import mm39 and rn7 from "./model/genomes/allGenomes";
 import MM39 from "model/genomes/mm39/mm39";
 import RN7 from "model/genomes/rn7/rn7";
+import { arrayCopy } from "vendor/igv/inflate";
+import { ArrowLeft } from "@material-ui/icons";
 console.log("🚀 ~ file: AppState.ts ~ line 31 ~ MM39", MM39)
 
 export let STORAGE: any = window.sessionStorage;
@@ -84,26 +86,14 @@ export interface AppState {
     highlights?: HighlightInterval[];
 }
 
-export interface UnifiedState {
-    selectedGenomes: string[];
-    genomes: GenomeState[];
-
-    sessionFromUrl?: boolean;
-    isShowingNavigator: boolean;
-    isShowingVR?: boolean;
-    virusBrowserMode?: boolean;
-    layout?: object;
-}
-
 // state for a single genome.
 export interface GenomeState {
-    // genomeName: string;
-    // bundleId: string; // consider: is this the same for maternal / paternal?
+    genomeName: string;
+    title: string;
     tracks: TrackModel[];
     customTracksPool?: TrackModel[];
     genomeConfig?: object;
 
-    synced: boolean;
     // if nullable, the data starts off as null and uses the global values. these values can be overridden locally.
     viewRegion: DisplayedRegionModel | null;
     metadataTerms: string[] | null;
@@ -111,6 +101,28 @@ export interface GenomeState {
     regionSetView: RegionSet | null;
     trackLegendWidth: number | null;
     highlights: HighlightInterval[] | null;
+
+    settings?: GenomeSettings;
+}
+
+export interface GenomeSettings {
+    syncToParent: boolean;
+    syncTargetIdx: number | null;
+
+    offsetAmount: number;
+    offsetTargetIdx: number;
+}
+
+export interface SyncedContainer {
+    title: string;
+    genomes: GenomeState[];
+
+    viewRegion: DisplayedRegionModel;
+    metadataTerms: string[];
+    regionSets: RegionSet[];
+    regionSetView: RegionSet;
+    trackLegendWidth: number;
+    highlights: HighlightInterval[];
 }
 
 const bundleId = uuid.v1();
@@ -138,6 +150,7 @@ const initialState: AppState = {
 
 enum ActionType {
     SET_GENOME = "SET_GENOME",
+    SET_MULTIPLE_GENOMES = "SET_MULTIPLE_GENOMES",
     SET_VIEW_REGION = "SET_VIEW_REGION",
     SET_TRACKS = "SET_TRACKS",
     SET_METADATA_TERMS = "SET_METADATA_TERMS",
@@ -176,6 +189,10 @@ export const GlobalActionCreators = {
      */
     setGenome: (genomeName: string) => {
         return { type: ActionType.SET_GENOME, genomeName };
+    },
+
+    setMultipleGenomes: (genomeNames: string[]) => {
+        return { type: ActionType.SET_MULTIPLE_GENOMES, genomeNames };
     },
 
     setViewRegion: (newStart: number, newEnd: number) => {
@@ -512,6 +529,8 @@ function getInitialState(): AppState {
             twoBitURL,
         } = getGenomeConfig(name);
         return {
+            genomeName: name,
+            title: name,
             tracks: defaultTracks,
             synced: true,
             viewRegion: null,
@@ -519,7 +538,7 @@ function getInitialState(): AppState {
             regionSets: null,
             regionSetView: null,
             trackLegendWidth: null,
-            highlights: null
+            highlights: null,
         }
     });
     
@@ -547,6 +566,28 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 viewRegion: nextViewRegion,
                 tracks: nextTracks,
             };
+        case ActionType.SET_MULTIPLE_GENOMES:
+            const { genomeNames } = action;
+            let genomeConfigs = genomeNames.map((name:string) => {
+                let nextViewRegion = null;
+                let nextTracks: TrackModel[] = [];
+                const config = getGenomeConfig(name);
+                if (config) {
+                    nextViewRegion = new DisplayedRegionModel(config.navContext, ...genomeConfig.defaultRegion);
+                    nextTracks = config.defaultTracks;
+                }
+                return {
+                    name: name,
+                    viewRegion: nextViewRegion,
+                    tracks: nextTracks,
+                }
+            });
+            return {
+                ...initialState,
+                genomeNames,
+                genomeStates: genomeConfigs,
+            }
+            
         case ActionType.SET_CUSTOM_VIRUS_GENOME: // Setting virus genome.
             const virusTracks = action.tracks.map((data: any) => TrackModel.deserialize(data));
             const genome = new Genome(action.name, [new Chromosome(action.seqId, action.seq.length)]);
