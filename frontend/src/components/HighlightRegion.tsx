@@ -33,7 +33,7 @@ interface HighlightRegionProps {
 export const getHighlightedXs = (interval: OpenInterval, visData: ViewExpansion, legendWidth: number, tracks: TrackModel[], trackData: TrackData): OpenInterval => {
     const { viewWindowRegion, viewWindow } = visData;
     // console.log(trackData)
-    const navBuilds = tracks.map(k => trackData[k.getId()].alignment).filter(x => x).map(x => x.navContextBuilder).filter(x => x); //remove rough mode adjustment
+    const navBuilds = tracks ? tracks.map(k => trackData[k.getId()].alignment).filter(x => x).map(x => x.navContextBuilder).filter(x => x) : []; //remove rough mode adjustment
     // console.log(navBuilds)
     let start, end;
     let newIntervalStart = interval.start, newIntervalEnd = interval.end;
