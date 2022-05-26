@@ -31,7 +31,7 @@ import MM39 from "model/genomes/mm39/mm39";
 import RN7 from "model/genomes/rn7/rn7";
 import { arrayCopy } from "vendor/igv/inflate";
 import { ArrowLeft } from "@material-ui/icons";
-console.log("🚀 ~ file: AppState.ts ~ line 31 ~ MM39", MM39)
+import { getDefaultSettings } from "http2";
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
@@ -65,8 +65,7 @@ export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 export interface AppState {
     genomeName: string;
 
-    genomeNames: string[];
-    genomeStates: GenomeState[];
+    containers: SyncedContainer[];
 
     viewRegion: DisplayedRegionModel;
     tracks: TrackModel[];
@@ -88,7 +87,7 @@ export interface AppState {
 
 // state for a single genome.
 export interface GenomeState {
-    genomeName: string;
+    name: string;
     title: string;
     tracks: TrackModel[];
     customTracksPool?: TrackModel[];
@@ -102,12 +101,11 @@ export interface GenomeState {
     trackLegendWidth: number | null;
     highlights: HighlightInterval[] | null;
 
-    settings?: GenomeSettings;
+    settings: GenomeSettings;
 }
 
 export interface GenomeSettings {
-    syncToParent: boolean;
-    syncTargetIdx: number | null;
+    syncHighlights: boolean;
 
     offsetAmount: number;
     offsetTargetIdx: number;
@@ -127,10 +125,37 @@ export interface SyncedContainer {
 
 const bundleId = uuid.v1();
 
+const initialContainerSettings: GenomeSettings = {
+    syncHighlights: true,
+    
+    offsetAmount: 0,
+    offsetTargetIdx: 0
+}
+
+const initialContainer: SyncedContainer = {
+    title: "",
+    genomes: [],
+
+    viewRegion: null,
+    metadataTerms: [],
+    regionSets: [],
+    regionSetView: null,
+    trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
+    highlights: [],
+}
+
+const getInitialContainerFromData = (name: string, viewRegion: DisplayedRegionModel, genome: GenomeState): SyncedContainer => {
+    return {
+        ...initialContainer,
+        viewRegion,
+        title: name,
+        genomes: [genome],
+    }
+}
+
 const initialState: AppState = {
     genomeName: "",
-    genomeNames: [],
-    genomeStates: [],
+    containers: [],
 
     viewRegion: null,
     tracks: [],
@@ -437,11 +462,10 @@ export const GenomeActionsCreatorsFactory = (idx: number) => {
 
 function getInitialState(): AppState {
     let state = initialState;
-    console.log("🚀 ~ file: AppState.ts ~ line 418 ~ getInitialState ~ initialState", state);
+
     const { query } = querySting.parseUrl(window.location.href);
     let newState;
     if (!_.isEmpty(query)) {
-        // console.log(query);
         if (query.session) {
             window.location.href = `http://epigenomegateway.wustl.edu/legacy/?genome=${query.genome}&session=${query.session}&statusId=${query.statusId}`;
         }
@@ -501,7 +525,6 @@ function getInitialState(): AppState {
                 type: ActionType.SET_VIRUS_BROWSER_MODE,
             });
         }
-        // console.log(newState);
         return (newState as AppState) || (state as AppState);
     }
     const blob = STORAGE.getItem(SESSION_KEY);
@@ -513,35 +536,6 @@ function getInitialState(): AppState {
             console.error(error);
         }
     }
-
-    console.log("temporary: creating artificial dual genomes.");
-    (state as AppState).genomeNames = ['mm39', 'rn7'];
-    (state as AppState).genomeStates = state.genomeNames.map((name:string, idx:number) => {
-        const {
-            genome,
-            navContext,
-            cytobands,
-            defaultRegion,
-            defaultTracks,
-            publicHubData,
-            publicHubList,
-            annotationTracks,
-            twoBitURL,
-        } = getGenomeConfig(name);
-        return {
-            genomeName: name,
-            title: name,
-            tracks: defaultTracks,
-            synced: true,
-            viewRegion: null,
-            metadataTerms: null,
-            regionSets: null,
-            regionSetView: null,
-            trackLegendWidth: null,
-            highlights: null,
-        }
-    });
-    
 
     return state;
 }
@@ -568,24 +562,42 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             };
         case ActionType.SET_MULTIPLE_GENOMES:
             const { genomeNames } = action;
-            let genomeConfigs = genomeNames.map((name:string) => {
+            const genomeContainers: SyncedContainer[] = genomeNames.map((name:string) => {
                 let nextViewRegion = null;
                 let nextTracks: TrackModel[] = [];
-                const config = getGenomeConfig(name);
+                const {
+                    genome,
+                    navContext,
+                    cytobands,
+                    defaultRegion,
+                    defaultTracks,
+                    publicHubData,
+                    publicHubList,
+                    annotationTracks,
+                    twoBitURL,
+                } = getGenomeConfig(name);
                 if (config) {
-                    nextViewRegion = new DisplayedRegionModel(config.navContext, ...genomeConfig.defaultRegion);
-                    nextTracks = config.defaultTracks;
+                    nextViewRegion = new DisplayedRegionModel(navContext, ...defaultRegion);
+                    nextTracks = defaultTracks;
                 }
-                return {
+                return getInitialContainerFromData(name, nextViewRegion, {
                     name: name,
-                    viewRegion: nextViewRegion,
+                    title: name,
                     tracks: nextTracks,
-                }
+
+                    viewRegion: null,
+                    metadataTerms: null,
+                    regionSets: null,
+                    regionSetView: null,
+                    trackLegendWidth: null,
+                    highlights: null,
+
+                    settings: initialContainerSettings,
+                })
             });
             return {
                 ...initialState,
-                genomeNames,
-                genomeStates: genomeConfigs,
+                containers: genomeContainers
             }
             
         case ActionType.SET_CUSTOM_VIRUS_GENOME: // Setting virus genome.

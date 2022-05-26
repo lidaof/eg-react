@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Card from "@material-ui/core/Card";
@@ -102,18 +102,19 @@ interface GenomePickerProps {
 export function GenomePicker(props: GenomePickerProps) {
     const [searchText, setSearchText] = useState<string>("");
     const [shiftHeld, setShiftHeld] = useState<boolean>(false);
-    const [genomesSelected, setGenomesSelected] = useState<{[key: string]: boolean}>({});
+    const [genomesSelected, setGenomesSelected] = useState<{ [key: string]: boolean }>({});
 
-    function downHandler({ key }: { key: string }) {
+    const downHandler = ({ key }: { key: string }) => {
         if (key === 'Shift') { return setShiftHeld(true); }
         if (key === 'Escape') {
             setGenomesSelected({});
         }
     }
 
-    function upHandler({ key }: { key: string }) {
+    const upHandler = ({ key }: { key: string }) => {
         if (key === 'Shift') {
-            if (genomesSelected.length) {
+            console.log(genomesSelected);
+            if (Object.values(genomesSelected).filter(e => e).length) {
                 props.onMultipleGenomeSelected(Object.keys(genomesSelected));
                 setGenomesSelected({});
             }
@@ -128,11 +129,11 @@ export function GenomePicker(props: GenomePickerProps) {
             window.removeEventListener('keydown', downHandler);
             window.removeEventListener('keyup', upHandler);
         };
-    }, []);
+    }, [genomesSelected]);
 
     const handleGenomePicked = (genomeName: string) => {
         if (shiftHeld) {
-            setGenomesSelected({...genomesSelected, [genomeName]: !genomesSelected[genomeName]});
+            setGenomesSelected({ ...genomesSelected, [genomeName]: !genomesSelected[genomeName] });
         } else {
             props.onGenomeSelected(genomeName)
         }
@@ -315,7 +316,7 @@ function AppHeader() {
 interface GenomePickerCardProps {
     species: string;
     details: { logoUrl: string; assemblies: string[] };
-    selected: {[key:string]: boolean};
+    selected: { [key: string]: boolean };
     onChoose: (genomeName: string) => void;
 }
 

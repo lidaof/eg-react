@@ -355,9 +355,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             genomeNames,
             genomeStates,
         } = this.props;
-        console.log("🚀 ~ file: App.tsx ~ line 350 ~ App ~ render ~ this.props", this.props);
-        console.log("🚀 ~ file: App.tsx ~ line 350 ~ App ~ render ~ this.state", this.state);
-
         
         if (sessionFromUrl) {
             return (

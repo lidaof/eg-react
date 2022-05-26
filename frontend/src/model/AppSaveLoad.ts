@@ -83,8 +83,7 @@ export class AppStateLoader {
             layout: object.layout || {},
             highlights: object.highlights || [],
 
-            genomeNames: object.genomeNames,
-            genomeStates: object.genomeStates
+            containers: object.containers,
             // threedTracks: object.threedTracks.map((data: any) => TrackModel.deserialize(data)),
         };
     }
