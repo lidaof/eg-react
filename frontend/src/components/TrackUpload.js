@@ -7,7 +7,6 @@ import JSON5 from "json5";
 import { readFileAsText, HELP_LINKS } from "../util";
 import { TrackOptionsUI } from "./trackManagers/TrackOptionsUI";
 import { TYPES_DESC } from "./trackManagers/CustomTrackAdder";
-const fs = require('fs');
 
 const ONE_TRACK_FILE_LIST = ["bigwig", "bigbed", "hic", "biginteract", "g3d", "dynseq", "rgbpeak"]; // all lower case
 
@@ -42,15 +41,22 @@ export class TrackUpload extends React.Component {
         this.setState({ msg: "Uploading track..." });
         let tracks;
         const { options } = this.state;
+        // let fileHandle;
+        // let [fileHandle] = await window.showOpenFilePicker({ multiple: false });
+        // console.log(fileHandle);
+        // console.log(await fileHandle.getFile());
+        // const fileList = Array.from(await fileHandle.getFile());
         const fileList = Array.from(event.target.files);
         const { indexSuffix } = this.state;
+        console.log(fileList);
         if (ONE_TRACK_FILE_LIST.includes(this.state.fileType.toLocaleLowerCase())) {
             tracks = fileList.map(
                 (file) =>
                     new TrackModel({
                         type: this.state.fileType,
-                        url: null,
-                        fileObj: file,
+                        url: file.path,
+                        // fileObj: file,
+                        fileObj: false,
                         name: file.name,
                         label: file.name,
                         files: null,
@@ -69,8 +75,9 @@ export class TrackUpload extends React.Component {
             tracks = [
                 new TrackModel({
                     type: this.state.fileType,
-                    url: null,
-                    fileObj: fileList[0],
+                    url: fileList[0].path,
+                    // fileObj: fileList[0],
+                    fileObj: null,
                     name: fileList[0].name,
                     label: fileList[0].name,
                     files: fileList,
@@ -204,6 +211,7 @@ export class TrackUpload extends React.Component {
                 <label htmlFor="trackFile">
                     <h3>2. Choose track file:</h3>
                     <input type="file" id="trackFile" multiple onChange={this.handleFileUpload} />
+                    {/* <button id="trackFile" onClick={this.handleFileUpload}>Choose Files</button> */}
                 </label>
             </div>
         );

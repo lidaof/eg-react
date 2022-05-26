@@ -7,6 +7,7 @@ import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { NumericalFeature } from "../../model/Feature";
 import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 import TrackModel, { TrackOptions } from "model/TrackModel";
+import * as fs from 'fs';
 
 export class BigWigTrackConfig extends TrackConfig {
     private numericalTrackConfig: NumericalTrackConfig;
@@ -17,6 +18,11 @@ export class BigWigTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
+        // console.log(fs);
+        // const fileObj = fs.readFile(this.trackModel.url, () => { console.log('worked21') });
+        // console.log(fileObj);
+        // return new LocalBigSourceGmod(fileObj);
+        // return new WorkerSource(BigGmodWorker, this.trackModel.url);
         if (this.trackModel.fileObj) {
             return new LocalBigSourceGmod(this.trackModel.fileObj);
         } else {

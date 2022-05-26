@@ -336,6 +336,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             highlights,
             onSetHighlights,
         } = this.props;
+        console.log(tracks);
         if (sessionFromUrl) {
             return (
                 <div className="container-fluid">
