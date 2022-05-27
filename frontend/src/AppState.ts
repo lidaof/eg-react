@@ -94,11 +94,6 @@ export interface GenomeState {
     genomeConfig?: object;
 
     // if nullable, the data starts off as null and uses the global values. these values can be overridden locally.
-    viewRegion: DisplayedRegionModel | null;
-    metadataTerms: string[] | null;
-    regionSets: RegionSet[] | null;
-    regionSetView: RegionSet | null;
-    trackLegendWidth: number | null;
     highlights: HighlightInterval[] | null;
 
     settings: GenomeSettings;
@@ -585,11 +580,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     title: name,
                     tracks: nextTracks,
 
-                    viewRegion: null,
-                    metadataTerms: null,
-                    regionSets: null,
-                    regionSetView: null,
-                    trackLegendWidth: null,
                     highlights: null,
 
                     settings: initialContainerSettings,

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { GenomeActionsCreatorsFactory } from "AppState";
+import { GenomeActionsCreatorsFactory, GenomeState, SyncedContainer } from "AppState";
 import Nav from "./Nav";
 import TrackContainer from './trackContainers/TrackContainer';
 
@@ -7,34 +7,52 @@ interface StateSyncSettingsProps {
     actionCreators: any;
 }
 
-function StateSyncSettings(props:StateSyncSettingsProps) {
+function StateSyncSettings(props: StateSyncSettingsProps) {
     const { actionCreators } = props;
 
     return (
         <div>
-            
+
         </div>
     )
 }
 
 interface GenomeProps {
     stateIdx: number;
-    // navProps: object;
-    trackContainerProps: object;
+
+    // containerData
+    cdata: SyncedContainer;
 }
 
-function Genome(props: GenomeProps) {
-    const { stateIdx, trackContainerProps } = props;
+function ContainerView(props: GenomeProps) {
+    const { stateIdx, cdata } = props;
+    const { title, genomes, viewRegion, metadataTerms, regionSets, regionSetView, trackLegendWidth, highlights } = cdata;
 
-    const actionCreators = useMemo(() => GenomeActionsCreatorsFactory(stateIdx), [stateIdx])
+    const [enteredRegion, setEnteredRegion] = useState(null);
+    const [highlightColor, setHighlightColor] = useState("rgba(255, 255, 0, 0.3)");
+
+    const actionCreators = useMemo(() => GenomeActionsCreatorsFactory(stateIdx), [stateIdx]);
+
+    const renderGenomes = () => {
+        genomes.map((g, idx) => (
+            <>
+                <h5>{g.title}</h5>
+                <TrackContainer 
+                    key={idx}
+                    tracks={g.tracks}
+                    viewRegion={viewRegion}
+                    
+                />
+            </>
+        ))
+    };
 
     return (
-        <>
-            <h1>{`State Index: ${stateIdx}`}</h1>
-            {/* <Nav {...navProps} /> */}
-            <TrackContainer {...trackContainerProps} />
-        </>
+        <div>
+            <h5>{`State Index: ${stateIdx}`}</h5>
+            {renderGenomes()}
+        </div>
     )
 }
 
-export default Genome;
+export default ContainerView;
