@@ -7,7 +7,7 @@ import { GlobalActionCreators, GenomeState, SyncedContainer } from "./AppState";
 import GenomePickerContainer from "./components/GenomePicker";
 import Nav from "./components/Nav";
 import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
-import ContainerView from "./components/GenomeView";
+import ContainerView from "./components/ContainerView";
 import TrackContainer from "./components/trackContainers/TrackContainer";
 import withCurrentGenome from "./components/withCurrentGenome";
 import DisplayedRegionModel from "./model/DisplayedRegionModel";
@@ -346,7 +346,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
 
             containers,
         } = this.props;
-        console.log("🚀 ~ file: App.tsx ~ line 358 ~ App ~ render ~ this.props", this.props)
         
         if (sessionFromUrl) {
             return (
@@ -424,7 +423,12 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     return (
                         <ContainerView 
                             stateIdx={idx}
+                            key={idx}
                             cdata={data}
+
+                            layoutModel={layoutModel}
+                            onSetAnchors3d={onSetAnchors3d}
+                            onSetGeneFor3d={onSetGeneFor3d}
                         />
                     )
                 })}

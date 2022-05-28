@@ -32,6 +32,7 @@ import RN7 from "model/genomes/rn7/rn7";
 import { arrayCopy } from "vendor/igv/inflate";
 import { ArrowLeft } from "@material-ui/icons";
 import { getDefaultSettings } from "http2";
+import { GenomeConfig } from "model/genomes/GenomeConfig";
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
@@ -91,7 +92,7 @@ export interface GenomeState {
     title: string;
     tracks: TrackModel[];
     customTracksPool?: TrackModel[];
-    genomeConfig?: object;
+    genomeConfig?: GenomeConfig;
 
     // if nullable, the data starts off as null and uses the global values. these values can be overridden locally.
     highlights: HighlightInterval[] | null;
@@ -136,7 +137,7 @@ const initialContainer: SyncedContainer = {
     regionSets: [],
     regionSetView: null,
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
-    highlights: [],
+    highlights: [],    
 }
 
 const getInitialContainerFromData = (name: string, viewRegion: DisplayedRegionModel, genome: GenomeState): SyncedContainer => {
