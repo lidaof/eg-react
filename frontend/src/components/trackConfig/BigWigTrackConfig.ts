@@ -7,7 +7,6 @@ import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { NumericalFeature } from "../../model/Feature";
 import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 import TrackModel, { TrackOptions } from "model/TrackModel";
-import * as fs from 'fs';
 
 export class BigWigTrackConfig extends TrackConfig {
     private numericalTrackConfig: NumericalTrackConfig;

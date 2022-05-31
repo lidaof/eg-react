@@ -40,8 +40,6 @@ import { BedcolorTrackConfig } from "./BedcolorTrackConfig";
 import { Rmskv2TrackConfig } from "./Rmskv2TrackConfig";
 import { JasparTrackConfig } from "./JasparTrackConfig";
 
-// import * as fs2 from 'file-system';
-
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 export const ALIGNMENT_TYPES = ["genomealign"];
 export const DYNAMIC_TYPES = ["dynamic", "dbedgraph", "dynamichic", "dynamiclongrange"];
@@ -110,9 +108,6 @@ if (process.env.NODE_ENV !== "production") {
 export function getTrackConfig(trackModel: TrackModel): TrackConfig {
     let type = trackModel.type || trackModel.filetype || "";
     type = type.toLowerCase();
-    // try doing readFile here
-
-    console.log(trackModel);
     const TrackConfigSubtype = TYPE_NAME_TO_CONFIG[type];
     if (TrackConfigSubtype) {
         return new TrackConfigSubtype(trackModel);

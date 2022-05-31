@@ -628,11 +628,19 @@ class TrackContainer extends React.Component {
             onSetImageInfo,
         } = this.props;
 
+        // try to handle track data fetch here
         console.log(tracks);
+        console.log(window.fs);
+        console.log(trackData);
+        console.log(window.fs.readFileSync("/home/xav1002/repos/eg-react/frontend/src/components/trackContainers/testFile.txt", 'utf8'));
+        // console.log(window.fs.readFileSync("/home/xav1002/repos/Test_Tracks/2.bigWig", 'utf8'));
+        window.fs.readFile("/home/xav1002/repos/eg-react/frontend/src/components/trackContainers/testFile.txt", 'utf8', (res) => { console.log(res) });
+
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
             const layoutProps = getTrackConfig(trackModel).isImageTrack() ? { layoutModel } : {};
+            console.log(layoutProps);
             return (
                 <TrackHandle
                     key={trackModel.getId()}
