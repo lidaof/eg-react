@@ -346,6 +346,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
 
             containers,
         } = this.props;
+        console.log("🚀 ~ file: App.tsx ~ line 349 ~ App ~ render ~ this.props", this.props)
         
         if (sessionFromUrl) {
             return (
@@ -371,6 +372,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
         const groupedTrackSets = this.groupTrackByGenome();
+        const navGenomeConfig = containers[0].genomes[0].genomeConfig || getGenomeConfig(containers[0].genomes[0].name);
         return (
             <div className="App container-fluid">
                 <Nav
@@ -381,10 +383,10 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     // onToggleHighlight={this.toggleHighlight}
                     onNewHighlight={this.newHighlight}
                     // onSetHighlightColor={this.setHighlightColor}
-                    selectedRegion={viewRegion}
+                    // selectedRegion={viewRegion}
                     onRegionSelected={onNewViewRegion}
                     tracks={tracks}
-                    genomeConfig={genomeConfig}
+                    genomeConfig={navGenomeConfig}
                     onTracksAdded={this.addTracks}
                     onTrackRemoved={this.removeTrack}
                     bundleId={bundleId}
@@ -403,9 +405,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     highlights={highlights}
                 />
                 <Notifications />
-                {isShowingNavigator && (
-                    <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} />
-                )}
                 <Offline>
                     <div className="alert alert-warning text-center lead" role="alert">
                         You are currently offline, so tracks on web won't load. But you can still use the{" "}
@@ -421,7 +420,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                 </Offline>
                 {containers.map((data:SyncedContainer, idx:number) => {
                     return (
-                        <ContainerView 
+                        <ContainerView
                             stateIdx={idx}
                             key={idx}
                             cdata={data}
@@ -429,6 +428,10 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                             layoutModel={layoutModel}
                             onSetAnchors3d={onSetAnchors3d}
                             onSetGeneFor3d={onSetGeneFor3d}
+                            viewer3dNumFrames={viewer3dNumFrames}
+                            isThereG3dTrack={isThereG3dTrack}
+                            onSetImageInfo={onSetImageInfo}
+                            isShowingNavigator={isShowingNavigator}
                         />
                     )
                 })}

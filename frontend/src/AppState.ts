@@ -540,7 +540,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
     if (!prevState) {
         return getInitialState(); 
     }
-
+    console.log(action);
     switch (action.type) {
         case ActionType.SET_GENOME: // Setting genome resets state.
             let nextViewRegion = null;

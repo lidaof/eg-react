@@ -113,7 +113,6 @@ export function GenomePicker(props: GenomePickerProps) {
 
     const upHandler = ({ key }: { key: string }) => {
         if (key === 'Shift') {
-            console.log(genomesSelected);
             if (Object.values(genomesSelected).filter(e => e).length) {
                 props.onMultipleGenomeSelected(Object.keys(genomesSelected));
                 setGenomesSelected({});

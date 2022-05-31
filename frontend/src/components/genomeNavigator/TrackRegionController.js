@@ -144,7 +144,7 @@ class TrackRegionController extends React.Component {
                         </>
                     )}
                     <h6>
-                        Region search (current region is {coordinates} <CopyToClip value={coordinates} />)
+                        Region search (current region is {129} <CopyToClip value={coordinates} />)
                     </h6>
                     <input
                         ref={(input) => (this.input = input)}

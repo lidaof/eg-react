@@ -26,8 +26,6 @@ const RULER_Y = CHROMOSOME_Y + 30;
 const SELECT_BOX_Y = "5px";
 const SELECT_BOX_HEIGHT = "60px";
 
-const PrimaryGenomeChromosomes = withCurrentGenome(Chromosomes);
-
 /**
  * The main pane of the genome navigator.  Manages child components and listens for events that modify the view region.
  * 
@@ -114,7 +112,7 @@ class MainPane extends React.Component {
      * @override
      */
     render() {
-        const {containerWidth, viewRegion, selectedRegion, onNewViewRequested, onRegionSelected} = this.props;
+        const {containerWidth, viewRegion, selectedRegion, onNewViewRequested, onRegionSelected, genomeConfig } = this.props;
         if (containerWidth === 0) {
             if (process.env.NODE_ENV !== "test") {
                 console.warn("Cannot render with a width of 0");
@@ -144,7 +142,7 @@ class MainPane extends React.Component {
                     style={{border: "1px solid black"}}
                     ref={this.componentRef}
                 >
-                    <PrimaryGenomeChromosomes viewRegion={viewRegion} width={containerWidth} y={CHROMOSOME_Y} />
+                    <Chromosomes genomeConfig={genomeConfig} viewRegion={viewRegion} width={containerWidth} y={CHROMOSOME_Y} />
                     <Ruler viewRegion={viewRegion} width={containerWidth} y={RULER_Y} />
                     <SelectedRegionBox
                         width={containerWidth}

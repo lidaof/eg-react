@@ -25,6 +25,8 @@ class GenomeNavigator extends React.Component {
          *         `newEnd`: the nav context coordinate of the end of the selected interval
          */
         onRegionSelected: PropTypes.func,
+
+        genomeConfig: PropTypes.object,
     };
 
     static defaultProps = {
@@ -145,6 +147,7 @@ class GenomeNavigator extends React.Component {
                     onRegionSelected={this.props.onRegionSelected}
                     onNewViewRequested={this.setNewView}
                     onZoom={this.zoom}
+                    genomeConfig={this.props.genomeConfig}
                 />
             </div>
         );

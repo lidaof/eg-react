@@ -47,12 +47,7 @@ const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 // HOC's //
 ///////////
 function mapStateToProps(state) {
-    return {
-        genome: state.browser.present.genomeName,
-        viewRegion: state.browser.present.viewRegion,
-        // tracks: state.browser.present.tracks,
-        metadataTerms: state.browser.present.metadataTerms,
-    };
+    return {};
 }
 
 const callbacks = {
@@ -62,7 +57,7 @@ const callbacks = {
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
-const withEnhancements = _.flowRight(withAppState, withAutoDimensions, withTrackView, withTrackData);
+const withEnhancements = _.flowRight(withAutoDimensions, withTrackView, withTrackData);
 
 /**
  * Container for holding all the tracks, and an avenue for manipulating state common to all tracks.
