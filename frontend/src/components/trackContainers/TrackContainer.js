@@ -629,18 +629,24 @@ class TrackContainer extends React.Component {
         } = this.props;
 
         // try to handle track data fetch here
-        console.log(tracks);
-        console.log(window.fs);
-        console.log(trackData);
-        console.log(window.fs.readFileSync("/home/xav1002/repos/eg-react/frontend/src/components/trackContainers/testFile.txt", 'utf8'));
+        // console.log(tracks);
+        // console.log(window.fs);
+        // console.log(trackData);
+        // console.log(window.fs.readFileSync("/home/xav1002/repos/eg-react/frontend/src/components/trackContainers/testFile.txt", 'utf8'));
         // console.log(window.fs.readFileSync("/home/xav1002/repos/Test_Tracks/2.bigWig", 'utf8'));
-        window.fs.readFile("/home/xav1002/repos/eg-react/frontend/src/components/trackContainers/testFile.txt", 'utf8', (res) => { console.log(res) });
+        // window.fs.readFile("/home/xav1002/repos/eg-react/frontend/src/components/trackContainers/testFile.txt", 'utf8', (res) => { console.log(res) });
 
         const trackElements = tracks.map((trackModel, index) => {
             const id = trackModel.getId();
             const data = trackData[id];
+            // let data;
+            // if (trackData[id] !== undefined) {
+            //     data = trackData[id];
+            // } else {
+            //     data = window.fs.readFileSync(trackModel.url, 'utf8');
+            // }
             const layoutProps = getTrackConfig(trackModel).isImageTrack() ? { layoutModel } : {};
-            console.log(layoutProps);
+            // console.log(layoutProps);
             return (
                 <TrackHandle
                     key={trackModel.getId()}
