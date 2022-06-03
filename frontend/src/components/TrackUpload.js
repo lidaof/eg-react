@@ -41,14 +41,11 @@ export class TrackUpload extends React.Component {
         this.setState({ msg: "Uploading track..." });
         let tracks;
         const { options } = this.state;
-        // let fileHandle;
-        // let [fileHandle] = await window.showOpenFilePicker({ multiple: false });
-        // console.log(fileHandle);
-        // console.log(await fileHandle.getFile());
-        // const fileList = Array.from(await fileHandle.getFile());
         const fileList = Array.from(event.target.files);
         const { indexSuffix } = this.state;
-        console.log(fileList);
+
+        console.log(event, fileList, this.state);
+
         if (ONE_TRACK_FILE_LIST.includes(this.state.fileType.toLocaleLowerCase())) {
             tracks = fileList.map(
                 (file) =>
@@ -60,6 +57,9 @@ export class TrackUpload extends React.Component {
                         name: file.name,
                         label: file.name,
                         files: null,
+                        size: file.size,
+                        // all files uploaded from this component are local
+                        isLocalFile: true,
                         options,
                     })
             );
@@ -81,6 +81,7 @@ export class TrackUpload extends React.Component {
                     name: fileList[0].name,
                     label: fileList[0].name,
                     files: fileList,
+                    isLocalFile: true,
                     options,
                 }),
             ];
@@ -139,6 +140,7 @@ export class TrackUpload extends React.Component {
                         files: null,
                         options: item.options || {},
                         metadata: item.metadata || {},
+                        isLocalFile: true,
                     });
                 } else {
                     track = new TrackModel({
@@ -150,6 +152,7 @@ export class TrackUpload extends React.Component {
                         files: [fileHash[item.filename], idxHash[item.filename + indexSuffix]],
                         options: item.options || {},
                         metadata: item.metadata || {},
+                        isLocalFile: true,
                     });
                 }
                 tracks.push(track);

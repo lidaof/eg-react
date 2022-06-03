@@ -2,6 +2,7 @@ import _ from "lodash";
 import { BigWig } from "@gmod/bbi";
 import { BlobFile } from "generic-filehandle";
 import DataSource from "../DataSource";
+import { string } from "prop-types";
 /**
  * Reads and gets data from bigwig or bigbed files hosted remotely using @gmod/bbi library
  *
@@ -14,8 +15,8 @@ class LocalBigSourceGmod extends DataSource {
      */
     constructor(blob) {
         super();
+        console.log(blob);
         this.blob = blob;
-        // console.log(this.blob);
         this.bw = new BigWig({
             filehandle: new BlobFile(blob),
         });

@@ -17,13 +17,16 @@ export class BigWigTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
-        // console.log(fs);
-        // const fileObj = fs.readFile(this.trackModel.url, () => { console.log('worked21') });
-        // console.log(fileObj);
-        // return new LocalBigSourceGmod(fileObj);
-        // return new WorkerSource(BigGmodWorker, this.trackModel.url);
-        if (this.trackModel.fileObj) {
-            return new LocalBigSourceGmod(this.trackModel.fileObj);
+        if (this.trackModel.isLocalFile) {
+            return new LocalBigSourceGmod(new Blob(
+                [JSON.stringify({
+                    name: this.trackModel.name,
+                    path: this.trackModel.url,
+                    size: this.trackModel.size,
+                    type: this.trackModel.type,
+                })],
+                null
+            ));
         } else {
             return new WorkerSource(BigGmodWorker, this.trackModel.url);
         }

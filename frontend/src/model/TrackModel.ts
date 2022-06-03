@@ -44,6 +44,7 @@ interface ITrackModel {
     fileObj?: Blob;
     queryEndpoint?: QueryEndpoint;
     querygenome?: string;
+    isLocalFile?: boolean;
 }
 
 let nextId = 0;
@@ -80,6 +81,8 @@ export class TrackModel {
     textConfig?: any;
     apiConfig?: any;
     queryEndpoint?: QueryEndpoint;
+    size?: number;
+    isLocalFile?: boolean;
 
     constructor(plainObject: ITrackModel) {
         Object.assign(this, plainObject);
@@ -101,6 +104,8 @@ export class TrackModel {
         this.textConfig = this.textConfig || {};
         this.apiConfig = this.apiConfig || {};
         this.queryEndpoint = this.queryEndpoint || {};
+        this.size = this.size || 0;
+        this.isLocalFile = this.isLocalFile || false;
         if (plainObject.querygenome) {
             // only set if there is value
             this.querygenome = plainObject.querygenome;
