@@ -17,6 +17,7 @@ export class BigWigTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
+        console.log(this.trackModel);
         if (this.trackModel.isLocalFile) {
             return new LocalBigSourceGmod(new Blob(
                 [JSON.stringify({
@@ -24,9 +25,9 @@ export class BigWigTrackConfig extends TrackConfig {
                     path: this.trackModel.url,
                     size: this.trackModel.size,
                     type: this.trackModel.type,
-                })],
-                null
-            ));
+                }, null, 2)],
+                {type : 'text/plain'}
+            ).text());
         } else {
             return new WorkerSource(BigGmodWorker, this.trackModel.url);
         }

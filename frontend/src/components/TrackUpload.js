@@ -45,6 +45,7 @@ export class TrackUpload extends React.Component {
         const { indexSuffix } = this.state;
 
         console.log(event, fileList, this.state);
+        console.log(await fileList[0].text());
 
         if (ONE_TRACK_FILE_LIST.includes(this.state.fileType.toLocaleLowerCase())) {
             tracks = fileList.map(
@@ -52,8 +53,8 @@ export class TrackUpload extends React.Component {
                     new TrackModel({
                         type: this.state.fileType,
                         url: file.path,
-                        // fileObj: file,
-                        fileObj: false,
+                        fileObj: file,
+                        // fileObj: false,
                         name: file.name,
                         label: file.name,
                         files: null,
