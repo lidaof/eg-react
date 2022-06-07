@@ -18,7 +18,7 @@ import AnnotationArrows from "./commonComponents/annotation/AnnotationArrows";
 
 import "./commonComponents/tooltip/Tooltip.css";
 
-export const MAX_BASES_PER_PIXEL = 6000; // The higher this number, the more zooming out we support
+export const MAX_BASES_PER_PIXEL = 1000; // The higher this number, the more zooming out we support
 const TOP_PADDING = 2;
 const TEXT_HEIGHT = 9; // height for both text label and arrows.
 export const DEFAULT_OPTIONS = {

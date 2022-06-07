@@ -14,7 +14,7 @@ import TrackLegend from "../commonComponents/TrackLegend";
 
 const ROW_VERTICAL_PADDING = 2;
 const ROW_HEIGHT = BedAnnotation.HEIGHT + ROW_VERTICAL_PADDING;
-
+export const MAX_BASES_PER_PIXEL = 2; // The higher this number, the more zooming out we support
 interface JasparTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
     data: JasparFeature[];
     viewRegion: DisplayedRegionModel;
@@ -101,9 +101,8 @@ class JasparTrackNoTooltip extends React.Component<JasparTrackProps> {
     }
 
     render() {
-        const { viewRegion, viewWindow, width, trackModel, options } = this.props;
-        const currentViewLength = viewRegion.getWidth() * viewWindow.getLength() / width;
-        if (currentViewLength > 10000) {
+        const { viewRegion, width, trackModel, options } = this.props;
+        if (viewRegion.getWidth() / width > MAX_BASES_PER_PIXEL) {
             return (
                 <Track
                     {...this.props}

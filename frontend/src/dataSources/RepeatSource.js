@@ -1,6 +1,6 @@
-import DataSource from './DataSource';
-import WorkerSource from './worker/WorkerSource';
-import BigWorker from './big/Big.worker';
+import DataSource from "./DataSource";
+import WorkerSource from "./worker/WorkerSource";
+import BigWorker from "./big/Big.worker";
 
 class RepeatSource extends DataSource {
     constructor(url, maxBasesPerPixel) {
