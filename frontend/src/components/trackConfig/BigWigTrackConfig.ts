@@ -7,6 +7,8 @@ import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { NumericalFeature } from "../../model/Feature";
 import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 import TrackModel, { TrackOptions } from "model/TrackModel";
+import { BigWig } from '@gmod/bbi';
+import { BlobFile, LocalFile } from "generic-filehandle";
 
 export class BigWigTrackConfig extends TrackConfig {
     private numericalTrackConfig: NumericalTrackConfig;
@@ -17,17 +19,25 @@ export class BigWigTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
+        // const testBW = new BigWig({ filehandle: this.trackModel.fileObj });
+        // const testBW = new BigWig({ path: this.trackModel.url });
+        // const testBW = new BigWig({ filehandle: new LocalFile(this.trackModel.url) });
+        // console.log(testBW);
+
+        // console.log(new LocalFile('/home/repos/Test_Tracks/testFile.txt'));
+        
         console.log(this.trackModel);
         if (this.trackModel.isLocalFile) {
-            return new LocalBigSourceGmod(new Blob(
-                [JSON.stringify({
-                    name: this.trackModel.name,
-                    path: this.trackModel.url,
-                    size: this.trackModel.size,
-                    type: this.trackModel.type,
-                }, null, 2)],
-                {type : 'text/plain'}
-            ).text());
+            // return new LocalBigSourceGmod(new Blob(
+            //     [JSON.stringify({
+            //         name: this.trackModel.name,
+            //         path: this.trackModel.url,
+            //         size: this.trackModel.size,
+            //         type: this.trackModel.type,
+            //     }, null, 2)],
+            //     {type : 'text/plain'}
+            // ));
+            return new LocalBigSourceGmod(this.trackModel.url);
         } else {
             return new WorkerSource(BigGmodWorker, this.trackModel.url);
         }

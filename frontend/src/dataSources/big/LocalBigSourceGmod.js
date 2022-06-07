@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { BigWig } from "@gmod/bbi";
-import { BlobFile } from "generic-filehandle";
+// import { BlobFile, LocalFile, RemoteFile } from "generic-filehandle";
+import { LocalFile, RemoteFile, open } from "generic-filehandle";
 import DataSource from "../DataSource";
 import { string } from "prop-types";
 /**
@@ -13,13 +14,21 @@ class LocalBigSourceGmod extends DataSource {
      *
      * @param {string} url - the URL from which to fetch data
      */
-    constructor(blob) {
+    constructor(path) {
         super();
-        console.log(blob);
-        this.blob = blob;
+        // this.blob = blob;
+        console.log(path);
+        // console.log(new RemoteFile(blob.path, { fetch: window.remoteFetch }));
+        const test = new window.localfile(path);
+        console.log(test, window.localfile, window.remoteFetch, window.versions);
+        // this.blob = blob;
         this.bw = new BigWig({
-            filehandle: new BlobFile(blob),
+            // filehandle: new BlobFile(blob),
+            filehandle: new window.localfile(path),
+            // path: new RemoteFile(blob.path, { fetch: window.remoteFetch }),
+            // path: blob.path,
         });
+        console.log(this.bw);
     }
 
     /**
