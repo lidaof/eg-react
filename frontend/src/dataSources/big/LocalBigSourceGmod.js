@@ -4,6 +4,7 @@ import { BigWig } from "@gmod/bbi";
 import { LocalFile, RemoteFile, open } from "generic-filehandle";
 import DataSource from "../DataSource";
 import { string } from "prop-types";
+import JSON5 from "json5";
 /**
  * Reads and gets data from bigwig or bigbed files hosted remotely using @gmod/bbi library
  *
@@ -19,15 +20,20 @@ class LocalBigSourceGmod extends DataSource {
         // this.blob = blob;
         console.log(path);
         // console.log(new RemoteFile(blob.path, { fetch: window.remoteFetch }));
-        const test = new window.localfile(path);
-        console.log(test, window.localfile, window.remoteFetch, window.versions);
+        // const test = new window.localfile(path);
+        // console.log(window.gfh, window.versions);
+        // console.log(window.nodeGFH, window.nodeGFH.createLocalBWFile(path), JSON5.parse(window.nodeGFH.createLocalBWFile(path)), window.versions);
+        console.log(window.nodeGFH);
+        console.log(window.nodeGFH.createLocalFile(path), JSON.parse(window.nodeGFH.createLocalFile(path)));
         // this.blob = blob;
         this.bw = new BigWig({
             // filehandle: new BlobFile(blob),
-            filehandle: new window.localfile(path),
+            // filehandle: new window.gfh.LocalFile(path),
+            filehandle: JSON.parse(window.nodeGFH.createLocalFile(path)),
             // path: new RemoteFile(blob.path, { fetch: window.remoteFetch }),
             // path: blob.path,
         });
+        // this.bw = JSON5.parse(window.nodeGFH.createLocalBWFile(path));
         console.log(this.bw);
     }
 
