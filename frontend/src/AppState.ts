@@ -434,7 +434,6 @@ export const GenomeActionsCreatorsFactory = (idx: number) => {
 
         setLayout: (layout: object) => {
             return {
-                idx: idx,
                 type: ActionType.SET_LAYOUT,
                 layout,
             };
@@ -540,7 +539,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
     if (!prevState) {
         return getInitialState(); 
     }
-    console.log(action);
     switch (action.type) {
         case ActionType.SET_GENOME: // Setting genome resets state.
             let nextViewRegion = null;
@@ -616,19 +614,42 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 genomeConfig: virusGenomeConfig,
             };
         case ActionType.SET_VIEW_REGION:
-            if (!prevState.viewRegion) {
+            let { start, end, idx } = action;
+            if (!prevState.containers[idx].viewRegion) {
                 return prevState;
             }
 
-            let { start, end } = action;
             const newLength = end - start;
             if (newLength < MIN_VIEW_REGION_SIZE) {
                 const amountToExpand = 0.5 * (MIN_VIEW_REGION_SIZE - newLength);
                 start -= amountToExpand;
                 end += amountToExpand;
             }
-            const newRegion = prevState.viewRegion.clone().setRegion(start, end);
-            return { ...prevState, viewRegion: newRegion };
+            const newRegion = prevState.containers[idx].viewRegion.clone().setRegion(start, end);
+            console.log({
+                ...prevState,
+                containers: prevState.containers.map((c, cIdx) => {
+                    if (cIdx == idx) {
+                        return {
+                            ...c,
+                            viewRegion: newRegion
+                        }
+                    }
+                    return c;
+                })
+            });
+            return {
+                ...prevState,
+                containers: prevState.containers.map((c, cIdx) => {
+                    if (cIdx == idx) {
+                        return {
+                            ...c,
+                            viewRegion: newRegion
+                        }
+                    }
+                    return c;
+                })
+            }
         case ActionType.SET_TRACKS:
             return { ...prevState, tracks: action.tracks };
         case ActionType.SET_METADATA_TERMS:

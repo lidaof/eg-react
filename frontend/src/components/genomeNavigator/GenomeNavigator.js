@@ -134,7 +134,6 @@ class GenomeNavigator extends React.Component {
         let proportion = targetRegionSize / this.state.viewRegion.getWidth();
         this._setModelState("zoom", [proportion]);
     }
-
     /**
      * @inheritdoc
      */

@@ -64,7 +64,9 @@ class Chromosomes extends React.PureComponent {
         super(props);
         this.state = {
             sequenceData: [],
+            loading: !props.genomeConfig,
         };
+        if (!props.genomeConfig) return;
         this.twoBitSource = props.genomeConfig.twoBitURL ? new TwoBitSource(props.genomeConfig.twoBitURL) : null;
         this.fastaSeq = props.genomeConfig.fastaSeq ? props.genomeConfig.fastaSeq : "";
         this.fetchSequence = _.throttle(this.fetchSequence, 500);
@@ -83,7 +85,7 @@ class Chromosomes extends React.PureComponent {
      * @param {Object} props - props as specified by React
      */
     fetchSequence = async (props) => {
-        if (!(this.twoBitSource || this.fastaSeq.length)) {
+        if (!(this.twoBitSource || (this.fastaSeq && this.fastaSeq.length))) {
             return;
         }
 
@@ -277,6 +279,7 @@ class Chromosomes extends React.PureComponent {
      * @override
      */
     render() {
+        if (this.state.loading) return <p>Loading Chromosomes</p>;
         const { viewRegion, width, labelOffset, hideChromName, hideCytoband, minXwidthPerBase } = this.props;
         const drawModel = new LinearDrawingModel(viewRegion, width);
 

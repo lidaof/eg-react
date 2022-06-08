@@ -3737,8 +3737,7 @@ var React = {
   createElement: createElementWithValidation,
   cloneElement: cloneElementWithValidation,
   createFactory: createFactoryWithValidation,
-  isValidElement: isValidElement,
-  version: ReactVersion,
+  isValidElement: isValidElement, 
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ReactSharedInternals$2
 };
 

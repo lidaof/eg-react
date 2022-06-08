@@ -346,7 +346,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
 
             containers,
         } = this.props;
-        console.log("🚀 ~ file: App.tsx ~ line 349 ~ App ~ render ~ this.props", this.props)
         
         if (sessionFromUrl) {
             return (
@@ -432,6 +431,10 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                             isThereG3dTrack={isThereG3dTrack}
                             onSetImageInfo={onSetImageInfo}
                             isShowingNavigator={isShowingNavigator}
+
+                            // temp fix for typescript not working with redux connected component
+                            onSetHighlights={(a) => null}
+                            onSetViewRegion={(a, b) => null}
                         />
                     )
                 })}

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { Action, Dispatch } from 'redux';
 import { GenomeActionsCreatorsFactory, GenomeState, SyncedContainer } from "AppState";
 import TrackContainer from './trackContainers/TrackContainer';
 import { RegionExpander } from "model/RegionExpander";
@@ -7,6 +8,7 @@ import { getGenomeConfig } from "model/genomes/allGenomes";
 import { Model } from "flexlayout-react";
 import { HighlightInterval } from "./trackContainers/HighlightMenu";
 import GenomeNavigator from "./genomeNavigator/GenomeNavigator";
+import { connect } from "react-redux";
 
 interface StateSyncSettingsProps {
     actionCreators: any;
@@ -17,7 +19,7 @@ function StateSyncSettings(props: StateSyncSettingsProps) {
 
     return (
         <div>
-
+            <h5>State Sync Settings</h5>
         </div>
     )
 }
@@ -25,18 +27,34 @@ function StateSyncSettings(props: StateSyncSettingsProps) {
 interface GenomeProps {
     stateIdx: number;
     cdata: SyncedContainer;
-
     layoutModel: Model;
-    onSetAnchors3d: (anchors: any) => void;
-    onSetGeneFor3d: (gene: any) => void;
     viewer3dNumFrames: any;
     isThereG3dTrack: boolean;
-    onSetImageInfo: (info: any) => void;
     isShowingNavigator: boolean;
+    onSetAnchors3d: (anchors: any) => void;
+    onSetGeneFor3d: (gene: any) => void;
+    onSetImageInfo: (info: any) => void;
+
+    // redux actions
+    onSetHighlights: (highlights: HighlightInterval[]) => void;
+    onSetViewRegion: (newStart: number, newEnd: number) => void;
 }
 
-function ContainerView(props: GenomeProps) {
-    const { stateIdx, cdata, layoutModel, onSetAnchors3d, onSetGeneFor3d, viewer3dNumFrames, isThereG3dTrack, onSetImageInfo, isShowingNavigator } = props;
+function _ContainerView(props: GenomeProps) {
+    const {
+        stateIdx,
+        cdata,
+        layoutModel,
+        viewer3dNumFrames,
+        isThereG3dTrack,
+        isShowingNavigator,
+        onSetAnchors3d,
+        onSetGeneFor3d,
+        onSetImageInfo,
+
+        onSetHighlights,
+        onSetViewRegion,
+    } = props;
     const { title, genomes, viewRegion, metadataTerms, regionSets, regionSetView, trackLegendWidth, highlights } = cdata;
 
     // state that is local to the container and dictates what all of the track containers would behave like. 
@@ -47,8 +65,6 @@ function ContainerView(props: GenomeProps) {
     const [regionExpanders, setRegionExpanders] = useState<RegionExpander[]>(new Array(genomes.length).fill(new RegionExpander(1)));
     const [suggestedMetaSets, setSuggestedMetaSets] = useState(new Set(["Track type"]));
 
-    const specializedActionCreators = useMemo(() => GenomeActionsCreatorsFactory(stateIdx), [stateIdx]);
-    const { setHighlights: onSetHighlights, setViewRegion: onNewViewRegion } = specializedActionCreators;
     const genomeConfigs: GenomeConfig[] = useMemo(() => genomes.map(g => {
         return g.genomeConfig || getGenomeConfig(g.name);
     }), [genomes]);
@@ -84,6 +100,7 @@ function ContainerView(props: GenomeProps) {
                         onNewHighlight={newHighlight}
                         highlights={highlights}
                         onSetHighlights={onSetHighlights}
+                        onNewRegion={onSetViewRegion}
 
                         childProps={{
                             genome: g.name,
@@ -100,13 +117,26 @@ function ContainerView(props: GenomeProps) {
 
     return (
         <div>
-            <h5>{`State Index: ${stateIdx}`}</h5>
+            <p>{`State Index: ${stateIdx}`}</p>
             {isShowingNavigator && (
-                <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onNewViewRegion} genomeConfig={genomeConfigs[0]} /> // TODO: either create a switch that allows use of genomeConfig of choice or overlays all of the genomes configs in different colors.
+                <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onSetViewRegion} genomeConfig={genomeConfigs[0]} /> // TODO: either create a switch that allows use of genomeConfig of choice or overlays all of the genomes configs in different colors.
             )}
             {renderGenomes()}
         </div>
     )
 }
+
+const mapDispatchToPropsFactory = (dispatch: Dispatch<Action>, ownProps: GenomeProps) => {
+    const specializedActionCreators = GenomeActionsCreatorsFactory(ownProps.stateIdx);
+    return {
+        onSetHighlights: (highlights: HighlightInterval[]) => dispatch(specializedActionCreators.setHighlights(highlights)),
+        onSetViewRegion: (newStart: number, newEnd: number) => dispatch(specializedActionCreators.setViewRegion(newStart, newEnd)),
+    }
+}
+
+const ContainerView = connect(
+    null,
+    mapDispatchToPropsFactory
+)(_ContainerView);
 
 export default ContainerView;
