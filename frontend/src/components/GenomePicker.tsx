@@ -7,6 +7,9 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import SearchIcon from "@material-ui/icons/Search";
+import { Switch, Paper } from "@material-ui/core"
+import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles"
+
 import {
     CardMedia,
     Container,
@@ -47,6 +50,7 @@ const LinkWithMargin = withStyles({
         margin: "10px",
     },
 })(Link);
+
 
 interface TabPanelProps {
     children: React.ReactNode;
@@ -163,6 +167,13 @@ export function GenomePicker(props: GenomePickerProps) {
 }
 
 function GenomePickerContainer(props: GenomePickerProps) {
+    const [darkMode, setDarkMode] = useState(false);
+    const themex = createMuiTheme({
+        palette: {
+            type: darkMode ? "dark" : "light",
+        },
+    });
+    // 
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
 
@@ -175,8 +186,13 @@ function GenomePickerContainer(props: GenomePickerProps) {
     };
 
     return (
+        
         <>
+        <ThemeProvider theme={themex}>
+        <Paper>
             <AppHeader />
+            <Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
+
             <AppBar position="static" color="default">
                 <Tabs
                     value={value}
@@ -207,6 +223,8 @@ function GenomePickerContainer(props: GenomePickerProps) {
                     )}
                 </TabPanel>
             </SwipeableViews>
+        </Paper >
+        </ThemeProvider >
         </>
     );
 }
@@ -227,13 +245,17 @@ export function AppIcon({ withText = true }) {
 }
 
 function AppHeader() {
+    
     const styles = useStyles();
     return (
+        
         <div>
             <AppBar color="transparent" position="static">
                 <Toolbar disableGutters>
                     <AppIcon />
                     <div className={styles.alignRight}>
+                        
+                        
                         <LinkWithMargin
                             href="https://epigenomegateway.readthedocs.io/en/latest/"
                             target="_blank"
@@ -252,6 +274,7 @@ function AppHeader() {
                 </Toolbar>
             </AppBar>
         </div>
+        
     );
 }
 
