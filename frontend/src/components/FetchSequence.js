@@ -21,7 +21,7 @@ export class FetchSequence extends React.Component {
 
     static propTypes = {
         genomeConfig: PropTypes.object.isRequired,
-        selectedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired
+        selectedRegion: PropTypes.instanceOf(DisplayedRegionModel), //.isRequired
     }
 
     constructor(props) {

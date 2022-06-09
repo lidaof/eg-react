@@ -39,6 +39,7 @@ import { BoxplotTrackConfig } from "./BoxplotTrackConfig";
 import { BedcolorTrackConfig } from "./BedcolorTrackConfig";
 import { Rmskv2TrackConfig } from "./Rmskv2TrackConfig";
 import { JasparTrackConfig } from "./JasparTrackConfig";
+import { GenomeConfig } from "model/genomes/GenomeConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 export const ALIGNMENT_TYPES = ["genomealign"];

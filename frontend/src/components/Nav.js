@@ -58,7 +58,7 @@ const callbacks = {
  */
 class Nav extends React.Component {
     static propTypes = {
-        selectedRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        selectedRegion: PropTypes.instanceOf(DisplayedRegionModel), //.isRequired,
         onRegionSelected: PropTypes.func,
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)),
         genomeConfig: PropTypes.object.isRequired,

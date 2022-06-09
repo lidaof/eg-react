@@ -123,7 +123,7 @@ const bundleId = uuid.v1();
 
 const initialContainerSettings: GenomeSettings = {
     syncHighlights: true,
-    
+
     offsetAmount: 0,
     offsetTargetIdx: 0
 }
@@ -137,7 +137,7 @@ const initialContainer: SyncedContainer = {
     regionSets: [],
     regionSetView: null,
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
-    highlights: [],    
+    highlights: [],
 }
 
 const getInitialContainerFromData = (name: string, viewRegion: DisplayedRegionModel, genome: GenomeState): SyncedContainer => {
@@ -329,7 +329,7 @@ export const GlobalActionCreators = {
     },
 };
 
-export const GenomeActionsCreatorsFactory = (idx: number) => {
+export const GenomeActionsCreatorsFactory = (containerIdx: number) => {
     return {
         /**
          * Modifies the current genome.
@@ -337,19 +337,19 @@ export const GenomeActionsCreatorsFactory = (idx: number) => {
          * @param {string} genomeName - name of the genome
          */
         setGenome: (genomeName: string) => {
-            return { idx: idx, type: ActionType.SET_GENOME, genomeName };
+            return { containerIdx, type: ActionType.SET_GENOME, genomeName };
         },
 
         setViewRegion: (newStart: number, newEnd: number) => {
-            return { idx: idx, type: ActionType.SET_VIEW_REGION, start: newStart, end: newEnd };
+            return { containerIdx, type: ActionType.SET_VIEW_REGION, start: newStart, end: newEnd };
         },
 
-        setTracks: (newTracks: TrackModel[]) => {
-            return { idx: idx, type: ActionType.SET_TRACKS, tracks: newTracks };
+        setTracks: (genomeIdx: number, newTracks: TrackModel[]) => {
+            return { containerIdx, genomeIdx, type: ActionType.SET_TRACKS, tracks: newTracks };
         },
 
-        setMetadataTerms: (newTerms: string[]) => {
-            return { idx: idx, type: ActionType.SET_METADATA_TERMS, terms: newTerms };
+        setMetadataTerms: (genomeIdx: number, newTerms: string[]) => {
+            return { containerIdx, genomeIdx, type: ActionType.SET_METADATA_TERMS, terms: newTerms };
         },
 
         /**
@@ -358,7 +358,7 @@ export const GenomeActionsCreatorsFactory = (idx: number) => {
          * @param {RegionSet[]} list - new region set list
          */
         setRegionSetList: (list: RegionSet[]) => {
-            return { idx: idx, type: ActionType.SET_REGION_SET_LIST, list };
+            return { containerIdx, type: ActionType.SET_REGION_SET_LIST, list };
         },
 
         /**
@@ -367,11 +367,11 @@ export const GenomeActionsCreatorsFactory = (idx: number) => {
          * @param {RegionSet} [set] - set with which to enter region set view, or null to exit region set view
          */
         setRegionSetView: (set: RegionSet) => {
-            return { idx: idx, type: ActionType.SET_REGION_SET_VIEW, set };
+            return { containerIdx, type: ActionType.SET_REGION_SET_VIEW, set };
         },
 
         setTrackLegendWidth: (width: number) => {
-            return { idx: idx, type: ActionType.SET_TRACK_LEGEND_WIDTH, width };
+            return { containerIdx, type: ActionType.SET_TRACK_LEGEND_WIDTH, width };
         },
 
         restoreSession: (sessionState: object) => {
@@ -408,7 +408,7 @@ export const GenomeActionsCreatorsFactory = (idx: number) => {
             withDefaultTracks: boolean = true
         ) => {
             return {
-                idx: idx,
+                containerIdx,
                 type: ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL,
                 tracks,
                 customTracksPool,
@@ -450,7 +450,7 @@ export const GenomeActionsCreatorsFactory = (idx: number) => {
          */
         setHighlights: (highlights: HighlightInterval[]) => {
             // console.log(highlights);
-            return { idx: idx, type: ActionType.SET_HIGHLIGHTS, highlights };
+            return { containerIdx, type: ActionType.SET_HIGHLIGHTS, highlights };
         },
     };
 };
@@ -537,10 +537,10 @@ function getInitialState(): AppState {
 
 function getNextState(prevState: AppState, action: AppAction): AppState {
     if (!prevState) {
-        return getInitialState(); 
+        return getInitialState();
     }
     switch (action.type) {
-        case ActionType.SET_GENOME: // Setting genome resets state.
+        case ActionType.SET_GENOME: { // Setting genome resets state.
             let nextViewRegion = null;
             let nextTracks: TrackModel[] = [];
             const genomeConfig = getGenomeConfig(action.genomeName);
@@ -554,9 +554,10 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 viewRegion: nextViewRegion,
                 tracks: nextTracks,
             };
-        case ActionType.SET_MULTIPLE_GENOMES:
+        }
+        case ActionType.SET_MULTIPLE_GENOMES: {
             const { genomeNames } = action;
-            const genomeContainers: SyncedContainer[] = genomeNames.map((name:string) => {
+            const genomeContainers: SyncedContainer[] = genomeNames.map((name: string) => {
                 let nextViewRegion = null;
                 let nextTracks: TrackModel[] = [];
                 const {
@@ -588,8 +589,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 ...initialState,
                 containers: genomeContainers
             }
-            
-        case ActionType.SET_CUSTOM_VIRUS_GENOME: // Setting virus genome.
+        }
+        case ActionType.SET_CUSTOM_VIRUS_GENOME: { // Setting virus genome.
             const virusTracks = action.tracks.map((data: any) => TrackModel.deserialize(data));
             const genome = new Genome(action.name, [new Chromosome(action.seqId, action.seq.length)]);
             const navContext = genome.makeNavContext();
@@ -613,9 +614,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 tracks: virusTracks,
                 genomeConfig: virusGenomeConfig,
             };
-        case ActionType.SET_VIEW_REGION:
-            let { start, end, idx } = action;
-            if (!prevState.containers[idx].viewRegion) {
+        }
+        // take idx
+        case ActionType.SET_VIEW_REGION: {
+            let { start, end, containerIdx } = action;
+            if (!prevState.containers[containerIdx].viewRegion) {
                 return prevState;
             }
 
@@ -625,35 +628,50 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 start -= amountToExpand;
                 end += amountToExpand;
             }
-            const newRegion = prevState.containers[idx].viewRegion.clone().setRegion(start, end);
-            console.log({
-                ...prevState,
-                containers: prevState.containers.map((c, cIdx) => {
-                    if (cIdx == idx) {
-                        return {
-                            ...c,
-                            viewRegion: newRegion
-                        }
-                    }
-                    return c;
-                })
-            });
+            const newRegion = prevState.containers[containerIdx].viewRegion.clone().setRegion(start, end);
             return {
                 ...prevState,
-                containers: prevState.containers.map((c, cIdx) => {
-                    if (cIdx == idx) {
-                        return {
-                            ...c,
-                            viewRegion: newRegion
-                        }
+                containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
+                    return {
+                        ...c,
+                        viewRegion: newRegion,
                     }
-                    return c;
-                })
+                }))
             }
-        case ActionType.SET_TRACKS:
-            return { ...prevState, tracks: action.tracks };
+        }
+        case ActionType.SET_TRACKS: {
+            const { tracks, containerIdx, genomeIdx } = action;
+            return {
+                ...prevState,
+                containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
+                    return {
+                        ...c,
+                        genomes: modifyArrayAtIdx(c.genomes, genomeIdx, (g => {
+                            return {
+                                ...g,
+                                tracks,
+                            };
+                        }))
+                    }
+                }))
+            };
+        }
         case ActionType.SET_METADATA_TERMS:
-            return { ...prevState, metadataTerms: action.terms };
+            const { terms, containerIdx, genomeIdx } = action;
+            return {
+                ...prevState,
+                containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
+                    return {
+                        ...c,
+                        genomes: modifyArrayAtIdx(c.genomes, genomeIdx, (g => {
+                            return {
+                                ...g,
+                                metadataTerms: terms,
+                            };
+                        }))
+                    }
+                }))
+            };
         case ActionType.SET_REGION_SET_LIST:
             return { ...prevState, regionSets: action.list };
         case ActionType.SET_REGION_SET_VIEW:
@@ -711,6 +729,15 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             // console.warn(action);
             return prevState;
     }
+}
+
+function modifyArrayAtIdx(oldContainers: any[], targetIdx:number, modify: (c: any) => any) {
+    return oldContainers.map((c, cIdx) => {
+        if (targetIdx === cIdx) {
+            return modify(c);
+        }
+        return c;
+    })
 }
 
 async function getTracksFromHubURL(url: string): Promise<any> {

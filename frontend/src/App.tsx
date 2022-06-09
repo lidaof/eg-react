@@ -435,6 +435,8 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                             // temp fix for typescript not working with redux connected component
                             onSetHighlights={(a) => null}
                             onSetViewRegion={(a, b) => null}
+                            onTracksChanged={(a) => null}
+                            onMetadataTermsChanged={(a) => null}
                         />
                     )
                 })}

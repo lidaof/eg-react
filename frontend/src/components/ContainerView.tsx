@@ -9,6 +9,7 @@ import { Model } from "flexlayout-react";
 import { HighlightInterval } from "./trackContainers/HighlightMenu";
 import GenomeNavigator from "./genomeNavigator/GenomeNavigator";
 import { connect } from "react-redux";
+import TrackModel from "model/TrackModel";
 
 interface StateSyncSettingsProps {
     actionCreators: any;
@@ -38,6 +39,8 @@ interface GenomeProps {
     // redux actions
     onSetHighlights: (highlights: HighlightInterval[]) => void;
     onSetViewRegion: (newStart: number, newEnd: number) => void;
+    onTracksChanged: (genomeIdx: number, tracks: TrackModel[]) => void;
+    onMetadataTermsChanged: (genomeIdx: number, terms: string[]) => void;
 }
 
 function _ContainerView(props: GenomeProps) {
@@ -54,6 +57,8 @@ function _ContainerView(props: GenomeProps) {
 
         onSetHighlights,
         onSetViewRegion,
+        onTracksChanged,
+        onMetadataTermsChanged,
     } = props;
     const { title, genomes, viewRegion, metadataTerms, regionSets, regionSetView, trackLegendWidth, highlights } = cdata;
 
@@ -79,8 +84,9 @@ function _ContainerView(props: GenomeProps) {
 
     const renderGenomes = () => {
         return genomes.map((g, idx) => {
+            const genomeConfig = genomeConfigs[idx];
             return (
-                <>
+                <div key={idx}>
                     <h5>{g.title}</h5>
                     <TrackContainer
                         key={idx}
@@ -89,7 +95,7 @@ function _ContainerView(props: GenomeProps) {
                         highlightEnteredRegion={highlightEnteredRegion}
                         expansionAmount={regionExpanders[idx]}
                         suggestedMetaSets={suggestedMetaSets}
-                        genomeConfig={genomeConfigs[idx]}
+                        genomeConfig={genomeConfig}
                         tracks={g.tracks.filter(tk => tk.type !== "g3d")}
                         layoutModel={layoutModel}
                         onSetAnchors3d={onSetAnchors3d}
@@ -100,17 +106,21 @@ function _ContainerView(props: GenomeProps) {
                         onNewHighlight={newHighlight}
                         highlights={highlights}
                         onSetHighlights={onSetHighlights}
-                        onNewRegion={onSetViewRegion}
-
+                        
                         childProps={{
                             genome: g.name,
                             viewRegion: viewRegion,
                             metadataTerms: metadataTerms,
                         }}
-
+                        
                         viewRegion={viewRegion}
+
+                        // formerly connected through redux
+                        onNewRegion={onSetViewRegion}
+                        onTracksChanged={(newTracks: TrackModel[]) => onTracksChanged(idx, newTracks)}
+                        onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(idx, newTerms)}
                     />
-                </>
+                </div>
             );
         })
     };
@@ -131,6 +141,8 @@ const mapDispatchToPropsFactory = (dispatch: Dispatch<Action>, ownProps: GenomeP
     return {
         onSetHighlights: (highlights: HighlightInterval[]) => dispatch(specializedActionCreators.setHighlights(highlights)),
         onSetViewRegion: (newStart: number, newEnd: number) => dispatch(specializedActionCreators.setViewRegion(newStart, newEnd)),
+        onTracksChanged: (genomeIdx: number, newTracks: TrackModel[]) => dispatch(specializedActionCreators.setTracks(genomeIdx, newTracks)),
+        onMetadataTermsChanged: (genomeIdx: number, newTerms: string[]) => dispatch(specializedActionCreators.setMetadataTerms(genomeIdx, newTerms)),
     }
 }
 

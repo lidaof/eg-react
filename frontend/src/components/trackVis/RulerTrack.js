@@ -7,7 +7,6 @@ import Chromosomes from "../genomeNavigator/Chromosomes";
 import Ruler from "../genomeNavigator/Ruler";
 import GenomicCoordinates from "./commonComponents/GenomicCoordinates";
 import TrackLegend from "./commonComponents/TrackLegend";
-import withCurrentGenome from "../withCurrentGenome";
 
 import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import { getGenomeConfig } from "../../model/genomes/allGenomes";
@@ -70,10 +69,9 @@ class RulerVisualizer extends React.PureComponent {
 
 class RulerTrack extends React.Component {
   render() {
-    const sencondaryGenome = this.props.trackModel.getMetadata("genome");
-    const genomeConfig =
-      getGenomeConfig(sencondaryGenome) || this.props.genomeConfig;
-    const selectedRegion = sencondaryGenome
+    const { genomeConfig } = this.props;
+    const secondaryGenome = this.props.trackModel.getMetadata("genome");
+    const selectedRegion = secondaryGenome
       ? this.props.viewRegion
       : this.props.selectedRegion;
     return (
@@ -101,4 +99,4 @@ class RulerTrack extends React.Component {
   }
 }
 
-export default withCurrentGenome(RulerTrack);
+export default RulerTrack;

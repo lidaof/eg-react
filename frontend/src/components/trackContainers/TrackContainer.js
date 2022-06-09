@@ -70,7 +70,7 @@ class TrackContainer extends React.Component {
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
         primaryView: PropTypes.object,
         trackData: PropTypes.object.isRequired,
-        metadataTerms: PropTypes.arrayOf(PropTypes.string).isRequired, // Metadata terms
+        metadataTerms: PropTypes.arrayOf(PropTypes.string), //.isRequired, // Metadata terms
         /**
          * Callback for when a new region is selected.  Signature:
          *     (newStart: number, newEnd: number): void
@@ -508,7 +508,7 @@ class TrackContainer extends React.Component {
             primaryView,
             onSetHighlights,
         } = this.props;
-        // console.log(this.props, viewRegion);
+
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
         const panLeftButton = (
             <button
@@ -621,6 +621,7 @@ class TrackContainer extends React.Component {
             basesPerPixel,
             isThereG3dTrack,
             onSetImageInfo,
+            genomeConfig
         } = this.props;
 
         const trackElements = tracks.map((trackModel, index) => {
@@ -653,6 +654,8 @@ class TrackContainer extends React.Component {
                     isThereG3dTrack={isThereG3dTrack}
                     onSetImageInfo={onSetImageInfo}
                     groupScale={this.state.groupScale}
+                    genomeConfig={genomeConfig}
+
                     {...layoutProps}
                 />
             );
@@ -666,7 +669,7 @@ class TrackContainer extends React.Component {
      * @return {JSX.Element} - subcontainer that renders tracks
      */
     renderSubContainer() {
-        const { tracks, primaryView, onNewRegion, onTracksChanged, onNewHighlight } = this.props;
+        const { tracks, primaryView, onNewRegion, onTracksChanged, onNewHighlight, genomeConfig } = this.props;
         const trackElements = this.makeTrackElements();
         switch (this.state.selectedTool) {
             case Tools.REORDER:
@@ -675,6 +678,7 @@ class TrackContainer extends React.Component {
                         trackElements={trackElements}
                         trackModels={tracks}
                         onTracksChanged={onTracksChanged}
+                        genomeConfig={genomeConfig}
                     />
                 );
             case Tools.ZOOM_IN:
@@ -683,6 +687,7 @@ class TrackContainer extends React.Component {
                         trackElements={trackElements}
                         visData={primaryView}
                         onNewRegion={onNewRegion}
+                        genomeConfig={genomeConfig}
                     />
                 );
             case Tools.DRAG:
@@ -693,6 +698,7 @@ class TrackContainer extends React.Component {
                         onNewRegion={onNewRegion}
                         xOffset={this.state.xOffset}
                         onXOffsetChanged={this.changeXOffset}
+                        genomeConfig={genomeConfig}
                     />
                 );
             case Tools.HIGHLIGHT:
@@ -701,6 +707,7 @@ class TrackContainer extends React.Component {
                         trackElements={trackElements}
                         visData={primaryView}
                         onNewRegion={onNewHighlight}
+                        genomeConfig={genomeConfig}
                     />
                 );
             default:
