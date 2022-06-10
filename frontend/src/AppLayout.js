@@ -22,6 +22,7 @@ import {
     ensureLayoutHeader,
 } from "./layoutUtils";
 import OmeroContainer from "components/trackVis/imageTrack/OmeroContainer";
+import "./DarkMode.css";
 
 import "../node_modules/flexlayout-react/style/light.css";
 import "./AppLayout.css";
@@ -207,6 +208,7 @@ class AppLayout extends React.PureComponent {
         // const isThereG3dTrack = tracks.filter((tk) => tk.type === "g3d").length > 0; // not working sometimes after browser app track selection
         // console.log(this.state.g3dcount);
         return (
+            <div className="bg">
             <App
                 layoutModel={model}
                 onSetAnchors3d={this.setAnchors3d}
@@ -215,6 +217,7 @@ class AppLayout extends React.PureComponent {
                 isThereG3dTrack={this.state.g3dcount > 0}
                 onSetImageInfo={this.setImageInfo}
             />
+            </div>
         );
     };
 
