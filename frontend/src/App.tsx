@@ -365,8 +365,8 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         const groupedTrackSets = this.groupTrackByGenome();
         return (
             <div className="App container-fluid">
+                <DarkMode />
                 <Nav
-                    <DarkMode />
                     {...this.state}
                     // isShowingNavigator={isShowingNavigator}
                     // onToggleNavigator={onToggleNavigator}
