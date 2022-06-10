@@ -21,4 +21,4 @@
 input:checked + .slider:before {transform: translateX(22px);}
 input:checked + .slider {background-color: cornflowerblue;}
 .slider.round {border-radius: 20px;}
-.slider.round:before {border-radius: 50%;}
+.slider.round:before {border-radius: 50%;} 
