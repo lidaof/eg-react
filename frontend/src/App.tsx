@@ -20,6 +20,9 @@ import { HELP_LINKS, getSecondaryGenomes } from "./util";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
 import { HighlightInterval } from './components/trackContainers/HighlightMenu';
 
+import "./DarkMode.css";
+import DarkMode from "./DarkMode";
+
 import "./App.css";
 
 const REGION_EXPANDER = new RegionExpander(1);
@@ -345,6 +348,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         if (!genomeConfig) {
             return (
                 <div>
+                    <DarkMode />
                     <GenomePickerContainer bundleId={bundleId} />
                     <hr />
                     <Footer />
@@ -362,6 +366,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         return (
             <div className="App container-fluid">
                 <Nav
+                    <DarkMode />
                     {...this.state}
                     // isShowingNavigator={isShowingNavigator}
                     // onToggleNavigator={onToggleNavigator}
