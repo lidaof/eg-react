@@ -31,6 +31,7 @@ import { ActionCreators } from "../AppState";
 import { treeOfLife } from "../model/genomes/allGenomes";
 import { SessionUI } from "./SessionUI";
 import Logo from '../images/logo.png'
+import "../DarkMode.css";
 
 import "./GenomePicker.css";
 
@@ -97,11 +98,11 @@ interface GenomePickerProps {
 
 export function GenomePicker(props: GenomePickerProps) {
     const [searchText, setSearchText] = useState("");
-
     // Map the genomes to a list of cards. Genome search engine filters by both the species and the different assemblies.
     // It is not case sensitive.
     const renderTreeCards = () => {
-        return Object.entries(treeOfLife)
+        return (
+            Object.entries(treeOfLife)
             .filter(([species2, details]) => {
                 return (
                     species2.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -125,7 +126,8 @@ export function GenomePicker(props: GenomePickerProps) {
                         />
                     </Grid>
                 );
-            });
+            })
+        );
     };
 
     return (
@@ -175,7 +177,7 @@ function GenomePickerContainer(props: GenomePickerProps) {
     };
 
     return (
-        <>
+        <div>
             <AppHeader />
             <AppBar position="static" color="default">
                 <Tabs
@@ -207,7 +209,7 @@ function GenomePickerContainer(props: GenomePickerProps) {
                     )}
                 </TabPanel>
             </SwipeableViews>
-        </>
+        </div>
     );
 }
 
@@ -282,15 +284,16 @@ function GenomePickerCard(props: GenomePickerCardProps) {
     return (
         <Card className={styles.card}>
             <CardMedia image={logoUrl} title={species} className={styles.media} />
-            <CardContent>
+                <CardContent>
                 <Typography gutterBottom variant="h5" component="h2" className={styles.cardTitle}>
                     {species}
                 </Typography>
                 <List className={styles.vertScroll}>{renderAssemblies()}</List>
-            </CardContent>
+                </CardContent>
         </Card>
     );
 }
+
 
 const useStyles = makeStyles({
     root: {
@@ -304,10 +307,13 @@ const useStyles = makeStyles({
         textTransform: "capitalize",
         textAlign: "left",
     },
-    card: {
+    card:{
         borderRadius: "10px",
         height: "100%",
         width: "270px",
+        backgroundColor: "darkgrey",
+        //backgroundColor: "var(--bg-color)", //matches the background color of the card to the page
+        color: "var(--font-color)",
     },
     alignRight: {
         marginRight: 15,

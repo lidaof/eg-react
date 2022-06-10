@@ -23,8 +23,11 @@ import {
 } from "./layoutUtils";
 import OmeroContainer from "components/trackVis/imageTrack/OmeroContainer";
 
+import "./DarkMode.css";
+
 import "../node_modules/flexlayout-react/style/light.css";
 import "./AppLayout.css";
+
 
 /**
  * generate layout when VR is on, or g3d track submitted etc
@@ -207,6 +210,7 @@ class AppLayout extends React.PureComponent {
         // const isThereG3dTrack = tracks.filter((tk) => tk.type === "g3d").length > 0; // not working sometimes after browser app track selection
         // console.log(this.state.g3dcount);
         return (
+            <div className="bg">
             <App
                 layoutModel={model}
                 onSetAnchors3d={this.setAnchors3d}
@@ -215,6 +219,7 @@ class AppLayout extends React.PureComponent {
                 isThereG3dTrack={this.state.g3dcount > 0}
                 onSetImageInfo={this.setImageInfo}
             />
+            </div>
         );
     };
 
@@ -369,7 +374,8 @@ class AppLayout extends React.PureComponent {
     render() {
         const layout = _.isEmpty(this.props.layout) ? initialLayout : ensureLayoutHeader(this.props.layout);
         const model = FlexLayout.Model.fromJson(layout);
-        return <FlexLayout.Layout model={model} factory={this.factory} />;
+        return (
+            <FlexLayout.Layout model={model} factory={this.factory} />);
         // if there is no new tabs, no need to use layout?
         // if (_.isEmpty(this.props.layout)) {
         //     return this.renderApp();

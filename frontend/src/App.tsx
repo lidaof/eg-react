@@ -19,6 +19,9 @@ import { Offline } from "react-detect-offline";
 import { HELP_LINKS, getSecondaryGenomes } from "./util";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
 import { HighlightInterval } from './components/trackContainers/HighlightMenu';
+//test
+import "./DarkMode.css";
+import DarkMode from "./DarkMode";
 
 import "./App.css";
 
@@ -345,6 +348,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         if (!genomeConfig) {
             return (
                 <div>
+                    <DarkMode />
                     <GenomePickerContainer bundleId={bundleId} />
                     <hr />
                     <Footer />
@@ -361,6 +365,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         const groupedTrackSets = this.groupTrackByGenome();
         return (
             <div className="App container-fluid">
+                <DarkMode />
                 <Nav
                     {...this.state}
                     // isShowingNavigator={isShowingNavigator}
