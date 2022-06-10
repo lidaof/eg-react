@@ -58,8 +58,27 @@
     grid-template-columns: auto auto;
 }
 
+[data-theme="dark"] {
+    --font-color: white;
+    --bg-color: #2b2b2b;
+    --link-color: lightblue;
+}
+
+[data-theme="light"] {
+    --font-color: #2b2b2b;
+    --bg-color: white;
+    --link-color: lightblue;
+}
+
+.bg {
+    background-color: var(--bg-color);
+    color: var(--font-color);
+}
+
 .searchFieldRounded .MuiOutlinedInput-root{
     border-radius: 50px;
+    background-color: var(--bg-color);
+    color: var(--font-color);
  }
 
 /* .GenomePicker-img {

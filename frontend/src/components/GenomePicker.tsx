@@ -31,6 +31,7 @@ import { ActionCreators } from "../AppState";
 import { treeOfLife } from "../model/genomes/allGenomes";
 import { SessionUI } from "./SessionUI";
 import Logo from '../images/logo.png'
+import "../DarkMode.css";
 
 import "./GenomePicker.css";
 
@@ -308,6 +309,9 @@ const useStyles = makeStyles({
         borderRadius: "10px",
         height: "100%",
         width: "270px",
+        backgroundColor: "darkgrey",
+        //backgroundColor: "var(--bg-color)", //matches the background color of the card to the page
+        color: "var(--font-color)",
     },
     alignRight: {
         marginRight: 15,
