@@ -2,7 +2,7 @@
     z-index: 1;
     min-width: 200px;
     max-width: 400px;
-    background-color: white;
+    background-color: var(--bg-color);
     border: 1px solid grey;
     border-radius: 0.25rem;
     font-size: small;
