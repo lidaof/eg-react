@@ -1,12 +1,10 @@
 [data-theme="dark"] {
     --font-color: white;
     --bg-color: #404040;
-    --link-color: lightblue;
 }
 [data-theme="light"] {
     --font-color: #2b2b2b;
     --bg-color: white;
-    --link-color: lightblue;
 }
 .bg {
     background-color: var(--bg-color);

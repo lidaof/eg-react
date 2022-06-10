@@ -198,7 +198,7 @@ class Nav extends React.Component {
         const REGION_EXPANDER = hasExpansionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
         const { genomeModal, otherGenome } = this.state;
         return (
-            <div className="Nav-container">
+            <div className="Nav-container bg">
                 <div className="panel">
                     <IconButton onClick={() => this.onGenomeSelected("")} style={{ marginTop: "5px" }}>
                         <ArrowBack />
@@ -267,7 +267,7 @@ class Nav extends React.Component {
                             </ReactModal>
                         </div>
                     )}
-                    <div className="element Nav-center">
+                    <div className="element Nav-center bg">
                         <TrackRegionController
                             selectedRegion={selectedRegion}
                             onRegionSelected={onRegionSelected}
@@ -280,7 +280,7 @@ class Nav extends React.Component {
                 </div> */}
                     <div className="element Nav-center btn-group">
                         <DropdownOpener extraClassName="btn-primary" label="🎹Tracks" />
-                        <div className="dropdown-menu">
+                        <div className="dropdown-menu bg">
                             <ModalMenuItem itemLabel="Annotation Tracks">
                                 <AnnotationTrackUI
                                     addedTracks={tracks}
@@ -350,7 +350,7 @@ class Nav extends React.Component {
                     </div>
                     <div className="element Nav-center">
                         <DropdownOpener extraClassName="btn-success" label="🔧Apps" />
-                        <div className="dropdown-menu">
+                        <div className="dropdown-menu bg">
                             <ModalMenuItem itemLabel="Region Set View">
                                 <RegionSetSelector genome={genomeConfig.genome} />
                             </ModalMenuItem>
@@ -431,7 +431,7 @@ class Nav extends React.Component {
                     </div>
                     <div className="element Nav-center">
                         <DropdownOpener extraClassName="btn-info" label="⚙Settings" />
-                        <div className="dropdown-menu">
+                        <div className="dropdown-menu bg">
                             <label className="dropdown-item" htmlFor="switchNavigator">
                                 <input
                                     id="switchNavigator"
@@ -511,7 +511,7 @@ class Nav extends React.Component {
                     {!virusBrowserMode && (
                         <div className="element Nav-center">
                             <DropdownOpener extraClassName="btn-warning" label="📖Help" />
-                            <div className="dropdown-menu">
+                            <div className="dropdown-menu bg">
                                 <label className="dropdown-item">
                                     <ModalMenuItem
                                         itemLabel="Hotkeys"
