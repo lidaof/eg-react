@@ -238,6 +238,7 @@ class Nav extends React.Component {
                                 contentLabel="genomeModal"
                                 onRequestClose={this.handleGenomeCloseModal}
                                 shouldCloseOnOverlayClick={true}
+                                
                                 style={{
                                     content: {
                                         // right: "unset",
@@ -246,6 +247,8 @@ class Nav extends React.Component {
                                         // left: 0,
                                         // height: "100%",
                                         zIndex: 5,
+                                        backgroundColor: "var(--bg-color)",
+                                        color: "var(--font-color)"
                                     },
                                     overlay: {
                                         backgroundColor: "rgba(111,107,101, 0.7)",
