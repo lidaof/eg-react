@@ -14,7 +14,8 @@ const MODAL_STYLE = {
         bottom: "unset",
         overflow: "visible",
         padding: "5px",
-        color: "black",
+        backgroundColor: "var(--bg-color)",
+        color: "var(--font-color)",
     },
     overlay: {
         backgroundColor: "rgba(111,107,101, 0.7)",
@@ -110,7 +111,7 @@ class TrackRegionController extends React.Component {
     render() {
         const coordinates = this.props.selectedRegion.currentRegionAsString();
         return (
-            <div className="tool-element">
+            <div className="bg tool-element">
                 <button className="btn btn-secondary" onClick={this.handleOpenModal}>
                     {coordinates}
                 </button>
@@ -165,6 +166,7 @@ class TrackRegionController extends React.Component {
                         <span className="alert-danger">{this.state.badInputMessage}</span>
                     )}
                 </ReactModal>
+            
             </div>
         );
     }
