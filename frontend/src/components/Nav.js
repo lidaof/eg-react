@@ -268,12 +268,12 @@ class Nav extends React.Component {
                         </div>
                     )}
                     <div className="element Nav-center">
-                        {/* <TrackRegionController
+                        <TrackRegionController
                             selectedRegion={selectedRegion}
                             onRegionSelected={onRegionSelected}
                             onNewHighlight={onNewHighlight}
                             virusBrowserMode={virusBrowserMode}
-                        /> */}
+                        />
                     </div>
                     {/* <div className="Nav-center">
                     <ZoomButtons viewRegion={selectedRegion} onNewRegion={onRegionSelected} />

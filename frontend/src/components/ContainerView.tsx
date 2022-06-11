@@ -37,10 +37,10 @@ interface GenomeProps {
     onSetImageInfo: (info: any) => void;
 
     // redux actions
-    onSetHighlights: (highlights: HighlightInterval[]) => void;
+    onSetHighlights: ( highlights: HighlightInterval[], genomeIdx?: number) => void;
     onSetViewRegion: (newStart: number, newEnd: number) => void;
-    onTracksChanged: (genomeIdx: number, tracks: TrackModel[]) => void;
-    onMetadataTermsChanged: (genomeIdx: number, terms: string[]) => void;
+    onTracksChanged: ( tracks: TrackModel[], genomeIdx?: number) => void;
+    onMetadataTermsChanged: ( terms: string[], genomeIdx?: number) => void;
 }
 
 function _ContainerView(props: GenomeProps) {
@@ -62,9 +62,6 @@ function _ContainerView(props: GenomeProps) {
     } = props;
     const { title, genomes, viewRegion, metadataTerms, regionSets, regionSetView, trackLegendWidth, highlights } = cdata;
 
-    // state that is local to the container and dictates what all of the track containers would behave like. 
-    // this was local to the original app component.
-    // why isn't it moved to global state?
     const [highlightColor, setHighlightColor] = useState("rgba(255, 255, 0, 0.3)");
     const [highlightEnteredRegion, setHighlightEnteredRegion] = useState(true);
     const [regionExpanders, setRegionExpanders] = useState<RegionExpander[]>(new Array(genomes.length).fill(new RegionExpander(1)));
@@ -74,26 +71,26 @@ function _ContainerView(props: GenomeProps) {
         return g.genomeConfig || getGenomeConfig(g.name);
     }), [genomes]);
 
-    const newHighlight = (start: number, end: number, tag: string = '') => {
+    const newHighlight = (start: number, end: number, tag: string = '', genomeIdx?: number, curHighlights?: HighlightInterval[]) => {
         const interval = new HighlightInterval(start, end, tag);
         const existing = highlights.find(h => h.start === start && h.end === end)
         if (!existing) {
-            onSetHighlights([...highlights, interval]);
+            onSetHighlights([...(curHighlights || highlights), interval], genomeIdx);
         }
     }
 
     const renderGenomes = () => {
-        return genomes.map((g, idx) => {
-            const genomeConfig = genomeConfigs[idx];
+        return genomes.map((g, gIdx) => {
+            const genomeConfig = genomeConfigs[gIdx];
             return (
-                <div key={idx}>
+                <div key={gIdx}>
                     <h5>{g.title}</h5>
                     <TrackContainer
-                        key={idx}
+                        key={gIdx}
                         enteredRegion={null}
                         highlightColor={highlightColor}
                         highlightEnteredRegion={highlightEnteredRegion}
-                        expansionAmount={regionExpanders[idx]}
+                        expansionAmount={regionExpanders[gIdx]}
                         suggestedMetaSets={suggestedMetaSets}
                         genomeConfig={genomeConfig}
                         tracks={g.tracks.filter(tk => tk.type !== "g3d")}
@@ -103,31 +100,26 @@ function _ContainerView(props: GenomeProps) {
                         viewer3dNumFrames={viewer3dNumFrames}
                         isThereG3dTrack={isThereG3dTrack}
                         onSetImageInfo={onSetImageInfo}
-                        onNewHighlight={newHighlight}
-                        highlights={highlights}
-                        onSetHighlights={onSetHighlights}
-                        
-                        childProps={{
-                            genome: g.name,
-                            viewRegion: viewRegion,
-                            metadataTerms: metadataTerms,
-                        }}
-                        
+                        onNewHighlight={(start: number, end: number, tag: string = '') => newHighlight(start, end, tag, gIdx, g.highlights)}
+                        highlights={g.highlights}
+                        onSetHighlights={(highlights: HighlightInterval[]) => onSetHighlights(highlights, gIdx)}
+
+                        genome={g.name}
                         viewRegion={viewRegion}
+                        metadataTerms={metadataTerms}
 
                         // formerly connected through redux
                         onNewRegion={onSetViewRegion}
-                        onTracksChanged={(newTracks: TrackModel[]) => onTracksChanged(idx, newTracks)}
-                        onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(idx, newTerms)}
+                        onTracksChanged={(newTracks: TrackModel[]) => onTracksChanged(newTracks, gIdx)}
+                        onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(newTerms, gIdx)}
                     />
                 </div>
             );
-        })
+        });
     };
 
     return (
         <div>
-            <p>{`State Index: ${stateIdx}`}</p>
             {isShowingNavigator && (
                 <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onSetViewRegion} genomeConfig={genomeConfigs[0]} /> // TODO: either create a switch that allows use of genomeConfig of choice or overlays all of the genomes configs in different colors.
             )}
@@ -139,10 +131,10 @@ function _ContainerView(props: GenomeProps) {
 const mapDispatchToPropsFactory = (dispatch: Dispatch<Action>, ownProps: GenomeProps) => {
     const specializedActionCreators = GenomeActionsCreatorsFactory(ownProps.stateIdx);
     return {
-        onSetHighlights: (highlights: HighlightInterval[]) => dispatch(specializedActionCreators.setHighlights(highlights)),
+        onSetHighlights: (highlights: HighlightInterval[], genomeIdx?: number) => dispatch(specializedActionCreators.setHighlights(highlights, genomeIdx)),
         onSetViewRegion: (newStart: number, newEnd: number) => dispatch(specializedActionCreators.setViewRegion(newStart, newEnd)),
-        onTracksChanged: (genomeIdx: number, newTracks: TrackModel[]) => dispatch(specializedActionCreators.setTracks(genomeIdx, newTracks)),
-        onMetadataTermsChanged: (genomeIdx: number, newTerms: string[]) => dispatch(specializedActionCreators.setMetadataTerms(genomeIdx, newTerms)),
+        onTracksChanged: (newTracks: TrackModel[], genomeIdx?: number) => dispatch(specializedActionCreators.setTracks(newTracks, genomeIdx)),
+        onMetadataTermsChanged: (newTerms: string[], genomeIdx?: number) => dispatch(specializedActionCreators.setMetadataTerms(newTerms, genomeIdx)),
     }
 }
 

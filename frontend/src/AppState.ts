@@ -344,11 +344,11 @@ export const GenomeActionsCreatorsFactory = (containerIdx: number) => {
             return { containerIdx, type: ActionType.SET_VIEW_REGION, start: newStart, end: newEnd };
         },
 
-        setTracks: (genomeIdx: number, newTracks: TrackModel[]) => {
+        setTracks: (newTracks: TrackModel[], genomeIdx?: number) => {
             return { containerIdx, genomeIdx, type: ActionType.SET_TRACKS, tracks: newTracks };
         },
 
-        setMetadataTerms: (genomeIdx: number, newTerms: string[]) => {
+        setMetadataTerms: (newTerms: string[], genomeIdx: number) => {
             return { containerIdx, genomeIdx, type: ActionType.SET_METADATA_TERMS, terms: newTerms };
         },
 
@@ -448,9 +448,9 @@ export const GenomeActionsCreatorsFactory = (containerIdx: number) => {
          * @param highlights array of HighlightItems that are created in HighlightMenu.js
          * @returns
          */
-        setHighlights: (highlights: HighlightInterval[]) => {
+        setHighlights: (highlights: HighlightInterval[], genomeIdx: number) => {
             // console.log(highlights);
-            return { containerIdx, type: ActionType.SET_HIGHLIGHTS, highlights };
+            return { containerIdx, genomeIdx, type: ActionType.SET_HIGHLIGHTS, highlights };
         },
     };
 };
@@ -536,23 +536,35 @@ function getInitialState(): AppState {
 }
 
 function getNextState(prevState: AppState, action: AppAction): AppState {
+    console.log("🚀 ~ file: AppState.ts ~ line 539 ~ getNextState ~ action", action)
     if (!prevState) {
         return getInitialState();
     }
     switch (action.type) {
         case ActionType.SET_GENOME: { // Setting genome resets state.
+            const { genomeName } = action;
+            if (!genomeName) {
+                return initialState;
+            }
             let nextViewRegion = null;
             let nextTracks: TrackModel[] = [];
-            const genomeConfig = getGenomeConfig(action.genomeName);
+            const genomeConfig = getGenomeConfig(genomeName);
             if (genomeConfig) {
                 nextViewRegion = new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion);
                 nextTracks = genomeConfig.defaultTracks;
             }
             return {
                 ...initialState,
-                genomeName: action.genomeName,
-                viewRegion: nextViewRegion,
-                tracks: nextTracks,
+                ...getSetGenomeObject(genomeName),
+                containers: [getInitialContainerFromData(genomeName, nextViewRegion, {
+                    name: genomeName,
+                    title: genomeName,
+                    tracks: nextTracks,
+
+                    highlights: null,
+
+                    settings: initialContainerSettings,
+                })]
             };
         }
         case ActionType.SET_MULTIPLE_GENOMES: {
@@ -561,15 +573,15 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 let nextViewRegion = null;
                 let nextTracks: TrackModel[] = [];
                 const {
-                    genome,
                     navContext,
-                    cytobands,
                     defaultRegion,
                     defaultTracks,
-                    publicHubData,
-                    publicHubList,
-                    annotationTracks,
-                    twoBitURL,
+                    // genome,
+                    // cytobands,
+                    // publicHubData,
+                    // publicHubList,
+                    // annotationTracks,
+                    // twoBitURL,
                 } = getGenomeConfig(name);
                 if (config) {
                     nextViewRegion = new DisplayedRegionModel(navContext, ...defaultRegion);
@@ -580,13 +592,14 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     title: name,
                     tracks: nextTracks,
 
-                    highlights: null,
+                    highlights: [],
 
                     settings: initialContainerSettings,
-                })
+                });
             });
             return {
                 ...initialState,
+                ...getSetGenomeObject(genomeNames[0]),
                 containers: genomeContainers
             }
         }
@@ -663,12 +676,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
                     return {
                         ...c,
-                        genomes: modifyArrayAtIdx(c.genomes, genomeIdx, (g => {
-                            return {
-                                ...g,
-                                metadataTerms: terms,
-                            };
-                        }))
+                        metadataTerms: terms,
                     }
                 }))
             };
@@ -722,8 +730,23 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, layout: action.layout };
         // case ActionType.SET_G3D_TRACKS:
         //     return { ...prevState, threedTracks: action.tracks };
-        case ActionType.SET_HIGHLIGHTS:
-            return { ...prevState, highlights: action.highlights };
+        case ActionType.SET_HIGHLIGHTS: {
+            const { highlights, containerIdx, genomeIdx } = action;
+            return {
+                ...prevState,
+                containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
+                    return {
+                        ...c,
+                        genomes: modifyArrayAtIdx(c.genomes, genomeIdx, (g => {
+                            return {
+                                ...g,
+                                highlights,
+                            };
+                        }))
+                    }
+                }))
+            };
+        }
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);
@@ -731,7 +754,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
     }
 }
 
-function modifyArrayAtIdx(oldContainers: any[], targetIdx:number, modify: (c: any) => any) {
+// takes an array and index, and a function that takes the array element and returns a new element
+function modifyArrayAtIdx(oldContainers: any[], targetIdx: number, modify: (c: any) => any) {
     return oldContainers.map((c, cIdx) => {
         if (targetIdx === cIdx) {
             return modify(c);
@@ -739,6 +763,25 @@ function modifyArrayAtIdx(oldContainers: any[], targetIdx:number, modify: (c: an
         return c;
     })
 }
+
+function getSetGenomeObject(genomeName: string) {
+    let nextViewRegion = null;
+    let nextTracks: TrackModel[] = [];
+    const genomeConfig = getGenomeConfig(genomeName);
+    if (genomeConfig) {
+        nextViewRegion = new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion);
+        nextTracks = genomeConfig.defaultTracks;
+    }
+    return {
+        ...initialState,
+        genomeName: genomeName,
+        viewRegion: nextViewRegion,
+        tracks: nextTracks,
+    };
+}
+
+// TODO
+// function getSetVirusGenomeObject
 
 async function getTracksFromHubURL(url: string): Promise<any> {
     const json = await new Json5Fetcher().get(url);

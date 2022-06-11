@@ -402,7 +402,7 @@ class TrackContainer extends React.Component {
     /**
      * happens when user selects dynamic hic plot
      */
-    applyDynamicHic = (tracks) => {
+    applyDynami1c = (tracks) => {
         const colors = [];
         let useDynamicColors = false;
         tracks.forEach((t) => {

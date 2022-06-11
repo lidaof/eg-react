@@ -382,7 +382,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     // onToggleHighlight={this.toggleHighlight}
                     onNewHighlight={this.newHighlight}
                     // onSetHighlightColor={this.setHighlightColor}
-                    // selectedRegion={viewRegion}
+                    selectedRegion={viewRegion}
                     onRegionSelected={onNewViewRegion}
                     tracks={tracks}
                     genomeConfig={navGenomeConfig}
@@ -417,6 +417,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                         functions.
                     </div>
                 </Offline>
+                {/* Implement such that when there's a genome name but no containers, just render like we would before phased update. */}
                 {containers.map((data:SyncedContainer, idx:number) => {
                     return (
                         <ContainerView
