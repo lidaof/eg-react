@@ -27,7 +27,7 @@ export class BigWigTrackConfig extends TrackConfig {
         // console.log(new LocalFile('/home/repos/Test_Tracks/testFile.txt'));
         
         console.log(this.trackModel);
-        if (this.trackModel.isLocalFile) {
+        // if (this.trackModel.isLocalFile) {
             // return new LocalBigSourceGmod(new Blob(
             //     [JSON.stringify({
             //         name: this.trackModel.name,
@@ -37,10 +37,10 @@ export class BigWigTrackConfig extends TrackConfig {
             //     }, null, 2)],
             //     {type : 'text/plain'}
             // ));
-            return new LocalBigSourceGmod(this.trackModel.url);
-        } else {
-            return new WorkerSource(BigGmodWorker, this.trackModel.url);
-        }
+            return new LocalBigSourceGmod(this.trackModel.fileObj);
+        // } else {
+        //     return new WorkerSource(BigGmodWorker, this.trackModel.url);
+        // }
     }
 
     /*

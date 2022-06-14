@@ -53,8 +53,8 @@ export class TrackUpload extends React.Component {
                     new TrackModel({
                         type: this.state.fileType,
                         url: file.path,
-                        // fileObj: file,
-                        fileObj: false,
+                        fileObj: file,
+                        // fileObj: false,
                         name: file.name,
                         label: file.name,
                         files: null,

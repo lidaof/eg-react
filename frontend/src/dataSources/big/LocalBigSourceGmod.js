@@ -1,7 +1,8 @@
 import _ from "lodash";
 import { BigWig } from "@gmod/bbi";
+import FrontendLocalFile from '../FrontendLocalFile';
 // import { BlobFile, LocalFile, RemoteFile } from "generic-filehandle";
-import { LocalFile, RemoteFile, open } from "generic-filehandle";
+import { LocalFile, RemoteFile, open, BlobFile } from "generic-filehandle";
 import DataSource from "../DataSource";
 import { string } from "prop-types";
 import JSON5 from "json5";
@@ -19,17 +20,22 @@ class LocalBigSourceGmod extends DataSource {
         super();
         // this.blob = blob;
         console.log(path);
+        // console.log(window.fs.readFile('/home/repos/Test_Tracks/testFile.txt', { encoding: 'utf8' }));
+        console.log(new FrontendLocalFile(path));
         // console.log(new RemoteFile(blob.path, { fetch: window.remoteFetch }));
         // const test = new window.localfile(path);
         // console.log(window.gfh, window.versions);
         // console.log(window.nodeGFH, window.nodeGFH.createLocalBWFile(path), JSON5.parse(window.nodeGFH.createLocalBWFile(path)), window.versions);
-        console.log(window.nodeGFH);
-        console.log(window.nodeGFH.createLocalFile(path), JSON.parse(window.nodeGFH.createLocalFile(path)));
+        // console.log(window.nodeGFH);
+        // console.log(window.nodeGFH.createLocalFile(path), JSON.parse(window.nodeGFH.createLocalFile(path)));
         // this.blob = blob;
+        console.log(new BigWig({ filehandle: new BlobFile(path) }));
+        console.log(new BigWig({ filehandle: new FrontendLocalFile(path.path) }));
         this.bw = new BigWig({
-            // filehandle: new BlobFile(blob),
+            // filehandle: new BlobFile(path),
             // filehandle: new window.gfh.LocalFile(path),
-            filehandle: JSON.parse(window.nodeGFH.createLocalFile(path)),
+            // filehandle: JSON.parse(window.nodeGFH.createLocalFile(path)),
+            filehandle: new FrontendLocalFile(path.path),
             // path: new RemoteFile(blob.path, { fetch: window.remoteFetch }),
             // path: blob.path,
         });
