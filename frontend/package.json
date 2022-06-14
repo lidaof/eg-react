@@ -146,6 +146,7 @@
         "react-sortable-hoc": "^1.11.0",
         "react-speech-recognition": "^2.0.4",
         "react-swipeable-views": "^0.14.0",
+        "react-switch": "^7.0.0",
         "react-table": "^6.11.5",
         "react-test-renderer": "^16.13.1",
         "reactcss": "^1.2.3",

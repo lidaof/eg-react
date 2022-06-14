@@ -33,6 +33,7 @@ import packageJson from "../../package.json";
 import ScatterPlot from "./Geneplot/ScatterPlot";
 import { TextTrack } from "./TextTrack";
 import { AppIcon, GenomePicker } from "./GenomePicker";
+import DarkMode from "./DarkMode";
 
 import "./Nav.css";
 
@@ -205,7 +206,7 @@ class Nav extends React.Component {
                     </IconButton>
                     {!virusBrowserMode && (
                         // <div className="element" id="logoDiv">
-                        <div style={{ marginTop: "10px" }}>
+                        <div style={{ marginTop: "6px" }}>
                             {/* <img
                                 src="https://epigenomegateway.wustl.edu/images/eglogo.jpg"
                                 width="180px"
@@ -238,7 +239,6 @@ class Nav extends React.Component {
                                 contentLabel="genomeModal"
                                 onRequestClose={this.handleGenomeCloseModal}
                                 shouldCloseOnOverlayClick={true}
-                                
                                 style={{
                                     content: {
                                         // right: "unset",
@@ -248,7 +248,7 @@ class Nav extends React.Component {
                                         // height: "100%",
                                         zIndex: 5,
                                         backgroundColor: "var(--bg-color)",
-                                        color: "var(--font-color)"
+                                        color: "var(--font-color)",
                                     },
                                     overlay: {
                                         backgroundColor: "rgba(111,107,101, 0.7)",
@@ -588,6 +588,9 @@ class Nav extends React.Component {
                             </div>
                         </div>
                     )}
+                    <div className="element Nav-center">
+                        <DarkMode />
+                    </div>
                 </div>
             </div>
         );

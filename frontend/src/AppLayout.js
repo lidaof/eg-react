@@ -23,11 +23,8 @@ import {
 } from "./layoutUtils";
 import OmeroContainer from "components/trackVis/imageTrack/OmeroContainer";
 
-import "./DarkMode.css";
-
-import "../node_modules/flexlayout-react/style/light.css";
+// import "../node_modules/flexlayout-react/style/light.css";
 import "./AppLayout.css";
-
 
 /**
  * generate layout when VR is on, or g3d track submitted etc
@@ -43,6 +40,7 @@ function mapStateToProps(state) {
         isShowingVR: state.browser.present.isShowingVR,
         layout: state.browser.present.layout,
         selectedSet: state.browser.present.regionSetView,
+        darkTheme: state.browser.present.darkTheme,
     };
 }
 
@@ -211,14 +209,14 @@ class AppLayout extends React.PureComponent {
         // console.log(this.state.g3dcount);
         return (
             <div className="bg">
-            <App
-                layoutModel={model}
-                onSetAnchors3d={this.setAnchors3d}
-                onSetGeneFor3d={this.setGeneFor3d}
-                viewer3dNumFrames={this.state.viewer3dNumFrames}
-                isThereG3dTrack={this.state.g3dcount > 0}
-                onSetImageInfo={this.setImageInfo}
-            />
+                <App
+                    layoutModel={model}
+                    onSetAnchors3d={this.setAnchors3d}
+                    onSetGeneFor3d={this.setGeneFor3d}
+                    viewer3dNumFrames={this.state.viewer3dNumFrames}
+                    isThereG3dTrack={this.state.g3dcount > 0}
+                    onSetImageInfo={this.setImageInfo}
+                />
             </div>
         );
     };
@@ -374,8 +372,13 @@ class AppLayout extends React.PureComponent {
     render() {
         const layout = _.isEmpty(this.props.layout) ? initialLayout : ensureLayoutHeader(this.props.layout);
         const model = FlexLayout.Model.fromJson(layout);
+        const theme = this.props.darkTheme ? "dark" : "light";
         return (
-            <FlexLayout.Layout model={model} factory={this.factory} />);
+            <div style={{ width: "100%", height: "100%" }} id="flex-container" data-theme={theme}>
+                <FlexLayout.Layout model={model} factory={this.factory} />
+            </div>
+        );
+
         // if there is no new tabs, no need to use layout?
         // if (_.isEmpty(this.props.layout)) {
         //     return this.renderApp();

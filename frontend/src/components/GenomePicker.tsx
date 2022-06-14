@@ -30,8 +30,8 @@ import SwipeableViews from "react-swipeable-views";
 import { ActionCreators } from "../AppState";
 import { treeOfLife } from "../model/genomes/allGenomes";
 import { SessionUI } from "./SessionUI";
+import DarkMode from "./DarkMode";
 import Logo from '../images/logo.png'
-import "../DarkMode.css";
 
 import "./GenomePicker.css";
 
@@ -103,30 +103,30 @@ export function GenomePicker(props: GenomePickerProps) {
     const renderTreeCards = () => {
         return (
             Object.entries(treeOfLife)
-            .filter(([species2, details]) => {
-                return (
-                    species2.toLowerCase().includes(searchText.toLowerCase()) ||
-                    details.assemblies.join("").toLowerCase().includes(searchText.toLowerCase())
-                );
-            })
-            .map(([species2, details], idx) => {
-                let filteredAssemblies = details.assemblies;
-                if (!species2.toLowerCase().includes(searchText.toLowerCase())) {
-                    filteredAssemblies = details.assemblies.filter((e) =>
-                        e.toLowerCase().includes(searchText.toLowerCase())
+                .filter(([species2, details]) => {
+                    return (
+                        species2.toLowerCase().includes(searchText.toLowerCase()) ||
+                        details.assemblies.join("").toLowerCase().includes(searchText.toLowerCase())
                     );
-                }
-                return (
-                    // @ts-ignore
-                    <Grid item xs={12} md={4} align="center" key={idx}>
-                        <GenomePickerCard
-                            species={species2}
-                            details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
-                            onChoose={(genomeName: string) => props.onGenomeSelected(genomeName)}
-                        />
-                    </Grid>
-                );
-            })
+                })
+                .map(([species2, details], idx) => {
+                    let filteredAssemblies = details.assemblies;
+                    if (!species2.toLowerCase().includes(searchText.toLowerCase())) {
+                        filteredAssemblies = details.assemblies.filter((e) =>
+                            e.toLowerCase().includes(searchText.toLowerCase())
+                        );
+                    }
+                    return (
+                        // @ts-ignore
+                        <Grid item xs={12} md={4} align="center" key={idx}>
+                            <GenomePickerCard
+                                species={species2}
+                                details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
+                                onChoose={(genomeName: string) => props.onGenomeSelected(genomeName)}
+                            />
+                        </Grid>
+                    );
+                })
         );
     };
 
@@ -220,7 +220,7 @@ export function AppIcon({ withText = true }) {
                 <img
                     src={Logo}
                     alt="Browser Icon"
-                    style={{ height: 40, width: "auto", marginRight: 10 }}
+                    style={{ height: 36, width: "auto", marginRight: 10 }}
                 />
                 {withText && <>WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span></>}
             </Typography>
@@ -236,6 +236,9 @@ function AppHeader() {
                 <Toolbar disableGutters>
                     <AppIcon />
                     <div className={styles.alignRight}>
+                        <span>
+                            <DarkMode />
+                        </span>
                         <LinkWithMargin
                             href="https://epigenomegateway.readthedocs.io/en/latest/"
                             target="_blank"
@@ -284,12 +287,12 @@ function GenomePickerCard(props: GenomePickerCardProps) {
     return (
         <Card className={styles.card}>
             <CardMedia image={logoUrl} title={species} className={styles.media} />
-                <CardContent>
+            <CardContent>
                 <Typography gutterBottom variant="h5" component="h2" className={styles.cardTitle}>
                     {species}
                 </Typography>
                 <List className={styles.vertScroll}>{renderAssemblies()}</List>
-                </CardContent>
+            </CardContent>
         </Card>
     );
 }
@@ -307,7 +310,7 @@ const useStyles = makeStyles({
         textTransform: "capitalize",
         textAlign: "left",
     },
-    card:{
+    card: {
         borderRadius: "10px",
         height: "100%",
         width: "270px",

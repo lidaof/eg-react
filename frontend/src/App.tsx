@@ -2,6 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import _ from "lodash";
+import Notifications from "react-notify-toast";
+import { Offline } from "react-detect-offline";
 // import AppState, { ActionCreators } from "./AppState";
 import { ActionCreators } from "./AppState";
 import GenomePickerContainer from "./components/GenomePicker";
@@ -11,17 +13,12 @@ import TrackContainer from "./components/trackContainers/TrackContainer";
 import withCurrentGenome from "./components/withCurrentGenome";
 import DisplayedRegionModel from "./model/DisplayedRegionModel";
 import TrackModel from "./model/TrackModel";
-import Notifications from "react-notify-toast";
 import LoadSession from "./components/LoadSession";
 import { RegionExpander } from "./model/RegionExpander";
 import { Footer } from "./components/Footer";
-import { Offline } from "react-detect-offline";
-import { HELP_LINKS, getSecondaryGenomes } from "./util";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
 import { HighlightInterval } from './components/trackContainers/HighlightMenu';
-//test
-import "./DarkMode.css";
-import DarkMode from "./DarkMode";
+import { HELP_LINKS, getSecondaryGenomes } from "./util";
 
 import "./App.css";
 
@@ -348,7 +345,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         if (!genomeConfig) {
             return (
                 <div>
-                    <DarkMode />
                     <GenomePickerContainer bundleId={bundleId} />
                     <hr />
                     <Footer />
@@ -365,7 +361,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         const groupedTrackSets = this.groupTrackByGenome();
         return (
             <div className="App container-fluid">
-                <DarkMode />
                 <Nav
                     {...this.state}
                     // isShowingNavigator={isShowingNavigator}

@@ -1,0 +1,16 @@
+[data-theme="dark"] {
+    --font-color: white;
+    --bg-color: #404040;
+}
+[data-theme="light"] {
+    --font-color: #2b2b2b;
+    --bg-color: white;
+}
+.bg {
+    background-color: var(--bg-color);
+    color: var(--font-color);
+}
+
+.darkToggleBox {
+    vertical-align: middle;
+}

@@ -72,10 +72,11 @@ export interface AppState {
     layout?: object;
     // g3dtracks?: TrackModel[];
     highlights?: HighlightInterval[];
+    darkTheme?: boolean;
 }
 
 const bundleId = uuid.v1();
-
+const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
 const initialState: AppState = {
     genomeName: "",
     viewRegion: null,
@@ -92,6 +93,7 @@ const initialState: AppState = {
     layout: {},
     // g3dtracks: [],
     highlights: [],
+    darkTheme: prefersDark,
 };
 
 enum ActionType {
@@ -115,6 +117,7 @@ enum ActionType {
     SET_LAYOUT = "SET_LAYOUT",
     // SET_G3D_TRACKS = "SET_G3D_TRACKS",
     SET_HIGHLIGHTS = "SET_HIGHLIGHTS",
+    SET_DARK_THEME = "SET_DARK_THEME",
 }
 
 interface AppAction {
@@ -246,6 +249,10 @@ export const ActionCreators = {
     setHighlights: (highlights: HighlightInterval[]) => {
         // console.log(highlights);
         return { type: ActionType.SET_HIGHLIGHTS, highlights };
+    },
+
+    setDarkTheme: (darkTheme: boolean) => {
+        return { type: ActionType.SET_DARK_THEME, darkTheme };
     },
 };
 
@@ -443,6 +450,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         //     return { ...prevState, threedTracks: action.tracks };
         case ActionType.SET_HIGHLIGHTS:
             return { ...prevState, highlights: action.highlights };
+        case ActionType.SET_DARK_THEME:
+            return { ...prevState, darkTheme: action.darkTheme };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);
