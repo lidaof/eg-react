@@ -179,7 +179,7 @@ function GenomePickerContainer(props: GenomePickerProps) {
     return (
         <div>
             <AppHeader />
-            <AppBar position="static" color="default">
+            <AppBar position="static" color="default" className="bg" >
                 <Tabs
                     value={value}
                     onChange={handleChange}
@@ -275,7 +275,7 @@ function GenomePickerCard(props: GenomePickerCardProps) {
         return assemblies.map((assembly, idx) => {
             return (
                 <ListItem key={idx} button onClick={() => onChoose(assembly)} style={{ height: 25 }}>
-                    <ListItemIcon>
+                    <ListItemIcon className={styles.icon}>
                         <ChevronRightIcon />
                     </ListItemIcon>
                     <ListItemText primary={assembly} />
@@ -314,8 +314,7 @@ const useStyles = makeStyles({
         borderRadius: "10px",
         height: "100%",
         width: "270px",
-        backgroundColor: "darkgrey",
-        //backgroundColor: "var(--bg-color)", //matches the background color of the card to the page
+        backgroundColor: "var(--bg-color)", //matches the background color of the card to the page
         color: "var(--font-color)",
     },
     alignRight: {
@@ -326,6 +325,9 @@ const useStyles = makeStyles({
         maxHeight: "200px",
         overflowY: "scroll",
     },
+    icon: {
+        color: "var(--font-color)",
+    }
 });
 
 GenomePickerContainer.propTypes = {
