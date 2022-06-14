@@ -192,15 +192,22 @@
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_mm10_axt.gz"
         },
         {
-            "name": "t2t-chm13tohg38",
-            "label": "hg38 - chm13 minimap2",
+            "name": "hg38tot2t-chm13v2",
+            "label": "hg38 - chm13v1.1 minimap2",
+            "querygenome": "t2t-chm13-v2.0",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/chm13v2.hg38.align.gz"
+        },
+        {
+            "name": "hg38tot2t-chm13v1.1",
+            "label": "hg38 - chm13v2 minimap2",
             "querygenome": "t2t-chm13-v1.1",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/querychm13tohg38.align.gz"
         },
         {
-            "name": "panTro5tohg38",
-            "label": "Chimpanzee panTro5 to hg38 blastz",
+            "name": "hg38topantro5",
+            "label": "query Chimpanzee panTro5 to hg38 blastz",
             "querygenome": "panTro5",
             "filetype": "genomealign",
             "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38_panTro5_axt.gz",
