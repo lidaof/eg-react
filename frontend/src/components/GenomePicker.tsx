@@ -114,7 +114,9 @@ export function GenomePicker(props: GenomePickerProps) {
     const upHandler = ({ key }: { key: string }) => {
         if (key === 'Shift') {
             if (Object.values(genomesSelected).filter(e => e).length) {
-                props.onMultipleGenomeSelected(Object.keys(genomesSelected));
+                props.onMultipleGenomeSelected(Object.entries(genomesSelected)
+                                                    .filter(([, v]) => v)
+                                                    .map(([k]) => k));
                 setGenomesSelected({});
             }
             setShiftHeld(false);
@@ -161,7 +163,6 @@ export function GenomePicker(props: GenomePickerProps) {
                         <GenomePickerCard
                             species={species2}
                             details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
-                            // TODO: Optimize how selected genomes are shown.
                             selected={genomesSelected}
                             onChoose={handleGenomePicked}
                         />
@@ -328,7 +329,6 @@ function GenomePickerCard(props: GenomePickerCardProps) {
         return assemblies.map((assembly, idx) => {
             const isSelected = !!selected[assembly];
             return (
-                // TODO: improve the selected style, ideally to match the material ui style
                 <ListItem
                     key={idx}
                     button

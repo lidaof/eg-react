@@ -24,14 +24,6 @@ import DataHubParser from "./model/DataHubParser";
 import OpenInterval from "./model/interval/OpenInterval";
 import { Genome } from "./model/genomes/Genome";
 import Chromosome from "./model/genomes/Chromosome";
-
-// TODO: remove this import
-// import mm39 and rn7 from "./model/genomes/allGenomes";
-import MM39 from "model/genomes/mm39/mm39";
-import RN7 from "model/genomes/rn7/rn7";
-import { arrayCopy } from "vendor/igv/inflate";
-import { ArrowLeft } from "@material-ui/icons";
-import { getDefaultSettings } from "http2";
 import { GenomeConfig } from "model/genomes/GenomeConfig";
 
 export let STORAGE: any = window.sessionStorage;
@@ -84,6 +76,8 @@ export interface AppState {
     layout?: object;
     // g3dtracks?: TrackModel[];
     highlights?: HighlightInterval[];
+    // TODO: add support for "compatability mode" which won't use the new containers/multiple genome support.
+    compatabilityMode: boolean;
 }
 
 // state for a single genome.
@@ -104,7 +98,6 @@ export interface GenomeSettings {
     syncHighlights: boolean;
 
     offsetAmount: number;
-    offsetTargetIdx: number;
 }
 
 export interface SyncedContainer {
@@ -125,7 +118,6 @@ const initialContainerSettings: GenomeSettings = {
     syncHighlights: true,
 
     offsetAmount: 0,
-    offsetTargetIdx: 0
 }
 
 const initialContainer: SyncedContainer = {
@@ -167,6 +159,7 @@ const initialState: AppState = {
     layout: {},
     // g3dtracks: [],
     highlights: [],
+    compatabilityMode: false,
 };
 
 enum ActionType {
@@ -191,6 +184,8 @@ enum ActionType {
     SET_LAYOUT = "SET_LAYOUT",
     // SET_G3D_TRACKS = "SET_G3D_TRACKS",
     SET_HIGHLIGHTS = "SET_HIGHLIGHTS",
+    SET_GENOME_SETTINGS = "SET_GENOME_SETTINGS",
+    SET_GENOME_CONTAINER = "SET_GENOME_CONTAINER",
 }
 
 interface AppAction {
@@ -329,7 +324,8 @@ export const GlobalActionCreators = {
     },
 };
 
-export const GenomeActionsCreatorsFactory = (containerIdx: number) => {
+export const ContainerActionsCreatorsFactory = (containerIdx: number) => {
+    // TODO: reorganize and change the comments
     return {
         /**
          * Modifies the current genome.
@@ -348,7 +344,7 @@ export const GenomeActionsCreatorsFactory = (containerIdx: number) => {
             return { containerIdx, genomeIdx, type: ActionType.SET_TRACKS, tracks: newTracks };
         },
 
-        setMetadataTerms: (newTerms: string[], genomeIdx: number) => {
+        setMetadataTerms: (newTerms: string[], genomeIdx?: number) => {
             return { containerIdx, genomeIdx, type: ActionType.SET_METADATA_TERMS, terms: newTerms };
         },
 
@@ -448,10 +444,29 @@ export const GenomeActionsCreatorsFactory = (containerIdx: number) => {
          * @param highlights array of HighlightItems that are created in HighlightMenu.js
          * @returns
          */
-        setHighlights: (highlights: HighlightInterval[], genomeIdx: number) => {
+        setHighlights: (highlights: HighlightInterval[], genomeIdx?: number) => {
             // console.log(highlights);
             return { containerIdx, genomeIdx, type: ActionType.SET_HIGHLIGHTS, highlights };
         },
+        
+        /**
+         * Replaces the current settings for a genome inside of a container with new settings.
+         *
+         * @param {GenomeSettings} settings - new region set list
+         * @param {number} genomeIdx - index of the genome in the container
+         */
+        setGenomeSettings: (settings: GenomeSettings, genomeIdx: number) => {
+            return { containerIdx, genomeIdx, type: ActionType.SET_GENOME_SETTINGS, settings };
+        },
+
+         /**
+         * Moves the specified genome to a new container at containerIdx
+         *
+         * @param {number} genomeIdx - index of the genome in the container
+         */
+        setGenomeContainer: (genomeIdx: number, newContainerIdx: number) => {
+            return { containerIdx, genomeIdx, newContainerIdx, type: ActionType.SET_GENOME_CONTAINER };
+        }
     };
 };
 
@@ -561,7 +576,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     title: genomeName,
                     tracks: nextTracks,
 
-                    highlights: null,
+                    highlights: [],
 
                     settings: initialContainerSettings,
                 })]
@@ -746,6 +761,46 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     }
                 }))
             };
+        }
+        case ActionType.SET_GENOME_SETTINGS: {
+            const { settings, containerIdx, genomeIdx } = action;
+            return {
+                ...prevState,
+                containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
+                    return {
+                        ...c,
+                        genomes: modifyArrayAtIdx(c.genomes, genomeIdx, (g => {
+                            return {
+                                ...g,
+                                settings,
+                            };
+                        }))
+                    }
+                }))
+            };
+        }
+        case ActionType.SET_GENOME_CONTAINER: {
+            const { containerIdx, newContainerIdx, genomeIdx } = action;
+            const curGenome: GenomeState = prevState.containers[containerIdx].genomes[genomeIdx];
+            
+            return {
+                ...prevState,
+                containers: prevState.containers.map((c, idx) => {
+                    if (idx === newContainerIdx) {
+                        return {
+                            ...c,
+                            genomes: [...c.genomes, curGenome],
+                        };
+                    }
+                    if (idx === containerIdx) {
+                        return {
+                            ...c,
+                            genomes: c.genomes.filter((_g, idx) => idx !==- genomeIdx),
+                        };
+                    }
+                    return c;
+                }).filter(c => c.genomes.length)
+            }
         }
         default:
             // console.warn("Unknown change state action; ignoring.");

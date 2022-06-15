@@ -47,7 +47,12 @@ const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 // HOC's //
 ///////////
 function mapStateToProps(state) {
-    return {};
+    return {
+        genome: state.browser.present.genomeName,
+        viewRegion: state.browser.present.viewRegion,
+        // tracks: state.browser.present.tracks,
+        metadataTerms: state.browser.present.metadataTerms,
+    };
 }
 
 const callbacks = {

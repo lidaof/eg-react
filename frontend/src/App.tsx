@@ -7,7 +7,7 @@ import { GlobalActionCreators, GenomeState, SyncedContainer } from "./AppState";
 import GenomePickerContainer from "./components/GenomePicker";
 import Nav from "./components/Nav";
 import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
-import ContainerView from "./components/ContainerView";
+import ContainerView from "./components/containerView/ContainerView";
 import TrackContainer from "./components/trackContainers/TrackContainer";
 import withCurrentGenome from "./components/withCurrentGenome";
 import DisplayedRegionModel from "./model/DisplayedRegionModel";
@@ -372,6 +372,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
         const groupedTrackSets = this.groupTrackByGenome();
         const navGenomeConfig = containers[0].genomes[0].genomeConfig || getGenomeConfig(containers[0].genomes[0].name);
+        const containerTitles = containers.map((container) => container.title);
         return (
             <div className="App container-fluid">
                 <Nav
@@ -432,12 +433,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                             isThereG3dTrack={isThereG3dTrack}
                             onSetImageInfo={onSetImageInfo}
                             isShowingNavigator={isShowingNavigator}
-
-                            // temp fix for typescript not working with redux connected component
-                            onSetHighlights={(a) => null}
-                            onSetViewRegion={(a, b) => null}
-                            onTracksChanged={(a) => null}
-                            onMetadataTermsChanged={(a) => null}
+                            containerTitles={containerTitles}
                         />
                     )
                 })}
