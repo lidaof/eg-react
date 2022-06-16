@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
 /*
 interface TreeViewData {
@@ -11,19 +11,26 @@ interface TreeViewData {
 
 function DefaultExpandButton(props) {
     if (props.isExpanded) {
-        return <span style={{marginRight: 5}} onClick={props.onClick} >▾</span>;
+        return (
+            <span style={{ marginRight: 5 }} onClick={props.onClick}>
+                ▾
+            </span>
+        );
     } else {
         return (
-        <span style={{display: "inline-block", transform: "rotate(-90deg)", marginRight: 5, cursor: "pointer"}} onClick={props.onClick} >
-            ▾
-        </span>
+            <span
+                style={{ display: "inline-block", transform: "rotate(-90deg)", marginRight: 5, cursor: "pointer" }}
+                onClick={props.onClick}
+            >
+                ▾
+            </span>
         );
     }
 }
 
 /**
  * A tree view (outline view) of data.  Nodes are collapsible, and customizable via props.
- * 
+ *
  * @author Silas Hsu
  */
 class TreeView extends React.Component {
@@ -33,12 +40,12 @@ class TreeView extends React.Component {
         indent: PropTypes.number,
         childIndent: PropTypes.number,
         leafRenderer: PropTypes.func,
-    }
+    };
 
     static defaultProps = {
         indent: 0,
         childIndent: 20,
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -48,7 +55,7 @@ class TreeView extends React.Component {
 
     renderLeaf(dataObj) {
         return (
-            <div style={{marginLeft: this.props.indent}} >
+            <div style={{ marginLeft: this.props.indent }}>
                 {this.props.leafRenderer ? this.props.leafRenderer(dataObj) : dataObj.label}
             </div>
         );
@@ -71,15 +78,18 @@ class TreeView extends React.Component {
         if (!this.props.data.children) {
             return this.renderLeaf(this.props.data);
         }
-        
+
         const onClick = this.props.onNodeToggled ? () => this.props.onNodeToggled(this.props.data) : undefined;
         return (
-        <div style={{marginLeft: this.props.indent, borderLeft: "1px solid grey"}} >
-            <DefaultExpandButton isExpanded={this.props.data.isExpanded} onClick={onClick} />
-            <span style={{cursor: "pointer"}} onClick={onClick}> { this.props.data.label }</span>
-            { this.props.data.isExpanded ? this.props.data.children.map(this.renderSubtree) : null }
-        </div>
-        )
+            <div style={{ marginLeft: this.props.indent, borderLeft: "1px solid grey" }}>
+                <DefaultExpandButton isExpanded={this.props.data.isExpanded} onClick={onClick} />
+                <span style={{ cursor: "pointer" }} onClick={onClick}>
+                    {" "}
+                    {this.props.data.label}
+                </span>
+                {this.props.data.isExpanded ? this.props.data.children.map(this.renderSubtree) : null}
+            </div>
+        );
     }
 }
 

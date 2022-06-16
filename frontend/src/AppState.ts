@@ -355,6 +355,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 genomeName: action.genomeName,
                 viewRegion: nextViewRegion,
                 tracks: nextTracks,
+                darkTheme: prevState.darkTheme,
             };
         case ActionType.SET_CUSTOM_VIRUS_GENOME: // Setting virus genome.
             const virusTracks = action.tracks.map((data: any) => TrackModel.deserialize(data));

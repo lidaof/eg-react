@@ -4,7 +4,7 @@
 .MetadataSelectionMenu {
     position: absolute;
     z-index: 4;
-    background: #edeef1;
+    background: var(--bg-color);
     padding: 5px;
     /* right: 60px; */
     /* top: 40px; */

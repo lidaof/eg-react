@@ -34,6 +34,7 @@ import ScatterPlot from "./Geneplot/ScatterPlot";
 import { TextTrack } from "./TextTrack";
 import { AppIcon, GenomePicker } from "./GenomePicker";
 import DarkMode from "./DarkMode";
+import { ShareUI } from "./ShareUI";
 
 import "./Nav.css";
 
@@ -44,6 +45,7 @@ function mapStateToProps(state) {
     return {
         isShowingNavigator: state.browser.present.isShowingNavigator,
         isShowingVR: state.browser.present.isShowingVR,
+        darkTheme: state.browser.present.darkTheme,
     };
 }
 
@@ -75,7 +77,7 @@ class Nav extends React.Component {
         this.state = {
             isCacheEnabled: true,
             genomeModal: false,
-            otherGenome: null,
+            // otherGenome: null,
         };
         this.debounced = _.debounce(this.props.onLegendWidthChange, 250);
         // this.renderOtherGenomes = this.renderOtherGenomes.bind(this);
@@ -149,10 +151,10 @@ class Nav extends React.Component {
     //     );
     // }
 
-    changeGenome = () => {
-        this.props.onGenomeSelected(this.state.otherGenome);
-        this.setState({ otherGenome: null, genomeModal: false });
-    };
+    // changeGenome = () => {
+    //     this.props.onGenomeSelected(this.state.otherGenome);
+    //     this.setState({ otherGenome: null, genomeModal: false });
+    // };
 
     onGenomeSelected = (name) => {
         this.props.onGenomeSelected(name);
@@ -191,13 +193,16 @@ class Nav extends React.Component {
             groupedTrackSets,
             virusBrowserMode,
             highlights,
+            darkTheme,
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const { name, logo, color } = getSpeciesInfo(genomeName);
         const expansionTypes = INTERACTION_TYPES.concat(ALIGNMENT_TYPES);
         const hasExpansionTrack = tracks.some((model) => expansionTypes.includes(model.type)) ? true : false;
         const REGION_EXPANDER = hasExpansionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
-        const { genomeModal, otherGenome } = this.state;
+        const { genomeModal } = this.state;
+        const modalfg = darkTheme ? "white" : "#222";
+        const modalbg = darkTheme ? "#222" : "white";
         return (
             <div className="Nav-container bg">
                 <div className="panel">
@@ -246,36 +251,41 @@ class Nav extends React.Component {
                                         // top: 0,
                                         // left: 0,
                                         // height: "100%",
+                                        color: modalfg,
+                                        background: modalbg,
                                         zIndex: 5,
-                                        backgroundColor: "var(--bg-color)",
-                                        color: "var(--font-color)",
                                     },
                                     overlay: {
                                         backgroundColor: "rgba(111,107,101, 0.7)",
                                     },
                                 }}
                             >
-                                <IconButton onClick={this.handleGenomeCloseModal}>
+                                <IconButton color="secondary" onClick={this.handleGenomeCloseModal}>
                                     <ArrowBack />
                                 </IconButton>
                                 <GenomePicker onGenomeSelected={this.onGenomeSelected} title="Choose a new genome" />
                                 <Button variant="contained" color="primary" onClick={this.handleGenomeCloseModal}>
                                     Close
-                                </Button>{" "}
+                                </Button>
+                                {/* {" "}
                                 {otherGenome && (
                                     <button className="btn btn-sm btn-primary" onClick={this.changeGenome}>
                                         Go
                                     </button>
-                                )}
+                                )} */}
                             </ReactModal>
                         </div>
                     )}
-                    <div className="element Nav-center bg">
+                    <div className="element Nav-center">
                         <TrackRegionController
                             selectedRegion={selectedRegion}
                             onRegionSelected={onRegionSelected}
                             onNewHighlight={onNewHighlight}
                             virusBrowserMode={virusBrowserMode}
+                            contentColorSetup={{
+                                color: modalfg,
+                                background: modalbg,
+                            }}
                         />
                     </div>
                     {/* <div className="Nav-center">
@@ -284,7 +294,15 @@ class Nav extends React.Component {
                     <div className="element Nav-center btn-group">
                         <DropdownOpener extraClassName="btn-primary" label="🎹Tracks" />
                         <div className="dropdown-menu bg">
-                            <ModalMenuItem itemLabel="Annotation Tracks">
+                            <ModalMenuItem
+                                itemLabel="Annotation Tracks"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <AnnotationTrackUI
                                     addedTracks={tracks}
                                     onTracksAdded={onTracksAdded}
@@ -293,7 +311,15 @@ class Nav extends React.Component {
                                     groupedTrackSets={groupedTrackSets}
                                 />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Public Data Hubs">
+                            <ModalMenuItem
+                                itemLabel="Public Data Hubs"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <HubPane
                                     addedTracks={tracks}
                                     onTracksAdded={onTracksAdded}
@@ -307,7 +333,15 @@ class Nav extends React.Component {
                                     addTermToMetaSets={addTermToMetaSets}
                                 />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Track Facet Table">
+                            <ModalMenuItem
+                                itemLabel="Track Facet Table"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <FacetTableUI
                                     publicTracksPool={publicTracksPool}
                                     customTracksPool={customTracksPool}
@@ -319,7 +353,15 @@ class Nav extends React.Component {
                                     addTermToMetaSets={addTermToMetaSets}
                                 />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Remote Tracks">
+                            <ModalMenuItem
+                                itemLabel="Remote Tracks"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <CustomTrackAdder
                                     addedTracks={tracks}
                                     onTracksAdded={onTracksAdded}
@@ -332,13 +374,37 @@ class Nav extends React.Component {
                                     genomeConfig={genomeConfig}
                                 />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Local Tracks">
+                            <ModalMenuItem
+                                itemLabel="Local Tracks"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <TrackUpload onTracksAdded={onTracksAdded} />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Local Text Tracks">
+                            <ModalMenuItem
+                                itemLabel="Local Text Tracks"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <TextTrack onTracksAdded={onTracksAdded} />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Track List">
+                            <ModalMenuItem
+                                itemLabel="Track List"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <TrackList
                                     addedTracks={tracks}
                                     onTracksAdded={onTracksAdded}
@@ -354,13 +420,37 @@ class Nav extends React.Component {
                     <div className="element Nav-center">
                         <DropdownOpener extraClassName="btn-success" label="🔧Apps" />
                         <div className="dropdown-menu bg">
-                            <ModalMenuItem itemLabel="Region Set View">
+                            <ModalMenuItem
+                                itemLabel="Region Set View"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <RegionSetSelector genome={genomeConfig.genome} />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Gene Plot">
+                            <ModalMenuItem
+                                itemLabel="Gene Plot"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <Geneplot genome={genomeConfig.genome} />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Scatter Plot">
+                            <ModalMenuItem
+                                itemLabel="Scatter Plot"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <ScatterPlot genome={genomeConfig.genome} />
                             </ModalMenuItem>
                             {!process.env.REACT_APP_NO_FIREBASE && (
@@ -374,6 +464,8 @@ class Nav extends React.Component {
                                                 overflow: "visible",
                                                 padding: "5px",
                                                 zIndex: 5,
+                                                color: modalfg,
+                                                background: modalbg,
                                             },
                                         }}
                                     >
@@ -388,6 +480,8 @@ class Nav extends React.Component {
                                                 overflow: "visible",
                                                 padding: "5px",
                                                 zIndex: 5,
+                                                color: modalfg,
+                                                background: modalbg,
                                             },
                                         }}
                                     >
@@ -403,6 +497,8 @@ class Nav extends React.Component {
                                         right: 0,
                                         padding: "14px",
                                         zIndex: 5,
+                                        color: modalfg,
+                                        background: modalbg,
                                     },
                                 }}
                             >
@@ -412,6 +508,7 @@ class Nav extends React.Component {
                                     genomeConfig={genomeConfig}
                                     highlights={highlights}
                                     viewRegion={selectedRegion}
+                                    darkTheme={darkTheme}
                                 />
                             </ModalMenuItem>
                             <ModalMenuItem
@@ -422,12 +519,22 @@ class Nav extends React.Component {
                                         right: 0,
                                         padding: "14px",
                                         zIndex: 5,
+                                        color: modalfg,
+                                        background: modalbg,
                                     },
                                 }}
                             >
                                 <DynamicRecordUI expansionAmount={REGION_EXPANDER} genomeConfig={genomeConfig} />
                             </ModalMenuItem>
-                            <ModalMenuItem itemLabel="Fetch Sequence">
+                            <ModalMenuItem
+                                itemLabel="Fetch Sequence"
+                                style={{
+                                    content: {
+                                        color: modalfg,
+                                        background: modalbg,
+                                    },
+                                }}
+                            >
                                 <FetchSequence genomeConfig={genomeConfig} selectedRegion={selectedRegion} />
                             </ModalMenuItem>
                         </div>
@@ -511,6 +618,20 @@ class Nav extends React.Component {
                             </label>
                         </div>
                     </div>
+                    <div className="element Nav-center">
+                        <ModalMenuItem
+                            itemLabel="📨Share"
+                            itemClassName="btn btn-danger"
+                            style={{
+                                content: {
+                                    color: modalfg,
+                                    background: modalbg,
+                                },
+                            }}
+                        >
+                            <ShareUI />
+                        </ModalMenuItem>
+                    </div>
                     {!virusBrowserMode && (
                         <div className="element Nav-center">
                             <DropdownOpener extraClassName="btn-warning" label="📖Help" />
@@ -525,6 +646,8 @@ class Nav extends React.Component {
                                                 overflow: "visible",
                                                 padding: "5px",
                                                 zIndex: 5,
+                                                color: modalfg,
+                                                background: modalbg,
                                             },
                                         }}
                                     >
@@ -646,6 +769,7 @@ function DropdownOpener(props) {
 class ModalMenuItem extends React.Component {
     static propTypes = {
         itemLabel: PropTypes.string,
+        itemClassName: PropTypes.string,
     };
 
     constructor(props) {
@@ -654,6 +778,7 @@ class ModalMenuItem extends React.Component {
             isOpen: false,
         };
         this.toggleOpen = this.toggleOpen.bind(this);
+        this.itemClass = this.props.itemClassName || "dropdown-item";
     }
 
     toggleOpen() {
@@ -674,7 +799,7 @@ class ModalMenuItem extends React.Component {
         };
         return (
             <React.Fragment>
-                <div className="dropdown-item" onClick={this.toggleOpen}>
+                <div className={this.itemClass} onClick={this.toggleOpen}>
                     {this.props.itemLabel}
                 </div>
                 <ReactModal

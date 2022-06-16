@@ -179,7 +179,7 @@ function GenomePickerContainer(props: GenomePickerProps) {
     return (
         <div>
             <AppHeader />
-            <AppBar position="static" color="default" className="bg" >
+            <AppBar position="static" color="default" >
                 <Tabs
                     value={value}
                     onChange={handleChange}
@@ -323,7 +323,7 @@ const useStyles = makeStyles({
     },
     vertScroll: {
         maxHeight: "200px",
-        overflowY: "scroll",
+        overflowY: "auto",
     },
     icon: {
         color: "var(--font-color)",

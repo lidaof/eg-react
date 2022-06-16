@@ -1,5 +1,5 @@
-import React from 'react';
-import LinearDrawingModel from '../model/LinearDrawingModel';
+import React from "react";
+import LinearDrawingModel from "../model/LinearDrawingModel";
 
 const MINOR_TICKS = 10;
 // For default display colors, sizes, etc. scroll down to RulerElementFactory.
@@ -7,7 +7,7 @@ const MINOR_TICKS = 10;
 /**
  * Designs a ruler that displays feature coordinates.  Note that feature coordinates are not necessarily genomic
  * coordinates.
- * 
+ *
  * @author Silas Hsu
  */
 export class RulerDesigner {
@@ -15,11 +15,11 @@ export class RulerDesigner {
      * Configures a new instance.  What elements the design() method returns depends on the passed
      * RulerElementFactory.  There is a default RulerElementFactory implementation; see those docs to find out what
      * it returns.
-     * 
+     *
      * @param {number} [tickSeparationHint] - requested X separation of major ticks
      * @param {RulerElementFactory} [rulerElementFactory] - element generator
      */
-    constructor(tickSeparationHint=60, rulerElementFactory=new RulerElementFactory()) {
+    constructor(tickSeparationHint = 60, rulerElementFactory = new RulerElementFactory()) {
         this._tickSeparationHint = tickSeparationHint;
         this._elementFactory = rulerElementFactory;
     }
@@ -34,18 +34,20 @@ export class RulerDesigner {
     /**
      * Gets the unit for the major tick labels, depending on the number of bases between ticks.  Chooses between unit
      * base, kilobase, and megabase.
-     * 
+     *
      * @param {number} log10BasesPerTick - log10() of the number of bases between ticks
      * @return {Ruler~Unit} the unit for tick labels
      */
     _getMajorUnit(log10BasesPerTick) {
-        if (log10BasesPerTick >= 6) { // 10K (Daofeng updated to 6 from 5)
+        if (log10BasesPerTick >= 6) {
+            // 10K (Daofeng updated to 6 from 5)
             return {
                 size: 1000000,
                 digits: 1,
                 name: "M",
             };
-        } else if (log10BasesPerTick > 3) { // 100 (Daofeng updated to 3 from 2)
+        } else if (log10BasesPerTick > 3) {
+            // 100 (Daofeng updated to 3 from 2)
             return {
                 size: 1000,
                 digits: 0,
@@ -63,7 +65,7 @@ export class RulerDesigner {
     /**
      * Designs the ruler.  Returns an array of anything, depending on the RulerElementFactory configured when this
      * object was created.
-     * 
+     *
      * @param {DisplayedRegionModel} viewRegion - the region to visualize
      * @param {number} width - X width of the ruler
      * @return {any[]} ruler design
@@ -97,7 +99,7 @@ export class RulerDesigner {
 
         return elements;
 
-        function addTicks(locus, contextSpan, isMajor=true, isReverse=false) {
+        function addTicks(locus, contextSpan, isMajor = true, isReverse = false) {
             let xPerTick, basesPerTick, getTickElement, getTextElement;
             if (isMajor) {
                 xPerTick = pixelsPerMajorTick;
@@ -121,7 +123,7 @@ export class RulerDesigner {
                 startBase = roundUp(locus.start, basesPerTick);
                 basesRounded = startBase - locus.start;
             }
-            
+
             const xStart = drawModel.baseToX(contextSpan.start + basesRounded);
             const xEnd = drawModel.baseToX(contextSpan.end);
             let x = xStart;
@@ -148,24 +150,24 @@ export class RulerDesigner {
     }
 }
 
-const COLOR = '#bbb';
+const COLOR = "#bbb";
 const MAJOR_TICK_HEIGHT = 10; // Minor tick height is half this
 const FONT_SIZE = 12;
 
 /**
  * A generator of elements for a Ruler design.  Allows customization of RulerDesigners.  The default implementation
  * returns React elements that are valid <svg> elements.
- * 
+ *
  * @author Silas Hsu
  */
 export class RulerElementFactory {
     /**
      * Configures a new instance that returns React elements that are valid <svg> elements.
-     * 
+     *
      * @param {string} color - color of the elements
      * @param {number} majorTickHeight - height of major ticks.  Minor ticks will be half this height.
      */
-    constructor(color=COLOR, majorTickHeight=MAJOR_TICK_HEIGHT, fontSize=FONT_SIZE) {
+    constructor(color = COLOR, majorTickHeight = MAJOR_TICK_HEIGHT, fontSize = FONT_SIZE) {
         this.color = color;
         this.majorTickHeight = majorTickHeight;
         this.fontSize = fontSize;
@@ -173,55 +175,83 @@ export class RulerElementFactory {
 
     /**
      * Creates a element that represents a line that spans the entire width of the ruler.
-     * 
+     *
      * @param {number} width - width of the ruler
-     * @return {JSX.Element} 
+     * @return {JSX.Element}
      */
     mainLine(width) {
-        return <line key="mainLine" x1={0} y1={0} x2={width} y2={0} stroke={this.color} strokeWidth={1} />;
+        return (
+            <line
+                key="mainLine"
+                x1={0}
+                y1={0}
+                x2={width}
+                y2={0}
+                stroke={this.color}
+                strokeWidth={1}
+                className="svg-line-bg"
+            />
+        );
     }
 
     /**
      * Creates a element that represents a major tick of the ruler.
-     * 
+     *
      * @param {number} x - x coordinate of the tick
-     * @return {JSX.Element} 
+     * @return {JSX.Element}
      */
     majorTick(x) {
         const key = "major" + x;
-        return <line key={key} x1={x} y1={-this.majorTickHeight} x2={x} y2={0} stroke={this.color} strokeWidth={2} />;
+        return (
+            <line
+                key={key}
+                x1={x}
+                y1={-this.majorTickHeight}
+                x2={x}
+                y2={0}
+                stroke={this.color}
+                strokeWidth={2}
+                className="svg-line-bg"
+            />
+        );
     }
 
     /**
      * Creates a element that labels a major tick of the ruler.
-     * 
+     *
      * @param {number} x - x coordinate of the tick
      * @param {string} text - label for the tick
-     * @return {JSX.Element} 
+     * @return {JSX.Element}
      */
     majorTickText(x, text) {
         const style = {
             textAnchor: "middle",
-            fontSize: this.fontSize
+            fontSize: this.fontSize,
         };
-        return <text key={"text" + x} x={x} y={this.fontSize + 2} style={style} >{text}</text>;
+        return (
+            <text key={"text" + x} x={x} y={this.fontSize + 2} style={style} className="svg-text-bg">
+                {text}
+            </text>
+        );
     }
 
     /**
      * Creates a element that represents minor tick of the ruler.
-     * 
+     *
      * @param {number} x - x coordinate of the tick
-     * @return {JSX.Element} 
+     * @return {JSX.Element}
      */
     minorTick(x) {
         const key = "minor" + x;
         const y1 = -this.majorTickHeight / 2;
-        return <line key={key} x1={x} y1={y1} x2={x} y2={0} stroke={this.color} strokeWidth={1} />;
+        return (
+            <line key={key} x1={x} y1={y1} x2={x} y2={0} stroke={this.color} strokeWidth={1} className="svg-line-bg" />
+        );
     }
 
     /**
      * Creates a element that labels a minor tick of the ruler.
-     * 
+     *
      * @param {number} x - x coordinate of the tick
      * @param {string} text - label for the tick
      * @return {JSX.Element}

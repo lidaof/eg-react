@@ -349,6 +349,7 @@ class Chromosomes extends React.PureComponent {
                                 fontWeight: "bold",
                                 fontSize: chrSize,
                             }}
+                            className="svg-text-bg"
                         >
                             {chromosomeName.name}
                         </text>
