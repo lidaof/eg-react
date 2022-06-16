@@ -116,6 +116,7 @@
         "polygon-lookup": "^2.6.0",
         "promise-worker": "^1.1.1",
         "prop-types": "^15.6.0",
+        "qrcode.react": "^3.0.2",
         "query-string": "^6.13.1",
         "rc-drawer": "^4.2.2",
         "react": "^16.13.1",

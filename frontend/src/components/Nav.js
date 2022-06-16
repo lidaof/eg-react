@@ -629,7 +629,7 @@ class Nav extends React.Component {
                                 },
                             }}
                         >
-                            <ShareUI />
+                            <ShareUI bundleId={bundleId} />
                         </ModalMenuItem>
                     </div>
                     {!virusBrowserMode && (
