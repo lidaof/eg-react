@@ -16,6 +16,7 @@ const ZOOMS = [
 ZoomButtons.propTypes = {
     viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
     onNewRegion: PropTypes.func.isRequired,
+    zoomOut: PropTypes.func.isRequired,
 }
 function ZoomButtons(props) {
     // const zoomOut = factor => {

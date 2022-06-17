@@ -32,6 +32,7 @@ export const Tools = {
 ToolButtons.propTypes = {
     selectedTool: PropTypes.oneOf(Object.values(Tools)),
     onToolClicked: PropTypes.func.isRequired,
+    allTools: PropTypes.object
 };
 export function ToolButtons(props) {
     let buttons = [];

@@ -434,6 +434,8 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                             onSetImageInfo={onSetImageInfo}
                             isShowingNavigator={isShowingNavigator}
                             containerTitles={containerTitles}
+
+                            embeddingMode={embeddingMode}
                         />
                     )
                 })}

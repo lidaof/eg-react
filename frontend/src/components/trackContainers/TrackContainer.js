@@ -93,6 +93,9 @@ class TrackContainer extends React.Component {
         onMetadataTermsChanged: PropTypes.func,
         suggestedMetaSets: PropTypes.instanceOf(Set),
         onNewHighlight: PropTypes.func,
+
+        provideControl: PropTypes.func,
+        tool: PropTypes.object
     };
 
     static defaultProps = {
@@ -136,6 +139,13 @@ class TrackContainer extends React.Component {
         this.groupManager = new GroupedTrackManager();
     }
 
+    componentDidMount() {
+        this.props.provideControl({
+            panLeftOrRight: this.panLeftOrRight,
+            zoomOut: this.zoomOut,
+        });
+    }
+
     componentDidUpdate(prevProps) {
         if (this.props.tracks !== prevProps.tracks || prevProps.primaryView !== this.props.primaryView) {
             this.getGroupScale();
@@ -160,7 +170,7 @@ class TrackContainer extends React.Component {
             window.setTimeout(() => {
                 this.setState({ panningAnimation: "none" });
                 // this.pan(-width); // Changes DRM
-                onNewRegion(...newRegion.getContextCoordinates());
+                !this.props.provideControl && onNewRegion(...newRegion.getContextCoordinates());
             }, 1000);
         });
         // onNewRegion(...newRegion.getContextCoordinates());
@@ -172,7 +182,7 @@ class TrackContainer extends React.Component {
         this.setState({ zoomAnimation: factor }, () => {
             window.setTimeout(() => {
                 this.setState({ zoomAnimation: 0 });
-                onNewRegion(...newRegion.getContextCoordinates());
+                !this.props.provideControl && onNewRegion(...newRegion.getContextCoordinates());
             }, 1000);
         });
         // onNewRegion(...newRegion.getContextCoordinates());
@@ -676,7 +686,7 @@ class TrackContainer extends React.Component {
     renderSubContainer() {
         const { tracks, primaryView, onNewRegion, onTracksChanged, onNewHighlight, genomeConfig } = this.props;
         const trackElements = this.makeTrackElements();
-        switch (this.state.selectedTool) {
+        switch (this.props.provideControl ? this.props.tool : this.state.selectedTool) {
             case Tools.REORDER:
                 return (
                     <ReorderableTrackContainer
@@ -789,7 +799,7 @@ class TrackContainer extends React.Component {
             <React.Fragment>
                 <OutsideClickDetector onOutsideClick={this.deselectAllTracks}>
                     {/* TODO: only render controls when !stateIdx or stateIdx === 0 */}
-                    {this.renderControls()}
+                    {!this.props.provideControl && this.renderControls()}
                     <ContextMenuManager
                         menuElement={contextMenu}
                         shouldMenuClose={(event) => !SELECTION_BEHAVIOR.isToggleEvent(event)}
