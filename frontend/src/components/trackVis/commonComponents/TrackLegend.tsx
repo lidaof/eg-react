@@ -129,6 +129,15 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                     .filter((d, i) => i === 2)
                     .attr("dy", "-0.1em");
             }
+            select(this.gNode)
+                .selectAll("text")
+                .attr("class", "svg-text-bg");
+            select(this.gNode)
+                .selectAll("line")
+                .attr("class", "svg-line-bg");
+            select(this.gNode)
+                .selectAll("path")
+                .attr("class", "svg-line-bg");
         }
     }
 
@@ -173,7 +182,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                 width,
                 minWidth: width,
                 height,
-                backgroundColor: trackModel.isSelected ? "yellow" : undefined,
+                backgroundColor: trackModel.isSelected ? "gray" : undefined,
                 justifyContent: "space-between",
             },
             style

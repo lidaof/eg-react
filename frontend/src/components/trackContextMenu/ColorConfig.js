@@ -75,7 +75,9 @@ export function SecondaryColorConfig(props) {
  * @return {JSX.Element} element to render
  */
 export function BackgroundColorConfig(props) {
-    return <ColorConfig {...props} optionName="backgroundColor" label="Background color" />;
+    return (
+        <ColorConfig {...props} optionName="backgroundColor" label="Background color" defaultValue="var(--bg-color)" />
+    );
 }
 
 /**
@@ -137,7 +139,6 @@ export function highValueColorConfig(props) {
 export function lowValueColorConfig(props) {
     return <ColorConfig {...props} optionName="lowValueColor" label="Low value color" />;
 }
-
 
 /**
  * A menu item that configures `trackModel.options.boxColor`

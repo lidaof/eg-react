@@ -17,7 +17,7 @@ export const THUMBNAIL_PADDING = 2;
 
 export const DEFAULT_OPTIONS = {
     imageHeight: [73],
-    backgroundColor: "white",
+    backgroundColor: "var(--bg-color)",
     fetchViewWindowOnly: true,
     imageAspectRatio: 1.315, // default ratio for IDR for many images as checked
     displayMode: AnnotationDisplayModes.FULL,

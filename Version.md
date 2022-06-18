@@ -1,5 +1,10 @@
 # Version History
 
+## 53.8.0
+
+-   added light/dark theme setting
+-   added view sharing via email/embed/QR code
+
 ## 53.7.0
 
 -   added MANE select 1.0 for hg38

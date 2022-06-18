@@ -25,7 +25,7 @@ function ZoomButtons(props) {
     const buttons = ZOOMS.map((zoom, index) =>
         <button
             key={index}
-            className="btn btn-outline-dark"
+            className="btn btn-outline-secondary"
             title={zoom.title}
             style={{fontFamily: "monospace"}}
             onClick={() => props.zoomOut(zoom.factor)}

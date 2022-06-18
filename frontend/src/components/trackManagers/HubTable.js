@@ -141,6 +141,9 @@ class HubTable extends React.PureComponent {
                 <h1>Public data hubs</h1>
                 <ReactTable
                     filterable
+                    defaultFilterMethod={(filter, row) =>
+                        String(row[filter.id]).toLowerCase().includes(filter.value.toLowerCase())
+                    }
                     defaultPageSize={10}
                     data={this.props.publicHubs}
                     columns={this.columns}

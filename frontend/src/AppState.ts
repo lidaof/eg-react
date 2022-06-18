@@ -24,6 +24,7 @@ import DataHubParser from "./model/DataHubParser";
 import OpenInterval from "./model/interval/OpenInterval";
 import { Genome } from "./model/genomes/Genome";
 import Chromosome from "./model/genomes/Chromosome";
+import { uncompressString } from "./components/ShareUI";
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
@@ -54,6 +55,20 @@ export const NO_SAVE_SESSION = "eg-no-session";
 export const MIN_VIEW_REGION_SIZE = 5;
 export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
+// if need change, also need change css variable in
+const DARK_FG_COLOR = "white";
+const DARK_BG_COLOR = "#222";
+const LIGHT_FG_COLOR = "#222";
+const LIGHT_BG_COLOR = "white";
+
+export function getFgColor(isDark: boolean) {
+    return isDark ? DARK_FG_COLOR : LIGHT_FG_COLOR;
+}
+
+export function getBgColor(isDark: boolean) {
+    return isDark ? DARK_BG_COLOR : LIGHT_BG_COLOR;
+}
+
 export interface AppState {
     genomeName: string;
     viewRegion: DisplayedRegionModel;
@@ -72,10 +87,11 @@ export interface AppState {
     layout?: object;
     // g3dtracks?: TrackModel[];
     highlights?: HighlightInterval[];
+    darkTheme?: boolean;
 }
 
 const bundleId = uuid.v1();
-
+const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
 const initialState: AppState = {
     genomeName: "",
     viewRegion: null,
@@ -92,6 +108,7 @@ const initialState: AppState = {
     layout: {},
     // g3dtracks: [],
     highlights: [],
+    darkTheme: prefersDark,
 };
 
 enum ActionType {
@@ -115,6 +132,7 @@ enum ActionType {
     SET_LAYOUT = "SET_LAYOUT",
     // SET_G3D_TRACKS = "SET_G3D_TRACKS",
     SET_HIGHLIGHTS = "SET_HIGHLIGHTS",
+    SET_DARK_THEME = "SET_DARK_THEME",
 }
 
 interface AppAction {
@@ -247,6 +265,10 @@ export const ActionCreators = {
         // console.log(highlights);
         return { type: ActionType.SET_HIGHLIGHTS, highlights };
     },
+
+    setDarkTheme: (darkTheme: boolean) => {
+        return { type: ActionType.SET_DARK_THEME, darkTheme };
+    },
 };
 
 function getInitialState(): AppState {
@@ -282,6 +304,10 @@ function getInitialState(): AppState {
             } else {
                 newState = { ...state, bundleId: query.bundle, sessionFromUrl: true };
             }
+        }
+        if (query.blob) {
+            const json = JSON.parse(uncompressString(query.blob));
+            newState = new AppStateLoader().fromObject(json);
         }
         if (query.hicUrl) {
             const tmpState = getNextState(state, {
@@ -348,6 +374,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 genomeName: action.genomeName,
                 viewRegion: nextViewRegion,
                 tracks: nextTracks,
+                darkTheme: prevState.darkTheme,
             };
         case ActionType.SET_CUSTOM_VIRUS_GENOME: // Setting virus genome.
             const virusTracks = action.tracks.map((data: any) => TrackModel.deserialize(data));
@@ -443,6 +470,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         //     return { ...prevState, threedTracks: action.tracks };
         case ActionType.SET_HIGHLIGHTS:
             return { ...prevState, highlights: action.highlights };
+        case ActionType.SET_DARK_THEME:
+            return { ...prevState, darkTheme: action.darkTheme };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);

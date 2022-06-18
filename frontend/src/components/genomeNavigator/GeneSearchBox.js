@@ -45,7 +45,16 @@ class GeneSearchBox extends React.PureComponent {
     // }
 
     render() {
-        return <GeneSearchBoxBase onGeneSelected={this.setViewToGene} simpleMode={false} voiceInput={true} />;
+        const { color, background } = this.props;
+        return (
+            <GeneSearchBoxBase
+                onGeneSelected={this.setViewToGene}
+                simpleMode={false}
+                voiceInput={true}
+                color={color}
+                background={background}
+            />
+        );
     }
 }
 

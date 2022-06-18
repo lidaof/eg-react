@@ -1,0 +1,151 @@
+[data-theme="dark"] {
+    --font-color: var(--dark-fg-color);
+    --bg-color: var(--dark-bg-color);
+    /* --link-color: #3bd1ff; */
+}
+[data-theme="light"] {
+    --font-color: var(--light-fg-color);
+    --bg-color: var(--light-bg-color);
+    /* --link-color: #3f51b5; */
+}
+.bg {
+    background-color: var(--bg-color);
+    color: var(--font-color);
+}
+
+.svg-text-bg {
+    fill: var(--font-color);
+}
+
+.svg-line-bg {
+    stroke: var(--font-color);
+}
+
+.darkToggleBox {
+    vertical-align: middle;
+    margin-left: 1ch;
+}
+
+/* a {
+    color: var(--link-color) !important;
+} */
+
+/* genomepicker */
+
+[data-theme="light"] hr {
+    border-top: 1px solid rgb(80 80 80 / 30%);
+}
+
+[data-theme="dark"] hr {
+    border-top: 1px solid rgb(223 220 220 / 30%);
+}
+
+[data-theme="light"] .MuiCard-root {
+    box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+}
+
+[data-theme="dark"] .MuiCard-root {
+    box-shadow: 0px 2px 1px -1px rgb(255 255 255 / 20%), 0px 1px 1px 0px rgb(255 255 255 / 14%),
+        0px 1px 3px 0px rgb(255 255 255 / 12%);
+}
+
+[data-theme="light"] .MuiListItem-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .MuiListItem-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .MuiAppBar-colorDefault {
+    color: rgba(0, 0, 0, 0.87);
+    background-color: #f5f5f5;
+}
+
+[data-theme="dark"] .MuiAppBar-colorDefault {
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #222;
+}
+
+[data-theme="light"] .MuiTab-textColorPrimary {
+    color: rgb(0 0 0 / 70%);
+}
+
+[data-theme="light"] .MuiTab-textColorPrimary.Mui-selected {
+    color: #3f51b5;
+}
+
+[data-theme="dark"] .MuiTab-textColorPrimary {
+    color: rgb(255 254 254 / 70%);
+}
+
+[data-theme="dark"] .MuiTab-textColorPrimary.Mui-selected {
+    color: #6e84ff;
+}
+
+/* nav.js */
+
+[data-theme="light"] .MuiIconButton-root {
+    color: rgba(0, 0, 0, 0.54);
+}
+
+[data-theme="dark"] .MuiIconButton-root {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* trackcontainer */
+
+[data-theme="light"] .btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+    color: #dfe4e8;
+    border-color: #dfe4e8;
+}
+
+[data-theme="light"] .btn-light {
+    color: #212529;
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+}
+
+[data-theme="light"] .btn-light.disabled,
+.btn-light:disabled {
+    color: #212529;
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+}
+
+[data-theme="dark"] .btn-light {
+    color: white;
+    background-color: transparent;
+    border-color: #dfe4e8;
+}
+
+[data-theme="dark"] .btn-light.disabled,
+.btn-light:disabled {
+    /* background-color: transparent; */
+    border-color: #f8f9fa;
+}
+
+/* hub table */
+
+.ReactTable .-pagination .-btn {
+    color: unset !important;
+}
+
+.ReactTable .-pagination .-btn[disabled] {
+    opacity: 1;
+}
+
+.ReactTable .rt-expander:after {
+    border-top: 7px solid rgba(152, 152, 152, 0.8) !important;
+}
+
+/* shareUI */
+
+#shareUI .MuiTab-textColorSecondary {
+    color: unset;
+}

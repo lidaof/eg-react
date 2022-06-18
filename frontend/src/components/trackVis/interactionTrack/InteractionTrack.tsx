@@ -54,7 +54,7 @@ interface InteractionTrackProps extends PropsFromTrackContainer, TooltipCallback
 export const DEFAULT_OPTIONS = {
     color: "#B8008A",
     color2: "#006385",
-    backgroundColor: "white",
+    backgroundColor: "var(--bg-color)",
     displayMode: InteractionDisplayMode.HEATMAP,
     scoreScale: ScaleChoices.AUTO,
     scoreMax: 10,

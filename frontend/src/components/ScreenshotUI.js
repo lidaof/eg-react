@@ -43,7 +43,7 @@ class ScreenshotUINotConnected extends React.Component {
     };
 
     prepareSvg = () => {
-        const { highlights, needClip, legendWidth, primaryView } = this.props;
+        const { highlights, needClip, legendWidth, primaryView, darkTheme } = this.props;
         const tracks = Array.from(document.querySelector("#screenshotContainer").querySelectorAll(".Track"));
         const boxHeight = tracks.reduce((acc, cur) => acc + cur.clientHeight, 11 * tracks.length);
         const boxWidth = tracks[0].clientWidth;
@@ -54,6 +54,29 @@ class ScreenshotUINotConnected extends React.Component {
         svgElem.setAttributeNS(null, "height", boxHeight + "");
         svgElem.setAttributeNS(null, "font-family", "Arial, Helvetica, sans-serif");
         svgElem.style.display = "block";
+        const defs = document.createElementNS(xmlns, "defs");
+        const style = document.createElementNS(xmlns, "style");
+        const bg = darkTheme ? "#222" : "white";
+        const fg = darkTheme ? "white" : "#222";
+        style.innerHTML = `:root { --bg-color: ${bg}; --font-color: ${fg}; } .svg-text-bg {
+    fill: var(--font-color);
+}
+
+.svg-line-bg {
+    stroke: var(--font-color);
+}`;
+        defs.appendChild(style);
+        svgElem.appendChild(defs);
+        if (darkTheme) {
+            const rect = document.createElementNS(xmlns, "rect");
+            rect.setAttribute("id", "bgcover");
+            rect.setAttribute("x", 0);
+            rect.setAttribute("y", 0);
+            rect.setAttribute("width", boxWidth + "");
+            rect.setAttribute("height", boxHeight + "");
+            rect.setAttribute("fill", "#222");
+            svgElem.appendChild(rect);
+        }
         const svgElemg = document.createElementNS(xmlns, "g"); // for labels, separate lines etc
         const svgElemg2 = document.createElementNS(xmlns, "g"); // for tracks contents
         const translateX = needClip ? -primaryView.viewWindow.start : 0;
@@ -73,6 +96,7 @@ class ScreenshotUINotConnected extends React.Component {
                 labelSvg.setAttributeNS(null, "y", y + 14 + "");
                 labelSvg.setAttributeNS(null, "font-size", "12px");
                 const textNode = document.createTextNode(trackLabelText);
+                labelSvg.setAttribute("class", "svg-text-bg");
                 labelSvg.appendChild(textNode);
                 svgElemg.appendChild(labelSvg);
             }
@@ -83,6 +107,7 @@ class ScreenshotUINotConnected extends React.Component {
                 labelSvg.setAttributeNS(null, "y", y + 33 + "");
                 labelSvg.setAttributeNS(null, "font-size", "12px");
                 const textNode = document.createTextNode(chrLabelText);
+                labelSvg.setAttribute("class", "svg-text-bg");
                 labelSvg.appendChild(textNode);
                 svgElemg.appendChild(labelSvg);
             }
@@ -130,7 +155,7 @@ class ScreenshotUINotConnected extends React.Component {
             sepLine.setAttribute("y1", y + "");
             sepLine.setAttribute("x2", boxWidth + "");
             sepLine.setAttribute("y2", y + "");
-            sepLine.setAttribute("stroke", "lightgray");
+            sepLine.setAttribute("stroke", "gray");
             svgElemg.appendChild(sepLine);
             // y += 1;
             x = 0;
@@ -214,7 +239,12 @@ class ScreenshotUINotConnected extends React.Component {
     };
 
     makeSvgTrackElements() {
-        const { tracks, trackData, primaryView, metadataTerms, viewRegion } = this.props;
+        const { tracks, trackData, primaryView, metadataTerms, viewRegion, darkTheme } = this.props;
+        if (darkTheme) {
+            document.documentElement.style.setProperty("--bg-color", "#222");
+        } else {
+            document.documentElement.style.setProperty("--bg-color", "white");
+        }
         const groupScale = new GroupedTrackManager().getGroupScale(
             tracks,
             trackData,

@@ -18,6 +18,7 @@ class FacetTableUI extends React.Component {
             onTracksAdded,
             addedTrackSets,
             addTermToMetaSets,
+            contentColorSetup,
         } = this.props;
         return (
             <Tabs
@@ -35,6 +36,7 @@ class FacetTableUI extends React.Component {
                             onTracksAdded={onTracksAdded}
                             addedTrackSets={addedTrackSets}
                             addTermToMetaSets={addTermToMetaSets}
+                            contentColorSetup={contentColorSetup}
                         />
                     ) : (
                         <p>No public tracks from data hubs yet. Load a hub first.</p>
@@ -49,6 +51,7 @@ class FacetTableUI extends React.Component {
                             onTracksAdded={onTracksAdded}
                             addedTrackSets={addedTrackSets}
                             addTermToMetaSets={addTermToMetaSets}
+                            contentColorSetup={contentColorSetup}
                         />
                     ) : (
                         <p>No custom tracks yet. Submit custom tracks or load custom data hub.</p>
