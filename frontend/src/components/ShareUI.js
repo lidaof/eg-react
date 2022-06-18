@@ -116,7 +116,7 @@ function ShareUI(props) {
             method: `POST`,
             headers: {
                 accept: `application/json`,
-                authorization: `Bearer 2nLQGpsuegHP8l8J0Uq1TsVkCzP3un3T23uQ5YovVf5lvvGOucGmFOYRVj6L`,
+                authorization: `Bearer ${process.env.REACT_APP_TINYURL_BEARER}`,
                 "content-type": `application/json`,
             },
             body: JSON.stringify({
