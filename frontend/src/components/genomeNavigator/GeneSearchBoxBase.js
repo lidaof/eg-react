@@ -19,7 +19,7 @@ const ENTER_KEY_CODE = 13;
 const ISOFORM_POPOVER_STYLE = {
     zIndex: 10,
     border: "2px solid grey",
-    backgroundColor: "white",
+    // backgroundColor: "white",
     maxHeight: "800px",
     overflow: "auto",
 };

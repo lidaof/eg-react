@@ -20,7 +20,16 @@ class GeneSearchBox3D extends React.PureComponent {
     };
 
     render() {
-        return <GeneSearchBoxBase onGeneSelected={this.setGene} simpleMode={true} voiceInput={false} />;
+        const { color, background } = this.props;
+        return (
+            <GeneSearchBoxBase
+                onGeneSelected={this.setGene}
+                simpleMode={true}
+                voiceInput={false}
+                color={color}
+                background={background}
+            />
+        );
     }
 }
 

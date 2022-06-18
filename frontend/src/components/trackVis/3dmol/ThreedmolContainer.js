@@ -9,11 +9,11 @@ import axios from "axios";
 import percentile from "percentile";
 import { notify } from "react-notify-toast";
 import Drawer from "rc-drawer";
-import TrackModel from "model/TrackModel";
-import DisplayedRegionModel from "model/DisplayedRegionModel";
-import ChromosomeInterval from "model/interval/ChromosomeInterval";
-import { getTrackConfig } from "components/trackConfig/getTrackConfig";
-import GeneSearchBox3D from "components/genomeNavigator/GeneSearchBox3D";
+import TrackModel from "../../../model/TrackModel";
+import DisplayedRegionModel from "../../../model/DisplayedRegionModel";
+import ChromosomeInterval from "../../../model/interval/ChromosomeInterval";
+import { getTrackConfig } from "../../../components/trackConfig/getTrackConfig";
+import GeneSearchBox3D from "../../../components/genomeNavigator/GeneSearchBox3D";
 import { BigwigSource } from "./BigwigSource";
 import { CORS_PROXY } from "../imageTrack/OmeroSvgVisualizer";
 import { chromColors, colorAsNumber, g3dParser, getClosestValueIndex, CYTOBAND_COLORS_SIMPLE } from "./helpers-3dmol";
@@ -44,6 +44,7 @@ import {
     getContrastingColor,
     getSymbolRegions,
 } from "../../../util";
+import { getBgColor, getFgColor } from "../../../AppState";
 
 import "rc-drawer/assets/index.css";
 import "./ThreedmolContainer.css";
@@ -188,6 +189,8 @@ class ThreedmolContainer extends React.Component {
         this.paintWithBigwig = _.debounce(this.paintWithBigwig, 150);
         // this.paintWithComparment = _.debounce(this.paintWithComparment, 150);
         this.paintWithAnnotation = _.debounce(this.paintWithAnnotation, 150);
+        this.modalfg = getFgColor(props.darkTheme);
+        this.modalbg = getBgColor(props.darkTheme);
     }
 
     async componentDidMount() {
@@ -197,7 +200,7 @@ class ThreedmolContainer extends React.Component {
         features.forEach((feature) => (this.chromHash[feature.name] = feature.locus.end));
         const element = this.myRef.current;
         const element2 = this.myRef2.current;
-        const config = { backgroundColor: "white" };
+        const config = { backgroundColor: this.modalbg };
         this.viewer = this.mol.createViewer(element, { ...config, id: "box1" }); // main
         this.viewer2 = this.mol.createViewer(element2, { ...config, id: "box2" }); // thumbnail
         this.viewer.linkViewer(this.viewer2);
@@ -510,6 +513,14 @@ class ThreedmolContainer extends React.Component {
             } else {
                 this.viewer.spin(false);
             }
+        }
+        if (prevProps.darkTheme !== this.props.darkTheme) {
+            this.modalfg = getFgColor(this.props.darkTheme);
+            this.modalbg = getBgColor(this.props.darkTheme);
+            this.viewer.setBackgroundColor(this.modalbg);
+            this.viewer2.setBackgroundColor(this.modalbg);
+            this.viewer.render();
+            this.viewer2.render();
         }
     }
 
@@ -2743,11 +2754,16 @@ class ThreedmolContainer extends React.Component {
                         handler={false}
                         showMask={false}
                     >
-                        <div id="accordion" style={{ flexDirection: menuFlexDirection }}>
+                        <div
+                            id="accordion"
+                            style={{
+                                flexDirection: menuFlexDirection,
+                            }}
+                        >
                             <div className="closeMenu-3d" onClick={this.onSwitch}>
                                 &times;
                             </div>
-                            <div className="card">
+                            <div className="card" style={{ color: this.modalfg, backgroundColor: this.modalbg }}>
                                 <div className="card-header" id="headingOne">
                                     <h5 className="mb-0">
                                         <button
@@ -2849,7 +2865,7 @@ class ThreedmolContainer extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="card">
+                            <div className="card" style={{ color: this.modalfg, backgroundColor: this.modalbg }}>
                                 <div className="card-header" id="headingTwo">
                                     <h5 className="mb-0">
                                         <button
@@ -2952,7 +2968,7 @@ class ThreedmolContainer extends React.Component {
                                 </div>
                             </div>
 
-                            <div className="card">
+                            <div className="card" style={{ color: this.modalfg, backgroundColor: this.modalbg }}>
                                 <div className="card-header" id="headingThree">
                                     <h5 className="mb-0">
                                         <button
@@ -3009,7 +3025,11 @@ class ThreedmolContainer extends React.Component {
                                             <strong>Gene labeling</strong>
                                         </p>
                                         <div>
-                                            <GeneSearchBox3D setGeneCallback={this.addGeneToMyShapes} />
+                                            <GeneSearchBox3D
+                                                setGeneCallback={this.addGeneToMyShapes}
+                                                color={this.modalfg}
+                                                background={this.modalbg}
+                                            />
                                         </div>
                                         <p>
                                             <strong>Region labeling</strong>
@@ -3069,7 +3089,7 @@ class ThreedmolContainer extends React.Component {
                                 </div>
                             </div>
 
-                            <div className="card">
+                            <div className="card" style={{ color: this.modalfg, backgroundColor: this.modalbg }}>
                                 <div className="card-header" id="heading4">
                                     <h5 className="mb-0">
                                         <button
@@ -3217,7 +3237,7 @@ class ThreedmolContainer extends React.Component {
                                 </div>
                             </div>
                             {/* 
-                            <div className="card">
+                            <div className="card" style={{ color: this.modalfg, backgroundColor: this.modalbg }}>
                                 <div className="card-header" id="heading5">
                                     <h5 className="mb-0">
                                         <button
@@ -3316,7 +3336,7 @@ class ThreedmolContainer extends React.Component {
                                 </div>
                             </div> */}
 
-                            <div className="card">
+                            <div className="card" style={{ color: this.modalfg, backgroundColor: this.modalbg }}>
                                 <div className="card-header" id="heading8">
                                     <h5 className="mb-0">
                                         <button
@@ -3417,7 +3437,7 @@ class ThreedmolContainer extends React.Component {
                                 </div>
                             </div>
 
-                            <div className="card">
+                            <div className="card" style={{ color: this.modalfg, backgroundColor: this.modalbg }}>
                                 <div className="card-header" id="heading6">
                                     <h5 className="mb-0">
                                         <button
@@ -3495,7 +3515,7 @@ class ThreedmolContainer extends React.Component {
                                 </div>
                             </div>
 
-                            <div className="card">
+                            <div className="card" style={{ color: this.modalfg, backgroundColor: this.modalbg }}>
                                 <div className="card-header" id="heading7">
                                     <h5 className="mb-0">
                                         <button

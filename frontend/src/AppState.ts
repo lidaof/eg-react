@@ -24,6 +24,7 @@ import DataHubParser from "./model/DataHubParser";
 import OpenInterval from "./model/interval/OpenInterval";
 import { Genome } from "./model/genomes/Genome";
 import Chromosome from "./model/genomes/Chromosome";
+import { uncompressString } from "./components/ShareUI";
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
@@ -53,6 +54,20 @@ export const SESSION_KEY = "eg-react-session";
 export const NO_SAVE_SESSION = "eg-no-session";
 export const MIN_VIEW_REGION_SIZE = 5;
 export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
+
+// if need change, also need change css variable in
+const DARK_FG_COLOR = "white";
+const DARK_BG_COLOR = "#222";
+const LIGHT_FG_COLOR = "#222";
+const LIGHT_BG_COLOR = "white";
+
+export function getFgColor(isDark: boolean) {
+    return isDark ? DARK_FG_COLOR : LIGHT_FG_COLOR;
+}
+
+export function getBgColor(isDark: boolean) {
+    return isDark ? DARK_BG_COLOR : LIGHT_BG_COLOR;
+}
 
 export interface AppState {
     genomeName: string;
@@ -289,6 +304,10 @@ function getInitialState(): AppState {
             } else {
                 newState = { ...state, bundleId: query.bundle, sessionFromUrl: true };
             }
+        }
+        if (query.blob) {
+            const json = JSON.parse(uncompressString(query.blob));
+            newState = new AppStateLoader().fromObject(json);
         }
         if (query.hicUrl) {
             const tmpState = getNextState(state, {

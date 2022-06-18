@@ -1,11 +1,11 @@
 [data-theme="dark"] {
-    --font-color: white;
-    --bg-color: #222;
+    --font-color: var(--dark-fg-color);
+    --bg-color: var(--dark-bg-color);
     /* --link-color: #3bd1ff; */
 }
 [data-theme="light"] {
-    --font-color: #222;
-    --bg-color: white;
+    --font-color: var(--light-fg-color);
+    --bg-color: var(--light-bg-color);
     /* --link-color: #3f51b5; */
 }
 .bg {
@@ -133,10 +133,19 @@
 /* hub table */
 
 .ReactTable .-pagination .-btn {
-    color: unset;
-    background: unset;
+    color: unset !important;
 }
 
 .ReactTable .-pagination .-btn[disabled] {
     opacity: 1;
+}
+
+.ReactTable .rt-expander:after {
+    border-top: 7px solid rgba(152, 152, 152, 0.8) !important;
+}
+
+/* shareUI */
+
+#shareUI .MuiTab-textColorSecondary {
+    color: unset;
 }

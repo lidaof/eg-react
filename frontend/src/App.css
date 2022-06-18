@@ -1,3 +1,11 @@
+:root {
+    --colNum: 2;
+    --dark-fg-color: white;
+    --dark-bg-color: #222;
+    --light-fg-color: #222;
+    --light-bg-color: white;
+}
+
 .App {
     margin-bottom: 30px;
 }

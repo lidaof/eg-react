@@ -3,11 +3,10 @@ import PropTypes from "prop-types";
 import ReactModal from "react-modal";
 import _ from "lodash";
 import { connect } from "react-redux";
-// import { RadioGroup, Radio } from "react-radio-group";
 import Button from "@material-ui/core/Button";
 import { ArrowBack } from "@material-ui/icons";
 import { IconButton } from "@material-ui/core";
-import { ActionCreators } from "../AppState";
+import { ActionCreators, getBgColor, getFgColor, STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "../AppState";
 import DisplayedRegionModel from "../model/DisplayedRegionModel";
 import { getSpeciesInfo } from "../model/genomes/allGenomes";
 import TrackRegionController from "./genomeNavigator/TrackRegionController";
@@ -24,7 +23,6 @@ import { RegionExpander } from "../model/RegionExpander";
 import { ScreenshotUI } from "./ScreenshotUI";
 import { DynamicRecordUI } from "./DynamicRecordUI";
 import FacetTableUI from "./FacetTableUI";
-import { STORAGE, SESSION_KEY, NO_SAVE_SESSION } from "../AppState";
 import { HotKeyInfo } from "./HotKeyInfo";
 import { INTERACTION_TYPES, ALIGNMENT_TYPES } from "./trackConfig/getTrackConfig";
 import { TrackUpload } from "./TrackUpload";
@@ -34,7 +32,7 @@ import ScatterPlot from "./Geneplot/ScatterPlot";
 import { TextTrack } from "./TextTrack";
 import { AppIcon, GenomePicker } from "./GenomePicker";
 import DarkMode from "./DarkMode";
-import { ShareUI } from "./ShareUI";
+import ShareUI from "./ShareUI";
 
 import "./Nav.css";
 
@@ -201,8 +199,8 @@ class Nav extends React.Component {
         const hasExpansionTrack = tracks.some((model) => expansionTypes.includes(model.type)) ? true : false;
         const REGION_EXPANDER = hasExpansionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
         const { genomeModal } = this.state;
-        const modalfg = darkTheme ? "white" : "#222";
-        const modalbg = darkTheme ? "#222" : "white";
+        const modalfg = getFgColor(darkTheme);
+        const modalbg = getBgColor(darkTheme);
         return (
             <div className="Nav-container bg">
                 <div className="panel">
@@ -331,6 +329,10 @@ class Nav extends React.Component {
                                     publicTrackSets={publicTrackSets}
                                     addedTrackSets={addedTrackSets}
                                     addTermToMetaSets={addTermToMetaSets}
+                                    contentColorSetup={{
+                                        color: modalfg,
+                                        background: modalbg,
+                                    }}
                                 />
                             </ModalMenuItem>
                             <ModalMenuItem
@@ -351,6 +353,10 @@ class Nav extends React.Component {
                                     customTrackSets={customTrackSets}
                                     addedTrackSets={addedTrackSets}
                                     addTermToMetaSets={addTermToMetaSets}
+                                    contentColorSetup={{
+                                        color: modalfg,
+                                        background: modalbg,
+                                    }}
                                 />
                             </ModalMenuItem>
                             <ModalMenuItem
@@ -629,7 +635,7 @@ class Nav extends React.Component {
                                 },
                             }}
                         >
-                            <ShareUI bundleId={bundleId} />
+                            <ShareUI color={modalfg} background={modalbg} />
                         </ModalMenuItem>
                     </div>
                     {!virusBrowserMode && (

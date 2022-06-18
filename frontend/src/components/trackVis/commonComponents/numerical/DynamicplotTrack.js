@@ -23,7 +23,7 @@ export const DEFAULT_OPTIONS = {
     yMin: 0,
     smooth: 0,
     color: "blue",
-    backgroundColor: "white",
+    backgroundColor: "var(--bg-color)",
     playing: true,
     speed: [10],
     dynamicColors: [],

@@ -109,7 +109,8 @@ class IsoformSelection extends React.PureComponent {
     }
 
     renderSuggestionsSimple() {
-        const navContext = this.props.genomeConfig.navContext;
+        const { color, background, genomeConfig } = this.props;
+        const navContext = genomeConfig.navContext;
         const contextIntervals = this.state.genes.map((gene) => gene.computeNavContextCoordinates(navContext)[0]);
         const leftmostStart = Math.min(...contextIntervals.map((location) => location.start));
         const rightmostEnd = Math.max(...contextIntervals.map((location) => location.end));
@@ -122,6 +123,10 @@ class IsoformSelection extends React.PureComponent {
                     key={gene.dbRecord._id}
                     className="IsoformSelection-item-simple"
                     onClick={() => this.props.onGeneSelected(gene)}
+                    style={{
+                        color,
+                        background,
+                    }}
                 >
                     <div>{gene.getLocus().toString()}</div>
                     <div>

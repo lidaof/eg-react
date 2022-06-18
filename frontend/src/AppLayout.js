@@ -285,7 +285,7 @@ class AppLayout extends React.PureComponent {
 
     render3dmolContainer = (node) => {
         const model = node.getModel();
-        const { viewRegion, genomeConfig, tracks, onNewViewRegion, onSetSelected, selectedSet } = this.props;
+        const { viewRegion, genomeConfig, tracks, onNewViewRegion, onSetSelected, selectedSet, darkTheme } = this.props;
         const config = node.getConfig();
         const { x, y, width, height } = node.getRect();
         const g3dtrack = TrackModel.deserialize(config.trackModel);
@@ -324,6 +324,7 @@ class AppLayout extends React.PureComponent {
                 imageInfo={this.state.imageInfo}
                 onSetSelected={onSetSelected}
                 selectedSet={selectedSet}
+                darkTheme={darkTheme}
             />
         );
     };

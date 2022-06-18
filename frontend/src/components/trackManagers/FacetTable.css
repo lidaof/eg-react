@@ -1,7 +1,3 @@
-:root {
-    --colNum: 2;
-}
-
 .facet-container {
     display: grid;
     grid-template-columns: auto;
@@ -30,16 +26,16 @@
     overflow: hidden;
 }
 
-.facet-content  > div {
+.facet-content > div {
     border-bottom: 1px solid #ccc;
     border-right: 1px solid #ccc;
     position: relative;
 }
 
 .facet-swap {
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: #ffffff;
-    border-color: #4CAF50;
+    border-color: #4caf50;
     cursor: pointer;
 }
 
@@ -53,7 +49,7 @@
     grid-column-end: 2;
 }
 
-.facet-column-header span{
+.facet-column-header span {
     /* transform: rotate(-60deg) translateY(65%); */
     /* transform: rotate(-90deg) translateY(90%);
     transform-origin: left bottom 0;
@@ -102,10 +98,10 @@ button.expanded {
 }
 
 .facet-item:hover:after {
-    content: '';  
+    content: "";
     height: 10000px;
     left: 0;
-    position: absolute;  
+    position: absolute;
     top: -5000px;
     width: 100%;
     z-index: 1;
@@ -117,10 +113,10 @@ button.expanded {
 }
 
 .facet-item:hover:before {
-    content: '';  
+    content: "";
     height: 100%;
     left: -5000px;
-    position: absolute;  
+    position: absolute;
     width: 10000px;
     z-index: 1;
     pointer-events: none;

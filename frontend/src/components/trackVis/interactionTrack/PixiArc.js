@@ -27,7 +27,7 @@ export class PixiArc extends React.PureComponent {
         speed: [5], //react-compound-slider require an array, to be FIXED
         // colors: [],
         color: "blue",
-        backgroundColor: "white",
+        backgroundColor: "var(--bg-color)",
         lineWidth: 1,
         dynamicColors: [],
         useDynamicColors: false,
