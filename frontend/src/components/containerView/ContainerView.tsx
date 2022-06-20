@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 import ContainerTools, { ProvidedControls } from "./ContainerTools";
 import { Tools } from "components/trackContainers/Tools";
+import InlineEditable from "components/InlineEditable";
 
 interface StateContainerProps {
     stateIdx: number;
@@ -35,6 +36,7 @@ interface StateContainerProps {
     onSetViewRegion?: (newStart: number, newEnd: number) => void;
     onTracksChanged?: (tracks: TrackModel[], genomeIdx?: number) => void;
     onMetadataTermsChanged?: (terms: string[], genomeIdx?: number) => void;
+    onTitleChanged?: (title: string, genomeIdx?: number) => void;
 }
 
 function _ContainerView(props: StateContainerProps) {
@@ -55,6 +57,7 @@ function _ContainerView(props: StateContainerProps) {
         onSetViewRegion,
         onTracksChanged,
         onMetadataTermsChanged,
+        onTitleChanged,
     } = props;
     const { title, genomes, viewRegion, metadataTerms, regionSets, regionSetView, trackLegendWidth, highlights } = cdata;
 
@@ -95,19 +98,23 @@ function _ContainerView(props: StateContainerProps) {
             const genomeConfig = genomeConfigs[gIdx];
             return (
                 <div key={gIdx}>
-                    <Grid container direction="row" alignItems="center">
-                        <Grid item>
-                            <Typography variant="h6">{g.title}</Typography>
+                    <div style={{
+                        marginLeft: 10
+                    }}>
+                        <Grid container direction="row" alignItems="center">
+                            <Grid item>
+                                <Typography variant="h6">{g.title}</Typography>
+                            </Grid>
+                            <Grid item>
+                                <StateSyncSettings
+                                    containerIdx={stateIdx}
+                                    genomeIdx={gIdx}
+                                    genomeSettings={g.settings}
+                                    containerTitles={containerTitles}
+                                />
+                            </Grid>
                         </Grid>
-                        <Grid item>
-                            <StateSyncSettings
-                                containerIdx={stateIdx}
-                                genomeIdx={gIdx}
-                                genomeSettings={g.settings}
-                                containerTitles={containerTitles}
-                            />
-                        </Grid>
-                    </Grid>
+                    </div>
                     <TrackContainer
                         key={(gIdx + 1) * genomes.length}
                         enteredRegion={null}
@@ -137,8 +144,8 @@ function _ContainerView(props: StateContainerProps) {
                         onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(newTerms, gIdx)}
 
                         provideControl={(c: ProvidedControls) => trackControls[gIdx] = c}
-
                         tool={tool}
+                        inContainer
                     />
                 </div>
             );
@@ -147,25 +154,42 @@ function _ContainerView(props: StateContainerProps) {
 
     return (
         <div>
-            {isShowingNavigator && (
-                <GenomeNavigator selectedRegion={viewRegion} onRegionSelected={onSetViewRegion} genomeConfig={genomeConfigs[0]} /> // TODO: either create a switch that allows use of genomeConfig of choice or overlays all of the genomes configs in different colors.
-            )}
-            <ContainerTools
-                trackControls={trackControls}
-                tool={tool}
-                onToolChanged={setTool}
-                embeddingMode={embeddingMode}
+            <Grid container direction="row" alignItems="center">
+                <Grid item>
+                    <InlineEditable
+                        value={title}
+                        onChange={(newTitle: string) => onTitleChanged(newTitle, stateIdx)}
+                        variant="h6"
+                    />
+                </Grid>
+                <Grid item>
+                    <ContainerTools
+                        trackControls={trackControls}
+                        tool={tool}
+                        onToolChanged={setTool}
+                        embeddingMode={embeddingMode}
 
-                viewRegion={viewRegion}
-                onNewRegion={onSetViewRegion}
-                // TODO: change this to container highlights
-                highlights={genomes[0].highlights}
-                onSetHighlights={(highlights: HighlightInterval[]) => onSetHighlights(highlights, 0)}
-                metadataTerms={metadataTerms}
-                onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(newTerms, 0)}
-                suggestedMetaSets={suggestedMetaSets}
-            />
-            {renderGenomes()}
+                        viewRegion={viewRegion}
+                        onNewRegion={onSetViewRegion}
+                        // TODO: change this to container highlights
+                        highlights={genomes[0].highlights}
+                        onSetHighlights={(highlights: HighlightInterval[]) => onSetHighlights(highlights, 0)}
+                        metadataTerms={metadataTerms}
+                        onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(newTerms, 0)}
+                        suggestedMetaSets={suggestedMetaSets}
+                    />
+                </Grid>
+            </Grid>
+            <div style={{
+                border: "1px solid #C4C4C4",
+                borderRadius: "30px",
+                overflow: "hidden",
+            }}>
+                {isShowingNavigator && (
+                    <GenomeNavigator inContainer selectedRegion={viewRegion} onRegionSelected={onSetViewRegion} genomeConfig={genomeConfigs[0]} /> // TODO: either create a switch that allows use of genomeConfig of choice or overlays all of the genomes configs in different colors.
+                )}
+                {renderGenomes()}
+            </div>
         </div>
     )
 }
@@ -177,6 +201,7 @@ const mapDispatchToPropsFactory = (dispatch: Dispatch<Action>, ownProps: StateCo
         onSetViewRegion: (newStart: number, newEnd: number) => dispatch(specializedActionCreators.setViewRegion(newStart, newEnd)),
         onTracksChanged: (newTracks: TrackModel[], genomeIdx?: number) => dispatch(specializedActionCreators.setTracks(newTracks, genomeIdx)),
         onMetadataTermsChanged: (newTerms: string[], genomeIdx?: number) => dispatch(specializedActionCreators.setMetadataTerms(newTerms, genomeIdx)),
+        onTitleChanged: (newTitle: string, genomeIdx?: number) => dispatch(specializedActionCreators.setTitle(newTitle, genomeIdx)),
     }
 }
 

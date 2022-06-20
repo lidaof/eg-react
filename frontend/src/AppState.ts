@@ -186,6 +186,7 @@ enum ActionType {
     SET_HIGHLIGHTS = "SET_HIGHLIGHTS",
     SET_GENOME_SETTINGS = "SET_GENOME_SETTINGS",
     SET_GENOME_CONTAINER = "SET_GENOME_CONTAINER",
+    SET_TITLE = "SET_TITLE",
 }
 
 interface AppAction {
@@ -448,7 +449,7 @@ export const ContainerActionsCreatorsFactory = (containerIdx: number) => {
             // console.log(highlights);
             return { containerIdx, genomeIdx, type: ActionType.SET_HIGHLIGHTS, highlights };
         },
-        
+
         /**
          * Replaces the current settings for a genome inside of a container with new settings.
          *
@@ -459,13 +460,23 @@ export const ContainerActionsCreatorsFactory = (containerIdx: number) => {
             return { containerIdx, genomeIdx, type: ActionType.SET_GENOME_SETTINGS, settings };
         },
 
-         /**
-         * Moves the specified genome to a new container at containerIdx
-         *
-         * @param {number} genomeIdx - index of the genome in the container
-         */
+        /**
+        * Moves the specified genome to a new container at containerIdx
+        *
+        * @param {number} genomeIdx - index of the genome in the container
+        */
         setGenomeContainer: (genomeIdx: number, newContainerIdx: number) => {
             return { containerIdx, genomeIdx, newContainerIdx, type: ActionType.SET_GENOME_CONTAINER };
+        },
+
+        /**
+         * Edits the title for containers or genomes.
+         * 
+         * @param {string} title - new title
+         * @param {number} [genomeIdx] - index of the genome in the container. If not specified, the title is applied to the container.
+         */
+        setTitle: (title: string, genomeIdx?: number) => {
+            return { containerIdx, genomeIdx, type: ActionType.SET_TITLE, title };
         }
     };
 };
@@ -782,7 +793,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         case ActionType.SET_GENOME_CONTAINER: {
             const { containerIdx, newContainerIdx, genomeIdx } = action;
             const curGenome: GenomeState = prevState.containers[containerIdx].genomes[genomeIdx];
-            
+
             return {
                 ...prevState,
                 containers: prevState.containers.map((c, idx) => {
@@ -795,11 +806,41 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     if (idx === containerIdx) {
                         return {
                             ...c,
-                            genomes: c.genomes.filter((_g, idx) => idx !==- genomeIdx),
+                            genomes: c.genomes.filter((_g, idx) => idx !== - genomeIdx),
                         };
                     }
                     return c;
                 }).filter(c => c.genomes.length)
+            }
+        }
+        case ActionType.SET_TITLE: {
+            const { title, genomeIdx } = action;
+
+            if (genomeIdx) {
+                return {
+                    ...prevState,
+                    containers: modifyArrayAtIdx(prevState.containers, genomeIdx, (c => {
+                        return {
+                            ...c,
+                            genomes: modifyArrayAtIdx(c.genomes, genomeIdx, (g => {
+                                return {
+                                    ...g,
+                                    title,
+                                };
+                            })),
+                        }
+                    }))
+                };
+            } else {
+                return {
+                    ...prevState,
+                    containers: modifyArrayAtIdx(prevState.containers, genomeIdx, (c => {
+                        return {
+                            ...c,
+                            title,
+                        }
+                    }))
+                };
             }
         }
         default:

@@ -95,7 +95,8 @@ class TrackContainer extends React.Component {
         onNewHighlight: PropTypes.func,
 
         provideControl: PropTypes.func,
-        tool: PropTypes.object
+        tool: PropTypes.object,
+        inContainer: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -170,7 +171,7 @@ class TrackContainer extends React.Component {
             window.setTimeout(() => {
                 this.setState({ panningAnimation: "none" });
                 // this.pan(-width); // Changes DRM
-                !this.props.provideControl && onNewRegion(...newRegion.getContextCoordinates());
+                onNewRegion(...newRegion.getContextCoordinates());
             }, 1000);
         });
         // onNewRegion(...newRegion.getContextCoordinates());
@@ -182,7 +183,7 @@ class TrackContainer extends React.Component {
         this.setState({ zoomAnimation: factor }, () => {
             window.setTimeout(() => {
                 this.setState({ zoomAnimation: 0 });
-                !this.props.provideControl && onNewRegion(...newRegion.getContextCoordinates());
+                onNewRegion(...newRegion.getContextCoordinates());
             }, 1000);
         });
         // onNewRegion(...newRegion.getContextCoordinates());
@@ -795,10 +796,13 @@ class TrackContainer extends React.Component {
             paddingBottom: "3px",
             cursor: selectedTool ? selectedTool.cursor : DEFAULT_CURSOR,
         };
+        if (this.props.inContainer) {
+            delete trackDivStyle.border;
+            trackDivStyle.borderTop = "1px solid black";
+        }
         return (
             <React.Fragment>
                 <OutsideClickDetector onOutsideClick={this.deselectAllTracks}>
-                    {/* TODO: only render controls when !stateIdx or stateIdx === 0 */}
                     {!this.props.provideControl && this.renderControls()}
                     <ContextMenuManager
                         menuElement={contextMenu}

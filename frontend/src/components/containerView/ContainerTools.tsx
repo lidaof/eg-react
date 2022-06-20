@@ -10,6 +10,18 @@ import DisplayedRegionModel from 'model/DisplayedRegionModel';
 import { HighlightInterval, HighlightMenu } from 'components/trackContainers/HighlightMenu';
 import { niceBpCount } from '../../util';
 import MetadataHeader from 'components/trackContainers/MetadataHeader';
+import {
+    IconButton,
+} from '@material-ui/core';
+import {
+    PanTool,
+    Shuffle,
+    ZoomIn,
+    BorderColor,
+    SwapVert,
+    ArrowLeft,
+    ArrowRight,
+} from '@material-ui/icons'
 
 export interface ProvidedControls {
     genomeIdx: number;
@@ -59,7 +71,7 @@ function ContainerTools(props: ContainerToolsProps) {
             callback(trackControl);
         });
     }
-
+    // TODO: implement the keyboard shortcuts.
     const panLeftButton = (
         <button
             className="btn btn-outline-dark"
@@ -112,7 +124,7 @@ function ContainerTools(props: ContainerToolsProps) {
                 <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={(factor: number) => applyAllContainers(e => e.zoomOut(factor))} />
                 <ButtonGroup buttons={panRightButton} />
                 <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
-                    {/* @ts-ignore */}
+                    {/* TODO: fix the duplicate undo redo that occurs with more than one genome (have to undo twice for one action when there are two genomes) */}
                     <UndoRedo />
                 </div>
                 <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>

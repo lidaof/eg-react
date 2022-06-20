@@ -54,7 +54,7 @@ function mapStateToProps(state: MapStateToPropsProps) {
         customTracksPool: state.browser.present.customTracksPool,
         virusBrowserMode: state.browser.present.virusBrowserMode,
         highlights: state.browser.present.highlights,
-        
+
         containers: state.browser.present.containers,
     };
 }
@@ -131,7 +131,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         this.state = {
             // isShowing3D: false,
             // isShowingNavigator: true,
-            
+
             // parent state
             highlightEnteredRegion: true,
             enteredRegion: null,
@@ -346,7 +346,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
 
             containers,
         } = this.props;
-        
+
         if (sessionFromUrl) {
             return (
                 <div className="container-fluid">
@@ -419,24 +419,29 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     </div>
                 </Offline>
                 {/* Implement such that when there's a genome name but no containers, just render like we would before phased update. */}
-                {containers.map((data:SyncedContainer, idx:number) => {
+                {containers.map((data: SyncedContainer, idx: number) => {
                     return (
-                        <ContainerView
-                            stateIdx={idx}
-                            key={idx}
-                            cdata={data}
+                        <div style={{
+                            marginTop: 20,
+                            marginBottom: idx === containers.length - 1 ? 0 : 20,
+                        }}>
+                            <ContainerView
+                                stateIdx={idx}
+                                key={idx}
+                                cdata={data}
 
-                            layoutModel={layoutModel}
-                            onSetAnchors3d={onSetAnchors3d}
-                            onSetGeneFor3d={onSetGeneFor3d}
-                            viewer3dNumFrames={viewer3dNumFrames}
-                            isThereG3dTrack={isThereG3dTrack}
-                            onSetImageInfo={onSetImageInfo}
-                            isShowingNavigator={isShowingNavigator}
-                            containerTitles={containerTitles}
+                                layoutModel={layoutModel}
+                                onSetAnchors3d={onSetAnchors3d}
+                                onSetGeneFor3d={onSetGeneFor3d}
+                                viewer3dNumFrames={viewer3dNumFrames}
+                                isThereG3dTrack={isThereG3dTrack}
+                                onSetImageInfo={onSetImageInfo}
+                                isShowingNavigator={isShowingNavigator}
+                                containerTitles={containerTitles}
 
-                            embeddingMode={embeddingMode}
-                        />
+                                embeddingMode={embeddingMode}
+                            />
+                        </div>
                     )
                 })}
                 {!embeddingMode && <Footer />}

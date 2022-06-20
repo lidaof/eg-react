@@ -27,6 +27,7 @@ class GenomeNavigator extends React.Component {
         onRegionSelected: PropTypes.func,
 
         genomeConfig: PropTypes.object,
+        inContainer: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -147,6 +148,7 @@ class GenomeNavigator extends React.Component {
                     onNewViewRequested={this.setNewView}
                     onZoom={this.zoom}
                     genomeConfig={this.props.genomeConfig}
+                    inContainer={this.props.inContainer}
                 />
             </div>
         );

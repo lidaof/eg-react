@@ -64,6 +64,7 @@ class MainPane extends React.Component {
          *          `focusPoint`: focal point of the zoom, which is where the mouse was as % of the width of the SVG.
          */
         onZoom: PropTypes.func.isRequired,
+        inContainer: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -139,7 +140,7 @@ class MainPane extends React.Component {
                     width="100%"
                     height={SVG_HEIGHT}
                     onContextMenu={event => event.preventDefault()}
-                    style={{border: "1px solid black"}}
+                    style={this.props.inContainer ? { borderBottom: "1px solid black" } :{border: "1px solid black"}}
                     ref={this.componentRef}
                 >
                     <Chromosomes genomeConfig={genomeConfig} viewRegion={viewRegion} width={containerWidth} y={CHROMOSOME_Y} />
