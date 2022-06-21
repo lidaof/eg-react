@@ -187,6 +187,7 @@ enum ActionType {
     SET_GENOME_SETTINGS = "SET_GENOME_SETTINGS",
     SET_GENOME_CONTAINER = "SET_GENOME_CONTAINER",
     SET_TITLE = "SET_TITLE",
+    CREATE_NEW_CONTAINER = "CREATE_NEW_CONTAINER",
 }
 
 interface AppAction {
@@ -477,6 +478,14 @@ export const ContainerActionsCreatorsFactory = (containerIdx: number) => {
          */
         setTitle: (title: string, genomeIdx?: number) => {
             return { containerIdx, genomeIdx, type: ActionType.SET_TITLE, title };
+        },
+
+        /**
+         * Creates a new container and moves the specified genome to it.
+         * @param {number} genomeIdx - index of the genome in the container
+         */
+        createNewContainer(genomeIdx: number) {
+            return { containerIdx, genomeIdx, type: ActionType.CREATE_NEW_CONTAINER };
         }
     };
 };
@@ -814,12 +823,13 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             }
         }
         case ActionType.SET_TITLE: {
-            const { title, genomeIdx } = action;
+            const { title, containerIdx, genomeIdx } = action;
 
-            if (genomeIdx) {
+            if (genomeIdx !== undefined) {
+                console.log('here');
                 return {
                     ...prevState,
-                    containers: modifyArrayAtIdx(prevState.containers, genomeIdx, (c => {
+                    containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
                         return {
                             ...c,
                             genomes: modifyArrayAtIdx(c.genomes, genomeIdx, (g => {
@@ -834,13 +844,37 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             } else {
                 return {
                     ...prevState,
-                    containers: modifyArrayAtIdx(prevState.containers, genomeIdx, (c => {
+                    containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
                         return {
                             ...c,
                             title,
                         }
                     }))
                 };
+            }
+        }
+        case ActionType.CREATE_NEW_CONTAINER: {
+            const { containerIdx, genomeIdx } = action;
+            console.log('here');
+            const newContainer: SyncedContainer = {
+                ...prevState.containers[containerIdx],
+                title: prevState.containers[containerIdx].genomes[genomeIdx].name,
+                genomes: [...prevState.containers[containerIdx].genomes].filter((_g, idx) => idx == genomeIdx),
+            }
+            console.log([...modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
+                return {
+                    ...c,
+                    genomes: c.genomes.filter((_g:any, idx:any) => idx !== genomeIdx),
+                }
+            })), newContainer]);
+            return {
+                ...prevState,
+                containers: [...modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
+                    return {
+                        ...c,
+                        genomes: c.genomes.filter((_g:any, idx:any) => idx !== genomeIdx),
+                    }
+                })), newContainer],
             }
         }
         default:

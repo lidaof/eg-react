@@ -34,14 +34,25 @@ interface StateSyncSettingsProps {
     genomeIdx: number;
     genomeSettings: GenomeSettings;
     containerTitles: string[];
+    allowNewContainer: boolean;
 
     // redux actions, set as optional because typescript isn't ommitting them from the connected component
     onGenomeSettingsChanged?: (newSettings: any, genomeIdx: number) => void;
     onSetGenomeContainer?: (genomeIdx: number, newContainerIdx: number) => void;
+    onNewContainer?: (genomeIdx: number) => void,
 }
 
 function _StateSyncSettings(props: StateSyncSettingsProps) {
-    const { containerTitles, containerIdx, genomeSettings, onGenomeSettingsChanged, onSetGenomeContainer } = props;
+    const {
+        containerTitles,
+        containerIdx,
+        genomeSettings,
+        genomeIdx,
+        allowNewContainer,
+        onGenomeSettingsChanged,
+        onSetGenomeContainer,
+        onNewContainer,
+    } = props;
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -129,11 +140,17 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
                         <Select
                             value={containerIdx}
                             label="Container"
-                            onChange={(e) => onSetGenomeContainer(props.genomeIdx, e.target.value as number)}
+                            onChange={(e) => {
+                                setOpen(false);
+                                e.target.value !== -1 && onSetGenomeContainer(props.genomeIdx, e.target.value as number);
+                            }}
                         >
                             {containerTitles.map((title, idx) => {
                                 return <MenuItem key={idx} value={idx}>{title}</MenuItem>
                             })}
+                            {allowNewContainer && (
+                                <MenuItem value={-1} onClick={() => onNewContainer(props.genomeIdx)}>New Container</MenuItem>
+                            )}
                         </Select>
                     </FormControl>
                 </DialogContent>
@@ -148,10 +165,11 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
 }
 
 const mapDispatchToPropsFactory = (dispatch: Dispatch<Action>, ownProps: StateSyncSettingsProps) => {
-    const actionCreators = ContainerActionsCreatorsFactory(ownProps.containerIdx);
+    const specializedActionCreators = ContainerActionsCreatorsFactory(ownProps.containerIdx);
     return {
-        onGenomeSettingsChanged: (newSettings: any, genomeIdx: number) => dispatch(actionCreators.setGenomeSettings(newSettings, genomeIdx)),
-        onSetGenomeContainer: (genomeIdx: number, newContainerIdx: number) => dispatch(actionCreators.setGenomeContainer(genomeIdx, newContainerIdx)),
+        onGenomeSettingsChanged: (newSettings: any, genomeIdx: number) => dispatch(specializedActionCreators.setGenomeSettings(newSettings, genomeIdx)),
+        onSetGenomeContainer: (genomeIdx: number, newContainerIdx: number) => dispatch(specializedActionCreators.setGenomeContainer(genomeIdx, newContainerIdx)),
+        onNewContainer: (genomeIdx: number) => dispatch(specializedActionCreators.createNewContainer(genomeIdx)),
     }
 }
 

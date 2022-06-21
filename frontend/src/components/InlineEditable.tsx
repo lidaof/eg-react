@@ -10,14 +10,21 @@ interface InlineEditableProps {
     value: string;
     onChange: (value: string) => void;
     variant: TypographyVariant;
+    prohibitedValues?: string[];
 }
 
 function InlineEditable(props: InlineEditableProps) {
     const [editing, setEditing] = useState(false);
+    const [value, setValue] = useState(props.value);
     const [hovering, setHovering] = useState(false);
 
-    const handleClick = () => setEditing(true);
+    const handleClick = () => { setValue(props.value); setEditing(true) };
     const handleBlur = () => setEditing(false);
+    const handleFinish = () => {
+        setEditing(false);
+        if (!value || (props.prohibitedValues && props.prohibitedValues).includes(value.toLowerCase())) return;
+        props.onChange(value);
+    };
 
     const handleMouseEnter = () => setHovering(true);
     const handleMouseLeave = () => setHovering(false);
@@ -26,12 +33,22 @@ function InlineEditable(props: InlineEditableProps) {
 
     if (editing) {
         body = (
-            <TextField
-                value={props.value}
-                onChange={(e) => props.onChange(e.target.value)}
-                onBlur={() => setEditing(false)}
+            <input
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onBlur={handleFinish}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        handleFinish();
+                    } else if (e.key === "Escape") {
+                        handleBlur();
+                    }
+                }}
                 autoFocus
-                
+                style={{
+                    width: value.length + "ch",
+                    minWidth: 75,
+                }}
             />
         );
     } else {
@@ -55,21 +72,27 @@ function InlineEditable(props: InlineEditableProps) {
                 onBlur={handleBlur}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
+                style={divStyle}
             >
                 {body}
             </div>
         )
     } else {
         return (
-            <Tooltip
-                title="Click to edit"
-                arrow
-                placement="top"
-                onClick={handleClick}
-                style={divStyle}
+            <div
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
             >
-                {body}
-            </Tooltip>
+                <Tooltip
+                    title="Click to edit"
+                    arrow
+                    placement="top"
+                    onClick={handleClick}
+                    style={divStyle}
+                >
+                    {body}
+                </Tooltip>
+            </div>
         )
     }
 

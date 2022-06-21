@@ -111,6 +111,7 @@ function _ContainerView(props: StateContainerProps) {
                                     genomeIdx={gIdx}
                                     genomeSettings={g.settings}
                                     containerTitles={containerTitles}
+                                    allowNewContainer={genomes.length > 1}
                                 />
                             </Grid>
                         </Grid>
@@ -156,11 +157,17 @@ function _ContainerView(props: StateContainerProps) {
         <div>
             <Grid container direction="row" alignItems="center">
                 <Grid item>
-                    <InlineEditable
-                        value={title}
-                        onChange={(newTitle: string) => onTitleChanged(newTitle, stateIdx)}
-                        variant="h6"
-                    />
+                    <div style={{
+                        marginLeft: 20,
+                        marginRight: 20
+                    }}>
+                        <InlineEditable
+                            value={title}
+                            onChange={(newTitle: string) => onTitleChanged(newTitle)}
+                            variant="h6"
+                            prohibitedValues={["new container"]}
+                        />
+                    </div>
                 </Grid>
                 <Grid item>
                     <ContainerTools

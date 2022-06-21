@@ -158,17 +158,17 @@ function ContainerTools(props: ContainerToolsProps) {
     );
 }
 
-function PixelInfo(props:any) {
-    const { basesPerPixel, viewRegion, primaryView } = props;
-    const viewBp = niceBpCount(viewRegion.getWidth());
-    const windowWidth = primaryView.viewWindow.getLength();
-    const span = niceBpCount(basesPerPixel, true);
-    return (
-        <span className="font-italic">
-            Viewing a {viewBp} region in {Math.round(windowWidth)}px, 1 pixel spans {span}
-        </span>
-    );
-}
+// function PixelInfo(props:any) {
+//     const { basesPerPixel, viewRegion, primaryView } = props;
+//     const viewBp = niceBpCount(viewRegion.getWidth());
+//     const windowWidth = primaryView.viewWindow.getLength();
+//     const span = niceBpCount(basesPerPixel, true);
+//     return (
+//         <span className="font-italic">
+//             Viewing a {viewBp} region in {Math.round(windowWidth)}px, 1 pixel spans {span}
+//         </span>
+//     );
+// }
 
 
 export default ContainerTools;
