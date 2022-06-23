@@ -9,12 +9,16 @@ class HubParser {
             newTrack;
         for (let plainObject of parsedJson.slice(tracksStartIndex)) {
             if (plainObject.url) {
-                if (plainObject.type.toLowerCase() !== "cool" && !plainObject.url.toLowerCase().startsWith("http")) {
+                if (!plainObject.url.toLowerCase().startsWith("http")) {
                     // relative path
-                    if (hubBase.length > 0) {
-                        url = `${hubBase}/${plainObject.url}`;
+                    if (plainObject.type && plainObject.type.toLowerCase() === "cool") {
+                        url = plainObject.url;
                     } else {
-                        continue;
+                        if (hubBase.length > 0) {
+                            url = `${hubBase}/${plainObject.url}`;
+                        } else {
+                            continue;
+                        }
                     }
                 } else {
                     url = plainObject.url;

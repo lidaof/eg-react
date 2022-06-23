@@ -96,9 +96,10 @@ function ShareUI(props) {
     const [link, setLink] = useState("");
     const { color, background, browser } = props;
     const { url } = querySting.parseUrl(window.location.href);
+    const url2 = url.replace(/\/$/, ""); // remove last possible slash
     const json = JSON.stringify(new AppStateSaver().toObject(browser.present));
     const compressed = compressString(json);
-    const full = `${url}/?blob=${compressed}`;
+    const full = `${url2}/?blob=${compressed}`;
     const emailLink = `mailto:?subject=browser%20view&body=${link}`;
     const iframeContent = `<iframe src="${link}" width="100%" height="1200" frameborder="0" style="border:0" allowfullscreen></iframe>`;
 
