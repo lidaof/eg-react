@@ -379,10 +379,10 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     {...this.state}
                     // isShowingNavigator={isShowingNavigator}
                     // onToggleNavigator={onToggleNavigator}
-                    // onToggle3DScene={this.toggle3DScene}
-                    // onToggleHighlight={this.toggleHighlight}
+                    // onToggle3DScene={this.toggle3DSnavene}
+                    // onToggleHighlight={this.toggleHnavghlight}
                     onNewHighlight={this.newHighlight}
-                    // onSetHighlightColor={this.setHighlightColor}
+                    // onSetHighlightColor={this.setHinavhlightColor}
                     selectedRegion={viewRegion}
                     onRegionSelected={onNewViewRegion}
                     tracks={tracks}
