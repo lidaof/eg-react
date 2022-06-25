@@ -219,7 +219,7 @@ interface AppAction {
  * All action creators.  Components don't need to know this, though.  They can think of them as callbacks that modify
  * the global store (or state).
  */
-export const GlobalActionCreators = {
+export const ActionCreators = {
     /**
      * Modifies the current genome.
      *
@@ -1093,22 +1093,22 @@ async function asyncInitState() {
                 const tracks = customTracksPool.filter((track: any) => track.showOnHubLoad);
                 if (tracks.length > 0) {
                     AppState.dispatch(
-                        GlobalActionCreators.setTracksCustomTracksPool(tracks, customTracksPool, withDefaultTracks)
+                        ActionCreators.setTracksCustomTracksPool(tracks, customTracksPool, withDefaultTracks)
                     );
                 } else {
-                    AppState.dispatch(GlobalActionCreators.setCustomTracksPool(customTracksPool));
+                    AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
                 }
             }
         }
         if (query.sessionFile) {
             const json = await new Json5Fetcher().get(mapUrl(query.sessionFile as string));
             if (json) {
-                AppState.dispatch(GlobalActionCreators.restoreSession(json));
+                AppState.dispatch(ActionCreators.restoreSession(json));
                 // when position in URL with sessionFile, see issue #245
                 if (query.position) {
                     const state = new AppStateLoader().fromObject(json);
                     const interval = state.viewRegion.getNavigationContext().parse(query.position as string);
-                    AppState.dispatch(GlobalActionCreators.setViewRegion(interval.start, interval.end));
+                    AppState.dispatch(ActionCreators.setViewRegion(interval.start, interval.end));
                 }
             }
         }
@@ -1134,15 +1134,15 @@ async function asyncInitState() {
                             });
                             const tracks = [...state.tracks, ...filteredTracks];
                             const finalState = { ...state, tracks };
-                            AppState.dispatch(GlobalActionCreators.setHubSessionStorage(finalState, customTracksPool));
+                            AppState.dispatch(ActionCreators.setHubSessionStorage(finalState, customTracksPool));
                         } else {
                             //if url changed genome
                             if (tracksInHub.length > 0) {
                                 AppState.dispatch(
-                                    GlobalActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool)
+                                    ActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool)
                                 );
                             } else {
-                                AppState.dispatch(GlobalActionCreators.setCustomTracksPool(customTracksPool));
+                                AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
                             }
                         }
                     } catch (error) {
@@ -1151,15 +1151,15 @@ async function asyncInitState() {
                     }
                 } else {
                     if (tracksInHub.length > 0) {
-                        AppState.dispatch(GlobalActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool));
+                        AppState.dispatch(ActionCreators.setTracksCustomTracksPool(tracksInHub, customTracksPool));
                     } else {
-                        AppState.dispatch(GlobalActionCreators.setCustomTracksPool(customTracksPool));
+                        AppState.dispatch(ActionCreators.setCustomTracksPool(customTracksPool));
                     }
                 }
             }
         }
         if (query.virusBrowserMode) {
-            AppState.dispatch(GlobalActionCreators.setVirusBrowserMode());
+            AppState.dispatch(ActionCreators.setVirusBrowserMode());
         }
     }
 }

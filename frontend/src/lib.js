@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { GlobalActionCreators } from './AppState';
+import { ActionCreators } from './AppState';
 import App from './App';
 
 
@@ -37,7 +37,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-    onSetRestore: GlobalActionCreators.setGenomeRestoreSession,
+    onSetRestore: ActionCreators.setGenomeRestoreSession,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EmbeddedContainer);

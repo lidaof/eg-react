@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { GlobalActionCreators } from '../AppState';
+import { ActionCreators } from '../AppState';
 
 import RegionSetConfig from './RegionSetConfig';
 
@@ -25,8 +25,8 @@ function mapStateToProps(state) {
  * Callbacks to pass to RegionSetSelector.
  */
 const callbacks = {
-    onSetsChanged: GlobalActionCreators.setRegionSetList,
-    onSetSelected: GlobalActionCreators.setRegionSetView,
+    onSetsChanged: ActionCreators.setRegionSetList,
+    onSetSelected: ActionCreators.setRegionSetView,
 };
 
 /**

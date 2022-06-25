@@ -9,7 +9,7 @@ import { notify } from "react-notify-toast";
 import JSZip from 'jszip';
 import _ from 'lodash'
 import { AppStateSaver } from "../model/AppSaveLoad";
-import { GlobalActionCreators } from "../AppState";
+import { ActionCreators } from "../AppState";
 import LoadSession from "./LoadSession";
 import { CopyToClip } from "./CopyToClipboard";
 import { readFileAsText, HELP_LINKS } from "../util";
@@ -384,8 +384,8 @@ class SessionUINotConnected extends React.Component<SessionUIProps, SessionUISta
 }
 
 const mapDispatchToProps = {
-    onRestoreSession: GlobalActionCreators.restoreSession,
-    onRetrieveBundle: GlobalActionCreators.retrieveBundle,
+    onRestoreSession: ActionCreators.restoreSession,
+    onRetrieveBundle: ActionCreators.retrieveBundle,
 };
 
 const enhance = compose(

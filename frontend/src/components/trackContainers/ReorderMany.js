@@ -4,7 +4,7 @@ import ReactModal from "react-modal";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { Slider, Rail, Handles, Tracks } from "react-compound-slider";
 import { SliderRail, Handle, Track } from "./SliderSubComponents";
-import { GlobalActionCreators } from "../../AppState";
+import { ActionCreators } from "../../AppState";
 import arrayMove from "array-move";
 
 /**
@@ -19,7 +19,7 @@ function mapStateToProps(state) {
 }
 
 const callbacks = {
-    onTracksChanged: GlobalActionCreators.setTracks,
+    onTracksChanged: ActionCreators.setTracks,
 };
 
 const gridItemStyles = {

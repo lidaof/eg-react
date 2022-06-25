@@ -3,7 +3,7 @@ import FlexLayout from "flexlayout-react";
 import shortid from "shortid";
 import { connect } from "react-redux";
 import _ from "lodash";
-import { GlobalActionCreators } from "./AppState";
+import { ActionCreators } from "./AppState";
 import withCurrentGenome from "./components/withCurrentGenome";
 import App from "./App";
 // import G3dContainer from "components/trackVis/3d/G3dContainer";
@@ -45,11 +45,11 @@ function mapStateToProps(state) {
 }
 
 const callbacks = {
-    onNewViewRegion: GlobalActionCreators.setViewRegion,
-    onTracksChanged: GlobalActionCreators.setTracks,
-    onToggleVR: GlobalActionCreators.toggleVR,
-    onSetLayout: GlobalActionCreators.setLayout,
-    onSetSelected: GlobalActionCreators.setRegionSetView,
+    onNewViewRegion: ActionCreators.setViewRegion,
+    onTracksChanged: ActionCreators.setTracks,
+    onToggleVR: ActionCreators.toggleVR,
+    onSetLayout: ActionCreators.setLayout,
+    onSetSelected: ActionCreators.setRegionSetView,
 };
 
 class AppLayout extends React.PureComponent {

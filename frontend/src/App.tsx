@@ -5,7 +5,7 @@ import _ from "lodash";
 import Notifications from "react-notify-toast";
 import { Offline } from "react-detect-offline";
 // import AppState, { ActionCreators } from "./AppState";
-import { GlobalActionCreators, GenomeState, SyncedContainer } from "./AppState";
+import { ActionCreators, GenomeState, SyncedContainer } from "./AppState";
 import GenomePickerContainer from "./components/GenomePicker";
 import Nav from "./components/Nav";
 import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
@@ -60,10 +60,10 @@ function mapStateToProps(state: MapStateToPropsProps) {
 }
 
 const callbacks = {
-    onNewViewRegion: GlobalActionCreators.setViewRegion,
-    onTracksChanged: GlobalActionCreators.setTracks,
-    onLegendWidthChange: GlobalActionCreators.setTrackLegendWidth,
-    onSetHighlights: GlobalActionCreators.setHighlights,
+    onNewViewRegion: ActionCreators.setViewRegion,
+    onTracksChanged: ActionCreators.setTracks,
+    onLegendWidthChange: ActionCreators.setTrackLegendWidth,
+    onSetHighlights: ActionCreators.setHighlights,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);

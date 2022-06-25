@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { GlobalActionCreators } from '../AppState';
+import { ActionCreators } from '../AppState';
 // import App from '../App';
 import TrackContainer from "./trackContainers/TrackContainer";
 import { RegionExpander } from '../model/RegionExpander';
@@ -84,10 +84,10 @@ const mapStateToProps = (state: any) => {
 }
 
 const callbacks = {
-    onNewRegion: GlobalActionCreators.setViewRegion,
-    onTracksChanged: GlobalActionCreators.setTracks,
-    onMetadataTermsChanged: GlobalActionCreators.setMetadataTerms,
-    onSetRestore: GlobalActionCreators.setGenomeRestoreSession,
+    onNewRegion: ActionCreators.setViewRegion,
+    onTracksChanged: ActionCreators.setTracks,
+    onMetadataTermsChanged: ActionCreators.setMetadataTerms,
+    onSetRestore: ActionCreators.setGenomeRestoreSession,
 };
 
 

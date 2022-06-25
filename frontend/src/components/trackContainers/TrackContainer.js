@@ -4,7 +4,7 @@ import _ from "lodash";
 import connect from "react-redux/lib/connect/connect";
 import ReactModal from "react-modal";
 import Hotkeys from "react-hot-keys";
-import { GlobalActionCreators } from "../../AppState";
+import { ActionCreators } from "../../AppState";
 import { withTrackData } from "./TrackDataManager";
 import { withTrackView } from "./TrackViewManager";
 import TrackHandle from "./TrackHandle";
@@ -56,9 +56,9 @@ function mapStateToProps(state) {
 }
 
 const callbacks = {
-    onNewRegion: GlobalActionCreators.setViewRegion,
-    onTracksChanged: GlobalActionCreators.setTracks,
-    onMetadataTermsChanged: GlobalActionCreators.setMetadataTerms,
+    onNewRegion: ActionCreators.setViewRegion,
+    onTracksChanged: ActionCreators.setTracks,
+    onMetadataTermsChanged: ActionCreators.setMetadataTerms,
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
