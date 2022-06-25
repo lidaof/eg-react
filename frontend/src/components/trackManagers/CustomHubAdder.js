@@ -4,6 +4,7 @@ import JSON5 from "json5";
 import Json5Fetcher from "../../model/Json5Fetcher";
 import DataHubParser from "../../model/DataHubParser";
 import { readFileAsText, HELP_LINKS } from "../../util";
+import { mapUrl } from "../../model/TrackModel";
 
 /**
  * custom hub add UI
@@ -42,7 +43,7 @@ class RemoteHubAdder extends React.Component {
         this.setState({ isLoading: true });
         let json;
         try {
-            json = await new Json5Fetcher().get(this.state.inputUrl);
+            json = await new Json5Fetcher().get(mapUrl(this.state.inputUrl));
             if (!Array.isArray(json)) {
                 this.setState({ isLoading: false, error: "Error: data hub should be an array of JSON object." });
                 return;

@@ -19,13 +19,14 @@ class TabixSource extends WorkerRunnableSource {
      *
      * @param {string} url - the url of the bed-like file to fetch.
      */
-    constructor(url, dataLimit = 100000) {
+    constructor(url, indexUrl, dataLimit = 100000) {
         super();
         this.url = url;
+        this.indexUrl = indexUrl ? indexUrl : url + ".tbi";
         this.dataLimit = dataLimit;
         this.tabix = new TabixIndexedFile({
             filehandle: new RemoteFile(url, { fetch }),
-            tbiFilehandle: new RemoteFile(url + ".tbi", { fetch }),
+            tbiFilehandle: new RemoteFile(this.indexUrl, { fetch }),
         });
     }
 

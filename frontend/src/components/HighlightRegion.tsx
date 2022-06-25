@@ -5,6 +5,8 @@ import { withTrackLegendWidth } from './withTrackLegendWidth';
 import { ViewExpansion } from '../model/RegionExpander';
 import ChromosomeInterval from '../model/interval/ChromosomeInterval';
 import { HighlightInterval } from '../components/trackContainers/HighlightMenu';
+import { TrackData } from './trackContainers/TrackDataManager';
+import TrackModel from '../model/TrackModel';
 
 import './HighlightRegion.css';
 
@@ -16,6 +18,8 @@ interface HighlightRegionProps {
     xOffset: number;
     viewRegion: ChromosomeInterval;
     highlights: HighlightInterval[];
+    trackData?: TrackData;
+    tracks?: TrackModel[];
 }
 
 
@@ -26,11 +30,24 @@ interface HighlightRegionProps {
  * @param legendWidth 
  * @returns 
  */
-export const getHighlightedXs = (interval: OpenInterval, visData: ViewExpansion, legendWidth: number): OpenInterval => {
+export const getHighlightedXs = (interval: OpenInterval, visData: ViewExpansion, legendWidth: number, tracks: TrackModel[], trackData: TrackData): OpenInterval => {
     const { viewWindowRegion, viewWindow } = visData;
+    // console.log(trackData)
+    const navBuilds = tracks ? tracks.map(k => trackData[k.getId()].alignment).filter(x => x).map(x => x.navContextBuilder).filter(x => x) : []; //remove rough mode adjustment
+    // console.log(navBuilds)
     let start, end;
+    let newIntervalStart = interval.start, newIntervalEnd = interval.end;
+    // navBuilds.forEach(build => {
+    //     newIntervalStart = build.convertOldCoordinates(newIntervalStart);
+    //     newIntervalEnd = build.convertOldCoordinates(newIntervalEnd);
+    //     return; // only execute once - not working
+    // })
+    if (navBuilds.length) {
+        newIntervalStart = navBuilds[0].convertOldCoordinates(newIntervalStart);
+        newIntervalEnd = navBuilds[0].convertOldCoordinates(newIntervalEnd);
+    }
     const drawModel = new LinearDrawingModel(viewWindowRegion, viewWindow.getLength());
-    const xRegion = drawModel.baseSpanToXSpan(interval);
+    const xRegion = drawModel.baseSpanToXSpan(new OpenInterval(newIntervalStart, newIntervalEnd));
     start = Math.max(legendWidth, xRegion.start + legendWidth);
     end = xRegion.end + legendWidth;
     if (end <= start) {
@@ -64,9 +81,9 @@ class HighlightRegion extends React.PureComponent<HighlightRegionProps> {
      */
     render(): JSX.Element {
         // console.log(this.props)
-        const { height, y, children, xOffset, highlights, legendWidth, visData } = this.props;
+        const { height, y, children, xOffset, highlights, legendWidth, visData, tracks, trackData } = this.props;
 
-        const xS = highlights.map(h => getHighlightedXs(new OpenInterval(h.start, h.end), visData, legendWidth));
+        const xS = highlights.map(h => getHighlightedXs(new OpenInterval(h.start, h.end), visData, legendWidth, tracks, trackData));
         const theBoxes = highlights.map((item, idx) => {
             const style = {
                 left: xS[idx].start + xOffset + "px",

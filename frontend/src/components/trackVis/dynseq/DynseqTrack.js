@@ -174,7 +174,7 @@ class DynseqTrack extends PureComponent {
     };
 
     render() {
-        const { data, viewRegion, width, trackModel, options, unit, basesPerPixel } = this.props;
+        const { data, viewRegion, width, trackModel, options, unit } = this.props;
         const { height, aggregateMethod } = options;
         const dataForward = data.filter((feature) => feature.value === undefined || feature.value >= 0); // bed track to density mode
         const dataReverse = data.filter((feature) => feature.value < 0);
@@ -197,7 +197,9 @@ class DynseqTrack extends PureComponent {
         // const drawModel = new LinearDrawingModel(viewRegion, width);
         // const seqmode = drawModel.basesToXWidth(1) > 2;
         const genomeConfig = getGenomeConfig(trackModel.getMetadata("genome")) || this.props.genomeConfig;
-        if (basesPerPixel <= MAX_PIXELS_PER_BASE_NUMERIC) {
+        // why not use `basesPerPixel` as in screenshot this value will change as we removed expanded region
+        const basesByPixel = viewRegion.getWidth() / width;
+        if (basesByPixel <= MAX_PIXELS_PER_BASE_NUMERIC) {
             const legend = (
                 <TrackLegend
                     trackModel={trackModel}

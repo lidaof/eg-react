@@ -34,6 +34,24 @@ export const TRACK_TYPES = {
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
 
+const TYPES_NEED_INDEX = [
+    "bedgraph",
+    "methylc",
+    "categorical",
+    "bed",
+    "refbed",
+    "longrange",
+    "longrangecolor",
+    "bam",
+    "pairwise",
+    "snv",
+    "snv2",
+    "qbed",
+    "dbedgraph",
+    "vcf",
+    "genomealign",
+];
+
 export const TYPES_DESC = {
     bigWig: "numerical data",
     bedGraph: "numerical data, processed by tabix in .gz format",
@@ -96,6 +114,7 @@ class CustomTrackAdder extends React.Component {
             selectedTabIndex: 0,
             querygenome: "",
             options: null, // custom track options
+            indexUrl: undefined,
         };
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
     }
@@ -175,7 +194,7 @@ class CustomTrackAdder extends React.Component {
     };
 
     renderCustomTrackAdder() {
-        const { type, url, name, metadata, urlError, querygenome } = this.state;
+        const { type, url, name, metadata, urlError, querygenome, indexUrl } = this.state;
         const primaryGenome = this.props.genomeConfig.genome.getName();
         var allGenomes = getSecondaryGenomes(primaryGenome, this.props.addedTracks);
         allGenomes.unshift(primaryGenome);
@@ -213,6 +232,18 @@ class CustomTrackAdder extends React.Component {
                         className="form-control"
                         value={name}
                         onChange={(event) => this.setState({ name: event.target.value })}
+                    />
+                </div>
+                <div
+                    className="form-group"
+                    style={{ display: TYPES_NEED_INDEX.includes(type.toLowerCase()) ? "block" : "none" }}
+                >
+                    <label>Track index URL (optional, only need if data and index files are not in same folder)</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={indexUrl}
+                        onChange={(event) => this.setState({ indexUrl: event.target.value.trim() })}
                     />
                 </div>
                 <div

@@ -173,6 +173,12 @@ class NumericalTrack extends React.PureComponent {
                 axisScale: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
                 valueToY: scaleLinear().domain([max, min]).range([TOP_PADDING, height]).clamp(true),
                 valueToOpacity: scaleLinear().domain([min, max]).range([0, 1]).clamp(true),
+                // for group feature when there is only nagetiva data, to be fixed
+                valueToYReverse: scaleLinear()
+                    .domain([0, min])
+                    .range([0, height - zeroLine - TOP_PADDING])
+                    .clamp(true),
+                valueToOpacityReverse: scaleLinear().domain([0, min]).range([0, 1]).clamp(true),
                 min,
                 max,
                 zeroLine,
