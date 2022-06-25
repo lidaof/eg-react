@@ -165,6 +165,7 @@ const initialState: AppState = {
 enum ActionType {
     SET_GENOME = "SET_GENOME",
     SET_MULTIPLE_GENOMES = "SET_MULTIPLE_GENOMES",
+    SET_MULTIPLE_GENOMES_WITH_CONTAINER = "SET_MULTIPLE_GENOMES_WITH_CONTAINER",
     SET_VIEW_REGION = "SET_VIEW_REGION",
     SET_TRACKS = "SET_TRACKS",
     SET_METADATA_TERMS = "SET_METADATA_TERMS",
@@ -211,6 +212,10 @@ export const GlobalActionCreators = {
 
     setMultipleGenomes: (genomeNames: string[]) => {
         return { type: ActionType.SET_MULTIPLE_GENOMES, genomeNames };
+    },
+
+    setMultipleGenomesWithContainer: (containers: string[][]) => {
+        return { type: ActionType.SET_MULTIPLE_GENOMES_WITH_CONTAINER, containers };
     },
 
     setViewRegion: (newStart: number, newEnd: number) => {
@@ -826,7 +831,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             const { title, containerIdx, genomeIdx } = action;
 
             if (genomeIdx !== undefined) {
-                console.log('here');
                 return {
                     ...prevState,
                     containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
@@ -855,32 +859,98 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         }
         case ActionType.CREATE_NEW_CONTAINER: {
             const { containerIdx, genomeIdx } = action;
-            console.log('here');
             const newContainer: SyncedContainer = {
                 ...prevState.containers[containerIdx],
                 title: prevState.containers[containerIdx].genomes[genomeIdx].name,
                 genomes: [...prevState.containers[containerIdx].genomes].filter((_g, idx) => idx == genomeIdx),
             }
-            console.log([...modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
-                return {
-                    ...c,
-                    genomes: c.genomes.filter((_g:any, idx:any) => idx !== genomeIdx),
-                }
-            })), newContainer]);
             return {
                 ...prevState,
                 containers: [...modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
                     return {
                         ...c,
-                        genomes: c.genomes.filter((_g:any, idx:any) => idx !== genomeIdx),
+                        genomes: c.genomes.filter((_g: any, idx: any) => idx !== genomeIdx),
                     }
                 })), newContainer],
+            }
+        }
+        case ActionType.SET_MULTIPLE_GENOMES_WITH_CONTAINER: {
+            const { containers } = action;
+
+            return {
+                ...initialState,
+                ...getSetGenomeObject(containers[0][0]),
+                containers: containers.map((containerGenomes: string[]) => {
+                    let nextViewRegion = null;
+                    let nextTracks: TrackModel[] = [];
+                    const {
+                        navContext,
+                        defaultRegion,
+                        defaultTracks,
+                        // genome,
+                        // cytobands,
+                        // publicHubData,
+                        // publicHubList,
+                        // annotationTracks,
+                        // twoBitURL,
+                    } = getGenomeConfig(containerGenomes[0]);
+                    if (config) {
+                        nextViewRegion = new DisplayedRegionModel(navContext, ...defaultRegion);
+                        nextTracks = defaultTracks;
+                    }
+
+                    return {
+                        ...initialContainer,
+                        viewRegion: nextViewRegion,
+                        title: getGenomeContainerTitle(containerGenomes),
+                        genomes: containerGenomes.map(name => {
+                            let nextViewRegion = null;
+                            let nextTracks: TrackModel[] = [];
+                            const {
+                                navContext,
+                                defaultRegion,
+                                defaultTracks,
+                                // genome,
+                                // cytobands,
+                                // publicHubData,
+                                // publicHubList,
+                                // annotationTracks,
+                                // twoBitURL,
+                            } = getGenomeConfig(name);
+                            if (config) {
+                                nextViewRegion = new DisplayedRegionModel(navContext, ...defaultRegion);
+                                nextTracks = defaultTracks;
+                            }
+
+                            return {
+                                name: name,
+                                title: name,
+                                tracks: nextTracks,
+
+                                highlights: [],
+
+                                settings: initialContainerSettings,
+                            };
+                        }),
+                    }
+                })
             }
         }
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);
             return prevState;
+    }
+}
+
+// takes an array of strings, and properly adds commas and an and at the end
+function getGenomeContainerTitle(genomes: string[]): string {
+    if (genomes.length === 1) {
+        return genomes[0];
+    } else if (genomes.length === 2) {
+        return `${genomes[0]} and ${genomes[1]}`;
+    } else {
+        return `${genomes.slice(0, -1).join(', ')} and ${genomes[genomes.length - 1]}`;
     }
 }
 

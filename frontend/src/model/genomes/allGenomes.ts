@@ -123,6 +123,30 @@ for (const config of allGenomes) {
     genomeNameToConfig[genomeName] = config;
 }
 
+interface PhasedSpeciesConfig {
+    logoUrl: string;
+    groupedAssemblies: string[][];
+    color: string;
+}
+
+export const phasedTreeOfLife: { [speciesName: string] : PhasedSpeciesConfig } = {
+    human: {
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
+        groupedAssemblies: [[HG19.genome.getName(), HG38.genome.getName()]],
+        color: "white",
+    },
+    chimp: {
+        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
+        groupedAssemblies: [[PANTRO6.genome.getName(), PANTRO5.genome.getName()]],
+        color: "white",
+    },
+    rhesus: {
+        logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
+        groupedAssemblies: [[rheMac10.genome.getName(), RheMac8.genome.getName()], [rheMac3.genome.getName(), rheMac2.genome.getName()]],
+        color: "yellow",
+    },
+}
+
 interface SpeciesConfig {
     logoUrl: string;
     assemblies: string[];

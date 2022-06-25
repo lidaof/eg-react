@@ -95,7 +95,7 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
                     }
                 }}
             >
-                <DialogTitle>
+                <DialogTitle disableTypography>
                     <Typography variant="h5" style={{ margin: "15px", marginBottom: 0 }}>
                         Genome Settings
                     </Typography>

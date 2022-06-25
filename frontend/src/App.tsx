@@ -421,10 +421,13 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                 {/* Implement such that when there's a genome name but no containers, just render like we would before phased update. */}
                 {containers.map((data: SyncedContainer, idx: number) => {
                     return (
-                        <div style={{
-                            marginTop: 20,
-                            marginBottom: idx === containers.length - 1 ? 0 : 20,
-                        }}>
+                        <div
+                            key={idx}
+                            style={{
+                                marginTop: 20,
+                                marginBottom: idx === containers.length - 1 ? 0 : 20,
+                            }}
+                        >
                             <ContainerView
                                 stateIdx={idx}
                                 key={idx}
