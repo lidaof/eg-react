@@ -1,12 +1,12 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import HubTable from './HubTable';
-import TrackModel from '../../model/TrackModel';
-import FacetTable from './FacetTable';
+import React from "react";
+import PropTypes from "prop-types";
+import HubTable from "./HubTable";
+import TrackModel from "../../model/TrackModel";
+import FacetTable from "./FacetTable";
 
 /**
  * The window containing UI for loading public track hubs and adding tracks from hubs.
- * 
+ *
  * @author Silas Hsu
  */
 class HubPane extends React.PureComponent {
@@ -30,7 +30,7 @@ class HubPane extends React.PureComponent {
 
     /**
      * Adds a list of tracks to the list of all tracks available from a hub.
-     * 
+     *
      * @param {TrackModel[]} newTracks - additions to the list of all tracks available from a hub
      * @param {boolean} makeVisible - whether to also add the tracks to the visible (added) track list
      */
@@ -47,32 +47,33 @@ class HubPane extends React.PureComponent {
      *     Conditionally, form to load a custom hub
      *     Buttons to show and hide the above
      *     If there are any tracks from hubs, a track list
-     * 
+     *
      * @return {JSX.Element} the element to render
      * @override
      */
     render() {
         return (
-        <div>
-             <HubTable 
-                onHubLoaded={this.props.onAddTracksToPool}
-                onTracksAdded={this.props.onTracksAdded}
-                publicHubs={this.props.publicHubs}
-                onHubUpdated={this.props.onHubUpdated}
-             />
-            {
-            this.props.publicTracksPool.length > 0 ?
-                <FacetTable
-                    tracks={this.props.publicTracksPool} // need include add tracks, also need consider track remove to just remove from sets
-                    addedTracks={this.props.addedTracks}
+            <div>
+                <HubTable
+                    onHubLoaded={this.props.onAddTracksToPool}
                     onTracksAdded={this.props.onTracksAdded}
-                    publicTrackSets={this.props.publicTrackSets}
-                    addedTrackSets={this.props.addedTrackSets}
-                    addTermToMetaSets={this.props.addTermToMetaSets}
-                /> :
-                <p>No tracks from data hubs yet.  Load a hub first.</p>
-            }
-        </div>
+                    publicHubs={this.props.publicHubs}
+                    onHubUpdated={this.props.onHubUpdated}
+                />
+                {this.props.publicTracksPool.length > 0 ? (
+                    <FacetTable
+                        tracks={this.props.publicTracksPool} // need include add tracks, also need consider track remove to just remove from sets
+                        addedTracks={this.props.addedTracks}
+                        onTracksAdded={this.props.onTracksAdded}
+                        publicTrackSets={this.props.publicTrackSets}
+                        addedTrackSets={this.props.addedTrackSets}
+                        addTermToMetaSets={this.props.addTermToMetaSets}
+                        contentColorSetup={this.props.contentColorSetup}
+                    />
+                ) : (
+                    <p>No tracks from data hubs yet. Load a hub first.</p>
+                )}
+            </div>
         );
     }
 }

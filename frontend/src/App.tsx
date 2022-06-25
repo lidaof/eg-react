@@ -2,6 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import _ from "lodash";
+import Notifications from "react-notify-toast";
+import { Offline } from "react-detect-offline";
 // import AppState, { ActionCreators } from "./AppState";
 import { GlobalActionCreators, GenomeState, SyncedContainer } from "./AppState";
 import GenomePickerContainer from "./components/GenomePicker";
@@ -12,14 +14,12 @@ import TrackContainer from "./components/trackContainers/TrackContainer";
 import withCurrentGenome from "./components/withCurrentGenome";
 import DisplayedRegionModel from "./model/DisplayedRegionModel";
 import TrackModel from "./model/TrackModel";
-import Notifications from "react-notify-toast";
 import LoadSession from "./components/LoadSession";
 import { RegionExpander } from "./model/RegionExpander";
 import { Footer } from "./components/Footer";
-import { Offline } from "react-detect-offline";
-import { HELP_LINKS, getSecondaryGenomes } from "./util";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
 import { HighlightInterval } from './components/trackContainers/HighlightMenu';
+import { HELP_LINKS, getSecondaryGenomes } from "./util";
 
 import "./App.css";
 

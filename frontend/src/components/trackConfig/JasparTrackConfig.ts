@@ -1,9 +1,7 @@
 import { TrackModel } from "./../../model/TrackModel";
 import { AnnotationTrackConfig } from "./AnnotationTrackConfig";
-import { JasparTrack, DEFAULT_OPTIONS } from "../trackVis/bedTrack/JasparTrack";
-import { BigGmodWorker } from "../../dataSources/WorkerTSHook";
-import LocalBigSourceGmod from "../../dataSources/big/LocalBigSourceGmod";
-import WorkerSource from "../../dataSources/worker/WorkerSource";
+import { JasparTrack, DEFAULT_OPTIONS, MAX_BASES_PER_PIXEL } from "../trackVis/bedTrack/JasparTrack";
+import JasparSource from "../../dataSources/JasparSource";
 import { JasparFeature } from "../../model/Feature";
 import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 import HiddenPixelsConfig from "../../components/trackContextMenu/HiddenPixelsConfig";
@@ -18,11 +16,7 @@ export class JasparTrackConfig extends AnnotationTrackConfig {
     }
 
     initDataSource() {
-        if (this.trackModel.fileObj) {
-            return new LocalBigSourceGmod(this.trackModel.fileObj);
-        } else {
-            return new WorkerSource(BigGmodWorker, this.trackModel.url);
-        }
+        return new JasparSource(this.trackModel, MAX_BASES_PER_PIXEL);
     }
 
     /**

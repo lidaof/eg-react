@@ -21,7 +21,7 @@
 }
 
 .IsoformSelection-item:hover {
-    background-color: #fdbb84;
+    background-color: #fdbb84 !important;
     cursor: pointer;
 }
 

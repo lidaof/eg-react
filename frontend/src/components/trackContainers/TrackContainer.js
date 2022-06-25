@@ -528,7 +528,7 @@ class TrackContainer extends React.Component {
         // position: "-webkit-sticky", position: "sticky", top: 0, zIndex: 1, background: "white"
         const panLeftButton = (
             <button
-                className="btn btn-outline-dark"
+                className="btn btn-outline-secondary"
                 title="Pan left
 (Alt+Z)"
                 style={{ fontFamily: "monospace" }}
@@ -539,7 +539,7 @@ class TrackContainer extends React.Component {
         );
         const panRightButton = (
             <button
-                className="btn btn-outline-dark"
+                className="btn btn-outline-secondary"
                 title="Pan right
 (Alt+X)"
                 style={{ fontFamily: "monospace" }}

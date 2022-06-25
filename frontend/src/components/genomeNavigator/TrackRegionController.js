@@ -14,7 +14,6 @@ const MODAL_STYLE = {
         bottom: "unset",
         overflow: "visible",
         padding: "5px",
-        color: "black",
     },
     overlay: {
         backgroundColor: "rgba(111,107,101, 0.7)",
@@ -108,9 +107,11 @@ class TrackRegionController extends React.Component {
      * @inheritdoc
      */
     render() {
+        const { color, background } = this.props.contentColorSetup;
+        const content = { ...MODAL_STYLE.content, color, background };
         const coordinates = this.props.selectedRegion.currentRegionAsString();
         return (
-            <div className="tool-element">
+            <div className="bg tool-element">
                 <button className="btn btn-secondary" onClick={this.handleOpenModal}>
                     {coordinates}
                 </button>
@@ -120,7 +121,7 @@ class TrackRegionController extends React.Component {
                     ariaHideApp={false}
                     onRequestClose={this.handleCloseModal}
                     shouldCloseOnOverlayClick={true}
-                    style={MODAL_STYLE}
+                    style={{ ...MODAL_STYLE, content }}
                 >
                     <span className="text-right" style={X_BUTTON_STYLE} onClick={this.handleCloseModal}>
                         ×
@@ -131,6 +132,8 @@ class TrackRegionController extends React.Component {
                         onRegionSelected={this.props.onRegionSelected}
                         handleCloseModal={this.handleCloseModal}
                         onNewHighlight={this.props.onNewHighlight}
+                        color={color}
+                        background={background}
                     />
                     {!this.props.virusBrowserMode && (
                         <>
@@ -140,6 +143,8 @@ class TrackRegionController extends React.Component {
                                 onRegionSelected={this.props.onRegionSelected}
                                 handleCloseModal={this.handleCloseModal}
                                 onNewHighlight={this.props.onNewHighlight}
+                                color={color}
+                                background={background}
                             />
                         </>
                     )}

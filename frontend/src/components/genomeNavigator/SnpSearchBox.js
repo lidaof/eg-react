@@ -107,7 +107,7 @@ class SnpSearchBox extends React.PureComponent {
         const mappings = snp.mappings.map((item, i) => (
             <li
                 style={{
-                    color: "blue",
+                    color: "#3f51b5",
                     textDecoration: "underline",
                     cursor: "pointer",
                 }}
@@ -155,6 +155,7 @@ class SnpSearchBox extends React.PureComponent {
 
     render() {
         const { result, loadingMsg } = this.state;
+        const { color, background } = this.props;
         return (
             <div>
                 <div>
@@ -164,7 +165,7 @@ class SnpSearchBox extends React.PureComponent {
                     </button>{" "}
                     <span className="text-info font-italic">{loadingMsg}</span>
                 </div>
-                <div style={{ position: "absolute", zIndex: 2, backgroundColor: "white" }}>
+                <div style={{ position: "absolute", zIndex: 2, backgroundColor: background, color }}>
                     {result && this.renderSNP(result)}
                 </div>
             </div>

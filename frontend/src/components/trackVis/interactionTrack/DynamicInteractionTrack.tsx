@@ -42,7 +42,7 @@ interface DynamicInteractionTrackProps extends PropsFromTrackContainer, TooltipC
 export const DEFAULT_OPTIONS = {
     color: "#B8008A",
     color2: "#006385",
-    backgroundColor: "white",
+    backgroundColor: "var(--bg-color)",
     scoreScale: ScaleChoices.AUTO,
     scoreMax: 10,
     scoreMin: 0,

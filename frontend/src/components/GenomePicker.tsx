@@ -28,9 +28,10 @@ import Tab from "@material-ui/core/Tab";
 import Box from "@material-ui/core/Box";
 import Link from "@material-ui/core/Link";
 import SwipeableViews from "react-swipeable-views";
-import { GlobalActionCreators } from "../AppState";
+import { ActionCreators } from "../AppState";
 import { treeOfLife, phasedTreeOfLife, } from "../model/genomes/allGenomes";
 import { SessionUI } from "./SessionUI";
+import DarkMode from "./DarkMode";
 import Logo from '../images/logo.png'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -45,9 +46,9 @@ import _ from "lodash";
  */
 
 const callbacks = {
-    onGenomeSelected: GlobalActionCreators.setGenome,
-    onMultipleGenomeSelected: GlobalActionCreators.setMultipleGenomes,
-    onMultipleGenomesWithContainerSelected: GlobalActionCreators.setMultipleGenomesWithContainer,
+    onGenomeSelected: ActionCreators.setGenome,
+    onMultipleGenomeSelected: ActionCreators.setMultipleGenomes,
+    onMultipleGenomesWithContainerSelected: ActionCreators.setMultipleGenomesWithContainer,
 };
 
 const LinkWithMargin = withStyles({
@@ -143,32 +144,34 @@ export function GenomePicker(props: GenomePickerProps) {
     // Map the genomes to a list of cards. Genome search engine filters by both the species and the different assemblies.
     // It is not case sensitive.
     const renderTreeCards = () => {
-        return Object.entries(treeOfLife)
-            .filter(([species2, details]) => {
-                return (
-                    species2.toLowerCase().includes(searchText.toLowerCase()) ||
-                    details.assemblies.join("").toLowerCase().includes(searchText.toLowerCase())
-                );
-            })
-            .map(([species2, details], idx) => {
-                let filteredAssemblies = details.assemblies;
-                if (!species2.toLowerCase().includes(searchText.toLowerCase())) {
-                    filteredAssemblies = details.assemblies.filter((e) =>
-                        e.toLowerCase().includes(searchText.toLowerCase())
+        return (
+            Object.entries(treeOfLife)
+                .filter(([species2, details]) => {
+                    return (
+                        species2.toLowerCase().includes(searchText.toLowerCase()) ||
+                        details.assemblies.join("").toLowerCase().includes(searchText.toLowerCase())
                     );
-                }
-                return (
-                    // @ts-ignore
-                    <Grid item xs={12} md={4} align="center" key={idx}>
-                        <GenomePickerCard
-                            species={species2}
-                            details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
-                            selected={genomesSelected}
-                            onChoose={handleGenomePicked}
-                        />
-                    </Grid>
-                );
-            });
+                })
+                .map(([species2, details], idx) => {
+                    let filteredAssemblies = details.assemblies;
+                    if (!species2.toLowerCase().includes(searchText.toLowerCase())) {
+                        filteredAssemblies = details.assemblies.filter((e) =>
+                            e.toLowerCase().includes(searchText.toLowerCase())
+                        );
+                    }
+                    return (
+                        // @ts-ignore
+                        <Grid item xs={12} md={4} align="center" key={idx}>
+                            <GenomePickerCard
+                                species={species2}
+                                details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
+                                selected={genomesSelected}
+                                onChoose={handleGenomePicked}
+                            />
+                        </Grid>
+                    )
+                })
+        );
     };
 
     let metaText = "";
@@ -313,9 +316,9 @@ function GenomePickerContainer(props: GenomePickerContainerProps) {
     };
 
     return (
-        <>
+        <div>
             <AppHeader />
-            <AppBar position="static" color="default">
+            <AppBar position="static" color="default" >
                 <Tabs
                     value={value}
                     onChange={handleChange}
@@ -353,7 +356,7 @@ function GenomePickerContainer(props: GenomePickerContainerProps) {
                 </TabPanel>
                 {/* <TabPanel value={value} index */}
             </SwipeableViews>
-        </>
+        </div>
     );
 }
 
@@ -364,7 +367,7 @@ export function AppIcon({ withText = true }) {
                 <img
                     src={Logo}
                     alt="Browser Icon"
-                    style={{ height: 40, width: "auto", marginRight: 10 }}
+                    style={{ height: 36, width: "auto", marginRight: 10 }}
                 />
                 {withText && <>WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span></>}
             </Typography>
@@ -380,6 +383,9 @@ function AppHeader() {
                 <Toolbar disableGutters>
                     <AppIcon />
                     <div className={styles.alignRight}>
+                        <span>
+                            <DarkMode />
+                        </span>
                         <LinkWithMargin
                             href="https://epigenomegateway.readthedocs.io/en/latest/"
                             target="_blank"
@@ -518,6 +524,8 @@ const useStyles = makeStyles({
         borderRadius: "10px",
         height: "100%",
         width: "270px",
+        backgroundColor: "var(--bg-color)", //matches the background color of the card to the page
+        color: "var(--font-color)",
     },
     alignRight: {
         marginRight: 15,
@@ -525,8 +533,11 @@ const useStyles = makeStyles({
     },
     vertScroll: {
         maxHeight: "200px",
-        overflowY: "scroll",
+        overflowY: "auto",
     },
+    icon: {
+        color: "var(--font-color)",
+    }
 });
 
 GenomePickerContainer.propTypes = {

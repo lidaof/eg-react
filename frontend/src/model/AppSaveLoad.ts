@@ -40,11 +40,7 @@ export class AppStateSaver {
             isShowingVR: appState.isShowingVR,
             layout: appState.layout,
             highlights: appState.highlights,
-
-            // TODO: Add support for savings/loading containers. 
-            // Currently, it fails because DisplayedRegionModel inside the containers isn't converted properly
-            // containers: appState.containers,
-            // compatabilityMode: appState.compatabilityMode,
+            darkTheme: appState.darkTheme,
             // threedTracks: appState.threedTracks.filter((track) => !track.fileObj).map((track) => track.serialize()),
         };
         return object;
@@ -90,6 +86,7 @@ export class AppStateLoader {
 
             containers: object.containers,
             compatabilityMode: object.compatabilityMode,
+            darkTheme: object.darkTheme || false,
             // threedTracks: object.threedTracks.map((data: any) => TrackModel.deserialize(data)),
         };
     }

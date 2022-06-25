@@ -1,15 +1,15 @@
-import { TrackConfig } from './TrackConfig';
-import RepeatSource from '../../dataSources/RepeatSource';
+import { TrackConfig } from "./TrackConfig";
+import RepeatSource from "../../dataSources/RepeatSource";
 
-import RepeatMaskerTrack, { DEFAULT_OPTIONS } from '../trackVis/RepeatMaskerTrack';
+import RepeatMaskerTrack, { DEFAULT_OPTIONS, MAX_BASES_PER_PIXEL } from "../trackVis/RepeatMaskerTrack";
 
-import { BackgroundColorConfig } from '../trackContextMenu/ColorConfig';
-import { AnnotationDisplayModeConfig } from '../trackContextMenu/DisplayModeConfig';
-import HeightConfig from '../trackContextMenu/HeightConfig';
+import { BackgroundColorConfig } from "../trackContextMenu/ColorConfig";
+import { AnnotationDisplayModeConfig } from "../trackContextMenu/DisplayModeConfig";
+import HeightConfig from "../trackContextMenu/HeightConfig";
 
-import { RepeatDASFeature, RepeatMaskerFeature } from '../../model/RepeatMaskerFeature';
-import { TrackModel } from '../../model/TrackModel';
-import HiddenPixelsConfig from '../trackContextMenu/HiddenPixelsConfig';
+import { RepeatDASFeature, RepeatMaskerFeature } from "../../model/RepeatMaskerFeature";
+import { TrackModel } from "../../model/TrackModel";
+import HiddenPixelsConfig from "../trackContextMenu/HiddenPixelsConfig";
 
 export class RepeatMaskerTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -18,11 +18,11 @@ export class RepeatMaskerTrackConfig extends TrackConfig {
     }
 
     initDataSource() {
-        return new RepeatSource(this.trackModel.url);
+        return new RepeatSource(this.trackModel.url, MAX_BASES_PER_PIXEL);
     }
 
     formatData(data: RepeatDASFeature[]) {
-        return data.map(feature => new RepeatMaskerFeature(feature))
+        return data.map((feature) => new RepeatMaskerFeature(feature));
     }
 
     getComponent() {
@@ -30,7 +30,12 @@ export class RepeatMaskerTrackConfig extends TrackConfig {
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), AnnotationDisplayModeConfig, HeightConfig, 
-            BackgroundColorConfig, HiddenPixelsConfig];
+        return [
+            ...super.getMenuComponents(),
+            AnnotationDisplayModeConfig,
+            HeightConfig,
+            BackgroundColorConfig,
+            HiddenPixelsConfig,
+        ];
     }
 }

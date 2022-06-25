@@ -22,7 +22,7 @@ export class PixiScene extends React.PureComponent {
         currentStep: 0,
         speed: [5], //react-compound-slider require an array, to be FIXED
         color: "blue",
-        backgroundColor: "white",
+        backgroundColor: "var(--bg-color)",
         dynamicColors: [],
         useDynamicColors: false,
     };

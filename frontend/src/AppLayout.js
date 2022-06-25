@@ -23,7 +23,7 @@ import {
 } from "./layoutUtils";
 import OmeroContainer from "components/trackVis/imageTrack/OmeroContainer";
 
-import "../node_modules/flexlayout-react/style/light.css";
+// import "../node_modules/flexlayout-react/style/light.css";
 import "./AppLayout.css";
 
 /**
@@ -40,6 +40,7 @@ function mapStateToProps(state) {
         isShowingVR: state.browser.present.isShowingVR,
         layout: state.browser.present.layout,
         selectedSet: state.browser.present.regionSetView,
+        darkTheme: state.browser.present.darkTheme,
     };
 }
 
@@ -207,14 +208,16 @@ class AppLayout extends React.PureComponent {
         // const isThereG3dTrack = tracks.filter((tk) => tk.type === "g3d").length > 0; // not working sometimes after browser app track selection
         // console.log(this.state.g3dcount);
         return (
-            <App
-                layoutModel={model}
-                onSetAnchors3d={this.setAnchors3d}
-                onSetGeneFor3d={this.setGeneFor3d}
-                viewer3dNumFrames={this.state.viewer3dNumFrames}
-                isThereG3dTrack={this.state.g3dcount > 0}
-                onSetImageInfo={this.setImageInfo}
-            />
+            <div className="bg">
+                <App
+                    layoutModel={model}
+                    onSetAnchors3d={this.setAnchors3d}
+                    onSetGeneFor3d={this.setGeneFor3d}
+                    viewer3dNumFrames={this.state.viewer3dNumFrames}
+                    isThereG3dTrack={this.state.g3dcount > 0}
+                    onSetImageInfo={this.setImageInfo}
+                />
+            </div>
         );
     };
 
@@ -282,7 +285,7 @@ class AppLayout extends React.PureComponent {
 
     render3dmolContainer = (node) => {
         const model = node.getModel();
-        const { viewRegion, genomeConfig, tracks, onNewViewRegion, onSetSelected, selectedSet } = this.props;
+        const { viewRegion, genomeConfig, tracks, onNewViewRegion, onSetSelected, selectedSet, darkTheme } = this.props;
         const config = node.getConfig();
         const { x, y, width, height } = node.getRect();
         const g3dtrack = TrackModel.deserialize(config.trackModel);
@@ -321,6 +324,7 @@ class AppLayout extends React.PureComponent {
                 imageInfo={this.state.imageInfo}
                 onSetSelected={onSetSelected}
                 selectedSet={selectedSet}
+                darkTheme={darkTheme}
             />
         );
     };
@@ -369,7 +373,13 @@ class AppLayout extends React.PureComponent {
     render() {
         const layout = _.isEmpty(this.props.layout) ? initialLayout : ensureLayoutHeader(this.props.layout);
         const model = FlexLayout.Model.fromJson(layout);
-        return <FlexLayout.Layout model={model} factory={this.factory} />;
+        const theme = this.props.darkTheme ? "dark" : "light";
+        return (
+            <div style={{ width: "100%", height: "100%" }} id="flex-container" data-theme={theme}>
+                <FlexLayout.Layout model={model} factory={this.factory} />
+            </div>
+        );
+
         // if there is no new tabs, no need to use layout?
         // if (_.isEmpty(this.props.layout)) {
         //     return this.renderApp();

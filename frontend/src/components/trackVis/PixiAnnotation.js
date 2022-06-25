@@ -25,7 +25,7 @@ export class PixiAnnotation extends React.PureComponent {
         speed: [5], //react-compound-slider require an array, to be FIXED
         // colors: [],
         color: "blue",
-        backgroundColor: "white",
+        backgroundColor: "var(--bg-color)",
         dynamicColors: [],
         useDynamicColors: false,
     };

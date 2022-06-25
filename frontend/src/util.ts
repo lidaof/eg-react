@@ -75,6 +75,9 @@ export function getPageCoordinates(relativeTo: Element, relativeX: number, relat
  * @return {string} a color that contrasts well with the input color
  */
 export function getContrastingColor(color: string): string {
+    if (color === "var(--bg-color)") {
+        return "var(--font-color)";
+    }
     const parsedColor = parseColor(color);
     if (!parsedColor.rgb) {
         return "black";

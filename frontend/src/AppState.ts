@@ -25,6 +25,7 @@ import OpenInterval from "./model/interval/OpenInterval";
 import { Genome } from "./model/genomes/Genome";
 import Chromosome from "./model/genomes/Chromosome";
 import { GenomeConfig } from "model/genomes/GenomeConfig";
+import { uncompressString } from "components/ShareUI";
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
@@ -55,6 +56,20 @@ export const NO_SAVE_SESSION = "eg-no-session";
 export const MIN_VIEW_REGION_SIZE = 5;
 export const DEFAULT_TRACK_LEGEND_WIDTH = 120;
 
+// if need change, also need change css variable in
+const DARK_FG_COLOR = "white";
+const DARK_BG_COLOR = "#222";
+const LIGHT_FG_COLOR = "#222";
+const LIGHT_BG_COLOR = "white";
+
+export function getFgColor(isDark: boolean) {
+    return isDark ? DARK_FG_COLOR : LIGHT_FG_COLOR;
+}
+
+export function getBgColor(isDark: boolean) {
+    return isDark ? DARK_BG_COLOR : LIGHT_BG_COLOR;
+}
+
 export interface AppState {
     genomeName: string;
 
@@ -78,6 +93,7 @@ export interface AppState {
     highlights?: HighlightInterval[];
     // TODO: add support for "compatability mode" which won't use the new containers/multiple genome support.
     compatabilityMode: boolean;
+    darkTheme?: boolean;
 }
 
 // state for a single genome.
@@ -113,6 +129,7 @@ export interface SyncedContainer {
 }
 
 const bundleId = uuid.v1();
+const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
 
 const initialContainerSettings: GenomeSettings = {
     syncHighlights: true,
@@ -160,6 +177,7 @@ const initialState: AppState = {
     // g3dtracks: [],
     highlights: [],
     compatabilityMode: false,
+    darkTheme: prefersDark,
 };
 
 enum ActionType {
@@ -189,6 +207,7 @@ enum ActionType {
     SET_GENOME_CONTAINER = "SET_GENOME_CONTAINER",
     SET_TITLE = "SET_TITLE",
     CREATE_NEW_CONTAINER = "CREATE_NEW_CONTAINER",
+    SET_DARK_THEME = "SET_DARK_THEME",
 }
 
 interface AppAction {
@@ -328,6 +347,10 @@ export const GlobalActionCreators = {
     setHighlights: (highlights: HighlightInterval[]) => {
         // console.log(highlights);
         return { type: ActionType.SET_HIGHLIGHTS, highlights };
+    },
+
+    setDarkTheme: (darkTheme: boolean) => {
+        return { type: ActionType.SET_DARK_THEME, darkTheme };
     },
 };
 
@@ -529,6 +552,10 @@ function getInitialState(): AppState {
                 newState = { ...state, bundleId: query.bundle, sessionFromUrl: true };
             }
         }
+        if (query.blob) {
+            const json = JSON.parse(uncompressString(query.blob));
+            newState = new AppStateLoader().fromObject(json);
+        }
         if (query.hicUrl) {
             const tmpState = getNextState(state, {
                 type: ActionType.SET_GENOME,
@@ -604,7 +631,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     highlights: [],
 
                     settings: initialContainerSettings,
-                })]
+                })],
+                darkTheme: prevState.darkTheme
             };
         }
         case ActionType.SET_MULTIPLE_GENOMES: {
@@ -936,6 +964,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 })
             }
         }
+        case ActionType.SET_DARK_THEME:
+            return { ...prevState, darkTheme: action.darkTheme };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);
