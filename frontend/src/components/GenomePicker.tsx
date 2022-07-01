@@ -38,6 +38,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import "./GenomePicker.css";
 import { Brightness2 } from "@material-ui/icons";
 import _ from "lodash";
+import { style } from "d3-selection";
+import { getGenomeContainerTitle } from "./containerView/containerUtils";
 
 /**
  * loading page for choose genome
@@ -317,7 +319,6 @@ function GenomePickerContainer(props: GenomePickerContainerProps) {
 
     return (
         <div>
-            <AppHeader />
             <AppBar position="static" color="default" >
                 <Tabs
                     value={value}
@@ -363,11 +364,11 @@ function GenomePickerContainer(props: GenomePickerContainerProps) {
 export function AppIcon({ withText = true }) {
     return (
         <>
-            <Typography variant="h5" noWrap>
+            <Typography variant="h5" noWrap style={{ color: "var(--neutral-font-color)" }}>
                 <img
                     src={Logo}
                     alt="Browser Icon"
-                    style={{ height: 36, width: "auto", marginRight: 10 }}
+                    style={{ height: 36, width: "auto", marginRight: 10, }}
                 />
                 {withText && <>WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span></>}
             </Typography>
@@ -426,9 +427,11 @@ function PhasedGenomeCard(props: PhasedGenomeCardProps) {
                     button
                     onClick={() => onChoose(species, idx)}
                     style={{
+                        backgroundColor: "var(--bg-color)",
                         borderRadius: 7
-                    }}>
-                    <ListItemIcon>
+                    }}
+                >
+                    <ListItemIcon className={styles.icon}>
                         <ChevronRightIcon />
                     </ListItemIcon>
                     <ListItemText primary={assembly} />
@@ -461,6 +464,8 @@ function GenomePickerCard(props: GenomePickerCardProps) {
     const styles = useStyles();
     const { species, selected, details, onChoose } = props;
     const { logoUrl, assemblies } = details;
+    
+
 
     const renderAssemblies = () => {
         return assemblies.map((assembly, idx) => {
@@ -472,10 +477,12 @@ function GenomePickerCard(props: GenomePickerCardProps) {
                     onClick={() => onChoose(assembly)}
                     style={{
                         height: 25,
-                        backgroundColor: isSelected ? 'lightgray' : 'white',
+                        // adjust the brightness depending on if it's dark or light mode
+                        backgroundColor: isSelected ? "silver" : null,
                         borderRadius: 7
-                    }}>
-                    <ListItemIcon>
+                    }}
+                >
+                    <ListItemIcon className={styles.icon}>
                         <ChevronRightIcon />
                     </ListItemIcon>
                     <ListItemText primary={assembly} />
@@ -495,17 +502,6 @@ function GenomePickerCard(props: GenomePickerCardProps) {
             </CardContent>
         </Card>
     );
-}
-
-// takes an array of strings, and properly adds commas and an and at the end
-function getGenomeContainerTitle(genomes: string[]): string {
-    if (genomes.length === 1) {
-        return genomes[0];
-    } else if (genomes.length === 2) {
-        return `${genomes[0]} and ${genomes[1]}`;
-    } else {
-        return `${genomes.slice(0, -1).join(', ')} and ${genomes[genomes.length - 1]}`;
-    }
 }
 
 const useStyles = makeStyles({

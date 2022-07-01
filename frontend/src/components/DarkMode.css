@@ -1,13 +1,17 @@
 [data-theme="dark"] {
     --font-color: var(--dark-fg-color);
+    --neutral-font-color: var(--dark-fg-color);
     --bg-color: var(--dark-bg-color);
     /* --link-color: #3bd1ff; */
 }
+
 [data-theme="light"] {
     --font-color: var(--light-fg-color);
+    --neutral-font-color: #5f6368;
     --bg-color: var(--light-bg-color);
     /* --link-color: #3f51b5; */
 }
+
 .bg {
     background-color: var(--bg-color);
     color: var(--font-color);

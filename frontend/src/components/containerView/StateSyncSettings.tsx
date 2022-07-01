@@ -125,7 +125,7 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
                             setOffsetValue(e.target.value);
                             let v = parseInt(e.target.value);
                             if (isNaN(v)) { v = 0 };
-                            setGenomeSettings({ ...genomeSettings, offsetAmount: v })
+                            setGenomeSettings({ ...genomeSettings, offsetAmount: v });
                         }}
                         style={menuItemStyle}
                     />

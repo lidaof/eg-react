@@ -7,7 +7,7 @@ import { Offline } from "react-detect-offline";
 // import AppState, { ActionCreators } from "./AppState";
 import { ActionCreators, GenomeState, SyncedContainer } from "./AppState";
 import GenomePickerContainer from "./components/GenomePicker";
-import Nav from "./components/Nav";
+import Nav from "./components/nav/Nav";
 import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
 import ContainerView from "./components/containerView/ContainerView";
 import TrackContainer from "./components/trackContainers/TrackContainer";
@@ -354,101 +354,82 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                 </div>
             );
         }
-        if (!(containers && containers.length)) {
-            return (
-                <div>
-                    <GenomePickerContainer bundleId={bundleId} />
-                    <hr />
-                    <Footer />
-                    <Notifications />
-                </div>
-            );
-        }
+        const pickingGenome = !(containers && containers.length);
         const tracksUrlSets = new Set([
             ...tracks.filter((track) => track.url).map((track) => track.url),
             ...tracks.filter((track) => !track.url).map((track) => track.name),
         ]);
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
-        const groupedTrackSets = this.groupTrackByGenome();
-        const navGenomeConfig = containers[0].genomes[0].genomeConfig || getGenomeConfig(containers[0].genomes[0].name);
-        const containerTitles = containers.map((container) => container.title);
+        let groupedTrackSets, navGenomeConfig, containerTitles: any;
+        if (!pickingGenome) {
+            groupedTrackSets = this.groupTrackByGenome();
+            navGenomeConfig = containers[0].genomes[0].genomeConfig || getGenomeConfig(containers[0].genomes[0].name);
+            containerTitles = containers.map((container) => container.title);
+        }
         return (
-            <div className="App container-fluid">
+            <>
                 <Nav
-                    {...this.state}
-                    // isShowingNavigator={isShowingNavigator}
-                    // onToggleNavigator={onToggleNavigator}
-                    // onToggle3DScene={this.toggle3DSnavene}
-                    // onToggleHighlight={this.toggleHnavghlight}
-                    onNewHighlight={this.newHighlight}
-                    // onSetHighlightColor={this.setHinavhlightColor}
-                    selectedRegion={viewRegion}
-                    onRegionSelected={onNewViewRegion}
-                    tracks={tracks}
-                    genomeConfig={navGenomeConfig}
-                    onTracksAdded={this.addTracks}
-                    onTrackRemoved={this.removeTrack}
-                    bundleId={bundleId}
-                    trackLegendWidth={trackLegendWidth}
-                    onLegendWidthChange={onLegendWidthChange}
-                    onAddTracksToPool={this.addTracksToPool}
-                    onHubUpdated={this.updatePublicHubs}
-                    addedTrackSets={tracksUrlSets}
-                    // publicHubs={publicHubs}
-                    removeTrackFromAvailable={this.removeTrackFromAvailable}
-                    addTracktoAvailable={this.addTracktoAvailable}
-                    addTermToMetaSets={this.addTermToMetaSets}
-                    embeddingMode={embeddingMode}
-                    groupedTrackSets={groupedTrackSets}
                     virusBrowserMode={virusBrowserMode}
-                    highlights={highlights}
+                    containerTitles={containerTitles}
+                    pickingGenome={pickingGenome}
                 />
-                <Notifications />
-                <Offline>
-                    <div className="alert alert-warning text-center lead" role="alert">
-                        You are currently offline, so tracks on web won't load. But you can still use the{" "}
-                        <a href={HELP_LINKS.localhub} target="_blank" rel="noopener noreferrer">
-                            Local Track
-                        </a>{" "}
-                        and{" "}
-                        <a href={HELP_LINKS.textTrack} target="_blank" rel="noopener noreferrer">
-                            Local Text Track
-                        </a>{" "}
-                        functions.
+                {pickingGenome ? (
+                    <div>
+                        <GenomePickerContainer bundleId={bundleId} />
+                        <hr />
+                        <Footer />
+                        <Notifications />
                     </div>
-                </Offline>
-                {/* Implement such that when there's a genome name but no containers, just render like we would before phased update. */}
-                {containers.map((data: SyncedContainer, idx: number) => {
-                    return (
-                        <div
-                            key={idx}
-                            style={{
-                                marginTop: 20,
-                                marginBottom: idx === containers.length - 1 ? 0 : 20,
-                            }}
-                        >
-                            <ContainerView
-                                stateIdx={idx}
-                                key={idx}
-                                cdata={data}
+                ) : (
+                    <div className="App container-fluid">
+                        <Notifications />
+                        <Offline>
+                            <div className="alert alert-warning text-center lead" role="alert">
+                                You are currently offline, so tracks on web won't load. But you can still use the{" "}
+                                <a href={HELP_LINKS.localhub} target="_blank" rel="noopener noreferrer">
+                                    Local Track
+                                </a>{" "}
+                                and{" "}
+                                <a href={HELP_LINKS.textTrack} target="_blank" rel="noopener noreferrer">
+                                    Local Text Track
+                                </a>{" "}
+                                functions.
+                            </div>
+                        </Offline>
+                        {/* Implement such that when there's a genome name but no containers, just render like we would before phased update. */}
+                        {containers.map((data: SyncedContainer, idx: number) => {
+                            return (
+                                <div
+                                    key={idx}
+                                    style={{
+                                        marginTop: 20,
+                                        marginBottom: idx === containers.length - 1 ? 0 : 20,
+                                    }}
+                                >
+                                    <ContainerView
+                                        stateIdx={idx}
+                                        key={idx}
+                                        cdata={data}
 
-                                layoutModel={layoutModel}
-                                onSetAnchors3d={onSetAnchors3d}
-                                onSetGeneFor3d={onSetGeneFor3d}
-                                viewer3dNumFrames={viewer3dNumFrames}
-                                isThereG3dTrack={isThereG3dTrack}
-                                onSetImageInfo={onSetImageInfo}
-                                isShowingNavigator={isShowingNavigator}
-                                containerTitles={containerTitles}
+                                        layoutModel={layoutModel}
+                                        onSetAnchors3d={onSetAnchors3d}
+                                        onSetGeneFor3d={onSetGeneFor3d}
+                                        viewer3dNumFrames={viewer3dNumFrames}
+                                        isThereG3dTrack={isThereG3dTrack}
+                                        onSetImageInfo={onSetImageInfo}
+                                        isShowingNavigator={isShowingNavigator}
+                                        containerTitles={containerTitles}
 
-                                embeddingMode={embeddingMode}
-                            />
-                        </div>
-                    )
-                })}
-                {!embeddingMode && <Footer />}
-            </div>
+                                        embeddingMode={embeddingMode}
+                                    />
+                                </div>
+                            )
+                        })}
+                        {!embeddingMode && <Footer />}
+                    </div>
+                )}
+            </>
         );
     }
 }

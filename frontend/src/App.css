@@ -2,7 +2,7 @@
     --colNum: 2;
     --dark-fg-color: white;
     --dark-bg-color: #222;
-    --light-fg-color: #222;
+    --light-fg-color: #202124;
     --light-bg-color: white;
 }
 
@@ -44,4 +44,40 @@
 .btn-dense {
     margin-right: 2px !important;
     margin-bottom: 0 !important;
+}
+
+[data-theme="dark"] {
+    --eg-on-primary-container: #EADDFF;
+    --eg-primary-container: #4F378B;
+
+    --eg-on-secondary-container: #E8DEF8;
+    --eg-secondary-container: #4A4458;
+}
+
+[data-theme="light"] {
+    --eg-on-primary-container: #21005D;
+    --eg-primary-container: #EADDFF;
+
+    /* --eg-on-secondary-container: #1D192B; */
+    --eg-on-secondary-container: var(--neutral-font-color);
+    --eg-secondary-container: #E8DEF8;
+}
+
+.eg-button {
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    color: var(--eg-on-secondary-container);
+    border-radius: 100px;
+    font-size: 16px;
+    transition: cubic-bezier(1, 0, 0, 1) 0.2s;
+    user-select: none;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eg-button:active {
+    background-color: var(--eg-secondary-container);
 }

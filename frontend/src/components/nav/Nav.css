@@ -10,12 +10,17 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
 
 .Nav-container {
     display: flex;
+    border-bottom: 1px #5f6368 solid;
+    height: 64px;
+    padding-bottom: 5px;
 }
 
 .panel {
     display: flex;
     flex-grow: 1;
     flex-wrap: wrap;
+    align-items: center;
+
     .element {
         min-width: 33%;
         max-width: 100%;
@@ -72,6 +77,7 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
     from {
         font-size: 1.4em;
     }
+
     to {
         font-size: 0.7em;
     }
@@ -81,8 +87,8 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
     color: red;
     font-size: 0.7em;
     position: absolute;
-    top: -2px;
-    left: 75px;
+    top: 5px;
+    left: 25px;
 }
 
 #logoDiv {
@@ -94,7 +100,8 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
 .GenomeNavigator-tooltip {
     position: relative;
     display: inline-block;
-    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+    border-bottom: 1px dotted black;
+    /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
@@ -119,13 +126,15 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
     widows: 240px;
     top: 100%;
     left: 50%;
-    margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+    margin-left: -60px;
+    /* Use half of the width (120/2 = 60), to center the tooltip */
 }
 
 .GenomeNavigator-tooltip .GenomeNavigator-tooltiptext::after {
     content: " ";
     position: absolute;
-    bottom: 100%; /* At the top of the tooltip */
+    bottom: 100%;
+    /* At the top of the tooltip */
     left: 24%;
     margin-left: -5px;
     border-width: 5px;

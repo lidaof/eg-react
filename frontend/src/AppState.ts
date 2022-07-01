@@ -26,6 +26,7 @@ import { Genome } from "./model/genomes/Genome";
 import Chromosome from "./model/genomes/Chromosome";
 import { GenomeConfig } from "model/genomes/GenomeConfig";
 import { uncompressString } from "components/ShareUI";
+import { getGenomeContainerTitle } from "components/containerView/containerUtils";
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
@@ -611,7 +612,10 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         case ActionType.SET_GENOME: { // Setting genome resets state.
             const { genomeName } = action;
             if (!genomeName) {
-                return initialState;
+                return {
+                    ...initialState,
+                    darkTheme: prevState.darkTheme,
+                };
             }
             let nextViewRegion = null;
             let nextTracks: TrackModel[] = [];
@@ -668,7 +672,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return {
                 ...initialState,
                 ...getSetGenomeObject(genomeNames[0]),
-                containers: genomeContainers
+                containers: genomeContainers,
+                darkTheme: prevState.darkTheme
             }
         }
         case ActionType.SET_CUSTOM_VIRUS_GENOME: { // Setting virus genome.
@@ -908,6 +913,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return {
                 ...initialState,
                 ...getSetGenomeObject(containers[0][0]),
+                darkTheme: prevState.darkTheme,
                 containers: containers.map((containerGenomes: string[]) => {
                     let nextViewRegion = null;
                     let nextTracks: TrackModel[] = [];
@@ -970,17 +976,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);
             return prevState;
-    }
-}
-
-// takes an array of strings, and properly adds commas and an and at the end
-function getGenomeContainerTitle(genomes: string[]): string {
-    if (genomes.length === 1) {
-        return genomes[0];
-    } else if (genomes.length === 2) {
-        return `${genomes[0]} and ${genomes[1]}`;
-    } else {
-        return `${genomes.slice(0, -1).join(', ')} and ${genomes[genomes.length - 1]}`;
     }
 }
 
