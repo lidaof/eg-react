@@ -1,4 +1,4 @@
-import AppState, { ActionCreators } from 'AppState';
+import AppState, { ActionCreators, GenomeState } from 'AppState';
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { ArrowBack } from '@material-ui/icons';
@@ -23,6 +23,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion/dist/framer-motion';
 
 import './Nav.css';
+import { getGenomeConfig } from 'model/genomes/allGenomes';
 
 const BASE_TITLE = "WashU Epigenome Browser";
 
@@ -30,6 +31,9 @@ interface NavProps {
     virusBrowserMode: boolean;
     containerTitles: string[] | null;
     pickingGenome: boolean;
+    bundleId: any;
+    
+    editingGenome: GenomeState;
     onGenomeSelected?: (genome: string) => void;
 }
 
@@ -38,6 +42,7 @@ function _Nav(props: NavProps) {
         virusBrowserMode,
         containerTitles,
         pickingGenome,
+        editingGenome,
         onGenomeSelected
     } = props;
     // const theme = useTheme();
@@ -56,6 +61,8 @@ function _Nav(props: NavProps) {
         if (!virusBrowserMode) document.title = BASE_TITLE;
         onGenomeSelected("");
     };
+
+    const genomeConfig = getGenomeConfig(editingGenome.name);
 
     return (
         <AppBar color="transparent" position="static" elevation={0} style={{ borderBottom: pickingGenome ? null : "1px #5f6368 solid", paddingLeft: 10 }}>
@@ -102,7 +109,9 @@ function _Nav(props: NavProps) {
                                 </>
                             ) : (
                                 <>
-                                    <Apps />
+                                    <Apps 
+                                        genomeConfig={genomeConfig}
+                                    />
                                     <Help />
                                     <Settings />
                                     <Share />
@@ -126,8 +135,9 @@ const buttonGroupStyle: React.CSSProperties = {
 };
 
 const mapStateToProps = (state: AppState) => {
+    const [cidx, gidx] = state.editTarget;
     return {
-
+        editingGenome: state.containers[cidx]?.genomes[gidx],
     }
 };
 

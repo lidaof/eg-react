@@ -3,18 +3,12 @@ import Button from '../../egUI/Button'
 import { Menu, MenuItem } from "@material-ui/core";
 import MenuModal from '../MenuModal';
 import RegionSetSelector from "components/RegionSetSelector";
-import { GenomeConfig } from "model/genomes/GenomeConfig";
-import Geneplot from "components/Geneplot/Geneplot";
-import ScatterPlot from "components/Geneplot/ScatterPlot";
 
-interface AppsProps {
-    genomeConfig: GenomeConfig;
+interface TracksProps {
+    
 }
 
-function Apps(props: AppsProps) {
-    const {
-        genomeConfig
-    } = props;
+function Tracks(props: TracksProps) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -35,26 +29,22 @@ function Apps(props: AppsProps) {
                 onClose={handleClose}
             >
                 <MenuModal title="Region Set View">
-                    <RegionSetSelector
-                        genome={genomeConfig.genome}
+                    <RegionSetSelector 
+                        
                     />
                 </MenuModal>
                 <MenuModal title="Gene Plot">
-                    <Geneplot genome={genomeConfig.genome} />
+                    <p>test</p>
                 </MenuModal>
                 <MenuModal title="Scatter Plot">
-                    <ScatterPlot genome={genomeConfig.genome} />
+                    <p>test</p>
                 </MenuModal>
-                {!process.env.REACT_APP_NO_FIREBASE && (
-                    <>
-                        <MenuModal title="Session">
-                            <p>test</p>
-                        </MenuModal>
-                        <MenuModal title="Go Live">
-                            <p>test</p>
-                        </MenuModal>
-                    </>
-                )}
+                <MenuModal title="Session">
+                    <p>test</p>
+                </MenuModal>
+                <MenuModal title="Go Live">
+                    <p>test</p>
+                </MenuModal>
                 <MenuModal title="Screenshot">
                     <p>test</p>
                 </MenuModal>
@@ -69,4 +59,4 @@ function Apps(props: AppsProps) {
     )
 }
 
-export default Apps;
+export default Tracks;

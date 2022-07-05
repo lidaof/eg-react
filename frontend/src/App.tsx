@@ -373,6 +373,8 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     virusBrowserMode={virusBrowserMode}
                     containerTitles={containerTitles}
                     pickingGenome={pickingGenome}
+                    bundleId={bundleId}
+                    {...this.state}
                 />
                 {pickingGenome ? (
                     <div>

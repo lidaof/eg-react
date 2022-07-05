@@ -95,6 +95,7 @@ export interface AppState {
     // TODO: add support for "compatability mode" which won't use the new containers/multiple genome support.
     compatabilityMode: boolean;
     darkTheme?: boolean;
+    editTarget: number[];
 }
 
 // state for a single genome.
@@ -179,6 +180,7 @@ const initialState: AppState = {
     highlights: [],
     compatabilityMode: false,
     darkTheme: prefersDark,
+    editTarget: [0, 0],
 };
 
 enum ActionType {
