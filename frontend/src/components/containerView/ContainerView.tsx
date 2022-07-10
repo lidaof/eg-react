@@ -59,7 +59,7 @@ function _ContainerView(props: StateContainerProps) {
         onMetadataTermsChanged,
         onTitleChanged,
     } = props;
-    const { title, genomes, viewRegion, metadataTerms, regionSets, regionSetView, trackLegendWidth, highlights } = cdata;
+    const { title, genomes, viewRegion, metadataTerms, regionSets, regionSetView, highlights } = cdata;
 
     const [highlightColor, setHighlightColor] = useState("rgba(255, 255, 0, 0.3)");
     const [highlightEnteredRegion, setHighlightEnteredRegion] = useState(true);
@@ -189,7 +189,7 @@ function _ContainerView(props: StateContainerProps) {
             </Grid>
             <div style={{
                 border: "1px solid #C4C4C4",
-                borderRadius: "30px",
+                borderRadius: 30,
                 overflow: "hidden",
             }}>
                 {isShowingNavigator && (

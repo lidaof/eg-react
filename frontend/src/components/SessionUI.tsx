@@ -401,7 +401,7 @@ const enhance = compose(
     )
 );
 
-export const SessionUI = enhance(SessionUINotConnected as any);
+export const SessionUI = enhance(SessionUINotConnected as any) as React.ElementType;
 
 function getFunName() {
     const adjectives = [

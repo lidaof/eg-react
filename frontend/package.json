@@ -189,6 +189,7 @@
     },
     "proxy": "http://localhost:3001/",
     "dependencies": {
-        "framer-motion": "^6.3.16"
+        "framer-motion": "^6.3.16",
+        "notistack": "^1.0.10"
     }
 }

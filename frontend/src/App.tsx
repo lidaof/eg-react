@@ -5,7 +5,7 @@ import _ from "lodash";
 import Notifications from "react-notify-toast";
 import { Offline } from "react-detect-offline";
 // import AppState, { ActionCreators } from "./AppState";
-import { ActionCreators, GenomeState, SyncedContainer } from "./AppState";
+import AppState, { ActionCreators, GenomeState, SyncedContainer } from "./AppState";
 import GenomePickerContainer from "./components/GenomePicker";
 import Nav from "./components/nav/Nav";
 import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
@@ -25,37 +25,31 @@ import "./App.css";
 
 const REGION_EXPANDER = new RegionExpander(1);
 
-interface MapStateToPropsProps {
-    browser: {
-        present: {
-            viewRegion: DisplayedRegionModel;
-            tracks: TrackModel[];
-            bundleId: string;
-            sessionFromUrl: string;
-            trackLegendWidth: number;
-            isShowingNavigator: boolean;
-            customTracksPool: TrackModel[];
-            virusBrowserMode: boolean;
-            highlights: HighlightInterval[];
+function mapStateToProps(state: { browser: { present: AppState } }) {
+    const appState = state.browser.present;
+    const [cidx, gidx] = appState.editTarget;
+    const { compatabilityMode, containers } = appState;
+    const pickingGenome = !(containers && containers.length);
 
-            containers: SyncedContainer[];
-        }
+    let editingGenome = {} as GenomeState, editingContainer = {} as SyncedContainer;
+    if (!pickingGenome && !compatabilityMode) {
+        editingGenome = (appState.containers && appState.containers[cidx].genomes[gidx]) || {} as GenomeState;
+        editingContainer = (appState.containers && appState.containers[cidx]) || {} as SyncedContainer;
     }
-}
 
-function mapStateToProps(state: MapStateToPropsProps) {
     return {
-        viewRegion: state.browser.present.viewRegion,
-        tracks: state.browser.present.tracks,
-        bundleId: state.browser.present.bundleId,
-        sessionFromUrl: state.browser.present.sessionFromUrl,
-        trackLegendWidth: state.browser.present.trackLegendWidth,
-        isShowingNavigator: state.browser.present.isShowingNavigator,
-        customTracksPool: state.browser.present.customTracksPool,
-        virusBrowserMode: state.browser.present.virusBrowserMode,
-        highlights: state.browser.present.highlights,
+        viewRegion: editingContainer.viewRegion || appState.viewRegion,
+        tracks: editingGenome.tracks || appState.tracks,
+        bundleId: appState.bundleId,
+        sessionFromUrl: appState.sessionFromUrl,
+        trackLegendWidth: appState.trackLegendWidth,
+        isShowingNavigator: appState.isShowingNavigator,
+        customTracksPool: editingGenome.customTracksPool || appState.customTracksPool,
+        virusBrowserMode: appState.virusBrowserMode,
+        highlights: editingGenome.highlights || appState.highlights,
 
-        containers: state.browser.present.containers,
+        containers: appState.containers,
+        editTarget: appState.editTarget,
     };
 }
 
@@ -94,6 +88,7 @@ interface AppProps {
     onSetHighlights: (highlights: HighlightInterval[]) => void;
 
     containers: SyncedContainer[];
+    editTarget: number[];
 }
 
 interface AppStateProps {
@@ -156,6 +151,15 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             this.updateOtherPublicHubs(this.props.tracks);
         }
         this.initializeMetaSets(this.props.tracks);
+    }
+
+    componentDidUpdate(prevProps: Readonly<AppProps>): void {
+        if (prevProps.editTarget[0] !== this.props.editTarget[0] || prevProps.editTarget[1] !== this.props.editTarget[1]) {
+            // if does not exist do not update
+            if (this.props.containers && this.props.containers[this.props.editTarget[0]] && this.props.containers[this.props.editTarget[0]].genomes[this.props.editTarget[1]]) {
+                this.updateOtherPublicHubs(this.props.containers[this.props.editTarget[0]].genomes[this.props.editTarget[1]].tracks);
+            }
+        }
     }
 
     UNSAFE_componentWillReceiveProps(nextProps: AppProps) {
@@ -343,8 +347,9 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             onSetImageInfo,
             highlights,
             onSetHighlights,
-
+            customTracksPool,
             containers,
+            editTarget,
         } = this.props;
 
         if (sessionFromUrl) {
@@ -369,12 +374,55 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         }
         return (
             <>
+                {/* <Nav
+                    {...this.state}
+                    // isShowingNavigator={isShowingNavigator}
+                    // onToggleNavigator={onToggleNavigator}
+                    // onToggle3DScene={this.toggle3DScene}
+                    onToggleHighlight={this.toggleHighlight}
+                    onSetEnteredRegion={this.setEnteredRegion}
+                    onSetHighlightColor={this.setHighlightColor}
+                    selectedRegion={viewRegion}
+                    onRegionSelected={onNewViewRegion}
+                    tracks={tracks}
+                    genomeConfig={genomeConfig}
+                    onTracksAdded={this.addTracks}
+                    onTrackRemoved={this.removeTrack}
+                    bundleId={bundleId}
+                    trackLegendWidth={trackLegendWidth}
+                    onLegendWidthChange={onLegendWidthChange}
+                    onAddTracksToPool={this.addTracksToPool}
+                    onHubUpdated={this.updatePublicHubs}
+                    addedTrackSets={tracksUrlSets}
+                    // publicHubs={publicHubs}
+                    removeTrackFromAvailable={this.removeTrackFromAvailable}
+                    addTracktoAvailable={this.addTracktoAvailable}
+                    addTermToMetaSets={this.addTermToMetaSets}
+                    embeddingMode={embeddingMode}
+                    groupedTrackSets={groupedTrackSets}
+                    virusBrowserMode={virusBrowserMode}
+                /> */}
                 <Nav
                     virusBrowserMode={virusBrowserMode}
                     containerTitles={containerTitles}
                     pickingGenome={pickingGenome}
                     bundleId={bundleId}
-                    {...this.state}
+                    availableTrackSets={this.state.availableTrackSets}
+                    // addedTrackSets={tracksUrlSets}
+                    addTermToMetaSets={this.addTermToMetaSets}
+                    addTracktoAvailable={this.addTracktoAvailable}
+                    // customTrackSets={this.state.customTrackSets}
+                    addedTrackSets={tracksUrlSets}
+                    removeTrackFromAvailable={this.removeTrackFromAvailable}
+                    onAddTracksToPool={this.addTracksToPool}
+                    customTracksPool={customTracksPool}
+                    genomeConfig={genomeConfig}
+                    onHubUpdated={this.updatePublicHubs}
+                    publicHubs={this.state.publicHubs}
+                    onTrackRemoved={this.removeTrack}
+                    onTracksAdded={this.addTracks}
+                    publicTracksPool={this.state.publicTracksPool}
+                    groupedTrackSets={groupedTrackSets}
                 />
                 {pickingGenome ? (
                     <div>

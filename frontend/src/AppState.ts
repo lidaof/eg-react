@@ -95,7 +95,7 @@ export interface AppState {
     // TODO: add support for "compatability mode" which won't use the new containers/multiple genome support.
     compatabilityMode: boolean;
     darkTheme?: boolean;
-    editTarget: number[];
+    editTarget: [number, number] // [containerIdx, genomeIdx];
 }
 
 // state for a single genome.
@@ -126,7 +126,6 @@ export interface SyncedContainer {
     metadataTerms: string[];
     regionSets: RegionSet[];
     regionSetView: RegionSet;
-    trackLegendWidth: number;
     highlights: HighlightInterval[];
 }
 
@@ -147,7 +146,6 @@ const initialContainer: SyncedContainer = {
     metadataTerms: [],
     regionSets: [],
     regionSetView: null,
-    trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
     highlights: [],
 }
 
@@ -211,6 +209,7 @@ enum ActionType {
     SET_TITLE = "SET_TITLE",
     CREATE_NEW_CONTAINER = "CREATE_NEW_CONTAINER",
     SET_DARK_THEME = "SET_DARK_THEME",
+    SET_EDIT_TARTGET = "SET_EDIT_TARGET",
 }
 
 interface AppAction {
@@ -355,6 +354,10 @@ export const ActionCreators = {
     setDarkTheme: (darkTheme: boolean) => {
         return { type: ActionType.SET_DARK_THEME, darkTheme };
     },
+
+    setEditTarget: (editTarget: number[]) => {
+        return { type: ActionType.SET_EDIT_TARTGET, editTarget };
+    }
 };
 
 export const ContainerActionsCreatorsFactory = (containerIdx: number) => {
@@ -601,12 +604,12 @@ function getInitialState(): AppState {
             console.error(error);
         }
     }
-
+    if (!state.editTarget) state.editTarget = [0, 0];
     return state;
 }
 
 function getNextState(prevState: AppState, action: AppAction): AppState {
-    console.log("🚀 ~ file: AppState.ts ~ line 539 ~ getNextState ~ action", action)
+    console.log("🚀 ~ file: AppState.ts ~ line 539 ~ getNextState ~ action", action);
     if (!prevState) {
         return getInitialState();
     }
@@ -729,12 +732,19 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         }
         case ActionType.SET_TRACKS: {
             const { tracks, containerIdx, genomeIdx } = action;
+            let cidx, gidx: number;
+            if (containerIdx) {
+                cidx = containerIdx;
+                gidx = genomeIdx;
+            } else {
+                [cidx, gidx] = prevState.editTarget;
+            }
             return {
                 ...prevState,
-                containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
+                containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
                     return {
                         ...c,
-                        genomes: modifyArrayAtIdx(c.genomes, genomeIdx, (g => {
+                        genomes: modifyArrayAtIdx(c.genomes, gidx, (g => {
                             return {
                                 ...g,
                                 tracks,
@@ -897,7 +907,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             const newContainer: SyncedContainer = {
                 ...prevState.containers[containerIdx],
                 title: prevState.containers[containerIdx].genomes[genomeIdx].name,
-                genomes: [...prevState.containers[containerIdx].genomes].filter((_g, idx) => idx == genomeIdx),
+                genomes: [...prevState.containers[containerIdx].genomes].filter((_g, idx) => idx === genomeIdx),
             }
             return {
                 ...prevState,
@@ -974,6 +984,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         }
         case ActionType.SET_DARK_THEME:
             return { ...prevState, darkTheme: action.darkTheme };
+        case ActionType.SET_EDIT_TARTGET:
+            return { ...prevState, editTarget: action.editTarget };
         default:
             // console.warn("Unknown change state action; ignoring.");
             // console.warn(action);

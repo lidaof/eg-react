@@ -1,5 +1,5 @@
-import AppState, { ActionCreators, GenomeState } from 'AppState';
-import React, { useEffect, useState } from 'react';
+import AppState, { ActionCreators, GenomeState, SyncedContainer } from 'AppState';
+import React, { useCallback, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { ArrowBack } from '@material-ui/icons';
 import { AppIcon } from '../GenomePicker';
@@ -11,6 +11,7 @@ import Apps from './items/AppsMenu';
 import Help from './items/HelpMenu';
 import Settings from './items/SettingsMenu';
 import Share from './items/ShareMenu';
+import Tracks from './items/TracksMenu';
 import {
     AppBar,
     IconButton,
@@ -23,18 +24,49 @@ import {
 import { motion, AnimatePresence } from 'framer-motion/dist/framer-motion';
 
 import './Nav.css';
-import { getGenomeConfig } from 'model/genomes/allGenomes';
+import { getGenomeConfig, getSpeciesInfo } from 'model/genomes/allGenomes';
+import Track from 'components/trackVis/commonComponents/Track';
+import { RegionExpander } from 'model/RegionExpander';
+import { ALIGNMENT_TYPES, INTERACTION_TYPES } from 'components/trackConfig/getTrackConfig';
+import _ from 'lodash';
 
 const BASE_TITLE = "WashU Epigenome Browser";
+const REGION_EXPANDER1 = new RegionExpander(1);
+const REGION_EXPANDER0 = new RegionExpander(0);
 
 interface NavProps {
     virusBrowserMode: boolean;
     containerTitles: string[] | null;
     pickingGenome: boolean;
-    bundleId: any;
-    
-    editingGenome: GenomeState;
+    bundleId: string;
+    availableTrackSets: Set<string>;
+    onTracksAdded: Function;
+    onTrackRemoved: Function;
+    onAddTracksToPool: Function;
+    publicTracksPool: any;
+    publicHubs: any;
+    onHubUpdated: Function;
+    customTracksPool: any;
+    // publicTrackSets: any;
+    // customTrackSets: any;
+    addTermToMetaSets: Function;
+    genomeConfig: any;
+    groupedTrackSets: any;
+    addTracktoAvailable: Function;
+    removeTrackFromAvailable: Function;
+    addedTrackSets: Set<string>;
+
+    // Redux props
+    editingGenome?: GenomeState;
+    editingContainer?: SyncedContainer;
     onGenomeSelected?: (genome: string) => void;
+    darkTheme?: boolean;
+    onToggleNavigator?: () => void;
+    isShowingNavigator?: boolean;
+    onToggleVR?: () => void;
+    isShowingVR?: boolean;
+    trackLegendWidth?: number;
+    onLegendWidthChanged?: (width: number) => void;
 }
 
 function _Nav(props: NavProps) {
@@ -43,13 +75,36 @@ function _Nav(props: NavProps) {
         containerTitles,
         pickingGenome,
         editingGenome,
-        onGenomeSelected
+        editingContainer,
+        bundleId,
+        availableTrackSets,
+        onTracksAdded,
+        onTrackRemoved,
+        onAddTracksToPool,
+        publicTracksPool,
+        publicHubs,
+        onHubUpdated,
+        customTracksPool,
+        // publicTrackSets,
+        // customTrackSets,
+        addedTrackSets,
+        addTermToMetaSets,
+        groupedTrackSets,
+        addTracktoAvailable,
+        removeTrackFromAvailable,
+        onGenomeSelected,
+        darkTheme,
+        onToggleNavigator,
+        isShowingNavigator,
+        onToggleVR,
+        isShowingVR,
+        trackLegendWidth,
+        onLegendWidthChanged,
     } = props;
     // const theme = useTheme();
     // const smallscreen = useMediaQuery(theme.breakpoints.down('sm'));
     const [title, setTitle] = useState<string>("WashU Epigenome Browser");
 
-    // change the title whenever containertitles changes using getgenomecontainertitle
     useEffect(() => {
         if (pickingGenome) return setTitle(BASE_TITLE);
         const titleText = containerTitles.length > 3 ? "Multiple Genomes" : getGenomeContainerTitle(containerTitles);
@@ -62,7 +117,17 @@ function _Nav(props: NavProps) {
         onGenomeSelected("");
     };
 
-    const genomeConfig = getGenomeConfig(editingGenome.name);
+    const genomeConfig = editingGenome && getGenomeConfig(editingGenome.name);
+
+    let genomeName, name, logo, color, expansionTypes, hasExpansionTrack, REGION_EXPANDER;
+
+    if (!pickingGenome) {
+        const genomeName = genomeConfig.genome.getName();
+        const { name, logo, color } = getSpeciesInfo(genomeName);
+        const expansionTypes = INTERACTION_TYPES.concat(ALIGNMENT_TYPES);
+        const hasExpansionTrack = editingGenome.tracks.some((model) => expansionTypes.includes(model.type)) ? true : false;
+        const REGION_EXPANDER = hasExpansionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
+    }
 
     return (
         <AppBar color="transparent" position="static" elevation={0} style={{ borderBottom: pickingGenome ? null : "1px #5f6368 solid", paddingLeft: 10 }}>
@@ -109,12 +174,44 @@ function _Nav(props: NavProps) {
                                 </>
                             ) : (
                                 <>
-                                    <Apps 
+                                    <Tracks
+                                        tracks={editingGenome.tracks}
+                                        onTracksAdded={onTracksAdded}
+                                        onTrackRemoved={onTrackRemoved}
+                                        onAddTracksToPool={onAddTracksToPool}
+                                        publicTracksPool={publicTracksPool}
+                                        publicHubs={publicHubs}
+                                        onHubUpdated={onHubUpdated}
+                                        // publicTrackSets={publicTrackSets}
+                                        customTracksPool={customTracksPool}
+                                        // customTrackSets={customTrackSets}
+                                        addedTrackSets={addedTrackSets}
+                                        addTermToMetaSets={addTermToMetaSets}
                                         genomeConfig={genomeConfig}
+                                        groupedTrackSets={groupedTrackSets}
+                                        availableTrackSets={availableTrackSets}
+                                        addTracktoAvailable={addTracktoAvailable}
+                                        removeTrackFromAvailable={removeTrackFromAvailable}
+                                    />
+                                    <Apps
+                                        genomeConfig={genomeConfig}
+                                        bundleId={bundleId}
+                                        hasExpansionTrack={hasExpansionTrack}
+                                        highlights={editingGenome && editingGenome.highlights}
+                                        regionExpander={REGION_EXPANDER}
+                                        viewRegion={editingContainer && editingContainer.viewRegion}
+                                        darkTheme={darkTheme}
                                     />
                                     <Help />
-                                    <Settings />
                                     <Share />
+                                    <Settings 
+                                        onToggleNavigator={onToggleNavigator}
+                                        isShowingNavigator={isShowingNavigator}
+                                        onToggleVR={onToggleVR}
+                                        isShowingVR={isShowingVR}
+                                        trackLegendWidth={trackLegendWidth}
+                                        onLegendWidthChanged={onLegendWidthChanged}
+                                    />
                                 </>
                             )}
                         </div>
@@ -134,15 +231,25 @@ const buttonGroupStyle: React.CSSProperties = {
     marginRight: 10,
 };
 
-const mapStateToProps = (state: AppState) => {
-    const [cidx, gidx] = state.editTarget;
+const mapStateToProps = (state: { browser: { present: AppState } }, ownProps: NavProps) => {
+    if (ownProps.pickingGenome) return {};
+    const [cidx, gidx] = state.browser.present.editTarget;
+
     return {
-        editingGenome: state.containers[cidx]?.genomes[gidx],
+        editingGenome: state.browser.present.containers && state.browser.present.containers[cidx].genomes[gidx],
+        editingContainer: state.browser.present.containers && state.browser.present.containers[cidx],
+        darkTheme: state.browser.present.darkTheme,
+        isShowingNavigator: state.browser.present.isShowingNavigator,
+        isShowingVR: state.browser.present.isShowingVR,
+        trackLegendWidth: state.browser.present.trackLegendWidth,
     }
 };
 
 const callbacks = {
     onGenomeSelected: ActionCreators.setGenome,
+    onToggleNavigator: ActionCreators.toggleNavigator,
+    onToggleVR: ActionCreators.toggleVR,
+    onLegendWidthChanged: ActionCreators.setTrackLegendWidth,
 }
 
 const Nav = connect(mapStateToProps, callbacks)(_Nav);

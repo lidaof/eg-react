@@ -87,6 +87,7 @@ export class AppStateLoader {
             containers: object.containers,
             compatabilityMode: object.compatabilityMode,
             darkTheme: object.darkTheme || false,
+            editTarget: object.editTarget,
             // threedTracks: object.threedTracks.map((data: any) => TrackModel.deserialize(data)),
         };
     }
