@@ -18,6 +18,7 @@ class HubPane extends React.PureComponent {
         addTermToMetaSets: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
         publicTrackSets: PropTypes.instanceOf(Set),
+        navigateToScreen: PropTypes.func
     };
 
     // constructor(props) {
@@ -69,6 +70,7 @@ class HubPane extends React.PureComponent {
                         addedTrackSets={this.props.addedTrackSets}
                         addTermToMetaSets={this.props.addTermToMetaSets}
                         contentColorSetup={this.props.contentColorSetup}
+                        navigateToScreen={this.props.navigateToScreen}
                     />
                 ) : (
                     <p>No tracks from data hubs yet. Load a hub first.</p>

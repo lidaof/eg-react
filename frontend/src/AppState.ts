@@ -108,6 +108,10 @@ export interface GenomeState {
 
     // if nullable, the data starts off as null and uses the global values. these values can be overridden locally.
     highlights: HighlightInterval[] | null;
+    
+    metadataTerms: string[];
+    regionSets: RegionSet[];
+    regionSetView: RegionSet;
 
     settings: GenomeSettings;
 }
@@ -123,9 +127,6 @@ export interface SyncedContainer {
     genomes: GenomeState[];
 
     viewRegion: DisplayedRegionModel;
-    metadataTerms: string[];
-    regionSets: RegionSet[];
-    regionSetView: RegionSet;
     highlights: HighlightInterval[];
 }
 
@@ -143,9 +144,6 @@ const initialContainer: SyncedContainer = {
     genomes: [],
 
     viewRegion: null,
-    metadataTerms: [],
-    regionSets: [],
-    regionSetView: null,
     highlights: [],
 }
 
@@ -178,7 +176,7 @@ const initialState: AppState = {
     highlights: [],
     compatabilityMode: false,
     darkTheme: prefersDark,
-    editTarget: [0, 0],
+    editTarget: [0, 0] // [containerIdx, genomeIdx];
 };
 
 enum ActionType {
@@ -638,8 +636,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     tracks: nextTracks,
 
                     highlights: [],
-
+                    metadataTerms: [],
+                    regionSets: [],
+                    regionSetView: null,
                     settings: initialContainerSettings,
+                    genomeConfig
                 })],
                 darkTheme: prevState.darkTheme
             };
@@ -649,6 +650,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             const genomeContainers: SyncedContainer[] = genomeNames.map((name: string) => {
                 let nextViewRegion = null;
                 let nextTracks: TrackModel[] = [];
+                const genomeConfig = getGenomeConfig(name);
                 const {
                     navContext,
                     defaultRegion,
@@ -659,8 +661,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     // publicHubList,
                     // annotationTracks,
                     // twoBitURL,
-                } = getGenomeConfig(name);
-                if (config) {
+                } = genomeConfig;
+                if (genomeConfig) {
                     nextViewRegion = new DisplayedRegionModel(navContext, ...defaultRegion);
                     nextTracks = defaultTracks;
                 }
@@ -670,8 +672,11 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     tracks: nextTracks,
 
                     highlights: [],
-
+                    metadataTerms: [],
+                    regionSets: [],
+                    regionSetView: null,
                     settings: initialContainerSettings,
+                    genomeConfig,
                 });
             });
             return {
@@ -681,7 +686,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 darkTheme: prevState.darkTheme
             }
         }
-        case ActionType.SET_CUSTOM_VIRUS_GENOME: { // Setting virus genome.
+        case ActionType.SET_CUSTOM_VIRUS_GENOME: { // Setting virus genome. // TODO: allow to use with containers
             const virusTracks = action.tracks.map((data: any) => TrackModel.deserialize(data));
             const genome = new Genome(action.name, [new Chromosome(action.seqId, action.seq.length)]);
             const navContext = genome.makeNavContext();
@@ -706,7 +711,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 genomeConfig: virusGenomeConfig,
             };
         }
-        // take idx
         case ActionType.SET_VIEW_REGION: {
             let { start, end, containerIdx } = action;
             if (!prevState.containers[containerIdx].viewRegion) {
@@ -732,6 +736,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         }
         case ActionType.SET_TRACKS: {
             const { tracks, containerIdx, genomeIdx } = action;
+            
             let cidx, gidx: number;
             if (containerIdx) {
                 cidx = containerIdx;
@@ -741,6 +746,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             }
             return {
                 ...prevState,
+                tracks: tracks.filter((t: TrackModel) => t.type === "g3d"),
                 containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
                     return {
                         ...c,
@@ -751,7 +757,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                             };
                         }))
                     }
-                }))
+                })),
             };
         }
         case ActionType.SET_METADATA_TERMS:
@@ -766,7 +772,22 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 }))
             };
         case ActionType.SET_REGION_SET_LIST:
-            return { ...prevState, regionSets: action.list };
+            const [cidx, gidx] = prevState.editTarget;
+
+            return {
+                ...prevState,
+                containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
+                    return {
+                        ...c,
+                        genomes: modifyArrayAtIdx(c.genomes, gidx, (g => {
+                            return {
+                                ...g,
+                                regionSetList: action.regionSetList,
+                            };
+                        }))
+                    }
+                })),
+            };
         case ActionType.SET_REGION_SET_VIEW:
             return handleRegionSetViewChange(prevState, action.set);
         case ActionType.SET_TRACK_LEGEND_WIDTH:
@@ -852,7 +873,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         case ActionType.SET_GENOME_CONTAINER: {
             const { containerIdx, newContainerIdx, genomeIdx } = action;
             const curGenome: GenomeState = prevState.containers[containerIdx].genomes[genomeIdx];
-
+            // TODO: update editing target 
             return {
                 ...prevState,
                 containers: prevState.containers.map((c, idx) => {
@@ -904,6 +925,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         }
         case ActionType.CREATE_NEW_CONTAINER: {
             const { containerIdx, genomeIdx } = action;
+            // TODO: update editing target
             const newContainer: SyncedContainer = {
                 ...prevState.containers[containerIdx],
                 title: prevState.containers[containerIdx].genomes[genomeIdx].name,
@@ -952,6 +974,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                         genomes: containerGenomes.map(name => {
                             let nextViewRegion = null;
                             let nextTracks: TrackModel[] = [];
+                            const genomeConfig = getGenomeConfig(name);
                             const {
                                 navContext,
                                 defaultRegion,
@@ -962,8 +985,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                                 // publicHubList,
                                 // annotationTracks,
                                 // twoBitURL,
-                            } = getGenomeConfig(name);
-                            if (config) {
+                            } = genomeConfig;
+                            if (genomeConfig) {
                                 nextViewRegion = new DisplayedRegionModel(navContext, ...defaultRegion);
                                 nextTracks = defaultTracks;
                             }
@@ -976,6 +999,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                                 highlights: [],
 
                                 settings: initialContainerSettings,
+                                genomeConfig
                             };
                         }),
                     }

@@ -128,7 +128,6 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
             const genome = track.querygenome || track.getMetadata("genome");
             const trackConfig = getTrackConfig(track);
             const options = trackConfig.getOptions();
-
             let visRegion, alignment = null;
             if (!genome || genome === this.props.genome) { // Is primary genome?
                 visRegion = primaryView.visRegion;

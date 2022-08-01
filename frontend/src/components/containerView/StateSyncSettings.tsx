@@ -28,6 +28,11 @@ import {
     Select,
     MenuItem,
 } from '@material-ui/core';
+import { useSnackbar } from 'notistack';
+import { ActionCreators as UndoActionCreators } from 'redux-undo';
+import {
+    Close as CloseIcon
+} from '@material-ui/icons'
 
 interface StateSyncSettingsProps {
     containerIdx: number;
@@ -40,6 +45,7 @@ interface StateSyncSettingsProps {
     onGenomeSettingsChanged?: (newSettings: any, genomeIdx: number) => void;
     onSetGenomeContainer?: (genomeIdx: number, newContainerIdx: number) => void;
     onNewContainer?: (genomeIdx: number) => void,
+    onUndo?: () => void;
 }
 
 function _StateSyncSettings(props: StateSyncSettingsProps) {
@@ -52,11 +58,13 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
         onGenomeSettingsChanged,
         onSetGenomeContainer,
         onNewContainer,
+        onUndo,
     } = props;
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const setGenomeSettings = (newSettings: any) => onGenomeSettingsChanged(newSettings, props.genomeIdx);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     const { syncHighlights, offsetAmount, } = genomeSettings;
     const [offsetValue, setOffsetValue] = useState<string>(offsetAmount.toString());
@@ -142,6 +150,20 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
                             label="Container"
                             onChange={(e) => {
                                 setOpen(false);
+                                const action = (snackbarId: number) => (
+                                    <>
+                                        <Button color="secondary" size="small" onClick={() => {
+                                            onUndo();
+                                            closeSnackbar(snackbarId);
+                                        }}>Undo</Button>
+                                        <IconButton onClick={() => closeSnackbar(snackbarId)} style={{ color: 'white' }}>
+                                            <CloseIcon />
+                                        </IconButton>
+                                    </>
+                                )
+                                enqueueSnackbar("Genome moved.", {
+                                    action
+                                });
                                 e.target.value !== -1 && onSetGenomeContainer(props.genomeIdx, e.target.value as number);
                             }}
                         >
@@ -166,10 +188,12 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
 
 const mapDispatchToPropsFactory = (dispatch: Dispatch<Action>, ownProps: StateSyncSettingsProps) => {
     const specializedActionCreators = ContainerActionsCreatorsFactory(ownProps.containerIdx);
+
     return {
         onGenomeSettingsChanged: (newSettings: any, genomeIdx: number) => dispatch(specializedActionCreators.setGenomeSettings(newSettings, genomeIdx)),
         onSetGenomeContainer: (genomeIdx: number, newContainerIdx: number) => dispatch(specializedActionCreators.setGenomeContainer(genomeIdx, newContainerIdx)),
         onNewContainer: (genomeIdx: number) => dispatch(specializedActionCreators.createNewContainer(genomeIdx)),
+        onUndo: () => dispatch(UndoActionCreators.undo()),
     }
 }
 

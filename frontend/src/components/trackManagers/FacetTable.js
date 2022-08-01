@@ -25,6 +25,7 @@ class FacetTable extends Component {
         addTermToMetaSets: PropTypes.func,
         addedTrackSets: PropTypes.instanceOf(Set),
         publicTrackSets: PropTypes.instanceOf(Set),
+        navigateToScreen: PropTypes.func,
     };
 
     static defaultProps = {
@@ -382,7 +383,19 @@ class FacetTable extends Component {
         const content = this.props.contentColorSetup ? this.props.contentColorSetup : null;
         return (
             <div>
-                <button onClick={() => this.handleOpenModal(id)} className="facet-item">
+                {/* <button onClick={() => this.handleOpenModal(id)} className="facet-item">
+                    <span className="green">{addUrls.length}</span>/{found.length}
+                </button> */}
+                <button onClick={() => this.props.navigateToScreen(
+                    <HubTrackTable
+                        tracks={found}
+                        addedTrackSets={this.props.addedTrackSets}
+                        onTracksAdded={this.props.onTracksAdded}
+                        rowHeader={rowHeader}
+                        columnHeader={columnHeader}
+                    />,
+                    "Track Table"
+                )} className="facet-item">
                     <span className="green">{addUrls.length}</span>/{found.length}
                 </button>
                 <ReactModal

@@ -8,88 +8,6 @@ import {
 import { NO_SAVE_SESSION, SESSION_KEY, STORAGE } from "AppState";
 import _ from "lodash";
 
-/* 
-<div className="element Nav-center">
-                        <DropdownOpener extraClassName="btn-info" label="⚙Settings" />
-                        <div className="dropdown-menu">
-                            <label className="dropdown-item" htmlFor="switchNavigator">
-                                <input
-                                    id="switchNavigator"
-                                    type="checkbox"
-                                    checked={isShowingNavigator}
-                                    onChange={onToggleNavigator}
-                                />
-                                <span style={{ marginLeft: "1ch" }}>Show genome-wide navigator</span>
-                                <span className="GenomeNavigator-tooltip" role="img" aria-label="genomenavigator">
-                                    ❓
-                                    <div className="GenomeNavigator-tooltiptext">
-                                        <ul style={{ lineHeight: "1.2em", marginBottom: 0 }}>
-                                            <li>Left mouse drag: select</li>
-                                            <li>Right mouse drag: pan</li>
-                                            <li>Mousewheel: zoom</li>
-                                        </ul>
-                                    </div>
-                                </span>
-                            </label>
-                            <label className="dropdown-item" htmlFor="isHighlightRegion">
-                                <input
-                                    id="isHighlightRegion"
-                                    type="checkbox"
-                                    checked={highlightEnteredRegion}
-                                    onChange={onToggleHighlight}
-                                />
-                                <span style={{ marginLeft: "1ch" }}>Highlight entered region</span>
-                            </label>
-                            <label className="dropdown-item">
-                                <ModalMenuItem
-                                    itemLabel="Change highlight color"
-                                    style={{
-                                        content: {
-                                            left: "unset",
-                                            bottom: "unset",
-                                            overflow: "visible",
-                                            padding: "5px",
-                                            zIndex: 5,
-                                        },
-                                        overlay: {
-                                            backgroundColor: "rgba(255, 255, 255, 0.1)",
-                                        },
-                                    }}
-                                >
-                                    <HighlightColorChange color={highlightColor} onChange={onSetHighlightColor} />
-                                </ModalMenuItem>
-                            </label>
-                            {!virusBrowserMode && (
-                                <label className="dropdown-item" htmlFor="switchVR">
-                                    <input id="switchVR" type="checkbox" checked={isShowingVR} onChange={onToggleVR} />
-                                    <span style={{ marginLeft: "1ch" }}>VR mode</span>
-                                </label>
-                            )}
-                            <label className="dropdown-item" htmlFor="cacheToggle">
-                                <input
-                                    id="cacheToggle"
-                                    type="checkbox"
-                                    checked={this.state.isCacheEnabled}
-                                    onChange={this.toggleCache}
-                                />
-                                <span style={{ marginLeft: "1ch" }}>Restore current view after Refresh</span>
-                            </label>
-                            <label className="dropdown-item" htmlFor="setLegendWidth">
-                                <input
-                                    type="number"
-                                    id="legendWidth"
-                                    step="5"
-                                    min="60"
-                                    max="200"
-                                    defaultValue={trackLegendWidth}
-                                    onChange={this.changeLegendWidth}
-                                />
-                                <span style={{ marginLeft: "1ch" }}>Change track legend width</span>
-                            </label>
-                        </div>
-                    </div>
-*/
-
 interface SettingsProps {
     onToggleNavigator: () => void;
     isShowingNavigator: boolean;
@@ -153,7 +71,7 @@ function Settings(props: SettingsProps) {
 
     return (
         <>
-            <Button onClick={handleClick}>Settings</Button>
+            <Button style={{ backgroundColor: open && "var(--eg-secondary-container)" }} onClick={handleClick}>Settings</Button>
             <Menu
                 anchorEl={anchorEl}
                 anchorOrigin={{ vertical: "bottom", horizontal: "left" }}

@@ -41,6 +41,7 @@ export class AppStateSaver {
             layout: appState.layout,
             highlights: appState.highlights,
             darkTheme: appState.darkTheme,
+            editTarget: appState.editTarget,
             // threedTracks: appState.threedTracks.filter((track) => !track.fileObj).map((track) => track.serialize()),
         };
         return object;
@@ -85,6 +86,7 @@ export class AppStateLoader {
             highlights: object.highlights || [],
 
             containers: object.containers,
+            // TODO: add logic to properly convert containers.
             compatabilityMode: object.compatabilityMode,
             darkTheme: object.darkTheme || false,
             editTarget: object.editTarget,

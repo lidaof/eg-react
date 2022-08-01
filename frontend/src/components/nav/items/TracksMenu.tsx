@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Button from '../../egUI/Button'
 import { Menu, MenuItem } from "@material-ui/core";
-import MenuModal from '../MenuModal';
+import MenuModal from '../../egUI/MenuModal';
+import NavigableMenuModal from '../../egUI/NavigableMenuModal';
 import RegionSetSelector from "components/RegionSetSelector";
 import FacetTableUI from "components/FacetTableUI";
 import { AnnotationTrackUI } from "components/trackManagers/AnnotationTrackUI";
@@ -68,7 +69,7 @@ function Tracks(props: TracksProps) {
     
     return (
         <>
-            <Button onClick={handleClick}>Tracks</Button>
+            <Button style={{ backgroundColor: open && "var(--eg-secondary-container)" }} onClick={handleClick}>Tracks</Button>
             <Menu
                 anchorEl={anchorEl}
                 anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
@@ -88,7 +89,7 @@ function Tracks(props: TracksProps) {
                         groupedTrackSets={groupedTrackSets}
                     />
                 </MenuModal>
-                <MenuModal closeMenu={handleClose} title="Public Data Hubs" genomeDependent>
+                <NavigableMenuModal closeMenu={handleClose} title="Public Data Hubs" genomeDependent>
                     <HubPane
                         addedTracks={tracks}
                         onTracksAdded={onTracksAdded}
@@ -101,7 +102,7 @@ function Tracks(props: TracksProps) {
                         addedTrackSets={addedTrackSets}
                         addTermToMetaSets={addTermToMetaSets}
                     />
-                </MenuModal>
+                </NavigableMenuModal>
                 <MenuModal closeMenu={handleClose} title="Track Facet Table" genomeDependent>
                     <FacetTableUI
                         publicTracksPool={publicTracksPool}

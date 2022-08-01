@@ -9,7 +9,9 @@ import {
     IconButton,
     Menu,
     MenuItem,
-    Typography
+    Typography,
+    useMediaQuery,
+    useTheme
 } from "@material-ui/core";
 import AppState, { ActionCreators, GenomeState, SyncedContainer } from "AppState";
 import { connect } from "react-redux";
@@ -40,6 +42,8 @@ function _MenuModal(props: MenuModalProps) {
         editTarget,
         editTargets,
     } = props;
+    const theme = useTheme();
+    const smallscreen = useMediaQuery(theme.breakpoints.down('xs'));
     const [open, setOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const menuOpen = Boolean(anchorEl);
@@ -65,12 +69,12 @@ function _MenuModal(props: MenuModalProps) {
                 props.onEditTargetChange(t.location);
             }
             handleMenuClose();
-        }}
+            }}
+            selected={t.selected}
         >
             {t.title}
         </MenuItem>
     ));
-
     return (
         <>
             <MenuItem onClick={handleOpen}>{title}</MenuItem>
@@ -81,11 +85,12 @@ function _MenuModal(props: MenuModalProps) {
                 fullWidth
                 maxWidth="md"
                 PaperProps={{
-                    style: {
+                    style: !smallscreen ? {
                         borderRadius: "30px",
                         height: "75%",
-                    }
+                    } : {}
                 }}
+                fullScreen={smallscreen}
             >
                 <DialogTitle disableTypography>
                     <div
@@ -99,7 +104,7 @@ function _MenuModal(props: MenuModalProps) {
                         <Typography variant="h5" style={{ margin: "15px", marginBottom: 0 }}>
                             {title}
                         </Typography>
-                        {genomeDependent && (
+                        {(genomeDependent && editTargets.length > 1) && (
                             <div
                                 style={{
                                     display: "flex",
@@ -141,6 +146,7 @@ function _MenuModal(props: MenuModalProps) {
 interface EditTargetItem {
     title: string;
     location: number[];
+    selected: boolean;
 }
 
 const mapStateToProps = (_state: { browser: { present: AppState } }, ownProps: MenuModalProps) => {
@@ -148,13 +154,14 @@ const mapStateToProps = (_state: { browser: { present: AppState } }, ownProps: M
     const state = _state.browser.present;
     const [cidx, gidx] = state.editTarget;
 
-    const editTargets = [];
+    const editTargets: EditTargetItem[] = [];
 
     for (let c = 0; c < state.containers.length; c++) {
         for (let g = 0; g < state.containers[c].genomes.length; g++) {
             editTargets.push({
-                title: `${state.containers[c].title} // ${state.containers[c].genomes[g].name}`,
-                location: [c, g]
+                title: `${state.containers[c].genomes[g].name}`,
+                location: [c, g],
+                selected: c === cidx && g === gidx,
             });
         }
     }

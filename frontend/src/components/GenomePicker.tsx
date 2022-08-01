@@ -33,7 +33,8 @@ import { treeOfLife, phasedTreeOfLife, } from "../model/genomes/allGenomes";
 import { SessionUI } from "./SessionUI";
 import DarkMode from "./DarkMode";
 import Logo from '../images/logo.png'
-import { motion, AnimatePresence } from 'framer-motion'
+// @ts-ignore
+import { motion, AnimatePresence } from 'framer-motion/dist/framer-motion';
 
 import "./GenomePicker.css";
 import { Brightness2 } from "@material-ui/icons";
@@ -96,6 +97,24 @@ function a11yProps(index: number) {
     };
 }
 
+function NoResults() {
+    return (
+        <div style={{ display: 'grid', placeItems: 'center', height: "32vh", marginTop: 100, width: "100%" }}>
+            <img
+                src="https://epigenomegateway.wustl.edu/browser/favicon-144.png"
+                alt="Browser Icon"
+                style={{ height: 125, width: "auto", marginLeft: 20, marginRight: 20 }}
+            />
+            <Typography variant="h4">
+                No results
+            </Typography>
+            <Typography variant="h5" style={{ width: '50vh', textAlign: 'center' }}>
+                Search for a genome by species or assembly name and it will show up here.
+            </Typography>
+        </div>
+    )
+}
+
 interface GenomePickerProps {
     onGenomeSelected: (name: string) => void;
     onMultipleGenomeSelected: (names: string[]) => void;
@@ -106,13 +125,14 @@ export function GenomePicker(props: GenomePickerProps) {
     const [searchText, setSearchText] = useState<string>("");
     const [shiftHeld, setShiftHeld] = useState<boolean>(false);
     const [genomesSelected, setGenomesSelected] = useState<{ [key: string]: boolean }>({});
+    const debouncedSetSearchText = useCallback(_.debounce(setSearchText, 250), []);
 
     const downHandler = ({ key }: { key: string }) => {
         if (key === 'Shift') { return setShiftHeld(true); }
         if (key === 'Escape') {
             setGenomesSelected({});
         }
-    }
+    };
 
     const upHandler = ({ key }: { key: string }) => {
         if (key === 'Shift') {
@@ -124,14 +144,20 @@ export function GenomePicker(props: GenomePickerProps) {
                 setShiftHeld(false);
             }
         }
-    }
+    };
+
+    const focusHandler = () => {
+        setShiftHeld(false);
+    };
 
     useEffect(() => {
         window.addEventListener('keydown', downHandler);
         window.addEventListener('keyup', upHandler);
+        window.addEventListener('focus', focusHandler);
         return () => {
             window.removeEventListener('keydown', downHandler);
             window.removeEventListener('keyup', upHandler);
+            window.removeEventListener('focus', focusHandler);
         };
     }, [genomesSelected]);
 
@@ -143,8 +169,6 @@ export function GenomePicker(props: GenomePickerProps) {
         }
     }
 
-    // Map the genomes to a list of cards. Genome search engine filters by both the species and the different assemblies.
-    // It is not case sensitive.
     const renderTreeCards = () => {
         return (
             Object.entries(treeOfLife)
@@ -163,7 +187,25 @@ export function GenomePicker(props: GenomePickerProps) {
                     }
                     return (
                         // @ts-ignore
-                        <Grid item xs={12} md={4} align="center" key={idx}>
+                        <Grid
+                            item
+                            xs={12}
+                            md={4}
+                            align="center"
+                            key={species2}
+                            component={motion.div}
+                            layout
+                            animate={{ opacity: 1 }}
+                            initial={{ opacity: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            style={{
+                                height: 270,
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                            }}
+                        >
                             <GenomePickerCard
                                 species={species2}
                                 details={{ logoUrl: details.logoUrl, assemblies: filteredAssemblies }}
@@ -188,12 +230,14 @@ export function GenomePicker(props: GenomePickerProps) {
         metaText = "Hold shift to select multiple";
     }
 
+    const treeCards = renderTreeCards();
+
     return (
         <Container maxWidth="md">
             <Grid container spacing={4}>
                 <Grid item xs={12} md={6}>
                     <Typography variant="h4" style={{ margin: "25px", marginLeft: 0, marginBottom: 0 }}>
-                        {props.title || "Please select a genome"}
+                        {props.title || "Select a genome"}
                     </Typography>
                     <Typography variant="body1" style={{ margin: 3 }}>
                         {metaText}
@@ -214,12 +258,22 @@ export function GenomePicker(props: GenomePickerProps) {
                                 </InputAdornment>
                             ),
                         }}
-                        onChange={(e) => setSearchText(e.target.value)}
+                        onChange={(e) => debouncedSetSearchText(e.target.value)}
                     />
                 </Grid>
             </Grid>
-            <Grid container spacing={2}>
-                {renderTreeCards()}
+            <Grid
+                container
+                spacing={2}
+                component={motion.div}
+                animate={{ opacity: 1 }}
+                initial={{ opacity: 0 }}
+                exit={{ opacity: 0 }}
+                layout
+            >
+                <AnimatePresence>
+                    {treeCards.length ? treeCards : <NoResults />}
+                </AnimatePresence>
             </Grid>
         </Container>
     )
@@ -232,14 +286,13 @@ interface PhasedGenomePickerProps {
 
 function PhasedGenomePicker(props: PhasedGenomePickerProps) {
     const [searchText, setSearchText] = useState<string>("");
+    const debouncedSetSearchText = useCallback(_.debounce(setSearchText, 250), []);
 
     const handleGenomePicked = (genomeName: string, assemblyIdx: number) => {
         // TODO: allow the user to click a specific assembly group in the phased genome picker card
         props.onSetMultipleGenomesWithContainer([phasedTreeOfLife[genomeName].groupedAssemblies[assemblyIdx]]);
     }
 
-    // Map the genomes to a list of cards. Genome search engine filters by both the species and the different assemblies.
-    // It is not case sensitive.
     const renderTreeCards = () => {
         return Object.entries(phasedTreeOfLife)
             .filter(([species2, details]) => {
@@ -253,7 +306,25 @@ function PhasedGenomePicker(props: PhasedGenomePickerProps) {
                 const assemblyStrs = groupedAssemblies.map((e) => getGenomeContainerTitle(e));
                 return (
                     // @ts-ignore
-                    <Grid item xs={12} md={4} align="center" key={idx}>
+                    <Grid
+                        item
+                        xs={12}
+                        md={4}
+                        align="center"
+                        key={species2}
+                        component={motion.div}
+                        layout
+                        animate={{ opacity: 1 }}
+                        initial={{ opacity: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        style={{
+                            height: 270,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                        }}
+                    >
                         <PhasedGenomeCard
                             species={species2}
                             details={{ logoUrl: details.logoUrl, assemblies: assemblyStrs }}
@@ -263,6 +334,8 @@ function PhasedGenomePicker(props: PhasedGenomePickerProps) {
                 );
             });
     };
+
+    const treeCards = renderTreeCards();
 
     return (
         <Container maxWidth="md">
@@ -287,12 +360,22 @@ function PhasedGenomePicker(props: PhasedGenomePickerProps) {
                                 </InputAdornment>
                             ),
                         }}
-                        onChange={(e) => setSearchText(e.target.value)}
+                        onChange={(e) => debouncedSetSearchText(e.target.value)}
                     />
                 </Grid>
             </Grid>
-            <Grid container spacing={2}>
-                {renderTreeCards()}
+            <Grid
+                container
+                spacing={2}
+                component={motion.div}
+                animate={{ opacity: 1 }}
+                initial={{ opacity: 0 }}
+                exit={{ opacity: 0 }}
+                layout
+            >
+                <AnimatePresence>
+                    {treeCards.length ? treeCards : <NoResults />}
+                </AnimatePresence>
             </Grid>
         </Container>
     )
@@ -318,7 +401,7 @@ function GenomePickerContainer(props: GenomePickerContainerProps) {
     };
 
     return (
-        <div>
+        <div style={{ marginBottom: 50 }}>
             <AppBar position="static" color="default" >
                 <Tabs
                     value={value}
@@ -328,35 +411,46 @@ function GenomePickerContainer(props: GenomePickerContainerProps) {
                     variant="fullWidth"
                     aria-label="genome picker"
                 >
-                    <Tab label="Genomes" {...a11yProps(0)} />
-                    <Tab label="Phased Genomes" {...a11yProps(1)} />
-                    <Tab label="Load a session" {...a11yProps(2)} />
+                    <Tab style={{ outline: 'none' }} label="Genomes" {...a11yProps(0)} />
+                    <Tab style={{ outline: 'none' }} label="Phased Genomes" {...a11yProps(1)} />
+                    <Tab style={{ outline: 'none' }} label="Load a session" {...a11yProps(2)} />
                 </Tabs>
             </AppBar>
-            <SwipeableViews
+            {/* <SwipeableViews
                 axis={theme.direction === "rtl" ? "x-reverse" : "x"}
                 index={value}
                 onChangeIndex={handleChangeIndex}
-            >
-                <TabPanel value={value} index={0} dir={theme.direction}>
-                    <GenomePicker onGenomeSelected={props.onGenomeSelected} onMultipleGenomeSelected={props.onMultipleGenomeSelected} />
-                </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
-                    <PhasedGenomePicker
-                        onSetMultipleGenomesWithContainer={props.onMultipleGenomesWithContainerSelected}
-                        onSetMultipleGenomes={props.onMultipleGenomeSelected}
-                    />
-                </TabPanel>
-                <TabPanel value={value} index={2} dir={theme.direction}>
-                    {!process.env.REACT_APP_NO_FIREBASE ? (
-                        // @ts-ignore
-                        <SessionUI bundleId={props.bundleId} withGenomePicker={true} />
-                    ) : (
-                        <p>Session function is only working with Firebase configuration.</p>
-                    )}
-                </TabPanel>
-                {/* <TabPanel value={value} index */}
-            </SwipeableViews>
+                animateTransitions={false}
+            > */}
+            <AnimatePresence exitBeforeEnter>
+                <motion.div
+                    key={value}
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -10, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    <TabPanel value={value} index={0} dir={theme.direction}>
+                        <GenomePicker onGenomeSelected={props.onGenomeSelected} onMultipleGenomeSelected={props.onMultipleGenomeSelected} />
+                    </TabPanel>
+                    <TabPanel value={value} index={1} dir={theme.direction}>
+                        <PhasedGenomePicker
+                            onSetMultipleGenomesWithContainer={props.onMultipleGenomesWithContainerSelected}
+                            onSetMultipleGenomes={props.onMultipleGenomeSelected}
+                        />
+                    </TabPanel>
+                    <TabPanel value={value} index={2} dir={theme.direction}>
+                        {!process.env.REACT_APP_NO_FIREBASE ? (
+                            // @ts-ignore
+                            <SessionUI bundleId={props.bundleId} withGenomePicker={true} />
+                        ) : (
+                            <p>Session function is only working with Firebase configuration.</p>
+                        )}
+                    </TabPanel>
+                </motion.div>
+            </AnimatePresence>
+            {/* <TabPanel value={value} index */}
+            {/* </SwipeableViews> */}
         </div>
     );
 }
@@ -464,7 +558,7 @@ function GenomePickerCard(props: GenomePickerCardProps) {
     const styles = useStyles();
     const { species, selected, details, onChoose } = props;
     const { logoUrl, assemblies } = details;
-    
+
 
 
     const renderAssemblies = () => {

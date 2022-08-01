@@ -192,7 +192,6 @@ class HubTrackTable extends React.PureComponent {
         });
         return (
             <React.Fragment>
-                <h1>Track table</h1>
                 <label htmlFor="searchTrack">Search tracks</label>
                 <input
                     type="text"

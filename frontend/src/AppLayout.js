@@ -25,6 +25,8 @@ import OmeroContainer from "components/trackVis/imageTrack/OmeroContainer";
 
 // import "../node_modules/flexlayout-react/style/light.css";
 import "./AppLayout.css";
+import { SnackbarProvider, closeSnackbar, withSnackbar } from "notistack";
+import { createTheme, CssBaseline, Grow, ThemeProvider, } from "@material-ui/core";
 
 /**
  * generate layout when VR is on, or g3d track submitted etc
@@ -62,6 +64,11 @@ class AppLayout extends React.PureComponent {
             geneFor3d: null,
             g3dcount: 0,
             imageInfo: null,
+            theme: createTheme({
+                palette: {
+                    type: props.darkTheme ? "dark" : "light",
+                }
+            })
         };
         this.handleNodeResize = _.debounce(this.handleNodeResize, 250);
     }
@@ -135,6 +142,15 @@ class AppLayout extends React.PureComponent {
         if (prevProps.layout !== this.props.layout) {
             const g3dcount = this.checkG3dLayout();
             this.setState({ g3dcount });
+        }
+        if (prevProps.darkTheme !== this.props.darkTheme) {
+            this.setState({
+                theme: createTheme({
+                    palette: {
+                        type: this.props.darkTheme ? "dark" : "light",
+                    }
+                })
+            });
         }
     }
 
@@ -297,7 +313,7 @@ class AppLayout extends React.PureComponent {
         //     const newTracks = [...tracks, g3dtrack];
         //     this.props.onTracksChanged(newTracks);
         // }
-        node.setEventListener("close", () => {
+        node.setEventListener("close", () => { // TODO: remove g3d tracks ONLY when the tab is closed
             this.removeTrackById(g3dtrack.id);
             const layout = deleteTabByIdFromModel(model, config.tabId);
             this.props.onSetLayout(layout);
@@ -375,9 +391,21 @@ class AppLayout extends React.PureComponent {
         const model = FlexLayout.Model.fromJson(layout);
         const theme = this.props.darkTheme ? "dark" : "light";
         return (
-            <div style={{ width: "100%", height: "100%" }} id="flex-container" data-theme={theme}>
-                <FlexLayout.Layout model={model} factory={this.factory} />
-            </div>
+            <ThemeProvider theme={this.state.theme}>
+                <CssBaseline />
+                <SnackbarProvider
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }}
+                    TransitionComponent={Grow}
+                    maxSnack={1}
+                >
+                    <div style={{ width: "100%", height: "100%" }} id="flex-container" data-theme={theme}>
+                        <FlexLayout.Layout model={model} factory={this.factory} />
+                    </div>
+                </SnackbarProvider>
+            </ThemeProvider>
         );
 
         // if there is no new tabs, no need to use layout?

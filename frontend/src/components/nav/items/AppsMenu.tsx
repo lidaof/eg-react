@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from '../../egUI/Button'
 import { Menu, MenuItem } from "@material-ui/core";
-import MenuModal from '../MenuModal';
+import MenuModal from '../../egUI/MenuModal';
 import RegionSetSelector from "components/RegionSetSelector";
 import { GenomeConfig } from "model/genomes/GenomeConfig";
 import Geneplot from "components/Geneplot/Geneplot";
@@ -48,7 +48,7 @@ function Apps(props: AppsProps) {
 
     return (
         <>
-            <Button onClick={handleClick}>Apps</Button>
+            <Button style={{ backgroundColor: open && "var(--eg-secondary-container)" }} onClick={handleClick}>Apps</Button>
             <Menu
                 anchorEl={anchorEl}
                 anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
@@ -89,7 +89,7 @@ function Apps(props: AppsProps) {
                 <MenuModal closeMenu={handleClose} title="Dynamic Record">
                     <DynamicRecordUI expansionAmount={regionExpander} genomeConfig={genomeConfig} />
                 </MenuModal>
-                <MenuModal closeMenu={handleClose} title="Fetch Sequence">
+                <MenuModal closeMenu={handleClose} title="Fetch Sequence" genomeDependent>
                     <FetchSequence genomeConfig={genomeConfig} selectedRegion={viewRegion} />
                 </MenuModal>
             </Menu>

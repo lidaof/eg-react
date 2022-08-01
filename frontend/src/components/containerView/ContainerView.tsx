@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core';
 import ContainerTools, { ProvidedControls } from "./ContainerTools";
 import { Tools } from "components/trackContainers/Tools";
-import InlineEditable from "components/InlineEditable";
+import InlineEditable from "components/egUI/InlineEditable";
 
 interface StateContainerProps {
     stateIdx: number;
@@ -59,7 +59,7 @@ function _ContainerView(props: StateContainerProps) {
         onMetadataTermsChanged,
         onTitleChanged,
     } = props;
-    const { title, genomes, viewRegion, metadataTerms, regionSets, regionSetView, highlights } = cdata;
+    const { title, genomes, viewRegion, highlights } = cdata;
 
     const [highlightColor, setHighlightColor] = useState("rgba(255, 255, 0, 0.3)");
     const [highlightEnteredRegion, setHighlightEnteredRegion] = useState(true);
@@ -137,7 +137,7 @@ function _ContainerView(props: StateContainerProps) {
 
                         genome={g.name}
                         viewRegion={viewRegion}
-                        metadataTerms={metadataTerms}
+                        metadataTerms={g.metadataTerms}
 
                         // formerly connected through redux
                         onNewRegion={onSetViewRegion}
@@ -181,7 +181,7 @@ function _ContainerView(props: StateContainerProps) {
                         // TODO: change this to container highlights
                         highlights={genomes[0].highlights}
                         onSetHighlights={(highlights: HighlightInterval[]) => onSetHighlights(highlights, 0)}
-                        metadataTerms={metadataTerms}
+                        metadataTerms={genomes[0].metadataTerms}
                         onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(newTerms, 0)}
                         suggestedMetaSets={suggestedMetaSets}
                     />

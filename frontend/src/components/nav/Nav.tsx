@@ -1,7 +1,8 @@
 import AppState, { ActionCreators, GenomeState, SyncedContainer } from 'AppState';
 import React, { useCallback, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { ArrowBack } from '@material-ui/icons';
+import { ArrowBack, Redo, Undo } from '@material-ui/icons';
+import MenuIcon from '@material-ui/icons/Menu';
 import { AppIcon } from '../GenomePicker';
 import { getGenomeContainerTitle } from '../containerView/containerUtils';
 import packageJson from '../../../package.json';
@@ -19,20 +20,53 @@ import {
     Typography,
     Menu,
     MenuItem,
+    Tooltip,
+    useTheme,
+    useMediaQuery,
+    Drawer,
 } from '@material-ui/core';
 // @ts-ignore
 import { motion, AnimatePresence } from 'framer-motion/dist/framer-motion';
-
+import { Dispatch, Action } from 'redux';
 import './Nav.css';
 import { getGenomeConfig, getSpeciesInfo } from 'model/genomes/allGenomes';
 import Track from 'components/trackVis/commonComponents/Track';
 import { RegionExpander } from 'model/RegionExpander';
 import { ALIGNMENT_TYPES, INTERACTION_TYPES } from 'components/trackConfig/getTrackConfig';
 import _ from 'lodash';
+import { ActionCreators as UndoActionCreators } from 'redux-undo';
+import UndoRedo from 'components/trackContainers/UndoRedo';
 
 const BASE_TITLE = "WashU Epigenome Browser";
 const REGION_EXPANDER1 = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
+
+interface CollapsedMenuProps {
+    children: React.ReactNode;
+    open: boolean;
+    handleOpen: () => void;
+    handleClose: () => void;
+}
+
+function CollapsedMenu(props: CollapsedMenuProps) {
+    const {
+        children,
+        open,
+        handleOpen,
+        handleClose,
+    } = props;
+
+    return (
+        <>
+            <IconButton style={{ outline: 'none' }} onClick={handleOpen}>
+                <MenuIcon />
+            </IconButton>
+            <Drawer anchor="left" open={open} onClose={handleClose}>
+                {children}
+            </Drawer>
+        </>
+    );
+}
 
 interface NavProps {
     virusBrowserMode: boolean;
@@ -67,6 +101,8 @@ interface NavProps {
     isShowingVR?: boolean;
     trackLegendWidth?: number;
     onLegendWidthChanged?: (width: number) => void;
+    onJumpToHistory?: (idx: number) => void;
+    undoIdx?: number;
 }
 
 function _Nav(props: NavProps) {
@@ -100,11 +136,13 @@ function _Nav(props: NavProps) {
         isShowingVR,
         trackLegendWidth,
         onLegendWidthChanged,
+        onJumpToHistory,
+        undoIdx
     } = props;
-    // const theme = useTheme();
-    // const smallscreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const theme = useTheme();
+    const smallscreen = useMediaQuery(theme.breakpoints.down('xs'));
+    const [menuOpen, setMenuOpen] = useState(false);
     const [title, setTitle] = useState<string>("WashU Epigenome Browser");
-
     useEffect(() => {
         if (pickingGenome) return setTitle(BASE_TITLE);
         const titleText = containerTitles.length > 3 ? "Multiple Genomes" : getGenomeContainerTitle(containerTitles);
@@ -117,22 +155,24 @@ function _Nav(props: NavProps) {
         onGenomeSelected("");
     };
 
+    const handleMenuOpen = () => setMenuOpen(true);
+    const handleMenuClose = () => setMenuOpen(false);
+
     const genomeConfig = editingGenome && getGenomeConfig(editingGenome.name);
 
-    let genomeName, name, logo, color, expansionTypes, hasExpansionTrack, REGION_EXPANDER;
+    let genomeName: string, expansionTypes: any[], hasExpansionTrack: any, REGION_EXPANDER: any;
 
-    if (!pickingGenome) {
-        const genomeName = genomeConfig.genome.getName();
-        const { name, logo, color } = getSpeciesInfo(genomeName);
-        const expansionTypes = INTERACTION_TYPES.concat(ALIGNMENT_TYPES);
-        const hasExpansionTrack = editingGenome.tracks.some((model) => expansionTypes.includes(model.type)) ? true : false;
-        const REGION_EXPANDER = hasExpansionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
+    if (!pickingGenome && genomeConfig) { // TODO: handle genomes that don't have a genome config.
+        genomeName = genomeConfig.genome.getName();
+        expansionTypes = INTERACTION_TYPES.concat(ALIGNMENT_TYPES);
+        hasExpansionTrack = editingGenome.tracks.some((model) => expansionTypes.includes(model.type)) ? true : false;
+        REGION_EXPANDER = hasExpansionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
     }
 
     return (
-        <AppBar color="transparent" position="static" elevation={0} style={{ borderBottom: pickingGenome ? null : "1px #5f6368 solid", paddingLeft: 10 }}>
+        <AppBar color="transparent" position="static" elevation={0} style={{ borderBottom: pickingGenome ? null : "1px #5f6368 solid", paddingLeft: 10, }}>
             <Toolbar disableGutters>
-                {!virusBrowserMode && (
+                {(!virusBrowserMode && (pickingGenome || !smallscreen)) && (
                     <div style={{ marginTop: "5px" }}>
                         <AppIcon withText={false} />
                         {/* <span id="theVersion">v{packageJson.version}</span> */}
@@ -147,72 +187,162 @@ function _Nav(props: NavProps) {
                         transition={{ duration: 0.2 }}
                         style={{ display: "flex", flexDirection: "row", width: "100%" }}
                     >
-                        {pickingGenome ? (
-                            <Typography variant="h5" className="title" style={{ marginTop: 5, marginLeft: 20, color: "var(--neutral-font-color)" }}>
-                                WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span>
-                            </Typography>
-                        ) : (
-                            <div style={{ display: "flex", flexDirection: "row", }}>
-                                <IconButton onClick={handleBack} style={{ marginTop: "5px", outline: "none" }}>
-                                    <ArrowBack />
-                                </IconButton>
-                                <Typography variant="h5" className="title" style={{ marginTop: 12, marginLeft: 20, color: "var(--neutral-font-color)" }}>
-                                    {title}
+                        {(() => {
+                            if (pickingGenome) return (
+                                <Typography variant="h5" className="title" style={{ marginTop: 5, marginLeft: 20, color: "var(--neutral-font-color)", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                                    {!smallscreen && <span>WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span></span>}
                                 </Typography>
-                            </div>
-                        )}
+                            )
+                            if (smallscreen) return (
+                                <div style={{ display: "flex", flexDirection: "row", }}>
+                                    <CollapsedMenu
+                                        open={menuOpen}
+                                        handleOpen={handleMenuOpen}
+                                        handleClose={handleMenuClose}
+                                    >
+                                        <div style={{
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            justifyContent: "center",
+                                            margin: 20,
+                                        }}>
+                                            <AppIcon withText={false} />
+                                        </div>
+                                        <UndoRedo />
+                                        <Tracks
+                                            tracks={editingGenome.tracks}
+                                            onTracksAdded={onTracksAdded}
+                                            onTrackRemoved={onTrackRemoved}
+                                            onAddTracksToPool={onAddTracksToPool}
+                                            publicTracksPool={publicTracksPool}
+                                            publicHubs={publicHubs}
+                                            onHubUpdated={onHubUpdated}
+                                            // publicTrackSets={publicTrackSets}
+                                            customTracksPool={customTracksPool}
+                                            // customTrackSets={customTrackSets}
+                                            addedTrackSets={addedTrackSets}
+                                            addTermToMetaSets={addTermToMetaSets}
+                                            genomeConfig={genomeConfig}
+                                            groupedTrackSets={groupedTrackSets}
+                                            availableTrackSets={availableTrackSets}
+                                            addTracktoAvailable={addTracktoAvailable}
+                                            removeTrackFromAvailable={removeTrackFromAvailable}
+                                        />
+                                        <Apps
+                                            genomeConfig={genomeConfig}
+                                            bundleId={bundleId}
+                                            hasExpansionTrack={hasExpansionTrack}
+                                            highlights={editingGenome && editingGenome.highlights}
+                                            regionExpander={REGION_EXPANDER}
+                                            viewRegion={editingContainer && editingContainer.viewRegion}
+                                            darkTheme={darkTheme}
+                                        />
+                                        <Help />
+                                        <Share />
+                                        <Settings
+                                            onToggleNavigator={onToggleNavigator}
+                                            isShowingNavigator={isShowingNavigator}
+                                            onToggleVR={onToggleVR}
+                                            isShowingVR={isShowingVR}
+                                            trackLegendWidth={trackLegendWidth}
+                                            onLegendWidthChanged={onLegendWidthChanged}
+                                        />
+                                        <div style={{
+                                            width: "100%",
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            justifyContent: 'center',
+                                        }}>
+                                            <IconButton onClick={async () => {
+                                                handleMenuClose();
+                                                await new Promise((resolve) => setTimeout(resolve, 200));
+                                                handleBack();
+                                            }} style={{
+                                                marginTop: "5px",
+                                                outline: "none",
+                                            }}>
+                                                <ArrowBack />
+                                            </IconButton>
+                                        </div>
+                                    </CollapsedMenu>
+                                    <Typography noWrap component="div" variant="h5" className="title" style={{ marginTop: 12, marginLeft: 20, color: "var(--neutral-font-color)" }}>
+                                        {title}
+                                    </Typography>
+                                </div>
+                            )
+                            return (
+                                <div style={{ display: "flex", flexDirection: "row", }}>
+                                    <IconButton onClick={handleBack} style={{ marginTop: "5px", outline: "none" }}>
+                                        <ArrowBack />
+                                    </IconButton>
+                                    <Typography variant="h5" className="title" style={{ marginTop: 12, marginLeft: 20, color: "var(--neutral-font-color)" }}>
+                                        {title}
+                                    </Typography>
+                                </div>
+                            )
+                        })()}
                         <div style={buttonGroupStyle}>
                             <DarkMode />
                             {pickingGenome ? (
                                 <>
                                     <Button href="https://epigenomegateway.readthedocs.io/en/latest/">
-                                        Documentation
+                                        {smallscreen ? 'Docs' : 'Documentation'}
                                     </Button>
                                     <Button href="https://epigenomegateway.wustl.edu/legacy/">
-                                        Switch to the 'old' browser
+                                        {smallscreen ? 'Legacy' : "Switch to the 'old' browser"}
                                     </Button>
+                                    {undoIdx !== -1 && (
+                                        <Tooltip title="Back to browser">
+                                            <IconButton onClick={() => onJumpToHistory(undoIdx)} style={{ outline: "none" }}>
+                                                <Redo />
+                                            </IconButton>
+                                        </Tooltip>
+                                    )}
                                 </>
                             ) : (
-                                <>
-                                    <Tracks
-                                        tracks={editingGenome.tracks}
-                                        onTracksAdded={onTracksAdded}
-                                        onTrackRemoved={onTrackRemoved}
-                                        onAddTracksToPool={onAddTracksToPool}
-                                        publicTracksPool={publicTracksPool}
-                                        publicHubs={publicHubs}
-                                        onHubUpdated={onHubUpdated}
-                                        // publicTrackSets={publicTrackSets}
-                                        customTracksPool={customTracksPool}
-                                        // customTrackSets={customTrackSets}
-                                        addedTrackSets={addedTrackSets}
-                                        addTermToMetaSets={addTermToMetaSets}
-                                        genomeConfig={genomeConfig}
-                                        groupedTrackSets={groupedTrackSets}
-                                        availableTrackSets={availableTrackSets}
-                                        addTracktoAvailable={addTracktoAvailable}
-                                        removeTrackFromAvailable={removeTrackFromAvailable}
-                                    />
-                                    <Apps
-                                        genomeConfig={genomeConfig}
-                                        bundleId={bundleId}
-                                        hasExpansionTrack={hasExpansionTrack}
-                                        highlights={editingGenome && editingGenome.highlights}
-                                        regionExpander={REGION_EXPANDER}
-                                        viewRegion={editingContainer && editingContainer.viewRegion}
-                                        darkTheme={darkTheme}
-                                    />
-                                    <Help />
-                                    <Share />
-                                    <Settings 
-                                        onToggleNavigator={onToggleNavigator}
-                                        isShowingNavigator={isShowingNavigator}
-                                        onToggleVR={onToggleVR}
-                                        isShowingVR={isShowingVR}
-                                        trackLegendWidth={trackLegendWidth}
-                                        onLegendWidthChanged={onLegendWidthChanged}
-                                    />
-                                </>
+                                !smallscreen && (
+                                    <>
+                                        <UndoRedo />
+                                        <Tracks
+                                            tracks={editingGenome.tracks}
+                                            onTracksAdded={onTracksAdded}
+                                            onTrackRemoved={onTrackRemoved}
+                                            onAddTracksToPool={onAddTracksToPool}
+                                            publicTracksPool={publicTracksPool}
+                                            publicHubs={publicHubs}
+                                            onHubUpdated={onHubUpdated}
+                                            // publicTrackSets={publicTrackSets}
+                                            customTracksPool={customTracksPool}
+                                            // customTrackSets={customTrackSets}
+                                            addedTrackSets={addedTrackSets}
+                                            addTermToMetaSets={addTermToMetaSets}
+                                            genomeConfig={genomeConfig}
+                                            groupedTrackSets={groupedTrackSets}
+                                            availableTrackSets={availableTrackSets}
+                                            addTracktoAvailable={addTracktoAvailable}
+                                            removeTrackFromAvailable={removeTrackFromAvailable}
+                                        />
+                                        <Apps
+                                            genomeConfig={genomeConfig}
+                                            bundleId={bundleId}
+                                            hasExpansionTrack={hasExpansionTrack}
+                                            highlights={editingGenome && editingGenome.highlights}
+                                            regionExpander={REGION_EXPANDER}
+                                            viewRegion={editingContainer && editingContainer.viewRegion}
+                                            darkTheme={darkTheme}
+                                        />
+                                        <Help />
+                                        <Share />
+                                        <Settings
+                                            onToggleNavigator={onToggleNavigator}
+                                            isShowingNavigator={isShowingNavigator}
+                                            onToggleVR={onToggleVR}
+                                            isShowingVR={isShowingVR}
+                                            trackLegendWidth={trackLegendWidth}
+                                            onLegendWidthChanged={onLegendWidthChanged}
+                                        />
+                                    </>
+                                )
                             )}
                         </div>
                     </motion.div>
@@ -231,8 +361,21 @@ const buttonGroupStyle: React.CSSProperties = {
     marginRight: 10,
 };
 
-const mapStateToProps = (state: { browser: { present: AppState } }, ownProps: NavProps) => {
-    if (ownProps.pickingGenome) return {};
+const mapStateToProps = (state: { browser: { present: AppState, past: AppState[], future: AppState[] } }, ownProps: NavProps) => {
+    if (ownProps.pickingGenome) {
+        let undoIdx = -1;
+        let past = state.browser.past;
+        if (past.length) {
+            for (let i = past.length - 1; i >= 0; i--) {
+                if (past[i].containers && past[i].containers.length) {
+                    undoIdx = i;
+                    break;
+                }
+            }
+        }
+        // TODO: retain dark mode preference when returning to genome view.
+        return { undoIdx };
+    }
     const [cidx, gidx] = state.browser.present.editTarget;
 
     return {
@@ -245,13 +388,16 @@ const mapStateToProps = (state: { browser: { present: AppState } }, ownProps: Na
     }
 };
 
-const callbacks = {
-    onGenomeSelected: ActionCreators.setGenome,
-    onToggleNavigator: ActionCreators.toggleNavigator,
-    onToggleVR: ActionCreators.toggleVR,
-    onLegendWidthChanged: ActionCreators.setTrackLegendWidth,
+const mapDispatchToProps = (dispatch: Dispatch<Action>) => {
+    return {
+        onGenomeSelected: (genomeName: string) => dispatch(ActionCreators.setGenome(genomeName)),
+        onToggleNavigator: () => dispatch(ActionCreators.toggleNavigator()),
+        onToggleVR: () => dispatch(ActionCreators.toggleVR()),
+        onLegendWidthChanged: (width: number) => dispatch(ActionCreators.setTrackLegendWidth(width)),
+        onJumpToHistory: (idx: number) => dispatch(UndoActionCreators.jumpToPast(idx)),
+    }
 }
 
-const Nav = connect(mapStateToProps, callbacks)(_Nav);
+const Nav = connect(mapStateToProps, mapDispatchToProps)(_Nav);
 
 export default Nav;

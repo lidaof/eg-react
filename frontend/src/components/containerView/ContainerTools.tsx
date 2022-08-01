@@ -124,10 +124,6 @@ function ContainerTools(props: ContainerToolsProps) {
                 <ZoomButtons viewRegion={viewRegion} onNewRegion={onNewRegion} zoomOut={(factor: number) => applyAllContainers(e => e.zoomOut(factor))} />
                 <ButtonGroup buttons={panRightButton} />
                 <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
-                    {/* TODO: fix the duplicate undo redo that occurs with more than one genome (have to undo twice for one action when there are two genomes) */}
-                    <UndoRedo />
-                </div>
-                <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                     <History />
                 </div>
                 <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>

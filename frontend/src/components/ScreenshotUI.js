@@ -12,11 +12,22 @@ import HighlightRegion, { getHighlightedXs } from "./HighlightRegion";
 import OpenInterval from "../model/interval/OpenInterval";
 
 function mapStateToProps(state) {
+    const appState = state.browser.present;
+    const [cidx, gidx] = appState.editTarget;
+    const { compatabilityMode, containers } = appState;
+    const pickingGenome = !(containers && containers.length);
+
+    let editingGenome = {}, editingContainer = {};
+    if (!pickingGenome && !compatabilityMode) {
+        editingGenome = (appState.containers && appState.containers[cidx].genomes[gidx]) || {};
+        editingContainer = (appState.containers && appState.containers[cidx]) || {};
+    }
+
     return {
-        genome: state.browser.present.genomeName,
-        viewRegion: state.browser.present.viewRegion,
-        tracks: state.browser.present.tracks,
-        metadataTerms: state.browser.present.metadataTerms,
+        genome: editingGenome.name,
+        viewRegion: editingContainer.viewRegion || appState.viewRegion,
+        tracks: editingGenome.tracks || appState.tracks,
+        metadataTerms: editingGenome.metadataTerms,
     };
 }
 
@@ -271,6 +282,7 @@ class ScreenshotUINotConnected extends React.Component {
                         selectedRegion={viewRegion}
                         zoomAnimation={0}
                         groupScale={groupScale}
+                        genomeConfig={this.props.genomeConfig}
                     />
                 ) : null;
             });

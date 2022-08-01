@@ -1,7 +1,7 @@
 import Button from "components/egUI/Button";
 import React, { useState } from "react";
 import { Dialog, DialogActions, DialogContent, DialogTitle, Grow, Menu, MenuItem, Typography } from "@material-ui/core";
-import MenuModal from "../MenuModal";
+import MenuModal from "../../egUI/MenuModal";
 import ShareUI from "components/ShareUI";
 
 interface ShareProps {
@@ -20,7 +20,7 @@ function Share(props: ShareProps) {
 
     return (
         <>
-            <Button onClick={handleOpen}>Share</Button>
+            <Button style={{ backgroundColor: open && "var(--eg-secondary-container)" }} onClick={handleOpen}>Share</Button>
             <Dialog
                 open={open}
                 onClose={handleClose}

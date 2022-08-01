@@ -20,6 +20,8 @@ import { Footer } from "./components/Footer";
 import { getGenomeConfig } from "./model/genomes/allGenomes";
 import { HighlightInterval } from './components/trackContainers/HighlightMenu';
 import { HELP_LINKS, getSecondaryGenomes } from "./util";
+// @ts-ignore
+import { motion } from 'framer-motion/dist/framer-motion';
 
 import "./App.css";
 
@@ -95,11 +97,11 @@ interface AppStateProps {
     highlightEnteredRegion: boolean;
     enteredRegion: any;
     highlightColor: string;
-    publicHubs: any[];
-    publicTracksPool: any[];
-    customTracksPool: any[];
-    availableTrackSets: Set<string>;
-    suggestedMetaSets: Set<string>;
+    publicHubs: { [genome: string]: any[] };
+    publicTracksPool: { [genome: string]: any[] };
+    customTracksPool: { [genome: string]: any[] };
+    availableTrackSets: { [genome: string]: Set<string> };
+    suggestedMetaSets: { [genome: string]: Set<string> };
 }
 
 // interface RGBAColor {
@@ -131,11 +133,16 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             highlightEnteredRegion: true,
             enteredRegion: null,
             highlightColor: "rgba(255, 255, 0, 0.3)", // light yellow
-            publicHubs: [],
-            publicTracksPool: [],
-            customTracksPool: [],
-            availableTrackSets: new Set(),
-            suggestedMetaSets: new Set(["Track type"]),
+            // publicHubs: [],
+            // publicTracksPool: [],
+            // customTracksPool: [],
+            publicHubs: {},
+            publicTracksPool: {},
+            customTracksPool: {},
+            // availableTrackSets: new Set(),
+            // suggestedMetaSets: new Set(["Track type"]),
+            availableTrackSets: {},
+            suggestedMetaSets: {},
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
@@ -153,43 +160,60 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         this.initializeMetaSets(this.props.tracks);
     }
 
-    componentDidUpdate(prevProps: Readonly<AppProps>): void {
-        if (prevProps.editTarget[0] !== this.props.editTarget[0] || prevProps.editTarget[1] !== this.props.editTarget[1]) {
-            // if does not exist do not update
-            if (this.props.containers && this.props.containers[this.props.editTarget[0]] && this.props.containers[this.props.editTarget[0]].genomes[this.props.editTarget[1]]) {
-                this.updateOtherPublicHubs(this.props.containers[this.props.editTarget[0]].genomes[this.props.editTarget[1]].tracks);
-            }
+    getCurrentGenomeName() {
+        if (!this.props.containers ||
+            !this.props.containers.length ||
+            !this.props.containers[this.props.editTarget[0]].genomes ||
+            !this.props.containers[this.props.editTarget[0]].genomes.length) {
+            return null;
         }
+        return this.props.containers[this.props.editTarget[0]].genomes[this.props.editTarget[1]].genomeConfig.genome.getName();
     }
 
     UNSAFE_componentWillReceiveProps(nextProps: AppProps) {
-        if (nextProps.genomeConfig && nextProps.genomeConfig !== this.props.genomeConfig) {
-            if (nextProps.genomeConfig.publicHubList) {
-                const publicHubs = nextProps.genomeConfig.publicHubList.slice();
-                publicHubs.map((x: { genome: any }) => (x.genome = nextProps.genomeConfig.genome.getName()));
-                this.setState({
-                    publicHubs: publicHubs,
-                });
-            } else {
-                // when switch genome, need reset hub as well
-                this.setState({
-                    publicHubs: [],
-                });
+        const pickingGenome = !(nextProps.containers && nextProps.containers.length);
+        if (pickingGenome) return;
+
+        if ((!(this.props.containers && this.props.containers.length) && nextProps.containers.length) ||
+            nextProps.editTarget[0] !== this.props.editTarget[0] ||
+            nextProps.editTarget[1] !== this.props.editTarget[1]) {
+            const nextGenomeConfig = nextProps.containers[nextProps.editTarget[0]].genomes[nextProps.editTarget[1]].genomeConfig;
+            const gName = nextGenomeConfig.genome.getName();
+            let newState: any = {};
+            if (!this.state.publicHubs[gName]) {
+                const publicHubs = (nextGenomeConfig.publicHubList || []).slice();
+                publicHubs.forEach((x: { genome: any }) => (x.genome = gName));
+                newState.publicHubs = {
+                    ...this.state.publicHubs,
+                    [gName]: publicHubs,
+                };
             }
-            this.setState({ publicTracksPool: [], customTracksPool: [] });
-        }
-        if (nextProps.publicTracksPool !== this.props.publicTracksPool) {
-            if (nextProps.publicTracksPool) {
-                this.setState({ publicTracksPool: nextProps.publicTracksPool });
-            } else {
-                this.setState({ publicTracksPool: [] });
+            if (!this.state.publicTracksPool[gName]) {
+                newState.publicTracksPool = {
+                    ...this.state.publicTracksPool,
+                    [gName]: [],
+                };
             }
-        }
-        if (nextProps.customTracksPool !== this.props.customTracksPool) {
-            if (nextProps.customTracksPool) {
-                this.setState({ customTracksPool: nextProps.customTracksPool });
-            } else {
-                this.setState({ customTracksPool: [] });
+            if (!this.state.suggestedMetaSets[gName]) {
+                newState.suggestedMetaSets = {
+                    ...this.state.suggestedMetaSets,
+                    [gName]: new Set(["Track type"]),
+                };
+            }
+            if (!this.state.availableTrackSets[gName]) {
+                newState.availableTrackSets = {
+                    ...this.state.availableTrackSets,
+                    [gName]: new Set(),
+                };
+            }
+            if (!this.state.customTracksPool[gName]) {
+                newState.customTracksPool = {
+                    ...this.state.customTracksPool,
+                    [gName]: [],
+                };
+            }
+            if (Object.keys(newState).length) {
+                this.setState(newState);
             }
         }
         this.initializeMetaSets(nextProps.tracks);
@@ -202,23 +226,35 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
     };
 
     addTermToMetaSets(term: any[]) {
+        if (!this.getCurrentGenomeName()) return;
         const toBeAdded = Array.isArray(term) ? term : [term];
         this.setState({
-            suggestedMetaSets: new Set([...this.state.suggestedMetaSets, ...toBeAdded]),
+            suggestedMetaSets: {
+                ...this.state.suggestedMetaSets,
+                [this.getCurrentGenomeName()]: new Set([...(this.state.suggestedMetaSets[this.getCurrentGenomeName()] || []), ...toBeAdded]),
+            },
         });
     }
 
     addTracktoAvailable(trackModel: any) {
+        if (!this.getCurrentGenomeName()) return;
         this.setState({
-            availableTrackSets: new Set([...this.state.availableTrackSets, trackModel]),
+            availableTrackSets: {
+                ...this.state.availableTrackSets,
+                [this.getCurrentGenomeName()]: new Set([...(this.state.availableTrackSets[this.getCurrentGenomeName()] || []), trackModel]),
+            },
         });
     }
 
     removeTrackFromAvailable(trackModel: any) {
-        const newTrackSets = new Set(Array.from(this.state.availableTrackSets));
+        // const newTrackSets = new Set(Array.from(this.state.availableTrackSets));
+        const newTrackSets = new Set(Array.from(this.state.availableTrackSets[this.getCurrentGenomeName()]));
         newTrackSets.delete(trackModel);
         this.setState({
-            availableTrackSets: newTrackSets,
+            availableTrackSets: {
+                ...this.state.availableTrackSets,
+                [this.getCurrentGenomeName()]: newTrackSets,
+            },
         });
     }
 
@@ -229,23 +265,24 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
      * @param {boolean} toPublic - whether to also add the tracks to public or custom pool
      */
     addTracksToPool(newTracks: TrackModel[], toPublic: boolean = true) {
+        const gName = this.getCurrentGenomeName();
         if (toPublic) {
             // const urlSets = new Set([...this.state.publicTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
-                publicTracksPool: this.state.publicTracksPool.concat(newTracks),
+                publicTracksPool: { ...this.state.publicTracksPool, [gName]: this.state.publicTracksPool[gName].concat(newTracks) },
                 // publicTrackSets: urlSets,
             });
         } else {
             // const urlSets = new Set([...this.state.customTrackSets, ...newTracks.map(track => track.url)]);
             this.setState({
-                customTracksPool: this.state.customTracksPool.concat(newTracks),
+                customTracksPool: { ...this.state.publicTracksPool, [gName]: this.state.customTracksPool[gName].concat(newTracks) },
                 // customTrackSets: urlSets,
             });
         }
     }
 
     updatePublicHubs(publicHubs: any) {
-        this.setState({ publicHubs });
+        this.setState({ publicHubs: { ...this.state.publicHubs, [this.getCurrentGenomeName()]: publicHubs } });
     }
 
     addTracks(tracks: any) {
@@ -322,7 +359,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             secondHubList = publicHubs.concat(secondHubList);
         }
         this.setState({
-            publicHubs: secondHubList,
+            publicHubs: { [this.getCurrentGenomeName()]: secondHubList }
         });
     };
 
@@ -351,7 +388,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             containers,
             editTarget,
         } = this.props;
-
+        const gName = this.getCurrentGenomeName();
         if (sessionFromUrl) {
             return (
                 <div className="container-fluid">
@@ -374,40 +411,12 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         }
         return (
             <>
-                {/* <Nav
-                    {...this.state}
-                    // isShowingNavigator={isShowingNavigator}
-                    // onToggleNavigator={onToggleNavigator}
-                    // onToggle3DScene={this.toggle3DScene}
-                    onToggleHighlight={this.toggleHighlight}
-                    onSetEnteredRegion={this.setEnteredRegion}
-                    onSetHighlightColor={this.setHighlightColor}
-                    selectedRegion={viewRegion}
-                    onRegionSelected={onNewViewRegion}
-                    tracks={tracks}
-                    genomeConfig={genomeConfig}
-                    onTracksAdded={this.addTracks}
-                    onTrackRemoved={this.removeTrack}
-                    bundleId={bundleId}
-                    trackLegendWidth={trackLegendWidth}
-                    onLegendWidthChange={onLegendWidthChange}
-                    onAddTracksToPool={this.addTracksToPool}
-                    onHubUpdated={this.updatePublicHubs}
-                    addedTrackSets={tracksUrlSets}
-                    // publicHubs={publicHubs}
-                    removeTrackFromAvailable={this.removeTrackFromAvailable}
-                    addTracktoAvailable={this.addTracktoAvailable}
-                    addTermToMetaSets={this.addTermToMetaSets}
-                    embeddingMode={embeddingMode}
-                    groupedTrackSets={groupedTrackSets}
-                    virusBrowserMode={virusBrowserMode}
-                /> */}
                 <Nav
                     virusBrowserMode={virusBrowserMode}
                     containerTitles={containerTitles}
                     pickingGenome={pickingGenome}
                     bundleId={bundleId}
-                    availableTrackSets={this.state.availableTrackSets}
+                    availableTrackSets={this.state.availableTrackSets[gName]}
                     // addedTrackSets={tracksUrlSets}
                     addTermToMetaSets={this.addTermToMetaSets}
                     addTracktoAvailable={this.addTracktoAvailable}
@@ -418,10 +427,10 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     customTracksPool={customTracksPool}
                     genomeConfig={genomeConfig}
                     onHubUpdated={this.updatePublicHubs}
-                    publicHubs={this.state.publicHubs}
+                    publicHubs={this.state.publicHubs[gName]}
                     onTrackRemoved={this.removeTrack}
                     onTracksAdded={this.addTracks}
-                    publicTracksPool={this.state.publicTracksPool}
+                    publicTracksPool={this.state.publicTracksPool[gName]}
                     groupedTrackSets={groupedTrackSets}
                 />
                 {pickingGenome ? (
@@ -448,34 +457,40 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                             </div>
                         </Offline>
                         {/* Implement such that when there's a genome name but no containers, just render like we would before phased update. */}
-                        {containers.map((data: SyncedContainer, idx: number) => {
-                            return (
-                                <div
-                                    key={idx}
-                                    style={{
-                                        marginTop: 20,
-                                        marginBottom: idx === containers.length - 1 ? 0 : 20,
-                                    }}
-                                >
-                                    <ContainerView
-                                        stateIdx={idx}
+                        <motion.div
+                            initial={{ y: 10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            {containers.map((data: SyncedContainer, idx: number) => {
+                                return (
+                                    <div
                                         key={idx}
-                                        cdata={data}
+                                        style={{
+                                            marginTop: 20,
+                                            marginBottom: idx === containers.length - 1 ? 0 : 20,
+                                        }}
+                                    >
+                                        <ContainerView
+                                            stateIdx={idx}
+                                            key={idx}
+                                            cdata={data}
 
-                                        layoutModel={layoutModel}
-                                        onSetAnchors3d={onSetAnchors3d}
-                                        onSetGeneFor3d={onSetGeneFor3d}
-                                        viewer3dNumFrames={viewer3dNumFrames}
-                                        isThereG3dTrack={isThereG3dTrack}
-                                        onSetImageInfo={onSetImageInfo}
-                                        isShowingNavigator={isShowingNavigator}
-                                        containerTitles={containerTitles}
+                                            layoutModel={layoutModel}
+                                            onSetAnchors3d={onSetAnchors3d}
+                                            onSetGeneFor3d={onSetGeneFor3d}
+                                            viewer3dNumFrames={viewer3dNumFrames}
+                                            isThereG3dTrack={isThereG3dTrack}
+                                            onSetImageInfo={onSetImageInfo}
+                                            isShowingNavigator={isShowingNavigator}
+                                            containerTitles={containerTitles}
 
-                                        embeddingMode={embeddingMode}
-                                    />
-                                </div>
-                            )
-                        })}
+                                            embeddingMode={embeddingMode}
+                                        />
+                                    </div>
+                                )
+                            })}
+                        </motion.div>
                         {!embeddingMode && <Footer />}
                     </div>
                 )}

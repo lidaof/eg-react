@@ -1,7 +1,7 @@
 import Button from "components/egUI/Button";
 import React, { useState } from "react";
 import { Divider, Menu, MenuItem } from "@material-ui/core";
-import MenuModal from "../MenuModal";
+import MenuModal from "../../egUI/MenuModal";
 import { HotKeyInfo } from "components/HotKeyInfo";
 
 /* 
@@ -80,7 +80,7 @@ function Help() {
     
     return (
         <>
-            <Button onClick={handleClick}>Help</Button>
+            <Button style={{ backgroundColor: open && "var(--eg-secondary-container)" }} onClick={handleClick}>Help</Button>
             <Menu
                 anchorEl={anchorEl}
                 anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
