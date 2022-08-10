@@ -33,6 +33,27 @@
     },
     "Genome Comparison": [
         {
+            "name": "danRer11tohg38",
+            "label": "hg38 to danRer11 blastz",
+            "querygenome": "hg38",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/danRer11/weaver/danRer11_hg38_axt.gz"
+        },
+        {
+            "name": "danRer11tomm39",
+            "label": "mm39 to danRer11 blastz",
+            "querygenome": "mm39",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/danRer11/weaver/danRer11_mm39_axt.gz"
+        },
+        {
+            "name": "danRer11tomm10",
+            "label": "mm10 to danRer11 blastz",
+            "querygenome": "mm10",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/danRer11/weaver/danRer11_mm10_axt.gz"
+        },
+        {
             "name": "danRer11tolepOcu1",
             "label": "Ensembl lastz using zebrafish danRer11 as reference and lepOcu1 as query",
             "querygenome": "lepOcu1",
