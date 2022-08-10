@@ -39,6 +39,7 @@ import { BoxplotTrackConfig } from "./BoxplotTrackConfig";
 import { BedcolorTrackConfig } from "./BedcolorTrackConfig";
 import { Rmskv2TrackConfig } from "./Rmskv2TrackConfig";
 import { JasparTrackConfig } from "./JasparTrackConfig";
+import { BrgfaTrackConfig } from "./BrgfaTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 export const ALIGNMENT_TYPES = ["genomealign"];
@@ -86,6 +87,7 @@ const TYPE_NAME_TO_CONFIG = {
     rmskv2: Rmskv2TrackConfig,
     bigchain: GenomeAlignTrackConfig,
     jaspar: JasparTrackConfig,
+    brgfa: BrgfaTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

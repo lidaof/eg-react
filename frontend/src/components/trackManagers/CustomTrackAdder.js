@@ -22,6 +22,7 @@ export const TRACK_TYPES = {
     Peak: ["rgbpeak"],
     Categorical: ["categorical"],
     // "Transcription Factor": ["jaspar"],
+    "Genome graph": ["brgfa"],
     Methylation: ["methylC"],
     Interaction: ["hic", "cool", "bigInteract", "longrange", "longrangecolor"],
     Stats: ["boxplot"],
@@ -50,6 +51,7 @@ const TYPES_NEED_INDEX = [
     "dbedgraph",
     "vcf",
     "genomealign",
+    "brgfa",
 ];
 
 export const TYPES_DESC = {
@@ -82,6 +84,7 @@ export const TYPES_DESC = {
     rmskv2: "RepeatMasker V2 structure with color",
     bigchain: "bigChain pairwise alignment",
     genomealign: "genome pairwise alignment",
+    brgfa: "genome graph in bed like rGFA format",
     // jaspar: "transcription factor binding data from Jaspar",
 };
 

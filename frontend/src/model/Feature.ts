@@ -1,7 +1,7 @@
 import ChromosomeInterval, { IChromosomeInterval } from "./interval/ChromosomeInterval";
 import NavigationContext from "./NavigationContext";
 
-type Strand = "+" | "-" | string;
+export type Strand = "+" | "-" | string;
 
 /**
  * The properties of Feature without the methods.
