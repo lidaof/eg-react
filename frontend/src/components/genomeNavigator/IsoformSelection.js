@@ -146,11 +146,11 @@ class IsoformSelection extends React.PureComponent {
 
     render() {
         if (this.state.isLoading) {
-            return "Loading...";
+            return <div className="IsoformSelection-empty-msg">Loading...</div>;
         }
 
         if (this.state.genes.length === 0) {
-            return `Could not find gene "${this.props.geneName}"`;
+            return <div className="IsoformSelection-empty-msg">Could not find gene "{this.props.geneName}"</div>;
         }
         if (this.props.simpleMode) {
             return this.renderSuggestionsSimple();
