@@ -383,9 +383,6 @@ class FacetTable extends Component {
         const content = this.props.contentColorSetup ? this.props.contentColorSetup : null;
         return (
             <div>
-                {/* <button onClick={() => this.handleOpenModal(id)} className="facet-item">
-                    <span className="green">{addUrls.length}</span>/{found.length}
-                </button> */}
                 <button onClick={() => this.props.navigateToScreen(
                     <HubTrackTable
                         tracks={found}

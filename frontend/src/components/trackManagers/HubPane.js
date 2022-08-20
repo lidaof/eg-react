@@ -60,8 +60,9 @@ class HubPane extends React.PureComponent {
                     onTracksAdded={this.props.onTracksAdded}
                     publicHubs={this.props.publicHubs}
                     onHubUpdated={this.props.onHubUpdated}
+                    genomeConfig={this.props.genomeConfig}
                 />
-                {this.props.publicTracksPool.length > 0 ? (
+                {(this.props.publicTracksPool && this.props.publicTracksPool.length) > 0 ? (
                     <FacetTable
                         tracks={this.props.publicTracksPool} // need include add tracks, also need consider track remove to just remove from sets
                         addedTracks={this.props.addedTracks}

@@ -1,31 +1,25 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
 import _ from "lodash";
-import Notifications from "react-notify-toast";
+import PropTypes from "prop-types";
+import React from "react";
 import { Offline } from "react-detect-offline";
+import Notifications from "react-notify-toast";
+import { connect } from "react-redux";
 // import AppState, { ActionCreators } from "./AppState";
 import AppState, { ActionCreators, GenomeState, SyncedContainer } from "./AppState";
-import GenomePickerContainer from "./components/GenomePicker";
-import Nav from "./components/nav/Nav";
-import GenomeNavigator from "./components/genomeNavigator/GenomeNavigator";
 import ContainerView from "./components/containerView/ContainerView";
-import TrackContainer from "./components/trackContainers/TrackContainer";
-import withCurrentGenome from "./components/withCurrentGenome";
-import DisplayedRegionModel from "./model/DisplayedRegionModel";
-import TrackModel from "./model/TrackModel";
-import LoadSession from "./components/LoadSession";
-import { RegionExpander } from "./model/RegionExpander";
 import { Footer } from "./components/Footer";
-import { getGenomeConfig } from "./model/genomes/allGenomes";
+import GenomePickerContainer from "./components/GenomePicker";
+import LoadSession from "./components/LoadSession";
+import Nav from "./components/nav/Nav";
 import { HighlightInterval } from './components/trackContainers/HighlightMenu';
-import { HELP_LINKS, getSecondaryGenomes } from "./util";
+import DisplayedRegionModel from "./model/DisplayedRegionModel";
+import { getGenomeConfig } from "./model/genomes/allGenomes";
+import TrackModel from "./model/TrackModel";
+import { getSecondaryGenomes, HELP_LINKS } from "./util";
 // @ts-ignore
 import { motion } from 'framer-motion/dist/framer-motion';
 
 import "./App.css";
-
-const REGION_EXPANDER = new RegionExpander(1);
 
 function mapStateToProps(state: { browser: { present: AppState } }) {
     const appState = state.browser.present;
@@ -52,6 +46,7 @@ function mapStateToProps(state: { browser: { present: AppState } }) {
 
         containers: appState.containers,
         editTarget: appState.editTarget,
+        genomeConfig: editingGenome.genomeConfig
     };
 }
 
@@ -63,7 +58,7 @@ const callbacks = {
 };
 
 const withAppState = connect(mapStateToProps, callbacks);
-const withEnhancements = _.flowRight(withAppState, withCurrentGenome);
+const withEnhancements = _.flowRight(withAppState);
 
 interface AppProps {
     viewRegion: DisplayedRegionModel;
@@ -158,6 +153,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             this.updateOtherPublicHubs(this.props.tracks);
         }
         this.initializeMetaSets(this.props.tracks);
+        this.initialStateAllocate(this.props);
     }
 
     getCurrentGenomeName() {
@@ -173,7 +169,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
     UNSAFE_componentWillReceiveProps(nextProps: AppProps) {
         const pickingGenome = !(nextProps.containers && nextProps.containers.length);
         if (pickingGenome) return;
-
         if ((!(this.props.containers && this.props.containers.length) && nextProps.containers.length) ||
             nextProps.editTarget[0] !== this.props.editTarget[0] ||
             nextProps.editTarget[1] !== this.props.editTarget[1]) {
@@ -217,6 +212,54 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             }
         }
         this.initializeMetaSets(nextProps.tracks);
+    }
+
+    initialStateAllocate(targetProps: any) {
+        const pickingGenome = !(targetProps.containers && targetProps.containers.length);
+        if (pickingGenome) return;
+        if ((targetProps.containers.length) ||
+            targetProps.editTarget[0] !== this.props.editTarget[0] ||
+            targetProps.editTarget[1] !== this.props.editTarget[1]) {
+            const nextGenomeConfig = targetProps.containers[targetProps.editTarget[0]].genomes[targetProps.editTarget[1]].genomeConfig;
+            const gName = nextGenomeConfig.genome.getName();
+            let newState: any = {};
+            if (!this.state.publicHubs[gName]) {
+                const publicHubs = (nextGenomeConfig.publicHubList || []).slice();
+                publicHubs.forEach((x: { genome: any }) => (x.genome = gName));
+                newState.publicHubs = {
+                    ...this.state.publicHubs,
+                    [gName]: publicHubs,
+                };
+            }
+            if (!this.state.publicTracksPool[gName]) {
+                newState.publicTracksPool = {
+                    ...this.state.publicTracksPool,
+                    [gName]: [],
+                };
+            }
+            if (!this.state.suggestedMetaSets[gName]) {
+                newState.suggestedMetaSets = {
+                    ...this.state.suggestedMetaSets,
+                    [gName]: new Set(["Track type"]),
+                };
+            }
+            if (!this.state.availableTrackSets[gName]) {
+                newState.availableTrackSets = {
+                    ...this.state.availableTrackSets,
+                    [gName]: new Set(),
+                };
+            }
+            if (!this.state.customTracksPool[gName]) {
+                newState.customTracksPool = {
+                    ...this.state.customTracksPool,
+                    [gName]: [],
+                };
+            }
+            if (Object.keys(newState).length) {
+                this.setState(newState);
+            }
+        }
+        this.initializeMetaSets(targetProps.tracks);
     }
 
     initializeMetaSets = (tracks: any[]) => {
@@ -366,13 +409,13 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
     render() {
         const {
             genomeConfig,
-            viewRegion,
+            // viewRegion,
             tracks,
-            onNewViewRegion,
+            // onNewViewRegion,
             bundleId,
             sessionFromUrl,
-            trackLegendWidth,
-            onLegendWidthChange,
+            // trackLegendWidth,
+            // onLegendWidthChange,
             isShowingNavigator,
             embeddingMode,
             virusBrowserMode,
@@ -382,11 +425,11 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             viewer3dNumFrames,
             isThereG3dTrack,
             onSetImageInfo,
-            highlights,
-            onSetHighlights,
+            // highlights,
+            // onSetHighlights,
             customTracksPool,
             containers,
-            editTarget,
+            // editTarget,
         } = this.props;
         const gName = this.getCurrentGenomeName();
         if (sessionFromUrl) {
@@ -396,6 +439,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                 </div>
             );
         }
+        console.log(this.state);
         const pickingGenome = !(containers && containers.length);
         const tracksUrlSets = new Set([
             ...tracks.filter((track) => track.url).map((track) => track.url),
@@ -403,10 +447,10 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         ]);
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
-        let groupedTrackSets, navGenomeConfig, containerTitles: any;
+        let groupedTrackSets, containerTitles: any;
         if (!pickingGenome) {
             groupedTrackSets = this.groupTrackByGenome();
-            navGenomeConfig = containers[0].genomes[0].genomeConfig || getGenomeConfig(containers[0].genomes[0].name);
+            // navGenomeConfig = containers[0].genomes[0].genomeConfig || getGenomeConfig(containers[0].genomes[0].name);
             containerTitles = containers.map((container) => container.title);
         }
         return (

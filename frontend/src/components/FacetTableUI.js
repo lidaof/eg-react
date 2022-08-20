@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, Tab } from "react-bootstrap-tabs";
+import { Tab, Tabs } from "react-bootstrap-tabs";
 import FacetTable from "./trackManagers/FacetTable";
 
 class FacetTableUI extends React.Component {
@@ -37,6 +37,7 @@ class FacetTableUI extends React.Component {
                             addedTrackSets={addedTrackSets}
                             addTermToMetaSets={addTermToMetaSets}
                             contentColorSetup={contentColorSetup}
+                            navigateToScreen={this.props.navigateToScreen}
                         />
                     ) : (
                         <p>No public tracks from data hubs yet. Load a hub first.</p>
@@ -44,7 +45,7 @@ class FacetTableUI extends React.Component {
                 </Tab>
                 <Tab label="Custom tracks facet table">
                     <h1>Tracks from custom track or hubs</h1>
-                    {customTracksPool.length > 0 ? (
+                    {(customTracksPool && customTracksPool.length) > 0 ? (
                         <FacetTable
                             tracks={customTracksPool}
                             addedTracks={addedTracks}
@@ -52,6 +53,7 @@ class FacetTableUI extends React.Component {
                             addedTrackSets={addedTrackSets}
                             addTermToMetaSets={addTermToMetaSets}
                             contentColorSetup={contentColorSetup}
+                            navigateToScreen={this.props.navigateToScreen}
                         />
                     ) : (
                         <p>No custom tracks yet. Submit custom tracks or load custom data hub.</p>

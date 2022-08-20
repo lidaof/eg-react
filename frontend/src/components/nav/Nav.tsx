@@ -1,41 +1,30 @@
-import AppState, { ActionCreators, GenomeState, SyncedContainer } from 'AppState';
-import React, { useCallback, useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { ArrowBack, Redo, Undo } from '@material-ui/icons';
+import {
+    AppBar, Drawer, IconButton,
+    Toolbar, Tooltip, Typography, useMediaQuery, useTheme
+} from '@material-ui/core';
+import { ArrowBack, Redo } from '@material-ui/icons';
 import MenuIcon from '@material-ui/icons/Menu';
-import { AppIcon } from '../GenomePicker';
+import AppState, { ActionCreators, GenomeState, SyncedContainer } from 'AppState';
+import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import { getGenomeContainerTitle } from '../containerView/containerUtils';
-import packageJson from '../../../package.json';
 import DarkMode from '../DarkMode';
 import Button from '../egUI/Button';
+import { AppIcon } from '../GenomePicker';
 import Apps from './items/AppsMenu';
 import Help from './items/HelpMenu';
 import Settings from './items/SettingsMenu';
 import Share from './items/ShareMenu';
 import Tracks from './items/TracksMenu';
-import {
-    AppBar,
-    IconButton,
-    Toolbar,
-    Typography,
-    Menu,
-    MenuItem,
-    Tooltip,
-    useTheme,
-    useMediaQuery,
-    Drawer,
-} from '@material-ui/core';
-// @ts-ignore
-import { motion, AnimatePresence } from 'framer-motion/dist/framer-motion';
-import { Dispatch, Action } from 'redux';
-import './Nav.css';
-import { getGenomeConfig, getSpeciesInfo } from 'model/genomes/allGenomes';
-import Track from 'components/trackVis/commonComponents/Track';
-import { RegionExpander } from 'model/RegionExpander';
 import { ALIGNMENT_TYPES, INTERACTION_TYPES } from 'components/trackConfig/getTrackConfig';
-import _ from 'lodash';
-import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import UndoRedo from 'components/trackContainers/UndoRedo';
+// @ts-ignore
+import { AnimatePresence, motion } from 'framer-motion/dist/framer-motion';
+import { getGenomeConfig } from 'model/genomes/allGenomes';
+import { RegionExpander } from 'model/RegionExpander';
+import { Action, Dispatch } from 'redux';
+import { ActionCreators as UndoActionCreators } from 'redux-undo';
+import './Nav.css';
 
 const BASE_TITLE = "WashU Epigenome Browser";
 const REGION_EXPANDER1 = new RegionExpander(1);
@@ -147,8 +136,8 @@ function _Nav(props: NavProps) {
         if (pickingGenome) return setTitle(BASE_TITLE);
         const titleText = containerTitles.length > 3 ? "Multiple Genomes" : getGenomeContainerTitle(containerTitles);
         setTitle(titleText);
-        if (!virusBrowserMode) document.title = `${titleText} | ${BASE_TITLE}`;
-    }, [containerTitles]);
+        if (!virusBrowserMode) document.title = `${titleText} :: ${BASE_TITLE}`;
+    }, [containerTitles, pickingGenome, virusBrowserMode]);
 
     const handleBack = () => {
         if (!virusBrowserMode) document.title = BASE_TITLE;
@@ -160,10 +149,9 @@ function _Nav(props: NavProps) {
 
     const genomeConfig = editingGenome && getGenomeConfig(editingGenome.name);
 
-    let genomeName: string, expansionTypes: any[], hasExpansionTrack: any, REGION_EXPANDER: any;
+    let expansionTypes: any[], hasExpansionTrack: any, REGION_EXPANDER: any;
 
     if (!pickingGenome && genomeConfig) { // TODO: handle genomes that don't have a genome config.
-        genomeName = genomeConfig.genome.getName();
         expansionTypes = INTERACTION_TYPES.concat(ALIGNMENT_TYPES);
         hasExpansionTrack = editingGenome.tracks.some((model) => expansionTypes.includes(model.type)) ? true : false;
         REGION_EXPANDER = hasExpansionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;

@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from "react";
 import {
-    TypographyVariant,
-    Typography,
-    TextField,
-    Tooltip,
+    Tooltip, Typography, TypographyVariant
 } from "@material-ui/core";
+import React, { useState } from "react";
 
 interface InlineEditableProps {
     value: string;
@@ -18,7 +15,7 @@ function InlineEditable(props: InlineEditableProps) {
     const [value, setValue] = useState(props.value);
     const [hovering, setHovering] = useState(false);
 
-    const handleClick = () => { setValue(props.value); setEditing(true) };
+    const handleClick = () => { setValue(props.value); setEditing(true); };
     const handleBlur = () => setEditing(false);
     const handleFinish = () => {
         setEditing(false);

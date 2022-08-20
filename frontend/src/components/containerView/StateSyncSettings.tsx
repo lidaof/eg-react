@@ -1,38 +1,14 @@
+import { ContainerActionsCreatorsFactory, GenomeSettings } from 'AppState';
 import React, { useEffect, useState } from 'react';
-import { Dispatch, Action } from 'redux';
 import { connect } from 'react-redux';
-import { ContainerActionsCreatorsFactory, GenomeSettings, GenomeState } from 'AppState';
+import { Action, Dispatch } from 'redux';
 
-import { Settings } from '@material-ui/icons';
 import {
-    IconButton,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    useMediaQuery,
-    useTheme,
-    Grow,
-    Typography,
-    FormControlLabel,
-    Checkbox,
-    FormGroup,
-    FormHelperText,
-    TextField,
-    FormControl,
-    FormLabel,
-    Radio,
-    RadioGroup,
-    InputLabel,
-    Select,
-    MenuItem,
+    Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormHelperText, Grow, IconButton, InputLabel, MenuItem, Select, TextField, Typography
 } from '@material-ui/core';
+import { Close as CloseIcon, Settings } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
-import {
-    Close as CloseIcon
-} from '@material-ui/icons'
 
 interface StateSyncSettingsProps {
     containerIdx: number;
@@ -53,7 +29,6 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
         containerTitles,
         containerIdx,
         genomeSettings,
-        genomeIdx,
         allowNewContainer,
         onGenomeSettingsChanged,
         onSetGenomeContainer,
@@ -72,7 +47,7 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
 
     useEffect(() => {
         setOffsetValue(offsetAmount.toString());
-    }, [open])
+    }, [open, offsetAmount]);
 
     const getOffsetTipMessage = () => {
         let m = "Navigation position, highlights, and other synced attributes will be offset ";

@@ -1,46 +1,30 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import {
+    AppBar, CardMedia,
+    Container, InputAdornment, List, ListItem, ListItemIcon, ListItemText, makeStyles, TextField
+} from "@material-ui/core";
+import Box from "@material-ui/core/Box";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
+import { useTheme } from "@material-ui/core/styles";
+import Tab from "@material-ui/core/Tab";
+import Tabs from "@material-ui/core/Tabs";
+import Typography from "@material-ui/core/Typography";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import SearchIcon from "@material-ui/icons/Search";
-import {
-    CardMedia,
-    Container,
-    ListItem,
-    ListItemText,
-    ListItemIcon,
-    List,
-    AppBar,
-    Toolbar,
-    TextField,
-    makeStyles,
-    withStyles,
-    InputAdornment,
-    CardActionArea,
-} from "@material-ui/core";
-import { useTheme } from "@material-ui/core/styles";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Box from "@material-ui/core/Box";
-import Link from "@material-ui/core/Link";
-import SwipeableViews from "react-swipeable-views";
+import PropTypes from "prop-types";
+import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { connect } from "react-redux";
 import { ActionCreators } from "../AppState";
-import { treeOfLife, phasedTreeOfLife, } from "../model/genomes/allGenomes";
+import Logo from '../images/logo.png';
+import { phasedTreeOfLife, treeOfLife } from "../model/genomes/allGenomes";
 import { SessionUI } from "./SessionUI";
-import DarkMode from "./DarkMode";
-import Logo from '../images/logo.png'
 // @ts-ignore
-import { motion, AnimatePresence } from 'framer-motion/dist/framer-motion';
+import { AnimatePresence, motion } from 'framer-motion/dist/framer-motion';
 
-import "./GenomePicker.css";
-import { Brightness2 } from "@material-ui/icons";
 import _ from "lodash";
-import { style } from "d3-selection";
 import { getGenomeContainerTitle } from "./containerView/containerUtils";
+import "./GenomePicker.css";
 
 /**
  * loading page for choose genome
@@ -53,12 +37,6 @@ const callbacks = {
     onMultipleGenomeSelected: ActionCreators.setMultipleGenomes,
     onMultipleGenomesWithContainerSelected: ActionCreators.setMultipleGenomesWithContainer,
 };
-
-const LinkWithMargin = withStyles({
-    root: {
-        margin: "10px",
-    },
-})(Link);
 
 interface TabPanelProps {
     children: React.ReactNode;
@@ -159,6 +137,7 @@ export function GenomePicker(props: GenomePickerProps) {
             window.removeEventListener('keyup', upHandler);
             window.removeEventListener('focus', focusHandler);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [genomesSelected]);
 
     const handleGenomePicked = (genomeName: string) => {
@@ -224,7 +203,7 @@ export function GenomePicker(props: GenomePickerProps) {
         if (keyLength) {
             metaText = `Release to select ${keyLength} genomes, or esc to cancel`;
         } else {
-            metaText = "Click on multiple genomes to select";
+            metaText = "Click on genomes to select";
         }
     } else {
         metaText = "Hold shift to select multiple";
@@ -396,10 +375,6 @@ function GenomePickerContainer(props: GenomePickerContainerProps) {
         setValue(newValue);
     };
 
-    const handleChangeIndex = (index: number) => {
-        setValue(index);
-    };
-
     return (
         <div style={{ marginBottom: 50 }}>
             <AppBar position="static" color="default" >
@@ -467,38 +442,6 @@ export function AppIcon({ withText = true }) {
                 {withText && <>WashU <span style={{ fontWeight: 100 }}>Epigenome Browser</span></>}
             </Typography>
         </>
-    );
-}
-
-function AppHeader() {
-    const styles = useStyles();
-    return (
-        <div>
-            <AppBar color="transparent" position="static">
-                <Toolbar disableGutters>
-                    <AppIcon />
-                    <div className={styles.alignRight}>
-                        <span>
-                            <DarkMode />
-                        </span>
-                        <LinkWithMargin
-                            href="https://epigenomegateway.readthedocs.io/en/latest/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Documentation
-                        </LinkWithMargin>
-                        <LinkWithMargin
-                            href="https://epigenomegateway.wustl.edu/legacy/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Switch to the 'old' browser
-                        </LinkWithMargin>
-                    </div>
-                </Toolbar>
-            </AppBar>
-        </div>
     );
 }
 

@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import Button from '../../egUI/Button'
-import { Menu, MenuItem } from "@material-ui/core";
-import MenuModal from '../../egUI/MenuModal';
-import RegionSetSelector from "components/RegionSetSelector";
-import { GenomeConfig } from "model/genomes/GenomeConfig";
-import Geneplot from "components/Geneplot/Geneplot";
-import ScatterPlot from "components/Geneplot/ScatterPlot";
-import { SessionUI } from "../../SessionUI";
-import LiveUI from "components/LiveUI";
-import { ScreenshotUI } from "components/ScreenshotUI";
-import { RegionExpander } from "model/RegionExpander";
-import { HighlightInterval } from "components/trackContainers/HighlightMenu";
-import DisplayedRegionModel from "model/DisplayedRegionModel";
+import { Menu } from "@material-ui/core";
 import { DynamicRecordUI } from "components/DynamicRecordUI";
 import { FetchSequence } from "components/FetchSequence";
+import Geneplot from "components/Geneplot/Geneplot";
+import ScatterPlot from "components/Geneplot/ScatterPlot";
+import LiveUI from "components/LiveUI";
+import RegionSetSelector from "components/RegionSetSelector";
+import { ScreenshotUI } from "components/ScreenshotUI";
+import { HighlightInterval } from "components/trackContainers/HighlightMenu";
+import DisplayedRegionModel from "model/DisplayedRegionModel";
+import { GenomeConfig } from "model/genomes/GenomeConfig";
+import { RegionExpander } from "model/RegionExpander";
+import React, { useState } from "react";
+import Button from '../../egUI/Button';
+import MenuModal from '../../egUI/MenuModal';
+import { SessionUI } from "../../SessionUI";
 
 interface AppsProps {
     genomeConfig: GenomeConfig;

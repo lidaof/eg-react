@@ -1,18 +1,17 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 import Chromosomes from './Chromosomes';
 import Ruler from './Ruler';
 import SelectedRegionBox from './SelectedRegionBox';
 
-import { SelectableGenomeArea } from '../SelectableGenomeArea';
 import { RegionPanTracker } from '../RegionPanTracker';
+import { SelectableGenomeArea } from '../SelectableGenomeArea';
 import withAutoDimensions from '../withAutoDimensions';
-import withCurrentGenome from '../withCurrentGenome';
 
 import DisplayedRegionModel from '../../model/DisplayedRegionModel';
-import { MouseButton } from '../../util';
 import OpenInterval from '../../model/interval/OpenInterval';
+import { MouseButton } from '../../util';
 
 import './MainPane.css';
 

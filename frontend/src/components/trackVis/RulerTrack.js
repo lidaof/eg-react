@@ -1,15 +1,14 @@
-import React from "react";
 import PropTypes from "prop-types";
+import React from "react";
 
-import Track from "./commonComponents/Track";
-import HoverTooltipContext from "./commonComponents/tooltip/HoverTooltipContext";
 import Chromosomes from "../genomeNavigator/Chromosomes";
 import Ruler from "../genomeNavigator/Ruler";
 import GenomicCoordinates from "./commonComponents/GenomicCoordinates";
+import HoverTooltipContext from "./commonComponents/tooltip/HoverTooltipContext";
+import Track from "./commonComponents/Track";
 import TrackLegend from "./commonComponents/TrackLegend";
 
 import DisplayedRegionModel from "../../model/DisplayedRegionModel";
-import { getGenomeConfig } from "../../model/genomes/allGenomes";
 import { TrackModel } from "../../model/TrackModel";
 
 const CHROMOSOMES_Y = 60;

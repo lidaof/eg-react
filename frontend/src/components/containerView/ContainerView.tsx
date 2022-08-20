@@ -1,22 +1,23 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Action, Dispatch } from 'redux';
-import { ContainerActionsCreatorsFactory, GenomeState, SyncedContainer } from "AppState";
-import TrackContainer from '../trackContainers/TrackContainer';
-import { RegionExpander } from "model/RegionExpander";
-import { GenomeConfig } from "model/genomes/GenomeConfig";
-import { getGenomeConfig } from "model/genomes/allGenomes";
-import { Model } from "flexlayout-react";
-import { HighlightInterval } from "../trackContainers/HighlightMenu";
-import GenomeNavigator from "../genomeNavigator/GenomeNavigator";
-import { connect } from "react-redux";
-import TrackModel from "model/TrackModel";
-import StateSyncSettings from './StateSyncSettings';
+import React from 'react';
 import {
     Grid, Typography
 } from '@material-ui/core';
-import ContainerTools, { ProvidedControls } from "./ContainerTools";
-import { Tools } from "components/trackContainers/Tools";
+import { ContainerActionsCreatorsFactory, SyncedContainer } from "AppState";
 import InlineEditable from "components/egUI/InlineEditable";
+import { Tools } from "components/trackContainers/Tools";
+import { Model } from "flexlayout-react";
+import { getGenomeConfig } from "model/genomes/allGenomes";
+import { GenomeConfig } from "model/genomes/GenomeConfig";
+import { RegionExpander } from "model/RegionExpander";
+import TrackModel from "model/TrackModel";
+import { useEffect, useMemo, useState } from "react";
+import { connect } from "react-redux";
+import { Action, Dispatch } from 'redux';
+import GenomeNavigator from "../genomeNavigator/GenomeNavigator";
+import { HighlightInterval } from "../trackContainers/HighlightMenu";
+import TrackContainer from '../trackContainers/TrackContainer';
+import ContainerTools, { ProvidedControls } from "./ContainerTools";
+import StateSyncSettings from './StateSyncSettings';
 
 interface StateContainerProps {
     stateIdx: number;
@@ -61,9 +62,12 @@ function _ContainerView(props: StateContainerProps) {
     } = props;
     const { title, genomes, viewRegion, highlights } = cdata;
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [highlightColor, setHighlightColor] = useState("rgba(255, 255, 0, 0.3)");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [highlightEnteredRegion, setHighlightEnteredRegion] = useState(true);
     const [regionExpanders, setRegionExpanders] = useState<RegionExpander[]>(new Array(genomes.length).fill(new RegionExpander(1)));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [suggestedMetaSets, setSuggestedMetaSets] = useState(new Set(["Track type"]));
     const [trackControls, setTrackControls] = useState<ProvidedControls[]>([]);
     const [tool, setTool] = useState<typeof Tools.DRAG>(Tools.DRAG);
@@ -79,7 +83,7 @@ function _ContainerView(props: StateContainerProps) {
             setRegionExpanders(regionExpanders.slice(0, genomes.length));
         }
         setTrackControls(new Array(genomes.length));
-    }, [genomes.length]);
+    }, [genomes.length, regionExpanders]);
 
     const genomeConfigs: GenomeConfig[] = useMemo(() => genomes.map(g => {
         return g.genomeConfig || getGenomeConfig(g.name);
@@ -189,7 +193,7 @@ function _ContainerView(props: StateContainerProps) {
             </Grid>
             <div style={{
                 border: "1px solid #C4C4C4",
-                borderRadius: 30,
+                borderRadius: 15,
                 overflow: "hidden",
             }}>
                 {isShowingNavigator && (

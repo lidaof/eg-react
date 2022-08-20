@@ -6,6 +6,10 @@
     --light-bg-color: white;
 }
 
+*:focus {
+    outline: none !important;
+}
+
 .App {
     margin-bottom: 30px;
 }

@@ -92,7 +92,7 @@ function _MenuModal(props: MenuModalProps) {
         setScreens([...screens, component]);
         setTitles([...titles, newTitle]);
     };
-
+    
     const canGoBack = screens.length > 0;
     const goBack = () => {
         if (canGoBack) {

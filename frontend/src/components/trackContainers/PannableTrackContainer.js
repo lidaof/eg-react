@@ -97,7 +97,7 @@ export class PannableTrackContainer extends React.Component {
      * @inheritdoc
      */
     render() {
-        const { trackElements, visData, xOffset, genomeConfig } = this.props;
+        const { trackElements, visData, xOffset, } = this.props;
         const { visRegion, visWidth, viewWindowRegion } = visData;
         const tracksWithXOffset = trackElements.map(
             // Give xOffset to tracks

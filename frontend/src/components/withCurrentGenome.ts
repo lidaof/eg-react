@@ -1,11 +1,22 @@
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { getGenomeConfig } from "../model/genomes/allGenomes";
+import AppState from "AppState";
+import SnackbarEngine from "SnackbarEngine";
 
-function getGenomeConfigFromStore(state) {
+let multipleGenomesWarned = false;
+
+function getGenomeConfigFromStore(state: { browser: { present: AppState, past: AppState[], future: AppState[] } }) {
+    const present = state.browser.present;
+    if (!(present.containers && present.containers.length && present.containers[0].genomes && present.containers[0].genomes.length)) return { genomeConfig: null }
+    if (!multipleGenomesWarned && (present.containers.length > 1 || present.containers[0].genomes.length > 1)) {
+        SnackbarEngine.warning("Multiple genomes aren't completely supported here yet. You might run into issues.");
+        multipleGenomesWarned = true;
+    }
     return {
-        genomeConfig: state.browser.present.genomeConfig || getGenomeConfig(state.browser.present.genomeName)
-    };
+        genomeConfig: present.containers[0].genomes[0].genomeConfig ||
+            getGenomeConfig(present.containers[0].genomes[0].name)
+    }
 }
 
 /**
@@ -22,6 +33,7 @@ function getGenomeConfigFromStore(state) {
  * @author Silas Hsu
  */
 const withCurrentGenome = connect(getGenomeConfigFromStore);
+// @ts-ignore
 withCurrentGenome.INJECTED_PROPS = {
     genomeConfig: PropTypes.object
 };

@@ -174,4 +174,4 @@ class HubTable extends React.PureComponent {
     }
 }
 
-export default withCurrentGenome(HubTable);
+export default HubTable;

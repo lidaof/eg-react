@@ -4,7 +4,6 @@ import shortid from "shortid";
 import { connect } from "react-redux";
 import _ from "lodash";
 import { ActionCreators } from "./AppState";
-import withCurrentGenome from "./components/withCurrentGenome";
 import App from "./App";
 // import G3dContainer from "components/trackVis/3d/G3dContainer";
 // import MolstarContainer from "components/trackVis/3d/MolstarContainer";
@@ -23,10 +22,10 @@ import {
 } from "./layoutUtils";
 import OmeroContainer from "components/trackVis/imageTrack/OmeroContainer";
 
-// import "../node_modules/flexlayout-react/style/light.css";
 import "./AppLayout.css";
-import { SnackbarProvider, closeSnackbar, withSnackbar } from "notistack";
+import { SnackbarProvider, } from "notistack";
 import { createTheme, CssBaseline, Grow, ThemeProvider, } from "@material-ui/core";
+import { SnackbarUtilsConfigurator } from "SnackbarEngine";
 
 /**
  * generate layout when VR is on, or g3d track submitted etc
@@ -36,12 +35,35 @@ const REGION_EXPANDER = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
 
 function mapStateToProps(state) {
+
+    const appState = state.browser.present;
+    const [cidx, gidx] = appState.editTarget;
+    const { compatabilityMode, containers } = appState;
+    const pickingGenome = !(containers && containers.length);
+
+    let editingGenome = {} , editingContainer = {};
+    if (!pickingGenome && !compatabilityMode) {
+        editingGenome = (appState.containers && appState.containers[cidx].genomes[gidx]) || {};
+        editingContainer = (appState.containers && appState.containers[cidx]) || {};
+    }
+
     return {
-        viewRegion: state.browser.present.viewRegion,
-        tracks: state.browser.present.tracks,
+        viewRegion: editingContainer.viewRegion || appState.viewRegion,
+        tracks: editingGenome.tracks || appState.tracks,
+        bundleId: appState.bundleId,
+        sessionFromUrl: appState.sessionFromUrl,
+        trackLegendWidth: appState.trackLegendWidth,
+        isShowingNavigator: appState.isShowingNavigator,
+        customTracksPool: editingGenome.customTracksPool || appState.customTracksPool,
+        virusBrowserMode: appState.virusBrowserMode,
+        highlights: editingGenome.highlights || appState.highlights,
+
+        containers: appState.containers,
+        g3dTracks: appState.g3dTracks,
+        editTarget: appState.editTarget,
         isShowingVR: state.browser.present.isShowingVR,
         layout: state.browser.present.layout,
-        selectedSet: state.browser.present.regionSetView,
+        selectedSet: editingGenome.regionSetView || appState.regionSetView,
         darkTheme: state.browser.present.darkTheme,
     };
 }
@@ -106,30 +128,32 @@ class AppLayout extends React.PureComponent {
                 this.props.onSetLayout(layout);
             }
         }
-        if (prevProps.tracks !== this.props.tracks) {
-            const prevG3dtracks = prevProps.tracks.filter((t) => t.type === "g3d");
-            const prevIds = prevG3dtracks.map((tk) => tk.getId());
-            const currentG3dtracks = this.props.tracks.filter((t) => t.type === "g3d");
-            const g3dtracks = currentG3dtracks.filter((tk) => !prevIds.includes(tk.getId()));
+        if (prevProps.g3dTracks !== this.props.g3dTracks) {
+            const prevG3dtracks = prevProps.g3dTracks;
+            const prevIds = prevG3dtracks.map((tk) => tk.track.getId());
+            const currentG3dtracks = this.props.g3dTracks;
+            const g3dtracks = currentG3dtracks.filter((tk) => !prevIds.includes(tk.track.getId()));
             let layout = { ...this.props.layout };
             if (g3dtracks.length) {
                 this.setState((prevState) => {
-                    return { g3dcount: prevState.g3dcount + g3dtracks.length };
+                    return { g3dCount: prevState.g3dcount + g3dtracks.length };
                 });
-                g3dtracks.forEach((tk) => {
+                g3dtracks.forEach((tinfo) => {
+                    const { track, location } = tinfo;
                     const tabId = shortid.generate();
                     const addLayout = {
                         type: "tabset",
                         children: [
                             {
                                 type: "tab",
-                                name: tk.getDisplayLabel(),
+                                name: track.getDisplayLabel(),
                                 component: "g3d",
                                 id: tabId,
                                 config: {
-                                    trackModel: tk.serialize(),
+                                    trackModel: track.serialize(),
                                     tabId,
-                                    trackId: tk.getId(),
+                                    trackId: track.getId(),
+                                    location,
                                 },
                             },
                         ],
@@ -139,6 +163,39 @@ class AppLayout extends React.PureComponent {
                 this.props.onSetLayout(layout);
             }
         }
+        // if (prevProps.tracks !== this.props.tracks) {
+        //     const prevG3dtracks = prevProps.tracks.filter((t) => t.type === "g3d");
+        //     const prevIds = prevG3dtracks.map((tk) => tk.getId());
+        //     const currentG3dtracks = this.props.tracks.filter((t) => t.type === "g3d");
+        //     const g3dtracks = currentG3dtracks.filter((tk) => !prevIds.includes(tk.getId()));
+        //     let layout = { ...this.props.layout };
+        //     if (g3dtracks.length) {
+        //         this.setState((prevState) => {
+        //             return { g3dcount: prevState.g3dcount + g3dtracks.length };
+        //         });
+        //         g3dtracks.forEach((tk) => {
+        //             const tabId = shortid.generate();
+        //             const addLayout = {
+        //                 type: "tabset",
+        //                 children: [
+        //                     {
+        //                         type: "tab",
+        //                         name: tk.getDisplayLabel(),
+        //                         component: "g3d",
+        //                         id: tabId,
+        //                         config: {
+        //                             trackModel: tk.serialize(),
+        //                             tabId,
+        //                             trackId: tk.getId(),
+        //                         },
+        //                     },
+        //                 ],
+        //             };
+        //             layout = addTabSetToLayout(addLayout, layout);
+        //         });
+        //         this.props.onSetLayout(layout);
+        //     }
+        // }
         if (prevProps.layout !== this.props.layout) {
             const g3dcount = this.checkG3dLayout();
             this.setState({ g3dcount });
@@ -301,8 +358,16 @@ class AppLayout extends React.PureComponent {
 
     render3dmolContainer = (node) => {
         const model = node.getModel();
-        const { viewRegion, genomeConfig, tracks, onNewViewRegion, onSetSelected, selectedSet, darkTheme } = this.props;
+        const { onNewViewRegion, onSetSelected, selectedSet, darkTheme } = this.props;
+        const { containers } = this.props;
         const config = node.getConfig();
+        const { location: [cidx, gidx] } = config;
+        const curContainer = containers[cidx];
+        if (!curContainer) return null;
+        const curGenome = curContainer.genomes[gidx];
+        const { viewRegion, } = curContainer;
+        const { genomeConfig, tracks } = curGenome;
+
         const { x, y, width, height } = node.getRect();
         const g3dtrack = TrackModel.deserialize(config.trackModel);
         g3dtrack.id = config.trackId;
@@ -399,8 +464,10 @@ class AppLayout extends React.PureComponent {
                         horizontal: 'right',
                     }}
                     TransitionComponent={Grow}
-                    maxSnack={1}
+                    maxSnack={3}
+                    preventDuplicate
                 >
+                    <SnackbarUtilsConfigurator />
                     <div style={{ width: "100%", height: "100%" }} id="flex-container" data-theme={theme}>
                         <FlexLayout.Layout model={model} factory={this.factory} />
                     </div>
@@ -421,5 +488,5 @@ class AppLayout extends React.PureComponent {
 }
 
 const withAppState = connect(mapStateToProps, callbacks);
-const withEnhancements = _.flowRight(withAppState, withCurrentGenome);
+const withEnhancements = _.flowRight(withAppState);
 export default withEnhancements(AppLayout);

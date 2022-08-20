@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import Button from '../../egUI/Button'
-import { Menu, MenuItem } from "@material-ui/core";
-import MenuModal from '../../egUI/MenuModal';
-import NavigableMenuModal from '../../egUI/NavigableMenuModal';
-import RegionSetSelector from "components/RegionSetSelector";
+import { Menu } from "@material-ui/core";
 import FacetTableUI from "components/FacetTableUI";
 import { AnnotationTrackUI } from "components/trackManagers/AnnotationTrackUI";
 import CustomTrackAdder from "components/trackManagers/CustomTrackAdder";
 import HubPane from "components/trackManagers/HubPane";
 import TrackList from "components/trackManagers/TrackList";
 import { TrackUpload } from "components/TrackUpload";
-import { TextTrack } from '../../TextTrack';
-import { GenomeConfig } from "model/genomes/GenomeConfig";
 import Track from "components/trackVis/commonComponents/Track";
+import { GenomeConfig } from "model/genomes/GenomeConfig";
 import TrackModel from "model/TrackModel";
+import React, { useState } from "react";
+import Button from '../../egUI/Button';
+import MenuModal from '../../egUI/MenuModal';
+import NavigableMenuModal from '../../egUI/NavigableMenuModal';
+import { TextTrack } from '../../TextTrack';
 
 interface TracksProps {
     tracks: TrackModel[];
@@ -101,9 +100,10 @@ function Tracks(props: TracksProps) {
                         // publicTrackSets={publicTrackSets}
                         addedTrackSets={addedTrackSets}
                         addTermToMetaSets={addTermToMetaSets}
+                        genomeConfig={genomeConfig}
                     />
                 </NavigableMenuModal>
-                <MenuModal closeMenu={handleClose} title="Track Facet Table" genomeDependent>
+                <NavigableMenuModal closeMenu={handleClose} title="Track Facet Table" genomeDependent>
                     <FacetTableUI
                         publicTracksPool={publicTracksPool}
                         customTracksPool={customTracksPool}
@@ -114,7 +114,7 @@ function Tracks(props: TracksProps) {
                         addedTrackSets={addedTrackSets}
                         addTermToMetaSets={addTermToMetaSets}
                     />
-                </MenuModal>
+                </NavigableMenuModal>
                 <MenuModal closeMenu={handleClose} title="Remote Tracks" genomeDependent>
                     <CustomTrackAdder
                         addedTracks={tracks}

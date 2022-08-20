@@ -1,27 +1,12 @@
-import TrackRegionController from 'components/genomeNavigator/TrackRegionController';
 import ButtonGroup from 'components/trackContainers/ButtonGroup';
+import { HighlightInterval, HighlightMenu } from 'components/trackContainers/HighlightMenu';
+import History from 'components/trackContainers/History';
+import MetadataHeader from 'components/trackContainers/MetadataHeader';
 import ReorderMany from 'components/trackContainers/ReorderMany';
 import { ToolButtons, Tools } from 'components/trackContainers/Tools';
-import UndoRedo from 'components/trackContainers/UndoRedo';
-import History from 'components/trackContainers/History';
 import ZoomButtons from 'components/trackContainers/ZoomButtons';
-import React, { RefObject, useState } from 'react';
 import DisplayedRegionModel from 'model/DisplayedRegionModel';
-import { HighlightInterval, HighlightMenu } from 'components/trackContainers/HighlightMenu';
-import { niceBpCount } from '../../util';
-import MetadataHeader from 'components/trackContainers/MetadataHeader';
-import {
-    IconButton,
-} from '@material-ui/core';
-import {
-    PanTool,
-    Shuffle,
-    ZoomIn,
-    BorderColor,
-    SwapVert,
-    ArrowLeft,
-    ArrowRight,
-} from '@material-ui/icons'
+import React, { useState } from 'react';
 
 export interface ProvidedControls {
     genomeIdx: number;
@@ -49,7 +34,6 @@ function ContainerTools(props: ContainerToolsProps) {
         trackControls,
         tool,
         onToolChanged,
-        embeddingMode,
         viewRegion,
         onNewRegion,
         onSetHighlights,

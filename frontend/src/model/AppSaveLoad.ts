@@ -2,7 +2,7 @@ import TrackModel from "./TrackModel";
 import RegionSet from "./RegionSet";
 import DisplayedRegionModel from "./DisplayedRegionModel";
 import { getGenomeConfig } from "./genomes/allGenomes";
-import { AppState, DEFAULT_TRACK_LEGEND_WIDTH } from "../AppState";
+import { AppState, SyncedContainer, DEFAULT_TRACK_LEGEND_WIDTH, GenomeState, G3DTrackInfo } from "../AppState";
 import OpenInterval from "./interval/OpenInterval";
 // import { withFirebase } from 'react-redux-firebase'
 
@@ -42,6 +42,34 @@ export class AppStateSaver {
             highlights: appState.highlights,
             darkTheme: appState.darkTheme,
             editTarget: appState.editTarget,
+            containers: appState.containers.map(container => {
+                return {
+                    title: container.title,
+                    genomes: container.genomes.map(genome => {
+                        const regionSetViewIndex = genome.regionSets && genome.regionSets.findIndex(regionSet => regionSet === genome.regionSetView);
+                        return {
+                            name: genome.name,
+                            title: genome.title,
+                            tracks: genome.tracks.filter((track) => !track.fileObj).map((track) => track.serialize()),
+                            customTracksPool: genome.customTracksPool,
+                            genomeConfig: genome.genomeConfig,
+                            highlights: genome.highlights,
+                            metadataTerms: genome.metadataTerms,
+                            regionSets: genome.regionSets && genome.regionSets.map((set) => set.serialize()),
+                            regionSetViewIndex: regionSetViewIndex,
+                            settings: genome.settings,
+                        };
+                    }),
+                    viewInterval: container.viewRegion ? container.viewRegion.getContextCoordinates().serialize() : null,
+                    highlights: container.highlights,
+                }
+            }),
+            g3dTracks: appState.g3dTracks && appState.g3dTracks.map((t: G3DTrackInfo): G3DTrackInfo => {
+                return {
+                    track: t.track.serialize(),
+                    location: t.location,
+                }
+            })
             // threedTracks: appState.threedTracks.filter((track) => !track.fileObj).map((track) => track.serialize()),
         };
         return object;
@@ -84,12 +112,37 @@ export class AppStateLoader {
             isShowingVR: object.isShowingVR,
             layout: object.layout || {},
             highlights: object.highlights || [],
-
-            containers: object.containers,
             // TODO: add logic to properly convert containers.
             compatabilityMode: object.compatabilityMode,
             darkTheme: object.darkTheme || false,
             editTarget: object.editTarget,
+            containers: object.containers && object.containers.map((container: SyncedContainer) => {
+                return {
+                    title: container.title,
+                    viewRegion: this._restoreContainerViewRegion(container, container.genomes[0].regionSetView),
+                    genomes: container.genomes.map((genome: GenomeState) => {
+                        return {
+                            name: genome.name,
+                            title: genome.title,
+                            tracks: genome.tracks.map((track: any) => TrackModel.deserialize(track)),
+                            customTracksPool: genome.customTracksPool,
+                            genomeConfig: getGenomeConfig(genome.name),
+                            highlights: genome.highlights,
+                            metadataTerms: genome.metadataTerms,
+                            regionSets: genome.regionSets && genome.regionSets.map((set: any) => RegionSet.deserialize(set)),
+                            regionSetView: genome.regionSetView,
+                            settings: genome.settings,
+                        };
+                    }),
+                    highlights: container.highlights,
+                }
+            }),
+            g3dTracks: object.g3dTracks && object.g3dTracks.map((t: G3DTrackInfo): G3DTrackInfo => {
+                return {
+                    track: TrackModel.deserialize(t.track),
+                    location: t.location,
+                }
+            })
             // threedTracks: object.threedTracks.map((data: any) => TrackModel.deserialize(data)),
         };
     }
@@ -120,5 +173,14 @@ export class AppStateLoader {
         } else {
             return new DisplayedRegionModel(genomeConfig.navContext, ...viewInterval);
         }
+    }
+
+    _restoreContainerViewRegion(container: any, regionSetView: RegionSet) {
+        const obj = {
+            genomeName: container.genomes[0].name,
+            viewInterval: container.viewInterval,
+            displayRegion: container.genomes[0].displayRegion,
+        }
+        return this._restoreViewRegion(obj, regionSetView);
     }
 }

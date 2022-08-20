@@ -1,14 +1,9 @@
+import { Dialog, DialogActions, DialogContent, DialogTitle, Grow, Typography } from "@material-ui/core";
 import Button from "components/egUI/Button";
-import React, { useState } from "react";
-import { Dialog, DialogActions, DialogContent, DialogTitle, Grow, Menu, MenuItem, Typography } from "@material-ui/core";
-import MenuModal from "../../egUI/MenuModal";
 import ShareUI from "components/ShareUI";
+import React, { useState } from "react";
 
-interface ShareProps {
-
-}
-
-function Share(props: ShareProps) {
+function Share() {
     const [open, setOpen] = useState(false);
 
     const handleOpen = () => {

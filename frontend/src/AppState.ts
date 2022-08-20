@@ -5,28 +5,29 @@
  * @author Daofeng Li
  *
  */
-import { createStore, combineReducers, compose } from "redux";
-import uuid from "uuid";
+import { getGenomeContainerTitle } from "components/containerView/containerUtils";
+import { uncompressString } from "components/ShareUI";
 import * as firebase from "firebase/app";
 import "firebase/database";
-import { firebaseReducer, reactReduxFirebase } from "react-redux-firebase";
-import undoable from "redux-undo";
-import querySting from "query-string";
-import _, { attempt } from "lodash";
-import { getGenomeConfig } from "./model/genomes/allGenomes";
-import DisplayedRegionModel from "./model/DisplayedRegionModel";
-import { AppStateSaver, AppStateLoader } from "./model/AppSaveLoad";
-import TrackModel, { mapUrl } from "./model/TrackModel";
-import RegionSet from "./model/RegionSet";
-import { HighlightInterval } from "./components/trackContainers/HighlightMenu";
-import Json5Fetcher from "./model/Json5Fetcher";
-import DataHubParser from "./model/DataHubParser";
-import OpenInterval from "./model/interval/OpenInterval";
-import { Genome } from "./model/genomes/Genome";
-import Chromosome from "./model/genomes/Chromosome";
+import _ from "lodash";
 import { GenomeConfig } from "model/genomes/GenomeConfig";
-import { uncompressString } from "components/ShareUI";
-import { getGenomeContainerTitle } from "components/containerView/containerUtils";
+import querySting from "query-string";
+import { firebaseReducer, reactReduxFirebase } from "react-redux-firebase";
+import { combineReducers, compose, createStore } from "redux";
+import undoable from "redux-undo";
+import SnackbarEngine from "SnackbarEngine";
+import uuid from "uuid";
+import { HighlightInterval } from "./components/trackContainers/HighlightMenu";
+import { AppStateLoader, AppStateSaver } from "./model/AppSaveLoad";
+import DataHubParser from "./model/DataHubParser";
+import DisplayedRegionModel from "./model/DisplayedRegionModel";
+import { getGenomeConfig } from "./model/genomes/allGenomes";
+import Chromosome from "./model/genomes/Chromosome";
+import { Genome } from "./model/genomes/Genome";
+import OpenInterval from "./model/interval/OpenInterval";
+import Json5Fetcher from "./model/Json5Fetcher";
+import RegionSet from "./model/RegionSet";
+import TrackModel, { mapUrl } from "./model/TrackModel";
 
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
@@ -96,6 +97,7 @@ export interface AppState {
     compatabilityMode: boolean;
     darkTheme?: boolean;
     editTarget: [number, number] // [containerIdx, genomeIdx];
+    g3dTracks: G3DTrackInfo[];
 }
 
 // state for a single genome.
@@ -108,7 +110,7 @@ export interface GenomeState {
 
     // if nullable, the data starts off as null and uses the global values. these values can be overridden locally.
     highlights: HighlightInterval[] | null;
-    
+
     metadataTerms: string[];
     regionSets: RegionSet[];
     regionSetView: RegionSet;
@@ -128,6 +130,11 @@ export interface SyncedContainer {
 
     viewRegion: DisplayedRegionModel;
     highlights: HighlightInterval[];
+}
+
+export interface G3DTrackInfo {
+    track: TrackModel;
+    location: [number, number] // [containerIdx, genomeIdx]
 }
 
 const bundleId = uuid.v1();
@@ -176,7 +183,8 @@ const initialState: AppState = {
     highlights: [],
     compatabilityMode: false,
     darkTheme: prefersDark,
-    editTarget: [0, 0] // [containerIdx, genomeIdx];
+    editTarget: [0, 0], // [containerIdx, genomeIdx];
+    g3dTracks: []
 };
 
 enum ActionType {
@@ -597,8 +605,9 @@ function getInitialState(): AppState {
     if (blob) {
         try {
             state = new AppStateLoader().fromJSON(blob);
+            if (state.containers && state.containers.length) SnackbarEngine.success("Restored last session");
         } catch (error) {
-            console.error("Error restoring session");
+            console.error("Session restored");
             console.error(error);
         }
     }
@@ -736,8 +745,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         }
         case ActionType.SET_TRACKS: {
             const { tracks, containerIdx, genomeIdx } = action;
-            
-            let cidx, gidx: number;
+
+            let cidx: number, gidx: number;
             if (containerIdx) {
                 cidx = containerIdx;
                 gidx = genomeIdx;
@@ -747,6 +756,12 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return {
                 ...prevState,
                 tracks: tracks.filter((t: TrackModel) => t.type === "g3d"),
+                g3dTracks: [...prevState.g3dTracks, ...tracks.filter((t: TrackModel) => t.type === "g3d").map((t: TrackModel) => {
+                    return {
+                        track: t,
+                        location: [cidx, gidx],
+                    };
+                })],
                 containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
                     return {
                         ...c,
@@ -761,7 +776,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             };
         }
         case ActionType.SET_METADATA_TERMS:
-            const { terms, containerIdx, genomeIdx } = action;
+            const { terms, containerIdx, } = action;
             return {
                 ...prevState,
                 containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
@@ -794,6 +809,8 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, trackLegendWidth: action.width };
         case ActionType.RESTORE_SESSION:
             const sessionState = new AppStateLoader().fromObject(action.sessionState);
+            // TODO: warn the user that their local work is about to be overwritten
+            // allow them to undo.
             if (!sessionState.bundleId) {
                 return { ...sessionState, bundleId: uuid.v1() };
             }
@@ -853,8 +870,16 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 }))
             };
         }
-        case ActionType.SET_GENOME_SETTINGS: {
+        case ActionType.SET_GENOME_SETTINGS: { // TODO: don't allow a genome to be moved if it has a 3d genome linked to it
             const { settings, containerIdx, genomeIdx } = action;
+
+            if (prevState.g3dTracks.some(({ location: [cidx, gidx] }) => {
+                return cidx === containerIdx && gidx === genomeIdx;
+            })) {
+                SnackbarEngine.error("You can't move a genome which is linked to a 3d genome!");
+                return prevState;
+            }
+
             return {
                 ...prevState,
                 containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
@@ -950,11 +975,9 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 darkTheme: prevState.darkTheme,
                 containers: containers.map((containerGenomes: string[]) => {
                     let nextViewRegion = null;
-                    let nextTracks: TrackModel[] = [];
                     const {
                         navContext,
                         defaultRegion,
-                        defaultTracks,
                         // genome,
                         // cytobands,
                         // publicHubData,
@@ -964,7 +987,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     } = getGenomeConfig(containerGenomes[0]);
                     if (config) {
                         nextViewRegion = new DisplayedRegionModel(navContext, ...defaultRegion);
-                        nextTracks = defaultTracks;
                     }
 
                     return {
@@ -972,12 +994,9 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                         viewRegion: nextViewRegion,
                         title: getGenomeContainerTitle(containerGenomes),
                         genomes: containerGenomes.map(name => {
-                            let nextViewRegion = null;
                             let nextTracks: TrackModel[] = [];
                             const genomeConfig = getGenomeConfig(name);
                             const {
-                                navContext,
-                                defaultRegion,
                                 defaultTracks,
                                 // genome,
                                 // cytobands,
@@ -987,7 +1006,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                                 // twoBitURL,
                             } = genomeConfig;
                             if (genomeConfig) {
-                                nextViewRegion = new DisplayedRegionModel(navContext, ...defaultRegion);
                                 nextTracks = defaultTracks;
                             }
 

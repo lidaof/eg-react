@@ -1,10 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
-import connect from "react-redux/lib/connect/connect";
 import ReactModal from "react-modal";
 import Hotkeys from "react-hot-keys";
-import { ActionCreators } from "../../AppState";
 import { withTrackData } from "./TrackDataManager";
 import { withTrackView } from "./TrackViewManager";
 import TrackHandle from "./TrackHandle";
@@ -46,22 +44,22 @@ const SELECTION_BEHAVIOR = new TrackSelectionBehavior();
 ///////////
 // HOC's //
 ///////////
-function mapStateToProps(state) {
-    return {
-        genome: state.browser.present.genomeName,
-        viewRegion: state.browser.present.viewRegion,
-        // tracks: state.browser.present.tracks,
-        metadataTerms: state.browser.present.metadataTerms,
-    };
-}
+// function mapStateToProps(state) {
+//     return {
+//         genome: state.browser.present.genomeName,
+//         viewRegion: state.browser.present.viewRegion,
+//         // tracks: state.browser.present.tracks,
+//         metadataTerms: state.browser.present.metadataTerms,
+//     };
+// }
 
-const callbacks = {
-    onNewRegion: ActionCreators.setViewRegion,
-    onTracksChanged: ActionCreators.setTracks,
-    onMetadataTermsChanged: ActionCreators.setMetadataTerms,
-};
+// const callbacks = {
+//     onNewRegion: ActionCreators.setViewRegion,
+//     onTracksChanged: ActionCreators.setTracks,
+//     onMetadataTermsChanged: ActionCreators.setMetadataTerms,
+// };
 
-const withAppState = connect(mapStateToProps, callbacks);
+// const withAppState = connect(mapStateToProps, callbacks);
 const withEnhancements = _.flowRight(withAutoDimensions, withTrackView, withTrackData);
 
 /**

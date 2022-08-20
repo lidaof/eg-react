@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
     Button,
     Dialog,
@@ -13,9 +12,12 @@ import {
     useMediaQuery,
     useTheme
 } from "@material-ui/core";
-import AppState, { ActionCreators, GenomeState, SyncedContainer } from "AppState";
-import { connect } from "react-redux";
 import { SwapVert } from "@material-ui/icons";
+import AppState, { ActionCreators, GenomeState, SyncedContainer } from "AppState";
+import React, { useState } from "react";
+import { connect } from "react-redux";
+// @ts-ignore
+import { motion } from 'framer-motion/dist/framer-motion';
 
 interface MenuModalProps {
     children: React.ReactNode;
@@ -69,7 +71,7 @@ function _MenuModal(props: MenuModalProps) {
                 props.onEditTargetChange(t.location);
             }
             handleMenuClose();
-            }}
+        }}
             selected={t.selected}
         >
             {t.title}
@@ -131,7 +133,15 @@ function _MenuModal(props: MenuModalProps) {
                     </div>
                 </DialogTitle>
                 <DialogContent style={{ marginLeft: "15px" }} key={genomeDependent && "" + editTarget[0] + editTarget[1]}>
-                    {children}
+                    <motion.div
+                        transition={{ duration: 0.3, bounce: 0, ease: "circOut" }}
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 50 }}
+                        key={editTarget}
+                    >
+                        {children}
+                    </motion.div>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">

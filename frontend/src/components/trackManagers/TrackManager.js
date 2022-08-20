@@ -6,6 +6,7 @@ import CustomTrackAdder from './CustomTrackAdder';
 
 import './TrackManager.css';
 
+// this component should be updated so that there is a genomeConfig passed down to it.
 /**
  * A complete specification for a submenu.
  * 
