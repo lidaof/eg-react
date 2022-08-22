@@ -1,5 +1,5 @@
+import { Feature, Strand } from "./../Feature";
 import ChromosomeInterval, { IChromosomeInterval } from "../interval/ChromosomeInterval";
-import NavigationContext from "../NavigationContext";
 
 /**
  * The properties of GraphNode without the methods.
@@ -7,35 +7,31 @@ import NavigationContext from "../NavigationContext";
 export interface IGraphNode {
     name: string;
     locus: IChromosomeInterval;
+    strand: Strand;
     rank: number;
-    // strand: Strand;
 }
-
 
 /**
  * A GraphNode, in the graph genome.
- *
+ * a feature with rank, maybe other methods and props in future so in a separate file
  * @author Daofeng Li
  */
-export class GraphNode {
-    name: string; // - name of the node
+export class GraphNode extends Feature {
     /**
-     * Makes a new instance with specified name and locus.  Empty names are valid.  If given `undefined` or `null`, it
-     * defaults to the locus as a string.
      *
-     * @param {string} [name] - name of the feature
-     * @param {ChromosomeInterval} locus - genomic location of the feature
+     * @param {string} [name] - name of the node
+     * @param {ChromosomeInterval} locus - genomic location of the node
      */
     constructor(name: string, public locus: ChromosomeInterval, public rank: number = 0) {
-        this.name = name === undefined ? locus.toString() : name; // eslint-disable-line eqeqeq
-        this.locus = locus;
-        this.rank  = rank;
+        super(name, locus);
+        this.rank = rank;
     }
 
     serialize(): IGraphNode {
         return {
             name: this.name,
             locus: this.getLocus().serialize(),
+            strand: this.strand,
             rank: this.rank,
         };
     }
@@ -44,36 +40,12 @@ export class GraphNode {
         return new GraphNode(object.name, ChromosomeInterval.deserialize(object.locus), object.rank);
     }
 
-    /**
-     * @return {string} the name of this feature
-     */
-    getName(): string {
-        return this.name;
-    }
-
-    /**
-     * @return {ChromosomeInterval} the genomic location of this feature
-     */
-    getLocus(): ChromosomeInterval {
-        return this.locus;
-    }
-
-    /**
-     * @return {number} the length of this feature's locus
-     */
-    getLength(): number {
-        return this.locus.getLength();
-    }
-
     getRank(): number {
         return this.rank;
- }
-    computeNavContextCoordinates(navContext: NavigationContext) {
-        return navContext.convertGenomeIntervalToBases(this.getLocus());
     }
 }
 /**
- * 
+ * the raw data from brgfa file record
  * @param raw 
  * {len: 8677
 name: "s73410"
@@ -90,6 +62,6 @@ interface IRawNode {
     soff: number;
 }
 
-export function nodeFromRawNode(raw: IRawNode){
-    return new GraphNode(raw.name, new ChromosomeInterval(raw.sname, raw.soff, raw.soff+raw.len), raw.rank);
+export function nodeFromRawNode(raw: IRawNode) {
+    return new GraphNode(raw.name, new ChromosomeInterval(raw.sname, raw.soff, raw.soff + raw.len), raw.rank);
 }

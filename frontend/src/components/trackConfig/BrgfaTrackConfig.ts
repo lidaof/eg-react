@@ -1,4 +1,4 @@
-import { GraphNode, nodeFromRawNode } from './../../model/graph/GraphNode';
+import { GraphNode, nodeFromRawNode } from "./../../model/graph/GraphNode";
 import YscaleConfig from "components/trackContextMenu/YscaleConfig";
 import { AnnotationDisplayModes } from "../../model/DisplayModes";
 import { AnnotationTrackConfig } from "./AnnotationTrackConfig";
@@ -11,7 +11,7 @@ import LocalBedSource from "../../dataSources/LocalBedSource";
 import BedTextSource from "../../dataSources/BedTextSource";
 import HiddenPixelsConfig from "../trackContextMenu/HiddenPixelsConfig";
 import AlwaysDrawLabelConfig from "components/trackContextMenu/AlwaysDrawLabelConfig";
-import { GraphLink } from 'model/graph/GraphLink';
+import { GraphLink } from "model/graph/GraphLink";
 
 export class BrgfaTrackConfig extends AnnotationTrackConfig {
     initDataSource() {
@@ -37,30 +37,32 @@ export class BrgfaTrackConfig extends AnnotationTrackConfig {
      */
     formatData(data: BedRecord[]) {
         const nodes = new Map();
-        const links:GraphLink[] = [];
-        data.forEach(
-            (record) => {
-                const locus = new ChromosomeInterval(record.chr, record.start, record.end);
-                const sname = record[3];
-                const snode =new GraphNode(sname, locus)
-                if(!nodes.has(sname)){
-                    nodes.set(sname, snode);
-                }
-                const json = JSON.parse(record[4]);
-                json.forEach((j:any) => {
-                    if (j.hasOwnProperty('s')){
-                        // this is source
-                        const node = nodeFromRawNode(j['s'])
-                        links.push(new GraphLink(node, snode, j['ss'], j['ts'], j['r']))
-                    } else if (j.hasOwnProperty('t')){
-                        // this is target
-                        const node = nodeFromRawNode(j['t'])
-                        links.push(new GraphLink(snode, node, j['ss'], j['ts'], j['r']))
-                    }
-                })
+        const links: GraphLink[] = [];
+        data.forEach((record) => {
+            const locus = new ChromosomeInterval(record.chr, record.start, record.end);
+            const sname = record[3];
+            const snode = new GraphNode(sname, locus);
+            if (!nodes.has(sname)) {
+                nodes.set(sname, snode);
             }
-        )
-        return {nodes, links}
+            const json = JSON.parse(record[4]);
+            json.forEach((j: any) => {
+                let node: GraphNode;
+                if (j.hasOwnProperty("s")) {
+                    // this is source
+                    node = nodeFromRawNode(j["s"]);
+                    links.push(new GraphLink(node, snode, j["ss"], j["ts"], j["r"]));
+                } else if (j.hasOwnProperty("t")) {
+                    // this is target
+                    node = nodeFromRawNode(j["t"]);
+                    links.push(new GraphLink(snode, node, j["ss"], j["ts"], j["r"]));
+                }
+                if (!nodes.has(node.getName())) {
+                    nodes.set(node.getName(), node);
+                }
+            });
+        });
+        return { nodes, links };
     }
 
     getComponent() {
