@@ -530,6 +530,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                                             containerTitles={containerTitles}
 
                                             embeddingMode={embeddingMode}
+                                            virusBrowserMode={virusBrowserMode}
                                         />
                                     </div>
                                 )

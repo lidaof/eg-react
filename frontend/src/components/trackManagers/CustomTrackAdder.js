@@ -298,7 +298,7 @@ class CustomTrackAdder extends React.Component {
                         <Tab label="Add Remote Data Hub">{this.renderCustomHubAdder()}</Tab>
                     </Tabs>
                 </div>
-                {this.props.customTracksPool.length > 0 && (
+                {(this.props.customTracksPool && this.props.customTracksPool.length) > 0 && (
                     <FacetTable
                         tracks={this.props.customTracksPool}
                         addedTracks={this.props.addedTracks}

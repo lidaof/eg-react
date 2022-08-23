@@ -1,0 +1,44 @@
+.IsoformSelection {
+    padding: 0;
+    margin: 0;
+    font-size: smaller;
+    border-collapse: collapse;
+    display: grid;
+    grid-template-columns: auto;
+}
+
+.IsoformSelection-item {
+    border: 1px solid lightgrey;
+    display: grid;
+    grid-template-columns: 80px auto auto auto;
+    grid-gap: 5px;
+    align-items: center;
+}
+
+.IsoformSelection-collection {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.IsoformSelection-item:hover {
+    background-color: #fdbb84;
+    cursor: pointer;
+}
+
+.IsoformSelection-item td {
+    padding: 0px 5px;
+}
+
+.IsoformSelection-description {
+    font-size: x-small;
+    min-width: 200px;
+}
+
+.IsoformSelection-item-simple {
+    border: 1px solid lightgrey;
+}
+
+.IsoformSelection-item-simple:hover {
+    background-color: #fdbb84;
+    cursor: pointer;
+}

@@ -18,6 +18,7 @@ import { HighlightInterval } from "../trackContainers/HighlightMenu";
 import TrackContainer from '../trackContainers/TrackContainer';
 import ContainerTools, { ProvidedControls } from "./ContainerTools";
 import StateSyncSettings from './StateSyncSettings';
+import TrackRegionController from './genomeNavigator/TrackRegionController';
 
 interface StateContainerProps {
     stateIdx: number;
@@ -28,6 +29,7 @@ interface StateContainerProps {
     isShowingNavigator: boolean;
     containerTitles: string[];
     embeddingMode: boolean;
+    virusBrowserMode: boolean;
     onSetAnchors3d: (anchors: any) => void;
     onSetGeneFor3d: (gene: any) => void;
     onSetImageInfo: (info: any) => void;
@@ -50,6 +52,7 @@ function _ContainerView(props: StateContainerProps) {
         isShowingNavigator,
         containerTitles,
         embeddingMode,
+        virusBrowserMode,
         onSetAnchors3d,
         onSetGeneFor3d,
         onSetImageInfo,
@@ -82,7 +85,9 @@ function _ContainerView(props: StateContainerProps) {
         if (genomes.length < regionExpanders.length) {
             setRegionExpanders(regionExpanders.slice(0, genomes.length));
         }
-        setTrackControls(new Array(genomes.length));
+        if (trackControls.length !== genomes.length) {
+            setTrackControls(new Array(genomes.length));
+        }
     }, [genomes.length, regionExpanders]);
 
     const genomeConfigs: GenomeConfig[] = useMemo(() => genomes.map(g => {
@@ -96,7 +101,6 @@ function _ContainerView(props: StateContainerProps) {
             onSetHighlights([...(curHighlights || highlights), interval], genomeIdx);
         }
     }
-
     const renderGenomes = () => {
         return genomes.map((g, gIdx) => {
             const genomeConfig = genomeConfigs[gIdx];
@@ -116,6 +120,14 @@ function _ContainerView(props: StateContainerProps) {
                                     genomeSettings={g.settings}
                                     containerTitles={containerTitles}
                                     allowNewContainer={genomes.length > 1}
+                                />
+                            </Grid>
+                            <Grid item style={{ marginLeft: 50 }}>
+                                <TrackRegionController
+                                    viewRegion={viewRegion}
+                                    genomeConfig={g.genomeConfig}
+                                    onRegionSelected={onSetViewRegion}
+                                    virusBrowserMode={virusBrowserMode}
                                 />
                             </Grid>
                         </Grid>
@@ -148,7 +160,9 @@ function _ContainerView(props: StateContainerProps) {
                         onTracksChanged={(newTracks: TrackModel[]) => onTracksChanged(newTracks, gIdx)}
                         onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(newTerms, gIdx)}
 
-                        provideControl={(c: ProvidedControls) => trackControls[gIdx] = c}
+                        provideControl={(c: ProvidedControls) => {
+                            trackControls[gIdx] = c;
+                        }}
                         tool={tool}
                         inContainer
                     />
@@ -169,7 +183,7 @@ function _ContainerView(props: StateContainerProps) {
                             value={title}
                             onChange={(newTitle: string) => onTitleChanged(newTitle)}
                             variant="h6"
-                            prohibitedValues={["new container"]}
+                            prohibitedValues={["new container", "multiple genomes"]}
                         />
                     </div>
                 </Grid>

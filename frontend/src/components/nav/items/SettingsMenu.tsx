@@ -100,9 +100,7 @@ function Settings(props: SettingsProps) {
                     </ListItemIcon>
                     Restore current view after Refresh
                 </MenuItem>
-                <MenuItem
-                    
-                >
+                <MenuItem>
                     <input
                         type="number"
                         id="legendWidth"

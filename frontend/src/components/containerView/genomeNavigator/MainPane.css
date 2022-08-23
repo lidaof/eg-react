@@ -1,0 +1,11 @@
+.MainPane {
+    width: 100%;
+}
+
+.MainPane-opaque {
+    opacity: 0.5;
+}
+
+.MainPane-opaque:hover {
+    opacity: 1;
+}

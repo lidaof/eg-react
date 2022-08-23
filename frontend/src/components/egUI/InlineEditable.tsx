@@ -2,6 +2,7 @@ import {
     Tooltip, Typography, TypographyVariant
 } from "@material-ui/core";
 import React, { useState } from "react";
+import SnackbarEngine from "../../SnackbarEngine";
 
 interface InlineEditableProps {
     value: string;
@@ -19,9 +20,11 @@ function InlineEditable(props: InlineEditableProps) {
     const handleBlur = () => setEditing(false);
     const handleFinish = () => {
         setEditing(false);
-        if (!value || (props.prohibitedValues && props.prohibitedValues).includes(value.toLowerCase())) return;
+        if (!value) return;
+        if ((props.prohibitedValues && props.prohibitedValues).includes(value.toLowerCase())) return SnackbarEngine.error("You can't set to this reserved value!");
         props.onChange(value);
     };
+    const handleFocus = (event: React.FocusEvent<any>) => event.target.select();
 
     const handleMouseEnter = () => setHovering(true);
     const handleMouseLeave = () => setHovering(false);
@@ -42,6 +45,7 @@ function InlineEditable(props: InlineEditableProps) {
                     }
                 }}
                 autoFocus
+                onFocus={handleFocus}
                 style={{
                     width: value.length + "ch",
                     minWidth: 75,

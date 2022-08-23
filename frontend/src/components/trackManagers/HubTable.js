@@ -4,7 +4,6 @@ import _ from "lodash";
 import ReactTable from "react-table";
 import Json5Fetcher from "../../model/Json5Fetcher";
 import DataHubParser from "../../model/DataHubParser";
-import withCurrentGenome from "../withCurrentGenome";
 import { ObjectAsTable } from "../trackContextMenu/TrackContextMenu";
 
 import "react-table/react-table.css";
