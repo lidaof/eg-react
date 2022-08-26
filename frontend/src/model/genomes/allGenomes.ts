@@ -52,7 +52,8 @@ import susScr11 from "./susScr11/susScr11";
 import susScr3 from "./susScr3/susScr3";
 import oviAri4 from "./oviAri4/oviAri4";
 import CHMV2 from "./t2t-chm13-v2.0/chm13v2";
-import bGalGal1 from "./bGalGal1/bGalGal1";
+import GRCg7b from "./GRCg7b/GRCg7b";
+import GRCg7w from "./GRCg7w/GRCg7w";
 
 /**
  * All available genomes.
@@ -112,7 +113,8 @@ export const allGenomes = [
     rheMac10,
     RN7,
     CHMV2,
-    bGalGal1,
+    GRCg7b,
+    GRCg7w,
 ];
 
 const genomeNameToConfig = {};
@@ -214,7 +216,12 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     chicken: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chicken.png",
-        assemblies: [bGalGal1.genome.getName(), GalGal6.genome.getName(), GalGal5.genome.getName()],
+        assemblies: [
+            GRCg7w.genome.getName(),
+            GRCg7b.genome.getName(),
+            GalGal6.genome.getName(),
+            GalGal5.genome.getName(),
+        ],
         color: "yellow",
     },
     frog: {
