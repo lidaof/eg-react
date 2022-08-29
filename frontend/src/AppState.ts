@@ -616,7 +616,6 @@ function getInitialState(): AppState {
 }
 
 function getNextState(prevState: AppState, action: AppAction): AppState {
-    console.log("🚀 ~ file: AppState.ts ~ line 539 ~ getNextState ~ action", action);
     if (!prevState) {
         return getInitialState();
     }

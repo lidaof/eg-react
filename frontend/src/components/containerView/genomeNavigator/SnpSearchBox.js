@@ -93,9 +93,9 @@ class SnpSearchBox extends React.PureComponent {
         const chrInterval = new ChromosomeInterval(`chr${entry.seq_region_name}`, entry.start - 1, entry.end)
         const interval = this.props.navContext.convertGenomeIntervalToBases(chrInterval)[0];
         if (interval) {
-            this.props.onRegionSelected(...interval);
+            this.props.onRegionSelected && this.props.onRegionSelected(...interval);
             this.props.handleCloseModal();
-            this.props.onSetEnteredRegion(chrInterval);
+            this.props.onSetEnteredRegion && this.props.onSetEnteredRegion(chrInterval);
         } else {
             notify.show("SNP not available in current region set view",  'error', 2000);
         }

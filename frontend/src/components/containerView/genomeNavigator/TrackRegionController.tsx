@@ -30,6 +30,8 @@ function TrackRegionController(props: TrackRegionControllerProps) {
         virusBrowserMode,
     } = props;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [coordinate, setCoordinate] = useState<string>("");
+    const [badInputMessage, setBadInputMessage] = useState<string>("");
     const open = Boolean(anchorEl);
 
     const handleClick = (event: React.MouseEvent<any>) => {
@@ -37,6 +39,30 @@ function TrackRegionController(props: TrackRegionControllerProps) {
     }
 
     const handleClose = () => {
+        setAnchorEl(null);
+    }
+
+    const handleParseRegion = () => {
+        let parsedRegion = null;
+        const navContext = viewRegion.getNavigationContext();
+
+        try {
+            parsedRegion = navContext.parse(coordinate);
+        } catch (error) {
+            if (error instanceof RangeError) {
+                setBadInputMessage(error.message);
+                return;
+            } else {
+                throw error;
+            }
+        }
+
+        if (badInputMessage) {
+            setBadInputMessage("");
+        }
+
+        onRegionSelected(parsedRegion.start, parsedRegion.end);
+        // onSetEnteredRegion(navContext.getLociInInterval(parsedRegion.start, parsedRegion.end)[0]);
         setAnchorEl(null);
     }
 
@@ -67,27 +93,45 @@ function TrackRegionController(props: TrackRegionControllerProps) {
                         <div style={{ margin: 12, width: 350 }}>
                             <Typography variant="body1">Gene Search</Typography>
                             <GeneSearchBox
-                                genomeConfig={genomeConfig}
                                 navContext={viewRegion.getNavigationContext()}
                                 onRegionSelected={onRegionSelected}
+                                genomeConfig={genomeConfig}
                                 handleCloseModal={handleClose}
-                                onToggleHighlight={() => 0}
-                                onSetEnteredRegion={() => 0}
                             />
-                            {!virusBrowserMode && (
+                             {!virusBrowserMode && (
                                 <>
                                     <Typography variant="body1">SNP Search</Typography>
                                     <SnpSearchBox
                                         navContext={viewRegion.getNavigationContext()}
                                         onRegionSelected={onRegionSelected}
                                         handleCloseModal={handleClose}
-                                        onToggleHighlight={() => 0}
-                                        onSetEnteredRegion={() => 0}        
                                     />
-                                </>  
+                                </>
                             )}
                             <Typography variant="body1">Region Search</Typography>
-                            
+                            <div style={{ display: "flex", flexDirection: "column", }}>
+                                <div>
+                                    <input
+                                        type="text"
+                                        size={30}
+                                        placeholder="Coordinate"
+                                        onChange={e => setCoordinate(e.target.value)}
+                                        onKeyDown={e => { if (e.key === "Enter") handleParseRegion() }}
+                                    />
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ marginLeft: "2px" }}
+                                        onClick={handleParseRegion}
+                                    >
+                                        Go
+                                    </button>
+                                </div>
+                                <div>
+                                    {badInputMessage.length > 0 && (
+                                        <span className="alert-danger">{badInputMessage}</span>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </Menu>
                 </Grid>

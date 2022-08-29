@@ -439,7 +439,6 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                 </div>
             );
         }
-        console.log(this.state);
         const pickingGenome = !(containers && containers.length);
         const tracksUrlSets = new Set([
             ...tracks.filter((track) => track.url).map((track) => track.url),

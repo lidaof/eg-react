@@ -62,7 +62,6 @@ class Chromosomes extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        console.log("🚀 ~ file: Chromosomes.js ~ line 65 ~ Chromosomes ~ constructor ~ props", props)
         this.state = {
             sequenceData: [],
         };

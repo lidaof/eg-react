@@ -29,9 +29,9 @@ class GeneSearchBox extends React.PureComponent {
     setViewToGene = (gene) => {
         const interval = this.props.navContext.convertGenomeIntervalToBases(gene.getLocus())[0];
         if (interval) {
-            this.props.onRegionSelected(...interval);
+            this.props.onRegionSelected && this.props.onRegionSelected(...interval);
             this.props.handleCloseModal();
-            this.props.onSetEnteredRegion(gene.getLocus());
+            this.props.onSetEnteredRegion && this.props.onSetEnteredRegion(gene.getLocus());
         } else {
             notify.show("Gene not available in current region set view", "error", 2000);
         }
