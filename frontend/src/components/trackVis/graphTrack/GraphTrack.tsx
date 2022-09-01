@@ -19,7 +19,7 @@ interface GraphTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
         color?: string;
         color2?: string;
         alwaysDrawLabel?: boolean;
-        rowHeight?: number;
+        rowHeight: number;
     };
 }
 
@@ -67,11 +67,10 @@ class GraphTrackNoTooltip extends React.Component<GraphTrackProps> {
      */
     render() {
         const { data, visRegion, width, options } = this.props;
-        const height = 500//this.getHeight(arrangeResult.numRowsAssigned);
         const visualizer = data.nodes ? <GraphVisualizer
             data={data}
             width={width}
-            height={height}
+            rowHeight={options.rowHeight}
             options={options}
             visRegion={visRegion}
         /> : <div>loading...</div>

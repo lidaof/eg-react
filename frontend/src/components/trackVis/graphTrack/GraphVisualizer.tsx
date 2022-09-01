@@ -4,11 +4,12 @@ import { GraphNode } from 'model/graph/GraphNode';
 import GraphNodeArranger from 'model/GraphNodeArranger';
 import memoizeOne from 'memoize-one';
 import DisplayedRegionModel from 'model/DisplayedRegionModel';
+import { PlacedFeatureGroup } from 'model/FeatureArranger';
 
 interface GraphVisualizerProps {
     data: any;
     width: number;
-    height: number;
+    rowHeight: number;
     options?: any;
     visRegion: DisplayedRegionModel;
 }
@@ -18,7 +19,7 @@ const SVG_STYLE = {
     overflow: "visible",
 };
 
-
+const TOP_PADDING = 2;
 
 export class GraphVisualizer extends React.PureComponent<GraphVisualizerProps> {
     private nodeArranger: GraphNodeArranger;
@@ -29,9 +30,27 @@ export class GraphVisualizer extends React.PureComponent<GraphVisualizerProps> {
     }
 
 
+    plotRank0Nodes = (placements: PlacedFeatureGroup[]): JSX.Element[] => {
+        const { rowHeight } = this.props;
+        const rects: JSX.Element[] = [];
+        placements.forEach((placement, i) => {
+            const [startX, endX] = placement.xSpan;
+            const y = placement.row * rowHeight + TOP_PADDING;
+            rects.push(<rect key={'rect' + i} x={startX} y={y} height={rowHeight} width={endX - startX} fill="none" stroke="black" />)
+            // return <polygon fill="none" stroke="black" />
+
+        })
+        return rects;
+    }
+
+    getHeight = (numRows: number): number => {
+        const { rowHeight } = this.props;
+        return numRows * rowHeight + TOP_PADDING;
+    }
+
 
     render() {
-        const { data, width, height, visRegion, options } = this.props;
+        const { data, width, visRegion, options } = this.props;
         const { links, nodes } = data;
         // node is a Map, node name -> node object
         const notRank0: GraphNode[] = [], rank0: GraphNode[] = [];
@@ -47,9 +66,11 @@ export class GraphVisualizer extends React.PureComponent<GraphVisualizerProps> {
         const arrangedNodes = this.nodeArranger.arrange(rank0, visRegion, width,
             30, 0);
         console.log(arrangedNodes)
+        const height = this.getHeight(arrangedNodes.numRowsAssigned);
+        const rank0Svg = this.plotRank0Nodes(arrangedNodes.placements)
         return (
             <svg width={width} height={height} style={SVG_STYLE} >
-                <text>aaa</text>
+                {rank0Svg}
             </svg>
         );
     }

@@ -101,7 +101,6 @@ export class GraphNodeArranger {
     ): GraphNodeArrangementResult {
         const drawModel = new LinearDrawingModel(viewRegion, width);
         const visibleNodes = nodes.filter((feature) => drawModel.basesToXWidth(feature.getLength()) >= hiddenPixels);
-
         const results: PlacedFeatureGroup[] = [],
             allNodesOutOfView: GraphNode[] = [];
         for (const node of visibleNodes) {
