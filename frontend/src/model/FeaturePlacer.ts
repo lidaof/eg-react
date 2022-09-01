@@ -1,10 +1,11 @@
-import DisplayedRegionModel from './DisplayedRegionModel';
-import { Feature } from './Feature';
-import OpenInterval from './interval/OpenInterval';
-import LinearDrawingModel from './LinearDrawingModel';
-import NavigationContext from './NavigationContext';
-import { FeatureSegment } from './interval/FeatureSegment';
-import { GenomeInteraction } from './GenomeInteraction';
+import { GraphNode } from "./graph/GraphNode";
+import DisplayedRegionModel from "./DisplayedRegionModel";
+import { Feature } from "./Feature";
+import OpenInterval from "./interval/OpenInterval";
+import LinearDrawingModel from "./LinearDrawingModel";
+import NavigationContext from "./NavigationContext";
+import { FeatureSegment } from "./interval/FeatureSegment";
+import { GenomeInteraction } from "./GenomeInteraction";
 
 /**
  * Draw information for a Feature
@@ -36,7 +37,8 @@ export class PlacedInteraction {
 
     constructor(interaction: GenomeInteraction, xSpan1: OpenInterval, xSpan2: OpenInterval) {
         this.interaction = interaction;
-        if (xSpan1.start <= xSpan2.start) { // Ensure the x spans are ordered
+        if (xSpan1.start <= xSpan2.start) {
+            // Ensure the x spans are ordered
             this.xSpan1 = xSpan1;
             this.xSpan2 = xSpan2;
         } else {
@@ -64,13 +66,18 @@ export class FeaturePlacer {
      * Computes context and draw locations for a list of features.  There may be a different number of placed features
      * than input features, as a feature might map to several different nav context coordinates, or a feature might
      * not map at all.
-     * 
+     *
      * @param {Feature[]} features - features for which to compute draw locations
      * @param {DisplayedRegionModel} viewRegion - region in which to draw
      * @param {number} width - width of visualization
      * @return {PlacedFeature[]} draw info for the features
      */
-    placeFeatures(features: Feature[], viewRegion: DisplayedRegionModel, width: number, useCenter: boolean=false): PlacedFeature[] {
+    placeFeatures(
+        features: Feature[],
+        viewRegion: DisplayedRegionModel,
+        width: number,
+        useCenter: boolean = false
+    ): PlacedFeature[] {
         const drawModel = new LinearDrawingModel(viewRegion, width);
         const viewRegionBounds = viewRegion.getContextCoordinates();
         const navContext = viewRegion.getNavigationContext();
@@ -80,8 +87,10 @@ export class FeaturePlacer {
             for (let contextLocation of feature.computeNavContextCoordinates(navContext)) {
                 contextLocation = contextLocation.getOverlap(viewRegionBounds); // Clamp the location to view region
                 if (contextLocation) {
-                    const xSpan = useCenter ? drawModel.baseSpanToXCenter(contextLocation) : drawModel.baseSpanToXSpan(contextLocation);
-                    const {visiblePart, isReverse} = this._locatePlacement(feature, navContext, contextLocation);
+                    const xSpan = useCenter
+                        ? drawModel.baseSpanToXCenter(contextLocation)
+                        : drawModel.baseSpanToXSpan(contextLocation);
+                    const { visiblePart, isReverse } = this._locatePlacement(feature, navContext, contextLocation);
                     placements.push({ feature, visiblePart, contextLocation, xSpan, isReverse });
                 }
             }
@@ -93,7 +102,7 @@ export class FeaturePlacer {
     /**
      * Gets the visible part of a feature after it has been placed in a navigation context, as well as if was placed
      * into a reversed part of the nav context.
-     * 
+     *
      * @param {Feature} feature - feature placed in a navigation context
      * @param {NavigationContext} contextLocation - navigation context in which the feature was placed
      * @param {OpenInterval} navContext - the feature's visible part in navigation context coordinates
@@ -115,19 +124,19 @@ export class FeaturePlacer {
         }
 
         // Now, we can compare the context location locus to the feature's locus.
-        const distFromFeatureLocus = contextLocusStart - feature.getLocus().start; 
+        const distFromFeatureLocus = contextLocusStart - feature.getLocus().start;
         const relativeStart = Math.max(0, distFromFeatureLocus);
         return {
             visiblePart: new FeatureSegment(feature, relativeStart, relativeStart + contextLocation.getLength()),
-            isReverse
+            isReverse,
         };
     }
 
     /**
      * Gets draw spans for feature segments, given a parent feature that has already been placed.
-     * 
-     * @param {PlacedFeature} placedFeature 
-     * @param {FeatureSegment[]} segments 
+     *
+     * @param {PlacedFeature} placedFeature
+     * @param {FeatureSegment[]} segments
      * @return {PlacedSegment[]}
      */
     placeFeatureSegments(placedFeature: PlacedFeature, segments: FeatureSegment[]): PlacedSegment[] {
@@ -147,7 +156,7 @@ export class FeaturePlacer {
                 }
                 placements.push({
                     segment,
-                    xSpan: new OpenInterval(xSpanStart, xSpanStart + xSpanLength)
+                    xSpan: new OpenInterval(xSpanStart, xSpanStart + xSpanLength),
                 });
             }
         }
@@ -155,9 +164,11 @@ export class FeaturePlacer {
         return placements;
     }
 
-    placeInteractions(interactions: GenomeInteraction[], viewRegion: DisplayedRegionModel,
-        width: number): PlacedInteraction[]
-    {
+    placeInteractions(
+        interactions: GenomeInteraction[],
+        viewRegion: DisplayedRegionModel,
+        width: number
+    ): PlacedInteraction[] {
         const drawModel = new LinearDrawingModel(viewRegion, width);
         const viewRegionBounds = viewRegion.getContextCoordinates();
         const navContext = viewRegion.getNavigationContext();
@@ -167,8 +178,8 @@ export class FeaturePlacer {
             let contextLocations1 = navContext.convertGenomeIntervalToBases(interaction.locus1);
             let contextLocations2 = navContext.convertGenomeIntervalToBases(interaction.locus2);
             // Clamp the locations to the view region
-            contextLocations1 = contextLocations1.map(location => location.getOverlap(viewRegionBounds));
-            contextLocations2 = contextLocations2.map(location => location.getOverlap(viewRegionBounds));
+            contextLocations1 = contextLocations1.map((location) => location.getOverlap(viewRegionBounds));
+            contextLocations2 = contextLocations2.map((location) => location.getOverlap(viewRegionBounds));
             for (const location1 of contextLocations1) {
                 for (const location2 of contextLocations2) {
                     if (location1 && location2) {
@@ -178,8 +189,47 @@ export class FeaturePlacer {
                     }
                 }
             }
-        };
+        }
 
         return mappedInteractions;
+    }
+
+    /**
+     * pretty much same as palceFeatures, but return feature not place-able. aka, out of view region
+     *
+     * @param nodes
+     * @param viewRegion
+     * @param width
+     * @param useCenter
+     * @returns
+     */
+    placeGraphNodes(
+        nodes: GraphNode[],
+        viewRegion: DisplayedRegionModel,
+        width: number
+    ): {
+        placements: PlacedFeature[];
+        nodesOutOfView: GraphNode[];
+    } {
+        const drawModel = new LinearDrawingModel(viewRegion, width);
+        const viewRegionBounds = viewRegion.getContextCoordinates();
+        const navContext = viewRegion.getNavigationContext();
+
+        const placements = [],
+            nodesOutOfView = [];
+        for (const node of nodes) {
+            for (let contextLocation of node.computeNavContextCoordinates(navContext)) {
+                contextLocation = contextLocation.getOverlap(viewRegionBounds); // Clamp the location to view region
+                if (contextLocation) {
+                    const xSpan = drawModel.baseSpanToXSpan(contextLocation);
+                    const { visiblePart, isReverse } = this._locatePlacement(node, navContext, contextLocation);
+                    placements.push({ feature: node, visiblePart, contextLocation, xSpan, isReverse });
+                } else {
+                    nodesOutOfView.push(node);
+                }
+            }
+        }
+
+        return { placements, nodesOutOfView };
     }
 }

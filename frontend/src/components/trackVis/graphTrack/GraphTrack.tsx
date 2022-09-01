@@ -19,12 +19,12 @@ interface GraphTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
         color?: string;
         color2?: string;
         alwaysDrawLabel?: boolean;
-        hiddenPixels?: number;
+        rowHeight?: number;
     };
 }
 
 export const DEFAULT_OPTIONS = {
-    hiddenPixels: 0.5,
+    rowHeight: 30,
 }
 
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
@@ -73,6 +73,7 @@ class GraphTrackNoTooltip extends React.Component<GraphTrackProps> {
             width={width}
             height={height}
             options={options}
+            visRegion={visRegion}
         /> : <div>loading...</div>
         const message = <React.Fragment>
             <HiddenItemsMessage numHidden={1} />

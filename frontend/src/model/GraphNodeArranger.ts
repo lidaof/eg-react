@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { GraphNode } from "./graph/GraphNode";
 import DisplayedRegionModel from "./DisplayedRegionModel";
 import { Feature } from "./Feature";
 import { FeaturePlacer, PlacedFeature } from "./FeaturePlacer";
@@ -17,10 +18,11 @@ export type PaddingFunc = (feature: Feature, xSpan: OpenInterval) => number;
 /**
  * Return value from GraphNodeArranger::arrange()
  */
-interface FeatureArrangementResult {
+interface GraphNodeArrangementResult {
     placements: PlacedFeatureGroup[]; // The draw locations of features that are visible
     numRowsAssigned: number; // Number of rows required to view all features
     numHidden: number; // Number of features omitted from featureArrangement
+    allNodesOutOfView: GraphNode[];
 }
 
 const FEATURE_PLACER = new FeaturePlacer();
@@ -59,36 +61,20 @@ export class GraphNodeArranger {
         return maxXsForRows.length;
     }
 
-    _combineAdjacent(placements: PlacedFeature[]): PlacedFeatureGroup[] {
+    _assignDefaultRow(placements: PlacedFeature[]): PlacedFeatureGroup[] {
         placements.sort((a, b) => a.xSpan.start - b.xSpan.start);
-
         const groups: PlacedFeatureGroup[] = [];
         let i = 0;
         while (i < placements.length) {
-            let j = i + 1;
-            while (j < placements.length && lociAreAdjacent(j - 1, j)) {
-                j++;
-            }
-
-            const placementsInGroup = placements.slice(i, j);
-            const firstPlacement = _.first(placementsInGroup);
-            const lastPlacement = _.last(placementsInGroup);
             groups.push({
-                feature: firstPlacement.feature,
+                feature: placements[i].feature,
                 row: -1,
-                xSpan: new OpenInterval(firstPlacement.xSpan.start, lastPlacement.xSpan.end),
-                placedFeatures: placementsInGroup,
+                xSpan: placements[i].xSpan,
+                placedFeatures: [placements[i]],
             });
-            i = j;
+            i++;
         }
-
         return groups;
-
-        function lociAreAdjacent(a: number, b: number) {
-            const locusA = placements[a].visiblePart.getLocus();
-            const locusB = placements[b].visiblePart.getLocus();
-            return locusA.end === locusB.start || locusA.start === locusB.end;
-        }
     }
 
     /**
@@ -104,30 +90,31 @@ export class GraphNodeArranger {
      * @param {number} width - width of the visualization
      * @param {number | PaddingFunc} [padding] - horizontal padding for intervals.  Default 0.
      * @param {number} [hiddenPixels] - hide an item when its length less than this value.  Default 0.5
-     * @return {FeatureArrangementResult} suggested draw location info
+     * @return  GraphNodeArrangementResult} suggested draw location info
      */
     arrange(
-        features: Feature[],
+        nodes: GraphNode[],
         viewRegion: DisplayedRegionModel,
         width: number,
         padding: number | PaddingFunc = 0,
-        hiddenPixels: number = 0.5
-    ): FeatureArrangementResult {
+        hiddenPixels: number = 0
+    ): GraphNodeArrangementResult {
         const drawModel = new LinearDrawingModel(viewRegion, width);
-        const visibleFeatures = features.filter(
-            (feature) => drawModel.basesToXWidth(feature.getLength()) >= hiddenPixels
-        );
+        const visibleNodes = nodes.filter((feature) => drawModel.basesToXWidth(feature.getLength()) >= hiddenPixels);
 
-        const results: PlacedFeatureGroup[] = [];
-        for (const feature of visibleFeatures) {
-            const placements = FEATURE_PLACER.placeFeatures([feature], viewRegion, width);
-            results.push(...this._combineAdjacent(placements));
+        const results: PlacedFeatureGroup[] = [],
+            allNodesOutOfView: GraphNode[] = [];
+        for (const node of visibleNodes) {
+            const { placements, nodesOutOfView } = FEATURE_PLACER.placeGraphNodes([node], viewRegion, width);
+            results.push(...this._assignDefaultRow(placements));
+            allNodesOutOfView.push(...nodesOutOfView);
         }
         const numRowsAssigned = this._assignRows(results, padding);
         return {
             placements: results,
             numRowsAssigned,
-            numHidden: features.length - visibleFeatures.length,
+            numHidden: nodes.length - visibleNodes.length,
+            allNodesOutOfView,
         };
     }
 }
