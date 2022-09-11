@@ -18,7 +18,7 @@ export type PaddingFunc = (feature: Feature, xSpan: OpenInterval) => number;
 /**
  * Return value from GraphNodeArranger::arrange()
  */
-interface GraphNodeArrangementResult {
+export interface GraphNodeArrangementResult {
     placements: PlacedFeatureGroup[]; // The draw locations of features that are visible
     numRowsAssigned: number; // Number of rows required to view all features
     numHidden: number; // Number of features omitted from featureArrangement

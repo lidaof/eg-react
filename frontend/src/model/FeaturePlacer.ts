@@ -200,7 +200,6 @@ export class FeaturePlacer {
      * @param nodes
      * @param viewRegion
      * @param width
-     * @param useCenter
      * @returns
      */
     placeGraphNodes(
