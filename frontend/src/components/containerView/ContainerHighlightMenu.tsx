@@ -116,7 +116,7 @@ class ContainerHighlightMenu extends React.Component<HighlightMenuProps> {
         const highlightElements = highlights.length ? highlights.map((item: ContainerHighlightInterval, index: number) => {
             gindices.add(item.genomeIdx);
             const generatedProperties = [];
-            generatedProperties.push(genomeNames[item.genomeIdx]);
+            if (genomeNames.length > 1) generatedProperties.push(genomeNames[item.genomeIdx]);
             return (
                 <Grid item xs={4} key={index}>
                     <HighlightItem

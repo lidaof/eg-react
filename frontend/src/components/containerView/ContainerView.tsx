@@ -63,7 +63,7 @@ function _ContainerView(props: StateContainerProps) {
         onMetadataTermsChanged,
         onTitleChanged,
     } = props;
-    const { title, genomes, viewRegion, highlights } = cdata;
+    const { title, genomes, viewRegion, highlights, metadataTerms } = cdata;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [highlightColor, setHighlightColor] = useState("rgba(255, 255, 0, 0.3)");
@@ -153,7 +153,7 @@ function _ContainerView(props: StateContainerProps) {
 
                         genome={g.name}
                         viewRegion={viewRegion}
-                        metadataTerms={g.metadataTerms}
+                        metadataTerms={metadataTerms}
 
                         // formerly connected through redux
                         onNewRegion={onSetViewRegion}
@@ -197,10 +197,10 @@ function _ContainerView(props: StateContainerProps) {
                         viewRegion={viewRegion}
                         onNewRegion={onSetViewRegion}
                         // TODO: change this to container highlights
-                        highlights={genomes[0].highlights}
-                        onSetHighlights={(highlights: HighlightInterval[]) => onSetHighlights(highlights, 0)}
-                        metadataTerms={genomes[0].metadataTerms}
-                        onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(newTerms, 0)}
+                        genomes={genomes}
+                        onSetCHighlights={onSetHighlights}
+                        metadataTerms={metadataTerms}
+                        onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(newTerms)}
                         suggestedMetaSets={suggestedMetaSets}
                     />
                 </Grid>

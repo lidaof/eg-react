@@ -54,12 +54,12 @@ export class AppStateSaver {
                             customTracksPool: genome.customTracksPool,
                             genomeConfig: genome.genomeConfig,
                             highlights: genome.highlights,
-                            metadataTerms: genome.metadataTerms,
                             regionSets: genome.regionSets && genome.regionSets.map((set) => set.serialize()),
                             regionSetViewIndex: regionSetViewIndex,
                             settings: genome.settings,
                         };
                     }),
+                    metadataTerms: container.metadataTerms,
                     viewInterval: container.viewRegion ? container.viewRegion.getContextCoordinates().serialize() : null,
                     highlights: container.highlights,
                 }
@@ -128,12 +128,12 @@ export class AppStateLoader {
                             customTracksPool: genome.customTracksPool,
                             genomeConfig: getGenomeConfig(genome.name),
                             highlights: genome.highlights,
-                            metadataTerms: genome.metadataTerms,
                             regionSets: genome.regionSets && genome.regionSets.map((set: any) => RegionSet.deserialize(set)),
                             regionSetView: genome.regionSetView,
                             settings: genome.settings,
                         };
                     }),
+                    metadataTerms: container.metadataTerms,
                     highlights: container.highlights,
                 }
             }),

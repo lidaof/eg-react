@@ -26,6 +26,10 @@ import _ from "lodash";
 import { getGenomeContainerTitle } from "./containerView/containerUtils";
 import "./GenomePicker.css";
 
+const preLoadedImages = [
+    "https://epigenomegateway.wustl.edu/browser/favicon-144.png"
+];
+
 /**
  * loading page for choose genome
  * @author Daofeng Li
@@ -374,6 +378,13 @@ function GenomePickerContainer(props: GenomePickerContainerProps) {
     const handleChange = (event: ChangeEvent<{}>, newValue: any) => {
         setValue(newValue);
     };
+
+    useEffect(() => {
+        preLoadedImages.forEach((isrc) => {
+            const img = new Image();
+            img.src = isrc;
+        });
+    }, [])
 
     return (
         <div style={{ marginBottom: 50 }}>

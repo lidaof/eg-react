@@ -1,12 +1,14 @@
 import ButtonGroup from 'components/trackContainers/ButtonGroup';
-import { HighlightInterval, HighlightMenu } from 'components/trackContainers/HighlightMenu';
+import { HighlightInterval, HighlightMenu as OldHighlightMenu } from 'components/trackContainers/HighlightMenu';
+import ContainerHighlightMenu, { ContainerHighlightInterval } from './ContainerHighlightMenu';
 import History from 'components/trackContainers/History';
 import MetadataHeader from 'components/trackContainers/MetadataHeader';
 import ReorderMany from 'components/trackContainers/ReorderMany';
 import { ToolButtons, Tools } from 'components/trackContainers/Tools';
 import ZoomButtons from 'components/trackContainers/ZoomButtons';
 import DisplayedRegionModel from 'model/DisplayedRegionModel';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { GenomeState } from 'AppState';
 
 export interface ProvidedControls {
     genomeIdx: number;
@@ -22,8 +24,8 @@ interface ContainerToolsProps {
     embeddingMode: boolean;
     viewRegion: DisplayedRegionModel;
     onNewRegion: (newStart: number, newEnd: number) => void;
-    highlights: HighlightInterval[];
-    onSetHighlights: (highlights: HighlightInterval[], genomeIdx?: number) => void;
+    genomes: GenomeState[];
+    onSetCHighlights: (highlights: HighlightInterval[], genomeIdx?: number) => void;
     metadataTerms: string[];
     onMetadataTermsChanged: (terms: string[]) => void;
     suggestedMetaSets: Set<string>;
@@ -36,8 +38,8 @@ function ContainerTools(props: ContainerToolsProps) {
         onToolChanged,
         viewRegion,
         onNewRegion,
-        onSetHighlights,
-        highlights,
+        onSetCHighlights,
+        genomes,
         metadataTerms,
         onMetadataTermsChanged,
         suggestedMetaSets
@@ -50,11 +52,28 @@ function ContainerTools(props: ContainerToolsProps) {
     const openHighlightModal = () => setHighlightModalOpen(true);
     const closeHighlightModal = () => setHighlightModalOpen(false);
 
+    const gNames = useMemo(() => genomes.map(g => g.name), [genomes]);
+
     const applyAllContainers = (callback: (trackContainer: ProvidedControls) => void) => {
         trackControls.forEach(trackControl => {
             callback(trackControl);
         });
+    };
+
+    const translateContainerHighlights = (): ContainerHighlightInterval[] => {
+        const res: ContainerHighlightInterval[] = [];
+        for (let i = 0; i < genomes.length; i++) {
+            const highlights = genomes[i].highlights;
+            for (let j = 0; j < highlights.length; j++) {
+                const { start, end, tag, color, display } = highlights[j];
+                res.push({ ...highlights[j], genomeIdx: i });
+            }
+        }
+        return res;
     }
+
+    const translatedContainerHighlights = translateContainerHighlights();
+
     // TODO: implement the keyboard shortcuts.
     const panLeftButton = (
         <button
@@ -111,14 +130,15 @@ function ContainerTools(props: ContainerToolsProps) {
                     <History />
                 </div>
                 <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
-                    <HighlightMenu
-                        onSetHighlights={onSetHighlights}
+                    <ContainerHighlightMenu
+                        onSetHighlights={onSetCHighlights}
                         onOpenHighlightMenuModal={openHighlightModal}
                         onCloseHighlightMenuModal={closeHighlightModal}
                         showHighlightMenuModal={highlightModalOpen}
-                        highlights={highlights}
+                        highlights={translatedContainerHighlights}
                         viewRegion={viewRegion}
                         onNewRegion={onNewRegion}
+                        genomeNames={gNames}
                     />
                 </div>
                 {/* <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>

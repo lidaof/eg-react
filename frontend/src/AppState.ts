@@ -111,7 +111,6 @@ export interface GenomeState {
     // if nullable, the data starts off as null and uses the global values. these values can be overridden locally.
     highlights: HighlightInterval[] | null;
 
-    metadataTerms: string[];
     regionSets: RegionSet[];
     regionSetView: RegionSet;
 
@@ -130,6 +129,7 @@ export interface SyncedContainer {
 
     viewRegion: DisplayedRegionModel;
     highlights: HighlightInterval[];
+    metadataTerms: string[];
 }
 
 export interface G3DTrackInfo {
@@ -152,6 +152,7 @@ const initialContainer: SyncedContainer = {
 
     viewRegion: null,
     highlights: [],
+    metadataTerms: [],
 }
 
 const getInitialContainerFromData = (name: string, viewRegion: DisplayedRegionModel, genome: GenomeState): SyncedContainer => {
@@ -159,6 +160,7 @@ const getInitialContainerFromData = (name: string, viewRegion: DisplayedRegionMo
         ...initialContainer,
         viewRegion,
         title: name,
+        metadataTerms: [],
         genomes: [genome],
     }
 }
@@ -616,6 +618,7 @@ function getInitialState(): AppState {
 }
 
 function getNextState(prevState: AppState, action: AppAction): AppState {
+    console.log("🚀 ~ file: AppState.ts ~ line 619 ~ getNextState ~ action", action);
     if (!prevState) {
         return getInitialState();
     }
@@ -644,7 +647,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     tracks: nextTracks,
 
                     highlights: [],
-                    metadataTerms: [],
                     regionSets: [],
                     regionSetView: null,
                     settings: initialContainerSettings,
@@ -680,7 +682,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     tracks: nextTracks,
 
                     highlights: [],
-                    metadataTerms: [],
                     regionSets: [],
                     regionSetView: null,
                     settings: initialContainerSettings,
@@ -854,6 +855,19 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         //     return { ...prevState, threedTracks: action.tracks };
         case ActionType.SET_HIGHLIGHTS: {
             const { highlights, containerIdx, genomeIdx } = action;
+
+            if (isNaN(genomeIdx)) {
+                return {
+                    ...prevState,
+                    containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
+                        return {
+                            ...c,
+                            highlights: highlights
+                        }
+                    }))
+                }
+            }
+
             return {
                 ...prevState,
                 containers: modifyArrayAtIdx(prevState.containers, containerIdx, (c => {
