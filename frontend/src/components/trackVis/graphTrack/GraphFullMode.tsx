@@ -1,7 +1,7 @@
 import React from 'react';
 import { GraphLink } from 'model/graph/GraphLink';
 import { GraphNode } from 'model/graph/GraphNode';
-import GraphNodeArranger, { GraphNodeArrangementResult } from 'model/GraphNodeArranger';
+import GraphNodeArranger from 'model/GraphNodeArranger';
 import memoizeOne from 'memoize-one';
 import DisplayedRegionModel from 'model/DisplayedRegionModel';
 import { PlacedFeatureGroup } from 'model/FeatureArranger';
@@ -20,7 +20,7 @@ interface GraphFullModeProps {
 }
 
 export interface PlacedNode {
-    node: GraphNode;
+    feature: GraphNode;
     row: number;
     xSpan: OpenInterval;
 }
@@ -35,7 +35,7 @@ const MINIMAL_NODE_LENGTH = 4;
 
 export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
     private nodeArranger: GraphNodeArranger;
-    private nodeMap: Map<string, PlacedFeatureGroup>;
+    private nodeMap: Map<string, PlacedFeatureGroup|PlacedNode>;
     private s2t: Map<string, string[]>;
     private t2s: Map<string, string[]>;
     constructor(props: GraphFullModeProps) {
@@ -73,10 +73,16 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
         return maxXsForRows.length;
     }
 
-    plotRank0Nodes = (placements: PlacedFeatureGroup[]): JSX.Element[] => {
+    addRowOffset = (groups: PlacedNode[]| PlacedFeatureGroup[], offset: number) => {
+        for (const group of groups){
+            group.row += offset
+        }
+    }
+
+    plotNodes = (placements: PlacedFeatureGroup[] | PlacedNode[]): JSX.Element[] => {
         const { rowHeight, ySkip } = this.props.options;
         const rects: JSX.Element[] = [];
-        placements.forEach((placement, i) => {
+        placements.forEach((placement: PlacedFeatureGroup | PlacedNode, i: number) => {
             const [startX, endX] = placement.xSpan;
             const y = placement.row * (rowHeight+ySkip) + TOP_PADDING;
             const drawWidth = Math.max(MINIMAL_NODE_LENGTH, (endX - startX));
@@ -86,7 +92,7 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
         return rects;
     }
 
-    plotRank0Links = (links: GraphLink[]):JSX.Element[] => {
+    plotLinks = (links: GraphLink[]):JSX.Element[] => {
         const { rowHeight, ySkip } = this.props.options;
         const lines: JSX.Element[] = [];
         links.forEach((link,i) => {
@@ -95,24 +101,21 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
             const targetPlacement = this.nodeMap.get(link.target.getName());
             if(sourcePlacement && targetPlacement) {
                 // some node may not exist in placement as they cannot be placed, FIXME
-            const sourceWidth = Math.max(MINIMAL_NODE_LENGTH, sourcePlacement.xSpan.getLength());
-            const targetWidth = Math.max(MINIMAL_NODE_LENGTH, targetPlacement.xSpan.getLength());
-
+                const sourceWidth = Math.max(MINIMAL_NODE_LENGTH, sourcePlacement.xSpan.getLength());
+                const targetWidth = Math.max(MINIMAL_NODE_LENGTH, targetPlacement.xSpan.getLength());
                 const y1 = sourcePlacement.row * (rowHeight+ySkip) + TOP_PADDING + 0.5*rowHeight;
                 const y2 = targetPlacement.row * (rowHeight+ySkip) + TOP_PADDING + 0.5*rowHeight;
-                if (link.rank === 0) {
-                    if (link.sourceStrand === '+') {
-                        x1 = sourcePlacement.xSpan.start+sourceWidth;
-                    } else {
-                        x1 = sourcePlacement.xSpan.end;
-                    }
-                    if(link.targetStrand === '+') {
-                        x2 = targetPlacement.xSpan.start;
-                    } else {
-                        x2 = targetPlacement.xSpan.start + targetWidth;
-                    }
-                    lines.push(<line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={1} />)
+                if (link.sourceStrand === '+') {
+                    x1 = sourcePlacement.xSpan.start+sourceWidth;
+                } else {
+                    x1 = sourcePlacement.xSpan.end;
                 }
+                if(link.targetStrand === '+') {
+                    x2 = targetPlacement.xSpan.start;
+                } else {
+                    x2 = targetPlacement.xSpan.start + targetWidth;
+                }
+                lines.push(<line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={1} />)
             }
         })
         return lines;
@@ -123,9 +126,8 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
         return numRows * (rowHeight+ySkip) + TOP_PADDING;
     }
 
-    updateNodeMap = (placements: PlacedFeatureGroup[]) => {
-        this.nodeMap.clear();
-        placements.forEach(placement => this.nodeMap.set(placement.feature.getName(), placement));
+    updateNodeMap = (placements: PlacedFeatureGroup[] | PlacedNode[]) => {
+        placements.forEach((placement: PlacedFeatureGroup | PlacedNode) => this.nodeMap.set(placement.feature.getName(), placement));
     }
 
     updateLinks = (links: GraphLink[]) => {
@@ -137,9 +139,8 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
             this.s2t.set(s, !this.s2t.get(s)? [t]: [...this.s2t.get(s), t])
             this.t2s.set(t, !this.t2s.get(t)? [s]: [...this.t2s.get(t), s])
         })
-        console.log(this.s2t, this.t2s)
     }
-
+    
     placeNotRank0Nodes = (unplacedNodes: GraphNode[]): PlacedNode[] => {
         // for nodes not in view or cannot find genomic locatin, place them according to their linked nodes which has xSpan...
         const placements:PlacedNode[] = [];
@@ -148,10 +149,13 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
             if (this.s2t.has(name)){
                 this.s2t.get(name).forEach(linkedNode => {
                     if (this.nodeMap.has(linkedNode)) {
+                        const hit = this.nodeMap.get(linkedNode);
+                        const ratio = node.getLength()/hit.feature.getLength();
+                        console.log(node.getLength(), hit.feature.getLength())
                         placements.push({
                             row: -1,
-                            xSpan: this.nodeMap.get(linkedNode).xSpan, //FIXME, consider length difference
-                            node,
+                            xSpan: new OpenInterval(hit.xSpan.start, hit.xSpan.start + hit.xSpan.getLength()*ratio),
+                            feature: node,
                         })
                         return;
                     }
@@ -159,42 +163,40 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
             }else if(this.t2s.has(name)){
                 this.t2s.get(name).forEach(linkedNode => {
                     if (this.nodeMap.has(linkedNode)) {
+                        const hit = this.nodeMap.get(linkedNode);
+                        const ratio = node.getLength()/hit.feature.getLength();
                         placements.push({
                             row: -1,
-                            xSpan: this.nodeMap.get(linkedNode).xSpan,
-                            node,
+                            xSpan: new OpenInterval(hit.xSpan.start, hit.xSpan.start + hit.xSpan.getLength()*ratio),
+                            feature: node,
                         })
                         return;
                     }
                 })
             }
         })
-        console.log(placements)
         return placements;
     }
 
-    renderFullGraph(arrangedNodes:GraphNodeArrangementResult, nodes: GraphNode[], links: GraphLink[], width: number, height:number) {
-        const notRank0: GraphNode[] = [], rank0: GraphNode[] = [];
-        nodes.forEach((node: GraphNode) => {
-            if (node.getRank() === 0) {
-                rank0.push(node)
-            } else {
-                notRank0.push(node)
-            }
-        })
-        const rank0Svg = this.plotRank0Nodes(arrangedNodes.placements)
-        this.updateNodeMap(arrangedNodes.placements)
-        this.updateLinks(links)
-        const link0Svg = this.plotRank0Links(links);
+    renderFullGraph(placements0: PlacedFeatureGroup[], placements1: PlacedNode[], placements2: PlacedNode[], links: GraphLink[], width: number, height:number) {
+       // heigh0 block in middle, heigh1 in top, and heigh2 in bottom 
+        
+        const rects0 = this.plotNodes(placements0)
+        const rects1 = this.plotNodes(placements1)
+        const rects2 = this.plotNodes(placements2)
+        const lines = this.plotLinks(links);
         return (
             <svg width={width} height={height} style={SVG_STYLE} >
-                {rank0Svg}
-                {link0Svg}
+                <g style={{background: "green"}}>{rects1}</g> 
+                <g style={{background: "red"}}>{rects0}</g> 
+                <g style={{background: "pink"}}>{rects2}</g> 
+                <g>{lines}</g>
             </svg>
         );
     }
 
     render() {
+        this.nodeMap.clear();
         const { data, trackModel, width, visRegion } = this.props;
         const { links, nodes } = data;
         // node is a Map, node name -> node object
@@ -209,18 +211,22 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
                 notRank0.push(node)
             }
         })
+        this.updateLinks(links);
         // only rank0 is in current ref genome
-        console.log(this.nodeMap)
-        const arrangedNodes = this.nodeArranger.arrange(rank0, visRegion, width,
-            30, 0);
-        console.log(arrangedNodes)
-        const height = this.getHeight(arrangedNodes.numRowsAssigned);
-        const visualizer = this.renderFullGraph(arrangedNodes, nodes, links, width, height)
-        const placeNodesNotInView = this.placeNotRank0Nodes(arrangedNodes.allNodesOutOfView);
-        const placesRank1Nodes = this.placeNotRank0Nodes(notRank0);
-        const notInViewRows = this._assignRows(placeNodesNotInView);
-        const rank1Rows = this._assignRows(placesRank1Nodes)
-        console.log(placeNodesNotInView, placesRank1Nodes, notInViewRows, rank1Rows)
+        // the idea to put not rank0 nodes (also nodes out of view) to the same x position with linked nodes in rank0
+        const arrangedNodes = this.nodeArranger.arrange(rank0, visRegion, width, 30, 0);
+        this.updateNodeMap(arrangedNodes.placements);
+        const placedNodesNotInView = this.placeNotRank0Nodes(arrangedNodes.allNodesOutOfView);
+        const placedRank1Nodes = this.placeNotRank0Nodes(notRank0);
+        const notInViewRows = this._assignRows(placedNodesNotInView);
+        this.updateNodeMap(placedNodesNotInView)
+        const rank1Rows = this._assignRows(placedRank1Nodes)
+        this.updateNodeMap(placedRank1Nodes)
+        const totalRows = arrangedNodes.numRowsAssigned + notInViewRows + rank1Rows;
+        const height = this.getHeight(totalRows);
+        this.addRowOffset(arrangedNodes.placements, notInViewRows);
+        this.addRowOffset(placedRank1Nodes, notInViewRows+ arrangedNodes.numRowsAssigned)
+        const visualizer = this.renderFullGraph(arrangedNodes.placements, placedNodesNotInView, placedRank1Nodes, links, width, height)
         const message = <TrackMessage message={`${nodes.size} nodes, ${links.length} links`} />;
         return (
             <Track

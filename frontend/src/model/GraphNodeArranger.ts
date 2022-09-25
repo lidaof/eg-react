@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { GraphNode } from "./graph/GraphNode";
 import DisplayedRegionModel from "./DisplayedRegionModel";
 import { Feature } from "./Feature";
