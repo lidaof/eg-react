@@ -1,18 +1,21 @@
+import React from 'react';
 import { GraphLink } from 'model/graph/GraphLink';
 import { GraphNode } from 'model/graph/GraphNode';
-import React from 'react';
+import Track from '../commonComponents/Track';
+import TrackLegend from '../commonComponents/TrackLegend';
+import TrackMessage from '../commonComponents/TrackMessage';
+import TrackModel from 'model/TrackModel';
+import OpenInterval from 'model/interval/OpenInterval';
 
 interface HengGraphVisualizerProps {
-    data: any;
-    width: number;
-    height: number;
+    data?: any;
+    width?: number;
+    height?: number;
     options?: any;
+    trackModel: TrackModel;
+    viewWindow: OpenInterval;
 }
 
-const SVG_STYLE = {
-    display: "block",
-    overflow: "visible",
-};
 
 //using Heng Li's gfa-plot library from the gfatools github repo
 
@@ -38,11 +41,9 @@ export class HengGraphVisualizer extends React.PureComponent<HengGraphVisualizer
         this.ref2 = React.createRef();
     }
 
-
-    plot() {
+    plot = () => {
         const { data } = this.props;
         const gfa = toGFA(data);
-        console.log(gfa)
         const target = this.ref.current;
         const info = this.ref2.current;
         (window as any).gfa_plot(target, gfa, info)
@@ -53,21 +54,24 @@ export class HengGraphVisualizer extends React.PureComponent<HengGraphVisualizer
     }
 
     componentDidUpdate(prevProps: Readonly<HengGraphVisualizerProps>, prevState: Readonly<{}>, snapshot?: any): void {
-        if (prevProps.data !== this.props.data) {
+        if (prevProps.data !== this.props.data || prevProps.viewWindow !== this.props.viewWindow) {
             this.plot()
         }
     }
 
     render() {
-        const { width, height } = this.props;
-        // <svg width={width} height={height} style={SVG_STYLE} >
-        //     <text>aaa</text>
-        // </svg>
-        return (<>
-            <canvas width={width} height={height} ref={this.ref}>
-            </canvas>
-            <div ref={this.ref2}></div>
-        </>
+        console.log('render')
+        const { height, trackModel, data, viewWindow } = this.props;
+        const { links, nodes } = data;
+        const message = <TrackMessage message={`${nodes.size} nodes ${links.length} links`} />;
+        return (<Track
+            {...this.props}
+            legend={<TrackLegend trackModel={trackModel} height={height} />}
+            visualizer={<>
+                <canvas width={viewWindow.getLength()} height={height} ref={this.ref} style={{ transform: `translateX(${viewWindow.start}px)` }}></canvas>
+                <div ref={this.ref2}></div></>}
+            message={message}
+        />
         );
     }
 }

@@ -8,6 +8,7 @@ import {
     BigWigZoomLevels,
     VcfColorScaleKeys,
     VcfDisplayModes,
+    GraphDisplayModes,
 } from "../../model/DisplayModes";
 
 /**
@@ -102,6 +103,18 @@ export function VcfDisplayModeConfig(props) {
             label="Display mode:"
             defaultValue={VcfDisplayModes.AUTO}
             choices={VcfDisplayModes}
+        />
+    );
+}
+
+export function GraphDisplayModeConfig(props) {
+    return (
+        <SelectConfig
+            {...props}
+            optionName="displayMode"
+            label="Display mode:"
+            defaultValue={GraphDisplayModes.FULL}
+            choices={GraphDisplayModes}
         />
     );
 }

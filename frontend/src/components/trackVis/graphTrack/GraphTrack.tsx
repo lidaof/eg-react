@@ -3,7 +3,8 @@ import { PropsFromTrackContainer } from "../commonComponents/Track";
 import { withTooltip, TooltipCallbacks } from "../commonComponents/tooltip/withTooltip";
 import configOptionMerging from "../commonComponents/configOptionMerging";
 import { GraphFullMode } from "./GraphFullMode";
-import { AnnotationDisplayModes } from 'model/DisplayModes';
+import { GraphDisplayModes } from 'model/DisplayModes';
+import { HengGraphVisualizer } from "./HengGraphVisualizer";
 
 
 interface GraphTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
@@ -21,7 +22,7 @@ interface GraphTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
 export const DEFAULT_OPTIONS = {
     rowHeight: 10,
     ySkip: 20,
-    displayMode: AnnotationDisplayModes.FULL,
+    displayMode: GraphDisplayModes.FULL,
 }
 
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
@@ -54,8 +55,14 @@ class GraphTrackNoTooltip extends React.Component<GraphTrackProps> {
      * @returns 
      */
     render() {
-        // const {  options } = this.props;
-        
+        const { options, data } = this.props;
+        const { nodes } = data;
+        if (!nodes) {
+            return <div>Loading...</div>
+        }
+        if (options.displayMode === GraphDisplayModes.HENGLI) {
+            return <HengGraphVisualizer {...this.props} />
+        }
         return (
             <GraphFullMode {...this.props} />
         );

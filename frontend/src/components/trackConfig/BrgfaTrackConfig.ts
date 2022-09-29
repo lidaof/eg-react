@@ -1,6 +1,5 @@
+import LabelConfig from "components/trackContextMenu/LabelConfig";
 import { GraphNode, nodeFromRawNode } from "./../../model/graph/GraphNode";
-import YscaleConfig from "components/trackContextMenu/YscaleConfig";
-import { AnnotationDisplayModes } from "../../model/DisplayModes";
 import { AnnotationTrackConfig } from "./AnnotationTrackConfig";
 import { GraphTrack } from "../trackVis/graphTrack/GraphTrack";
 import WorkerSource from "../../dataSources/worker/WorkerSource";
@@ -9,9 +8,8 @@ import BedRecord from "../../dataSources/bed/BedRecord";
 import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 import LocalBedSource from "../../dataSources/LocalBedSource";
 import BedTextSource from "../../dataSources/BedTextSource";
-import HiddenPixelsConfig from "../trackContextMenu/HiddenPixelsConfig";
-import AlwaysDrawLabelConfig from "components/trackContextMenu/AlwaysDrawLabelConfig";
 import { GraphLink } from "model/graph/GraphLink";
+import { GraphDisplayModeConfig } from "components/trackContextMenu/DisplayModeConfig";
 
 export class BrgfaTrackConfig extends AnnotationTrackConfig {
     initDataSource() {
@@ -70,10 +68,7 @@ export class BrgfaTrackConfig extends AnnotationTrackConfig {
     }
 
     getMenuComponents() {
-        const items = [...super.getMenuComponents(), HiddenPixelsConfig, AlwaysDrawLabelConfig];
-        if (this.getOptions().displayMode === AnnotationDisplayModes.DENSITY) {
-            items.push(YscaleConfig);
-        }
+        const items = [LabelConfig, GraphDisplayModeConfig];
         return items;
     }
 }

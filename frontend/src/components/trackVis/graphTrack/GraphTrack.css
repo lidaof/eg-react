@@ -1,0 +1,29 @@
+.graph-links line {
+    stroke: gray;
+}
+.graph-links line:hover {
+    stroke: rgb(205, 50, 164);
+    opacity: 0.7;
+    stroke-width: 4px;
+}
+
+.type1-nodes {
+    fill: #ffcc00;
+}
+
+.type0-nodes {
+    fill: #009900;
+}
+
+.type2-nodes {
+    fill: #ff3399;
+}
+
+.type1-nodes rect:hover,
+.type0-nodes rect:hover,
+.type2-nodes rect:hover {
+    fill: blue;
+    opacity: 0.7;
+    stroke: #f51313;
+    stroke-width: 2px;
+}
