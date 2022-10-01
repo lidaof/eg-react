@@ -54,7 +54,7 @@ sname: "chr7"
 soff: 26715364}
  */
 
-interface IRawNode {
+export interface IRawNode {
     len: number;
     name: string;
     rank: number;

@@ -275,6 +275,12 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
         const backRects = this.plotBackground(width, notInViewRows, '#ffcc00', arrangedNodes.numRowsAssigned, '#009900', rank1Rows, '#ff3399')
         const graph = this.renderFullGraph(arrangedNodes.placements, placedNodesNotInView, placedRank1Nodes, links);
         const visualizer = (<svg width={width} height={height} style={SVG_STYLE} >
+            <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="3" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" />
+                </marker>
+            </defs>
             {backRects}
             {graph}
         </svg>)

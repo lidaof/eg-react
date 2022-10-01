@@ -5,6 +5,12 @@
     stroke: rgb(205, 50, 164);
     opacity: 0.7;
     stroke-width: 4px;
+    marker-end: url("#arrow");
+}
+
+svg #arrow {
+    fill: rgb(205, 50, 164);
+    opacity: 0.7;
 }
 
 .type1-nodes {
