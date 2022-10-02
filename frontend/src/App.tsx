@@ -414,7 +414,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     expansionAmount={REGION_EXPANDER}
                     suggestedMetaSets={this.state.suggestedMetaSets}
                     genomeConfig={genomeConfig}
-                    tracks={tracks.filter((tk) => tk.type !== "g3d")}
+                    tracks={tracks.filter((tk) => (tk.type !== "g3d" && tk.type !== "graph"))}
                     layoutModel={layoutModel}
                     onSetAnchors3d={onSetAnchors3d}
                     onSetGeneFor3d={onSetGeneFor3d}
