@@ -121,7 +121,10 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
                 } else {
                     x2 = targetPlacement.xSpan.start + targetWidth;
                 }
-                lines.push(<line key={i} x1={x1} y1={y1} x2={x2} y2={y2} strokeWidth={1} onMouseMove={event => this.showLinkTooltip(event, link)} onMouseOut={this.hideTooltip} />)
+                // lines.push(<line key={i} x1={x1} y1={y1} x2={x2} y2={y2} strokeWidth={1} onMouseMove={event => this.showLinkTooltip(event, link)} onMouseOut={this.hideTooltip} />)
+                const r = 1.5 * Math.hypot(x2 - x1, y2 - y1);
+                const d = `M${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2}`;
+                lines.push(<path key={i} d={d} strokeWidth={1.5} fill="none" onMouseMove={event => this.showLinkTooltip(event, link)} onMouseOut={this.hideTooltip} />)
             }
         })
         return lines;
@@ -279,6 +282,10 @@ export class GraphFullMode extends React.PureComponent<GraphFullModeProps> {
                 <marker id="arrow" viewBox="0 0 10 10" refX="3" refY="5"
                     markerWidth="6" markerHeight="6" orient="auto">
                     <path d="M 0 0 L 10 5 L 0 10 z" />
+                </marker>
+                <marker id="arrow2" viewBox="0 -5 10 10" refX="15" refY="-0.5"
+                    markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,-5L10,0L0,5" />
                 </marker>
             </defs>
             {backRects}

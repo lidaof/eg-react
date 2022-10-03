@@ -1,7 +1,9 @@
-.graph-links line {
+.graph-links path {
     stroke: gray;
+    marker-end: url("#arrow2");
 }
-.graph-links line:hover {
+
+.graph-links path:hover {
     stroke: rgb(205, 50, 164);
     opacity: 0.7;
     stroke-width: 4px;
@@ -10,6 +12,11 @@
 
 svg #arrow {
     fill: rgb(205, 50, 164);
+    opacity: 0.7;
+}
+
+svg #arrow2 {
+    fill: gray;
     opacity: 0.7;
 }
 

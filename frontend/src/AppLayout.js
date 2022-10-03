@@ -110,7 +110,7 @@ class AppLayout extends React.PureComponent {
             const prevGgtracks = prevProps.tracks.filter((t) => t.type === "graph");
             const prevgIds = prevGgtracks.map((tk) => tk.getId());
             const currentGgtracks = this.props.tracks.filter((t) => t.type === "graph");
-            const ggtracks = currentGgtracks.filter((tk) => !prevIds.includes(tk.getId()));
+            const ggtracks = currentGgtracks.filter((tk) => !prevgIds.includes(tk.getId()));
 
             let layout = { ...this.props.layout };
             if (g3dtracks.length) {
@@ -384,9 +384,11 @@ class AppLayout extends React.PureComponent {
     renderGraphContainer = (node) => {
         //gg short for global graph
         const model = node.getModel();
-        const { viewRegion, genomeConfig, tracks, onNewViewRegion, darkTheme } = this.props;
+        const { viewRegion, genomeConfig, onNewViewRegion, darkTheme } = this.props;
         const config = node.getConfig();
         const { x, y, width, height } = node.getRect();
+        const ggtrack = TrackModel.deserialize(config.trackModel);
+        ggtrack.id = config.trackId;
         node.setEventListener("close", () => {
             this.removeTrackById(config.trackId);
             const layout = deleteTabByIdFromModel(model, config.tabId);
@@ -395,7 +397,7 @@ class AppLayout extends React.PureComponent {
         return (
             <GraphContainer
                 viewRegion={viewRegion}
-                tracks={tracks}
+                ggtrack={ggtrack}
                 expansionAmount={REGION_EXPANDER0}
                 genomeConfig={genomeConfig}
                 width={width}
