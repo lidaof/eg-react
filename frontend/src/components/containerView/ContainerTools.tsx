@@ -18,8 +18,6 @@ export interface ProvidedControls {
 
 interface ContainerToolsProps {
     trackControls: ProvidedControls[];
-    tool: typeof Tools.DRAG;
-    onToolChanged: (newTool: any) => void;
 
     embeddingMode: boolean;
     viewRegion: DisplayedRegionModel;
@@ -34,8 +32,6 @@ interface ContainerToolsProps {
 function ContainerTools(props: ContainerToolsProps) {
     const {
         trackControls,
-        tool,
-        onToolChanged,
         viewRegion,
         onNewRegion,
         onSetCHighlights,
@@ -101,11 +97,11 @@ function ContainerTools(props: ContainerToolsProps) {
     return (
         <div className="tool-container">
             <div className="tool-panel">
-                <ToolButtons
+                {/* <ToolButtons
                     allTools={Tools}
                     selectedTool={tool}
                     onToolClicked={tool => onToolChanged(tool)}
-                />
+                /> */}
                 {/* TODO: support embedding mode */}
                 {/* {embeddingMode && (
                     <TrackRegionController

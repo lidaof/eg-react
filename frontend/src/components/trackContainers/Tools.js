@@ -1,6 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ButtonGroup from "./ButtonGroup";
+import {
+    PanTool,
+    SwapVert,
+    ZoomIn,
+    Bookmark
+} from "@material-ui/icons"
 
 export const Tools = {
     DRAG: {
@@ -8,24 +14,28 @@ export const Tools = {
         title: `Drag tool
 (Alt+H or Alt+D)`,
         cursor: "pointer",
+        icon: <PanTool />,
     },
     REORDER: {
         buttonContent: "🔀",
         title: `Reorder tool
 (Alt+R or Alt+S)`,
         cursor: "all-scroll",
+        icon: <SwapVert />,
     },
     ZOOM_IN: {
         buttonContent: "⬚🔍+",
         title: `Zoom-in tool
 (Alt+M)`,
         cursor: "zoom-in",
+        icon: <ZoomIn />,
     },
     HIGHLIGHT: {
         buttonContent: "⛅",
         title: `Highlight tool
 (Alt+N)`,
         cursor: "ew-resize",
+        icon: <Bookmark />,
     },
 };
 
