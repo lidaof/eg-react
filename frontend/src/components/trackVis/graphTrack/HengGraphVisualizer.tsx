@@ -60,7 +60,7 @@ export class HengGraphVisualizer extends React.PureComponent<HengGraphVisualizer
     }
 
     render() {
-        console.log('render')
+        // console.log('render')
         const { height, trackModel, data, viewWindow } = this.props;
         const { links, nodes } = data;
         const message = <TrackMessage message={`${nodes.size} nodes ${links.length} links`} />;

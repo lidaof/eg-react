@@ -4,7 +4,7 @@ import { RemoteFile } from "generic-filehandle";
 import { fetch } from "node-fetch";
 import WorkerRunnableSource from "../worker/WorkerRunnableSource";
 import { ensureMaxListLength } from "../../util";
-import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
+// import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 
 /**
  * A DataSource that gets BedRecords from remote bed files.  Designed to run in webworker context.  Only indexed bed
