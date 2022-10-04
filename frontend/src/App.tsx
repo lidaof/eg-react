@@ -20,6 +20,9 @@ import { getSecondaryGenomes, HELP_LINKS } from "./util";
 import { motion } from 'framer-motion/dist/framer-motion';
 
 import "./App.css";
+import { Tools } from "components/trackContainers/Tools";
+import FloatingTools from "FloatingTools";
+import { ToolbarClassKey } from "@material-ui/core";
 
 function mapStateToProps(state: { browser: { present: AppState } }) {
     const appState = state.browser.present;
@@ -97,6 +100,7 @@ interface AppStateProps {
     customTracksPool: { [genome: string]: any[] };
     availableTrackSets: { [genome: string]: Set<string> };
     suggestedMetaSets: { [genome: string]: Set<string> };
+    activeTool: typeof Tools.DRAG
 }
 
 // interface RGBAColor {
@@ -138,6 +142,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             // suggestedMetaSets: new Set(["Track type"]),
             availableTrackSets: {},
             suggestedMetaSets: {},
+            activeTool: Tools.DRAG,
         };
         this.addTracksToPool = this.addTracksToPool.bind(this);
         this.addTracks = this.addTracks.bind(this);
@@ -406,6 +411,12 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
         });
     };
 
+    setActiveTool = (tool: typeof Tools.DRAG) => {
+        this.setState({
+            activeTool: tool
+        });
+    };
+
     render() {
         const {
             genomeConfig,
@@ -476,6 +487,11 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     publicTracksPool={this.state.publicTracksPool[gName]}
                     groupedTrackSets={groupedTrackSets}
                 />
+                <FloatingTools 
+                    activeTool={this.state.activeTool}
+                    pickingGenome={pickingGenome}
+                    onSetActiveTool={this.setActiveTool}
+                />
                 {pickingGenome ? (
                     <div>
                         <GenomePickerContainer bundleId={bundleId} />
@@ -530,6 +546,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
 
                                             embeddingMode={embeddingMode}
                                             virusBrowserMode={virusBrowserMode}
+                                            activeTool={this.state.activeTool}
                                         />
                                     </div>
                                 )

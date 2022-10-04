@@ -30,6 +30,7 @@ interface StateContainerProps {
     containerTitles: string[];
     embeddingMode: boolean;
     virusBrowserMode: boolean;
+    activeTool: typeof Tools.DRAG;
     onSetAnchors3d: (anchors: any) => void;
     onSetGeneFor3d: (gene: any) => void;
     onSetImageInfo: (info: any) => void;
@@ -62,6 +63,7 @@ function _ContainerView(props: StateContainerProps) {
         onTracksChanged,
         onMetadataTermsChanged,
         onTitleChanged,
+        activeTool
     } = props;
     const { title, genomes, viewRegion, highlights, metadataTerms } = cdata;
 
@@ -73,7 +75,6 @@ function _ContainerView(props: StateContainerProps) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [suggestedMetaSets, setSuggestedMetaSets] = useState(new Set(["Track type"]));
     const [trackControls, setTrackControls] = useState<ProvidedControls[]>([]);
-    const [tool, setTool] = useState<typeof Tools.DRAG>(Tools.DRAG);
 
     useEffect(() => {
         // whenever there is another genome added, add a region expander for it
@@ -163,7 +164,7 @@ function _ContainerView(props: StateContainerProps) {
                         provideControl={(c: ProvidedControls) => {
                             trackControls[gIdx] = c;
                         }}
-                        tool={tool}
+                        tool={activeTool}
                         inContainer
                     />
                 </div>
@@ -190,8 +191,6 @@ function _ContainerView(props: StateContainerProps) {
                 <Grid item>
                     <ContainerTools
                         trackControls={trackControls}
-                        tool={tool}
-                        onToolChanged={setTool}
                         embeddingMode={embeddingMode}
 
                         viewRegion={viewRegion}
