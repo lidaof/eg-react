@@ -1,0 +1,16 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "type": "refbed",
+            "name": "lifted gencode v29",
+            "url": "https://vizhub.wustl.edu/public/pangenome/HG01978.maternal.refbed.gz"
+        }
+    ]
+}

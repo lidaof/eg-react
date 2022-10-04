@@ -88,6 +88,7 @@
         "eslint-plugin-prettier": "^3.1.4",
         "firebase": "^7.15.4",
         "flexlayout-react": "^0.3.11",
+        "framer-motion": "^6.3.16",
         "fuse.js": "^3.6.1",
         "g3djs": "^2.0.1",
         "generic-filehandle": "^2.2.1",
@@ -104,6 +105,7 @@
         "nightmare": "^2.10.0",
         "node-fetch": "^2.6.1",
         "node-sass": "^7.0.0",
+        "notistack": "^1.0.10",
         "npm": "^8.11.0",
         "papaparse": "^5.2.0",
         "parse-color": "^1.0.0",
@@ -187,9 +189,5 @@
             "last 1 safari version"
         ]
     },
-    "proxy": "http://localhost:3001/",
-    "dependencies": {
-        "framer-motion": "^6.3.16",
-        "notistack": "^1.0.10"
-    }
+    "proxy": "http://localhost:3001/"
 }
