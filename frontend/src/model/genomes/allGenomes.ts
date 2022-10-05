@@ -52,6 +52,20 @@ import susScr11 from "./susScr11/susScr11";
 import susScr3 from "./susScr3/susScr3";
 import oviAri4 from "./oviAri4/oviAri4";
 import CHMV2 from "./t2t-chm13-v2.0/chm13v2";
+// phased
+import HG002_maternal from './pangenome/HG002/maternal';
+import HG002_paternal from './pangenome/HG002/paternal';
+import HG00621_maternal from './pangenome/HG00621/maternal';
+import HG00621_paternal from './pangenome/HG00621/paternal';
+import HG00741_maternal from './pangenome/HG00741/maternal';
+import HG00741_paternal from './pangenome/HG00741/paternal';
+import HG01952_maternal from './pangenome/HG01952/maternal';
+import HG01952_paternal from './pangenome/HG01952/paternal';
+import HG01978_maternal from './pangenome/HG01978/maternal';
+import HG01978_paternal from './pangenome/HG01978/paternal';
+import HG03516_maternal from './pangenome/HG03516/maternal';
+import HG03516_paternal from './pangenome/HG03516/paternal';
+
 
 /**
  * All available genomes.
@@ -111,6 +125,19 @@ export const allGenomes = [
     rheMac10,
     RN7,
     CHMV2,
+    // phased
+    HG002_maternal,
+    HG002_paternal,
+    HG00621_maternal,
+    HG00621_paternal,
+    HG00741_maternal,
+    HG00741_paternal,
+    HG01952_maternal,
+    HG01952_paternal,
+    HG01978_maternal,
+    HG01978_paternal,
+    HG03516_maternal,
+    HG03516_paternal,
 ];
 
 const genomeNameToConfig = {};
@@ -132,18 +159,13 @@ interface PhasedSpeciesConfig {
 export const phasedTreeOfLife: { [speciesName: string] : PhasedSpeciesConfig } = {
     human: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
-        groupedAssemblies: [[HG19.genome.getName(), HG38.genome.getName()]],
+        groupedAssemblies: [[HG002_maternal.genome.getName(), HG002_paternal.genome.getName()],
+                            [HG00621_maternal.genome.getName(), HG00621_paternal.genome.getName()],
+                            [HG00741_maternal.genome.getName(), HG00741_paternal.genome.getName()],
+                            [HG01952_maternal.genome.getName(), HG01952_paternal.genome.getName()],
+                            [HG01978_maternal.genome.getName(), HG01978_paternal.genome.getName()],
+                            [HG03516_maternal.genome.getName(), HG03516_paternal.genome.getName()]],
         color: "white",
-    },
-    chimp: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
-        groupedAssemblies: [[PANTRO6.genome.getName(), PANTRO5.genome.getName()]],
-        color: "white",
-    },
-    rhesus: {
-        logoUrl: "https://vizhub.wustl.edu/public/rheMac8/Rhesus_macaque.png",
-        groupedAssemblies: [[rheMac10.genome.getName(), RheMac8.genome.getName()], [rheMac3.genome.getName(), rheMac2.genome.getName()]],
-        color: "yellow",
     },
 }
 
