@@ -1,6 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import * as d3 from "d3";
+import { create } from "d3";
+import { scaleSequential } from "d3-scale";
+import { extent } from "d3-array";
+import { drag } from 'd3-drag';
+import { zoom } from 'd3-zoom';
+import { interpolateViridis } from "d3-scale-chromatic"
+import { forceManyBody, forceX, forceY, forceSimulation, forceLink } from "d3-force";
 import TrackModel from "model/TrackModel";
 import DisplayedRegionModel from "model/DisplayedRegionModel";
 import TabixSource from "dataSources/bed/TabixSource";
@@ -97,15 +103,15 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
         const links = data.links.map((d: any) => Object.create(d));
         const nodes = data.nodes.map((d: any) => Object.create(d));
         const ranks: number[] = Array.from(new Set(links.map((d: any) => d.rank)))
-        const color = d3.scaleSequential().domain(d3.extent(ranks))
-            .interpolator(d3.interpolateViridis)
-        const simulation = d3.forceSimulation(nodes)
-            .force("link", d3.forceLink(links).id(d => (d as any).id))
-            .force("charge", d3.forceManyBody().strength(-400))
-            .force("x", d3.forceX())
-            .force("y", d3.forceY());
+        const color = scaleSequential().domain(extent(ranks))
+            .interpolator(interpolateViridis)
+        const simulation = forceSimulation(nodes)
+            .force("link", forceLink(links).id(d => (d as any).id))
+            .force("charge", forceManyBody().strength(-400))
+            .force("x", forceX())
+            .force("y", forceY());
 
-        const svg = d3.create("svg")
+        const svg = create("svg")
             .attr("viewBox", `${-width / 2} ${-height / 2} ${width} ${height}`)
             .style("font", "12px sans-serif");
 
@@ -160,6 +166,16 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
             link.attr("d", this.linkArc);
             node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
         });
+
+        const zoomed = zoom()
+            .scaleExtent([0.25, 4])
+            .on("zoom", function (event) {
+                svg.selectAll("g").attr("transform", event.transform);
+                simulation.restart();
+            });
+
+        svg.call(zoomed as any);
+
         host.appendChild(svg.node())
     }
 
@@ -190,7 +206,7 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
             d.fy = null;
         }
 
-        return d3.drag()
+        return drag()
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended) as any;
