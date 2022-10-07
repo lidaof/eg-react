@@ -18,7 +18,7 @@ export const TRACK_TYPES = {
     Numerical: ["bigWig", "bedGraph", "qBED"],
     Variant: ["vcf"],
     "Dynamic sequence": ["dynseq"],
-    Annotation: ["bed", "bigBed", "refBed"],
+    Annotation: ["bed", "bigBed", "refBed", "bedcolor"],
     Peak: ["rgbpeak"],
     Categorical: ["categorical"],
     // "Transcription Factor": ["jaspar"],
@@ -50,6 +50,7 @@ const TYPES_NEED_INDEX = [
     "dbedgraph",
     "vcf",
     "genomealign",
+    "bedcolor",
 ];
 
 export const TYPES_DESC = {
@@ -58,6 +59,7 @@ export const TYPES_DESC = {
     methylC: "methylation data, processed by tabix in .gz format",
     categorical: "categorical data, processed by tabix in .gz format",
     bed: "annotationd data, processed by tabix in .gz format",
+    bedcolor: "annotationd data with color, processed by tabix in .gz format",
     bigBed: "anotation data",
     repeatmasker: "repeats annotation data in bigBed format",
     refBed: "gene annotationd data, processed by tabix in .gz format",
