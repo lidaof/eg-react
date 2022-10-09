@@ -11,16 +11,23 @@ import TrackModel from "model/TrackModel";
 import DisplayedRegionModel from "model/DisplayedRegionModel";
 import TabixSource from "dataSources/bed/TabixSource";
 import ChromosomeInterval from "model/interval/ChromosomeInterval";
+import { NodeContextMenu } from './NodeContextMenu';
 
 interface GraphContainerProps {
     width: number;
     height: number;
     ggtrack: TrackModel;
     viewRegion: DisplayedRegionModel;
+    x: number;
+    y: number;
+    onNewViewRegion: (start: number, end: number) => void;
 }
 
 interface GraphContainerState {
     data: any;
+    contextNode: object;
+    pageX: number;
+    pageY: number;
 }
 
 
@@ -33,12 +40,17 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
 
     ref: any;
     chromHash: object;
+    contextNode: object;
+
     constructor(props: any) {
         super(props);
         this.ref = React.createRef();
         this.chromHash = {}; // key: chrom, value: length
         this.state = {
             data: null,
+            contextNode: null,
+            pageX: 0,
+            pageY: 0,
         }
     }
 
@@ -60,10 +72,13 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
         }
     }
 
+    resetContextNode = () => {
+        this.setState({ contextNode: null, pageX: 0, pageY: 0 })
+    }
+
     prepareData = async () => {
         const { ggtrack, viewRegion } = this.props;
         const region0 = viewRegion.getFeatureSegments()[0]; // use first chrom here, FIXME
-        console.log('fetching data');
         const dataSource = new TabixSource(ggtrack.url, ggtrack.url + '.tbi');
         const records = await dataSource.getData([new ChromosomeInterval(region0.getName(), region0.relativeStart, region0.relativeEnd)]);
         // const records = await dataSource.getData([new ChromosomeInterval('chr7', 25763189, 27044648)]);
@@ -146,6 +161,10 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
             .selectAll("g")
             .data(nodes)
             .join("g")
+            .on('contextmenu', (event: any, d: any) => {
+                event.preventDefault();
+                this.setState({ contextNode: d, pageX: event.pageX, pageY: event.pageY })
+            })
             .call(this.drag(simulation));
 
         node.append("circle")
@@ -213,8 +232,11 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
     }
 
     render() {
-        console.log(this.props)
-        return <div ref={this.ref}></div>;
+        const { x, y, onNewViewRegion, viewRegion } = this.props;
+        const { contextNode, pageX, pageY } = this.state;
+        return <div ref={this.ref}>
+            <NodeContextMenu x={pageX - x} y={pageY - y} node={contextNode} onNewViewRegion={onNewViewRegion} viewRegion={viewRegion} removeNodeContextMenu={this.resetContextNode} />
+        </div>;
     }
 }
 

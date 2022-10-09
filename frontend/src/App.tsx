@@ -69,7 +69,7 @@ interface AppProps {
     tracks: TrackModel[];
     bundleId: string;
     sessionFromUrl: string;
-    onNewViewRegion: (region: DisplayedRegionModel) => void;
+    onNewViewRegion: (start: number, end: number) => void;
     onTracksChanged: (tracks: TrackModel[]) => void;
     embeddingMode: any;
     genomeConfig: any;
