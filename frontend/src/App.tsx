@@ -546,7 +546,10 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
 
                                             embeddingMode={embeddingMode}
                                             virusBrowserMode={virusBrowserMode}
-                                            activeTool={this.state.activeTool}
+                                            activeTool={this.state.activeTool} 
+
+                                            highlightColor={this.state.highlightColor}
+                                            highlightEnteredRegion={this.state.highlightEnteredRegion}
                                         />
                                     </div>
                                 )

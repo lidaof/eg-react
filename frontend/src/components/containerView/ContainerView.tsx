@@ -19,6 +19,7 @@ import TrackContainer from '../trackContainers/TrackContainer';
 import ContainerTools, { ProvidedControls } from "./ContainerTools";
 import StateSyncSettings from './StateSyncSettings';
 import TrackRegionController from './genomeNavigator/TrackRegionController';
+import ContainerGenome from './ContainerGenome';
 
 interface StateContainerProps {
     stateIdx: number;
@@ -31,6 +32,8 @@ interface StateContainerProps {
     embeddingMode: boolean;
     virusBrowserMode: boolean;
     activeTool: typeof Tools.DRAG;
+    highlightColor: string;
+    highlightEnteredRegion: boolean;
     onSetAnchors3d: (anchors: any) => void;
     onSetGeneFor3d: (gene: any) => void;
     onSetImageInfo: (info: any) => void;
@@ -54,6 +57,10 @@ function _ContainerView(props: StateContainerProps) {
         containerTitles,
         embeddingMode,
         virusBrowserMode,
+        activeTool,
+        highlightColor,
+        highlightEnteredRegion,
+
         onSetAnchors3d,
         onSetGeneFor3d,
         onSetImageInfo,
@@ -63,33 +70,18 @@ function _ContainerView(props: StateContainerProps) {
         onTracksChanged,
         onMetadataTermsChanged,
         onTitleChanged,
-        activeTool
     } = props;
     const { title, genomes, viewRegion, highlights, metadataTerms } = cdata;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [highlightColor, setHighlightColor] = useState("rgba(255, 255, 0, 0.3)");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [highlightEnteredRegion, setHighlightEnteredRegion] = useState(true);
-    const [regionExpanders, setRegionExpanders] = useState<RegionExpander[]>(new Array(genomes.length).fill(new RegionExpander(1)));
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [suggestedMetaSets, setSuggestedMetaSets] = useState(new Set(["Track type"]));
     const [trackControls, setTrackControls] = useState<ProvidedControls[]>([]);
 
     useEffect(() => {
-        // whenever there is another genome added, add a region expander for it
-        if (genomes.length > regionExpanders.length) {
-            setRegionExpanders([...regionExpanders, new RegionExpander(1)]);
-        }
-        // TODO: when a genome is removed, remove the correct region expander instead of the last one.
-        // whenever there is another genome removed, remove the region expander for it
-        if (genomes.length < regionExpanders.length) {
-            setRegionExpanders(regionExpanders.slice(0, genomes.length));
-        }
         if (trackControls.length !== genomes.length) {
             setTrackControls(new Array(genomes.length));
         }
-    }, [genomes.length, regionExpanders]);
+    }, [genomes.length]);
 
     const genomeConfigs: GenomeConfig[] = useMemo(() => genomes.map(g => {
         return g.genomeConfig || getGenomeConfig(g.name);
@@ -101,71 +93,41 @@ function _ContainerView(props: StateContainerProps) {
         if (!existing) {
             onSetHighlights([...(curHighlights || highlights), interval], genomeIdx);
         }
-    }
+    };
+    const accessTrackControls = (c: ProvidedControls, gIdx: number) => {
+        trackControls[gIdx] = c;
+    };
     const renderGenomes = () => {
         return genomes.map((g, gIdx) => {
             const genomeConfig = genomeConfigs[gIdx];
             return (
                 <div key={gIdx}>
-                    <div style={{
-                        marginLeft: 10
-                    }}>
-                        <Grid container direction="row" alignItems="center">
-                            <Grid item>
-                                <Typography variant="h6">{g.title}</Typography>
-                            </Grid>
-                            <Grid item>
-                                <StateSyncSettings
-                                    containerIdx={stateIdx}
-                                    genomeIdx={gIdx}
-                                    genomeSettings={g.settings}
-                                    containerTitles={containerTitles}
-                                    allowNewContainer={genomes.length > 1}
-                                />
-                            </Grid>
-                            <Grid item style={{ marginLeft: 50 }}>
-                                <TrackRegionController
-                                    viewRegion={viewRegion}
-                                    genomeConfig={g.genomeConfig}
-                                    onRegionSelected={onSetViewRegion}
-                                    virusBrowserMode={virusBrowserMode}
-                                />
-                            </Grid>
-                        </Grid>
-                    </div>
-                    <TrackContainer
-                        key={(gIdx + 1) * genomes.length}
-                        enteredRegion={null}
+                    <ContainerGenome 
+                        stateIdx={stateIdx}
+                        gIdx={gIdx}
+                        parentContainer={cdata}
+                        containerTitles={containerTitles}
+                        genomes={genomes}
+                        viewRegion={viewRegion}
+                        virusBrowserMode={virusBrowserMode}
                         highlightColor={highlightColor}
                         highlightEnteredRegion={highlightEnteredRegion}
-                        expansionAmount={regionExpanders[gIdx]}
-                        suggestedMetaSets={suggestedMetaSets}
-                        genomeConfig={genomeConfig}
-                        tracks={g.tracks.filter(tk => tk.type !== "g3d")}
-                        layoutModel={layoutModel}
-                        onSetAnchors3d={onSetAnchors3d}
-                        onSetGeneFor3d={onSetGeneFor3d}
                         viewer3dNumFrames={viewer3dNumFrames}
                         isThereG3dTrack={isThereG3dTrack}
+                        activeTool={activeTool}
+                        suggestedMetaSets={suggestedMetaSets}
+
+                        accessTrackControls={accessTrackControls}
+                        newHighlight={newHighlight}
+
+                        onSetAnchors3d={onSetAnchors3d}
+                        onSetGeneFor3d={onSetGeneFor3d}
                         onSetImageInfo={onSetImageInfo}
-                        onNewHighlight={(start: number, end: number, tag: string = '') => newHighlight(start, end, tag, gIdx, g.highlights)}
-                        highlights={g.highlights}
-                        onSetHighlights={(highlights: HighlightInterval[]) => onSetHighlights(highlights, gIdx)}
-
-                        genome={g.name}
-                        viewRegion={viewRegion}
-                        metadataTerms={metadataTerms}
-
-                        // formerly connected through redux
-                        onNewRegion={onSetViewRegion}
-                        onTracksChanged={(newTracks: TrackModel[]) => onTracksChanged(newTracks, gIdx)}
-                        onMetadataTermsChanged={(newTerms: string[]) => onMetadataTermsChanged(newTerms, gIdx)}
-
-                        provideControl={(c: ProvidedControls) => {
-                            trackControls[gIdx] = c;
-                        }}
-                        tool={activeTool}
-                        inContainer
+                        
+                        onSetHighlights={onSetHighlights}
+                        onSetViewRegion={onSetViewRegion}
+                        onTracksChanged={onTracksChanged}
+                        onMetadataTermsChanged={onMetadataTermsChanged}
                     />
                 </div>
             );

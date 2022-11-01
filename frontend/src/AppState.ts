@@ -73,9 +73,9 @@ export function getBgColor(isDark: boolean) {
 }
 
 export interface AppState {
+    containers: SyncedContainer[];
     genomeName: string;
 
-    containers: SyncedContainer[];
 
     viewRegion: DisplayedRegionModel;
     tracks: TrackModel[];
