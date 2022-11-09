@@ -12,11 +12,13 @@ import { getTrackConfig } from './trackConfig/getTrackConfig';
 const HME = window.HME;
 
 function mapStateToProps(state) {
+    const presentState = state.browser.present;
+    const [cidx, gidx] = presentState.editTarget;
     return {
-        genome: state.browser.present.genomeName,
-        viewRegion: state.browser.present.viewRegion,
-        tracks: state.browser.present.tracks,
-        metadataTerms: state.browser.present.metadataTerms
+        genome: presentState.containers[cidx].genomes[gidx].genomeName,
+        viewRegion: presentState.containers[cidx].viewRegion,
+        tracks: presentState.containers[cidx].genomes[gidx].tracks,
+        metadataTerms: presentState.containers[cidx].genomes[gidx].metadataTerms,
     };
 }
 
@@ -42,7 +44,7 @@ class DynamicRecordUINotConnected extends React.Component {
         if (vw % 2 !== 0) vw -= 1;
         if (vh % 2 !== 0) vh -= 1;
         encoder.width = vw;
-        encoder.height = vh;
+        encoder.height = vh; 
         encoder.initialize();
         // const frames = 100;
         console.log(tracks, canvas, ctx, vw, vh, encoder)

@@ -15,9 +15,11 @@ import Genome from '../model/genomes/Genome';
  * @return {Object} props to pass to RegionSetSelector
  */
 function mapStateToProps(state) {
+    const present = state.browser.present;
+    const [cidx, gidx] = present.editTarget;
     return {
-        sets: state.browser.present.regionSets,
-        selectedSet: state.browser.present.regionSetView
+        sets: present.containers[cidx].genomes[gidx].regionSets,
+        selectedSet: present.containers[cidx].genomes[gidx].reginoSetView,
     };
 }
 

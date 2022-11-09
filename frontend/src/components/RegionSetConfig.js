@@ -12,6 +12,7 @@ import ChromosomeInterval from "../model/interval/ChromosomeInterval";
 import { getSymbolRegions } from "../util";
 
 import "react-table/react-table.css";
+import SnackbarEngine from "SnackbarEngine";
 
 /**
  * Placeholder genes for a new set
@@ -107,7 +108,9 @@ class RegionSetConfig extends React.Component {
             return getSymbolRegions(genomeName, symbol);
         });
         const parsed = await Promise.all(promise);
-        const parsed2 = parsed.map((item, index) => {
+        const withoutErrors = parsed.filter(e => !e.statusCode || e.statusCode != 501);
+        if (withoutErrors.length != parsed.length) SnackbarEngine.warning("Some items could not be retrieved! Displaying the ones that could be retrieved.");
+        const parsed2 = withoutErrors.map((item, index) => {
             if (Array.isArray(item)) {
                 if (item.length === 0) {
                     return null;

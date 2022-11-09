@@ -5,30 +5,33 @@ import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 import { ActionCreators } from "../AppState";
 import { Link } from "react-router-dom";
 import { notify } from 'react-notify-toast';
-import App from "../App";
+import { createTheme, ThemeProvider, CssBaseline, Grow, } from '@material-ui/core';
+import { SnackbarProvider, } from 'notistack';
+import { SnackbarUtilsConfigurator } from 'SnackbarEngine';
+import App from 'App';
 import { AppStateSaver } from '../model/AppSaveLoad';
 
 class Live extends React.Component {
 
-    componentDidUpdate(prevProps){
+    componentDidUpdate(prevProps) {
         const { liveId } = this.props.match.params;
         const { live, onSetRestore } = this.props;
         const genome = live[liveId].present.genomeName;
-        if(prevProps.live !== live) {
+        if (prevProps.live !== live) {
             onSetRestore(genome, live[liveId].present);
         }
     }
 
     async UNSAFE_componentWillReceiveProps(nextProps) {
-        const {firebase, browser} = this.props;
+        const { firebase, browser } = this.props;
         const { liveId } = this.props.match.params;
-        if(nextProps.browser.present !== browser.present) {
+        if (nextProps.browser.present !== browser.present) {
             const nextObj = new AppStateSaver().toObject(nextProps.browser.present);
             const cleanedObj = JSON.parse(JSON.stringify(nextObj));
             try {
                 await firebase.update(`live/${liveId}/`, {
-                        present: cleanedObj,
-                    }
+                    present: cleanedObj,
+                }
                 );
             } catch (error) {
                 console.error(error);
@@ -43,13 +46,35 @@ class Live extends React.Component {
         if (!isLoaded(live)) {
             return <div>Loading...</div>;
         }
-        if ( isEmpty(live) || isEmpty(live[liveId])) {
+        if (isEmpty(live) || isEmpty(live[liveId])) {
             return <div>Live browser content is empty
-                <br/>
-            <Link to="/">Go home</Link>
+                <br />
+                <Link to="/">Go home</Link>
             </div>;
         }
-        return <App />;
+        return (
+            <ThemeProvider theme={createTheme({
+                palette: {
+                    type: "light",
+                }
+            })}>
+                <CssBaseline />
+                <SnackbarProvider
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }}
+                    TransitionComponent={Grow}
+                    maxSnack={3}
+                    preventDuplicate
+                >
+                    <SnackbarUtilsConfigurator />
+                    <div style={{ width: "100%", height: "100%" }} id="flex-container" data-theme={"light"}>
+                        <App />
+                    </div>
+                </SnackbarProvider>
+            </ThemeProvider>
+        );
     }
 };
 

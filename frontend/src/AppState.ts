@@ -74,27 +74,15 @@ export function getBgColor(isDark: boolean) {
 
 export interface AppState {
     containers: SyncedContainer[];
-    genomeName: string;
 
-
-    viewRegion: DisplayedRegionModel;
-    tracks: TrackModel[];
-    metadataTerms: string[];
-    regionSets: RegionSet[];
-    regionSetView: RegionSet;
     trackLegendWidth: number;
     bundleId: string;
     sessionFromUrl?: boolean;
     isShowingNavigator: boolean;
     isShowingVR?: boolean;
-    customTracksPool?: TrackModel[];
     genomeConfig?: object;
     virusBrowserMode?: boolean;
     layout?: object;
-    // g3dtracks?: TrackModel[];
-    highlights?: HighlightInterval[];
-    // TODO: add support for "compatability mode" which won't use the new containers/multiple genome support.
-    compatabilityMode: boolean;
     darkTheme?: boolean;
     editTarget: [number, number] // [containerIdx, genomeIdx];
     g3dTracks: G3DTrackInfo[];
@@ -141,7 +129,7 @@ const bundleId = uuid.v1();
 const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
 
 const initialContainerSettings: GenomeSettings = {
-    syncHighlights: true,
+    syncHighlights: false,
 
     offsetAmount: 0,
 }
@@ -166,24 +154,14 @@ const getInitialContainerFromData = (name: string, viewRegion: DisplayedRegionMo
 }
 
 const initialState: AppState = {
-    genomeName: "",
     containers: [],
 
-    viewRegion: null,
-    tracks: [],
-    metadataTerms: [],
-    regionSets: [], // Available region sets, to be used for region set view
-    regionSetView: null, // Region set backing current region set view, if applicable
     trackLegendWidth: DEFAULT_TRACK_LEGEND_WIDTH,
     bundleId,
     sessionFromUrl: false,
     isShowingNavigator: true,
     isShowingVR: false,
-    customTracksPool: [],
     layout: {},
-    // g3dtracks: [],
-    highlights: [],
-    compatabilityMode: false,
     darkTheme: prefersDark,
     editTarget: [0, 0], // [containerIdx, genomeIdx];
     g3dTracks: []
@@ -585,7 +563,7 @@ function getInitialState(): AppState {
         }
         if (query.position) {
             if (newState) {
-                const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
+                const interval = newState.containers[0].viewRegion.getNavigationContext().parse(query.position as string);
                 newState = getNextState(newState as AppState, {
                     type: ActionType.SET_VIEW_REGION,
                     ...interval,
@@ -696,6 +674,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             }
         }
         case ActionType.SET_CUSTOM_VIRUS_GENOME: { // Setting virus genome. // TODO: allow to use with containers
+            const [cidx, gidx] = prevState.editTarget;
             const virusTracks = action.tracks.map((data: any) => TrackModel.deserialize(data));
             const genome = new Genome(action.name, [new Chromosome(action.seqId, action.seq.length)]);
             const navContext = genome.makeNavContext();
@@ -714,11 +693,19 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             };
             return {
                 ...initialState,
-                genomeName: action.name,
-                viewRegion: virusViewRegion,
-                tracks: virusTracks,
-                genomeConfig: virusGenomeConfig,
-            };
+                containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
+                    return {
+                        ...c,
+                        genomes: modifyArrayAtIdx(c.genomes, gidx, (g => {
+                            return {
+                                ...g,
+                                tracks: virusTracks,
+                                genomeConfig: virusGenomeConfig,
+                            }
+                        }))
+                    }
+                }))
+            }
         }
         case ActionType.SET_VIEW_REGION: {
             let { start, end, containerIdx } = action;
@@ -755,7 +742,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             }
             return {
                 ...prevState,
-                tracks: tracks.filter((t: TrackModel) => t.type === "g3d"),
                 g3dTracks: [...prevState.g3dTracks, ...tracks.filter((t: TrackModel) => t.type === "g3d").map((t: TrackModel) => {
                     return {
                         track: t,
@@ -797,7 +783,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                         genomes: modifyArrayAtIdx(c.genomes, gidx, (g => {
                             return {
                                 ...g,
-                                regionSetList: action.regionSetList,
+                                regionSets: action.list,
                             };
                         }))
                     }
@@ -819,7 +805,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             return { ...prevState, bundleId: action.bundleId };
         case ActionType.SET_GENOME_RESTORE_SESSION:
             const state = new AppStateLoader().fromObject(action.sessionState);
-            return { ...state, genomeName: action.genomeName };
+            return { ...state, }; // removed set genome
         case ActionType.TOGGLE_NAVIGATOR:
             return {
                 ...prevState,
@@ -830,20 +816,61 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                 ...prevState,
                 isShowingVR: !prevState.isShowingVR,
             };
-        case ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL:
-            const tracks = action.withDefaultTracks ? [...prevState.tracks, ...action.tracks] : [...action.tracks];
+        case ActionType.SET_TRACKS_CUSTOM_TRACKS_POOL: {
+            // @ts-ignore
+            const [cidx, gidx] = prevState.editTarget;
+            const tracks = action.withDefaultTracks ? [...prevState.containers[cidx].genomes[gidx].tracks, ...action.tracks] : [...action.tracks];
             return {
                 ...prevState,
-                tracks,
-                customTracksPool: action.customTracksPool,
+                containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
+                    return {
+                        ...c,
+                        genomes: modifyArrayAtIdx(c.genomes, gidx, (g => {
+                            return {
+                                ...g,
+                                tracks,
+                                customTracksPool: action.customTracksPool,
+                            }
+                        }))
+                    }
+                }))
+            }
+        }
+        case ActionType.SET_CUSTOM_TRACKS_POOL: {
+            const [cidx, gidx] = prevState.editTarget;
+
+            return {
+                ...prevState,
+                containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
+                    return {
+                        ...c,
+                        genomes: modifyArrayAtIdx(c.genomes, gidx, (g => {
+                            return {
+                                ...g,
+                                customTracksPool: action.customTracksPool,
+                            }
+                        }))
+                    }
+                }))
             };
-        case ActionType.SET_CUSTOM_TRACKS_POOL:
-            return { ...prevState, customTracksPool: action.customTracksPool };
-        case ActionType.SET_HUB_SESSION_STORAGE:
+        }
+        case ActionType.SET_HUB_SESSION_STORAGE: {
+            const [cidx, gidx] = prevState.editTarget;
             return {
                 ...action.state,
-                customTracksPool: action.customTracksPool,
+                containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
+                    return {
+                        ...c,
+                        genomes: modifyArrayAtIdx(c.genomes, gidx, (g => {
+                            return {
+                                ...g,
+                                customTracksPool: action.customTracksPool,
+                            }
+                        }))
+                    }
+                }))
             };
+        }
         case ActionType.SET_VIRUS_BROWSER_MODE:
             return {
                 ...prevState,
@@ -1091,21 +1118,43 @@ async function getTracksFromHubURL(url: string): Promise<any> {
  * @return {Object} next redux store
  */
 function handleRegionSetViewChange(prevState: AppState, nextSet: RegionSet) {
+    const [cidx, gidx] = prevState.editTarget;
     if (nextSet) {
         return {
             ...prevState,
-            regionSetView: nextSet,
-            viewRegion: new DisplayedRegionModel(nextSet.makeNavContext()),
+            containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
+                return {
+                    ...c,
+                    viewRegion: new DisplayedRegionModel(nextSet.makeNavContext()),
+                    genomes: modifyArrayAtIdx(c.genomes, gidx, (g => {
+                        return {
+                            ...g,
+                            regionSetView: nextSet,
+                        }
+                    }))
+                }
+            }))
         };
     } else {
-        const genomeConfig = getGenomeConfig(prevState.genomeName);
+        const genomeConfig = getGenomeConfig(prevState.containers[cidx].genomes[gidx].name);
         const nextViewRegion = genomeConfig
             ? new DisplayedRegionModel(genomeConfig.navContext, ...genomeConfig.defaultRegion)
             : null;
         return {
             ...prevState,
-            regionSetView: null,
             viewRegion: nextViewRegion,
+            containers: modifyArrayAtIdx(prevState.containers, cidx, (c => {
+                return {
+                    ...c,
+                    viewRegion: nextViewRegion,
+                    genomes: modifyArrayAtIdx(c.genomes, gidx, (g => {
+                        return {
+                            ...g,
+                            regionSetView: null,
+                        }
+                    }))
+                }
+            }))
         };
     }
 }
@@ -1171,7 +1220,7 @@ async function asyncInitState() {
                 // when position in URL with sessionFile, see issue #245
                 if (query.position) {
                     const state = new AppStateLoader().fromObject(json);
-                    const interval = state.viewRegion.getNavigationContext().parse(query.position as string);
+                    const interval = state.containers[0].viewRegion.getNavigationContext().parse(query.position as string);
                     AppState.dispatch(ActionCreators.setViewRegion(interval.start, interval.end));
                 }
             }
@@ -1184,9 +1233,9 @@ async function asyncInitState() {
                 if (blob) {
                     try {
                         const state = new AppStateLoader().fromJSON(blob);
-                        if (state.genomeName === query.genome) {
+                        if (state.containers[0].genomes[0].name === query.genome) {
                             const trackSets = new Set();
-                            state.tracks.forEach((t: any) => trackSets.add(t.url || t.label));
+                            state.containers[0].genomes[0].tracks.forEach((t: any) => trackSets.add(t.url || t.label));
                             const filteredTracks = tracksInHub.filter((t: any) => {
                                 if (t.url) {
                                     return !trackSets.has(t.url);
@@ -1196,7 +1245,7 @@ async function asyncInitState() {
                                     return true;
                                 }
                             });
-                            const tracks = [...state.tracks, ...filteredTracks];
+                            const tracks = [...state.containers[0].genomes[0].tracks, ...filteredTracks];
                             const finalState = { ...state, tracks };
                             AppState.dispatch(ActionCreators.setHubSessionStorage(finalState, customTracksPool));
                         } else {

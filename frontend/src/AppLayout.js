@@ -35,7 +35,6 @@ const REGION_EXPANDER = new RegionExpander(1);
 const REGION_EXPANDER0 = new RegionExpander(0);
 
 function mapStateToProps(state) {
-
     const appState = state.browser.present;
     const [cidx, gidx] = appState.editTarget;
     const { compatabilityMode, containers } = appState;

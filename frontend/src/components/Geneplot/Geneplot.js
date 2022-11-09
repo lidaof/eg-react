@@ -13,10 +13,12 @@ import ColorPicker from '../ColorPicker';
 const Plot = window.createPlotlyComponent.default(window.Plotly);
 
 function mapStateToProps(state) {
+    const present = state.browser.present;
+    const [cidx, gidx] = present.editTarget;
     return {
-        tracks: state.browser.present.tracks,
-        sets: state.browser.present.regionSets,
-        selectedSet: state.browser.present.regionSetView,
+        tracks: present.containers[cidx].genomes[gidx].tracks,
+        sets: present.containers[cidx].genomes[gidx].regionSets,
+        selectedSet: present.containers[cidx].genomes[gidx].regionSetView,
     };
 }
 

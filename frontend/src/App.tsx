@@ -27,25 +27,25 @@ import { ToolbarClassKey } from "@material-ui/core";
 function mapStateToProps(state: { browser: { present: AppState } }) {
     const appState = state.browser.present;
     const [cidx, gidx] = appState.editTarget;
-    const { compatabilityMode, containers } = appState;
+    const { containers } = appState;
     const pickingGenome = !(containers && containers.length);
 
     let editingGenome = {} as GenomeState, editingContainer = {} as SyncedContainer;
-    if (!pickingGenome && !compatabilityMode) {
+    if (!pickingGenome) {
         editingGenome = (appState.containers && appState.containers[cidx].genomes[gidx]) || {} as GenomeState;
         editingContainer = (appState.containers && appState.containers[cidx]) || {} as SyncedContainer;
     }
 
     return {
-        viewRegion: editingContainer.viewRegion || appState.viewRegion,
-        tracks: editingGenome.tracks || appState.tracks,
+        viewRegion: editingContainer.viewRegion,
+        tracks: editingGenome.tracks || [],
         bundleId: appState.bundleId,
         sessionFromUrl: appState.sessionFromUrl,
         trackLegendWidth: appState.trackLegendWidth,
         isShowingNavigator: appState.isShowingNavigator,
-        customTracksPool: editingGenome.customTracksPool || appState.customTracksPool,
+        customTracksPool: editingGenome.customTracksPool,
         virusBrowserMode: appState.virusBrowserMode,
-        highlights: editingGenome.highlights || appState.highlights,
+        highlights: editingGenome.highlights,
 
         containers: appState.containers,
         editTarget: appState.editTarget,
@@ -451,10 +451,15 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
             );
         }
         const pickingGenome = !(containers && containers.length);
-        const tracksUrlSets = new Set([
-            ...tracks.filter((track) => track.url).map((track) => track.url),
-            ...tracks.filter((track) => !track.url).map((track) => track.name),
-        ]);
+        let tracksUrlSets;
+        if (tracks) {
+            tracksUrlSets = new Set([
+                ...tracks.filter((track) => track.url).map((track) => track.url),
+                ...tracks.filter((track) => !track.url).map((track) => track.name),
+            ]);
+        } else {
+            tracksUrlSets = new Set<string>();
+        }
         // tracksUrlSets.delete('Ruler'); // allow ruler to be added many times
         // const publicHubs = genomeConfig.publicHubList ? genomeConfig.publicHubList.slice() : [] ;
         let groupedTrackSets, containerTitles: any;

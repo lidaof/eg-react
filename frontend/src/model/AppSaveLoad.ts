@@ -26,23 +26,22 @@ export class AppStateSaver {
      * @return {Object} plain object representing app state
      */
     toObject(appState: AppState): object {
-        const regionSetViewIndex = appState.regionSets.findIndex((set) => set === appState.regionSetView);
+        let regionSetViewIndex;
+        if (appState.containers && appState.containers.length && appState.containers[0].genomes[0].regionSets) {
+            regionSetViewIndex = appState.containers[0].genomes[0].regionSets.findIndex((set) => set === appState.containers[0].genomes[0].regionSetView);
+        } else {
+            regionSetViewIndex = -1;
+        }
+
         const object = {
-            genomeName: appState.genomeName,
-            viewInterval: appState.viewRegion ? appState.viewRegion.getContextCoordinates().serialize() : null,
-            tracks: appState.tracks.filter((track) => !track.fileObj).map((track) => track.serialize()),
-            metadataTerms: appState.metadataTerms,
-            regionSets: appState.regionSets.map((set) => set.serialize()),
-            regionSetViewIndex,
             trackLegendWidth: appState.trackLegendWidth,
             bundleId: appState.bundleId,
             isShowingNavigator: appState.isShowingNavigator,
             isShowingVR: appState.isShowingVR,
             layout: appState.layout,
-            highlights: appState.highlights,
             darkTheme: appState.darkTheme,
             editTarget: appState.editTarget,
-            containers: appState.containers.map(container => {
+            containers: appState.containers && appState.containers.map(container => {
                 return {
                     title: container.title,
                     genomes: container.genomes.map(genome => {
@@ -54,7 +53,7 @@ export class AppStateSaver {
                             customTracksPool: genome.customTracksPool,
                             genomeConfig: genome.genomeConfig,
                             highlights: genome.highlights,
-                            regionSets: genome.regionSets && genome.regionSets.map((set) => set.serialize()),
+                            regionSets: (genome.regionSets && genome.regionSets.map((set) => set.serialize())) || [],
                             regionSetViewIndex: regionSetViewIndex,
                             settings: genome.settings,
                         };
@@ -99,21 +98,41 @@ export class AppStateLoader {
     fromObject(object: any): AppState {
         const regionSets = object.regionSets ? object.regionSets.map(RegionSet.deserialize) : [];
         const regionSetView = regionSets[object.regionSetViewIndex] || null;
+        if (object.genomeName) {
+            // restore legacy formatting.
+            return {
+                trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
+                bundleId: object.bundleId,
+                isShowingNavigator: object.isShowingNavigator,
+                isShowingVR: object.isShowingVR,
+                layout: object.layout || {},
+                darkTheme: object.darkTheme || false,
+                editTarget: [0, 0],
+                g3dTracks: [],
+                containers: [{
+                    title: object.genomeName,
+                    viewRegion: this._restoreViewRegion(object, regionSetView),
+                    metadataTerms: object.metadataTerms,
+                    highlights: [],
+                    genomes: [{
+                        name: object.genomeName,
+                        title: object.genomeName,
+                        tracks: object.tracks.map((d: any) => TrackModel.deserialize(d)),
+                        regionSets: regionSets || new Set(),
+                        regionSetView: object.regionSetView || null,
+                        highlights: object.highlights || [],
+                        settings: { offsetAmount: 0, syncHighlights: false },
+                        genomeConfig: getGenomeConfig(object.genomeName),
+                    }]
+                }]
+            }
+        }
         return {
-            genomeName: object.genomeName,
-            viewRegion: this._restoreViewRegion(object, regionSetView),
-            tracks: object.tracks.map((data: any) => TrackModel.deserialize(data)),
-            metadataTerms: object.metadataTerms || [],
-            regionSets,
-            regionSetView,
             trackLegendWidth: object.trackLegendWidth || DEFAULT_TRACK_LEGEND_WIDTH,
             bundleId: object.bundleId,
             isShowingNavigator: object.isShowingNavigator,
             isShowingVR: object.isShowingVR,
             layout: object.layout || {},
-            highlights: object.highlights || [],
-            // TODO: add logic to properly convert containers.
-            compatabilityMode: object.compatabilityMode,
             darkTheme: object.darkTheme || false,
             editTarget: object.editTarget,
             containers: object.containers && object.containers.map((container: SyncedContainer) => {
@@ -127,9 +146,9 @@ export class AppStateLoader {
                             tracks: genome.tracks.map((track: any) => TrackModel.deserialize(track)),
                             customTracksPool: genome.customTracksPool,
                             genomeConfig: getGenomeConfig(genome.name),
-                            highlights: genome.highlights,
-                            regionSets: genome.regionSets && genome.regionSets.map((set: any) => RegionSet.deserialize(set)),
-                            regionSetView: genome.regionSetView,
+                            highlights: genome.highlights || [],
+                            regionSets: (genome.regionSets && genome.regionSets.map((set: any) => RegionSet.deserialize(set))) || [],
+                            regionSetView: genome.regionSetView || null,
                             settings: genome.settings,
                         };
                     }),
