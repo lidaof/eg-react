@@ -579,6 +579,7 @@ async function asyncInitState() {
             }
         }
         if (query.hubSessionStorage) {
+            // reads data from both session storage and hubSessionStorage URL which is a josn hub, need check if genome changed or not
             const customTracksPool = await getTracksFromHubURL(mapUrl(query.hubSessionStorage as string));
             if (customTracksPool) {
                 const tracksInHub = customTracksPool.filter((track: any) => track.showOnHubLoad);

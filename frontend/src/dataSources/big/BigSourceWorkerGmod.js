@@ -40,9 +40,11 @@ class BigSourceWorkerGmod extends WorkerRunnableSource {
             return this.bw.getFeatures(chrom, locus.start, locus.end);
         });
         const dataForEachLocus = await Promise.all(promises);
-        loci.forEach((locus, index) => {
-            dataForEachLocus[index].forEach((f) => (f.chr = locus.chr));
-        });
+        if (options.ensemblStyle) {
+            loci.forEach((locus, index) => {
+                dataForEachLocus[index].forEach((f) => (f.chr = locus.chr));
+            });
+        }
         const combinedData = _.flatten(dataForEachLocus);
         // console.log(combinedData);
         return combinedData;

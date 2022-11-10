@@ -69,7 +69,7 @@ interface AppProps {
     tracks: TrackModel[];
     bundleId: string;
     sessionFromUrl: string;
-    onNewViewRegion: (region: DisplayedRegionModel) => void;
+    onNewViewRegion: (start: number, end: number) => void;
     onTracksChanged: (tracks: TrackModel[]) => void;
     embeddingMode: any;
     genomeConfig: any;
@@ -414,7 +414,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                     expansionAmount={REGION_EXPANDER}
                     suggestedMetaSets={this.state.suggestedMetaSets}
                     genomeConfig={genomeConfig}
-                    tracks={tracks.filter((tk) => tk.type !== "g3d")}
+                    tracks={tracks.filter((tk) => (tk.type !== "g3d" && tk.type !== "graph"))}
                     layoutModel={layoutModel}
                     onSetAnchors3d={onSetAnchors3d}
                     onSetGeneFor3d={onSetGeneFor3d}

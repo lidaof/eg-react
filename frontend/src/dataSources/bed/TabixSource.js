@@ -4,7 +4,7 @@ import { RemoteFile } from "generic-filehandle";
 import { fetch } from "node-fetch";
 import WorkerRunnableSource from "../worker/WorkerRunnableSource";
 import { ensureMaxListLength } from "../../util";
-import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
+// import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 
 /**
  * A DataSource that gets BedRecords from remote bed files.  Designed to run in webworker context.  Only indexed bed
@@ -36,20 +36,34 @@ class TabixSource extends WorkerRunnableSource {
      * @param {ChromosomeInterval[]} loci - locations for which to fetch data
      * @return {Promise<BedRecord[]>} Promise for the data
      */
-    getData = async (loci) => {
-        let promises = loci.map(this.getDataForLocus);
+    getData = async (loci, basesPerPixel, options) => {
+        // let promises = loci.map(this.getDataForLocus);
+        const promises = loci.map((locus) => {
+            let chrom = options.ensemblStyle ? locus.chr.replace("chr", "") : locus.chr;
+            if (chrom === "M") {
+                chrom = "MT";
+            }
+            return this.getDataForLocus(chrom, locus.start, locus.end);
+        });
         const dataForEachLocus = await Promise.all(promises);
+        if (options.ensemblStyle) {
+            loci.forEach((locus, index) => {
+                dataForEachLocus[index].forEach((f) => (f.chr = locus.chr));
+            });
+        }
         return _.flatten(dataForEachLocus);
     };
 
     /**
      * Gets data for a single chromosome interval.
      *
-     * @param {ChromosomeInterval} loci - genome coordinates
+     * @param {string} chr - genome coordinates
+     * @param {number} start - genome coordinates
+     * @param {stnumberring} end - genome coordinates
      * @return {Promise<BedRecord[]>} Promise for the data
      */
-    getDataForLocus = async (locus) => {
-        const { chr, start, end } = locus;
+    getDataForLocus = async (chr, start, end) => {
+        // const { chr, start, end } = locus;
         const rawlines = [];
         await this.tabix.getLines(chr, start, end, (line) => rawlines.push(line));
         let lines;
