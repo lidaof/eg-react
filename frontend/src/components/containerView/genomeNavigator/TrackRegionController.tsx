@@ -4,7 +4,6 @@ import {
     IconButton,
     Grid,
     Menu,
-    Tooltip
 } from '@material-ui/core';
 import {
     Search as SearchIcon

@@ -108,8 +108,8 @@ class RegionSetConfig extends React.Component {
             return getSymbolRegions(genomeName, symbol);
         });
         const parsed = await Promise.all(promise);
-        const withoutErrors = parsed.filter(e => !e.statusCode || e.statusCode != 501);
-        if (withoutErrors.length != parsed.length) SnackbarEngine.warning("Some items could not be retrieved! Displaying the ones that could be retrieved.");
+        const withoutErrors = parsed.filter(e => !e.statusCode || e.statusCode !== 501);
+        if (withoutErrors.length !== parsed.length) SnackbarEngine.warning("Some items could not be retrieved! Displaying the ones that could be retrieved.");
         const parsed2 = withoutErrors.map((item, index) => {
             if (Array.isArray(item)) {
                 if (item.length === 0) {

@@ -678,7 +678,6 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             const virusTracks = action.tracks.map((data: any) => TrackModel.deserialize(data));
             const genome = new Genome(action.name, [new Chromosome(action.seqId, action.seq.length)]);
             const navContext = genome.makeNavContext();
-            const virusViewRegion = new DisplayedRegionModel(navContext);
             const defaultRegion = new OpenInterval(0, action.seq.length);
             const annotationTracks = JSON.parse(action.annTracks);
             const virusGenomeConfig = {

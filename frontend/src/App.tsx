@@ -22,7 +22,6 @@ import { motion } from 'framer-motion/dist/framer-motion';
 import "./App.css";
 import { Tools } from "components/trackContainers/Tools";
 import FloatingTools from "FloatingTools";
-import { ToolbarClassKey } from "@material-ui/core";
 
 function mapStateToProps(state: { browser: { present: AppState } }) {
     const appState = state.browser.present;

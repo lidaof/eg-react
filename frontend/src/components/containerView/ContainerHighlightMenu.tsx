@@ -21,7 +21,6 @@ import {
 import DisplayedRegionModel from "../../model/DisplayedRegionModel";
 import ColorPicker from "../../components/ColorPicker";
 import { Chip } from '@material-ui/core';
-import { support } from "jszip";
 
 // import "./HighlightMenu.css";
 
@@ -111,7 +110,7 @@ class ContainerHighlightMenu extends React.Component<HighlightMenuProps> {
     handleRemoveAll = (iset: Set<number>): void => { for (let e of iset) this.props.onSetHighlights([], e); }
 
     render() {
-        const { highlights, viewRegion, onSetHighlights, genomeNames } = this.props;
+        const { highlights, viewRegion, genomeNames } = this.props;
         const gindices = new Set<number>();
         const highlightElements = highlights.length ? highlights.map((item: ContainerHighlightInterval, index: number) => {
             gindices.add(item.genomeIdx);

@@ -5,7 +5,6 @@ import axios from "axios";
 import Autosuggest from "react-autosuggest";
 import { Manager, Target, Popper } from "react-popper";
 import SpeechRecognition from "react-speech-recognition";
-import withCurrentGenome from "../../withCurrentGenome";
 import IsoformSelection from "./IsoformSelection";
 import OutsideClickDetector from "../../OutsideClickDetector";
 import { Genome } from "../../../model/genomes/Genome";

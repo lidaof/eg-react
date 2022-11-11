@@ -1,10 +1,9 @@
 import ButtonGroup from 'components/trackContainers/ButtonGroup';
-import { HighlightInterval, HighlightMenu as OldHighlightMenu } from 'components/trackContainers/HighlightMenu';
+import { HighlightInterval, } from 'components/trackContainers/HighlightMenu';
 import ContainerHighlightMenu, { ContainerHighlightInterval } from './ContainerHighlightMenu';
 import History from 'components/trackContainers/History';
 import MetadataHeader from 'components/trackContainers/MetadataHeader';
 import ReorderMany from 'components/trackContainers/ReorderMany';
-import { ToolButtons, Tools } from 'components/trackContainers/Tools';
 import ZoomButtons from 'components/trackContainers/ZoomButtons';
 import DisplayedRegionModel from 'model/DisplayedRegionModel';
 import React, { useState, useMemo } from 'react';
@@ -61,7 +60,7 @@ function ContainerTools(props: ContainerToolsProps) {
         for (let i = 0; i < genomes.length; i++) {
             const highlights = genomes[i].highlights;
             for (let j = 0; j < highlights.length; j++) {
-                const { start, end, tag, color, display } = highlights[j];
+                // const { start, end, tag, color, display } = highlights[j];
                 res.push({ ...highlights[j], genomeIdx: i });
             }
         }

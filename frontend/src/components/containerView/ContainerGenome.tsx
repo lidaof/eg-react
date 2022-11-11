@@ -11,8 +11,6 @@ import DisplayedRegionModel from 'model/DisplayedRegionModel';
 import TrackContainer from '../trackContainers/TrackContainer';
 import { HighlightInterval } from 'components/trackContainers/HighlightMenu';
 import TrackModel from 'model/TrackModel';
-import { getSecondaryGenomes } from '../../util';
-import SnackbarEngine from 'SnackbarEngine';
 import { RegionExpander } from 'model/RegionExpander';
 import { ProvidedControls } from './ContainerTools';
 import { Tools } from 'components/trackContainers/Tools';

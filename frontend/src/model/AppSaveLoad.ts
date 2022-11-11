@@ -26,12 +26,12 @@ export class AppStateSaver {
      * @return {Object} plain object representing app state
      */
     toObject(appState: AppState): object {
-        let regionSetViewIndex;
-        if (appState.containers && appState.containers.length && appState.containers[0].genomes[0].regionSets) {
-            regionSetViewIndex = appState.containers[0].genomes[0].regionSets.findIndex((set) => set === appState.containers[0].genomes[0].regionSetView);
-        } else {
-            regionSetViewIndex = -1;
-        }
+        // let regionSetViewIndex;
+        // if (appState.containers && appState.containers.length && appState.containers[0].genomes[0].regionSets) {
+        //     regionSetViewIndex = appState.containers[0].genomes[0].regionSets.findIndex((set) => set === appState.containers[0].genomes[0].regionSetView);
+        // } else {
+        //     regionSetViewIndex = -1;
+        // }
 
         const object = {
             trackLegendWidth: appState.trackLegendWidth,

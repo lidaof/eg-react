@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    Grid, Typography
+    Grid
 } from '@material-ui/core';
 import { ContainerActionsCreatorsFactory, SyncedContainer } from "AppState";
 import InlineEditable from "components/egUI/InlineEditable";
@@ -8,17 +8,13 @@ import { Tools } from "components/trackContainers/Tools";
 import { Model } from "flexlayout-react";
 import { getGenomeConfig } from "model/genomes/allGenomes";
 import { GenomeConfig } from "model/genomes/GenomeConfig";
-import { RegionExpander } from "model/RegionExpander";
 import TrackModel from "model/TrackModel";
 import { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import { Action, Dispatch } from 'redux';
 import GenomeNavigator from "../genomeNavigator/GenomeNavigator";
 import { HighlightInterval } from "../trackContainers/HighlightMenu";
-import TrackContainer from '../trackContainers/TrackContainer';
 import ContainerTools, { ProvidedControls } from "./ContainerTools";
-import StateSyncSettings from './StateSyncSettings';
-import TrackRegionController from './genomeNavigator/TrackRegionController';
 import ContainerGenome from './ContainerGenome';
 
 interface StateContainerProps {
@@ -50,7 +46,6 @@ function _ContainerView(props: StateContainerProps) {
     const {
         stateIdx,
         cdata,
-        layoutModel,
         viewer3dNumFrames,
         isThereG3dTrack,
         isShowingNavigator,
@@ -81,7 +76,7 @@ function _ContainerView(props: StateContainerProps) {
         if (trackControls.length !== genomes.length) {
             setTrackControls(new Array(genomes.length));
         }
-    }, [genomes.length]);
+    }, [genomes.length, trackControls.length]);
 
     const genomeConfigs: GenomeConfig[] = useMemo(() => genomes.map(g => {
         return g.genomeConfig || getGenomeConfig(g.name);
@@ -99,7 +94,6 @@ function _ContainerView(props: StateContainerProps) {
     };
     const renderGenomes = () => {
         return genomes.map((g, gIdx) => {
-            const genomeConfig = genomeConfigs[gIdx];
             return (
                 <div key={gIdx}>
                     <ContainerGenome 

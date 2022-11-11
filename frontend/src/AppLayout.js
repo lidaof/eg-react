@@ -129,7 +129,7 @@ class AppLayout extends React.PureComponent {
         }
         if (prevProps.g3dTracks !== this.props.g3dTracks) {
             const prevG3dtracks = prevProps.g3dTracks;
-            const prevIds = prevG3dtracks.map((tk) => tk.track.getId());
+            const prevIds = prevG3dtracks ? prevG3dtracks.map((tk) => tk.track.getId()) : [];
             const currentG3dtracks = this.props.g3dTracks;
             const g3dtracks = currentG3dtracks.filter((tk) => !prevIds.includes(tk.track.getId()));
             let layout = { ...this.props.layout };
