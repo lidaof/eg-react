@@ -207,7 +207,7 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
           y={y}
           height={RECT_HEIGHT}
           opacity={0.75}
-          isToRight={!placement.record.getIsReverseStrandQuery()}
+          isToRight={!(isQuery && placement.record.getIsReverseStrandQuery())}
           color="white"
           separation={baseWidth}
         />
@@ -224,7 +224,7 @@ class GenomeAlignTrackWithoutOptions extends React.PureComponent<PropsFromTrackC
             strokeDasharray={baseWidth / 2}
           />
           {rects}
-          {isQuery && arrows}
+          {arrows}
           {letters}
         </React.Fragment>
       );
