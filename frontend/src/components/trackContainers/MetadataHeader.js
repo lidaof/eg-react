@@ -49,7 +49,7 @@ class MetadataHeader extends React.PureComponent {
                     </div>
                 </div>
 
-                <div className="MetadataHeader-container">
+                <div className="MetadataHeader-container" style={{ marginLeft: 50 }}>
                     <ul className="MetadataHeader-terms">
                         {this.props.terms.map((term) => (
                             <li key={term} style={{ width: termWidth, fontSize: termWidth * 0.75 }}>

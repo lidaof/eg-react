@@ -2,20 +2,36 @@ import React from "react";
 import { ColorPicker } from "./ColorPicker";
 
 export const Legend = (props) => {
-    const { colorScale, onUpdateLegendColor } = props;
+    const { colorScale, onUpdateLegendColor, sepColorScale, haps } = props;
     if (!colorScale) return null;
     const [min, max] = colorScale.domain();
-    // console.log(props)
     const color1 = colorScale(min);
     const color2 = colorScale((min + max) * 0.25);
     const color3 = colorScale((min + max) * 0.5);
     const color4 = colorScale((min + max) * 0.75);
     const color5 = colorScale(max);
     // console.log(color1, color2, color3, color4, color5)
+    const sepInitColorMin = {};
+    const sepInitColorMax = {};
+    for (let key in sepColorScale) {
+        const cs = sepColorScale[key] || colorScale;
+        const [smin, smax] = cs.domain();
+        const cmin = cs(smin);
+        const cmax = cs(smax);
+        sepInitColorMin[key] = cmin;
+        sepInitColorMax[key] = cmax;
+    }
     return (
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <div>
-                <ColorPicker onUpdateLegendColor={onUpdateLegendColor} colorKey="legendMinColor" initColor={color1} />
+                <ColorPicker
+                    onUpdateLegendColor={onUpdateLegendColor}
+                    colorKey="legendMinColor"
+                    sepInitColor={sepInitColorMin}
+                    initColor={color1}
+                    haps={haps}
+                    message="Targeted highlights are only supported by region paint"
+                />
             </div>
             <svg height="40" width="300" style={{ display: "block" }}>
                 <defs>
@@ -37,7 +53,14 @@ export const Legend = (props) => {
                 Sorry, your browser does not support inline SVG.
             </svg>
             <div>
-                <ColorPicker onUpdateLegendColor={onUpdateLegendColor} colorKey="legendMaxColor" initColor={color5} />
+                <ColorPicker
+                    onUpdateLegendColor={onUpdateLegendColor}
+                    colorKey="legendMaxColor"
+                    sepInitColor={sepInitColorMax}
+                    initColor={color5}
+                    haps={haps}
+                    message="Targeted highlights are only supported by region paint"
+                />
             </div>
         </div>
     );

@@ -1,4 +1,4 @@
-import { ContainerActionsCreatorsFactory, GenomeSettings } from 'AppState';
+import AppState, { ContainerActionsCreatorsFactory, GenomeSettings } from 'AppState';
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Action, Dispatch } from 'redux';
@@ -16,6 +16,7 @@ interface StateSyncSettingsProps {
     genomeSettings: GenomeSettings;
     containerTitles: string[];
     allowNewContainer: boolean;
+    threedContainerActive?: boolean;
 
     // redux actions, set as optional because typescript isn't ommitting them from the connected component
     onGenomeSettingsChanged?: (newSettings: any, genomeIdx: number) => void;
@@ -30,6 +31,7 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
         containerIdx,
         genomeSettings,
         allowNewContainer,
+        threedContainerActive,
         onGenomeSettingsChanged,
         onSetGenomeContainer,
         onNewContainer,
@@ -123,6 +125,7 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
                         <Select
                             value={containerIdx}
                             label="Container"
+                            disabled={threedContainerActive}
                             onChange={(e) => {
                                 setOpen(false);
                                 const action = (snackbarId: number) => (
@@ -150,6 +153,9 @@ function _StateSyncSettings(props: StateSyncSettingsProps) {
                             )}
                         </Select>
                     </FormControl>
+                    {threedContainerActive && (
+                        <FormHelperText>You can't move containers while there's a 3D genome active.</FormHelperText>
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
@@ -172,6 +178,15 @@ const mapDispatchToPropsFactory = (dispatch: Dispatch<Action>, ownProps: StateSy
     }
 }
 
-const StateSyncSettings = connect(null, mapDispatchToPropsFactory)(_StateSyncSettings);
+const mapStateToProps = (state: { browser: { present: AppState } }) => {
+    const present = state.browser.present;
+    if (!present.layout || !(present.layout as any).layout) return {};
+
+    return {
+        threedContainerActive: (present.layout as any).layout.children && (present.layout as any).layout.children.length > 1,
+    }
+}
+
+const StateSyncSettings = connect(mapStateToProps, mapDispatchToPropsFactory)(_StateSyncSettings);
 
 export default StateSyncSettings;

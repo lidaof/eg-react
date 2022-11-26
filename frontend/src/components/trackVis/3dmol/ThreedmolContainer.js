@@ -51,6 +51,20 @@ import "./ThreedmolContainer.css";
 
 const unzip = util.promisify(zlib.unzip);
 
+export const highlightHap = {
+    maternal: "maternal",
+    paternal: "paternal",
+}
+export class ThreedHighlight {
+    constructor(
+        viewRegion,
+        highlightHap,
+    ) {
+        this.viewRegion = viewRegion;
+        this.highlightHap = highlightHap;
+    }
+}
+
 /**
  * the container for holding 3D structure rendered by 3Dmol.js
  * @author Daofeng Li
@@ -61,6 +75,8 @@ class ThreedmolContainer extends React.Component {
         tracks: PropTypes.arrayOf(PropTypes.instanceOf(TrackModel)).isRequired,
         g3dtrack: PropTypes.instanceOf(TrackModel).isRequired, // g3d track id to get g3d track to render
         viewRegion: PropTypes.instanceOf(DisplayedRegionModel).isRequired,
+        threedHighlights: PropTypes.arrayOf(ThreedHighlight).isRequired,
+        statusMessage: PropTypes.string.isRequired,
         width: PropTypes.number,
         height: PropTypes.number,
         x: PropTypes.number, // x position to left screen from flex layout
@@ -110,7 +126,10 @@ class ThreedmolContainer extends React.Component {
             legendMax: 10,
             legendMinColor: "yellow", //yellow
             legendMaxColor: "red", //red
+            sepLegendMinColor: {},
+            sepLegendMaxColor: {},
             colorScale: null,
+            sepColorScale: {},
             chrom: "",
             start: 0,
             end: 0,
@@ -138,6 +157,7 @@ class ThreedmolContainer extends React.Component {
             modelDisplayConfig: null, // key: hap, value: true or false, true for display, false for hidden
             highlightingOn: false,
             highlightingColor: "#ffff00", // yellow
+            sepHighlightingColor: {},
             highlightingColorChanged: false,
             // highlightingChromColor: "grey",
             highlightingChromColor: "#f2f2f2",
@@ -260,6 +280,9 @@ class ThreedmolContainer extends React.Component {
             legendMaxColor,
             legendMinColor,
             resolution,
+            sepHighlightingColor,
+            sepLegendMaxColor,
+            sepLegendMinColor,
             annoUsePromoter,
             gene,
             promoter,
@@ -278,7 +301,8 @@ class ThreedmolContainer extends React.Component {
         } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
-        if (legendMaxColor !== prevState.legendMaxColor || legendMinColor !== prevState.legendMinColor) {
+        if (legendMaxColor !== prevState.legendMaxColor || legendMinColor !== prevState.legendMinColor ||
+            sepLegendMaxColor !== prevState.sepLegendMaxColor || sepLegendMinColor !== prevState.sepLegendMinColor) {
             await this.paintBigwig(paintRegion);
         }
         // if (
@@ -391,7 +415,7 @@ class ThreedmolContainer extends React.Component {
                 this.removeImageLabel();
             }
         }
-        if (prevProps.viewRegion !== this.props.viewRegion) {
+        if (prevProps.viewRegion !== this.props.viewRegion || prevProps.threedHighlights !== this.props.threedHighlights) {
             const chroms = this.viewRegionToChroms();
             const prevChroms = prevProps.viewRegion.getFeatureSegments().map((region) => region.getName());
             if (!arraysEqual(prevChroms, chroms)) {
@@ -474,7 +498,7 @@ class ThreedmolContainer extends React.Component {
             this.viewer.render();
             this.viewer2.render();
         }
-        if (highlightingColor !== prevState.highlightingColor) {
+        if (highlightingColor !== prevState.highlightingColor || sepHighlightingColor !== prevState.sepHighlightingColor) {
             this.setState({ highlightingColorChanged: true });
         }
         if (
@@ -853,10 +877,10 @@ class ThreedmolContainer extends React.Component {
     };
 
     viewRegionToRegions = () => {
-        const { viewRegion, genomeConfig } = this.props;
+        const { viewRegion, genomeConfig, } = this.props;
         const regions = viewRegion.getFeatureSegments();
         const navContext = genomeConfig.navContext;
-        // console.log(regions);
+
         return regions.map((region) => {
             if (navContext.hasFeatureWithName(region.feature)) {
                 return {
@@ -874,6 +898,33 @@ class ThreedmolContainer extends React.Component {
             }
         });
     };
+
+    threedHighlightsToRegions = () => {
+        const { genomeConfig, threedHighlights } = this.props;
+
+        const res = {};
+        for (let el of threedHighlights) {
+            const regions = el.viewRegion.getFeatureSegments();
+            const navContext = genomeConfig.navContext;
+            res[el.highlightHap] = regions.map((region) => {
+                if (navContext.hasFeatureWithName(region.feature)) {
+                    return {
+                        chrom: region.getName(),
+                        start: region.relativeStart,
+                        end: region.relativeEnd,
+                    };
+                } else {
+                    // region set view
+                    return {
+                        chrom: region.feature.locus.chr,
+                        start: region.feature.locus.start,
+                        end: region.feature.locus.end,
+                    };
+                }
+            });
+        }
+        return res;
+    }
 
     onMenuPositionChange = (e) => {
         const value = e.target.value;
@@ -1145,9 +1196,32 @@ class ThreedmolContainer extends React.Component {
         }
     };
 
-    updateLegendColor = (k, color) => {
-        this.setState({ [k]: color });
+    updateLegendColor = (k, color, hap) => {
+        const capFirst = s => s.charAt(0).toUpperCase() + s.slice(1);
+        const sepK = "sep" + capFirst(k);
+        if (hap) {
+            this.setState({
+                [sepK]: { ...this.state[sepK], [hap]: color, }
+            });
+        } else {
+            this.setState({ [k]: color, [sepK]: {} });
+        }
     };
+
+    // updateBigWigLegend = (k, color, hap) => {
+    //     const capFirst = s => s.charAt(0).toUpperCase() + s.slice(1);
+    //     const sepK = "sep" + capFirst(k);
+    //     if (hap) {
+    //         this.setState({
+    //             [sepK]: { ...this.state[sepK], [hap]: color, }
+    //         })
+    //     } else {
+    //         this.setState({
+    //             [k]: color,
+    //             [sepK]: {},
+    //         })
+    //     }
+    // }
 
     updateResolution = (resolution) => {
         this.setState({ resolution });
@@ -1163,7 +1237,10 @@ class ThreedmolContainer extends React.Component {
             modelDisplayConfig,
             showEnvelop,
         } = this.state;
-        const regions = this.viewRegionToRegions();
+        // const regions = this.viewRegionToRegions();
+        if (!modelDisplayConfig) return;
+        const threedHighlights = this.threedHighlightsToRegions();
+
         // console.log(regions);
         // const colorByRegion = function (atom, region) {
         //     if (
@@ -1178,13 +1255,21 @@ class ThreedmolContainer extends React.Component {
         // };
         const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
         const resString = resolution.toString();
+        // Object.keys(modelDisplayConfig).forEach((hap) => {
+        //     regionRange[hap] = {};
+        //     regions.forEach((reg) => {
+        //         const leftResi = getClosestValueIndex(this.atomStartsByChrom[resString][hap][reg.chrom], reg.start)[1];
+        //         const rightResi = getClosestValueIndex(this.atomStartsByChrom[resString][hap][reg.chrom], reg.end)[0];
+        //         regionRange[hap][reg.chrom] = [leftResi, rightResi];
+        //     });
+        // });
         Object.keys(modelDisplayConfig).forEach((hap) => {
             regionRange[hap] = {};
-            regions.forEach((reg) => {
+            threedHighlights[hap].forEach((reg => {
                 const leftResi = getClosestValueIndex(this.atomStartsByChrom[resString][hap][reg.chrom], reg.start)[1];
                 const rightResi = getClosestValueIndex(this.atomStartsByChrom[resString][hap][reg.chrom], reg.end)[0];
                 regionRange[hap][reg.chrom] = [leftResi, rightResi];
-            });
+            }))
         });
 
         // this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3, hidden: true } }); //remove existing style
@@ -1195,22 +1280,22 @@ class ThreedmolContainer extends React.Component {
         //         { cartoon: { colorfunc: (atom) => colorByRegion(atom, region), style: "trace", thickness: 1 } }
         //     );
         // });
-        const usedHighlightStyle =
-            highlightStyle === "cartoon"
-                ? {
-                      cartoon: { color: highlightingColor, style: "trace", thickness: cartoonThickness },
-                  }
-                : {
-                      sphere: {
-                          color: highlightingColor,
-                          opacity: 1,
-                          radius: cartoonThickness,
-                      },
-                  };
         let validateRegion = false;
-        // console.log(regionRange);
         Object.keys(modelDisplayConfig).forEach((hap) => {
-            regions.forEach((region) => {
+            const hapColor = this.state.sepHighlightingColor[hap] || highlightingColor;
+            const usedHighlightStyle =
+                highlightStyle === "cartoon"
+                    ? {
+                        cartoon: { color: hapColor, style: "trace", thickness: cartoonThickness },
+                    }
+                    : {
+                        sphere: {
+                            color: hapColor,
+                            opacity: 1,
+                            radius: cartoonThickness,
+                        },
+                    };
+            threedHighlights[hap].forEach((region) => {
                 if (
                     regionRange[hap][region.chrom][0] !== undefined &&
                     regionRange[hap][region.chrom][1] !== undefined
@@ -1382,16 +1467,34 @@ class ThreedmolContainer extends React.Component {
                 return "grey";
             }
         };
-        const usedHighlightStyle =
-            highlightStyle === "cartoon"
-                ? { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
-                : {
-                      sphere: {
-                          colorfunc: colorByValue,
-                          opacity: 1,
-                          radius: cartoonThickness,
-                      },
-                  };
+        const sepColorScale = {};
+        const sepColorByValue = {};
+        Object.keys(modelDisplayConfig).forEach((hap) => {
+            const lmin = this.state.sepLegendMinColor[hap] || legendMinColor;
+            const lmax = this.state.sepLegendMaxColor[hap] || legendMaxColor;
+            console.log(lmin);
+            console.log(lmax);
+            const hapColorScale = scaleLinear()
+                .domain([minValue, maxValue])
+                .range([lmin, lmax])
+                .clamp(true);
+            const hapColorByValue = function (atom) {
+                if (atomInFilterRegions(atom, filterRegions)) {
+                    const value = getBigwigValueForAtom(keepers, atom, resolution);
+                    if (value) {
+                        return colorAsNumber(hapColorScale(value));
+                    } else {
+                        // console.log(atom, "no value");
+                        return "grey";
+                    }
+                } else {
+                    // console.log(atom, "not in region");
+                    return "grey";
+                }
+            };
+            sepColorScale[hap] = hapColorScale;
+            sepColorByValue[hap] = hapColorByValue;
+        });
         if (chooseRegion === "region") {
             const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
             const resString = resolution.toString();
@@ -1410,6 +1513,16 @@ class ThreedmolContainer extends React.Component {
                 });
             });
             Object.keys(modelDisplayConfig).forEach((hap) => {
+                const usedHighlightStyle =
+                highlightStyle === "cartoon"
+                    ? { cartoon: { colorfunc: sepColorByValue[hap] || colorByValue, style: "trace", thickness: cartoonThickness } }
+                    : {
+                        sphere: {
+                            colorfunc: sepColorByValue[hap] || colorByValue,
+                            opacity: 1,
+                            radius: cartoonThickness,
+                        },
+                    };
                 queryChroms.forEach((chrom) => {
                     if (regionRange[hap][chrom][0] !== undefined && regionRange[hap][chrom][1] !== undefined) {
                         const resiSelect = `${regionRange[hap][chrom][0]}-${regionRange[hap][chrom][1]}`;
@@ -1421,6 +1534,16 @@ class ThreedmolContainer extends React.Component {
                 });
             });
         } else {
+            const usedHighlightStyle =
+            highlightStyle === "cartoon"
+                ? { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
+                : {
+                    sphere: {
+                        colorfunc: colorByValue,
+                        opacity: 1,
+                        radius: cartoonThickness,
+                    },
+                };
             queryChroms.forEach((chrom) => {
                 this.viewer.setStyle({ chain: chrom }, usedHighlightStyle);
             });
@@ -1433,6 +1556,7 @@ class ThreedmolContainer extends React.Component {
             legendMax: maxScore,
             legendMin: minScore,
             colorScale,
+            sepColorScale,
             staticCategories: { "no data": "grey" },
         });
     };
@@ -2097,12 +2221,12 @@ class ThreedmolContainer extends React.Component {
             highlightStyle === "cartoon"
                 ? { cartoon: { colorfunc: colorByAnnotation, style: "trace", thickness: cartoonThickness } }
                 : {
-                      sphere: {
-                          colorfunc: colorByAnnotation,
-                          opacity: 1,
-                          radius: cartoonThickness,
-                      },
-                  };
+                    sphere: {
+                        colorfunc: colorByAnnotation,
+                        opacity: 1,
+                        radius: cartoonThickness,
+                    },
+                };
         if (chooseRegion === "region") {
             const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
             const resString = resolution.toString();
@@ -2614,7 +2738,7 @@ class ThreedmolContainer extends React.Component {
                 if (locus) {
                     return { label, locus };
                 }
-            } catch (error) {}
+            } catch (error) { }
             return getSymbolRegions(genomeName, symbol);
         });
         const parsed = await Promise.all(promise);
@@ -2681,6 +2805,10 @@ class ThreedmolContainer extends React.Component {
         this.setState({ message });
     };
 
+    getHaps = () => {
+        return this.state.modelDisplayConfig ? Object.keys(this.state.modelDisplayConfig) : [];
+    }
+
     render() {
         const {
             legendMax,
@@ -2707,6 +2835,7 @@ class ThreedmolContainer extends React.Component {
             bigWigUrl,
             bigWigInputUrl,
             paintRegion,
+            sepColorScale,
             // uploadCompartmentFile,
             // compartmentFileUrl,
             // paintCompartmentRegion,
@@ -2718,6 +2847,7 @@ class ThreedmolContainer extends React.Component {
             myShapeRegion,
             myShapes,
             highlightingColor,
+            sepHighlightingColor,
             highlightingColorChanged,
             lineOpacity,
             cartoonThickness,
@@ -2993,6 +3123,8 @@ class ThreedmolContainer extends React.Component {
                                         <div style={{ display: "flex", alignItems: "flex-start" }}>
                                             <ColorPicker
                                                 onUpdateLegendColor={this.updateLegendColor}
+                                                haps={this.getHaps()}
+                                                sepInitColor={sepHighlightingColor}
                                                 colorKey={"highlightingColor"}
                                                 initColor={highlightingColor}
                                             />
@@ -3591,7 +3723,12 @@ class ThreedmolContainer extends React.Component {
 
                     <div id="legend">
                         {paintMethod === "score" && (
-                            <Legend colorScale={colorScale} onUpdateLegendColor={this.updateLegendColor} />
+                            <Legend
+                                haps={this.getHaps()}
+                                colorScale={colorScale}
+                                sepColorScale={sepColorScale}
+                                onUpdateLegendColor={this.updateLegendColor}
+                            />
                         )}
 
                         {(paintMethod === "compartment" || paintMethod === "annotation") && (

@@ -10,7 +10,7 @@ function getGenomeConfigFromStore(state: { browser: { present: AppState, past: A
     const present = state.browser.present;
     if (!(present.containers && present.containers.length && present.containers[0].genomes && present.containers[0].genomes.length)) return { genomeConfig: null }
     if (!multipleGenomesWarned && (present.containers.length > 1 || present.containers[0].genomes.length > 1)) {
-        SnackbarEngine.warning("Multiple genomes aren't completely supported here yet. You might run into issues.");
+        SnackbarEngine.warning("Something here doesn't completely support multiple genomes. You might run into issues.");
         multipleGenomesWarned = true;
     }
     return {

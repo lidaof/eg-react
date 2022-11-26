@@ -6,13 +6,22 @@ import MetadataHeader from 'components/trackContainers/MetadataHeader';
 import ReorderMany from 'components/trackContainers/ReorderMany';
 import ZoomButtons from 'components/trackContainers/ZoomButtons';
 import DisplayedRegionModel from 'model/DisplayedRegionModel';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { GenomeState } from 'AppState';
+import { ViewExpansion } from 'model/RegionExpander';
+import { niceBpCount } from '../../util';
 
 export interface ProvidedControls {
     genomeIdx: number;
     panLeftOrRight: Function;
-    zoomOut: Function
+    zoomOut: Function;
+    getPixelInfo: () => PixelInfoData;
+}
+
+export interface PixelInfoData {
+    primaryView: ViewExpansion;
+    basesPerPixel: number;
+    viewRegion: number;
 }
 
 interface ContainerToolsProps {
@@ -37,10 +46,21 @@ function ContainerTools(props: ContainerToolsProps) {
         genomes,
         metadataTerms,
         onMetadataTermsChanged,
-        suggestedMetaSets
+        suggestedMetaSets,
     } = props;
     const [reorderManyModalOpen, setReorderManyModalOpen] = useState(false);
     const [highlightModalOpen, setHighlightModalOpen] = useState(false);
+    const [pixelInfo, setPixelInfo] = useState<PixelInfoData | null>(null);
+
+    useEffect(() => {
+        if (trackControls[0]) {
+            setTimeout(() => {
+                setPixelInfo(trackControls[0].getPixelInfo());
+            }, 100)
+        } else if (trackControls[0]) {
+            setPixelInfo(trackControls[0].getPixelInfo());
+        }
+    }, [viewRegion, trackControls])
 
     const openReorderManyModal = () => setReorderManyModalOpen(true);
     const closeReorderManyModal = () => setReorderManyModalOpen(false);
@@ -136,13 +156,15 @@ function ContainerTools(props: ContainerToolsProps) {
                         genomeNames={gNames}
                     />
                 </div>
-                {/* <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
-                    <PixelInfo
-                        basesPerPixel={this.props.basesPerPixel}
-                        viewRegion={viewRegion}
-                        primaryView={primaryView}
-                    />
-                </div> */}
+                {(pixelInfo && pixelInfo.primaryView) && (
+                    <div className="tool-element" style={{ minWidth: "200px", alignSelf: "center" }}>
+                        <PixelInfo
+                            basesPerPixel={pixelInfo.basesPerPixel}
+                            viewRegion={pixelInfo.viewRegion}
+                            primaryView={pixelInfo.primaryView}
+                        />
+                    </div>
+                )}
                 <MetadataHeader
                     terms={metadataTerms}
                     onNewTerms={onMetadataTermsChanged}
@@ -153,17 +175,17 @@ function ContainerTools(props: ContainerToolsProps) {
     );
 }
 
-// function PixelInfo(props:any) {
-//     const { basesPerPixel, viewRegion, primaryView } = props;
-//     const viewBp = niceBpCount(viewRegion.getWidth());
-//     const windowWidth = primaryView.viewWindow.getLength();
-//     const span = niceBpCount(basesPerPixel, true);
-//     return (
-//         <span className="font-italic">
-//             Viewing a {viewBp} region in {Math.round(windowWidth)}px, 1 pixel spans {span}
-//         </span>
-//     );
-// }
+function PixelInfo(props:any) {
+    const { basesPerPixel, viewRegion, primaryView } = props;
+    const viewBp = niceBpCount(viewRegion.getWidth());
+    const windowWidth = primaryView.viewWindow.getLength();
+    const span = niceBpCount(basesPerPixel, true);
+    return (
+        <span className="font-italic">
+            Viewing a {viewBp} region in {Math.round(windowWidth)}px, 1 pixel spans {span}
+        </span>
+    );
+}
 
 
 export default ContainerTools;

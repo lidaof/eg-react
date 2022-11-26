@@ -77,7 +77,18 @@ function ContainerGenome(props: ContainerGenomeProps) {
     const { genomeConfig, } = genomes[gIdx]
     const { metadataTerms } = parentContainer;
 
+
+
     const g = genomes[gIdx];
+    const { offsetAmount } = g.settings;
+    let translated = viewRegion;
+    if (offsetAmount !== 0) {
+        const navContext = translated.getNavigationContext();
+        const contextCoords = translated.getContextCoordinates();
+        const { start, end } = contextCoords;
+        translated = new DisplayedRegionModel(navContext, start + offsetAmount, end + offsetAmount);
+    }
+
     return (
         <>
             <div style={{
@@ -98,7 +109,7 @@ function ContainerGenome(props: ContainerGenomeProps) {
                     </Grid>
                     <Grid item style={{ marginLeft: 50 }}>
                         <TrackRegionController
-                            viewRegion={viewRegion}
+                            viewRegion={translated}
                             genomeConfig={g.genomeConfig}
                             onRegionSelected={onSetViewRegion}
                             virusBrowserMode={virusBrowserMode}
@@ -125,7 +136,7 @@ function ContainerGenome(props: ContainerGenomeProps) {
                 onSetHighlights={(highlights: HighlightInterval[]) => onSetHighlights(highlights, gIdx)}
 
                 genome={g.name}
-                viewRegion={viewRegion}
+                viewRegion={translated}
                 metadataTerms={metadataTerms}
 
                 // formerly connected through redux

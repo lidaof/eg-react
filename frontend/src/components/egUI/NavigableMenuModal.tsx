@@ -130,7 +130,7 @@ function _MenuModal(props: MenuModalProps) {
                 onClose={handleClose}
                 TransitionComponent={Grow}
                 fullWidth
-                maxWidth="md"
+                maxWidth="xl"
                 PaperProps={{
                     style: !smallscreen ? {
                         borderRadius: "30px",

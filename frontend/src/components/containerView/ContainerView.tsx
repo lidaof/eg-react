@@ -130,7 +130,7 @@ function _ContainerView(props: StateContainerProps) {
 
     return (
         <div>
-            <Grid container direction="row" alignItems="center">
+            <Grid container direction="row" alignItems="center" justifyContent='space-between'>
                 <Grid item>
                     <div style={{
                         marginLeft: 20,

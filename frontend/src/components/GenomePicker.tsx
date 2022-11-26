@@ -1,5 +1,5 @@
 import {
-    AppBar, CardMedia,
+    AppBar, ButtonBase, CardMedia,
     Container, InputAdornment, List, ListItem, ListItemIcon, ListItemText, makeStyles, TextField
 } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
@@ -23,7 +23,7 @@ import { SessionUI } from "./SessionUI";
 import { AnimatePresence, motion } from 'framer-motion/dist/framer-motion';
 
 import _ from "lodash";
-import { getGenomeContainerTitle } from "./containerView/containerUtils";
+import { getPhasedGenomeName } from "./containerView/containerUtils";
 import "./GenomePicker.css";
 
 const preLoadedImages = [
@@ -286,13 +286,13 @@ function PhasedGenomePicker(props: PhasedGenomePickerProps) {
             })
             .map(([species2, details], idx) => {
                 const { groupedAssemblies } = details;
-                const assemblyStrs = groupedAssemblies.map((e) => getGenomeContainerTitle(e));
+                const assemblyStrs = groupedAssemblies.map((e) => getPhasedGenomeName(e));
                 return (
                     // @ts-ignore
                     <Grid
                         item
-                        xs={12}
-                        md={4}
+                        // xs={12}
+                        // md={4}
                         align="center"
                         key={species2}
                         component={motion.div}
@@ -351,6 +351,7 @@ function PhasedGenomePicker(props: PhasedGenomePickerProps) {
                 container
                 spacing={2}
                 component={motion.div}
+                direction="column"
                 animate={{ opacity: 1 }}
                 initial={{ opacity: 0 }}
                 exit={{ opacity: 0 }}
@@ -375,9 +376,10 @@ function GenomePickerContainer(props: GenomePickerContainerProps) {
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
 
-    const handleChange = (event: ChangeEvent<{}>, newValue: any) => {
+    const handleChange = (_: ChangeEvent<{}>, newValue: any) => {
         setValue(newValue);
     };
+
 
     useEffect(() => {
         preLoadedImages.forEach((isrc) => {
@@ -470,35 +472,74 @@ function PhasedGenomeCard(props: PhasedGenomeCardProps) {
     const renderAssemblies = () => {
         return assemblies.map((assembly, idx) => {
             return (
-                <ListItem
+                <Grid
+                    item
+                    component={ButtonBase}
                     key={idx}
-                    button
                     onClick={() => onChoose(species, idx)}
                     style={{
                         backgroundColor: "var(--bg-color)",
-                        borderRadius: 7
+                        height: 125,
+                        borderTop: '1px #5f6368 solid',
+                        borderBottom: '1px #5f6368 solid',
+                        display: 'flex',
+                        alignItems: 'center',
                     }}
                 >
-                    <ListItemIcon className={styles.icon}>
-                        <ChevronRightIcon />
-                    </ListItemIcon>
                     <ListItemText primary={assembly} />
-                </ListItem>
+                </Grid>
             );
         });
     };
 
     return (
-        <Card className={styles.card}>
-            <CardMedia image={logoUrl} title={species} className={styles.media} />
+        <Card className={styles.phasedCard}>
             <CardContent>
-                <Typography gutterBottom variant="h5" component="h2" className={styles.cardTitle}>
-                    {species}
-                </Typography>
-                <List className={styles.vertScroll}>{renderAssemblies()}</List>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                    }}
+                >
+                    <div>
+                        <img
+                            src={logoUrl}
+                            alt=""
+                            style={{
+                                width: "160px",
+                                height: "160px",
+                                objectFit: "cover",
+                                borderRadius: 30,
+                            }}
+                        />
+                        <Typography variant="h5" component="h2" className={styles.cardTitle} style={{ margin: 30, }}>{species}</Typography>
+                    </div>
+                    <div style={{ height: "100%", width: "100%" }}>
+                        <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-evenly"
+                        >
+                            {renderAssemblies()}
+                        </Grid>
+                    </div>
+                </div>
             </CardContent>
         </Card>
     );
+    // return (
+    //     <Card className={styles.phasedCard}>
+    //         <CardMedia image={logoUrl} title={species} className={styles.media} style={{ width: "160px", height: "160px" }} />
+    //         <CardContent>
+    //             <Typography gutterBottom variant="h5" component="h2" className={styles.cardTitle}>
+    //                 {species}
+    //             </Typography>
+    //             <List className={styles.vertScroll}>{renderAssemblies()}</List>
+    //         </CardContent>
+    //     </Card>
+    // );
 }
 
 interface GenomePickerCardProps {
@@ -568,6 +609,13 @@ const useStyles = makeStyles({
         borderRadius: "10px",
         height: "100%",
         width: "270px",
+        backgroundColor: "var(--bg-color)", //matches the background color of the card to the page
+        color: "var(--font-color)",
+    },
+    phasedCard: {
+        borderRadius: "10px",
+        height: "100%",
+        width: "100%",
         backgroundColor: "var(--bg-color)", //matches the background color of the card to the page
         color: "var(--font-color)",
     },

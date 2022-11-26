@@ -21,7 +21,20 @@ export class ColorPicker extends React.Component {
                 b: parsed.values[2],
                 a: parsed.alpha,
             },
+            targetHap: "",
         };
+    }
+
+    componentDidUpdate(_, prevState) {
+        if (prevState.targetHap !== this.state.targetHap) {
+            const toBeParsed = this.state.targetHap ? this.props.sepInitColor[this.state.targetHap] : this.props.initColor;
+            if (!toBeParsed) return;
+            const parsed = colorParse(toBeParsed);
+            const [r, g, b] = parsed.values;
+            this.setState({
+                color: { r, g, b, a: parsed.alpha }
+            })
+        }
     }
 
     handleClick = () => {
@@ -38,17 +51,26 @@ export class ColorPicker extends React.Component {
         this.setState({ color: color.rgb });
         const { onUpdateLegendColor, colorKey, getChangedColor } = this.props;
         if (onUpdateLegendColor) {
-            onUpdateLegendColor(colorKey, color.hex);
+            if (this.state.targetHap) {
+                onUpdateLegendColor(colorKey, color.hex, this.state.targetHap);
+            } else {
+                onUpdateLegendColor(colorKey, color.hex);
+            }
         }
         if (getChangedColor) {
             getChangedColor(color.hex);
         }
     };
 
+    setTargetHap = (e) => {
+        this.setState({ targetHap: e.target.value });
+    }
+
     render() {
         const brightness = (0.299 * this.state.color.r + 0.587 * this.state.color.g + 0.114 * this.state.color.b) / 255;
         const color = brightness < 0.5 ? "white" : "black";
         const width = this.props.fullWidth ? "unset" : "24px";
+
         const styles = reactCSS({
             default: {
                 color: {
@@ -72,6 +94,7 @@ export class ColorPicker extends React.Component {
                     position: "absolute",
                     zIndex: "2",
                     display: "inline-block",
+                    backgroundColor: "white",
                 },
                 cover: {
                     position: "fixed",
@@ -79,6 +102,7 @@ export class ColorPicker extends React.Component {
                     right: "0px",
                     bottom: "0px",
                     left: "0px",
+                    zIndex: -1,
                 },
             },
         });
@@ -91,7 +115,22 @@ export class ColorPicker extends React.Component {
                 {this.state.displayColorPicker ? (
                     <div style={styles.popover}>
                         <div style={styles.cover} onClick={this.handleClose} />
-                        <SketchPicker color={this.state.color} onChangeComplete={this.handleChange} />
+                        <div>
+                            <div>
+                                <select value={this.state.targetHap} onChange={this.setTargetHap} style={{ width: 200 }}>
+                                    <option value="">all</option>
+                                    {this.props.haps && this.props.haps.map(h => (
+                                        <>
+                                            <option value={h}>{h}</option>
+                                        </>
+                                    ))}
+                                </select>
+                                {this.props.message && (
+                                    <p style={{ fontSize: 10, }}>{this.props.message}</p>
+                                )}
+                            </div>
+                            <SketchPicker color={this.state.color} onChangeComplete={this.handleChange} />
+                        </div>
                     </div>
                 ) : null}
             </div>

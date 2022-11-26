@@ -7,7 +7,7 @@ import { ActionCreators } from "./AppState";
 import App from "./App";
 // import G3dContainer from "components/trackVis/3d/G3dContainer";
 // import MolstarContainer from "components/trackVis/3d/MolstarContainer";
-import ThreedmolContainer from "components/trackVis/3dmol/ThreedmolContainer";
+import ThreedmolContainer, { highlightHap, ThreedHighlight } from "components/trackVis/3dmol/ThreedmolContainer";
 import { BrowserScene } from "./components/vr/BrowserScene";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { RegionExpander } from "model/RegionExpander";
@@ -40,7 +40,7 @@ function mapStateToProps(state) {
     const { compatabilityMode, containers } = appState;
     const pickingGenome = !(containers && containers.length);
 
-    let editingGenome = {} , editingContainer = {};
+    let editingGenome = {}, editingContainer = {};
     if (!pickingGenome && !compatabilityMode) {
         editingGenome = (appState.containers && appState.containers[cidx].genomes[gidx]) || {};
         editingContainer = (appState.containers && appState.containers[cidx]) || {};
@@ -372,6 +372,32 @@ class AppLayout extends React.PureComponent {
         g3dtrack.id = config.trackId;
         const origG3d = tracks.filter((tk) => tk.getId() === g3dtrack.id);
         g3dtrack.fileObj = origG3d.length ? origG3d[0].fileObj : null;
+
+        let seperatedGenomeName = curGenome.name.split('-');
+        const threedHighlights = [];
+        for (let i = 0; i < containers.length; i++) {
+            for (let j = 0; j < containers[i].genomes.length; j++) {
+                if (!containers[i].genomes[j].name.startsWith(seperatedGenomeName[0])) continue;
+                const curSeperated = containers[i].genomes[j].name.split('-');
+                if (curSeperated[1]) {
+                    threedHighlights.push(new ThreedHighlight(
+                        containers[i].viewRegion,
+                        highlightHap[curSeperated[1]]
+                    ));
+                } else {
+                    threedHighlights.push(new ThreedHighlight(
+                        containers[i].viewRegion,
+                        highlightHap["maternal"]
+                    ));
+                    threedHighlights.push(new ThreedHighlight(
+                        containers[i].viewRegion,
+                        highlightHap["paternal"]
+                    ));
+                }
+            }
+        }
+        let statusMessage = `This 3D model is linked to ${seperatedGenomeName[0]} genome`;
+
         // const currentTrackIds = tracks.map((tk) => tk.getId());
         // if (!currentTrackIds.includes(g3dtrack.id)) {
         //     const newTracks = [...tracks, g3dtrack];
@@ -390,6 +416,8 @@ class AppLayout extends React.PureComponent {
                 g3dtrack={g3dtrack}
                 expansionAmount={REGION_EXPANDER0}
                 genomeConfig={genomeConfig}
+                threedHighlights={threedHighlights}
+                statusMessage={statusMessage}
                 width={width}
                 height={height}
                 x={x}

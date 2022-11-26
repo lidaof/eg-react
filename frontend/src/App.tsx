@@ -524,6 +524,9 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                             initial={{ y: 10, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.2 }}
+                            style={{
+                                paddingRight: 50,
+                            }}
                         >
                             {containers.map((data: SyncedContainer, idx: number) => {
                                 return (

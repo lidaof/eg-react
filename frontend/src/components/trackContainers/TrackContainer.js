@@ -138,10 +138,19 @@ class TrackContainer extends React.Component {
         this.groupManager = new GroupedTrackManager();
     }
 
+    getPixelInfo() {
+        return {
+            primaryView: this.props.primaryView,
+            basesPerPixel: this.props.basesPerPixel,
+            viewRegion: this.props.viewRegion,
+        }
+    }
+
     componentDidMount() {
         this.props.provideControl({
             panLeftOrRight: this.panLeftOrRight,
             zoomOut: this.zoomOut,
+            getPixelInfo: this.getPixelInfo.bind(this),
         });
     }
 

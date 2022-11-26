@@ -9,3 +9,5 @@ export function getGenomeContainerTitle(genomes: string[]): string {
         return `${genomes.slice(0, -1).join(', ')} and ${genomes[genomes.length - 1]}`;
     }
 };
+
+export function getPhasedGenomeName(fullPhasedName: string[]) { return fullPhasedName[0].split('-')[0] }
