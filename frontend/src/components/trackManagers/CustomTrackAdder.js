@@ -31,6 +31,7 @@ export const TRACK_TYPES = {
     "3D Structure": ["g3d"],
     Dynamic: ["dbedgraph"],
     Image: ["omero4dn", "omeroidr"],
+    Multiome: ["fiber"],
 };
 
 export const NUMERRICAL_TRACK_TYPES = ["bigwig", "bedgraph"]; // the front UI we allow any case of types, in TrackModel only lower case
@@ -54,6 +55,7 @@ const TYPES_NEED_INDEX = [
     "bedcolor",
     "brgfa",
     "graph",
+    "fiber",
 ];
 
 export const TYPES_DESC = {
@@ -90,6 +92,7 @@ export const TYPES_DESC = {
     brgfa: "local genome graph in bed like rGFA format",
     graph: "global genome graph in bed like rGFA format",
     // jaspar: "transcription factor binding data from Jaspar",
+    fiber: 'fiber-seq data'
 };
 
 /**

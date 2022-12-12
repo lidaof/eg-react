@@ -193,4 +193,24 @@ export class NumericalArrayFeature extends Feature {
     }
 }
 
+/**
+ * Everything a Feature is, plus a `values` prop.
+ *
+ * @author Daofeng Li
+ */
+export class Fiber extends Feature {
+    blockStarts: number[];
+
+    /**
+     * Sets values and returns this.
+     *
+     * @param {number[]} values - value to attach to this instance.
+     * @return {this}
+     */
+    withBlockStarts(blockString: string): this {
+        this.blockStarts = JSON.parse('['+blockString+']');
+        return this;
+    }
+}
+
 export default Feature;
