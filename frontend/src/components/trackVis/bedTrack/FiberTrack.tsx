@@ -82,8 +82,7 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
         return placedGroup.placedFeatures.map((placement, i) => (
             <FiberAnnotation
                 key={i}
-                fiber={placement.feature}
-                xSpan={placement.xSpan}
+                placement={placement}
                 y={y}
                 isMinimal={isLastRow}
                 color={this.props.options.color}

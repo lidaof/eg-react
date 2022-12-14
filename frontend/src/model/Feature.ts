@@ -208,7 +208,7 @@ export class Fiber extends Feature {
      * @return {this}
      */
     withBlockStarts(blockString: string): this {
-        this.blockStarts = JSON.parse('['+blockString+']');
+        this.blockStarts = JSON.parse('['+blockString+']').slice(1,-1);
         return this;
     }
 }
