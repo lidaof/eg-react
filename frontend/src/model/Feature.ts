@@ -194,12 +194,13 @@ export class NumericalArrayFeature extends Feature {
 }
 
 /**
- * Everything a Feature is, plus a `values` prop.
+ * the feature for a fiber or molecular, with the on and off relative position from start.
  *
  * @author Daofeng Li
  */
 export class Fiber extends Feature {
-    blockStarts: number[];
+    ons: number[];
+    offs: number[];
 
     /**
      * Sets values and returns this.
@@ -207,8 +208,9 @@ export class Fiber extends Feature {
      * @param {number[]} values - value to attach to this instance.
      * @return {this}
      */
-    withBlockStarts(blockString: string): this {
-        this.blockStarts = JSON.parse('['+blockString+']').slice(1,-1);
+    withOnsOffs(onString: string, offString: string): this {
+        this.ons = onString ? JSON.parse("[" + onString + "]") : [];
+        this.offs = offString ? JSON.parse("[" + offString + "]") : [];
         return this;
     }
 }

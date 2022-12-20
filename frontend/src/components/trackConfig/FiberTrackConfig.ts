@@ -1,8 +1,8 @@
-import { Fiber } from './../../model/Feature';
+import RowHeightConfig from "components/trackContextMenu/RowHeightConfig";
+import HeightConfig from "components/trackContextMenu/HeightConfig";
+import { Fiber } from "./../../model/Feature";
 import YscaleConfig from "components/trackContextMenu/YscaleConfig";
-import { AnnotationDisplayModes } from "../../model/DisplayModes";
-import { AnnotationTrackConfig } from "./AnnotationTrackConfig";
-import { FiberTrack } from "../trackVis/bedTrack/FiberTrack";
+import { FiberTrack, DEFAULT_OPTIONS } from "../trackVis/bedTrack/FiberTrack";
 import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { BedWorker } from "../../dataSources/WorkerTSHook";
 import BedRecord from "../../dataSources/bed/BedRecord";
@@ -10,10 +10,15 @@ import ChromosomeInterval from "../../model/interval/ChromosomeInterval";
 import LocalBedSource from "../../dataSources/LocalBedSource";
 import BedTextSource from "../../dataSources/BedTextSource";
 import HiddenPixelsConfig from "../trackContextMenu/HiddenPixelsConfig";
-import AlwaysDrawLabelConfig from "components/trackContextMenu/AlwaysDrawLabelConfig";
+import { PrimaryColorConfig, SecondaryColorConfig } from "components/trackContextMenu/ColorConfig";
+import TrackModel from "model/TrackModel";
+import { TrackConfig } from "./TrackConfig";
 
-
-export class FiberTrackConfig extends AnnotationTrackConfig {
+export class FiberTrackConfig extends TrackConfig {
+    constructor(trackModel: TrackModel) {
+        super(trackModel);
+        this.setDefaultOptions(DEFAULT_OPTIONS);
+    }
     initDataSource() {
         if (this.trackModel.isText) {
             return new BedTextSource({
@@ -37,14 +42,13 @@ export class FiberTrackConfig extends AnnotationTrackConfig {
      * @return {Feature[]} bed records in the form of Feature
      */
     formatData(data: BedRecord[]) {
-        return data.map(
-            (record) =>
-                new Fiber(
-                    // "." is a placeholder that means "undefined" in the bed file.
-                    undefined,
-                    new ChromosomeInterval(record.chr, record.start, record.end),
-                    ''
-                ).withBlockStarts(record[3])
+        return data.map((record) =>
+            new Fiber(
+                // "." is a placeholder that means "undefined" in the bed file.
+                undefined,
+                new ChromosomeInterval(record.chr, record.start, record.end),
+                ""
+            ).withOnsOffs(record[3], record[4])
         );
     }
 
@@ -53,10 +57,15 @@ export class FiberTrackConfig extends AnnotationTrackConfig {
     }
 
     getMenuComponents() {
-        const items = [...super.getMenuComponents(), HiddenPixelsConfig, AlwaysDrawLabelConfig];
-        if (this.getOptions().displayMode === AnnotationDisplayModes.DENSITY) {
-            items.push(YscaleConfig);
-        }
+        const items = [
+            ...super.getMenuComponents(),
+            RowHeightConfig,
+            PrimaryColorConfig,
+            SecondaryColorConfig,
+            HiddenPixelsConfig,
+            HeightConfig,
+            YscaleConfig,
+        ];
         return items;
     }
 }
