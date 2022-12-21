@@ -65,6 +65,8 @@ export class ThreedHighlight {
     }
 }
 
+let lastHighlightPaintingExcludeHap = {};
+
 /**
  * the container for holding 3D structure rendered by 3Dmol.js
  * @author Daofeng Li
@@ -126,10 +128,10 @@ class ThreedmolContainer extends React.Component {
             legendMax: 10,
             legendMinColor: "yellow", //yellow
             legendMaxColor: "red", //red
-            sepLegendMinColor: {},
-            sepLegendMaxColor: {},
+            sepLegendMinColor: {}, // seperate
+            sepLegendMaxColor: {}, // seperate
             colorScale: null,
-            sepColorScale: {},
+            sepColorScale: {}, // seperate
             chrom: "",
             start: 0,
             end: 0,
@@ -157,7 +159,7 @@ class ThreedmolContainer extends React.Component {
             modelDisplayConfig: null, // key: hap, value: true or false, true for display, false for hidden
             highlightingOn: false,
             highlightingColor: "#ffff00", // yellow
-            sepHighlightingColor: {},
+            sepHighlightingColor: {}, // seperate
             highlightingColorChanged: false,
             // highlightingChromColor: "grey",
             highlightingChromColor: "#f2f2f2",
@@ -179,15 +181,22 @@ class ThreedmolContainer extends React.Component {
             frameLabels: [],
             currentFrame: 0,
             myShapes: {},
+            sepMyShapes: {},
             myShapeLabel: "",
+            sepMyShapeLabel: {},
             myShapeRegion: "",
+            sepMyShapeRegion: {},
             lineOpacity: 1,
+            sepLineOpacity: {}, // seperate
             cartoonThickness: 0.5,
+            sepCartoonThickness: {},
             highlightStyle: "cartoon",
+            sepHighlightStyle: {},
             useLegengMin: 0,
             useLegengMax: 10,
             autoLegendScale: true,
             myArrows: {},
+            sepMyArrows: {},
             labelStyle: "shape", // or arrow
             annoFormat: "cytoband", // cytoband, refgene, bedrgb, bed4, 4dn, cell2014
             annoUsePromoter: false,
@@ -205,6 +214,8 @@ class ThreedmolContainer extends React.Component {
             spinDirection: "y",
             spinSpeed: 1,
             spinReverse: false,
+            targetHap: "",
+            paintingExcludeHap: {},
         };
         this.paintWithBigwig = _.debounce(this.paintWithBigwig, 150);
         // this.paintWithComparment = _.debounce(this.paintWithComparment, 150);
@@ -260,15 +271,17 @@ class ThreedmolContainer extends React.Component {
             mainBoxHeight,
             mainBoxWidth,
             highlightingColor,
-            lineOpacity,
-            cartoonThickness,
-            highlightStyle,
+            // lineOpacity,
+            // cartoonThickness,
+            // highlightStyle,
             autoLegendScale,
             layout,
             thumbStyle,
             highlightingOn,
             myShapes,
+            sepMyShapes,
             myArrows,
+            sepMyArrows,
             A,
             B,
             A1,
@@ -298,9 +311,11 @@ class ThreedmolContainer extends React.Component {
             spinDirection,
             spinSpeed,
             spinReverse,
+            paintingExcludeHap,
         } = this.state;
         const { width, height } = this.props;
         const halftWidth = width * 0.5;
+
         if (legendMaxColor !== prevState.legendMaxColor || legendMinColor !== prevState.legendMinColor ||
             sepLegendMaxColor !== prevState.sepLegendMaxColor || sepLegendMinColor !== prevState.sepLegendMinColor) {
             await this.paintBigwig(paintRegion);
@@ -389,8 +404,8 @@ class ThreedmolContainer extends React.Component {
                 this.addAnchors3dToMyArrows(this.props.anchors3d);
             }
         }
-        if (!_.isEqual(myArrows, prevState.myArrows)) {
-            if (!_.isEmpty(myArrows)) {
+        if (!_.isEqual(myArrows, prevState.myArrows) || !_.isEqual(sepMyArrows, prevState.sepMyArrows)) {
+            if (!_.isEmpty(myArrows) || !_.isEmpty(sepMyArrows)) {
                 this.drawAnchors3d(modelDisplayConfig);
             } else {
                 this.removeAnchors3d();
@@ -401,8 +416,8 @@ class ThreedmolContainer extends React.Component {
                 this.addGeneToMyShapes(this.props.geneFor3d);
             }
         }
-        if (!_.isEqual(myShapes, prevState.myShapes)) {
-            if (!_.isEmpty(myShapes)) {
+        if (!_.isEqual(myShapes, prevState.myShapes) || !_.isEqual(sepMyShapes, prevState.sepMyShapes)) {
+            if (!_.isEmpty(myShapes) || !_.isEmpty(sepMyShapes)) {
                 this.drawMyShapes(modelDisplayConfig);
             } else {
                 this.removeMyShapes();
@@ -501,11 +516,11 @@ class ThreedmolContainer extends React.Component {
         if (highlightingColor !== prevState.highlightingColor || sepHighlightingColor !== prevState.sepHighlightingColor) {
             this.setState({ highlightingColorChanged: true });
         }
-        if (
-            lineOpacity !== prevState.lineOpacity ||
-            cartoonThickness !== prevState.cartoonThickness ||
-            highlightStyle !== prevState.highlightStyle
-        ) {
+        if (this.anyChangedIncludeSep(prevState, [
+            "lineOpacity",
+            "cartoonThickness",
+            "highlightStyle"
+        ]) || !_.isEqual(paintingExcludeHap, prevState.paintingExcludeHap)) {
             this.setState({
                 highlightingColorChanged: true,
                 paintRegion: "none",
@@ -561,6 +576,16 @@ class ThreedmolContainer extends React.Component {
         // if (this.props.anchors3d.length && this.props.onSetAnchors3d) {
         //     this.props.onSetAnchors3d([]);
         // }
+    }
+
+    anyChangedIncludeSep = (prevState, stateKeys) => {
+        for (let k of stateKeys) {
+            const sepk = this.getSepName(k);
+            const rnonhap = (this.state[k] !== prevState[k]);
+            const rhap = (this.state[sepk] !== prevState[sepk]);
+            if (rnonhap || rhap) return true;
+        }
+        return false;
     }
 
     onSwitch = () => {
@@ -625,56 +650,20 @@ class ThreedmolContainer extends React.Component {
     };
 
     drawMyShapes = (displayConfig) => {
-        const { resolution, myShapes } = this.state;
+        const { resolution, } = this.state;
         const resString = resolution.toString();
         this.prepareAtomKeeper();
         const displayedModelKeys = this.getDisplayedModelKeys(displayConfig);
         if (this.shapes.length) {
             this.removeMyShapes(false);
         }
-        Object.keys(myShapes).forEach((s) => {
-            if (myShapes[s].locus) {
-                const locus = myShapes[s].locus;
-                const atoms = findAtomsWithRegion(
-                    this.atomKeeper[resString],
-                    locus.chr,
-                    locus.start,
-                    locus.end,
-                    resolution,
-                    displayedModelKeys
-                );
-                atoms.forEach((atom) => {
-                    let addingShape;
-                    if (myShapes[s].outline === "sphere") {
-                        addingShape = this.viewer.addSphere({
-                            center: { x: atom.x, y: atom.y, z: atom.z },
-                            radius: myShapes[s].size,
-                            color: myShapes[s].color,
-                            wireframe: myShapes[s].wireframe,
-                        });
-                    } else if (myShapes[s].outline === "box") {
-                        addingShape = this.viewer.addBox({
-                            corner: { x: atom.x, y: atom.y, z: atom.z },
-                            dimensions: { w: myShapes[s].size, h: myShapes[s].size, d: myShapes[s].size },
-                            color: myShapes[s].color,
-                            wireframe: myShapes[s].wireframe,
-                        });
-                    }
-                    this.shapes.push(addingShape);
-                    if (myShapes[s].showLabel) {
-                        this.shapeLabels.push(
-                            this.viewer.addLabel(myShapes[s].label, {
-                                position: { x: atom.x, y: atom.y, z: atom.z },
-                                fontColor: myShapes[s].color,
-                                backgroundColor: getContrastingColor(myShapes[s].color),
-                                backgroundOpacity: 0.8,
-                            })
-                        );
-                    }
-                });
-            } else if (myShapes[s].loci) {
-                myShapes[s].loci.forEach((locusObj) => {
-                    const { locus, label } = locusObj;
+        const haps = this.getHapsWithDefault();
+
+        haps.forEach(hap => {
+            const myShapes = this.getSepFromStateWithoutDefaultingToSelectedHap("myShapes", hap);
+            Object.keys(myShapes).forEach((s) => {
+                if (myShapes[s].locus) {
+                    const locus = myShapes[s].locus;
                     const atoms = findAtomsWithRegion(
                         this.atomKeeper[resString],
                         locus.chr,
@@ -684,6 +673,7 @@ class ThreedmolContainer extends React.Component {
                         displayedModelKeys
                     );
                     atoms.forEach((atom) => {
+                        if (hap && atom.properties.hap !== hap) return;
                         let addingShape;
                         if (myShapes[s].outline === "sphere") {
                             addingShape = this.viewer.addSphere({
@@ -703,7 +693,7 @@ class ThreedmolContainer extends React.Component {
                         this.shapes.push(addingShape);
                         if (myShapes[s].showLabel) {
                             this.shapeLabels.push(
-                                this.viewer.addLabel(label, {
+                                this.viewer.addLabel(myShapes[s].label, {
                                     position: { x: atom.x, y: atom.y, z: atom.z },
                                     fontColor: myShapes[s].color,
                                     backgroundColor: getContrastingColor(myShapes[s].color),
@@ -712,9 +702,52 @@ class ThreedmolContainer extends React.Component {
                             );
                         }
                     });
-                });
-            }
-        });
+                } else if (myShapes[s].loci) {
+                    myShapes[s].loci.forEach((locusObj) => {
+                        const { locus, label } = locusObj;
+                        const atoms = findAtomsWithRegion(
+                            this.atomKeeper[resString],
+                            locus.chr,
+                            locus.start,
+                            locus.end,
+                            resolution,
+                            displayedModelKeys
+                        );
+                        atoms.forEach((atom) => {
+                            if (hap && atom.properties.hap !== hap) return;
+                            let addingShape;
+                            if (myShapes[s].outline === "sphere") {
+                                addingShape = this.viewer.addSphere({
+                                    center: { x: atom.x, y: atom.y, z: atom.z },
+                                    radius: myShapes[s].size,
+                                    color: myShapes[s].color,
+                                    wireframe: myShapes[s].wireframe,
+                                });
+                            } else if (myShapes[s].outline === "box") {
+                                addingShape = this.viewer.addBox({
+                                    corner: { x: atom.x, y: atom.y, z: atom.z },
+                                    dimensions: { w: myShapes[s].size, h: myShapes[s].size, d: myShapes[s].size },
+                                    color: myShapes[s].color,
+                                    wireframe: myShapes[s].wireframe,
+                                });
+                            }
+                            this.shapes.push(addingShape);
+                            if (myShapes[s].showLabel) {
+                                this.shapeLabels.push(
+                                    this.viewer.addLabel(label, {
+                                        position: { x: atom.x, y: atom.y, z: atom.z },
+                                        fontColor: myShapes[s].color,
+                                        backgroundColor: getContrastingColor(myShapes[s].color),
+                                        backgroundOpacity: 0.8,
+                                    })
+                                );
+                            }
+                        });
+                    });
+                }
+            });
+        })
+
         if (!this.shapes.length) {
             this.removeMyShapes();
             this.setState({ message: "cannot find matched atoms to label or no model is displaying, skip" });
@@ -758,7 +791,7 @@ class ThreedmolContainer extends React.Component {
     };
 
     drawAnchors3d = (displayConfig) => {
-        const { resolution, myArrows } = this.state;
+        const { resolution, } = this.state;
         const resString = resolution.toString();
         this.prepareAtomKeeper();
         const displayedModelKeys = this.getDisplayedModelKeys(displayConfig);
@@ -767,42 +800,22 @@ class ThreedmolContainer extends React.Component {
         if (this.arrows.length) {
             this.removeAnchors3d(false);
         }
-        Object.keys(myArrows).forEach((s) => {
-            const anchor = myArrows[s];
-            if (anchor.locus) {
-                const atoms = findAtomsWithRegion(
-                    this.atomKeeper[resString],
-                    anchor.locus.chr,
-                    anchor.locus.start,
-                    anchor.locus.end,
-                    resolution,
-                    displayedModelKeys
-                );
-                atoms.forEach((atom) => {
-                    this.arrows.push(
-                        this.viewer.addArrow({
-                            start: anchor.start,
-                            end: { x: atom.x, y: atom.y, z: atom.z },
-                            radius: anchor.radius,
-                            color: anchor.color,
-                            radiusRadio: 0.2, //hard-coded
-                            mid: 1.0, //hard-coded
-                        })
-                    );
-                });
-            } else if (anchor.loci) {
-                anchor.loci.forEach((lociItem) => {
-                    const { locus } = lociItem;
+        const haps = this.getHapsWithDefault();
+        haps.forEach(hap => {
+            const myArrows = this.getSepFromStateWithoutDefaultingToSelectedHap("myArrows", hap);
+            Object.keys(myArrows).forEach((s) => {
+                const anchor = myArrows[s];
+                if (anchor.locus) {
                     const atoms = findAtomsWithRegion(
                         this.atomKeeper[resString],
-                        locus.chr,
-                        locus.start,
-                        locus.end,
+                        anchor.locus.chr,
+                        anchor.locus.start,
+                        anchor.locus.end,
                         resolution,
                         displayedModelKeys
                     );
-                    // console.log(atoms);
                     atoms.forEach((atom) => {
+                        if (hap && atom.properties.hap !== hap) return;
                         this.arrows.push(
                             this.viewer.addArrow({
                                 start: anchor.start,
@@ -814,9 +827,36 @@ class ThreedmolContainer extends React.Component {
                             })
                         );
                     });
-                });
-            }
-        });
+                } else if (anchor.loci) {
+                    anchor.loci.forEach((lociItem) => {
+                        const { locus } = lociItem;
+                        const atoms = findAtomsWithRegion(
+                            this.atomKeeper[resString],
+                            locus.chr,
+                            locus.start,
+                            locus.end,
+                            resolution,
+                            displayedModelKeys
+                        );
+                        // console.log(atoms);
+                        atoms.forEach((atom) => {
+                            if (hap && atom.properties.hap !== hap) return;
+                            this.arrows.push(
+                                this.viewer.addArrow({
+                                    start: anchor.start,
+                                    end: { x: atom.x, y: atom.y, z: atom.z },
+                                    radius: anchor.radius,
+                                    color: anchor.color,
+                                    radiusRadio: 0.2, //hard-coded
+                                    mid: 1.0, //hard-coded
+                                })
+                            );
+                        });
+                    });
+                }
+            });
+        })
+
         if (!this.arrows.length) {
             this.removeAnchors3d();
             this.setState({ message: "cannot find matched atoms to point or no model is displaying, skip" });
@@ -1196,9 +1236,15 @@ class ThreedmolContainer extends React.Component {
         }
     };
 
-    updateLegendColor = (k, color, hap) => {
+    getSepName = (regName) => {
         const capFirst = s => s.charAt(0).toUpperCase() + s.slice(1);
-        const sepK = "sep" + capFirst(k);
+        const sepK = "sep" + capFirst(regName);
+        return sepK;
+    }
+
+    updateLegendColor = (k, color) => {
+        const sepK = this.getSepName(k)
+        let hap = this.state.targetHap;
         if (hap) {
             this.setState({
                 [sepK]: { ...this.state[sepK], [hap]: color, }
@@ -1229,18 +1275,25 @@ class ThreedmolContainer extends React.Component {
 
     highlightRegions = () => {
         const {
-            highlightStyle,
+            // highlightStyle,
+            // sepHighlightStyle,
             highlightingColor,
             cartoonThickness,
+            sepCartoonThickness,
             resolution,
             lineOpacity,
+            sepLineOpacity,
             modelDisplayConfig,
             showEnvelop,
+            paintingExcludeHap,
         } = this.state;
         // const regions = this.viewRegionToRegions();
         if (!modelDisplayConfig) return;
         const threedHighlights = this.threedHighlightsToRegions();
-
+        if (!_.isEqual(lastHighlightPaintingExcludeHap, paintingExcludeHap)) {
+            this.removeHighlightRegions();
+        }
+        lastHighlightPaintingExcludeHap = paintingExcludeHap;
         // console.log(regions);
         // const colorByRegion = function (atom, region) {
         //     if (
@@ -1264,6 +1317,7 @@ class ThreedmolContainer extends React.Component {
         //     });
         // });
         Object.keys(modelDisplayConfig).forEach((hap) => {
+            if (paintingExcludeHap[hap]) return;
             regionRange[hap] = {};
             threedHighlights[hap].forEach((reg => {
                 const leftResi = getClosestValueIndex(this.atomStartsByChrom[resString][hap][reg.chrom], reg.start)[1];
@@ -1273,7 +1327,11 @@ class ThreedmolContainer extends React.Component {
         });
 
         // this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: 0.3, hidden: true } }); //remove existing style
-        this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } }); //remove existing style
+        // this.viewer.setStyle({}, { line: { colorscheme: "chrom", opacity: lineOpacity } }); //remove existing style
+        Object.keys(modelDisplayConfig).forEach((hap) => {
+            if (paintingExcludeHap[hap]) return;
+            this.viewer.setStyle({ properties: { hap: hap } }, { line: { colorscheme: "chrom", opacity: sepLineOpacity[hap] || lineOpacity, } });
+        });
         // regions.forEach((region) => {
         //     this.viewer.setStyle(
         //         { chain: region.chrom },
@@ -1282,17 +1340,18 @@ class ThreedmolContainer extends React.Component {
         // });
         let validateRegion = false;
         Object.keys(modelDisplayConfig).forEach((hap) => {
+            if (paintingExcludeHap[hap]) return;
             const hapColor = this.state.sepHighlightingColor[hap] || highlightingColor;
             const usedHighlightStyle =
-                highlightStyle === "cartoon"
+                this.getSepFromState("highlightStyle", hap) === "cartoon"
                     ? {
-                        cartoon: { color: hapColor, style: "trace", thickness: cartoonThickness },
+                        cartoon: { color: hapColor, style: "trace", thickness: sepCartoonThickness[hap] || cartoonThickness },
                     }
                     : {
                         sphere: {
                             color: hapColor,
                             opacity: 1,
-                            radius: cartoonThickness,
+                            radius: sepCartoonThickness[hap] || cartoonThickness,
                         },
                     };
             threedHighlights[hap].forEach((region) => {
@@ -1472,8 +1531,6 @@ class ThreedmolContainer extends React.Component {
         Object.keys(modelDisplayConfig).forEach((hap) => {
             const lmin = this.state.sepLegendMinColor[hap] || legendMinColor;
             const lmax = this.state.sepLegendMaxColor[hap] || legendMaxColor;
-            console.log(lmin);
-            console.log(lmax);
             const hapColorScale = scaleLinear()
                 .domain([minValue, maxValue])
                 .range([lmin, lmax])
@@ -1499,6 +1556,7 @@ class ThreedmolContainer extends React.Component {
             const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
             const resString = resolution.toString();
             Object.keys(modelDisplayConfig).forEach((hap) => {
+                if (this.state.paintingExcludeHap[hap]) return;
                 regionRange[hap] = {};
                 regions.forEach((reg) => {
                     const leftResi = getClosestValueIndex(
@@ -1513,16 +1571,19 @@ class ThreedmolContainer extends React.Component {
                 });
             });
             Object.keys(modelDisplayConfig).forEach((hap) => {
+                if (this.state.paintingExcludeHap[hap]) return;
+                const hapHighlightStyle = this.state.sepHighlightStyle[hap] || highlightStyle;
+                const hapThickness = this.state.sepCartoonThickness[hap] || cartoonThickness;
                 const usedHighlightStyle =
-                highlightStyle === "cartoon"
-                    ? { cartoon: { colorfunc: sepColorByValue[hap] || colorByValue, style: "trace", thickness: cartoonThickness } }
-                    : {
-                        sphere: {
-                            colorfunc: sepColorByValue[hap] || colorByValue,
-                            opacity: 1,
-                            radius: cartoonThickness,
-                        },
-                    };
+                    hapHighlightStyle === "cartoon"
+                        ? { cartoon: { colorfunc: sepColorByValue[hap] || colorByValue, style: "trace", thickness: hapThickness } }
+                        : {
+                            sphere: {
+                                colorfunc: sepColorByValue[hap] || colorByValue,
+                                opacity: 1,
+                                radius: hapThickness,
+                            },
+                        };
                 queryChroms.forEach((chrom) => {
                     if (regionRange[hap][chrom][0] !== undefined && regionRange[hap][chrom][1] !== undefined) {
                         const resiSelect = `${regionRange[hap][chrom][0]}-${regionRange[hap][chrom][1]}`;
@@ -1534,18 +1595,23 @@ class ThreedmolContainer extends React.Component {
                 });
             });
         } else {
-            const usedHighlightStyle =
-            highlightStyle === "cartoon"
-                ? { cartoon: { colorfunc: colorByValue, style: "trace", thickness: cartoonThickness } }
-                : {
-                    sphere: {
-                        colorfunc: colorByValue,
-                        opacity: 1,
-                        radius: cartoonThickness,
-                    },
-                };
-            queryChroms.forEach((chrom) => {
-                this.viewer.setStyle({ chain: chrom }, usedHighlightStyle);
+            Object.keys(modelDisplayConfig).forEach((hap) => {
+                if (this.state.paintingExcludeHap[hap]) return;
+                const hapHighlightStyle = this.state.sepHighlightStyle[hap] || highlightStyle;
+                const hapThickness = this.state.sepCartoonThickness[hap] || cartoonThickness;
+                const usedHighlightStyle =
+                    hapHighlightStyle === "cartoon"
+                        ? { cartoon: { colorfunc: sepColorByValue[hap] || colorByValue, style: "trace", thickness: hapThickness } }
+                        : {
+                            sphere: {
+                                colorfunc: sepColorByValue[hap] || colorByValue,
+                                opacity: 1,
+                                radius: hapThickness,
+                            },
+                        };
+                queryChroms.forEach((chrom) => {
+                    this.viewer.setStyle({ chain: chrom, properties: { hap: hap } }, usedHighlightStyle);
+                });
             });
         }
         if (showEnvelop && this.envelop) {
@@ -2231,6 +2297,7 @@ class ThreedmolContainer extends React.Component {
             const regionRange = {}; // key: hap: {key: chrom, value: [lower resi, higher resi] used for selection}
             const resString = resolution.toString();
             Object.keys(modelDisplayConfig).forEach((hap) => {
+                if (this.state.paintingExcludeHap[hap]) return;
                 regionRange[hap] = {};
                 regions.forEach((reg) => {
                     const leftResi = getClosestValueIndex(
@@ -2245,6 +2312,7 @@ class ThreedmolContainer extends React.Component {
                 });
             });
             Object.keys(modelDisplayConfig).forEach((hap) => {
+                if (this.state.paintingExcludeHap[hap]) return;
                 queryChroms.forEach((chrom) => {
                     if (regionRange[hap][chrom][0] !== undefined && regionRange[hap][chrom][1] !== undefined) {
                         const resiSelect = `${regionRange[hap][chrom][0]}-${regionRange[hap][chrom][1]}`;
@@ -2256,8 +2324,11 @@ class ThreedmolContainer extends React.Component {
                 });
             });
         } else {
-            queryChroms.forEach((chrom) => {
-                this.viewer.setStyle({ chain: chrom }, usedHighlightStyle);
+            Object.keys(modelDisplayConfig).forEach((hap) => {
+                if (this.state.paintingExcludeHap[hap]) return;
+                queryChroms.forEach((chrom) => {
+                    this.viewer.setStyle({ chain: chrom, properties: { hap: hap } }, usedHighlightStyle);
+                });
             });
         }
         if (showEnvelop && this.envelop) {
@@ -2468,11 +2539,11 @@ class ThreedmolContainer extends React.Component {
     };
 
     handleMyShapeLabelChange = (e) => {
-        this.setState({ myShapeLabel: e.target.value });
+        this.setSepIntoState("myShapeLabel", e.target.value);
     };
 
     handleMyShapeRegionChange = (e) => {
-        this.setState({ myShapeRegion: e.target.value });
+        this.setSepIntoState("myShapeRegion", e.target.value);
     };
 
     handleEnvelopOpacityChange = (e) => {
@@ -2531,7 +2602,7 @@ class ThreedmolContainer extends React.Component {
     addRegionToMyShapes = () => {
         const { labelStyle } = this.state;
         if (labelStyle === "shape") {
-            const { myShapeRegion, myShapeLabel, myShapes } = this.state;
+            const [myShapeRegion, myShapeLabel, myShapes] = [this.getSepFromState("myShapeRegion"), this.getSepFromState("myShapeLabel"), this.getSepFromState("myShapes")];
             const newShapes = { ...myShapes };
             try {
                 const locus = ChromosomeInterval.parse(myShapeRegion);
@@ -2547,7 +2618,7 @@ class ThreedmolContainer extends React.Component {
                         wireframe: false,
                         showLabel: true,
                     };
-                    this.setState({ myShapeRegion: "", myShapeLabel: "", myShapes: newShapes });
+                    this.setSepIntoState({ myShapeRegion: "", myShapeLabel: "", myShapes: newShapes })
                 } else {
                     this.setState({ message: "error, duplicated label region, skip" });
                     return;
@@ -2589,7 +2660,7 @@ class ThreedmolContainer extends React.Component {
     addGeneToMyShapes = (gene) => {
         const { labelStyle } = this.state;
         if (labelStyle === "shape") {
-            const { myShapes } = this.state;
+            const myShapes = this.getSepFromState("myShapes");
             const newShapes = { ...myShapes };
 
             const locus = gene.getLocus();
@@ -2605,13 +2676,13 @@ class ThreedmolContainer extends React.Component {
                     wireframe: false,
                     showLabel: true,
                 };
-                this.setState({ myShapes: newShapes });
+                this.setSepIntoState("myShapes", newShapes, undefined, false);
             } else {
                 this.setState({ message: "error, duplicated gene region, skip" });
                 return;
             }
         } else if (labelStyle === "arrow") {
-            const { myArrows } = this.state;
+            const myArrows = this.getSepFromState("myArrows");
             const newArrows = { ...myArrows };
 
             const locus = gene.getLocus();
@@ -2624,7 +2695,7 @@ class ThreedmolContainer extends React.Component {
                     radius: 0.2,
                     color: "blue",
                 };
-                this.setState({ myArrows: newArrows });
+                this.setSepIntoState("myArrows", newArrows, undefined, false);
             } else {
                 this.setState({ message: "error, duplicated gene region, skip" });
                 return;
@@ -2681,7 +2752,7 @@ class ThreedmolContainer extends React.Component {
         const loci = await this.parseUploadedRegionFile(fileobj);
         const { labelStyle } = this.state;
         if (labelStyle === "shape") {
-            const { myShapes } = this.state;
+            const myShapes = this.getSepFromState("myShapes");
             const newShapes = { ...myShapes };
 
             if (!newShapes.hasOwnProperty(label)) {
@@ -2695,13 +2766,13 @@ class ThreedmolContainer extends React.Component {
                     wireframe: false,
                     showLabel: true,
                 };
-                this.setState({ myShapes: newShapes });
+                this.setSepIntoState("myShapes", newShapes);
             } else {
                 this.setState({ message: "error, duplicated file name, skip" });
                 return;
             }
         } else if (labelStyle === "arrow") {
-            const { myArrows } = this.state;
+            const myArrows = this.getSepFromState("myArrows");
             const newArrows = { ...myArrows };
             if (!newArrows.hasOwnProperty(label)) {
                 newArrows[label] = {
@@ -2711,7 +2782,7 @@ class ThreedmolContainer extends React.Component {
                     radius: 0.2,
                     color: "blue",
                 };
-                this.setState({ myArrows: newArrows });
+                this.setSepIntoState("myArrows", newArrows);
             } else {
                 this.setState({ message: "error, duplicated file name, skip" });
                 return;
@@ -2781,24 +2852,23 @@ class ThreedmolContainer extends React.Component {
     };
 
     updateMyShapes = (shapeKey, shape) => {
-        const newShapes = { ...this.state.myShapes, [shapeKey]: shape };
-        this.setState({ myShapes: newShapes });
-        // this.drawMyShapes(this.state.modelDisplayConfig);
+        const newShapes = { ...this.getSepFromStateWithDefault("myShapes"), [shapeKey]: shape };
+        this.setSepIntoState("myShapes", newShapes, undefined, false);
     };
 
     deleteShapeByKey = (shapekey) => {
-        const { [shapekey]: remove, ...newShapes } = this.state.myShapes;
-        this.setState({ myShapes: newShapes });
+        const { [shapekey]: remove, ...newShapes } = this.getSepFromStateWithDefault("myShapes");
+        this.setSepIntoState("myShapes", newShapes, undefined, false);
     };
 
     updateMyArrows = (arrowKey, arrow) => {
-        const newArrows = { ...this.state.myArrows, [arrowKey]: arrow };
-        this.setState({ myArrows: newArrows });
+        const newArrows = { ...this.getSepFromStateWithDefault("myArrows"), [arrowKey]: arrow };
+        this.setSepIntoState("myArrows", newArrows, undefined, false);
     };
 
     deleteArrowByKey = (arrowkey) => {
-        const { [arrowkey]: remove, ...newArrows } = this.state.myArrows;
-        this.setState({ myArrows: newArrows });
+        const { [arrowkey]: remove, ...newArrows } = this.getSepFromStateWithDefault("myArrows");
+        this.setSepIntoState("myArrows", newArrows, undefined, false);
     };
 
     setMessage = (message) => {
@@ -2807,6 +2877,129 @@ class ThreedmolContainer extends React.Component {
 
     getHaps = () => {
         return this.state.modelDisplayConfig ? Object.keys(this.state.modelDisplayConfig) : [];
+    }
+
+    getHapsWithDefault = () => {
+        return [...this.getHaps(), ""];
+    }
+
+    setTargetHap = (e) => {
+        this.setState({ targetHap: e.target.value });
+    }
+
+    getSepFromState = (k, targetHap, allowEmpty = false) => {
+        const sepName = this.getSepName(k);
+        if (allowEmpty) return (
+            (this.state[sepName] && this.state[sepName].hasOwnProperty((targetHap || this.state.targetHap))) ? this.state[sepName][targetHap || this.state.targethap] : this.state[k]
+        );
+        return (this.state[sepName] && this.state[sepName][targetHap || this.state.targetHap]) || this.state[k];
+    }
+
+    getSepFromStateWithDefault = (k, targetHap) => {
+        const sepName = this.getSepName(k);
+        return (this.state[sepName] && this.state[sepName][targetHap || this.state.targetHap]) || (() => {
+            if (!targetHap && !this.state.targetHap) return this.state[k];
+            const type = typeof this.state[k];
+            return type === "array" ? [] : type === "object" ? {} : type;
+        })();
+    }
+
+    getSepFromStateWithoutDefaultingToSelectedHap = (k, targetHap) => {
+        const sepName = this.getSepName(k);
+        return (this.state[sepName] && this.state[sepName][targetHap]) || (() => {
+            if (!targetHap) return this.state[k];
+            const type = typeof this.state[k];
+            return type === "array" ? [] : type === "object" ? {} : type;
+        })();
+    }
+
+    setSepIntoState = (k, data, target, wipeHapsOnMainUpdate=true) => {
+        const thap = this.state.targetHap;
+        if (typeof k === "string") {
+            const key = k;
+            const sepName = this.getSepName(key);
+            if (thap) {
+                this.setState({
+                    [sepName]: { ...this.state[sepName], [thap]: data }
+                })
+            } else {
+                if (wipeHapsOnMainUpdate) {
+                    this.setState({
+                        [key]: data,
+                        [sepName]: {}
+                    });
+                } else {
+                    this.setState({
+                        [key]: data,
+                    });
+                }
+            }
+        } else {
+            Object.keys(k).forEach(key => {
+                const sepName = this.getSepName(key);
+                const keyData = k[key];
+                if (thap) {
+                    this.setState({
+                        [sepName]: { ...this.state[sepName], [thap]: keyData }
+                    })
+                } else {
+                    if (wipeHapsOnMainUpdate) {
+                        this.setState({
+                            [key]: keyData,
+                            [sepName]: {}
+                        });
+                    } else {
+                        this.setState({
+                            [key]: keyData,
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    renderHapPicker = () => {
+        return (
+            <div>
+                <select value={this.state.targetHap} onChange={this.setTargetHap} style={{ width: 200 }}>
+                    <option value="">all</option>
+                    {this.getHaps().map(h => (
+                        <>
+                            <option value={h}>{h}</option>
+                        </>
+                    ))}
+                </select>
+            </div>
+        )
+    }
+
+    renderExcludePicker = () => {
+        const curHap = this.state.targetHap;
+        if (!curHap) return null;
+        const val = Boolean(this.state.paintingExcludeHap[curHap]);
+
+        return (
+            <div style={{
+                display: "flex",
+                flexDirection: "row",
+                marginLeft: 15,
+            }}>
+                <input
+                    type="checkbox"
+                    checked={val}
+                    onChange={(e) => {
+                        const newVal = e.target.checked;
+                        this.setState({
+                            paintingExcludeHap: {
+                                ...this.state.paintingExcludeHap,
+                                [curHap]: newVal
+                            }
+                        })
+                    }}
+                />
+                <p>Don't paint {curHap}</p>
+            </div>
+        )
     }
 
     render() {
@@ -2843,9 +3036,9 @@ class ThreedmolContainer extends React.Component {
             staticCategories,
             newG3dUrl,
             frameLabels,
-            myShapeLabel,
-            myShapeRegion,
-            myShapes,
+            // myShapeLabel,
+            // myShapeRegion,
+            // myShapes,
             highlightingColor,
             sepHighlightingColor,
             highlightingColorChanged,
@@ -2856,7 +3049,7 @@ class ThreedmolContainer extends React.Component {
             useLegengMin,
             useLegengMax,
             labelStyle,
-            myArrows,
+            // myArrows,
             annoFormat,
             paintAnnotationRegion,
             annoUsePromoter,
@@ -2868,6 +3061,7 @@ class ThreedmolContainer extends React.Component {
             spinDirection,
             spinSpeed,
             spinReverse,
+            targetHap
         } = this.state;
         const { tracks, x, y, onNewViewRegion, viewRegion, sync3d, onSetSelected, selectedSet, genomeConfig } =
             this.props;
@@ -2884,6 +3078,7 @@ class ThreedmolContainer extends React.Component {
                         handler={false}
                         showMask={false}
                     >
+                        {this.renderHapPicker()}
                         <div
                             id="accordion"
                             style={{
@@ -3113,11 +3308,14 @@ class ThreedmolContainer extends React.Component {
                                     </h5>
                                 </div>
                                 <div id="collapseThree" className="collapse show" aria-labelledby="headingThree">
+                                    {this.renderHapPicker()}
+                                    {this.renderExcludePicker()}
                                     <div className="card-body">
                                         <OpacityThickness
-                                            opacity={lineOpacity}
-                                            thickness={cartoonThickness}
-                                            highlightStyle={highlightStyle}
+                                            opacity={this.getSepFromState("lineOpacity")}
+                                            thickness={this.getSepFromState("cartoonThickness")}
+                                            highlightStyle={this.getSepFromState("highlightStyle")}
+                                            targetHap={targetHap}
                                             onUpdate={this.updateLegendColor}
                                         />
                                         <div style={{ display: "flex", alignItems: "flex-start" }}>
@@ -3125,6 +3323,8 @@ class ThreedmolContainer extends React.Component {
                                                 onUpdateLegendColor={this.updateLegendColor}
                                                 haps={this.getHaps()}
                                                 sepInitColor={sepHighlightingColor}
+                                                setTargetHap={this.setTargetHap}
+                                                targetHap={this.state.targetHap}
                                                 colorKey={"highlightingColor"}
                                                 initColor={highlightingColor}
                                             />
@@ -3171,7 +3371,7 @@ class ThreedmolContainer extends React.Component {
                                             <input
                                                 type="text"
                                                 placeholder="chr start end"
-                                                value={myShapeRegion}
+                                                value={this.getSepFromState("myShapeRegion", undefined, true)}
                                                 onChange={this.handleMyShapeRegionChange}
                                             />
                                         </div>
@@ -3180,7 +3380,7 @@ class ThreedmolContainer extends React.Component {
                                             <input
                                                 type="text"
                                                 placeholder="my region"
-                                                value={myShapeLabel}
+                                                value={this.getSepFromState("myShapeLabel", undefined, true)}
                                                 onChange={this.handleMyShapeLabelChange}
                                             />
                                             <button
@@ -3203,7 +3403,7 @@ class ThreedmolContainer extends React.Component {
 
                                         <div>
                                             <ShapeList
-                                                shapes={myShapes}
+                                                shapes={this.getSepFromStateWithDefault("myShapes")}
                                                 onUpdateMyShapes={this.updateMyShapes}
                                                 onDeleteShapeByKey={this.deleteShapeByKey}
                                                 onSetMessage={this.setMessage}
@@ -3211,7 +3411,7 @@ class ThreedmolContainer extends React.Component {
                                         </div>
                                         <div>
                                             <ArrowList
-                                                arrows={myArrows}
+                                                arrows={this.getSepFromStateWithDefault("myArrows")}
                                                 onUpdateMyArrows={this.updateMyArrows}
                                                 onDeleteArrowByKey={this.deleteArrowByKey}
                                                 onSetMessage={this.setMessage}
@@ -3236,6 +3436,8 @@ class ThreedmolContainer extends React.Component {
                                     </h5>
                                 </div>
                                 <div id="collapse4" className="collapse show" aria-labelledby="heading4">
+                                    {this.renderHapPicker()}
+                                    {this.renderExcludePicker()}
                                     <div className="card-body">
                                         <p>
                                             <span>Data:</span>{" "}
@@ -3295,9 +3497,9 @@ class ThreedmolContainer extends React.Component {
                                             key={numFormat}
                                         />
                                         <OpacityThickness
-                                            opacity={lineOpacity}
-                                            thickness={cartoonThickness}
-                                            highlightStyle={highlightStyle}
+                                            opacity={this.getSepFromState("lineOpacity")}
+                                            thickness={this.getSepFromState("cartoonThickness")}
+                                            highlightStyle={this.getSepFromState("highlightStyle")}
                                             onUpdate={this.updateLegendColor}
                                         />
                                         {colorScale && (
@@ -3483,6 +3685,8 @@ class ThreedmolContainer extends React.Component {
                                     </h5>
                                 </div>
                                 <div id="collapse8" className="collapse show" aria-labelledby="heading8">
+                                    {this.renderHapPicker()}
+                                    {this.renderExcludePicker()}
                                     <div className="card-body">
                                         <div>
                                             <p>
@@ -3521,9 +3725,9 @@ class ThreedmolContainer extends React.Component {
                                             key={annoFormat}
                                         />
                                         <OpacityThickness
-                                            opacity={lineOpacity}
-                                            thickness={cartoonThickness}
-                                            highlightStyle={highlightStyle}
+                                            opacity={this.getSepFromState("lineOpacity")}
+                                            thickness={this.getSepFromState("cartoonThickness")}
+                                            highlightStyle={this.getSepFromState("highlightStyle")}
                                             onUpdate={this.updateLegendColor}
                                         />
                                         <label style={{ display: annoFormat === "refgene" ? "block" : "none" }}>
@@ -3725,8 +3929,9 @@ class ThreedmolContainer extends React.Component {
                         {paintMethod === "score" && (
                             <Legend
                                 haps={this.getHaps()}
-                                colorScale={colorScale}
-                                sepColorScale={sepColorScale}
+                                setTargetHap={this.setTargetHap}
+                                targetHap={this.state.targetHap}
+                                colorScale={this.getSepFromState("colorScale")}
                                 onUpdateLegendColor={this.updateLegendColor}
                             />
                         )}
