@@ -100,7 +100,7 @@
         "iwanthue": "^1.4.0",
         "jquery": "^3.5.1",
         "jquery.kinetic": "^2.2.4",
-        "json5": "^1.0.1",
+        "json5": "^2.2.2",
         "jsonschema": "^1.2.6",
         "jszip": "^3.7.1",
         "lodash": "^4.17.19",
