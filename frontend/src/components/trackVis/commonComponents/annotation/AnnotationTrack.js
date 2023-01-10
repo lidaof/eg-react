@@ -6,7 +6,12 @@ import Track from "../Track";
 import NumericalTrack from "../numerical/NumericalTrack";
 
 import { DefaultAggregators } from "../../../../model/FeatureAggregator";
-import { AnnotationDisplayModes, NumericalDisplayModes, VcfDisplayModes } from "../../../../model/DisplayModes";
+import {
+    AnnotationDisplayModes,
+    FiberDisplayModes,
+    NumericalDisplayModes,
+    VcfDisplayModes,
+} from "../../../../model/DisplayModes";
 import configOptionMerging from "../configOptionMerging";
 
 export const DEFAULT_OPTIONS = {
@@ -33,6 +38,7 @@ export class AnnotationTrack extends React.PureComponent {
             displayMode: PropTypes.oneOfType([
                 PropTypes.oneOf(Object.values(AnnotationDisplayModes)),
                 PropTypes.oneOf(Object.values(VcfDisplayModes)),
+                PropTypes.oneOf(Object.values(FiberDisplayModes)),
             ]).isRequired, // Display mode
             height: PropTypes.number, // Height in density display mode
         }).isRequired,

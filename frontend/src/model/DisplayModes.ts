@@ -51,3 +51,8 @@ export const VcfDisplayModes = {
     DENSITY: "density",
     FULL: "full",
 };
+
+export enum FiberDisplayModes {
+    AUTO = "auto",
+    HEATMAP = "heatmap",
+}

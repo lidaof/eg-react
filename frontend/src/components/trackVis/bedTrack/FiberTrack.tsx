@@ -15,6 +15,7 @@ import { FeaturePlacer } from "model/FeaturePlacer";
 import TrackLegend from "../commonComponents/TrackLegend";
 import HoverTooltipContext from "../commonComponents/tooltip/HoverTooltipContext";
 import DesignRenderer, { RenderTypes } from "art/DesignRenderer";
+import { FiberDisplayModes } from "model/DisplayModes";
 
 const ROW_VERTICAL_PADDING = 2;
 export const FIBER_DENSITY_CUTOFF_LENGTH = 300000;
@@ -27,7 +28,9 @@ interface FiberTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
         hiddenPixels?: number;
         rowHeight: number;
         height: number; // for density mode
+        displayMode: FiberDisplayModes,
     };
+    forceSvg?: boolean;
 }
 
 interface AggregatedFiber {
@@ -42,14 +45,17 @@ export const DEFAULT_OPTIONS = {
     color: 'orangered',
     color2: 'blue',
     height: 40,
+    displayMode: FiberDisplayModes.AUTO,
 }
 
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 
+// const NAMES = ['chr11:5273848-5284079', 'chr11:5279356-5288355', 'chr11:5268918-5283588', 'chr11:5278466-5287241', 'chr11:5274928-5292829']
+
 /**
- * Track component for BED annotations.
+ * Track component for fibers/methylmod.
  *
- * @author Silas Hsu
+ * @author Daofeng Li
  */
 class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
     static displayName = "FiberTrack";
@@ -94,6 +100,7 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
                 onShowTooltip={this.props.onShowTooltip}
                 onHideTooltip={this.props.onHideTooltip}
                 hiddenPixels={this.props.options.hiddenPixels}
+                displayMode={this.props.options.displayMode}
             />
         ));
     }
@@ -126,19 +133,15 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
             (feature as Fiber).ons.forEach((rbs) => {
                 const bs = Math.abs(rbs);
                 if (bs >= relativeStart && bs < relativeEnd) {
-                    const x = Math.floor(((bs - relativeStart) / segmentWidth) * width);
-                    if (x <= endX && x >= startX) {
-                        xToFibers[x].on += 1;
-                    }
+                    const x = startX + Math.floor(((bs - relativeStart) / segmentWidth) * (endX - startX));
+                    xToFibers[x].on += 1;
                 }
             });
             (feature as Fiber).offs.forEach((rbs) => {
                 const bs = Math.abs(rbs);
                 if (bs >= relativeStart && bs < relativeEnd) {
-                    const x = Math.floor(((bs - relativeStart) / segmentWidth) * width);
-                    if (x <= endX && x >= startX) {
-                        xToFibers[x].off += 1;
-                    }
+                    const x = startX + Math.floor(((bs - relativeStart) / segmentWidth) * (endX - startX));
+                    xToFibers[x].off += 1;
                 }
             });
         }
@@ -164,20 +167,25 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
         const item = this.xMap[Math.round(x)];
         if (!item.count) { return null };
         return <div>
-            <div>{item.on} mA / {item.off} umA in background</div>
-            <div>{item.count} fibers</div>
+            <div>{item.on} modified base(s)/{item.off} canonical base(s)</div>
+            <div>{item.count} reads</div>
         </div>
     }
 
     visualizer = () => {
         const { pctToY, countToY, pcts, counts } = this.scales;
-        const { height, color } = this.props.options;
+        const { height, color, color2, displayMode } = this.props.options;
         const bars: any[] = [];
         const lines = [];
         pcts.forEach((pct: number, idx: number) => {
             if (pct) {
-                const y = pctToY(pct);
-                bars.push(<rect key={idx} x={idx} width={1} y={y} height={height - y} fill={color} opacity={0.7} />)
+                if (displayMode === FiberDisplayModes.AUTO) {
+                    const y = pctToY(pct);
+                    bars.push(<rect key={idx} x={idx} width={1} y={y} height={height - y} fill={color} fillOpacity={0.7} />)
+                } else {
+                    const fillColor = pct >= 0.5 ? color : color2;
+                    bars.push(<rect key={idx} x={idx} width={1} y={0} height={height} fill={fillColor} fillOpacity={0.5} />)
+                }
             }
         });
         for (let i = 0; i < counts.length - 1; i++) {
@@ -193,7 +201,7 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
         return (
             <HoverTooltipContext tooltipRelativeY={height} getTooltipContents={this.renderTooltipContents} >
                 <DesignRenderer
-                    type={RenderTypes.CANVAS}
+                    type={this.props.forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS}
                     width={this.props.width}
                     height={height}
                 >
@@ -205,26 +213,25 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
     }
 
     render() {
-        // if (this.props.visRegion.getWidth() > FIBER_DENSITY_CUTOFF_LENGTH) {
-
         const { data, visRegion, width, options, trackModel } = this.props;
-        this.xMap = this.aggregateFibers(data, visRegion, width);
-        this.scales = this.computeScales();
-        return <Track
-            {...this.props}
-            legend={
-                <div>
-                    <TrackLegend trackModel={trackModel} height={options.height} axisScale={this.scales.pctToY}
-                    />
-                </div>
-            }
-            visualizer={this.visualizer()}
-        />
-        // }
+        if (visRegion.getWidth() > FIBER_DENSITY_CUTOFF_LENGTH) {
+            this.xMap = this.aggregateFibers(data, visRegion, width);
+            this.scales = this.computeScales();
+            return <Track
+                {...this.props}
+                legend={
+                    <div>
+                        <TrackLegend trackModel={trackModel} height={options.height} axisScale={options.displayMode === FiberDisplayModes.AUTO ? this.scales.pctToY : this.scales.countToY}
+                        />
+                    </div>
+                }
+                visualizer={this.visualizer()}
+            />
+        }
         return (
             <AnnotationTrack
                 {...this.props}
-                rowHeight={this.props.options.rowHeight + ROW_VERTICAL_PADDING}
+                rowHeight={options.rowHeight + ROW_VERTICAL_PADDING}
                 getAnnotationElement={this.renderAnnotation}
                 featurePadding={this.paddingFunc}
             />

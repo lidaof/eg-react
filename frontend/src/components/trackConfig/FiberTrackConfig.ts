@@ -13,6 +13,7 @@ import HiddenPixelsConfig from "../trackContextMenu/HiddenPixelsConfig";
 import { PrimaryColorConfig, SecondaryColorConfig } from "components/trackContextMenu/ColorConfig";
 import TrackModel from "model/TrackModel";
 import { TrackConfig } from "./TrackConfig";
+import { FiberDisplayModeConfig } from "components/trackContextMenu/DisplayModeConfig";
 
 export class FiberTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -59,6 +60,7 @@ export class FiberTrackConfig extends TrackConfig {
     getMenuComponents() {
         const items = [
             ...super.getMenuComponents(),
+            FiberDisplayModeConfig,
             RowHeightConfig,
             PrimaryColorConfig,
             SecondaryColorConfig,

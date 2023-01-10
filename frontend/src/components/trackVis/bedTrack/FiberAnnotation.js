@@ -4,6 +4,7 @@ import { scaleLinear } from "d3-scale";
 import _ from "lodash";
 import { TranslatableG } from "../../TranslatableG";
 import Tooltip from "../commonComponents/tooltip/Tooltip";
+import { FiberDisplayModes } from "model/DisplayModes";
 
 const DOT_BP_PIXEL_CUTOFF = 2.5;
 
@@ -20,6 +21,7 @@ class FiberAnnotation extends React.Component {
         color2: PropTypes.string, // Color of reverse strand annotations
         rowHeight: PropTypes.number,
         isMinimal: PropTypes.bool, // Whether to just render a plain box
+        displayMode: PropTypes.string,
         /**
          * Callback for click events.  Signature: (event: MouseEvent, feature: Feature): void
          *     `event`: the triggering click event
@@ -59,7 +61,8 @@ class FiberAnnotation extends React.Component {
     };
 
     render() {
-        const { placement, y, color, color2, isMinimal, hiddenPixels, rowHeight, onHideTooltip } = this.props;
+        const { placement, y, color, color2, isMinimal, hiddenPixels, rowHeight, onHideTooltip, displayMode } =
+            this.props;
         const { feature, xSpan, visiblePart } = placement;
         const { relativeStart, relativeEnd } = visiblePart;
         const segmentWidth = relativeEnd - relativeStart;
@@ -71,13 +74,16 @@ class FiberAnnotation extends React.Component {
         if (isMinimal) {
             return (
                 <TranslatableG y={y}>
-                    <rect x={startX} y={0} width={width} height={rowHeight * 0.25} fill={color} opacity={0.7} />
+                    <rect x={startX} y={0} width={width} height={rowHeight} fill={color} opacity={0.7} />
                 </TranslatableG>
             );
         }
         const bpPixel = (1 / segmentWidth) * width;
         if (bpPixel < DOT_BP_PIXEL_CUTOFF) {
-            const mainBody = <rect x={startX} y={rowHeight} width={width} height={1} fill="gray" opacity={0.5} />;
+            const mainBody =
+                displayMode === FiberDisplayModes.AUTO ? (
+                    <rect x={startX} y={rowHeight} width={width} height={1} fill="gray" opacity={0.5} />
+                ) : null;
             const intWidth = Math.round(width);
             const xMap = Array(intWidth).fill(null); // relative x from 0 to width, like in feature aggregator
             for (let x = 0; x < intWidth; x++) {
@@ -110,33 +116,52 @@ class FiberAnnotation extends React.Component {
             const bgScale = scaleLinear().range([0.2, 0.9]).domain([0, maxValue]).clamp(true);
             xMap.forEach((x, idx) => {
                 if (x.on || x.off) {
-                    bars.push(
-                        <rect
-                            key={idx + "bgbar"}
-                            x={startX + idx}
-                            y={0}
-                            height={rowHeight}
-                            width={barWidth}
-                            fill="gray"
-                            opacity={bgScale(totals[idx])}
-                        />
-                    );
-                    const barHeight = scale(pcts[idx]);
-                    bars.push(
-                        <rect
-                            key={idx + "fgbar"}
-                            x={startX + idx}
-                            y={rowHeight - barHeight}
-                            height={barHeight}
-                            width={barWidth}
-                            fill={color}
-                            opacity={0.7}
-                            onMouseEnter={(event) =>
-                                this.renderBarTooltip(event, feature, x.on, pcts[idx], totals[idx])
-                            }
-                            onMouseOut={onHideTooltip}
-                        />
-                    );
+                    if (displayMode === FiberDisplayModes.AUTO) {
+                        bars.push(
+                            <rect
+                                key={idx + "bgbar"}
+                                x={startX + idx}
+                                y={0}
+                                height={rowHeight}
+                                width={barWidth}
+                                fill="gray"
+                                opacity={bgScale(totals[idx])}
+                            />
+                        );
+                        const barHeight = scale(pcts[idx]);
+                        bars.push(
+                            <rect
+                                key={idx + "fgbar"}
+                                x={startX + idx}
+                                y={rowHeight - barHeight}
+                                height={barHeight}
+                                width={barWidth}
+                                fill={color}
+                                opacity={0.7}
+                                onMouseEnter={(event) =>
+                                    this.renderBarTooltip(event, feature, x.on, pcts[idx], totals[idx])
+                                }
+                                onMouseOut={onHideTooltip}
+                            />
+                        );
+                    } else {
+                        const fillColor = pcts[idx] >= 0.5 ? color : color2;
+                        bars.push(
+                            <rect
+                                key={idx + "fgrect"}
+                                x={startX + idx}
+                                y={0}
+                                height={rowHeight}
+                                width={barWidth}
+                                fill={fillColor}
+                                opacity={0.7}
+                                onMouseEnter={(event) =>
+                                    this.renderBarTooltip(event, feature, x.on, pcts[idx], totals[idx])
+                                }
+                                onMouseOut={onHideTooltip}
+                            />
+                        );
+                    }
                 }
             });
 
@@ -152,48 +177,88 @@ class FiberAnnotation extends React.Component {
             feature.ons.forEach((rbs, idx) => {
                 const bs = Math.abs(rbs);
                 if (bs >= relativeStart && bs < relativeEnd) {
-                    const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5 - 10);
-                    const blockStart = startX + ((bs - relativeStart + 0.5) / segmentWidth) * width;
-                    const cy = rbs > 0 ? 0.25 * rowHeight : 0.75 * rowHeight;
                     const fillColor = rbs > 0 ? color : color2;
-                    blocks.push(
-                        <circle
-                            key={idx + "fg"}
-                            cx={blockStart}
-                            cy={cy}
-                            r={radius}
-                            fill={fillColor}
-                            stroke={fillColor}
-                            strokeWidth={2}
-                            opacity={0.7}
-                            onMouseEnter={(event) => this.renderTooltip(event, feature, bs)}
-                            onMouseOut={onHideTooltip}
-                        />
-                    );
+                    if (displayMode === FiberDisplayModes.AUTO) {
+                        const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5 - 10);
+                        const blockStart = startX + ((bs - relativeStart + 0.5) / segmentWidth) * width;
+                        const cy = rbs > 0 ? 0.25 * rowHeight : 0.75 * rowHeight;
+                        blocks.push(
+                            <circle
+                                key={idx + "fg"}
+                                cx={blockStart}
+                                cy={cy}
+                                r={radius}
+                                fill={fillColor}
+                                stroke={fillColor}
+                                strokeWidth={2}
+                                opacity={0.7}
+                                onMouseEnter={(event) => this.renderTooltip(event, feature, bs)}
+                                onMouseOut={onHideTooltip}
+                            />
+                        );
+                    } else {
+                        const rwidth = Math.max(1, bpPixel);
+                        const x = startX + ((bs - relativeStart) / segmentWidth) * width;
+                        const y = rbs > 0 ? 0 : 0.5 * rowHeight;
+                        blocks.push(
+                            <rect
+                                key={idx + "fg"}
+                                x={x}
+                                y={y}
+                                height={rowHeight * 0.5}
+                                width={rwidth}
+                                fill={fillColor}
+                                strokeWidth={0}
+                                opacity={0.6}
+                                onMouseEnter={(event) => this.renderTooltip(event, feature, bs)}
+                                onMouseOut={onHideTooltip}
+                            />
+                        );
+                    }
                 }
             });
             feature.offs.forEach((rbs, idx) => {
                 const bs = Math.abs(rbs);
                 if (bs >= relativeStart && bs < relativeEnd) {
-                    const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5 - 10);
-                    const blockStart = startX + ((bs - relativeStart + 0.5) / segmentWidth) * width;
-                    const cy = rbs > 0 ? 0.25 * rowHeight : 0.75 * rowHeight;
-                    const fillColor = rbs > 0 ? color : color2;
-                    blocks.push(
-                        <circle
-                            key={idx + "bg"}
-                            cx={blockStart}
-                            cy={cy}
-                            r={radius}
-                            fill={fillColor}
-                            stroke={fillColor}
-                            strokeWidth={2}
-                            fillOpacity={0}
-                            opacity={0.7}
-                            onMouseEnter={(event) => this.renderTooltip(event, feature, bs)}
-                            onMouseOut={onHideTooltip}
-                        />
-                    );
+                    if (displayMode === FiberDisplayModes.AUTO) {
+                        const fillColor = rbs > 0 ? color : color2;
+                        const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5 - 10);
+                        const blockStart = startX + ((bs - relativeStart + 0.5) / segmentWidth) * width;
+                        const cy = rbs > 0 ? 0.25 * rowHeight : 0.75 * rowHeight;
+                        blocks.push(
+                            <circle
+                                key={idx + "bg"}
+                                cx={blockStart}
+                                cy={cy}
+                                r={radius}
+                                fill={fillColor}
+                                stroke={fillColor}
+                                strokeWidth={2}
+                                fillOpacity={0}
+                                opacity={0.7}
+                                onMouseEnter={(event) => this.renderTooltip(event, feature, bs)}
+                                onMouseOut={onHideTooltip}
+                            />
+                        );
+                    } else {
+                        const rwidth = Math.max(1, bpPixel);
+                        const x = startX + ((bs - relativeStart) / segmentWidth) * width;
+                        const y = rbs > 0 ? 0 : 0.5 * rowHeight;
+                        blocks.push(
+                            <rect
+                                key={idx + "bg"}
+                                x={x}
+                                y={y}
+                                height={rowHeight * 0.5}
+                                width={rwidth}
+                                fill="lightgrey"
+                                strokeWidth={0}
+                                opacity={0.6}
+                                onMouseEnter={(event) => this.renderTooltip(event, feature, bs)}
+                                onMouseOut={onHideTooltip}
+                            />
+                        );
+                    }
                 }
             });
 
