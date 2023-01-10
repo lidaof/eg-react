@@ -85,3 +85,7 @@
 .eg-button:active {
     background-color: var(--eg-secondary-container);
 }
+
+* {
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
