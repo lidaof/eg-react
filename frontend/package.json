@@ -155,7 +155,7 @@
         "script-loader": "^0.7.2",
         "shortid": "^2.2.15",
         "styled-components": "^5.3.3",
-        "tcp-port-used": "^0.1.2",
+        "tcp-port-used": "^1.0.2",
         "text-encoding": "^0.7.0",
         "three": "^0.137.0",
         "typescript": "^3.4.5",
