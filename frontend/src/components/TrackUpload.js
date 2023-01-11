@@ -36,6 +36,9 @@ export class TrackUpload extends React.Component {
         const indexSuffix = fileType === "bam" ? ".bai" : ".tbi";
         this.setState({ fileType, indexSuffix });
     };
+    handleAssemblyChange = (event) => {
+        this.setState({ assembly: event.target.value });
+    };
 
     handleFileUpload = async (event) => {
         this.setState({ msg: "Uploading track..." });
@@ -54,6 +57,7 @@ export class TrackUpload extends React.Component {
                         label: file.name,
                         files: null,
                         options,
+                        metadata: { genome: this.state.assembly }
                     })
             );
         } else {
@@ -196,8 +200,14 @@ export class TrackUpload extends React.Component {
                 </label>
                 <br />
                 <TrackOptionsUI onGetOptions={(value) => this.getOptions(value)} />
+                <label htmlFor="Assembly">
+                    <h3>2. Choose assembly:</h3>
+                    <input value={this.state.assembly} onChange={this.handleAssemblyChange}>
+                    </input>
+                </label>
+                <br />
                 <label htmlFor="trackFile">
-                    <h3>2. Choose track file:</h3>
+                    <h3>3. Choose track file:</h3>
                     <input type="file" id="trackFile" multiple onChange={this.handleFileUpload} />
                 </label>
             </div>
