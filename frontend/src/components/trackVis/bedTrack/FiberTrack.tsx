@@ -23,12 +23,13 @@ export const FIBER_DENSITY_CUTOFF_LENGTH = 300000;
 interface FiberTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
     data: Fiber[];
     options: {
-        color?: string;
-        color2?: string;
+        color?: string; // methylated color
+        color2?: string; // un methylated color
         hiddenPixels?: number;
         rowHeight: number;
         height: number; // for density mode
-        displayMode: FiberDisplayModes,
+        maxRows: number;
+        displayMode: FiberDisplayModes;
     };
     forceSvg?: boolean;
 }
@@ -45,6 +46,7 @@ export const DEFAULT_OPTIONS = {
     color: 'orangered',
     color2: 'blue',
     height: 40,
+    maxRows: 20,
     displayMode: FiberDisplayModes.AUTO,
 }
 
@@ -164,9 +166,12 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
     }
 
     renderTooltipContents = (x: number) => {
-        const item = this.xMap[Math.round(x)];
+        const { pcts } = this.scales;
+        const index = Math.round(x)
+        const item = this.xMap[index];
         if (!item.count) { return null };
         return <div>
+            <div>methylation level: {pcts[index].toFixed(3)}</div>
             <div>{item.on} modified base(s)/{item.off} canonical base(s)</div>
             <div>{item.count} reads</div>
         </div>
@@ -175,6 +180,10 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
     visualizer = () => {
         const { pctToY, countToY, pcts, counts } = this.scales;
         const { height, color, color2, displayMode } = this.props.options;
+        const colorScale = scaleLinear()
+            .domain([0, 1])
+            .range([color2 as any, color as any])
+            .clamp(true)
         const bars: any[] = [];
         const lines = [];
         pcts.forEach((pct: number, idx: number) => {
@@ -183,8 +192,8 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
                     const y = pctToY(pct);
                     bars.push(<rect key={idx} x={idx} width={1} y={y} height={height - y} fill={color} fillOpacity={0.7} />)
                 } else {
-                    const fillColor = pct >= 0.5 ? color : color2;
-                    bars.push(<rect key={idx} x={idx} width={1} y={0} height={height} fill={fillColor} fillOpacity={0.5} />)
+                    const fillColor = colorScale(pct);
+                    bars.push(<rect key={idx} x={idx} width={1} y={0} height={height} fill={fillColor as any} fillOpacity={0.5} />)
                 }
             }
         });

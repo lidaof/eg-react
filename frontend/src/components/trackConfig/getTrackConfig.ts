@@ -44,6 +44,7 @@ import { FiberTrackConfig } from "./FiberTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 export const ALIGNMENT_TYPES = ["genomealign"];
+export const MOD_TYPES = ["modbed"];
 export const DYNAMIC_TYPES = ["dynamic", "dbedgraph", "dynamichic", "dynamiclongrange"];
 
 const TYPE_NAME_TO_CONFIG = {
@@ -89,7 +90,7 @@ const TYPE_NAME_TO_CONFIG = {
     bigchain: GenomeAlignTrackConfig,
     jaspar: JasparTrackConfig,
     brgfa: BrgfaTrackConfig,
-    fiber: FiberTrackConfig,
+    modbed: FiberTrackConfig, // fiber track was renamed to modbed meaning read modification data
 };
 const DefaultConfig = TrackConfig;
 

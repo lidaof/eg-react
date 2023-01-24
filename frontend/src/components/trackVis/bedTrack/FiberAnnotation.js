@@ -38,7 +38,7 @@ class FiberAnnotation extends React.Component {
         const tooltip = (
             <Tooltip pageX={event.pageX} pageY={event.pageY} ignoreMouse={true}>
                 <div>
-                    position {bs} in {feature.getName()}
+                    {bs && `position ${bs} in`} {feature.getName()} read
                 </div>
             </Tooltip>
         );
@@ -72,11 +72,16 @@ class FiberAnnotation extends React.Component {
             return null;
         }
         if (isMinimal) {
-            return (
-                <TranslatableG y={y}>
-                    <rect x={startX} y={0} width={width} height={rowHeight} fill={color} opacity={0.7} />
-                </TranslatableG>
-            );
+            return null;
+            // return (
+            //     <TranslatableG
+            //         y={y}
+            //         onMouseEnter={(event) => this.renderTooltip(event, feature)}
+            //         onMouseOut={onHideTooltip}
+            //     >
+            //         <rect x={startX} y={0} width={width} height={rowHeight} fill={color} opacity={0.2} />
+            //     </TranslatableG>
+            // );
         }
         const bpPixel = (1 / segmentWidth) * width;
         if (bpPixel < DOT_BP_PIXEL_CUTOFF) {
