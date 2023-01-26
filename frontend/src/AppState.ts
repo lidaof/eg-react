@@ -323,11 +323,17 @@ function getInitialState(): AppState {
             newState = { ...tmpState, tracks: [track] };
         }
         if (query.position) {
+            const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
             if (newState) {
-                const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
                 newState = getNextState(newState as AppState, {
                     type: ActionType.SET_VIEW_REGION,
                     ...interval,
+                });
+            }
+            if (query.highlightPosition) {
+                newState = getNextState(newState as AppState, {
+                    type: ActionType.SET_HIGHLIGHTS,
+                    highlights: [new HighlightInterval(interval.start, interval.end)],
                 });
             }
         }

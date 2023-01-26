@@ -59,12 +59,12 @@ class ScreenshotUINotConnected extends React.Component {
         const bg = darkTheme ? "#222" : "white";
         const fg = darkTheme ? "white" : "#222";
         style.innerHTML = `:root { --bg-color: ${bg}; --font-color: ${fg}; } .svg-text-bg {
-    fill: var(--font-color);
-}
+            fill: var(--font-color);
+        }
 
-.svg-line-bg {
-    stroke: var(--font-color);
-}`;
+        .svg-line-bg {
+            stroke: var(--font-color);
+        }`;
         defs.appendChild(style);
         svgElem.appendChild(defs);
         if (darkTheme) {

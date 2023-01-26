@@ -1,5 +1,13 @@
 # Version History
 
+## 54.0.0
+
+-   added new track type `modbed` for display long read sequencing methylation data
+-   added ensembl style for matplot and dynamic tracks
+-   fixed a screenshot bug when svg imported to Adobe Illustrator
+-   removed default highlight for gene/snp/region search
+-   added `highlightPosition` url parameter, used with `position`, for example `&position=chr3:181429711-181432223&highlightPosition=1` will jump to `chr3:181429711-181432223` and highlight it at same time
+
 ## 53.8.0
 
 -   added light/dark theme setting
