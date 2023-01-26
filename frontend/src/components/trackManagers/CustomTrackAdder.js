@@ -23,7 +23,7 @@ export const TRACK_TYPES = {
     Categorical: ["categorical"],
     // "Transcription Factor": ["jaspar"],
     "Genome graph": ["brgfa", "graph"],
-    Methylation: ["methylC"],
+    Methylation: ["methylC", "modbed"],
     Interaction: ["hic", "cool", "bigInteract", "longrange", "longrangecolor"],
     Stats: ["boxplot"],
     Repeats: ["rmskv2", "repeatmasker"],
@@ -54,6 +54,7 @@ const TYPES_NEED_INDEX = [
     "bedcolor",
     "brgfa",
     "graph",
+    "modbed",
 ];
 
 export const TYPES_DESC = {
@@ -90,6 +91,7 @@ export const TYPES_DESC = {
     brgfa: "local genome graph in bed like rGFA format",
     graph: "global genome graph in bed like rGFA format",
     // jaspar: "transcription factor binding data from Jaspar",
+    modbed: "read modification for methylation etc.",
 };
 
 /**

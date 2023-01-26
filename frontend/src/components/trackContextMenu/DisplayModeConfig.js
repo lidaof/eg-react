@@ -9,6 +9,7 @@ import {
     VcfColorScaleKeys,
     VcfDisplayModes,
     GraphDisplayModes,
+    FiberDisplayModes,
 } from "../../model/DisplayModes";
 
 /**
@@ -115,6 +116,18 @@ export function GraphDisplayModeConfig(props) {
             label="Display mode:"
             defaultValue={GraphDisplayModes.FULL}
             choices={GraphDisplayModes}
+        />
+    );
+}
+
+export function FiberDisplayModeConfig(props) {
+    return (
+        <SelectConfig
+            {...props}
+            optionName="displayMode"
+            label="Display mode:"
+            defaultValue={FiberDisplayModes.AUTO}
+            choices={FiberDisplayModes}
         />
     );
 }

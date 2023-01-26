@@ -72,11 +72,11 @@ export class GeneAnnotation extends React.Component<GeneAnnotationProps> {
      * @param {string} color - color of all the rectangles
      * @return {JSX.Element[]} <rect> elements
      */
-    _renderCenteredRects(placedSegments: PlacedSegment[], height: number, color: string) {
+    _renderCenteredRects(placedSegments: PlacedSegment[], height: number, color: string, opacity: number = 1) {
         return placedSegments.map(placedSegment => {
             const x = placedSegment.xSpan.start;
             const width = Math.max(placedSegment.xSpan.getLength(), 3); // min 3 px for exon
-            return <rect key={x + shortid.generate()} x={x} y={(HEIGHT - height) / 2} width={width} height={height} fill={color} />;
+            return <rect key={x + shortid.generate()} x={x} y={(HEIGHT - height) / 2} width={width} height={height} fill={color} opacity={opacity} />;
         });
     }
 
@@ -122,7 +122,8 @@ export class GeneAnnotation extends React.Component<GeneAnnotationProps> {
         />;
 
         // utrArrowCover covers up arrows where the UTRs will be
-        const utrArrowCover = this._renderCenteredRects(placedUtrs, HEIGHT, backgroundColor);
+        const utrArrowCover = this._renderCenteredRects(placedUtrs, HEIGHT, backgroundColor, 0);
+        // const utrArrowCover = this._renderCenteredRects(placedUtrs, HEIGHT, 'white'); //somehow Illustrator don't understand css variables?
         const utrRects = this._renderCenteredRects(placedUtrs, UTR_HEIGHT, color);
 
         return (
