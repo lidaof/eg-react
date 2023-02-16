@@ -1,3 +1,4 @@
+import HideMinimalItemsConfig from "components/trackContextMenu/HideMinimalItemsConfig";
 import { AnnotationTrackConfig } from "./AnnotationTrackConfig";
 import GeneAnnotationTrack from "../trackVis/geneAnnotationTrack/GeneAnnotationTrack";
 import { DEFAULT_OPTIONS } from "../trackVis/geneAnnotationTrack/GeneAnnotation";
@@ -26,6 +27,6 @@ export class GeneAnnotationTrackConfig extends AnnotationTrackConfig {
     }
 
     getMenuComponents() {
-        return [...super.getMenuComponents(), ItalicizeTextConfig, HiddenPixelsConfig];
+        return [...super.getMenuComponents(), ItalicizeTextConfig, HiddenPixelsConfig, HideMinimalItemsConfig];
     }
 }

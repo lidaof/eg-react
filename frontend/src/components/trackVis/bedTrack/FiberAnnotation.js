@@ -61,8 +61,18 @@ class FiberAnnotation extends React.Component {
     };
 
     render() {
-        const { placement, y, color, color2, isMinimal, hiddenPixels, rowHeight, onHideTooltip, displayMode } =
-            this.props;
+        const {
+            placement,
+            y,
+            color,
+            color2,
+            isMinimal,
+            hiddenPixels,
+            rowHeight,
+            onHideTooltip,
+            displayMode,
+            hideMinimalItems,
+        } = this.props;
         const { feature, xSpan, visiblePart } = placement;
         const { relativeStart, relativeEnd } = visiblePart;
         const segmentWidth = relativeEnd - relativeStart;
@@ -72,16 +82,18 @@ class FiberAnnotation extends React.Component {
             return null;
         }
         if (isMinimal) {
-            return null;
-            // return (
-            //     <TranslatableG
-            //         y={y}
-            //         onMouseEnter={(event) => this.renderTooltip(event, feature)}
-            //         onMouseOut={onHideTooltip}
-            //     >
-            //         <rect x={startX} y={0} width={width} height={rowHeight} fill={color} opacity={0.2} />
-            //     </TranslatableG>
-            // );
+            if (hideMinimalItems) {
+                return null;
+            }
+            return (
+                <TranslatableG
+                    y={y}
+                    onMouseEnter={(event) => this.renderTooltip(event, feature)}
+                    onMouseOut={onHideTooltip}
+                >
+                    <rect x={startX} y={0} width={width} height={rowHeight} fill={color} opacity={0.2} />
+                </TranslatableG>
+            );
         }
         const bpPixel = (1 / segmentWidth) * width;
         if (bpPixel < DOT_BP_PIXEL_CUTOFF) {

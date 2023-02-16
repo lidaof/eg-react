@@ -23,6 +23,7 @@ export const DEFAULT_OPTIONS = {
     },
     hiddenPixels: 0.5,
     italicizeText: false,
+    hideMinimalItems: false,
 }
 
 interface GeneDisplayOptions {

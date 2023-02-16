@@ -20,6 +20,7 @@ export const DEFAULT_OPTIONS = {
     color2: "red",
     maxRows: 20,
     height: 40, // For density display mode
+    hideMinimalItems: false,
 };
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
 

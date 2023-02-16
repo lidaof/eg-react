@@ -15,6 +15,7 @@ interface GeneAnnotationScaffoldProps {
         color?: string;
         backgroundColor?: string;
         italicizeText?: boolean;
+        hideMinimalItems?: boolean;
     };
 
     /**
@@ -52,7 +53,7 @@ export class GeneAnnotationScaffold extends React.PureComponent<GeneAnnotationSc
     }
 
     render(): JSX.Element {
-        const { gene, xSpan, viewWindow, y, isMinimal, children } = this.props;
+        const { gene, xSpan, viewWindow, y, isMinimal, children, options } = this.props;
         const [xStart, xEnd] = xSpan;
         const { color, backgroundColor, italicizeText } = GeneAnnotation.getDrawColors(gene, this.props.options);
 
@@ -69,6 +70,9 @@ export class GeneAnnotationScaffold extends React.PureComponent<GeneAnnotationSc
 
         if (isMinimal) {
             // Just render a box if minimal.
+            if (options.hideMinimalItems) {
+                return null;
+            }
             return (
                 <TranslatableG y={y} onClick={this.handleClick}>
                     {coveringRect}

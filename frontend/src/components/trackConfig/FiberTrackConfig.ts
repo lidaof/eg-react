@@ -15,6 +15,7 @@ import TrackModel from "model/TrackModel";
 import { TrackConfig } from "./TrackConfig";
 import { FiberDisplayModeConfig } from "components/trackContextMenu/DisplayModeConfig";
 import MaxRowsConfig from "components/trackContextMenu/MaxRowsConfig";
+import HideMinimalItemsConfig from "components/trackContextMenu/HideMinimalItemsConfig";
 
 export class FiberTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -69,6 +70,7 @@ export class FiberTrackConfig extends TrackConfig {
             HiddenPixelsConfig,
             HeightConfig,
             YscaleConfig,
+            HideMinimalItemsConfig,
         ];
         return items;
     }
