@@ -1,5 +1,11 @@
 # Version History
 
+## 54.0.1
+
+-   new genome for _Parhyale hawaiensis_ version 5 is added
+-   added an option to hide minimal annotations
+-   removed some old version gene annotation tracks (files can be requested if still need)
+
 ## 54.0.0
 
 -   added new track type `modbed` for display long read sequencing methylation data

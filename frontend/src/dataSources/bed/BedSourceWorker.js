@@ -134,6 +134,7 @@ class BedSourceWorker extends WorkerRunnableSource {
                 chr: columns[0],
                 start: Number.parseInt(columns[1], 10),
                 end: Number.parseInt(columns[2], 10),
+                n: columns.length, // number of columns in initial data row
             };
 
             if (feature.start > end) {

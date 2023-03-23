@@ -7,6 +7,7 @@ import { HiddenItemsMessage } from '../TrackMessage';
 
 import { FeatureArranger, PlacedFeatureGroup, PaddingFunc } from '../../../../model/FeatureArranger';
 import { Feature } from '../../../../model/Feature';
+import { SortItemsOptions } from '../../../../model/SortItemsOptions'
 
 const SVG_STYLE = {
     display: "block",
@@ -32,6 +33,7 @@ interface FullDisplayModeProps extends PropsFromTrackContainer {
         maxRows: number; // Max number of rows of annotations to render
         hiddenPixels?: number;
         hideMinimalItems?: boolean;
+        sortItems?: SortItemsOptions;
     };
 
     legend?: JSX.Element; // Override for the default legend element
@@ -74,7 +76,7 @@ class FullDisplayMode extends React.Component<FullDisplayModeProps> {
         const { data, featurePadding, visRegion, width, rowHeight, options, getAnnotationElement } = this.props;
         // Important: it is ok to arrange() every render only because we memoized the function in the constructor.
         const arrangeResult = this.featureArranger.arrange(data, visRegion, width,
-            featurePadding, options.hiddenPixels);
+            featurePadding, options.hiddenPixels, options.sortItems);
         const height = this.getHeight(arrangeResult.numRowsAssigned);
         const legend = this.props.legend || <TrackLegend height={height} trackModel={this.props.trackModel} />;
         const visualizer = <FullVisualizer

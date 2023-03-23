@@ -355,3 +355,8 @@ export const safeParseJsonString = (str: string) => {
         return str;
     }
 };
+
+export const parseNumberString = (str: string) => {
+    const a = Number(str);
+    return Number.isNaN(a) ? str : a;
+};

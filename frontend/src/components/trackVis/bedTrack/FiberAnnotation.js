@@ -54,7 +54,9 @@ class FiberAnnotation extends React.Component {
                 <div>
                     {onCount}/{total} ({`${(onPct * 100).toFixed(2)}%`})
                 </div>
-                <div>{feature.getName()}</div>
+                <div>
+                    {feature.getName()} sortKey: {feature.sortKey}
+                </div>
             </Tooltip>
         );
         this.props.onShowTooltip(tooltip);
@@ -141,7 +143,7 @@ class FiberAnnotation extends React.Component {
                                 y={0}
                                 height={rowHeight}
                                 width={barWidth}
-                                fill="gray"
+                                fill="lightgray"
                                 opacity={bgScale(totals[idx])}
                             />
                         );
@@ -162,7 +164,9 @@ class FiberAnnotation extends React.Component {
                             />
                         );
                     } else {
+                        // bar heatmap
                         const fillColor = pcts[idx] >= 0.5 ? color : color2;
+                        const opacity = pcts[idx] >= 0.5 ? 1 : 0.3;
                         bars.push(
                             <rect
                                 key={idx + "fgrect"}
@@ -171,7 +175,7 @@ class FiberAnnotation extends React.Component {
                                 height={rowHeight}
                                 width={barWidth}
                                 fill={fillColor}
-                                opacity={0.7}
+                                opacity={opacity}
                                 onMouseEnter={(event) =>
                                     this.renderBarTooltip(event, feature, x.on, pcts[idx], totals[idx])
                                 }
@@ -189,6 +193,7 @@ class FiberAnnotation extends React.Component {
                 </TranslatableG>
             );
         } else {
+            // bp level
             const mainBody = <rect x={startX} y={rowHeight * 0.5} width={width} height={2} fill="gray" opacity={0.5} />;
             const blocks = [];
             feature.ons.forEach((rbs, idx) => {
@@ -270,7 +275,7 @@ class FiberAnnotation extends React.Component {
                                 width={rwidth}
                                 fill="lightgrey"
                                 strokeWidth={0}
-                                opacity={0.6}
+                                opacity={0.5}
                                 onMouseEnter={(event) => this.renderTooltip(event, feature, bs)}
                                 onMouseOut={onHideTooltip}
                             />

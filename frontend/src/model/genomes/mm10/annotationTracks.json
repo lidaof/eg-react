@@ -15,25 +15,6 @@
         {
             "name": "gencodeCompVM25",
             "label": "GENCODE M25 genes",
-            "filetype": "geneAnnotation"
-        },
-        {
-            "name": "gencodeM19",
-            "label": "GENCODE M19 genes",
-            "options": {
-                "categoryColors": {
-                    "coding": "rgb(0,60,179)",
-                    "nonCoding": "rgb(0,128,0)",
-                    "pseudogene": "rgb(230,0,172)",
-                    "problem": "rgb(255,0,0)",
-                    "polyA": "rgb(0,0,51)"
-                }
-            },
-            "filetype": "geneAnnotation"
-        },
-        {
-            "name": "gencodeM19Basic",
-            "label": "GENCODE M19 genes (basic set)",
             "options": {
                 "categoryColors": {
                     "coding": "rgb(0,60,179)",

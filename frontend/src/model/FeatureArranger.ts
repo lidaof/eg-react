@@ -4,6 +4,7 @@ import { Feature } from "./Feature";
 import { FeaturePlacer, PlacedFeature } from "./FeaturePlacer";
 import LinearDrawingModel from "./LinearDrawingModel";
 import OpenInterval from "./interval/OpenInterval";
+import { SortItemsOptions } from "./SortItemsOptions";
 
 export interface PlacedFeatureGroup {
     feature: Feature;
@@ -33,9 +34,14 @@ export class FeatureArranger {
      * @param {number | PaddingFunc} padding - getter of padding.  See the arrange() method for more info.
      * @return {number} the number of rows assigned
      */
-    _assignRows(groups: PlacedFeatureGroup[], padding: number | PaddingFunc): number {
-        groups.sort((a, b) => a.xSpan.start - b.xSpan.start);
-
+    _assignRows(groups: PlacedFeatureGroup[], padding: number | PaddingFunc, sortItems: SortItemsOptions): number {
+        if (sortItems === SortItemsOptions.NONE) {
+            groups.sort((a, b) => a.xSpan.start - b.xSpan.start);
+        } else if (sortItems === SortItemsOptions.ASC) {
+            groups.sort((a, b) => a.feature.sortKey - b.feature.sortKey);
+        } else if (sortItems === SortItemsOptions.DESC) {
+            groups.sort((a, b) => b.feature.sortKey - a.feature.sortKey);
+        }
         const maxXsForRows: number[] = [];
         const isConstPadding = typeof padding === "number";
         for (const group of groups) {
@@ -111,7 +117,8 @@ export class FeatureArranger {
         viewRegion: DisplayedRegionModel,
         width: number,
         padding: number | PaddingFunc = 0,
-        hiddenPixels: number = 0.5
+        hiddenPixels: number = 0.5,
+        sortItems: SortItemsOptions = SortItemsOptions.NONE
     ): FeatureArrangementResult {
         const drawModel = new LinearDrawingModel(viewRegion, width);
         const visibleFeatures = features.filter(
@@ -123,7 +130,7 @@ export class FeatureArranger {
             const placements = FEATURE_PLACER.placeFeatures([feature], viewRegion, width);
             results.push(...this._combineAdjacent(placements));
         }
-        const numRowsAssigned = this._assignRows(results, padding);
+        const numRowsAssigned = this._assignRows(results, padding, sortItems);
         return {
             placements: results,
             numRowsAssigned,

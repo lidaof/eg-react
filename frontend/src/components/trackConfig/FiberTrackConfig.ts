@@ -16,6 +16,7 @@ import { TrackConfig } from "./TrackConfig";
 import { FiberDisplayModeConfig } from "components/trackContextMenu/DisplayModeConfig";
 import MaxRowsConfig from "components/trackContextMenu/MaxRowsConfig";
 import HideMinimalItemsConfig from "components/trackContextMenu/HideMinimalItemsConfig";
+import SortItemsConfig from "components/trackContextMenu/SortItemsConfig";
 
 export class FiberTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -45,14 +46,31 @@ export class FiberTrackConfig extends TrackConfig {
      * @return {Feature[]} bed records in the form of Feature
      */
     formatData(data: BedRecord[]) {
-        return data.map((record) =>
-            new Fiber(
-                // "." is a placeholder that means "undefined" in the bed file.
-                undefined,
-                new ChromosomeInterval(record.chr, record.start, record.end),
-                ""
-            ).withOnsOffs(record[3], record[4])
-        );
+        return data.map((record) => {
+            if (record.n === 5) {
+                return new Fiber(
+                    // "." is a placeholder that means "undefined" in the bed file.
+                    undefined,
+                    new ChromosomeInterval(record.chr, record.start, record.end),
+                    ""
+                ).withFiber(undefined, record[3], record[4]);
+            }
+            if (record.n === 6) {
+                return new Fiber(undefined, new ChromosomeInterval(record.chr, record.start, record.end), "").withFiber(
+                    record[3],
+                    record[4],
+                    record[5]
+                );
+            }
+            if (record.n === 7) {
+                return new Fiber(record[3], new ChromosomeInterval(record.chr, record.start, record.end), "").withFiber(
+                    record[4],
+                    record[5],
+                    record[6]
+                );
+            }
+            return null;
+        });
     }
 
     getComponent() {
@@ -70,6 +88,7 @@ export class FiberTrackConfig extends TrackConfig {
             HiddenPixelsConfig,
             HeightConfig,
             YscaleConfig,
+            SortItemsConfig,
             HideMinimalItemsConfig,
         ];
         return items;

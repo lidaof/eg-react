@@ -54,6 +54,7 @@ import oviAri4 from "./oviAri4/oviAri4";
 import CHMV2 from "./t2t-chm13-v2.0/chm13v2";
 import GRCg7b from "./GRCg7b/GRCg7b";
 import GRCg7w from "./GRCg7w/GRCg7w";
+import phaw5 from "./phaw5/phaw5";
 
 /**
  * All available genomes.
@@ -115,6 +116,7 @@ export const allGenomes = [
     CHMV2,
     GRCg7b,
     GRCg7w,
+    phaw5,
 ];
 
 const genomeNameToConfig = {};
@@ -237,6 +239,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     "spotted Gar": {
         logoUrl: "https://vizhub.wustl.edu/public/lepOcu1/SpottedGar.png",
         assemblies: [LEPOCU1.genome.getName()],
+        color: "white",
+    },
+    "P. hawaiensis": {
+        logoUrl: "https://vizhub.wustl.edu/public/phaw5/phaw.png",
+        assemblies: [phaw5.genome.getName()],
         color: "white",
     },
     "fruit fly": {

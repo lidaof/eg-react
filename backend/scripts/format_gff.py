@@ -22,7 +22,7 @@ def main():
     fin = sys.argv[1]
     fout = '{}.refbed'.format(fin)
     try:
-        with open(fin,"rU") as infile:
+        with open(fin,"r") as infile:
             with open(fout,'w') as outfile:
                 for line in infile:
                     if line.startswith('#'): continue

@@ -87,6 +87,7 @@ class TabixSource extends WorkerRunnableSource {
             chr: columns[0],
             start: Number.parseInt(columns[1], 10),
             end: Number.parseInt(columns[2], 10),
+            n: columns.length, // number of columns in initial data row
         };
         for (let i = 3; i < columns.length; i++) {
             // Copy the rest of the columns to the feature
