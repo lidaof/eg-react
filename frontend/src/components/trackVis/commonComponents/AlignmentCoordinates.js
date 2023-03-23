@@ -45,13 +45,13 @@ class AlignmentSequence extends React.Component {
             const cusorTargetSeqLeft = record.targetSeq.substr(
                 start + relativeDisplayStart, relativeHighlightStart - relativeDisplayStart).toUpperCase();
             const cusorTargetSeqMid = record.targetSeq.substr(start + relativeHighlightStart, highlightLength).toUpperCase();
-            const cusorTargetSeqRight = record.targetSeq.substr(start + relativeHighlightEnd + 1, relativeDisplayEnd - relativeHighlightEnd).toUpperCase();
+            const cusorTargetSeqRight = record.targetSeq.substr(start + relativeHighlightStart + highlightLength, relativeDisplayEnd - relativeHighlightEnd).toUpperCase();
 
             const cusorQuerySeqLeft = record.querySeq.substr(
                 start + relativeDisplayStart, relativeHighlightStart - relativeDisplayStart).toUpperCase();
             const cusorQuerySeqMid = record.querySeq.substr(start + relativeHighlightStart, highlightLength).toUpperCase();
             const cusorQuerySeqRight = record.querySeq.substr(
-                start + relativeHighlightEnd + 1, relativeDisplayEnd - relativeHighlightEnd).toUpperCase();
+                start + relativeHighlightStart + highlightLength, relativeDisplayEnd - relativeHighlightEnd).toUpperCase();
 
             const targetBaseLookup = makeBaseNumberLookup(visiblePart.getTargetSequence(),visiblePart.relativeStart);
             const targetStart = record.locus.start + targetBaseLookup[relativeDisplayStart];
