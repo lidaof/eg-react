@@ -16,12 +16,12 @@ followint this example https://codepen.io/EightArmsHQ/pen/mvqJwg?editors=1100
     display: flex;
     flex-grow: 1;
     flex-wrap: wrap;
-    .element {
+    /* .element {
         min-width: 33%;
         max-width: 100%;
         flex-grow: 1;
         flex-basis: calc(var(--multiplier) * 999);
-    }
+    } */
 }
 
 .element {
