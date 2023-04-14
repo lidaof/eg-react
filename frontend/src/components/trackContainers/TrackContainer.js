@@ -35,6 +35,7 @@ import { GroupedTrackManager } from "components/trackManagers/GroupedTrackManage
 import { getTrackConfig } from "components/trackConfig/getTrackConfig";
 
 import "./TrackContainer.css";
+import { CircularProgress } from "@material-ui/core";
 
 // import { DEFAULT_OPTIONS as DYNAMIC_OPTIONS } from "components/trackVis/commonComponents/numerical/DynamicplotTrack";
 
@@ -772,8 +773,20 @@ class TrackContainer extends React.Component {
     render() {
         const { tracks, onTracksChanged, primaryView, viewRegion, basesPerPixel, trackData, highlights } = this.props;
         if (!primaryView) {
-            return <div>Loading...</div>;
+            return (
+                <div style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: 25,
+                    marginBottom: 25,
+                }}>
+                    <CircularProgress />
+                </div>
+            )
         }
+        
         const { selectedTool } = this.state;
         const fileInfos = {}; // key, track id, value: fileInfo obj
         tracks.forEach((tk) => {

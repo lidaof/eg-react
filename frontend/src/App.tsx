@@ -393,6 +393,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
     updateOtherPublicHubs = (tracks: any[]) => {
         const { genomeConfig } = this.props;
         const secondaryGenomes = getSecondaryGenomes(genomeConfig.genome.getName(), tracks);
+        
         const secondConfigs = secondaryGenomes.map((g) => getGenomeConfig(g));
         secondConfigs
             .filter((x) => x.publicHubList)

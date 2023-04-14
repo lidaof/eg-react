@@ -64,8 +64,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
                     trackConfig => trackConfig.shouldFetchBecauseRegionChange(trackConfig.getOptions())
                 );
             } else if (this.props.tracks !== prevProps.tracks) {
-                this.detectChangedTracks(prevProps.tracks); // Fetch some
-            } else if (this.props.viewAndAlignmentPromise !== prevProps.viewAndAlignmentPromise) {
+                this.detectChangedTracks(prevProps.tracks); // Fetch somewo
                 this.fetchAllTracks(trackConfig => trackConfig.isGenomeAlignTrack());
             }
         }

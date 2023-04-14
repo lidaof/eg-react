@@ -147,7 +147,7 @@ for (const config of allGenomes) {
         // We need this, because when saving session, we save the genome name.
         throw new Error(`Two genomes have the same name ${genomeName}.  Refusing to continue!`);
     }
-    genomeNameToConfig[genomeName] = config;
+    genomeNameToConfig[genomeName.toLowerCase()] = config;
 }
 
 interface PhasedSpeciesConfig {
@@ -339,7 +339,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
  * @return {GenomeConfig} the genome's configuration object, or null if no such genome exists.
  */
 export function getGenomeConfig(genomeName: string): GenomeConfig {
-    return genomeNameToConfig[genomeName] || null;
+    return genomeNameToConfig[genomeName.toLowerCase()] || null;
 }
 
 export function getSpeciesInfo(genomeName: string) {

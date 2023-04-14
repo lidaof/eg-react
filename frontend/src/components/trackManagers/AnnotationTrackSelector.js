@@ -9,7 +9,7 @@ import TreeView from './TreeView';
  * @param {Object} schemaNode - object from  
  * @param {string} nodeLabel - what to 
  */
-function convertAnnotationJsonSchema(schemaNode, nodeLabel) {
+export function convertAnnotationJsonSchema(schemaNode, nodeLabel) {
     if (!schemaNode) {
         return {
             isExpanded: false,
@@ -57,7 +57,8 @@ export class AnnotationTrackSelector extends React.Component {
 
     constructor(props) {
         super(props);
-        const {genome, annotationTracks} = props.genomeConfig;
+        const {genome, annotationTracks} = props.genomeConfig; 
+        
         this.data = convertAnnotationJsonSchema(annotationTracks, genome.getName());
         this.nodeToggled = this.nodeToggled.bind(this);
         this.renderLeaf = this.renderLeaf.bind(this);

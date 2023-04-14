@@ -26,6 +26,7 @@ import "./AppLayout.css";
 import { SnackbarProvider, } from "notistack";
 import { createTheme, CssBaseline, Grow, ThemeProvider, } from "@material-ui/core";
 import { SnackbarUtilsConfigurator } from "SnackbarEngine";
+import DialogProvider from "components/DialogProvider";
 
 /**
  * generate layout when VR is on, or g3d track submitted etc
@@ -494,10 +495,12 @@ class AppLayout extends React.PureComponent {
                     maxSnack={3}
                     preventDuplicate
                 >
-                    <SnackbarUtilsConfigurator />
-                    <div style={{ width: "100%", height: "100%" }} id="flex-container" data-theme={theme}>
-                        <FlexLayout.Layout model={model} factory={this.factory} />
-                    </div>
+                    <DialogProvider>
+                        <SnackbarUtilsConfigurator />
+                        <div style={{ width: "100%", height: "100%" }} id="flex-container" data-theme={theme}>
+                            <FlexLayout.Layout model={model} factory={this.factory} />
+                        </div>
+                    </DialogProvider>
                 </SnackbarProvider>
             </ThemeProvider>
         );

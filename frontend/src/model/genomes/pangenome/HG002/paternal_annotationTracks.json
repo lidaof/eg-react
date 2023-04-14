@@ -12,5 +12,14 @@
             "name": "lifted gencode v29",
             "url": "https://vizhub.wustl.edu/public/pangenome/HG002.paternal.refbed.gz"
         }
+    ],
+    "Genome Comparison": [
+        {
+            "name": "HG002-paternalalign",
+            "label": "Query HG002 maternal to paternal",
+            "querygenome": "HG002-maternal",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/pangenome/genomealign/hg002-p-m.genomealign.gz"
+        }
     ]
 }

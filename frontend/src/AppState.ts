@@ -196,6 +196,7 @@ enum ActionType {
     CREATE_NEW_CONTAINER = "CREATE_NEW_CONTAINER",
     SET_DARK_THEME = "SET_DARK_THEME",
     SET_EDIT_TARTGET = "SET_EDIT_TARGET",
+    SET_CONTAINER_GENOMES = "SET_CONTAINER_GENOMES",
 }
 
 interface AppAction {
@@ -490,6 +491,10 @@ export const ContainerActionsCreatorsFactory = (containerIdx: number) => {
             return { containerIdx, genomeIdx, newContainerIdx, type: ActionType.SET_GENOME_CONTAINER };
         },
 
+        setContainerGenomes: (newGenomes: GenomeState[]) => {
+            return { containerIdx, newGenomes, type: ActionType.SET_CONTAINER_GENOMES };
+        },
+
         /**
          * Edits the title for containers or genomes.
          * 
@@ -507,6 +512,7 @@ export const ContainerActionsCreatorsFactory = (containerIdx: number) => {
         createNewContainer(genomeIdx: number) {
             return { containerIdx, genomeIdx, type: ActionType.CREATE_NEW_CONTAINER };
         }
+
     };
 };
 
@@ -596,7 +602,8 @@ function getInitialState(): AppState {
 }
 
 function getNextState(prevState: AppState, action: AppAction): AppState {
-    console.log("🚀 ~ file: AppState.ts ~ line 619 ~ getNextState ~ action", action);
+    console.log(action);
+    
     if (!prevState) {
         return getInitialState();
     }
@@ -950,11 +957,29 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
                     if (idx === containerIdx) {
                         return {
                             ...c,
-                            genomes: c.genomes.filter((_g, idx) => idx !== - genomeIdx),
+                            genomes: c.genomes.filter((_g, idx) => idx !== genomeIdx),
                         };
                     }
                     return c;
                 }).filter(c => c.genomes.length)
+            }
+        }
+        case ActionType.SET_CONTAINER_GENOMES: {
+            const { containerIdx, newGenomes } = action;
+
+            return {
+                ...prevState,
+                containers: prevState.containers.map((c, idx) => {
+                    if (idx === containerIdx) {
+                        return {
+                            ...c,
+                            genomes: newGenomes
+                        }
+                    }
+
+                    return c;
+                }),
+                editTarget: [0, 0],
             }
         }
         case ActionType.SET_TITLE: {
