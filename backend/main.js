@@ -62,8 +62,6 @@ async function main(argv) {
         envConfig = API_CONFIG;
     } else if (environment === "digital") {
         const DIGITAL_CONFIG = {
-            dbUrl: "mongodb+srv://doadmin:72iY0w5EGas81A43@db-mongodb-nyc1-84416-2567ba51.mongo.ondigitalocean.com/genedata?authSource=admin&replicaSet=db-mongodb-nyc1-84416&tls=true",
-            // dbUrl: "mongodb+srv://dpuru:twlab2019@cluster1.e3dfn.mongodb.net/genedata",
             host: "localhost",
             port: 3001,
             routes: {
