@@ -10,12 +10,12 @@
 .tool-panel {
     display: flex;
     flex-wrap: wrap;
-    .tool-element {
+    /* .tool-element {
         min-width: 33%;
         max-width: 100%;
         flex-grow: 1;
         flex-basis: calc(var(--multiplier) * 999);
-    }
+    } */
 }
 
 #beamLeft {

@@ -1,5 +1,10 @@
 # Version History
 
+## 54.0.2
+
+-   Fix Chrome 112 Navbar nested css problem (by Shane)
+-   small changes to modbed base pair level visualization
+
 ## 54.0.1
 
 -   new genome for _Parhyale hawaiensis_ version 5 is added

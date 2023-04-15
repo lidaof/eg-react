@@ -54,9 +54,7 @@ class FiberAnnotation extends React.Component {
                 <div>
                     {onCount}/{total} ({`${(onPct * 100).toFixed(2)}%`})
                 </div>
-                <div>
-                    {feature.getName()} sortKey: {feature.sortKey}
-                </div>
+                <div>{feature.getName()}</div>
             </Tooltip>
         );
         this.props.onShowTooltip(tooltip);
