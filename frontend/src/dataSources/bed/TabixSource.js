@@ -39,14 +39,15 @@ class TabixSource extends WorkerRunnableSource {
     getData = async (loci, basesPerPixel, options) => {
         // let promises = loci.map(this.getDataForLocus);
         const promises = loci.map((locus) => {
-            let chrom = options.ensemblStyle ? locus.chr.replace("chr", "") : locus.chr;
+            // graph container uses this source directly w/o initial track, so options is null
+            let chrom = options && options.ensemblStyle ? locus.chr.replace("chr", "") : locus.chr;
             if (chrom === "M") {
                 chrom = "MT";
             }
             return this.getDataForLocus(chrom, locus.start, locus.end);
         });
         const dataForEachLocus = await Promise.all(promises);
-        if (options.ensemblStyle) {
+        if (options && options.ensemblStyle) {
             loci.forEach((locus, index) => {
                 dataForEachLocus[index].forEach((f) => (f.chr = locus.chr));
             });

@@ -1,18 +1,17 @@
-'use strict';
-const fs = require('fs');
-
-const mongoUtils = require('./mongoUtils');
-const setUpServer = require('./server').setUpServer;
+"use strict";
+const fs = require("fs");
+const mongoUtils = require("./mongoUtils");
+const setUpServer = require("./server").setUpServer;
 
 const ExitCodes = {
     UNKNOWN_ARGUMENT: 1,
     MONGO_ERROR: 2,
-    SERVER_SETUP_ERROR: 3
+    SERVER_SETUP_ERROR: 3,
 };
 
 /**
  * Main entry point.  Starts the server.
- * 
+ *
  * @param {string[]} argv - arguments
  */
 async function main(argv) {
@@ -26,46 +25,59 @@ async function main(argv) {
     let envConfig;
     if (environment === "dev") {
         const DEV_CONFIG = {
-            dbUrl: 'mongodb://localhost:27017',
-            host: 'localhost',
-            port: 3001
+            dbUrl: "mongodb://localhost:27017",
+            host: "localhost",
+            port: 3001,
         };
         envConfig = DEV_CONFIG;
     } else if (environment === "prod") {
         const tls = {
-            key: fs.readFileSync('/etc/letsencrypt/live/epigenome.tk/privkey.pem'),
-            cert: fs.readFileSync('/etc/letsencrypt/live/epigenome.tk/fullchain.pem')
-          };
-          const PROD_CONFIG = {
-              dbUrl: 'mongodb://localhost:27017',
-              host:'ec2-3-86-222-39.compute-1.amazonaws.com',
-              port: 443,
-              tls: tls
-          };          
-        envConfig = PROD_CONFIG
+            key: fs.readFileSync("/etc/letsencrypt/live/epigenome.tk/privkey.pem"),
+            cert: fs.readFileSync("/etc/letsencrypt/live/epigenome.tk/fullchain.pem"),
+        };
+        const PROD_CONFIG = {
+            dbUrl: "mongodb://localhost:27017",
+            host: "ec2-3-86-222-39.compute-1.amazonaws.com",
+            port: 443,
+            tls: tls,
+        };
+        envConfig = PROD_CONFIG;
     } else if (environment === "api") {
         const tls = {
-            key: fs.readFileSync('/etc/letsencrypt/live/api.epigenomegateway.org/privkey.pem'),
-            cert: fs.readFileSync('/etc/letsencrypt/live/api.epigenomegateway.org/fullchain.pem')
-          };
-            const API_CONFIG = {
-                dbUrl: 'mongodb://localhost:27017',
-              	host:'ec2-3-86-222-39.compute-1.amazonaws.com',
-                port: 443,
-                tls: tls,
-                routes: {
-                    cors: {
-                      origin: ['*'],
-                      additionalHeaders: ['token']
-                    }
-                }
-            };
+            key: fs.readFileSync("/etc/letsencrypt/live/api.epigenomegateway.org/privkey.pem"),
+            cert: fs.readFileSync("/etc/letsencrypt/live/api.epigenomegateway.org/fullchain.pem"),
+        };
+        const API_CONFIG = {
+            dbUrl: "mongodb://localhost:27017",
+            host: "ec2-3-86-222-39.compute-1.amazonaws.com",
+            port: 443,
+            tls: tls,
+            routes: {
+                cors: {
+                    origin: ["*"],
+                    additionalHeaders: ["token"],
+                },
+            },
+        };
         envConfig = API_CONFIG;
+    } else if (environment === "digital") {
+        const DIGITAL_CONFIG = {
+            dbUrl: "mongodb+srv://doadmin:72iY0w5EGas81A43@db-mongodb-nyc1-84416-2567ba51.mongo.ondigitalocean.com/genedata?authSource=admin&replicaSet=db-mongodb-nyc1-84416&tls=true",
+            // dbUrl: "mongodb+srv://dpuru:twlab2019@cluster1.e3dfn.mongodb.net/genedata",
+            host: "localhost",
+            port: 3001,
+            routes: {
+                cors: {
+                    origin: ["*"],
+                },
+            },
+        };
+        envConfig = DIGITAL_CONFIG;
     } else {
-        console.error(`Unknown environment "${environment}".  Enter either "dev" or "prod" or "api"`);
+        console.error(`Unknown environment "${environment}".  Enter either "dev" or "prod" or "api" or "digital"`);
         process.exit(ExitCodes.UNKNOWN_ARGUMENT);
     }
-    const {dbUrl, ...serverOptions} = envConfig;
+    const { dbUrl, ...serverOptions } = envConfig;
     console.log(`Starting server in ${environment.toUpperCase()} mode...`);
 
     // Connect to MongoDB
@@ -92,15 +104,16 @@ async function main(argv) {
     }
 
     // Set up callbacks after server has started
-    process.on('SIGINT', async function() {
-        console.log('Stopping server...');
+    process.on("SIGINT", async function () {
+        console.log("Stopping server...");
         await server.stop();
         process.exit(0);
     });
 
-    process.on('unhandledRejection', console.error);
+    process.on("unhandledRejection", console.error);
 }
 
-if (require.main === module) { // Called directly
-    main(process.argv)
+if (require.main === module) {
+    // Called directly
+    main(process.argv);
 } // else required as a module

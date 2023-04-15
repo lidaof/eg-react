@@ -194,7 +194,7 @@ class FiberAnnotation extends React.Component {
             );
         } else {
             // bp level
-            const mainBody = <rect x={startX} y={rowHeight * 0.5} width={width} height={2} fill="gray" opacity={0.5} />;
+            const mainBody = <rect x={startX} y={rowHeight * 0.5} width={width} height={1} fill="gray" opacity={0.5} />;
             const blocks = [];
             feature.ons.forEach((rbs, idx) => {
                 const bs = Math.abs(rbs);
@@ -203,7 +203,7 @@ class FiberAnnotation extends React.Component {
                     if (displayMode === FiberDisplayModes.AUTO) {
                         const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5 - 10);
                         const blockStart = startX + ((bs - relativeStart + 0.5) / segmentWidth) * width;
-                        const cy = rbs > 0 ? 0.25 * rowHeight : 0.75 * rowHeight;
+                        const cy = rbs > 0 ? 0.4 * rowHeight : 0.6 * rowHeight;
                         blocks.push(
                             <circle
                                 key={idx + "fg"}
@@ -246,7 +246,7 @@ class FiberAnnotation extends React.Component {
                         const fillColor = rbs > 0 ? color : color2;
                         const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5 - 10);
                         const blockStart = startX + ((bs - relativeStart + 0.5) / segmentWidth) * width;
-                        const cy = rbs > 0 ? 0.25 * rowHeight : 0.75 * rowHeight;
+                        const cy = rbs > 0 ? 0.4 * rowHeight : 0.6 * rowHeight;
                         blocks.push(
                             <circle
                                 key={idx + "bg"}
