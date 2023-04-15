@@ -47,13 +47,29 @@ export class FiberTrackConfig extends TrackConfig {
      */
     formatData(data: BedRecord[]) {
         return data.map((record) => {
-            if (record.n === 5) {
-                return new Fiber(
-                    // "." is a placeholder that means "undefined" in the bed file.
+            if (record.n === 4) {
+                return new Fiber(undefined, new ChromosomeInterval(record.chr, record.start, record.end), "").withFiber(
                     undefined,
-                    new ChromosomeInterval(record.chr, record.start, record.end),
-                    ""
-                ).withFiber(undefined, record[3], record[4]);
+                    record[3],
+                    undefined
+                );
+            }
+            if (record.n === 5) {
+                if (record[3].includes(",")) {
+                    // FIXME, use , to check if not read name
+                    return new Fiber(
+                        // "." is a placeholder that means "undefined" in the bed file.
+                        undefined,
+                        new ChromosomeInterval(record.chr, record.start, record.end),
+                        ""
+                    ).withFiber(undefined, record[3], record[4]);
+                } else {
+                    return new Fiber(
+                        record[3],
+                        new ChromosomeInterval(record.chr, record.start, record.end),
+                        ""
+                    ).withFiber(undefined, record[4], undefined);
+                }
             }
             if (record.n === 6) {
                 return new Fiber(undefined, new ChromosomeInterval(record.chr, record.start, record.end), "").withFiber(
