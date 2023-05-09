@@ -132,7 +132,8 @@ class FiberAnnotation extends React.Component {
             const scale = scaleLinear().domain([0, 1]).range([0, rowHeight]).clamp(true);
             const bgScale = scaleLinear().range([0.2, 0.9]).domain([0, maxValue]).clamp(true);
             xMap.forEach((x, idx) => {
-                if (x.on || x.off) {
+                // if (x.on || x.off) {
+                if (x.on) {
                     if (displayMode === FiberDisplayModes.AUTO) {
                         bars.push(
                             <rect
@@ -164,16 +165,18 @@ class FiberAnnotation extends React.Component {
                     } else {
                         // bar heatmap
                         const fillColor = pcts[idx] >= 0.5 ? color : color2;
-                        const opacity = pcts[idx] >= 0.5 ? 1 : 0.3;
+                        // const opacity = pcts[idx] >= 0.5 ? 1 : 0.3;
                         bars.push(
                             <rect
                                 key={idx + "fgrect"}
                                 x={startX + idx}
                                 y={0}
                                 height={rowHeight}
-                                width={barWidth}
+                                // width={barWidth}
+                                width={10}
                                 fill={fillColor}
-                                opacity={opacity}
+                                opacity={1}
+                                // opacity={opacity}
                                 onMouseEnter={(event) =>
                                     this.renderBarTooltip(event, feature, x.on, pcts[idx], totals[idx])
                                 }
@@ -199,7 +202,7 @@ class FiberAnnotation extends React.Component {
                 if (bs >= relativeStart && bs < relativeEnd) {
                     const fillColor = rbs > 0 ? color : color2;
                     if (displayMode === FiberDisplayModes.AUTO) {
-                        const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5 - 10);
+                        const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5);
                         const blockStart = startX + ((bs - relativeStart + 0.5) / segmentWidth) * width;
                         const cy = rbs > 0 ? 0.4 * rowHeight : 0.6 * rowHeight;
                         blocks.push(
@@ -242,7 +245,7 @@ class FiberAnnotation extends React.Component {
                 if (bs >= relativeStart && bs < relativeEnd) {
                     if (displayMode === FiberDisplayModes.AUTO) {
                         const fillColor = rbs > 0 ? color : color2;
-                        const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5 - 10);
+                        const radius = Math.min(Math.max(bpPixel * 0.5, 2), rowHeight * 0.5);
                         const blockStart = startX + ((bs - relativeStart + 0.5) / segmentWidth) * width;
                         const cy = rbs > 0 ? 0.4 * rowHeight : 0.6 * rowHeight;
                         blocks.push(
