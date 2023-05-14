@@ -31,7 +31,6 @@ class BigSourceWorkerGmod extends WorkerRunnableSource {
      * @override
      */
     async getData(loci, basesPerPixel, options) {
-        // console.log(options);
         const promises = loci.map((locus) => {
             let chrom = options.ensemblStyle ? locus.chr.replace("chr", "") : locus.chr;
             if (chrom === "M") {
@@ -44,7 +43,6 @@ class BigSourceWorkerGmod extends WorkerRunnableSource {
             dataForEachLocus[index].forEach((f) => (f.chr = locus.chr));
         });
         const combinedData = _.flatten(dataForEachLocus);
-        // console.log(combinedData);
         return combinedData;
     }
 }

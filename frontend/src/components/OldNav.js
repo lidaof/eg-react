@@ -24,7 +24,7 @@ import { ScreenshotUI } from "./ScreenshotUI";
 import { DynamicRecordUI } from "./DynamicRecordUI";
 import FacetTableUI from "./FacetTableUI";
 import { HotKeyInfo } from "./HotKeyInfo";
-import { INTERACTION_TYPES, ALIGNMENT_TYPES } from "./trackConfig/getTrackConfig";
+import { INTERACTION_TYPES, ALIGNMENT_TYPES, MOD_TYPES } from "./trackConfig/getTrackConfig";
 import { TrackUpload } from "./TrackUpload";
 import { FetchSequence } from "./FetchSequence";
 import packageJson from "../../package.json";
@@ -195,7 +195,7 @@ class Nav extends React.Component {
         } = this.props;
         const genomeName = genomeConfig.genome.getName();
         const { name, logo, color } = getSpeciesInfo(genomeName);
-        const expansionTypes = INTERACTION_TYPES.concat(ALIGNMENT_TYPES);
+        const expansionTypes = INTERACTION_TYPES.concat(ALIGNMENT_TYPES).concat(MOD_TYPES);
         const hasExpansionTrack = tracks.some((model) => expansionTypes.includes(model.type)) ? true : false;
         const REGION_EXPANDER = hasExpansionTrack ? REGION_EXPANDER1 : REGION_EXPANDER0;
         const { genomeModal } = this.state;

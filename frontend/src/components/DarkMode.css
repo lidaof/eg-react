@@ -99,10 +99,10 @@
 
 /* trackcontainer */
 
-[data-theme="light"] .btn-outline-secondary {
+/* [data-theme="light"] .btn-outline-secondary {
     color: #6c757d;
     border-color: #6c757d;
-}
+} */
 
 [data-theme="dark"] .btn-outline-secondary {
     color: #dfe4e8;

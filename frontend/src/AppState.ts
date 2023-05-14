@@ -568,12 +568,19 @@ function getInitialState(): AppState {
             newState = { ...tmpState, tracks: [track] };
         }
         if (query.position) {
+            // const interval = newState.viewRegion.getNavigationContext().parse(query.position as string);
             if (newState) {
                 const interval = newState.containers[0].viewRegion.getNavigationContext().parse(query.position as string);
                 newState = getNextState(newState as AppState, {
                     type: ActionType.SET_VIEW_REGION,
                     ...interval,
                 });
+                if (query.highlightPosition) {
+                    newState = getNextState(newState as AppState, {
+                        type: ActionType.SET_HIGHLIGHTS,
+                        highlights: [new HighlightInterval(interval.start, interval.end)],
+                    });
+                }
             }
         }
         if (query.virusBrowserMode) {
@@ -603,7 +610,7 @@ function getInitialState(): AppState {
 
 function getNextState(prevState: AppState, action: AppAction): AppState {
     console.log(action);
-    
+
     if (!prevState) {
         return getInitialState();
     }
@@ -1250,6 +1257,7 @@ async function asyncInitState() {
             }
         }
         if (query.hubSessionStorage) {
+            // reads data from both session storage and hubSessionStorage URL which is a josn hub, need check if genome changed or not
             const customTracksPool = await getTracksFromHubURL(mapUrl(query.hubSessionStorage as string));
             if (customTracksPool) {
                 const tracksInHub = customTracksPool.filter((track: any) => track.showOnHubLoad);

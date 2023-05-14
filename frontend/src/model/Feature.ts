@@ -1,7 +1,7 @@
 import ChromosomeInterval, { IChromosomeInterval } from "./interval/ChromosomeInterval";
 import NavigationContext from "./NavigationContext";
 
-type Strand = "+" | "-" | string;
+export type Strand = "+" | "-" | string;
 
 /**
  * The properties of Feature without the methods.
@@ -189,6 +189,28 @@ export class NumericalArrayFeature extends Feature {
      */
     withValues(values: readonly number[]): this {
         this.values = values.slice();
+        return this;
+    }
+}
+
+/**
+ * the feature for a fiber or molecular, with the on and off relative position from start.
+ *
+ * @author Daofeng Li
+ */
+export class Fiber extends Feature {
+    ons: number[];
+    offs: number[];
+
+    /**
+     * Sets values and returns this.
+     *
+     * @param {number[]} values - value to attach to this instance.
+     * @return {this}
+     */
+    withOnsOffs(onString: string, offString: string): this {
+        this.ons = onString ? JSON.parse("[" + onString + "]") : [];
+        this.offs = offString ? JSON.parse("[" + offString + "]") : [];
         return this;
     }
 }

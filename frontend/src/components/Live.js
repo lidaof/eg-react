@@ -1,19 +1,16 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
+import React from "react";
+import { connect } from "react-redux";
+import { compose } from "redux";
+import { firebaseConnect, isLoaded, isEmpty } from "react-redux-firebase";
 import { ActionCreators } from "../AppState";
 import { Link } from "react-router-dom";
 import { notify } from 'react-notify-toast';
-import { createTheme, ThemeProvider, CssBaseline, Grow, } from '@material-ui/core';
-import { SnackbarProvider, } from 'notistack';
-import { SnackbarUtilsConfigurator } from 'SnackbarEngine';
-import App from 'App';
+import App from "../App";
 import { AppStateSaver } from '../model/AppSaveLoad';
 
 class Live extends React.Component {
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps){
         const { liveId } = this.props.match.params;
         const { live, onSetRestore } = this.props;
         const genome = live[liveId].present.genomeName;
@@ -30,12 +27,12 @@ class Live extends React.Component {
             const cleanedObj = JSON.parse(JSON.stringify(nextObj));
             try {
                 await firebase.update(`live/${liveId}/`, {
-                    present: cleanedObj,
-                }
+                        present: cleanedObj,
+                    }
                 );
             } catch (error) {
                 console.error(error);
-                notify.show('Error sync to live', 'error', 2000);
+                notify.show("Error sync to live", "error", 2000);
             }
         }
     }
@@ -43,56 +40,33 @@ class Live extends React.Component {
     render() {
         const { liveId } = this.props.match.params;
         const { live } = this.props;
+        const theme = this.props.darkTheme ? "dark" : "light";
         if (!isLoaded(live)) {
             return <div>Loading...</div>;
         }
-        if (isEmpty(live) || isEmpty(live[liveId])) {
+        if ( isEmpty(live) || isEmpty(live[liveId])) {
             return <div>Live browser content is empty
-                <br />
-                <Link to="/">Go home</Link>
+                <br/>
+            <Link to="/">Go home</Link>
             </div>;
         }
-        return (
-            <ThemeProvider theme={createTheme({
-                palette: {
-                    type: "light",
-                }
-            })}>
-                <CssBaseline />
-                <SnackbarProvider
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    }}
-                    TransitionComponent={Grow}
-                    maxSnack={3}
-                    preventDuplicate
-                >
-                    <SnackbarUtilsConfigurator />
-                    <div style={{ width: "100%", height: "100%" }} id="flex-container" data-theme={"light"}>
-                        <App />
-                    </div>
-                </SnackbarProvider>
-            </ThemeProvider>
-        );
+        return <App />;
     }
-};
-
+}
 
 const mapStateToProps = (state, props) => {
     return {
         live: state.firebase.data.live,
         browser: state.browser,
+        darkTheme: state.browser.present.darkTheme,
     };
-}
+};
 
 const mapDispatchToProps = {
     onSetRestore: ActionCreators.setGenomeRestoreSession,
 };
 
 export default compose(
-    firebaseConnect(props => [
-        { path: `live/${props.match.params.liveId}` }
-    ]),
-    connect(mapStateToProps, mapDispatchToProps),
+    firebaseConnect((props) => [{ path: `live/${props.match.params.liveId}` }]),
+    connect(mapStateToProps, mapDispatchToProps)
 )(Live);

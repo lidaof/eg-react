@@ -87,7 +87,7 @@ class TrackLegend extends React.PureComponent<TrackLegendProps> {
                 if (axisDomain[0] > 1000) {
                     axis.tickValues(axisDomain).tickFormat(format(".3s"));
                 } else {
-                    axis.tickValues(axisDomain); //.tickFormat(format(".2s"));
+                    axis.tickValues(axisDomain); //.tickFormat(format("d"));
                 }
             }
             const dy0 = this.props.axisScaleReverse || this.props.noShiftFirstAxisLabel ? "0.32em" : "-0.1em";

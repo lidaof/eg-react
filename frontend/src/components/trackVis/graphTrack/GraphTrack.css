@@ -1,0 +1,42 @@
+.graph-links path {
+    stroke: gray;
+    marker-end: url("#arrow2");
+}
+
+.graph-links path:hover {
+    stroke: rgb(205, 50, 164);
+    opacity: 0.7;
+    stroke-width: 4px;
+    marker-end: url("#arrow");
+}
+
+svg #arrow {
+    fill: rgb(205, 50, 164);
+    opacity: 0.7;
+}
+
+svg #arrow2 {
+    fill: gray;
+    opacity: 0.7;
+}
+
+.type1-nodes {
+    fill: #ffcc00;
+}
+
+.type0-nodes {
+    fill: #009900;
+}
+
+.type2-nodes {
+    fill: #ff3399;
+}
+
+.type1-nodes rect:hover,
+.type0-nodes rect:hover,
+.type2-nodes rect:hover {
+    fill: blue;
+    opacity: 0.7;
+    stroke: #f51313;
+    stroke-width: 2px;
+}

@@ -40,6 +40,7 @@ class SnpSearchBox extends React.PureComponent {
         onRegionSelected: PropTypes.func.isRequired,
         handleCloseModal: PropTypes.func.isRequired,
         onNewHighlight: PropTypes.func,
+        doHighlight: PropTypes.bool,
     };
 
     constructor(props) {
@@ -96,7 +97,9 @@ class SnpSearchBox extends React.PureComponent {
         if (interval) {
             this.props.onRegionSelected(...interval);
             this.props.handleCloseModal();
-            this.props.onNewHighlight(interval.start, interval.end, inputValue.trim());
+            if (this.props.doHighlight) {
+                this.props.onNewHighlight(interval.start, interval.end, inputValue.trim());
+            }
         } else {
             notify.show("SNP not available in current region set view", "error", 2000);
         }

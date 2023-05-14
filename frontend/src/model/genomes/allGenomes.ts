@@ -66,6 +66,8 @@ import HG01978_paternal from './pangenome/HG01978/paternal';
 import HG03516_maternal from './pangenome/HG03516/maternal';
 import HG03516_paternal from './pangenome/HG03516/paternal';
 
+import GRCg7b from "./GRCg7b/GRCg7b";
+import GRCg7w from "./GRCg7w/GRCg7w";
 
 /**
  * All available genomes.
@@ -138,6 +140,8 @@ export const allGenomes = [
     HG01978_paternal,
     HG03516_maternal,
     HG03516_paternal,
+    GRCg7b,
+    GRCg7w,
 ];
 
 const genomeNameToConfig = {};
@@ -258,7 +262,12 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     chicken: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chicken.png",
-        assemblies: [GalGal6.genome.getName(), GalGal5.genome.getName()],
+        assemblies: [
+            GRCg7w.genome.getName(),
+            GRCg7b.genome.getName(),
+            GalGal6.genome.getName(),
+            GalGal5.genome.getName(),
+        ],
         color: "yellow",
     },
     frog: {

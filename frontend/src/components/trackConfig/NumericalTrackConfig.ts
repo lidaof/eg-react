@@ -4,7 +4,7 @@ import { NumericalDisplayModeConfig } from "../trackContextMenu/DisplayModeConfi
 import { PrimaryColorConfig, SecondaryColorConfig, BackgroundColorConfig } from "../trackContextMenu/ColorConfig";
 import HeightConfig from "../trackContextMenu/HeightConfig";
 import YscaleConfig from "../trackContextMenu/YscaleConfig";
-import { TrackModel } from "../../model/TrackModel";
+import { TrackModel, TrackOptions } from "../../model/TrackModel";
 import AggregateConfig from "../trackContextMenu/AggregateConfig";
 import SmoothConfig from "../trackContextMenu/SmoothConfig";
 import EnsemblStyleConfig from "components/trackContextMenu/EnsemblStyleConfig";
@@ -28,5 +28,12 @@ export class NumericalTrackConfig extends TrackConfig {
             BackgroundColorConfig,
             EnsemblStyleConfig,
         ];
+    }
+
+    /**
+     * @override
+     */
+    shouldFetchBecauseOptionChange(oldOptions: TrackOptions, newOptions: TrackOptions): boolean {
+        return oldOptions.ensemblStyle !== newOptions.ensemblStyle;
     }
 }

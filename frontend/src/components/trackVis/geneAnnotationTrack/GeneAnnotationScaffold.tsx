@@ -63,6 +63,7 @@ export class GeneAnnotationScaffold extends React.PureComponent<GeneAnnotationSc
                 width={xSpan.getLength()}
                 height={HEIGHT}
                 fill={isMinimal ? color : backgroundColor}
+                opacity={isMinimal ? 1 : 0}
             />
         );
 

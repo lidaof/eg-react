@@ -9,6 +9,12 @@ export const AnnotationDisplayModes = {
     DENSITY: "density",
 };
 
+export const GraphDisplayModes = {
+    FULL: "full",
+    DENSITY: "density",
+    HENGLI: "hengli",
+};
+
 export enum InteractionDisplayMode {
     HEATMAP = "heatmap",
     ARC = "arc",
@@ -45,3 +51,8 @@ export const VcfDisplayModes = {
     DENSITY: "density",
     FULL: "full",
 };
+
+export enum FiberDisplayModes {
+    AUTO = "auto",
+    HEATMAP = "heatmap",
+}

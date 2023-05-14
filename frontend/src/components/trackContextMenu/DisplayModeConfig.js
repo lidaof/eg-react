@@ -8,6 +8,8 @@ import {
     BigWigZoomLevels,
     VcfColorScaleKeys,
     VcfDisplayModes,
+    GraphDisplayModes,
+    FiberDisplayModes,
 } from "../../model/DisplayModes";
 
 /**
@@ -102,6 +104,30 @@ export function VcfDisplayModeConfig(props) {
             label="Display mode:"
             defaultValue={VcfDisplayModes.AUTO}
             choices={VcfDisplayModes}
+        />
+    );
+}
+
+export function GraphDisplayModeConfig(props) {
+    return (
+        <SelectConfig
+            {...props}
+            optionName="displayMode"
+            label="Display mode:"
+            defaultValue={GraphDisplayModes.FULL}
+            choices={GraphDisplayModes}
+        />
+    );
+}
+
+export function FiberDisplayModeConfig(props) {
+    return (
+        <SelectConfig
+            {...props}
+            optionName="displayMode"
+            label="Display mode:"
+            defaultValue={FiberDisplayModes.AUTO}
+            choices={FiberDisplayModes}
         />
     );
 }

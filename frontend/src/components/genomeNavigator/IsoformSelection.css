@@ -42,3 +42,7 @@
     background-color: #fdbb84;
     cursor: pointer;
 }
+
+.IsoformSelection-empty-msg {
+    background-color: #a4ae86 !important;
+}

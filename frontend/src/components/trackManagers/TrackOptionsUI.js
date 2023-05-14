@@ -68,7 +68,7 @@ export class TrackOptionsUI extends React.Component {
                     className="w-100 p-3"
                     value={this.state.value}
                     onChange={this.handleChangeSimple}
-                    rows={10}
+                    rows={2}
                 ></textarea>
             </div>
         );

@@ -21,6 +21,7 @@ import {
     ensureLayoutHeader,
 } from "./layoutUtils";
 import OmeroContainer from "components/trackVis/imageTrack/OmeroContainer";
+import GraphContainer from "components/trackVis/graphTrack/GraphContainer";
 
 import "./AppLayout.css";
 import { SnackbarProvider, } from "notistack";
@@ -154,6 +155,29 @@ class AppLayout extends React.PureComponent {
                                     tabId,
                                     trackId: track.getId(),
                                     location,
+                                },
+                            },
+                        ],
+                    };
+                    layout = addTabSetToLayout(addLayout, layout);
+                });
+                this.props.onSetLayout(layout);
+            }
+            if (ggtracks.length) {
+                ggtracks.forEach((tk) => {
+                    const tabId = shortid.generate();
+                    const addLayout = {
+                        type: "tabset",
+                        children: [
+                            {
+                                type: "tab",
+                                name: tk.getDisplayLabel(),
+                                component: "graph",
+                                id: tabId,
+                                config: {
+                                    trackModel: tk.serialize(),
+                                    tabId,
+                                    trackId: tk.getId(),
                                 },
                             },
                         ],
@@ -459,6 +483,35 @@ class AppLayout extends React.PureComponent {
         );
     };
 
+    renderGraphContainer = (node) => {
+        //gg short for global graph
+        const model = node.getModel();
+        const { viewRegion, genomeConfig, onNewViewRegion, darkTheme } = this.props;
+        const config = node.getConfig();
+        const { x, y, width, height } = node.getRect();
+        const ggtrack = TrackModel.deserialize(config.trackModel);
+        ggtrack.id = config.trackId;
+        node.setEventListener("close", () => {
+            this.removeTrackById(config.trackId);
+            const layout = deleteTabByIdFromModel(model, config.tabId);
+            this.props.onSetLayout(layout);
+        });
+        return (
+            <GraphContainer
+                viewRegion={viewRegion}
+                ggtrack={ggtrack}
+                expansionAmount={REGION_EXPANDER0}
+                genomeConfig={genomeConfig}
+                width={width}
+                height={height}
+                x={x}
+                y={y}
+                onNewViewRegion={onNewViewRegion}
+                darkTheme={darkTheme}
+            />
+        );
+    };
+
     factory = (node) => {
         const layoutComponent = node.getComponent();
         node.setEventListener("resize", () => this.handleNodeResize(node));
@@ -467,6 +520,7 @@ class AppLayout extends React.PureComponent {
             vr: (node) => this.renderVRscene(node),
             g3d: (node) => this.render3dmolContainer(node),
             omero: (node) => this.renderOmeroContainer(node),
+            graph: (node) => this.renderGraphContainer(node),
         };
         return layoutFuncs[layoutComponent](node);
     };
