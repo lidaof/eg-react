@@ -4,6 +4,11 @@ import {
 import React, { useState } from "react";
 import SnackbarEngine from "../../SnackbarEngine";
 
+/**
+ * A component that allows inline editing of text.
+ * @author Shane Liu
+ */
+
 interface InlineEditableProps {
     value: string;
     onChange: (value: string) => void;

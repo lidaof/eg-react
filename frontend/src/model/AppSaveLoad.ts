@@ -2,7 +2,7 @@ import TrackModel from "./TrackModel";
 import RegionSet from "./RegionSet";
 import DisplayedRegionModel from "./DisplayedRegionModel";
 import { getGenomeConfig } from "./genomes/allGenomes";
-import { AppState, SyncedContainer, DEFAULT_TRACK_LEGEND_WIDTH, GenomeState, G3DTrackInfo } from "../AppState";
+import { AppState, SyncedContainer, DEFAULT_TRACK_LEGEND_WIDTH, GenomeState, SpecialTrackInfo } from "../AppState";
 import OpenInterval from "./interval/OpenInterval";
 // import { withFirebase } from 'react-redux-firebase'
 
@@ -63,7 +63,7 @@ export class AppStateSaver {
                     highlights: container.highlights,
                 }
             }),
-            g3dTracks: appState.g3dTracks && appState.g3dTracks.map((t: G3DTrackInfo): G3DTrackInfo => {
+            g3dTracks: appState.specialTracks && appState.specialTracks.map((t: SpecialTrackInfo): SpecialTrackInfo => {
                 return {
                     track: t.track.serialize(),
                     location: t.location,
@@ -108,7 +108,7 @@ export class AppStateLoader {
                 layout: object.layout || {},
                 darkTheme: object.darkTheme || false,
                 editTarget: [0, 0],
-                g3dTracks: [],
+                specialTracks: [],
                 containers: [{
                     title: object.genomeName,
                     viewRegion: this._restoreViewRegion(object, regionSetView),
@@ -156,7 +156,7 @@ export class AppStateLoader {
                     highlights: container.highlights,
                 }
             }),
-            g3dTracks: object.g3dTracks && object.g3dTracks.map((t: G3DTrackInfo): G3DTrackInfo => {
+            specialTracks: object.specialTracks && object.specialTracks.map((t: SpecialTrackInfo): SpecialTrackInfo => {
                 return {
                     track: TrackModel.deserialize(t.track),
                     location: t.location,

@@ -1,17 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { create } from "d3";
-import { scaleSequential } from "d3-scale";
-import { extent } from "d3-array";
-import { drag } from 'd3-drag';
-import { zoom } from 'd3-zoom';
-import { interpolateViridis } from "d3-scale-chromatic"
-import { forceManyBody, forceX, forceY, forceSimulation, forceLink } from "d3-force";
+// import { create } from "d3";
+// import { scaleSequential } from "d3-scale";
+// import { extent } from "d3-array";
+// import { drag } from 'd3-drag';
+// import { zoom } from 'd3-zoom';
+// import { interpolateViridis } from "d3-scale-chromatic"
+// import { forceManyBody, forceX, forceY, forceSimulation, forceLink } from "d3-force";
 import TrackModel from "model/TrackModel";
 import DisplayedRegionModel from "model/DisplayedRegionModel";
 import TabixSource from "dataSources/bed/TabixSource";
 import ChromosomeInterval from "model/interval/ChromosomeInterval";
 import { NodeContextMenu } from './NodeContextMenu';
+// changed to require statements instead because of problems with installing @types/d3
+const { create } = require('d3');
+const { scaleSequential } = require('d3-scale');
+const { extent } = require('d3-array');
+const { drag } = require('d3-drag');
+const { zoom } = require('d3-zoom');
+const { interpolateViridis } = require('d3-scale-chromatic');
+const { forceManyBody, forceX, forceY, forceSimulation, forceLink } = require('d3-force');
 
 interface GraphContainerProps {
     width: number;
@@ -121,7 +129,7 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
         const color = scaleSequential().domain(extent(ranks))
             .interpolator(interpolateViridis)
         const simulation = forceSimulation(nodes)
-            .force("link", forceLink(links).id(d => (d as any).id))
+            .force("link", forceLink(links).id((d: any) => d.id))
             .force("charge", forceManyBody().strength(-400))
             .force("x", forceX())
             .force("y", forceY());
@@ -134,7 +142,7 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
         svg.append("defs").selectAll("marker")
             .data(ranks)
             .join("marker")
-            .attr("id", d => `arrow-${d}`)
+            .attr("id", (d:any) => `arrow-${d}`)
             .attr("viewBox", "0 -5 10 10")
             .attr("refX", 15)
             .attr("refY", -0.5)
@@ -151,7 +159,7 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
             .selectAll("path")
             .data(links)
             .join("path")
-            .attr("stroke", d => color((d as any).rank))
+            .attr("stroke", (d:any) => color((d as any).rank))
             .attr("marker-end", (d: any) => `url(${`#arrow-${d.rank}`})`);
 
         const node = svg.append("g")
@@ -175,7 +183,7 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
         node.append("text")
             .attr("x", 8)
             .attr("y", "0.31em")
-            .text(d => (d as any).id)
+            .text((d:any) => (d as any).id)
             .clone(true).lower()
             .attr("fill", "none")
             .attr("stroke", "white")
@@ -188,7 +196,7 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
 
         const zoomed = zoom()
             .scaleExtent([0.25, 4])
-            .on("zoom", function (event) {
+            .on("zoom", function (event:any) {
                 svg.selectAll("g").attr("transform", event.transform);
                 simulation.restart();
             });

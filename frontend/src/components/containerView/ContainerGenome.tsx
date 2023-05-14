@@ -6,7 +6,7 @@ import {
 
 import TrackRegionController from './genomeNavigator/TrackRegionController';
 import StateSyncSettings from './StateSyncSettings';
-import { GenomeState, SyncedContainer } from 'AppState';
+import { GenomeState, SyncedContainer, specialTrackTypes } from 'AppState';
 import DisplayedRegionModel from 'model/DisplayedRegionModel';
 import TrackContainer from '../trackContainers/TrackContainer';
 import { HighlightInterval } from 'components/trackContainers/HighlightMenu';
@@ -14,6 +14,11 @@ import TrackModel from 'model/TrackModel';
 import { RegionExpander } from 'model/RegionExpander';
 import { ProvidedControls } from './ContainerTools';
 import { Tools } from 'components/trackContainers/Tools';
+
+/**
+ * Render a single genome inside a container.
+ * @author Shane Liu
+ */
 
 const REGION_EXPANDER = new RegionExpander(1);
 
@@ -125,7 +130,7 @@ function ContainerGenome(props: ContainerGenomeProps) {
                 expansionAmount={REGION_EXPANDER}
                 suggestedMetaSets={suggestedMetaSets}
                 genomeConfig={genomeConfig}
-                tracks={g.tracks.filter(tk => tk.type !== "g3d")}
+                tracks={g.tracks.filter(tk => !specialTrackTypes.has(tk.type))}
                 onSetAnchors3d={onSetAnchors3d}
                 onSetGeneFor3d={onSetGeneFor3d}
                 viewer3dNumFrames={viewer3dNumFrames}

@@ -72,6 +72,8 @@ export function getBgColor(isDark: boolean) {
     return isDark ? DARK_BG_COLOR : LIGHT_BG_COLOR;
 }
 
+export const specialTrackTypes = new Set(["g3d", "graph"]);
+
 export interface AppState {
     containers: SyncedContainer[];
 
@@ -85,7 +87,7 @@ export interface AppState {
     layout?: object;
     darkTheme?: boolean;
     editTarget: [number, number] // [containerIdx, genomeIdx];
-    g3dTracks: G3DTrackInfo[];
+    specialTracks: SpecialTrackInfo[];
 }
 
 // state for a single genome.
@@ -120,7 +122,7 @@ export interface SyncedContainer {
     metadataTerms: string[];
 }
 
-export interface G3DTrackInfo {
+export interface SpecialTrackInfo {
     track: TrackModel;
     location: [number, number] // [containerIdx, genomeIdx]
 }
@@ -164,7 +166,7 @@ const initialState: AppState = {
     layout: {},
     darkTheme: prefersDark,
     editTarget: [0, 0], // [containerIdx, genomeIdx];
-    g3dTracks: []
+    specialTracks: [],
 };
 
 enum ActionType {
@@ -518,7 +520,7 @@ export const ContainerActionsCreatorsFactory = (containerIdx: number) => {
 
 function getInitialState(): AppState {
     let state = initialState;
-
+    
     const { query } = querySting.parseUrl(window.location.href);
     let newState;
     if (!_.isEmpty(query)) {
@@ -755,7 +757,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             }
             return {
                 ...prevState,
-                g3dTracks: [...prevState.g3dTracks, ...tracks.filter((t: TrackModel) => t.type === "g3d").map((t: TrackModel) => {
+                specialTracks: [...prevState.specialTracks, ...tracks.filter((t: TrackModel) => specialTrackTypes.has(t.type)).map((t: TrackModel) => {
                     return {
                         track: t,
                         location: [cidx, gidx],
@@ -926,7 +928,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
         case ActionType.SET_GENOME_SETTINGS: { // TODO: don't allow a genome to be moved if it has a 3d genome linked to it
             const { settings, containerIdx, genomeIdx } = action;
 
-            if (prevState.g3dTracks.some(({ location: [cidx, gidx] }) => {
+            if (prevState.specialTracks.some(({ location: [cidx, gidx] }) => {
                 return cidx === containerIdx && gidx === genomeIdx;
             })) {
                 SnackbarEngine.error("You can't move a genome which is linked to a 3d genome!");

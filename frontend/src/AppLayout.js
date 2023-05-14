@@ -60,7 +60,7 @@ function mapStateToProps(state) {
         highlights: editingGenome.highlights || appState.highlights,
 
         containers: appState.containers,
-        g3dTracks: appState.g3dTracks,
+        specialTracks: appState.specialTracks || [],
         editTarget: appState.editTarget,
         isShowingVR: state.browser.present.isShowingVR,
         layout: state.browser.present.layout,
@@ -129,11 +129,17 @@ class AppLayout extends React.PureComponent {
                 this.props.onSetLayout(layout);
             }
         }
-        if (prevProps.g3dTracks !== this.props.g3dTracks) {
-            const prevG3dtracks = prevProps.g3dTracks;
+        if (prevProps.specialTracks !== this.props.specialTracks) {
+            const prevG3dtracks = prevProps.specialTracks.filter((tk) => tk.type === "g3d");
             const prevIds = prevG3dtracks ? prevG3dtracks.map((tk) => tk.track.getId()) : [];
-            const currentG3dtracks = this.props.g3dTracks;
+            const currentG3dtracks = this.props.specialTracks.filter((tk) => tk.type === "g3d");
             const g3dtracks = currentG3dtracks.filter((tk) => !prevIds.includes(tk.track.getId()));
+
+            const prevGgtracks = prevProps.specialTracks.filter((t) => t.type === "graph");
+            const prevgIds = prevGgtracks.map((tk) => tk.getId());
+            const currentGgtracks = this.props.specialTracks.filter((t) => t.type === "graph");
+            const ggtracks = currentGgtracks.filter((tk) => !prevgIds.includes(tk.getId()));
+
             let layout = { ...this.props.layout };
             if (g3dtracks.length) {
                 this.setState((prevState) => {

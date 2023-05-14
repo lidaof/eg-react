@@ -20,6 +20,11 @@ import { SyncDisabled, Sync } from '@material-ui/icons';
 import { showConfirmationDialog, showDialog } from 'components/DialogProvider';
 import SnackbarEngine from 'SnackbarEngine';
 
+/**
+ * Render a single genome container, which can contain multiple genomes.
+ * @author Shane Liu
+ */
+
 interface StateContainerProps {
     stateIdx: number;
     cdata: SyncedContainer;

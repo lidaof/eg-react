@@ -40,7 +40,6 @@ class Live extends React.Component {
     render() {
         const { liveId } = this.props.match.params;
         const { live } = this.props;
-        const theme = this.props.darkTheme ? "dark" : "light";
         if (!isLoaded(live)) {
             return <div>Loading...</div>;
         }
