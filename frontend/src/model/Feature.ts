@@ -1,6 +1,5 @@
 import ChromosomeInterval, { IChromosomeInterval } from "./interval/ChromosomeInterval";
 import NavigationContext from "./NavigationContext";
-import { parseNumberString } from "../util";
 
 export type Strand = "+" | "-" | string;
 
@@ -24,7 +23,7 @@ export const REVERSE_STRAND_CHAR = "-";
  */
 export class Feature {
     name: string; // - name of the feature
-    sortKey: any;
+    score?: any;
     /**
      * Makes a new instance with specified name and locus.  Empty names are valid.  If given `undefined` or `null`, it
      * defaults to the locus as a string.
@@ -210,10 +209,10 @@ export class Fiber extends Feature {
      * @param {number[]} values - value to attach to this instance.
      * @return {this}
      */
-    withFiber(sortKey: string, onString: string, offString: string): this {
-        this.ons = onString ? JSON.parse("[" + onString + "]") : [];
-        this.offs = offString ? JSON.parse("[" + offString + "]") : [];
-        this.sortKey = sortKey === undefined ? this.name : parseNumberString(sortKey);
+    withFiber(score: number | string, onString: string, offString: string): this {
+        this.ons = onString !== "." ? JSON.parse("[" + onString + "]") : [];
+        this.offs = offString !== "." ? JSON.parse("[" + offString + "]") : [];
+        this.score = score;
         return this;
     }
 }

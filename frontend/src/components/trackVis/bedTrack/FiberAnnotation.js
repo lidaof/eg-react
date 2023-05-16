@@ -5,6 +5,7 @@ import _ from "lodash";
 import { TranslatableG } from "../../TranslatableG";
 import Tooltip from "../commonComponents/tooltip/Tooltip";
 import { FiberDisplayModes } from "model/DisplayModes";
+import AnnotationArrows from "../commonComponents/annotation/AnnotationArrows";
 
 const DOT_BP_PIXEL_CUTOFF = 2.5;
 
@@ -196,6 +197,18 @@ class FiberAnnotation extends React.Component {
         } else {
             // bp level
             const mainBody = <rect x={startX} y={rowHeight * 0.5} width={width} height={1} fill="gray" opacity={0.5} />;
+            const arrows = feature.strand !== "." && (
+                <AnnotationArrows
+                    startX={xSpan.start}
+                    endX={xSpan.end}
+                    y={rowHeight * 0.25}
+                    height={rowHeight * 0.5}
+                    opacity={0.75}
+                    isToRight={feature.strand !== "-"}
+                    color="grey"
+                    separation={200}
+                />
+            );
             const blocks = [];
             feature.ons.forEach((rbs, idx) => {
                 const bs = Math.abs(rbs);
@@ -288,6 +301,7 @@ class FiberAnnotation extends React.Component {
             return (
                 <TranslatableG y={y}>
                     {mainBody}
+                    {arrows}
                     {blocks}
                 </TranslatableG>
             );

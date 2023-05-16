@@ -38,9 +38,9 @@ export class FeatureArranger {
         if (sortItems === SortItemsOptions.NONE) {
             groups.sort((a, b) => a.xSpan.start - b.xSpan.start);
         } else if (sortItems === SortItemsOptions.ASC) {
-            groups.sort((a, b) => a.feature.sortKey - b.feature.sortKey);
+            groups.sort((a, b) => a.feature.score - b.feature.score);
         } else if (sortItems === SortItemsOptions.DESC) {
-            groups.sort((a, b) => b.feature.sortKey - a.feature.sortKey);
+            groups.sort((a, b) => b.feature.score - a.feature.score);
         }
         const maxXsForRows: number[] = [];
         const isConstPadding = typeof padding === "number";
