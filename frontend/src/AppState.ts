@@ -757,7 +757,7 @@ function getNextState(prevState: AppState, action: AppAction): AppState {
             }
             return {
                 ...prevState,
-                specialTracks: [...prevState.specialTracks, ...tracks.filter((t: TrackModel) => specialTrackTypes.has(t.type)).map((t: TrackModel) => {
+                specialTracks: [...(prevState.specialTracks || []), ...tracks.filter((t: TrackModel) => specialTrackTypes.has(t.type)).map((t: TrackModel) => {
                     return {
                         track: t,
                         location: [cidx, gidx],

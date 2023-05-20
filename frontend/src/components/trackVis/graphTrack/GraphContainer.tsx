@@ -1,25 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
-// import { create } from "d3";
-// import { scaleSequential } from "d3-scale";
-// import { extent } from "d3-array";
-// import { drag } from 'd3-drag';
-// import { zoom } from 'd3-zoom';
-// import { interpolateViridis } from "d3-scale-chromatic"
-// import { forceManyBody, forceX, forceY, forceSimulation, forceLink } from "d3-force";
+import { create } from "d3";
+import { scaleSequential } from "d3-scale";
+import { extent } from "d3-array";
+import { drag } from 'd3-drag';
+import { zoom } from 'd3-zoom';
+import { interpolateViridis } from "d3-scale-chromatic"
+import { forceManyBody, forceX, forceY, forceSimulation, forceLink } from "d3-force";
 import TrackModel from "model/TrackModel";
 import DisplayedRegionModel from "model/DisplayedRegionModel";
 import TabixSource from "dataSources/bed/TabixSource";
 import ChromosomeInterval from "model/interval/ChromosomeInterval";
 import { NodeContextMenu } from './NodeContextMenu';
 // changed to require statements instead because of problems with installing @types/d3
-const { create } = require('d3');
-const { scaleSequential } = require('d3-scale');
-const { extent } = require('d3-array');
-const { drag } = require('d3-drag');
-const { zoom } = require('d3-zoom');
-const { interpolateViridis } = require('d3-scale-chromatic');
-const { forceManyBody, forceX, forceY, forceSimulation, forceLink } = require('d3-force');
+// const { create } = require('d3');
+// const { scaleSequential } = require('d3-scale');
+// const { extent } = require('d3-array');
+// const { drag } = require('d3-drag');
+// const { zoom } = require('d3-zoom');
+// const { interpolateViridis } = require('d3-scale-chromatic');
+// const { forceManyBody, forceX, forceY, forceSimulation, forceLink } = require('d3-force');
 
 interface GraphContainerProps {
     width: number;

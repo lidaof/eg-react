@@ -3,7 +3,7 @@ import FlexLayout from "flexlayout-react";
 import shortid from "shortid";
 import { connect } from "react-redux";
 import _ from "lodash";
-import { ActionCreators } from "./AppState";
+import { ActionCreators, } from "./AppState";
 import App from "./App";
 // import G3dContainer from "components/trackVis/3d/G3dContainer";
 // import MolstarContainer from "components/trackVis/3d/MolstarContainer";
@@ -130,15 +130,15 @@ class AppLayout extends React.PureComponent {
             }
         }
         if (prevProps.specialTracks !== this.props.specialTracks) {
-            const prevG3dtracks = prevProps.specialTracks.filter((tk) => tk.type === "g3d");
+            const prevG3dtracks = prevProps.specialTracks.filter((tk) => tk.track.type === "g3d");
             const prevIds = prevG3dtracks ? prevG3dtracks.map((tk) => tk.track.getId()) : [];
-            const currentG3dtracks = this.props.specialTracks.filter((tk) => tk.type === "g3d");
+            const currentG3dtracks = this.props.specialTracks.filter((tk) => tk.track.type === "g3d");
             const g3dtracks = currentG3dtracks.filter((tk) => !prevIds.includes(tk.track.getId()));
 
-            const prevGgtracks = prevProps.specialTracks.filter((t) => t.type === "graph");
-            const prevgIds = prevGgtracks.map((tk) => tk.getId());
-            const currentGgtracks = this.props.specialTracks.filter((t) => t.type === "graph");
-            const ggtracks = currentGgtracks.filter((tk) => !prevgIds.includes(tk.getId()));
+            const prevGgtracks = prevProps.specialTracks.filter((t) => t.track.type === "graph");
+            const prevgIds = prevGgtracks.map((tk) => tk.track.getId());
+            const currentGgtracks = this.props.specialTracks.filter((t) => t.track.type === "graph");
+            const ggtracks = currentGgtracks.filter((tk) => !prevgIds.includes(tk.track.getId()));
 
             let layout = { ...this.props.layout };
             if (g3dtracks.length) {
@@ -170,7 +170,8 @@ class AppLayout extends React.PureComponent {
                 this.props.onSetLayout(layout);
             }
             if (ggtracks.length) {
-                ggtracks.forEach((tk) => {
+                ggtracks.forEach((tinfo) => {
+                    const { track: tk, location } = tinfo;
                     const tabId = shortid.generate();
                     const addLayout = {
                         type: "tabset",
@@ -184,6 +185,7 @@ class AppLayout extends React.PureComponent {
                                     trackModel: tk.serialize(),
                                     tabId,
                                     trackId: tk.getId(),
+                                    location,
                                 },
                             },
                         ],
