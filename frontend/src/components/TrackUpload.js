@@ -187,6 +187,7 @@ export class TrackUpload extends React.Component {
                         <optgroup label="select both the track file and index file (only select 1 pair)">
                             <option value="bedGraph">bedGraph - {TYPES_DESC.bedGraph}</option>
                             <option value="methylC">methylC - {TYPES_DESC.methylC}</option>
+                            <option value="modbed">modbed - {TYPES_DESC.modbed}</option>
                             <option value="categorical">categorical - {TYPES_DESC.categorical}</option>
                             <option value="bed">bed - {TYPES_DESC.bed}</option>
                             <option value="vcf">vcf - {TYPES_DESC.vcf}</option>
