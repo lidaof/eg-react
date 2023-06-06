@@ -206,7 +206,7 @@ class FiberAnnotation extends React.Component {
                     opacity={0.75}
                     isToRight={feature.strand !== "-"}
                     color="grey"
-                    separation={200}
+                    separation={100}
                 />
             );
             const blocks = [];
