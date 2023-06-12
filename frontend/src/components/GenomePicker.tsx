@@ -61,6 +61,7 @@ function TabPanel(props: TabPanelProps) {
             style={{ overflow: "hidden" }}
             {...other}
         >
+            {/* @ts-ignore */}
             {value === index && <Box>{children}</Box>}
         </div>
     );

@@ -101,8 +101,11 @@ function TrackRegionController(props: TrackRegionControllerProps) {
                                 <>
                                     <Typography variant="body1">SNP Search</Typography>
                                     <SnpSearchBox
+                                        // @ts-ignore
                                         navContext={viewRegion.getNavigationContext()}
+                                        // @ts-ignore
                                         onRegionSelected={onRegionSelected}
+                                        // @ts-ignore
                                         handleCloseModal={handleClose}
                                     />
                                 </>

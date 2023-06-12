@@ -90,5 +90,5 @@ const callbacks = {
     onSetRestore: ActionCreators.setGenomeRestoreSession,
 };
 
-
+// @ts-ignore
 export default connect(mapStateToProps, callbacks)(EmbeddedContainer);

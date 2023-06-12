@@ -82,22 +82,24 @@ class Tooltip extends React.PureComponent {
          * DOM will still get mouse events.  Stopping propagation stops several undesirable behaviors related to
          * dragging.
          */
-        return ReactDOM.createPortal(
-            <Manager>
-                <Target style={{ position: "absolute", left: pageX, top: pageY }} />
-                <Popper
-                    placement="bottom-start"
-                    modifiers={{ flip: { enabled: false } }}
-                    className="Tooltip"
-                    style={contentStyle}
-                    onMouseDown={stopEvent}
-                >
-                    <OutsideClickDetector onOutsideClick={onClose}>{children}</OutsideClickDetector>
-                    {!this.props.hideArrow && <Arrow style={ARROW_STYLE} />}
-                </Popper>
-            </Manager>,
-            document.body
-        );
+        return <>
+            {ReactDOM.createPortal(
+                <Manager>
+                    <Target style={{ position: "absolute", left: pageX, top: pageY }} />
+                    <Popper
+                        placement="bottom-start"
+                        modifiers={{ flip: { enabled: false } }}
+                        className="Tooltip"
+                        style={contentStyle}
+                        onMouseDown={stopEvent}
+                    >
+                        <OutsideClickDetector onOutsideClick={onClose}>{children}</OutsideClickDetector>
+                        {!this.props.hideArrow && <Arrow style={ARROW_STYLE} />}
+                    </Popper>
+                </Manager>,
+                document.body
+            )}
+        </>;
     }
 }
 

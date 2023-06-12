@@ -37,6 +37,7 @@ class DarkMode extends React.Component<ThemeProps, null> {
         this.props.onSetDarkTheme(!this.props.darkTheme);
     }
     render(): React.ReactNode {
+        // @ts-ignore
         return <Switch onChange={this.toggleTheme} checked={!this.props.darkTheme} className="darkToggleBox"
             offColor='#505050'
             onHandleColor='#505050'
@@ -74,4 +75,5 @@ class DarkMode extends React.Component<ThemeProps, null> {
 }
 
 const withDarkTheme = connect(mapStateToProps, callbacks);
+// @ts-ignore
 export default withDarkTheme(DarkMode);

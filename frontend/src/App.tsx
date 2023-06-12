@@ -377,7 +377,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
 
     groupTrackByGenome = () => {
         const { genomeConfig, tracks } = this.props;
-        const grouped = {}; // key: genome name like `hg19`, value: a set of track name or url
+        const grouped: { [ genomeName: string ]: Set<any> } = {}; // key: genome name like `hg19`, value: a set of track name or url
         tracks.forEach((track) => {
             const gname = track.getMetadata("genome");
             const targeName = gname ? gname : genomeConfig.genome.getName();
@@ -507,6 +507,7 @@ class App extends React.PureComponent<AppProps, AppStateProps> {
                 ) : (
                     <div className="App container-fluid">
                         <Notifications />
+                        {/* @ts-ignore */}
                         <Offline>
                             <div className="alert alert-warning text-center lead" role="alert">
                                 You are currently offline, so tracks on web won't load. But you can still use the{" "}

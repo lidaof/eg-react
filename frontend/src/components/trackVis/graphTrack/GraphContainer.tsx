@@ -47,7 +47,7 @@ class GraphContainer extends React.PureComponent<GraphContainerProps, GraphConta
     };
 
     ref: any;
-    chromHash: object;
+    chromHash: { [key: string]: number };
     contextNode: object;
 
     constructor(props: any) {

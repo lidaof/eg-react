@@ -132,8 +132,11 @@ function ContainerTools(props: ContainerToolsProps) {
                 )} */}
                 <div className="tool-element" style={{ display: "flex", alignItems: "center" }}>
                     <ReorderMany
+                        // @ts-ignore
                         onOpenReorderManyModal={openReorderManyModal}
+                        // @ts-ignore
                         onCloseReorderManyModal={closeReorderManyModal}
+                        // @ts-ignore
                         showReorderManyModal={reorderManyModalOpen}
                     />
                 </div>
@@ -175,7 +178,7 @@ function ContainerTools(props: ContainerToolsProps) {
     );
 }
 
-function PixelInfo(props:any) {
+function PixelInfo(props: any) {
     const { basesPerPixel, viewRegion, primaryView } = props;
     const viewBp = niceBpCount(viewRegion.getWidth());
     const windowWidth = primaryView.viewWindow.getLength();

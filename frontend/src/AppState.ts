@@ -32,7 +32,7 @@ import TrackModel, { mapUrl } from "./model/TrackModel";
 export let STORAGE: any = window.sessionStorage;
 if (process.env.NODE_ENV === "test") {
     // jsdom doesn't support local storage.  Use a mock.
-    const storage = {};
+    const storage: { [key: string ]: any } = {};
 
     STORAGE = {
         setItem(key: string, value: any) {
@@ -87,7 +87,7 @@ export interface AppState {
     layout?: object;
     darkTheme?: boolean;
     editTarget: [number, number] // [containerIdx, genomeIdx];
-    specialTracks: SpecialTrackInfo[];
+    specialTracks: SpecialTrackInfo[]
 }
 
 // state for a single genome.

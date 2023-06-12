@@ -59,17 +59,21 @@ function Apps(props: AppsProps) {
                     style: { borderRadius: 16 }
                 }}
             >
-                <MenuModal closeMenu={handleClose} title="Region Set View" genomeDependent>
+                <MenuModal closeMenu={handleClose} title="Region Set View" genomeDependent>'
+                    {/* @ts-ignore */}
                     <RegionSetSelector genome={genomeConfig.genome} />
                 </MenuModal>
                 <MenuModal closeMenu={handleClose} title="Gene Plot" genomeDependent>
+                    {/* @ts-ignore */}
                     <Geneplot genome={genomeConfig.genome} />
                 </MenuModal>
                 <MenuModal closeMenu={handleClose} title="Scatter Plot" genomeDependent>
+                    {/* @ts-ignore */}
                     <ScatterPlot genome={genomeConfig.genome} />
                 </MenuModal>
                 {!process.env.REACT_APP_NO_FIREBASE && (
                     [<MenuModal closeMenu={handleClose} title="Session" key={0}>
+                        {/* @ts-ignore */}
                         <SessionUI bundleId={bundleId} />
                     </MenuModal>,
                     <MenuModal closeMenu={handleClose} title="Go Live" key={1}>

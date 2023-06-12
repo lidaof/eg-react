@@ -20,13 +20,14 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": false,
-    "suppressImplicitAnyIndexErrors": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "strict": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "checkJs": false
   },
   "exclude": [
     "node_modules",
