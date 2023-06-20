@@ -88,12 +88,13 @@ class ScreenshotUINotConnected extends React.Component {
             y = 5;
         tracks.forEach((ele, idx) => {
             const legendWidth = ele.children[0].clientWidth + 1;
-            const trackHeight = ele.children[1].clientHeight + 5;
+            const trackHeight = ele.children[1].clientHeight + 3;
+            const yoffset = trackHeight > 20 ? 24: 14;
             const trackLabelText = ele.children[0].querySelector(".TrackLegend-label").textContent;
             if (trackLabelText) {
                 const labelSvg = document.createElementNS(xmlns, "text");
                 labelSvg.setAttributeNS(null, "x", x + 4 + "");
-                labelSvg.setAttributeNS(null, "y", y + 14 + "");
+                labelSvg.setAttributeNS(null, "y", y + yoffset + "");
                 labelSvg.setAttributeNS(null, "font-size", "12px");
                 const textNode = document.createTextNode(trackLabelText);
                 labelSvg.setAttribute("class", "svg-text-bg");
@@ -104,7 +105,7 @@ class ScreenshotUINotConnected extends React.Component {
             if (chrLabelText) {
                 const labelSvg = document.createElementNS(xmlns, "text");
                 labelSvg.setAttributeNS(null, "x", x + 15 + "");
-                labelSvg.setAttributeNS(null, "y", y + 33 + "");
+                labelSvg.setAttributeNS(null, "y", y + 35 + "");
                 labelSvg.setAttributeNS(null, "font-size", "12px");
                 const textNode = document.createTextNode(chrLabelText);
                 labelSvg.setAttribute("class", "svg-text-bg");
@@ -242,8 +243,10 @@ class ScreenshotUINotConnected extends React.Component {
         const { tracks, trackData, primaryView, metadataTerms, viewRegion, darkTheme } = this.props;
         if (darkTheme) {
             document.documentElement.style.setProperty("--bg-color", "#222");
+            document.documentElement.style.setProperty("--font-color", "white");
         } else {
             document.documentElement.style.setProperty("--bg-color", "white");
+            document.documentElement.style.setProperty("--font-color", "#222");
         }
         const groupScale = new GroupedTrackManager().getGroupScale(
             tracks,
