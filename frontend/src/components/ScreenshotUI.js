@@ -89,7 +89,7 @@ class ScreenshotUINotConnected extends React.Component {
         tracks.forEach((ele, idx) => {
             const legendWidth = ele.children[0].clientWidth + 1;
             const trackHeight = ele.children[1].clientHeight + 3;
-            const yoffset = trackHeight > 20 ? 24: 14;
+            const yoffset = trackHeight > 20 ? 24 : 14;
             const trackLabelText = ele.children[0].querySelector(".TrackLegend-label").textContent;
             if (trackLabelText) {
                 const labelSvg = document.createElementNS(xmlns, "text");
@@ -128,20 +128,22 @@ class ScreenshotUINotConnected extends React.Component {
             const trackG = document.createElementNS(xmlns, "g");
             if (eleSvgs.length > 0) {
                 x += legendWidth;
+                let yoff = 0; // when bi-directional numerical track is not symmetric, need a tempory variable to hold y offset
                 eleSvgs.forEach((eleSvg, idx2) => {
                     eleSvg.setAttribute("id", "svg" + idx + idx2);
                     eleSvg.setAttribute("x", x + "");
-                    eleSvg.setAttribute("y", idx2 * eleSvg.clientHeight + y + "");
+                    eleSvg.setAttribute("y", yoff + y + "");
                     if (options && options.backgroundColor) {
                         const rect = document.createElementNS(xmlns, "rect");
                         rect.setAttribute("id", "backRect" + idx);
                         rect.setAttribute("x", x + "");
-                        rect.setAttribute("y", idx2 * eleSvg.clientHeight + y + "");
+                        rect.setAttribute("y", yoff + y + "");
                         rect.setAttribute("width", eleSvg.clientWidth + "");
                         rect.setAttribute("height", eleSvg.clientHeight + "");
                         rect.setAttribute("fill", options.backgroundColor);
                         trackG.appendChild(rect);
                     }
+                    yoff += eleSvg.clientHeight; // do this before appendChild
                     trackG.appendChild(eleSvg);
                 });
             }

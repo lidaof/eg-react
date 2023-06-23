@@ -1,5 +1,10 @@
 # Version History
 
+## 54.0.3
+
+-   fix an bug that screenshot UI doesn't show axis label
+-   fix #319
+
 ## 54.0.2
 
 -   Fix Chrome 112 Navbar nested css problem (by Shane)
