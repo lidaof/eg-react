@@ -31,6 +31,7 @@ interface FiberTrackProps extends PropsFromTrackContainer, TooltipCallbacks {
         maxRows: number;
         displayMode: FiberDisplayModes;
         hideMinimalItems: boolean;
+        pixelsPadding?: number;
     };
     forceSvg?: boolean;
 }
@@ -50,6 +51,7 @@ export const DEFAULT_OPTIONS = {
     maxRows: 20,
     displayMode: FiberDisplayModes.AUTO,
     hideMinimalItems: false,
+    pixelsPadding: 0,
 }
 
 const withDefaultOptions = configOptionMerging(DEFAULT_OPTIONS);
@@ -106,6 +108,7 @@ class FiberTrackNoTooltip extends React.Component<FiberTrackProps> {
                 hiddenPixels={this.props.options.hiddenPixels}
                 displayMode={this.props.options.displayMode}
                 hideMinimalItems={this.props.options.hideMinimalItems}
+                pixelsPadding={this.props.options.pixelsPadding}
             />
         ));
     }

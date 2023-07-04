@@ -73,6 +73,7 @@ class FiberAnnotation extends React.Component {
             onHideTooltip,
             displayMode,
             hideMinimalItems,
+            pixelsPadding,
         } = this.props;
         const { feature, xSpan, visiblePart } = placement;
         const { relativeStart, relativeEnd } = visiblePart;
@@ -133,8 +134,8 @@ class FiberAnnotation extends React.Component {
             const scale = scaleLinear().domain([0, 1]).range([0, rowHeight]).clamp(true);
             const bgScale = scaleLinear().range([0.2, 0.9]).domain([0, maxValue]).clamp(true);
             xMap.forEach((x, idx) => {
-                // if (x.on || x.off) {
-                if (x.on) {
+                if (x.on || x.off) {
+                    // if (x.on) {
                     if (displayMode === FiberDisplayModes.AUTO) {
                         bars.push(
                             <rect
@@ -142,7 +143,7 @@ class FiberAnnotation extends React.Component {
                                 x={startX + idx}
                                 y={0}
                                 height={rowHeight}
-                                width={barWidth}
+                                width={barWidth + pixelsPadding}
                                 fill="lightgray"
                                 opacity={bgScale(totals[idx])}
                             />
@@ -154,7 +155,7 @@ class FiberAnnotation extends React.Component {
                                 x={startX + idx}
                                 y={rowHeight - barHeight}
                                 height={barHeight}
-                                width={barWidth}
+                                width={barWidth + pixelsPadding}
                                 fill={color}
                                 opacity={0.7}
                                 onMouseEnter={(event) =>
@@ -173,8 +174,8 @@ class FiberAnnotation extends React.Component {
                                 x={startX + idx}
                                 y={0}
                                 height={rowHeight}
-                                // width={barWidth}
-                                width={10}
+                                width={barWidth + pixelsPadding}
+                                // width={10}
                                 fill={fillColor}
                                 opacity={1}
                                 // opacity={opacity}

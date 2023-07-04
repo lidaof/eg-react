@@ -18,6 +18,7 @@ import MaxRowsConfig from "components/trackContextMenu/MaxRowsConfig";
 import HideMinimalItemsConfig from "components/trackContextMenu/HideMinimalItemsConfig";
 import SortItemsConfig from "components/trackContextMenu/SortItemsConfig";
 import { parseNumberString } from "./../../util";
+import PixelsPaddingConfig from "components/trackContextMenu/PixelsPaddingConfig";
 
 export class FiberTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
@@ -73,6 +74,7 @@ export class FiberTrackConfig extends TrackConfig {
             YscaleConfig,
             SortItemsConfig,
             HideMinimalItemsConfig,
+            PixelsPaddingConfig,
         ];
         return items;
     }

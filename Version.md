@@ -1,5 +1,9 @@
 # Version History
 
+## 54.0.4
+
+-   add `pixelsPadding` option for `modbed` track while display in heatmap mode, used for padding the drawing tick pixel
+
 ## 54.0.3
 
 -   fix an bug that screenshot UI doesn't show axis label
