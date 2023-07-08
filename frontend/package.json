@@ -107,7 +107,7 @@
         "memoize-one": "^3.1.1",
         "nightmare": "^2.10.0",
         "node-fetch": "^2.6.1",
-        "node-sass": "^7.0.0",
+        "node-sass": "^9.0.0",
         "npm": "^8.11.0",
         "papaparse": "^5.2.0",
         "parse-color": "^1.0.0",
