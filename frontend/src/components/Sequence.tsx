@@ -1,7 +1,7 @@
 import React from 'react';
 import OpenInterval from '../model/interval/OpenInterval';
 
-const COMPLEMENT_BASE = {
+const COMPLEMENT_BASE: { [key: string]: string } = {
     A: 'T',
     T: 'A',
     G: 'C',
@@ -18,7 +18,7 @@ function getReverseComplement(sequence: string): string {
     return result;
 }
 
-export const BASE_COLORS = {
+export const BASE_COLORS: { [key: string]: string } = {
     G: '#3899c7', // Blue
     C: '#e05144', // Red
     T: '#9238c7', // Purple

@@ -113,7 +113,7 @@ if (process.env.NODE_ENV !== "production") {
 export function getTrackConfig(trackModel: TrackModel): TrackConfig {
     let type = trackModel.type || trackModel.filetype || "";
     type = type.toLowerCase();
-    const TrackConfigSubtype = TYPE_NAME_TO_CONFIG[type];
+    const TrackConfigSubtype = TYPE_NAME_TO_CONFIG[type as keyof typeof TYPE_NAME_TO_CONFIG];
     if (TrackConfigSubtype) {
         return new TrackConfigSubtype(trackModel);
     } else {

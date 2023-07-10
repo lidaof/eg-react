@@ -101,7 +101,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
             }
 
             // Clean up the data sources and state of removed tracks
-            const deletionUpdate = {};
+            const deletionUpdate: { [key: number]: any } = {};
             for (const track of removedTracks) {
                 const id = track.getId();
                 this._dataSourceManager.cleanUp(id);
@@ -164,7 +164,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
         dispatchTrackUpdate(track: TrackModel, newTrackState: Partial<TrackData>) {
             const id = track.getId();
             this.setState((prevState) => {
-                const update = {};
+                const update: { [key: number]: any } = {};
                 const prevTrackData = prevState[id] || INITIAL_TRACK_DATA;
                 update[id] = {
                     ...prevTrackData,
@@ -193,6 +193,7 @@ export function withTrackData(WrappedComponent: React.ComponentType<{ trackData:
         }
 
         render() {
+            // @ts-ignore
             return <WrappedComponent trackData={this.getTrackData()} {...this.props} />;
         }
     };
