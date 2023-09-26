@@ -82,9 +82,19 @@ const publicHubData = {
         "The NIH Roadmap Epigenomics Mapping Consortium was launched with the goal of producing a public resource of human epigenomic data to catalyze basic biology and disease-oriented research. The Consortium leverages experimental pipelines built around next-generation sequencing technologies to map DNA methylation, histone modifications, chromatin accessibility and small RNA transcripts in stem cells and primary ex vivo tissues selected to represent the normal counterparts of tissues and organ systems frequently involved in human disease (quoted from Roadmap website).",
     "Image collection":
         "Image data from the Image Data Resource (IDR) or 4DN. Images are mapped to genomic coordinates with annotation gene id or symbol.",
+    "Human Pangenome Reference Consortium (HPRC)":
+        "The Human Pangenome Reference Consortium (HPRC) is a project funded by the National Human Genome Research Institute to sequence and assemble genomes from individuals from diverse populations in order to better represent genomic landscape of diverse human populations.",
 };
 
 const publicHubList = [
+    {
+        collection: "Human Pangenome Reference Consortium (HPRC)",
+        name: "HPRC long read methylation data",
+        numTracks: 12,
+        oldHubFormat: false,
+        url: "https://vizhub.wustl.edu/public/hg38/modbed/hub.json",
+        description: "modbed format methylation track on PacBio and ONT platforms, for 6 sample sources.",
+    },
     {
         collection: "Reference human epigenomes from Roadmap Epigenomics Consortium",
         name: "All Chromatin states tracks",
