@@ -74,7 +74,7 @@
         "@types/uuid": "^3.4.9",
         "array-move": "^2.2.2",
         "array-smooth": "^1.0.0",
-        "axios": "^0.21.1",
+        "axios": "^1.6.0",
         "babel-cli": "^6.26.0",
         "babel-loader": "^8.1.0",
         "babel-plugin-transform-class-properties": "^6.24.1",
