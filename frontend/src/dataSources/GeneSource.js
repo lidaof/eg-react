@@ -2,7 +2,7 @@ import axios from "axios";
 import _ from "lodash";
 import DataSource from "./DataSource";
 
-export const AWS_API = "https://lambda.epigenomegateway.org/v2";
+export const AWS_API = "https://lambda.epigenomegateway.org/v3";
 // export const AWS_API = ""; // local test
 
 /**

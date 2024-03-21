@@ -9,6 +9,7 @@ import DAN_RER7 from "./danRer7/danRer7";
 import PANTRO5 from "./panTro5/panTro5";
 import PANTRO6 from "./panTro6/panTro6";
 import rn4 from "./rn4/rn4";
+import RN5 from "./rn5/rn5";
 import RN6 from "./rn6/rn6";
 import RN7 from "./rn7/rn7";
 import MM9 from "./mm9/mm9";
@@ -74,6 +75,7 @@ export const allGenomes = [
     DAN_RER10,
     DAN_RER7,
     RN6,
+    RN5,
     rn4,
     RheMac8,
     rheMac3,
@@ -208,7 +210,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     rat: {
         logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Rat.png",
-        assemblies: [RN7.genome.getName(), RN6.genome.getName(), rn4.genome.getName()],
+        assemblies: [RN7.genome.getName(), RN6.genome.getName(), RN5.genome.getName(), rn4.genome.getName()],
         color: "white",
     },
     opossum: {

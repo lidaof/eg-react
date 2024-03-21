@@ -4,6 +4,7 @@
 
 -   add `pixelsPadding` option for `modbed` track while display in heatmap mode, used for padding the drawing tick pixel
 -   add HPRC modbed hub for `hg38`
+-   add the genome `rn5`
 
 ## 54.0.3
 
