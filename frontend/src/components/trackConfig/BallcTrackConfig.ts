@@ -3,8 +3,7 @@ import MethylCTrack, { DEFAULT_OPTIONS } from "../trackVis/MethylCTrack";
 import { BackgroundColorConfig } from "../trackContextMenu/ColorConfig";
 import HeightConfig from "../trackContextMenu/HeightConfig";
 import MaxMethylAndDepthFilterConfig from "../trackContextMenu/MaxMethylAndDepthFilterConfig";
-import CombineStrandConfig from "../trackContextMenu/CombineStrandConfig";
-import { MethylColorConfig, ReadDepthColorConfig } from "../trackContextMenu/MethylColorConfig";
+import { ReadDepthColorConfig } from "../trackContextMenu/MethylColorConfig";
 import { TrackModel } from "../../model/TrackModel";
 import WorkerSource from "../../dataSources/worker/WorkerSource";
 import { BallcWorker } from "../../dataSources/WorkerTSHook";
@@ -13,7 +12,7 @@ import BallcRecord, { BallcItem } from "../../model/BallcRecord";
 export class BallcTrackConfig extends TrackConfig {
     constructor(trackModel: TrackModel) {
         super(trackModel);
-        this.setDefaultOptions(DEFAULT_OPTIONS);
+        this.setDefaultOptions({...DEFAULT_OPTIONS, isCombineStrands: true});
     }
 
     initDataSource() {
@@ -27,7 +26,6 @@ export class BallcTrackConfig extends TrackConfig {
      * @return {BallcRecord[]} MethylCRecords made from the input
      */
     formatData(data: BallcItem[]) {
-        console.log(data);
         return data.map((item) => new BallcRecord(item));
     }
 
@@ -35,8 +33,6 @@ export class BallcTrackConfig extends TrackConfig {
         return [
             ...super.getMenuComponents(),
             HeightConfig,
-            CombineStrandConfig,
-            MethylColorConfig,
             MaxMethylAndDepthFilterConfig,
             ReadDepthColorConfig,
             BackgroundColorConfig,

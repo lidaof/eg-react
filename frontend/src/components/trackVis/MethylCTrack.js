@@ -199,7 +199,6 @@ class MethylCTrack extends React.PureComponent {
      */
     render() {
         const { data, trackModel, viewRegion, width, options } = this.props;
-        console.log(data);
         this.aggregatedRecords = this.aggregateRecords(data, viewRegion, width);
         this.scales = this.computeScales(this.aggregatedRecords, options.height, options.maxMethyl);
         return (
