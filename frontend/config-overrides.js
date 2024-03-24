@@ -25,7 +25,7 @@ module.exports = (config, env) => {
     config.module.rules.push({
         loader: require.resolve("babel-loader"),
         exclude: /node_modules/,
-        query: {
+        options: {
             presets: ["@babel/preset-typescript", "@babel/preset-env", "@babel/preset-react"],
             plugins: ["@babel/proposal-class-properties", "@babel/proposal-object-rest-spread"],
         },

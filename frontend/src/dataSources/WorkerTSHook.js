@@ -7,8 +7,10 @@ import BedWorker from "./bed/Bed.worker";
 import BigWorker from "./big/Big.worker";
 import BigGmodWorker from "./big/BigGmod.worker";
 import GenomeAlignWorker from "./bed/GenomeAlign.worker";
+import BallcWorker from "./ballc/Ballc.worker";
 
 export { BedWorker };
 export { BigWorker };
 export { BigGmodWorker };
 export { GenomeAlignWorker };
+export { BallcWorker };

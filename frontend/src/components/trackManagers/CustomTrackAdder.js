@@ -23,7 +23,7 @@ export const TRACK_TYPES = {
     Categorical: ["categorical"],
     // "Transcription Factor": ["jaspar"],
     "Genome graph": ["brgfa", "graph"],
-    Methylation: ["methylC", "modbed"],
+    Methylation: ["methylC", "modbed", "ballc"],
     Interaction: ["hic", "cool", "bigInteract", "longrange", "longrangecolor"],
     Stats: ["boxplot"],
     Repeats: ["rmskv2", "repeatmasker"],
@@ -55,12 +55,14 @@ const TYPES_NEED_INDEX = [
     "brgfa",
     "graph",
     "modbed",
+    "ballc",
 ];
 
 export const TYPES_DESC = {
     bigWig: "numerical data",
     bedGraph: "numerical data, processed by tabix in .gz format",
     methylC: "methylation data, processed by tabix in .gz format",
+    ballc: "methylation data in ballc format",
     categorical: "categorical data, processed by tabix in .gz format",
     bed: "annotationd data, processed by tabix in .gz format",
     bedcolor: "annotationd data with color, processed by tabix in .gz format",
@@ -138,7 +140,7 @@ class CustomTrackAdder extends React.Component {
             this.setState({ urlError: "Enter a URL" });
             return;
         } else {
-            const newTrack = new TrackModel({ ...this.state, datahub: "Custom track" });
+            const newTrack = new TrackModel({ ...this.state, datahub: "Remote track" });
             if (getTrackConfig(newTrack).isGenomeAlignTrack()) {
                 if (!this.state.querygenome) {
                     this.setState({ urlError: "Please enter query genome for genomealign/bigchain track" });

@@ -41,6 +41,7 @@ import { Rmskv2TrackConfig } from "./Rmskv2TrackConfig";
 import { JasparTrackConfig } from "./JasparTrackConfig";
 import { BrgfaTrackConfig } from "./BrgfaTrackConfig";
 import { FiberTrackConfig } from "./FiberTrackConfig";
+import { BallcTrackConfig } from "./BallcTrackConfig";
 
 export const INTERACTION_TYPES = ["hic", "longrange", "biginteract"];
 export const ALIGNMENT_TYPES = ["genomealign"];
@@ -91,6 +92,7 @@ const TYPE_NAME_TO_CONFIG = {
     jaspar: JasparTrackConfig,
     brgfa: BrgfaTrackConfig,
     modbed: FiberTrackConfig, // fiber track was renamed to modbed meaning read modification data
+    ballc: BallcTrackConfig,
 };
 const DefaultConfig = TrackConfig;
 

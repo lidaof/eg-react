@@ -1,23 +1,23 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import { scaleLinear } from 'd3-scale';
+import React from "react";
+import PropTypes from "prop-types";
+import _ from "lodash";
+import memoizeOne from "memoize-one";
+import { scaleLinear } from "d3-scale";
 
-import Track from './commonComponents/Track';
-import TrackLegend from './commonComponents/TrackLegend';
-import configOptionMerging from './commonComponents/configOptionMerging';
-import HoverTooltipContext from './commonComponents/tooltip/HoverTooltipContext';
-import GenomicCoordinates from './commonComponents/GenomicCoordinates';
-import DesignRenderer, { RenderTypes } from '../../art/DesignRenderer';
+import Track from "./commonComponents/Track";
+import TrackLegend from "./commonComponents/TrackLegend";
+import configOptionMerging from "./commonComponents/configOptionMerging";
+import HoverTooltipContext from "./commonComponents/tooltip/HoverTooltipContext";
+import GenomicCoordinates from "./commonComponents/GenomicCoordinates";
+import DesignRenderer, { RenderTypes } from "../../art/DesignRenderer";
 
-import TrackModel from '../../model/TrackModel';
-import { FeatureAggregator } from '../../model/FeatureAggregator';
-import MethylCRecord from '../../model/MethylCRecord';
-import { getContrastingColor } from '../../util';
+import TrackModel from "../../model/TrackModel";
+import { FeatureAggregator } from "../../model/FeatureAggregator";
+import MethylCRecord from "../../model/MethylCRecord";
+import { getContrastingColor } from "../../util";
 
-import './commonComponents/tooltip/Tooltip.css';
-import './MethylCTrack.css';
+import "./commonComponents/tooltip/Tooltip.css";
+import "./MethylCTrack.css";
 
 const VERTICAL_PADDING = 0;
 const PLOT_DOWNWARDS_STRAND = "reverse";
@@ -49,17 +49,14 @@ function makeBackgroundColorStyle(color) {
 }
 
 /**
- * Visualizer for MethylC tracks. 
- * 
+ * Visualizer for MethylC tracks.
+ *
  * @author Daofeng Li
  */
 class MethylCTrack extends React.PureComponent {
-    static propTypes = Object.assign({},
-        Track.tracksFromTrackContainer,
-        {
+    static propTypes = Object.assign({}, Track.tracksFromTrackContainer, {
         data: PropTypes.array.isRequired, //PropTypes.arrayOf(PropTypes.instanceOf(MethylCRecord)).isRequired,
-        }
-    );
+    });
 
     constructor(props) {
         super(props);
@@ -92,39 +89,41 @@ class MethylCTrack extends React.PureComponent {
             ...
         ]
         */
-        const forwardRecords = xMap.map(record => record.forward);
-        const reverseRecords = xMap.map(record => record.reverse);
-        const maxDepthForward = _.maxBy(forwardRecords, 'depth') || { depth: 0 };
-        const maxDepthReverse = _.maxBy(reverseRecords, 'depth') || { depth: 0 };
+        const forwardRecords = xMap.map((record) => record.forward);
+        const reverseRecords = xMap.map((record) => record.reverse);
+        const maxDepthForward = _.maxBy(forwardRecords, "depth") || { depth: 0 };
+        const maxDepthReverse = _.maxBy(reverseRecords, "depth") || { depth: 0 };
         const maxDepth = Math.max(maxDepthForward.depth, maxDepthReverse.depth);
         return {
             methylToY: scaleLinear().domain([maxMethyl, 0]).range([VERTICAL_PADDING, height]).clamp(true),
-            depthToY: scaleLinear().domain([maxDepth, 0]).range([VERTICAL_PADDING, height]).clamp(true)
+            depthToY: scaleLinear().domain([maxDepth, 0]).range([VERTICAL_PADDING, height]).clamp(true),
         };
     }
 
     /**
      * Renders the tooltip contents that appear when mousing over the track
-     * 
+     *
      * @param {number} x - x coordinate of the mouseover relative to the left side of the visualizer
      * @return {JSX.Element} tooltip contents to render
      */
     renderTooltipContents(x) {
-        const {trackModel, viewRegion, width, options} = this.props;
+        const { trackModel, viewRegion, width, options } = this.props;
         const strandsAtPixel = this.aggregatedRecords[Math.round(x)];
 
-        return <div>
-            {this.renderTooltipContentsForStrand(strandsAtPixel, options.isCombineStrands ? "combined" : "forward")}
-            {!options.isCombineStrands && this.renderTooltipContentsForStrand(strandsAtPixel, "reverse")}
-            <div className="Tooltip-minor-text">
-                <GenomicCoordinates viewRegion={viewRegion} width={width} x={x} />
+        return (
+            <div>
+                {this.renderTooltipContentsForStrand(strandsAtPixel, options.isCombineStrands ? "combined" : "forward")}
+                {!options.isCombineStrands && this.renderTooltipContentsForStrand(strandsAtPixel, "reverse")}
+                <div className="Tooltip-minor-text">
+                    <GenomicCoordinates viewRegion={viewRegion} width={width} x={x} />
+                </div>
+                <div className="Tooltip-minor-text">{trackModel.getDisplayLabel()}</div>
             </div>
-            <div className="Tooltip-minor-text" >{trackModel.getDisplayLabel()}</div>
-        </div>;
+        );
     }
 
     renderTooltipContentsForStrand(strandsAtPixel, strand) {
-        const {depthColor, colorsForContext, depthFilter} = this.props.options;
+        const { depthColor, colorsForContext, depthFilter } = this.props.options;
         const dataAtPixel = strandsAtPixel[strand];
         let details = null;
         if (dataAtPixel) {
@@ -133,17 +132,19 @@ class MethylCTrack extends React.PureComponent {
             }
             let dataElements = [];
             // Sort alphabetically by context name first
-            const contextValues = _.sortBy(dataAtPixel.contextValues, 'context');
+            const contextValues = _.sortBy(dataAtPixel.contextValues, "context");
             for (let contextData of contextValues) {
                 const contextName = contextData.context;
                 const color = (colorsForContext[contextName] || UNKNOWN_CONTEXT_COLORS).color;
                 dataElements.push(
-                    <div key={contextName + "label"} style={makeBackgroundColorStyle(color)} >{contextName}</div>,
-                    <div key={contextName + "value"} >{contextData.value.toFixed(2)}</div>
+                    <div key={contextName + "label"} style={makeBackgroundColorStyle(color)}>
+                        {contextName}
+                    </div>,
+                    <div key={contextName + "value"}>{contextData.value.toFixed(2)}</div>
                 );
             }
             details = (
-                <div className="MethylCTrack-tooltip-strand-details" >
+                <div className="MethylCTrack-tooltip-strand-details">
                     <div style={makeBackgroundColorStyle(depthColor)}>Depth</div>
                     <div>{Math.round(dataAtPixel.depth)}</div>
                     {dataElements}
@@ -151,56 +152,79 @@ class MethylCTrack extends React.PureComponent {
             );
         }
 
-        return <div key={strand} className="MethylCTrack-tooltip-strand">
-            <span className="MethylCTrack-tooltip-strand-title">{strand}</span>
-            {details || <div className="Tooltip-minor-text">(No data)</div>}
-        </div>;
+        return (
+            <div key={strand} className="MethylCTrack-tooltip-strand">
+                <span className="MethylCTrack-tooltip-strand-title">{strand}</span>
+                {details || <div className="Tooltip-minor-text">(No data)</div>}
+            </div>
+        );
     }
 
     renderVisualizer() {
-        const {width, options, forceSvg} = this.props;
-        const {height, colorsForContext, depthColor, isCombineStrands, depthFilter} = options;
+        const { width, options, forceSvg } = this.props;
+        const { height, colorsForContext, depthColor, isCombineStrands, depthFilter } = options;
         const childProps = {
-            data: this.aggregatedRecords, scales: this.scales, htmlType: forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS,
-            width, height, colorsForContext, depthColor, depthFilter
+            data: this.aggregatedRecords,
+            scales: this.scales,
+            htmlType: forceSvg ? RenderTypes.SVG : RenderTypes.CANVAS,
+            width,
+            height,
+            colorsForContext,
+            depthColor,
+            depthFilter,
         };
         let strandRenderers, tooltipY;
         if (isCombineStrands) {
             strandRenderers = <StrandVisualizer {...childProps} strand="combined" />;
             tooltipY = height;
         } else {
-            strandRenderers = <React.Fragment>
-                <StrandVisualizer {...childProps} strand="forward" />
-                <StrandVisualizer {...childProps} strand="reverse" />
-            </React.Fragment>;
+            strandRenderers = (
+                <React.Fragment>
+                    <StrandVisualizer {...childProps} strand="forward" />
+                    <StrandVisualizer {...childProps} strand="reverse" />
+                </React.Fragment>
+            );
             tooltipY = height * 2;
         }
 
         return (
-        <HoverTooltipContext tooltipRelativeY={tooltipY} getTooltipContents={this.renderTooltipContents} >
-            {strandRenderers}
-        </HoverTooltipContext>
+            <HoverTooltipContext tooltipRelativeY={tooltipY} getTooltipContents={this.renderTooltipContents}>
+                {strandRenderers}
+            </HoverTooltipContext>
         );
     }
 
-    /** 
+    /**
      * @inheritdoc
      */
     render() {
-        const {data, trackModel, viewRegion, width, options} = this.props;
+        const { data, trackModel, viewRegion, width, options } = this.props;
+        console.log(data);
         this.aggregatedRecords = this.aggregateRecords(data, viewRegion, width);
         this.scales = this.computeScales(this.aggregatedRecords, options.height, options.maxMethyl);
-        return <Track
-            {...this.props}
-            legend={
-                <div>
-                    <TrackLegend trackModel={trackModel} height={options.height} axisScale={this.scales.methylToY} 
-                    noShiftFirstAxisLabel={!options.isCombineStrands} />
-                    {!options.isCombineStrands && <ReverseStrandLegend trackModel={trackModel} height={options.height} maxMethyl={options.maxMethyl} />}
-                </div>
-            }
-            visualizer={this.renderVisualizer()}
-        />
+        return (
+            <Track
+                {...this.props}
+                legend={
+                    <div>
+                        <TrackLegend
+                            trackModel={trackModel}
+                            height={options.height}
+                            axisScale={this.scales.methylToY}
+                            noShiftFirstAxisLabel={!options.isCombineStrands}
+                        />
+                        {!options.isCombineStrands && (
+                            <ReverseStrandLegend
+                                trackModel={trackModel}
+                                height={options.height}
+                                maxMethyl={options.maxMethyl}
+                            />
+                        )}
+                    </div>
+                }
+                visualizer={this.renderVisualizer()}
+            />
+        );
     }
 }
 
@@ -224,7 +248,7 @@ class StrandVisualizer extends React.PureComponent {
     }
 
     renderBarElement(x) {
-        const {data, scales, strand, height, depthFilter} = this.props;
+        const { data, scales, strand, height, depthFilter } = this.props;
         const pixelData = data[x][strand];
         if (!pixelData) {
             return null;
@@ -233,39 +257,41 @@ class StrandVisualizer extends React.PureComponent {
         if (pixelData.depth < depthFilter) {
             return null;
         }
-        
+
         let backgroundColor;
         if (pixelData.contextValues.length === 1) {
             const contextName = pixelData.contextValues[0].context;
             backgroundColor = this.getColorsForContext(contextName).background;
         } else {
-            backgroundColor = OVERLAPPING_CONTEXTS_COLORS.background
+            backgroundColor = OVERLAPPING_CONTEXTS_COLORS.background;
         }
 
         let elements = [
-            <rect key={x + "bg"} x={x} y={VERTICAL_PADDING} width={1} height={height} fill={backgroundColor} />
+            <rect key={x + "bg"} x={x} y={VERTICAL_PADDING} width={1} height={height} fill={backgroundColor} />,
         ];
         for (let contextData of pixelData.contextValues) {
             const contextName = contextData.context;
             const drawY = scales.methylToY(contextData.value);
             const drawHeight = height - drawY;
             const color = this.getColorsForContext(contextName).color;
-            elements.push(<rect
-                key={x + contextName}
-                x={x}
-                y={drawY}
-                width={1}
-                height={drawHeight}
-                fill={color}
-                fillOpacity={0.75}
-            />);
+            elements.push(
+                <rect
+                    key={x + contextName}
+                    x={x}
+                    y={drawY}
+                    width={1}
+                    height={drawHeight}
+                    fill={color}
+                    fillOpacity={0.75}
+                />
+            );
         }
-        
+
         return elements;
     }
 
     renderDepthPlot() {
-        const {data, scales, strand, depthColor, height, depthFilter} = this.props;
+        const { data, scales, strand, depthColor, height, depthFilter } = this.props;
         let elements = [];
         for (let x = 0; x < data.length - 1; x++) {
             const currentRecord = data[x][strand];
@@ -280,47 +306,47 @@ class StrandVisualizer extends React.PureComponent {
             }
         }
         if (strand === PLOT_DOWNWARDS_STRAND) {
-            const transform = `translate(0, ${height+1}) scale(1, -1)`;
+            const transform = `translate(0, ${height + 1}) scale(1, -1)`;
             return <g transform={transform}>{elements}</g>;
         } else {
             return elements;
         }
-        
     }
 
     render() {
-        const {data, strand, width, height, htmlType} = this.props;
-        let style = strand === PLOT_DOWNWARDS_STRAND ?
-            {transform: "scale(1, -1)", borderBottom: "1px solid lightgrey"} : undefined;
+        const { data, strand, width, height, htmlType } = this.props;
+        let style =
+            strand === PLOT_DOWNWARDS_STRAND
+                ? { transform: "scale(1, -1)", borderBottom: "1px solid lightgrey" }
+                : undefined;
         let bars = [];
         for (let x = 0; x < data.length; x++) {
-            bars.push(this.renderBarElement(x))
+            bars.push(this.renderBarElement(x));
         }
         if (htmlType === RenderTypes.SVG && strand === PLOT_DOWNWARDS_STRAND) {
-            const transform = `translate(0, ${height+1}) scale(1, -1)`;
+            const transform = `translate(0, ${height + 1}) scale(1, -1)`;
             bars = <g transform={transform}>{bars}</g>;
             style = undefined;
         }
         return (
-        <DesignRenderer
-            type={htmlType}
-            width={width}
-            height={height}
-            style={style}
-        >
-            {bars}
-            {this.renderDepthPlot()}
-        </DesignRenderer>
+            <DesignRenderer type={htmlType} width={width} height={height} style={style}>
+                {bars}
+                {this.renderDepthPlot()}
+            </DesignRenderer>
         );
     }
 }
 
 function ReverseStrandLegend(props) {
-    const mockTrackModel = new TrackModel({name: " ", isSelected: props.trackModel.isSelected});
-    return <TrackLegend
-        trackModel={mockTrackModel}
-        height={props.height}
-        hideFirstAxisLabel={true}
-        axisScale={scaleLinear().domain([0, props.maxMethyl]).range([0, props.height - VERTICAL_PADDING])}
-    />;
+    const mockTrackModel = new TrackModel({ name: " ", isSelected: props.trackModel.isSelected });
+    return (
+        <TrackLegend
+            trackModel={mockTrackModel}
+            height={props.height}
+            hideFirstAxisLabel={true}
+            axisScale={scaleLinear()
+                .domain([0, props.maxMethyl])
+                .range([0, props.height - VERTICAL_PADDING])}
+        />
+    );
 }
