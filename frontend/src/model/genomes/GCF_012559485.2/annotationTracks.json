@@ -1,0 +1,22 @@
+{
+    "Ruler": [{ "type": "ruler", "label": "Ruler", "name": "Ruler" }],
+    "Genes": [
+        {
+            "type": "geneAnnotation",
+            "name": "ncbiRefSeq",
+            "genome": "GCF_012559485.2",
+            "label": "NCBI RefSeq genes"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "bigbed",
+                "url": "https://vizhub.wustl.edu/public/GCF_012559485.2/GCF_012559485.2_MFA1912RKSv2.rmsk.bb",
+                "height": 30
+            }
+        ]
+    }
+}

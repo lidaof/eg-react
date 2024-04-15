@@ -1,5 +1,14 @@
 # Version History
 
+## 54.0.6
+
+- add the new genome `GCF_012559485.2`
+- add the new genome `bosTau9`
+
+## 54.0.5
+
+- add the `ballc` track support
+
 ## 54.0.4
 
 -   add `pixelsPadding` option for `modbed` track while display in heatmap mode, used for padding the drawing tick pixel

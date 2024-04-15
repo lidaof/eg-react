@@ -1,0 +1,27 @@
+{
+    "Ruler": [
+        {
+            "type": "ruler",
+            "label": "Ruler",
+            "name": "Ruler"
+        }
+    ],
+    "Genes": [
+        {
+            "name": "ncbiRefSeq",
+            "label": "NCBI RefSeq genes",
+            "filetype": "geneAnnotation"
+        }
+    ],
+    "RepeatMasker": {
+        "All Repeats": [
+            {
+                "name": "rmsk_all",
+                "label": "RepeatMasker",
+                "filetype": "repeatmasker",
+                "url": "https://vizhub.wustl.edu/public/bosTau9/rmsk16.bb",
+                "height": 30
+            }
+        ]
+    }
+}

@@ -14,6 +14,7 @@ import RN6 from "./rn6/rn6";
 import RN7 from "./rn7/rn7";
 import MM9 from "./mm9/mm9";
 import BosTau8 from "./bosTau8/bosTau8";
+import BosTau9 from "./bosTau9/bosTau9";
 import rheMac2 from "./rheMac2/rheMac2";
 import rheMac3 from "./rheMac3/rheMac3";
 import rheMac10 from "./rheMac10/rheMac10";
@@ -56,6 +57,7 @@ import CHMV2 from "./t2t-chm13-v2.0/chm13v2";
 import GRCg7b from "./GRCg7b/GRCg7b";
 import GRCg7w from "./GRCg7w/GRCg7w";
 import phaw5 from "./phaw5/phaw5";
+import GCF_012559485_2 from "./GCF_012559485.2/GCF_012559485.2";
 
 /**
  * All available genomes.
@@ -71,6 +73,7 @@ export const allGenomes = [
     PANTRO5,
     panTro4,
     BosTau8,
+    BosTau9,
     DAN_RER11,
     DAN_RER10,
     DAN_RER7,
@@ -119,6 +122,7 @@ export const allGenomes = [
     GRCg7b,
     GRCg7w,
     phaw5,
+    GCF_012559485_2,
 ];
 
 const genomeNameToConfig = {};
@@ -173,6 +177,11 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         ],
         color: "yellow",
     },
+    "Crab-eating macaque": {
+        logoUrl: "https://vizhub.wustl.edu/public/Crab-eating_macaque/Crab-eating_macaque.png",
+        assemblies: [GCF_012559485_2.genome.getName()],
+        color: "#b80cef",
+    },
     marmoset: {
         logoUrl: "https://vizhub.wustl.edu/public/calJac3/Marmoset.png",
         assemblies: [calJac4.genome.getName(), calJac3.genome.getName()],
@@ -180,7 +189,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     cow: {
         logoUrl: "https://vizhub.wustl.edu/public/bosTau8/Cow.png",
-        assemblies: [BosTau8.genome.getName()],
+        assemblies: [BosTau9.genome.getName(), BosTau8.genome.getName()],
         color: "yellow",
     },
     sheep: {
