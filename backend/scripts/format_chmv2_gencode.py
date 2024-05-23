@@ -1,4 +1,5 @@
 # this script takes the file output by add_transcriptClass.py and formats it so mongoimport can read it
+from format_gencode_gtf import typeMap
 
 desc = {}
 with open('kgXref.txt') as fin:
@@ -7,16 +8,7 @@ with open('kgXref.txt') as fin:
         t = line.strip().split('\t')
         desc[t[4]] = t[7]
 types = {}
-with open('gencodeV35.meta.tsv') as fin:
-    next(fin)
-    for line in fin:
-        t= line.strip('\n').split('\t') # same row not protein id at end of line
-        geneid = t[4] # use transcript id
-        symbol = t[1]
-        gtype = t[-2]
-        if geneid not in types:
-            types[geneid] = [symbol, gtype]
-with open('gencodeV35.bed')  as fin, open('chmv2_gencodeV35.refbed','w') as fout:
+with open('catLiftOffGenesV1.bed')  as fin, open('catLiftOffGenesV1.refbed','w') as fout:
     for line in fin:
         t = line.strip().split('\t')
         chrom = t[0]
@@ -26,14 +18,19 @@ with open('gencodeV35.bed')  as fin, open('chmv2_gencodeV35.refbed','w') as fout
         cend = t[7]
         if cend == t[6]:
             cend = end
-        symbol, gtype = types[geneid]
-        if symbol in desc:
-            description = desc[symbol]
+        genetype = t[17]
+        gtype = genetype
+        if genetype in typeMap:
+            gtype = typeMap[genetype]
+        symbol = t[12]
+        ensgid = t[20].split('.')[0]
+        if ensgid in desc:
+            description = desc[ensgid]
         else:
             description = ''
-        estarts = t[-1].rstrip(',').split(',')
+        estarts = t[11].rstrip(',').split(',')
         estarts = [int(x) for x in estarts]
-        esizes = t[-2].rstrip(',').split(',')
+        esizes = t[10].rstrip(',').split(',')
         esizes = [int(x) for x in esizes]
         estarts = [x + start for x in estarts]
         eends = [ n+estarts[m] for m,n in enumerate(esizes)]

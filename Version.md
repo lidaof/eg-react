@@ -2,12 +2,13 @@
 
 ## 54.0.6
 
-- add the new genome `GCF_012559485.2`
-- add the new genome `bosTau9`
+-   add the new genome `GCF_012559485.2`
+-   add the new genome `bosTau9`
+-   Switched T2T gene annotation from using `gencodeV35.bed` to `catLiftOffGenesV1.bed`
 
 ## 54.0.5
 
-- add the `ballc` track support
+-   add the `ballc` track support
 
 ## 54.0.4
 
