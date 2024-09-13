@@ -116,8 +116,13 @@ function reviseDuplicates(herderRefs, list, start, end) {
     const uniqueList = [];
     list.forEach((item) => {
         if (!hasItem(uniqueList, item) && start <= item.pos && end >= item.pos) {
-            item["chr"] = herderRefs[item["ref_id"]]["ref_name"];
-            uniqueList.push(item);
+            try {
+                item["chr"] = herderRefs[item["ref_id"]]["ref_name"];
+                uniqueList.push(item);
+            } catch (error) {
+                // Code to handle the error
+                // console.error('An error occurred:', error);
+            }
         }
     });
     uniqueList.sort((a, b) => a.pos - b.pos);
