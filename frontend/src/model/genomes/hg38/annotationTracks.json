@@ -353,6 +353,17 @@
                 "source": "UCSC Genome Browser",
                 "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsSusScr3/"
             }
+        },
+        {
+            "name": "hg38tocanFam3",
+            "label": "Query dog canFam3 to hg38 blastz",
+            "querygenome": "canFam3",
+            "filetype": "genomealign",
+            "url": "https://vizhub.wustl.edu/public/hg38/weaver/hg38-canFam3.gz",
+            "details": {
+                "source": "UCSC Genome Browser",
+                "download url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsCanFam3/"
+            }
         }
     ],
     "Mappability": [
