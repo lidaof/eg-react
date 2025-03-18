@@ -13,8 +13,27 @@
             "filetype": "geneAnnotation"
         },
         {
+            "name": "MANE_select_1.4",
+            "label": "MANE selection v1.4",
+            "filetype": "geneAnnotation"
+        },
+        {
             "name": "MANE_select_1.0",
             "label": "MANE selection v1.0",
+            "filetype": "geneAnnotation"
+        },
+        {
+            "name": "gencodeV47",
+            "label": "GENCODE V47 genes",
+            "options": {
+                "categoryColors": {
+                    "coding": "rgb(0,60,179)",
+                    "nonCoding": "rgb(0,128,0)",
+                    "pseudogene": "rgb(230,0,172)",
+                    "problem": "rgb(255,0,0)",
+                    "polyA": "rgb(0,0,51)"
+                }
+            },
             "filetype": "geneAnnotation"
         },
         {

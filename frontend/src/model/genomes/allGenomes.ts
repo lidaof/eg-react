@@ -40,6 +40,7 @@ import papAnu2 from "./papAnu2/papAnu2";
 import oryCun2 from "./oryCun2/oryCun2";
 import canFam2 from "./canFam2/canFam2";
 import canFam3 from "./canFam3/canFam3";
+import canFam6 from "./canFam6/canFam6";
 import monDom5 from "./monDom5/monDom5";
 import calJac3 from "./calJac3/calJac3";
 import calJac4 from "./calJac4/calJac4";
@@ -100,6 +101,7 @@ export const allGenomes = [
     nomLeu3,
     papAnu2,
     oryCun2,
+    canFam6,
     canFam3,
     canFam2,
     monDom5,
@@ -143,12 +145,12 @@ interface SpeciesConfig {
 
 export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     human: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Human.png",
-        assemblies: [HG19.genome.getName(), HG38.genome.getName(), CHM13v1_1.genome.getName(), CHMV2.genome.getName()],
+        logoUrl: "https://epigenomegateway.wustl.edu/browser2022/images/Human.png",
+        assemblies: [HG38.genome.getName(), HG19.genome.getName(), CHMV2.genome.getName(), CHM13v1_1.genome.getName() ],
         color: "white",
     },
     chimp: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chimp.png",
+        logoUrl: "https://epigenomegateway.wustl.edu/browser2022/images/Chimp.png",
         assemblies: [PANTRO6.genome.getName(), PANTRO5.genome.getName(), panTro4.genome.getName()],
         color: "white",
     },
@@ -209,16 +211,16 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
     },
     dog: {
         logoUrl: "https://vizhub.wustl.edu/public/canFam3/dog.png",
-        assemblies: [canFam3.genome.getName(), canFam2.genome.getName()],
+        assemblies: [canFam6.genome.getName(), canFam3.genome.getName(), canFam2.genome.getName()],
         color: "yellow",
     },
     mouse: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Mouse.png",
+        logoUrl: "https://epigenomegateway.wustl.edu/browser2022/images/Mouse.png",
         assemblies: [MM39.genome.getName(), MM10.genome.getName(), MM9.genome.getName()],
         color: "yellow",
     },
     rat: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Rat.png",
+        logoUrl: "https://epigenomegateway.wustl.edu/browser2022/images/Rat.png",
         assemblies: [RN7.genome.getName(), RN6.genome.getName(), RN5.genome.getName(), rn4.genome.getName()],
         color: "white",
     },
@@ -228,7 +230,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         color: "white",
     },
     chicken: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Chicken.png",
+        logoUrl: "https://epigenomegateway.wustl.edu/browser2022/images/Chicken.png",
         assemblies: [
             GRCg7w.genome.getName(),
             GRCg7b.genome.getName(),
@@ -243,7 +245,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         color: "white",
     },
     zebrafish: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Zebrafish.png",
+        logoUrl: "https://epigenomegateway.wustl.edu/browser2022/images/Zebrafish.png",
         assemblies: [DAN_RER11.genome.getName(), DAN_RER10.genome.getName(), DAN_RER7.genome.getName()],
         color: "yellow",
     },
@@ -268,7 +270,7 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         color: "black",
     },
     arabidopsis: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Arabidopsis.png",
+        logoUrl: "https://epigenomegateway.wustl.edu/browser2022/images/Arabidopsis.png",
         assemblies: [AraTha1.genome.getName()],
         color: "yellow",
     },
@@ -283,12 +285,12 @@ export const treeOfLife: { [speciesName: string]: SpeciesConfig } = {
         color: "white",
     },
     yeast: {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Yeast.png",
+        logoUrl: "https://epigenomegateway.wustl.edu/browser2022/images/Yeast.png",
         assemblies: [SACCER3.genome.getName()],
         color: "black",
     },
     "P. falciparum": {
-        logoUrl: "https://epigenomegateway.wustl.edu/browser/images/Pfalciparum.png",
+        logoUrl: "https://epigenomegateway.wustl.edu/browser2022/images/Pfalciparum.png",
         assemblies: [Pfal3D7.genome.getName()],
         color: "black",
     },

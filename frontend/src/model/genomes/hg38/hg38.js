@@ -46,13 +46,13 @@ const defaultTracks = [
     }),
     new TrackModel({
         type: "geneAnnotation",
-        name: "gencodeV39",
+        name: "gencodeV47",
         genome: "hg38",
     }),
     new TrackModel({
         type: "geneAnnotation",
-        name: "MANE_select_1.0",
-        label: "MANE selection v1.0",
+        name: "MANE_select_1.4",
+        label: "MANE selection v1.4",
         genome: "hg38",
     }),
     new TrackModel({

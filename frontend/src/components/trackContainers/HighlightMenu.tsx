@@ -96,7 +96,7 @@ export class HighlightMenu extends React.Component<HighlightMenuProps> {
         }) : (
             <div style={{ display: 'grid', placeItems: 'center', height: "32vh", marginTop: 100, color: '#3c4043' }}>
                 <img
-                    src="https://epigenomegateway.wustl.edu/browser/favicon-144.png"
+                    src="https://epigenomegateway.wustl.edu/browser2022/favicon-144.png"
                     alt="Browser Icon"
                     style={{ height: 125, width: "auto", marginLeft: 20, marginRight: 20 }}
                 />

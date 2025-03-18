@@ -8,7 +8,7 @@ import EmbeddedContainerUI from "./components/EmbeddedContainerUI";
 // import VirusGateway from "./components/VirusGateway";
 
 const AppRouter = () => (
-    <BrowserRouter basename="/browser">
+    <BrowserRouter basename="/browser2022">
         <React.Fragment>
             <Switch>
                 <Route path="/" component={AppLayout} exact={true} />
