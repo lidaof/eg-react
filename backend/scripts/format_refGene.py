@@ -1,7 +1,7 @@
 # this script formats raw refgene data from UCSC so mongoimport can read it.
 
 desc = {}
-with open('kgXref.hg19.txt') as fin:
+with open('kgXref.txt') as fin:
     # "kgID,mRNA,spID,spDisplayID,geneSymbol,refseq,protAcc,description,rfamAcc,tRnaName",
     for line in fin:
         t = line.strip().split('\t')

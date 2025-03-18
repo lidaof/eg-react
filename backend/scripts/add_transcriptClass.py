@@ -6,12 +6,12 @@ import sys
 
 def main():
     d = {} # key: transcription id, value: transcriptClass
-    with open('wgEncodeGencodeAttrsVM25.txt') as fin:
+    with open('wgEncodeGencodeAttrsV47lift37.txt') as fin:
         for line in fin:
             t = line.strip().split('\t')
             d[t[4]] = t[12]
-    with open('wgEncodeGencodeCompVM25.txt',"rU") as infile:
-        with open('wgEncodeGencodeCompVM25.with_transcriptClass.txt','w') as outfile:
+    with open('wgEncodeGencodeCompV47lift37.txt',"r") as infile:
+        with open('wgEncodeGencodeCompV47lift37.with_transcriptClass.txt','w') as outfile:
             for line in infile:
                 line = line.strip()
                 t = line.split('\t')

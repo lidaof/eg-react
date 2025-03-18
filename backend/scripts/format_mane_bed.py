@@ -10,7 +10,9 @@ with open('kgXref.txt') as fin:
         t = line.strip().split('\t')
         desc[t[0]] = t[7]
 
-with open('MANE.GRCh38.v1.0.refseq.bed')  as fin, open('mane_select_v1.0.hg38.refbed','w') as fout:
+# with open('MANE.GRCh38.v1.0.refseq.bed')  as fin, open('mane_select_v1.0.hg38.refbed','w') as fout:
+# get mane.bb from ucsc
+with open('mane.bed')  as fin, open('mane_select_v1.4.hg38.refbed','w') as fout:
     for line in fin:
         t = line.strip().split('\t')
         chrom = t[0]
@@ -21,18 +23,18 @@ with open('MANE.GRCh38.v1.0.refseq.bed')  as fin, open('mane_select_v1.0.hg38.re
         cend = t[7]
         symbol = t[18]
         gtype = t[19]
-        if t[-4] in desc:
-            description = desc[t[-4]]
+        if t[3] in desc:
+            description = desc[t[3]]
         else:
             description = ''
         details = {}
         details['description'] = description
-        details['NCBI id'] = t[3]
-        details['NCBI gene'] = t[17]
-        details['NCBI protein'] = t[-5]
-        details['Ensembl id'] = t[-4]
-        details['Ensembl gene'] = t[-3]
-        details['Ensembl protein'] = t[-2]
+        details['NCBI id'] = t[-4]
+        details['NCBI gene'] = t[-3]
+        details['NCBI protein'] = t[-2]
+        details['Ensembl id'] = t[3]
+        details['Ensembl gene'] = t[17]
+        details['Ensembl protein'] = t[-5]
         details['maneStat'] = t[-1]
         estarts = t[11].rstrip(',').split(',')
         estarts = [int(x) for x in estarts]
