@@ -90,7 +90,7 @@
         "enzyme": "^3.11.0",
         "enzyme-adapter-react-16": "^1.15.2",
         "eslint-plugin-prettier": "^3.1.4",
-        "firebase": "^7.15.4",
+        "firebase": "^10.9.0",
         "flexlayout-react": "^0.3.11",
         "fuse.js": "^3.6.1",
         "g3djs": "^2.0.1",
